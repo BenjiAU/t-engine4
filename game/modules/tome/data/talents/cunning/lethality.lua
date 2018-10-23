@@ -142,7 +142,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Become a whirling storm of blades, increasing attack speed by %d%% and causing melee attacks to strike an additional adjacent target other than your primary target for %d%% weapon damage. 
-This talent is exhausting to use, draining 6 stamina each turn.]]):format(t.getSpeed(self, t)*100, t.getDamage(self,t)*100)
+This talent is exhausting to use, draining 4 stamina each turn.]]):format(t.getSpeed(self, t)*100, t.getDamage(self,t)*100)
 	end,
 }
 

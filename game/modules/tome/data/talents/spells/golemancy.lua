@@ -68,8 +68,8 @@ function makeAlchemistGolem(self)
 		},
 
 		resolvers.equip{ id=true,
-			{type="weapon", subtype="battleaxe", autoreq=true, id=true, ego_chance=-1000},
-			{type="armor", subtype="heavy", autoreq=true, id=true, ego_chance=-1000}
+			{type="weapon", subtype="battleaxe", autoreq=true, id=true, ego_chance=-1000, not_properties = {"unique"}},
+			{type="armor", subtype="heavy", autoreq=true, id=true, ego_chance=-1000, not_properties = {"unique"}}
 		},
 
 		talents_types = {

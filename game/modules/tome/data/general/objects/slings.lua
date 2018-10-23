@@ -27,7 +27,7 @@ newEntity{
 	moddable_tile = resolvers.moddable_tile("sling"),
 	encumber = 4,
 	rarity = 7,
-	combat = { talented = "sling", accuracy_effect = "mace", sound = "actions/sling", sound_miss = "actions/sling", },
+	combat = { talented = "sling", accuracy_effect = "mace", physspeed=1, sound = "actions/sling", sound_miss = "actions/sling", },
 	archery_kind = "sling",
 	archery = "sling",
 	require = { talent = { Talents.T_SHOOT }, },

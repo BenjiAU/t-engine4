@@ -1141,7 +1141,7 @@ newEntity{ base="BASE_NPC_HORROR", define_as = "ANIMATED_BLADE",
 
 	negative_status_effect_immune = 1,
 	body = { INVEN = 10, MAINHAND=1 },
-	
+	no_drops = true,
 	resolvers.equip{
 		{type="weapon", subtype="longsword", ego_chance = 100, autoreq=true},
 	},

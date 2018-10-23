@@ -460,7 +460,7 @@ newTalent{
 			disarm_immune = 1,
 			never_move = 1,
 			--no_drops = true, -- remove to drop the weapon
-
+			exp_worth = 0,
 			resolvers.talents{
 				[Talents.T_WEAPON_COMBAT]={base=1, every=10},
 				[Talents.T_WEAPONS_MASTERY]={base=1, every=10},
@@ -478,7 +478,8 @@ newTalent{
 			summon_time = t.getDuration(self, t),
 			summon_quiet = true,
 			on_die = function(self, who)
-				game.logSeen({x=self.x, y=self.y}, "#F53CBE#%s drops to the ground.", self.name:capitalize())
+				-- Add weapon to inventory
+				self.summoner:addObject(self.summoner.INVEN_INVEN, self.cursed_item )
 			end,
 		}
 
@@ -509,8 +510,8 @@ newTalent{
 		result = sentry:wearObject(o, true, false)
 		o.power = charges
 		if not result then
-			game.logPlayer(self, "Your animated sentry struggles for a moment and then drops to the ground inexplicably.")
-			game.level.map:addObject(x, y, o)
+			game.logPlayer(self, "Your animated sentry struggles for a moment and then returns to your inventory inexplicably.")
+			self.summoner:addObject(self.summoner.INVEN_INVEN, self.cursed_item )
 			return nil
 		end
 		local qo = nil
@@ -561,6 +562,7 @@ newTalent{
 		sentry.unused_generics = 0
 		sentry.unused_talents_types = 0
 		sentry.no_points_on_levelup = true
+		sentry.cursed_item = o
 		if game.party:hasMember(self) then
 			sentry.remove_from_party_on_death = true
 			game.party:addMember(sentry, { control="no", type="summon", title="Summon"})
