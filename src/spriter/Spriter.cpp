@@ -295,9 +295,9 @@ void DORSpriter::removeCharacterMap(const char *name) {
 	for (auto it : instances) it->removeCharacterMap(name);
 }
 
-vec2 DORSpriter::getObjectPosition(const char *name) {
-	if (!instances.size()) return {0, 0};
-	UniversalObjectInterface *so = instances[0]->getObjectInstance(name);
+vec2 DORSpriter::getObjectPosition(const char *name, uint8_t i_idx) {
+	if (instances.size() <= i_idx) return {0, 0};
+	UniversalObjectInterface *so = instances[i_idx]->getObjectInstance(name);
 	if (so) {
 		float x = so->getPosition().x * scale_x, y = so->getPosition().y * scale_y;
 		float c = cos(rot_z);

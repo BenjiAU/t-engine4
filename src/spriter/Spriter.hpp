@@ -179,7 +179,7 @@ public:
 	void applyCharacterMap(const char *name);
 	void removeCharacterMap(const char *name);
 
-	vec2 getObjectPosition(const char *name);
+	vec2 getObjectPosition(const char *name, uint8_t i_idx = 0);
 
 	void setShader(shader_type *s) { shader = s; };
 	virtual void render(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);

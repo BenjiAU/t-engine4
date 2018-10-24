@@ -1449,7 +1449,7 @@ static int gl_spriter_shader(lua_State *L)
 static int gl_spriter_get_object_position(lua_State *L)
 {
 	DORSpriter *v = userdata_to_DO<DORSpriter>(L, 1, "gl{spriter}");
-	vec2 pos = v->getObjectPosition(lua_tostring(L, 2));
+	vec2 pos = v->getObjectPosition(lua_tostring(L, 2), lua_tonumber(L, 3));
 	lua_pushnumber(L, pos.x);
 	lua_pushnumber(L, pos.y);
 	return 2;
