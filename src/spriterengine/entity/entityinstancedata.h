@@ -88,6 +88,7 @@ namespace SpriterEngine
 
 		AnimationInstance *getAnimation(int animationIndex);
 		AnimationInstance *getAnimation(const std::string &animationName);
+		bool hasAnimation(const std::string &animationName);
 
 		void playSoundTriggers();
 		void playEventTriggers();

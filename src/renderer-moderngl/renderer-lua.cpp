@@ -1412,7 +1412,8 @@ static int gl_spriter_new(lua_State *L)
 
 	*v = t = new DORSpriter();
 	setWeakSelfRef(L, -1, t);
-	t->load(file, name);
+	t->loadModel(file);
+	t->loadEntity(name);
 	return 1;
 }
 
@@ -1421,6 +1422,14 @@ static int gl_spriter_free(lua_State *L)
 	DORSpriter *v = userdata_to_DO<DORSpriter>(L, 1, "gl{spriter}");
 	delete(v);
 	lua_pushnumber(L, 1);
+	return 1;
+}
+
+static int gl_spriter_load_entity(lua_State *L)
+{
+	DORSpriter *v = userdata_to_DO<DORSpriter>(L, 1, "gl{spriter}");
+	v->loadEntity(luaL_checkstring(L, 2));
+	lua_pushvalue(L, 1);
 	return 1;
 }
 
@@ -2025,6 +2034,7 @@ static const struct luaL_Reg gl_spriter_reg[] =
 	{"__gc", gl_spriter_free},
 	{"triggerCallback", gl_spriter_trigger_callback},
 	{"characterMap", gl_spriter_character_map},
+	{"loadEntity", gl_spriter_load_entity},
 	{"setAnim", gl_spriter_set_anim},
 	{"getObjectPosition", gl_spriter_get_object_position},
 	{"getKind", gl_generic_getkind},

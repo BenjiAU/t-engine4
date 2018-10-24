@@ -261,8 +261,8 @@ DORSpriter::DORSpriter() {
 	scml = "";
 }
 DORSpriter::~DORSpriter() {
+	for (EntityInstance *it : instances) delete it;
 	if (spritermodel) DORSpriterCache::releaseModel(spritermodel);
-	if (instance) delete instance;
 }
 
 void DORSpriter::cloneInto(DisplayObject* _into) {
@@ -276,23 +276,28 @@ void DORSpriter::setTriggerCallback(int ref) {
 	trigger_cb_lua_ref = ref;
 }
 
-void DORSpriter::load(const char *file, const char *name) {
+void DORSpriter::loadModel(const char *file) {
 	currently_processing = this;
 	scml = file;
 	spritermodel = DORSpriterCache::getModel(file);
-	instance = spritermodel->getNewEntityInstance(name);
+}
+
+void DORSpriter::loadEntity(const char *name) {
+	if (!spritermodel) return;
+	instances.push_back(spritermodel->getNewEntityInstance(name));
 }
 
 void DORSpriter::applyCharacterMap(const char *name) {
-	instance->applyCharacterMap(name);
+	for (auto it : instances) it->applyCharacterMap(name);
 }
 
 void DORSpriter::removeCharacterMap(const char *name) {
-	instance->removeCharacterMap(name);
+	for (auto it : instances) it->removeCharacterMap(name);
 }
 
 vec2 DORSpriter::getObjectPosition(const char *name) {
-	UniversalObjectInterface *so = instance->getObjectInstance(name);
+	if (!instances.size()) return {0, 0};
+	UniversalObjectInterface *so = instances[0]->getObjectInstance(name);
 	if (so) {
 		float x = so->getPosition().x * scale_x, y = so->getPosition().y * scale_y;
 		float c = cos(rot_z);
@@ -305,43 +310,50 @@ vec2 DORSpriter::getObjectPosition(const char *name) {
 }
 
 void DORSpriter::startAnim(const char *name, float blendtime, float speed) {
-	if (!instance) return;
+	if (!instances.size()) return;
 	currently_processing = this;
-	if (speed) instance->setPlaybackSpeedRatio(speed);
-	else instance->setPlaybackSpeedRatio(1);
-	if (blendtime) instance->setCurrentAnimation(name, blendtime * 1000.0);
-	else instance->setCurrentAnimation(name);
+	for (auto it : instances) {
+		if (speed) it->setPlaybackSpeedRatio(speed);
+		else it->setPlaybackSpeedRatio(1);
+		if (it->hasAnimation(name)) {
+			if (blendtime) it->setCurrentAnimation(name, blendtime * 1000.0);
+			else it->setCurrentAnimation(name);
+		}
+	}
 }
 
 void DORSpriter::onKeyframe(float nb_keyframe) {
-	if (!instance) return;
+	if (!instances.size()) return;
 	currently_processing = this;
-	instance->setTimeElapsed(1000.0 * nb_keyframe / KEYFRAMES_PER_SEC);
-	setChanged();
+	for (auto it : instances) {
+		it->setTimeElapsed(1000.0 * nb_keyframe / KEYFRAMES_PER_SEC);
+		setChanged();
 
-	if (instance->animationJustFinished(true) && trigger_cb_lua_ref != LUA_NOREF) {
-		lua_rawgeti(L, LUA_REGISTRYINDEX, DisplayObject::weak_registry_ref);
-		lua_rawgeti(L, LUA_REGISTRYINDEX, trigger_cb_lua_ref);
-		lua_rawgeti(L, -2, getWeakSelfRef());
-		lua_pushliteral(L, "animStop");
-		lua_pushstring(L, instance->currentAnimationName().c_str());
-		if (lua_pcall(L, 3, 0, 0))
-		{
-			printf("DORSpriter trigger callback keyframe error: %s\n", lua_tostring(L, -1));
-			lua_pop(L, 1);
+		if (it->animationJustFinished(true) && trigger_cb_lua_ref != LUA_NOREF) {
+			lua_rawgeti(L, LUA_REGISTRYINDEX, DisplayObject::weak_registry_ref);
+			lua_rawgeti(L, LUA_REGISTRYINDEX, trigger_cb_lua_ref);
+			lua_rawgeti(L, -2, getWeakSelfRef());
+			lua_pushliteral(L, "animStop");
+			lua_pushstring(L, it->currentAnimationName().c_str());
+			if (lua_pcall(L, 3, 0, 0))
+			{
+				printf("DORSpriter trigger callback keyframe error: %s\n", lua_tostring(L, -1));
+				lua_pop(L, 1);
+			}
+			lua_pop(L, 1); // weak registery
 		}
-		lua_pop(L, 1); // weak registery
 	}
 }
 
 void DORSpriter::render(RendererGL *container, mat4& cur_model, vec4& cur_color, bool cur_visible) {
-	if (!visible || !cur_visible || !instance) return;
+	if (!instances.size()) return;
+	if (!visible || !cur_visible) return;
 	currently_processing = this;
 	render_z = false;
 	render_model = cur_model * model;
 	render_color = cur_color * color;
 	render_container = container;
-	instance->render();
+	for (auto it : instances) it->render();
 	resetChanged();
 }
 

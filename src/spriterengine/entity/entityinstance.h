@@ -112,6 +112,8 @@ namespace SpriterEngine
 		void setCurrentTime(real newCurrentTime);
 		void setTimeRatio(real newCurrentTimeRatio) override;
 
+		bool hasAnimation(const std::string &animationName);
+		
 		void setPlaybackSpeedRatio(real newPlaybackSpeedRatio);
 
 		void setCurrentTimeToPreviousKeyFrame();

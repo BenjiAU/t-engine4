@@ -508,6 +508,10 @@ namespace SpriterEngine
 		}
 	}
 
+	bool EntityInstance::hasAnimation(const std::string &animationName) {
+		return currentEntity->hasAnimation(animationName);
+	}
+
 	void EntityInstance::setCurrentAnimation(int newAnimationIndex)
 	{
 		currentEntity->setCurrentAnimation(newAnimationIndex, &currentAnimation);

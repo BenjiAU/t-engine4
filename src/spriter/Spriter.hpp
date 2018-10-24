@@ -23,6 +23,8 @@
 
 #include <string.h>
 
+#include <vector>
+
 #include "renderer-moderngl/Renderer.hpp"
 #include "spriterengine/spriterengine.h"
 #include "spriter/tinyxmlspriterfiledocumentwrapper.h"
@@ -146,7 +148,7 @@ private:
 
 protected:
 	SpriterModel *spritermodel = NULL;
-	EntityInstance *instance = NULL;
+	vector<EntityInstance*> instances;
 
 	shader_type *shader;
 	string scml;
@@ -169,7 +171,8 @@ public:
 
 	void setTriggerCallback(int ref);
 
-	void load(const char *file, const char *name);
+	void loadModel(const char *file);
+	void loadEntity(const char *name);
 	void startAnim(const char *name, float blendtime=0, float speed=1);
 
 
