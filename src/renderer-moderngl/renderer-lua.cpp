@@ -390,6 +390,14 @@ int gl_generic_reset_matrix(lua_State *L)
 	return 1;
 }
 
+int gl_generic_sort_center(lua_State *L)
+{
+	DisplayObject *c = userdata_to_DO(L, 1);
+	c->sortCenter(lua_tonumber(L, 2), lua_tonumber(L, 3), lua_tonumber(L, 4));
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
 int gl_generic_shown(lua_State *L)
 {
 	DisplayObject *c = userdata_to_DO(L, 1);
@@ -459,6 +467,39 @@ static int gl_renderer_linemode(lua_State *L)
 	return 1;
 }
 
+static int gl_renderer_sort(lua_State *L)
+{
+	RendererGL *r = userdata_to_DO<RendererGL>(L, 1, "gl{renderer}");
+	if (lua_isstring(L, 2) && lua_isstring(L, 3)) {
+		SortMode mode = SortMode::NO_SORT;
+		const char *ms = lua_tostring(L, 2);
+		if (!strcmp(ms, "no")) mode = SortMode::NO_SORT;
+		else if (!strcmp(ms, "fast")) mode = SortMode::FAST;
+		else if (!strcmp(ms, "full")) mode = SortMode::FULL;
+		else if (!strcmp(ms, "gl")) mode = SortMode::GL;
+		else {
+			lua_pushstring(L, "Parameter to zSort() must be either true/falase or no/fast/full/gl");
+			lua_error(L);
+		}		
+
+		SortAxis axis = SortAxis::Z;
+		const char *ma = lua_tostring(L, 3);
+		if (!strcmp(ma, "x")) axis = SortAxis::X;
+		else if (!strcmp(ma, "y")) axis = SortAxis::Y;
+		else if (!strcmp(ma, "z")) axis = SortAxis::Z;
+		else {
+			lua_pushstring(L, "Parameter to sort() must be no/fast/full/gl and x/y/z");
+			lua_error(L);
+		}		
+
+		r->enableSorting(mode, axis);
+	} else {
+		r->enableSorting(SortMode::NO_SORT);
+	}
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
 static int gl_renderer_zsort(lua_State *L)
 {
 	RendererGL *r = userdata_to_DO<RendererGL>(L, 1, "gl{renderer}");
@@ -473,9 +514,9 @@ static int gl_renderer_zsort(lua_State *L)
 			lua_pushstring(L, "Parameter to zSort() must be either true/falase or no/fast/full/gl");
 			lua_error(L);
 		}		
-		r->zSorting(mode);
+		r->enableSorting(mode, SortAxis::Z);
 	} else {
-		r->zSorting(lua_toboolean(L, 2) ? SortMode::FAST : SortMode::NO_SORT);
+		r->enableSorting(lua_toboolean(L, 2) ? SortMode::FAST : SortMode::NO_SORT, SortAxis::Z);
 	}
 	lua_pushvalue(L, 1);
 	return 1;
@@ -1896,6 +1937,7 @@ static int physic_world_get_count(lua_State *L) {
 static const struct luaL_Reg gl_renderer_reg[] =
 {
 	{"__gc", gl_renderer_free},
+	{"sort", gl_renderer_sort},
 	{"zSort", gl_renderer_zsort},
 	{"view", gl_renderer_view},
 	{"lineMode", gl_renderer_linemode},
@@ -2034,30 +2076,11 @@ static const struct luaL_Reg gl_spriter_reg[] =
 	{"__gc", gl_spriter_free},
 	{"triggerCallback", gl_spriter_trigger_callback},
 	{"characterMap", gl_spriter_character_map},
+	{"shader", gl_spriter_shader},
 	{"loadEntity", gl_spriter_load_entity},
 	{"setAnim", gl_spriter_set_anim},
 	{"getObjectPosition", gl_spriter_get_object_position},
-	{"getKind", gl_generic_getkind},
-	{"getColor", gl_generic_color_get},
-	{"getTranslate", gl_generic_translate_get},
-	{"getRotate", gl_generic_rotate_get},
-	{"getScale", gl_generic_scale_get},
-	{"getShown", gl_generic_shown_get},
-	{"shown", gl_generic_shown},
-	{"shader", gl_spriter_shader},
-	{"color", gl_generic_color},
-	{"resetMatrix", gl_generic_reset_matrix},
-	{"physicCreate", gl_generic_physic_create},
-	{"physicDestroy", gl_generic_physic_destroy},
-	{"physic", gl_generic_get_physic},
-	{"rawtween", gl_generic_tween},
-	{"rawcancelTween", gl_generic_cancel_tween},
-	{"rawhasTween", gl_generic_has_tween},
-	{"translate", gl_generic_translate},
-	{"rotate", gl_generic_rotate},
-	{"scale", gl_generic_scale},
-	{"clone", gl_generic_clone},
-	{"removeFromParent", gl_generic_remove_from_parent},
+	INJECT_GENERIC_DO_METHODS
 	{NULL, NULL},
 };
 

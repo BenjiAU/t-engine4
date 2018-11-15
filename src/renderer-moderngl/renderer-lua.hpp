@@ -41,6 +41,7 @@ extern int gl_generic_rotate(lua_State *L);
 extern int gl_generic_scale(lua_State *L);
 extern int gl_generic_reset_matrix(lua_State *L);
 extern int gl_generic_shown(lua_State *L);
+extern int gl_generic_sort_center(lua_State *L);
 extern int gl_generic_remove_from_parent(lua_State *L);
 
 #define INJECT_GENERIC_DO_METHODS \
@@ -62,6 +63,7 @@ extern int gl_generic_remove_from_parent(lua_State *L);
 	{"translate", gl_generic_translate}, \
 	{"rotate", gl_generic_rotate}, \
 	{"scale", gl_generic_scale}, \
+	{"sortCenter", gl_generic_sort_center}, \
 	{"clone", gl_generic_clone}, \
 	{"removeFromParent", gl_generic_remove_from_parent}, \
 

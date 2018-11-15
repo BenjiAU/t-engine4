@@ -148,14 +148,14 @@ void TE4SpriterImageFile::renderSprite(UniversalObjectInterface *spriteInfo) {
 	DORSpriter *spriter = DORSpriter::currently_processing;
 
 	if (!spriter->render_z) {
-		auto dl = getDisplayList(spriter->render_container, {texture->tex.tex, 0, 0}, spriter->shader, VERTEX_BASE, RenderKind::QUADS);
+		auto dl = getDisplayList(spriter->render_container, {texture->tex.tex, 0, 0}, spriter->shader, VERTEX_BASE + VERTEX_MAP_INFO, RenderKind::QUADS);
 
 		// Make the matrix corresponding to the shape
 		mat4 qm = mat4();
 		qm = glm::translate(qm, glm::vec3((float)spriteInfo->getPosition().x, (float)spriteInfo->getPosition().y, 0));
 		qm = glm::rotate(qm, (float)spriteInfo->getAngle(), glm::vec3(0, 0, 1));
 		qm = glm::scale(qm, glm::vec3((float)spriteInfo->getScale().x, (float)spriteInfo->getScale().y, 1));
-		qm = spriter->render_model * qm;
+		mat4 qmw = spriter->render_model * qm;
 
 		// Make the vertexes, un-rotated & unscaled
 		vec2 origin = {spriteInfo->getPivot().x * w - xoff, spriteInfo->getPivot().y * h - yoff};
@@ -181,16 +181,29 @@ void TE4SpriterImageFile::renderSprite(UniversalObjectInterface *spriteInfo) {
 		}
 
 		// Now apply the matrix on them
-		p1.pos = qm * p1.pos;
-		p2.pos = qm * p2.pos;
-		p3.pos = qm * p3.pos;
-		p4.pos = qm * p4.pos;
+		vec4 bp1 = qm * p1.pos;
+		vec4 bp2 = qm * p2.pos;
+		vec4 bp3 = qm * p3.pos;
+		vec4 bp4 = qm * p4.pos;
+		p1.pos = qmw * p1.pos;
+		p2.pos = qmw * p2.pos;
+		p3.pos = qmw * p3.pos;
+		p4.pos = qmw * p4.pos;
 
 		// And we're done!
 		dl->list.push_back(p1);
 		dl->list.push_back(p2);
 		dl->list.push_back(p3);
 		dl->list.push_back(p4);
+		dl->list_map_info.push_back({{0, 0, 0, 0}, {bp1.x, bp1.y, 1, 1}});
+		dl->list_map_info.push_back({{0, 0, 0, 0}, {bp2.x, bp2.y, 1, 1}});
+		dl->list_map_info.push_back({{0, 0, 0, 0}, {bp3.x, bp3.y, 1, 1}});
+		dl->list_map_info.push_back({{0, 0, 0, 0}, {bp4.x, bp4.y, 1, 1}});
+		// printf("--------\n");
+		// printf("== %fx%f\n", bp1.x, bp1.y);
+		// printf("== %fx%f\n", bp2.x, bp2.y);
+		// printf("== %fx%f\n", bp3.x, bp3.y);
+		// printf("== %fx%f\n", bp4.x, bp4.y);
 	} else {
 		// // Make the matrix corresponding to the shape
 		// mat4 qm = mat4();
@@ -368,12 +381,12 @@ void DORSpriter::render(RendererGL *container, mat4& cur_model, vec4& cur_color,
 // 	resetChanged();
 // }
 
-void DORSpriter::sortZ(RendererGL *container, mat4& cur_model) {
+void DORSpriter::sortCoords(RendererGL *container, mat4& cur_model) {
 	mat4 vmodel = cur_model * model;
 
 	// We take a "virtual" point at 0 coordinates
-	vec4 virtualz = vmodel * vec4(0, 0, 0, 1);
-	sort_z = virtualz.z;
+	sort_coords = vmodel * sort_center;
+	// printf(" * %f x %f!\n", sort_coords.x, sort_coords.y);
 	sort_shader = shader;
 	sort_tex = {99999,0,0}; // DGDGDGDG UGH we need a wayto find the actual texture
 	container->sorted_dos.push_back(this);

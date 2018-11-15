@@ -147,13 +147,36 @@ void RendererGL::setShader(shader_type *s, int lua_ref) {
 // 	}
 // }
 
-static bool sort_dos(DORFlatSortable *i, DORFlatSortable *j) {
-	if (i->sort_z == j->sort_z) {
+static bool sort_dos_x(DORFlatSortable *i, DORFlatSortable *j) {
+	if (i->sort_coords.x == j->sort_coords.x) {
 		if (i->sort_shader == j->sort_shader) return i->sort_tex < j->sort_tex;
 		else return i->sort_shader < j->sort_shader;
 	} else {
-		return i->sort_z < j->sort_z;
+		return i->sort_coords.x < j->sort_coords.x;
 	}
+}
+static bool sort_dos_y(DORFlatSortable *i, DORFlatSortable *j) {
+	if (i->sort_coords.y == j->sort_coords.y) {
+		if (i->sort_shader == j->sort_shader) return i->sort_tex < j->sort_tex;
+		else return i->sort_shader < j->sort_shader;
+	} else {
+		return i->sort_coords.y < j->sort_coords.y;
+	}
+}
+static bool sort_dos_z(DORFlatSortable *i, DORFlatSortable *j) {
+	if (i->sort_coords.z == j->sort_coords.z) {
+		if (i->sort_shader == j->sort_shader) return i->sort_tex < j->sort_tex;
+		else return i->sort_shader < j->sort_shader;
+	} else {
+		return i->sort_coords.z < j->sort_coords.z;
+	}
+}
+
+void RendererGL::enableSorting(SortMode mode, SortAxis axis) {
+	zsort = mode;
+	if (axis == SortAxis::X) sort_method = sort_dos_x;
+	else if (axis == SortAxis::Y) sort_method = sort_dos_y;
+	else sort_method = sort_dos_z;
 }
 
 void RendererGL::sortedToDL() {
@@ -218,20 +241,23 @@ void RendererGL::update() {
 				sorted_dos.clear();
 
 				// First we iterate over the DOs tree to "flatten" in
+				// printf("---- srt!\n");
 				for (auto it = dos.begin() ; it != dos.end(); ++it) {
 					DisplayObject *i = dynamic_cast<DisplayObject*>(*it);
-					if (i) i->sortZ(this, cur_model);
+					if (i) {
+						i->sortCoords(this, cur_model);
+					}
 				}
 
 				// Now we sort the flattened tree. This is awy faster than the full sort mode because here we sort DOs instead of vertices
 				// Also since we are not sorting vertices we likely dont need to use a stable sort -- DGDGDGDG: don't we ?
-				sort(sorted_dos.begin(), sorted_dos.end(), sort_dos);
+				sort(sorted_dos.begin(), sorted_dos.end(), sort_method);
 			}
 
 			// And now we can iterate the sorted flattened tree and render as a normal no sort render
 			// printf("FST redraw\n");
 			for (auto it = sorted_dos.begin() ; it != sorted_dos.end(); ++it) {
-				DORFlatSortable *i = dynamic_cast<DORFlatSortable*>(*it);
+				DisplayObject *i = dynamic_cast<DisplayObject*>(*it);
 				if (i && i->parent) {
 					recomputematrix cur = i->parent->computeParentCompositeMatrix(this, {cur_model, color, true});
 					i->render(this, cur.model, cur.color, cur.visible);
@@ -337,7 +363,9 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	}
 
 	cur_model = cur_model * model; // This is .. undeeded ..??
-	View *use_view = view ? view : View::getCurrent();
+	// View *use_view = view ? view : View::getCurrent();
+	if (view) view->use(true);
+	View *use_view = View::getCurrent();
 	mat4 mvp = use_view->get() * cur_model;
 	cur_color = cur_color * color;
 
@@ -475,6 +503,8 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	if (zsort == SortMode::GL) glDisable(GL_DEPTH_TEST);
 	if (!allow_blending) glEnable(GL_BLEND);
 	if (premultiplied_alpha) glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+	if (view) view->use(false);
 
 	if (cutting) {
 		glDisable(GL_SCISSOR_TEST);

@@ -113,10 +113,23 @@ public:
 };
 
 extern int donb;
+
+enum class SortAxis { NONE, X, Y, Z }; 
+
+/****************************************************************************
+ ** All childs of that can be sorted in fast mode by RendererGl
+ ****************************************************************************/
+class DORFlatSortable {
+public:
+	shader_type *sort_shader;
+	array<GLuint, DO_MAX_TEX> sort_tex;
+	vec4 sort_coords;
+};
+
 /****************************************************************************
  ** Generic display object
  ****************************************************************************/
-class DisplayObject {
+class DisplayObject : public DORFlatSortable {
 	friend class DORPhysic;
 	friend class DORTweener;
 	friend class View;
@@ -130,6 +143,9 @@ protected:
 	// lua_State *L = NULL;
 	mat4 model;
 	vec4 color;
+	vec4 sort_center = vec4(0, 0, 0, 1);
+	bool sort_center_set = false;
+	SortAxis sort_axis = SortAxis::Y;
 	bool visible = true;
 	float x = 0, y = 0, z = 0;
 	float rot_x = 0, rot_y = 0, rot_z = 0;
@@ -181,6 +197,7 @@ public:
 	void rotate(float x, float y, float z, bool increment);
 	void scale(float x, float y, float z, bool increment);
 	void shown(bool v);
+	void sortCenter(float x, float y, float z);
 
 	bool hasTween(TweenSlot slot);
 	void tween(TweenSlot slot, easing_ptr easing, float from, float to, float time, int on_end_ref, int on_change_ref);
@@ -191,23 +208,13 @@ public:
 
 	virtual void render(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible) = 0;
 	// virtual void renderZ(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible) = 0;
-	virtual void sortZ(RendererGL *container, mat4& cur_model) = 0;
-};
-
-/****************************************************************************
- ** All childs of that can be sorted in fast mode by RendererGl
- ****************************************************************************/
-class DORFlatSortable : public DisplayObject {
-public:
-	shader_type *sort_shader;
-	array<GLuint, DO_MAX_TEX> sort_tex;
-	float sort_z;
+	virtual void sortCoords(RendererGL *container, mat4& cur_model);
 };
 
 /****************************************************************************
  ** DO that has a vertex list
  ****************************************************************************/
-class DORVertexes : public DORFlatSortable{
+class DORVertexes : public DisplayObject {
 	friend class DisplayObject;
 	friend class DORTweener;
 protected:
@@ -220,8 +227,6 @@ protected:
 	array<int, DO_MAX_TEX> tex_lua_ref{{ LUA_NOREF, LUA_NOREF, LUA_NOREF}};
 	array<GLuint, DO_MAX_TEX> tex{{0, 0, 0}};
 	int tex_max = 1;
-	bool is_zflat = true;
-	float zflat = 0;
 
 	array<GLint, 3> tween_uni{{0, 0, 0}};
 	array<GLfloat, 3> tween_uni_val{{0, 0, 0}};
@@ -283,8 +288,7 @@ public:
 	void getShaderUniformTween(const char *uniform, uint8_t pos, float default_val);
 
 	virtual void render(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
-	// virtual void renderZ(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
-	virtual void sortZ(RendererGL *container, mat4& cur_model);
+	virtual void sortCoords(RendererGL *container, mat4& cur_model);
 };
 
 /****************************************************************************
@@ -302,10 +306,9 @@ public:
 	virtual void containerClear();
 
 	virtual void containerRender(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
-	// virtual void containerRenderZ(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
-	virtual void containerSortZ(RendererGL *container, mat4& cur_model);
+	virtual void containerSortCoords(RendererGL *container, mat4& cur_model);
 };
-class DORContainer : public DORFlatSortable, public IContainer{
+class DORContainer : public DisplayObject, public IContainer{
 protected:
 	virtual void cloneInto(DisplayObject *into);
 public:
@@ -319,8 +322,7 @@ public:
 	virtual void clear();
 
 	virtual void render(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
-	// virtual void renderZ(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
-	virtual void sortZ(RendererGL *container, mat4& cur_model);
+	virtual void sortCoords(RendererGL *container, mat4& cur_model);
 };
 
 
@@ -344,8 +346,6 @@ public:
 	void setRendererName(char *name, bool copy);
 
 	virtual void render(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
-	// virtual void renderZ(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
-	virtual void sortZ(RendererGL *container, mat4& cur_model);
 
 	virtual void toScreenSimple();
 	virtual void toScreen(mat4 cur_model, vec4 color) = 0;

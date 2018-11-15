@@ -354,7 +354,7 @@ DisplayObject* MapObjectRenderer::clone() {
 	return into;
 }
 void MapObjectRenderer::cloneInto(DisplayObject *_into) {
-	DORFlatSortable::cloneInto(_into);
+	DisplayObject::cloneInto(_into);
 	MapObjectRenderer *into = dynamic_cast<MapObjectRenderer*>(_into);
 }
 
@@ -395,17 +395,6 @@ void MapObjectRenderer::render(RendererGL *container, mat4& cur_model, vec4& cur
 			dm = dm->next.get();
 		}
 	}
-}
-
-void MapObjectRenderer::sortZ(RendererGL *container, mat4& cur_model) {
-	mat4 vmodel = cur_model * model;
-
-	// We take a "virtual" point at zflat coordinates
-	vec4 virtualz = vmodel * vec4(0, 0, 0, 1);
-	sort_z = virtualz.z;
-	sort_shader = NULL;
-	sort_tex = {0,0,0};
-	container->sorted_dos.push_back(this);
 }
 
 /*************************************************************************

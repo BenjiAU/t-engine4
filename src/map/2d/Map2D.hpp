@@ -355,7 +355,7 @@ public:
 /****************************************************************************
  ** DO-inheriting direct renderer for MapObjects
  ****************************************************************************/
-class MapObjectRenderer : public DORFlatSortable, public MapObjectProcessor {
+class MapObjectRenderer : public DisplayObject, public MapObjectProcessor {
 private:
 	vector<tuple<sMapObject,int>> mos;
 	bool allow_cb = false;
@@ -375,8 +375,6 @@ public:
 	void removeMapObject(MapObject *mo);
 
 	virtual void render(RendererGL *container, mat4& cur_model, vec4& cur_color, bool cur_visible);
-	// virtual void renderZ(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
-	virtual void sortZ(RendererGL *container, mat4& cur_model);
 };
 
 void map2d_clean_particles();

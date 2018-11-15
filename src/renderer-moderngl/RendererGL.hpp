@@ -72,6 +72,8 @@ extern DisplayList* getDisplayList(RendererGL *container);
 // GL sort will turn on depth test and let OpenGL handle it. Transparency will bork
 enum class SortMode { NO_SORT, FAST, FULL, GL }; 
 
+using SortMethod = bool(DORFlatSortable *i, DORFlatSortable *j);
+
 class RendererGL : public SubRenderer {
 	friend class DORVertexes;
 protected:
@@ -82,6 +84,7 @@ protected:
 	GLuint *vbo_elements_data = NULL;
 	GLuint vbo_elements = 0;
 	int vbo_elements_nb = 0;
+	SortMethod *sort_method;
 	SortMode zsort = SortMode::NO_SORT;
 	vector<DisplayList*> displays;
 	bool recompute_fast_sort = true;
@@ -107,7 +110,7 @@ protected:
 	virtual void cloneInto(DisplayObject *into);
 
 public:
-	vector<DORFlatSortable*> sorted_dos;
+	vector<DisplayObject*> sorted_dos;
 	// vector<sortable_vertex> zvertices;
 
 	RendererGL(VBOMode mode);
@@ -126,8 +129,8 @@ public:
 	void countVertexes(bool count) { count_vertexes = count; };
 	void countDraws(bool count) { count_draws = count; };
 	void countTime(bool count) { count_time = count; };
-	void zSorting(bool sort) { zsort = sort ? SortMode::FAST : SortMode::NO_SORT; };
-	void zSorting(SortMode mode) { zsort = mode; };
+	void enableSorting(bool sort) { enableSorting(sort ? SortMode::FAST : SortMode::NO_SORT); };
+	void enableSorting(SortMode mode, SortAxis axis = SortAxis::Z);
 	void enableBlending(bool v) { allow_blending = v; };
 	void premultipliedAlpha(bool v) { premultiplied_alpha = v; };
 	void setLineMode(float size, bool smooth) { line_width = size; line_smooth = smooth; }

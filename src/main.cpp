@@ -1498,6 +1498,7 @@ int main(int argc, char *argv[])
 
 		while (TRUE) {
 			on_tick();
+			// DGDGDGDG make two game loops, one for realtime one for turnbased!
 
 			/* handle the events in the queue */
 			while (SDL_PollEvent(&event))

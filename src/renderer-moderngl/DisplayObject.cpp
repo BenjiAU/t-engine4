@@ -102,6 +102,14 @@ void DisplayObject::setChanged(bool force) {
 	}
 }
 
+static inline bool checkChangedAxis(float x, float y, float z, SortAxis axis) {
+	if (axis == SortAxis::NONE) return false;
+	if (z && axis == SortAxis::Z) return true;
+	else if (y && axis == SortAxis::Y) return true;
+	else if (x && axis == SortAxis::X) return true;
+	return false;
+}
+
 void DisplayObject::setSortingChanged() {
 	DisplayObject *p = parent;
 	while (p) {
@@ -217,13 +225,15 @@ void DORTweener::onKeyframe(float nb_keyframes) {
 			switch (slot) {
 				case TweenSlot::TX:
 					who->x = val; mat = true;
+					if (val && who->sort_axis == SortAxis::X) who->setSortingChanged();
 					break;
 				case TweenSlot::TY:
 					who->y = val; mat = true;
+					if (val && who->sort_axis == SortAxis::Y) who->setSortingChanged();
 					break;
 				case TweenSlot::TZ:
 					who->z = val; mat = true;
-					who->setSortingChanged();
+					if (val && who->sort_axis == SortAxis::Z) who->setSortingChanged();
 					break;
 				case TweenSlot::RX:
 					who->rot_x = val; mat = true;
@@ -393,9 +403,12 @@ void DisplayObject::cancelTween(TweenSlot slot) {
 void DisplayObject::translate(float x, float y, float z, bool increment) {
 	if (physics.size()) {
 		if (!increment) {
+			float oldx = this->x, oldy = this->y, oldz = this->z;
 			this->z = z;
 			for (auto physic : physics) physic->setPos(x, y);
-			if (z != this->z) setSortingChanged();
+			if (oldz != this->z && sort_axis == SortAxis::Z) setSortingChanged();
+			else if (oldy != this->y && sort_axis == SortAxis::Y) setSortingChanged();
+			else if (oldx != this->x && sort_axis == SortAxis::X) setSortingChanged();
 			recomputeModelMatrix();
 			return;
 		} else {
@@ -407,9 +420,11 @@ void DisplayObject::translate(float x, float y, float z, bool increment) {
 		this->x += x;
 		this->y += y;
 		this->z += z;
-		if (z) setSortingChanged();
+		if (checkChangedAxis(x, y, z, sort_axis)) setSortingChanged();
 	} else {
-		if (z != this->z) setSortingChanged();
+		if (z != this->z && sort_axis == SortAxis::Z) setSortingChanged();
+		else if (y != this->y && sort_axis == SortAxis::Y) setSortingChanged();
+		else if (x != this->x && sort_axis == SortAxis::X) setSortingChanged();
 		this->x = x;
 		this->y = y;
 		this->z = z;
@@ -453,6 +468,20 @@ void DisplayObject::scale(float x, float y, float z, bool increment) {
 		this->scale_z = z;
 	}
 	recomputeModelMatrix();
+}
+
+void DisplayObject::sortCenter(float x, float y, float z) {
+	sort_center_set = true;
+	sort_center = vec4(x, y, z, 1);
+}
+
+void DisplayObject::sortCoords(RendererGL *container, mat4& cur_model) {
+	mat4 vmodel = cur_model * model;
+
+	sort_coords = vmodel * sort_center;
+	sort_shader = nullptr;
+	sort_tex = {0, 0, 0};
+	container->sorted_dos.push_back(this);
 }
 
 void DisplayObject::cloneInto(DisplayObject *into) {
@@ -564,12 +593,10 @@ int DORVertexes::addQuad(
 	int size = vertices.size();
 	if (size + 4 >= vertices.capacity()) {vertices.reserve(vertices.capacity() * 2);}
 
-	// This really shouldnt happend from the lua side as we dont even expose the addQuad version with z positions
-	if ((z1 != z2) || (z1 != z3) || (z1 != z4) || (z3 != z4) || (size && (z1 != zflat))) {
-		// printf("Warning making non flat DORVertexes::addQuad!\n");
-		is_zflat = false;
+	if (!size && !sort_center_set) {
+		sort_center = vec4(x1, y1, z1 ,1);
+		sort_center_set = true;
 	}
-	if (!size) zflat = z1;
 
 	vertices.push_back({{x1, y1, z1, 1}, {u1, v1}, {r, g, b, a}});
 	vertices.push_back({{x2, y2, z2, 1}, {u2, v2}, {r, g, b, a}});
@@ -584,12 +611,10 @@ int DORVertexes::addQuad(vertex v1, vertex v2, vertex v3, vertex v4) {
 	int size = vertices.size();
 	if (size + 4 >= vertices.capacity()) {vertices.reserve(vertices.capacity() * 2);}
 
-	// This really shouldnt happend from the lua side as we dont even expose the addQuad version with z positions
-	if ((v1.pos.z != v2.pos.z) || (v1.pos.z != v3.pos.z) || (v1.pos.z != v4.pos.z) || (v3.pos.z != v4.pos.z) || (size && (v1.pos.z != zflat))) {
-		// printf("Warning making non flat DORVertexes::addQuad!\n");
-		is_zflat = false;
+	if (!size && !sort_center_set) {
+		sort_center = v1.pos;
+		sort_center_set = true;
 	}
-	if (!size) zflat = v1.pos.z;
 
 	vertices.push_back(v1);
 	vertices.push_back(v2);
@@ -639,12 +664,10 @@ int DORVertexes::addQuadPie(
 	int size = vertices.size();
 	if (size + 10 >= vertices.capacity()) {vertices.reserve(vertices.capacity() * 2);}
 
-	if ((size && (0 != zflat))) {
-		// printf("Warning making non flat DORVertexes::addQuadPie!\n");
-		is_zflat = false;
+	if (!size && !sort_center_set) {
+		sort_center = vec4(x1, y1, 0, 1);
+		sort_center_set = true;
 	}
-	if (!size) zflat = 0;
-
 
 	float w = x2 - x1;
 	float h = y2 - y1;
@@ -755,12 +778,10 @@ int DORVertexes::addPoint(
 	int size = vertices.size();
 	if (size + 1 >= vertices.capacity()) {vertices.reserve(vertices.capacity() * 2);}
 
-	// This really shouldnt happend from the lua side as we dont even expose the addQuad version with z positions
-	if (size && (z1 != zflat)) {
-		// printf("Warning making non flat DORVertexes::addQuad!\n");
-		is_zflat = false;
+	if (!size && !sort_center_set) {
+		sort_center = vec4(x1, y1, z1, 1);
+		sort_center_set = true;
 	}
-	if (!size) zflat = z1;
 
 	vertices.push_back({{x1, y1, z1, 1}, {u1, v1}, {r, g, b, a}});
 
@@ -1016,6 +1037,16 @@ void DORVertexes::render(RendererGL *container, mat4& cur_model, vec4& cur_color
 	resetChanged();
 }
 
+void DORVertexes::sortCoords(RendererGL *container, mat4& cur_model) {
+	mat4 vmodel = cur_model * model;
+
+	sort_coords = vmodel * sort_center;
+	// printf(" * %f x %f!\n", sort_coords.x, sort_coords.y);
+	sort_shader = shader;
+	sort_tex = tex;
+	container->sorted_dos.push_back(this);
+}
+
 // void DORVertexes::renderZ(RendererGL *container, mat4& cur_model, vec4& cur_color, bool cur_visible) {
 // 	if (!visible || !cur_visible) return;
 // 	mat4 vmodel = cur_model * model;
@@ -1040,22 +1071,6 @@ void DORVertexes::render(RendererGL *container, mat4& cur_model, vec4& cur_color
 
 // 	resetChanged();
 // }
-
-void DORVertexes::sortZ(RendererGL *container, mat4& cur_model) {
-	if (!is_zflat) {
-		printf("[DORVertexes::sortZ] ERROR! trying to sort a non zflat vertices list!\n");
-		return;
-	}
-
-	mat4 vmodel = cur_model * model;
-
-	// We take a "virtual" point at zflat coordinates
-	vec4 virtualz = vmodel * vec4(0, 0, zflat, 1);
-	sort_z = virtualz.z;
-	sort_shader = shader;
-	sort_tex = tex;
-	container->sorted_dos.push_back(this);
-}
 
 /*************************************************************************
  ** IContainer
@@ -1107,10 +1122,10 @@ void IContainer::containerRender(RendererGL *container, mat4& cur_model, vec4& c
 // 	}
 // }
 
-void IContainer::containerSortZ(RendererGL *container, mat4& cur_model) {
+void IContainer::containerSortCoords(RendererGL *container, mat4& cur_model) {
 	for (auto it = dos.begin() ; it != dos.end(); ++it) {
 		DisplayObject *i = dynamic_cast<DisplayObject*>(*it);
-		if (i) i->sortZ(container, cur_model);
+		if (i) i->sortCoords(container, cur_model);
 	}
 }
 
@@ -1163,13 +1178,13 @@ void DORContainer::render(RendererGL *container, mat4& cur_model, vec4& cur_colo
 // 	resetChanged();
 // }
 
-void DORContainer::sortZ(RendererGL *container, mat4& cur_model) {
+void DORContainer::sortCoords(RendererGL *container, mat4& cur_model) {
 	// if (!visible) return; // DGDGDGDG: If you want :shown() to not trigger a Z rebuild we need to remove that. But to do that visible needs to be able to propagate like model & color; it does not currently
 	mat4 cmodel = cur_model * model;
-	containerSortZ(container, cmodel);
+	containerSortCoords(container, cmodel);
 }
 
-// void DORContainer::sortZ(RendererGL *container, mat4& cur_model) {
+// void DORContainer::sortCoords(RendererGL *container, mat4& cur_model) {
 // }
 
 
@@ -1216,17 +1231,6 @@ void SubRenderer::render(RendererGL *container, mat4& cur_model, vec4& cur_color
 // 	dest[startat].sub = this;
 // 	// resetChanged(); // DGDGDGDG: investigate why things break if this is on
 // }
-
-void SubRenderer::sortZ(RendererGL *container, mat4& cur_model) {
-	mat4 vmodel = cur_model * model;
-
-	// We take a "virtual" point at zflat coordinates
-	vec4 virtualz = vmodel * vec4(0, 0, 0, 1);
-	sort_z = virtualz.z;
-	sort_shader = NULL;
-	sort_tex = {0, 0, 0};
-	container->sorted_dos.push_back(this);
-}
 
 void SubRenderer::toScreenSimple() {
 	toScreen(mat4(), {1.0, 1.0, 1.0, 1.0});
