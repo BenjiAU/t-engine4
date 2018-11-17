@@ -151,6 +151,45 @@ mat4 View::getCam() {
 	return cam;
 }
 
+vec2 View::unproject(vec2 screenpos) {
+	if (mode == ViewMode::PROJECT) {
+		update();
+
+		// mat4 mvp = view * cam;
+		// for (float i = -0; i <=5000; i++) {
+		// 	vec4 test(i, 0, 0, 1);
+		// 	vec4 res = mvp * test;
+		// 	printf("==== %f : => : %f\n", i, res.x);
+		// }
+		// printf("%0.3f  ;  %0.3f  ;  %0.3f  ;  %0.3f\n", mvp[0][0], mvp[1][0], mvp[2][0], mvp[3][0]);
+		// printf("%0.3f  ;  %0.3f  ;  %0.3f  ;  %0.3f\n", mvp[0][1], mvp[1][1], mvp[2][1], mvp[3][1]);
+		// printf("%0.3f  ;  %0.3f  ;  %0.3f  ;  %0.3f\n", mvp[0][2], mvp[1][2], mvp[2][2], mvp[3][2]);
+		// printf("%0.3f  ;  %0.3f  ;  %0.3f  ;  %0.3f\n", mvp[0][3], mvp[1][3], mvp[2][3], mvp[3][3]);
+		// exit(0);
+
+		vec4 ray = vec4((w-screenpos.x)/w, 0, screenpos.y/h, 1);
+		// vec4 ray = vec4(screenpos.x / w - 1, screenpos.y / h - 1, -1, 1);
+		ray = glm::inverse(view) * ray;
+		printf("=====1 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, ray.x, ray.y);
+		ray = glm::inverse(cam) * ray;
+		ray.w = 0;
+		printf("=====2 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, ray.x, ray.y);
+
+		vec3 sp(w-screenpos.x, 0, screenpos.y);
+		vec4 port(0, 0, w, h);
+		vec3 near = glm::unProject(sp, cam, view, port);
+		printf("=====3 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, near.x, near.y);
+		sp.z = 1;
+		vec3 far = glm::unProject(sp, cam, view, port);
+		printf("=====3 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, far.x, far.y);
+
+
+		return vec2(ray);
+	} else {
+		return screenpos;
+	}
+}
+
 mat4 View::getView() {
 	return view;
 }

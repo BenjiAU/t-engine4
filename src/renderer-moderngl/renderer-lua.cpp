@@ -1685,6 +1685,15 @@ static int gl_view_project(lua_State *L)
 	return 1;
 }
 
+static int gl_view_unproject(lua_State *L)
+{
+	View *v = *(View**)auxiliar_checkclass(L, "gl{view}", 1);
+	vec2 r = v->unproject(vec2(lua_tonumber(L, 2), lua_tonumber(L, 3)));
+	lua_pushnumber(L, r.x);
+	lua_pushnumber(L, r.y);
+	return 2;
+}
+
 static int gl_view_use(lua_State *L)
 {
 	View *v = *(View**)auxiliar_checkclass(L, "gl{view}", 1);
@@ -2102,6 +2111,7 @@ static const struct luaL_Reg gl_view_reg[] =
 	{"ortho", gl_view_ortho},
 	{"project", gl_view_project},
 	{"use", gl_view_use},
+	{"unproject", gl_view_unproject},
 	{NULL, NULL},
 };
 

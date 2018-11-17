@@ -61,6 +61,7 @@ public:
 	mat4 get();
 	mat4 getView();
 	mat4 getCam();
+	vec2 unproject(vec2 screenpos);
 
 	virtual void onScreenResize(int w, int h);
 
