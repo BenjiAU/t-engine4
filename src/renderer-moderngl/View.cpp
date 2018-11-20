@@ -65,7 +65,7 @@ void View::setProjectView(
 
 	mode = ViewMode::PROJECT;
 	view = glm::perspective(
-		fov_angle,         // The horizontal Field of View, in degrees : the amount of "zoom". Think "camera lens". Usually between 90° (extra wide) and 30° (quite zoomed in)
+		glm::radians(fov_angle),         // The horizontal Field of View, in degrees : the amount of "zoom". Think "camera lens". Usually between 90° (extra wide) and 30° (quite zoomed in)
 		(float)w / (float)h, // Aspect Ratio. Depends on the size of your window. Notice that 4/3 == 800/600 == 1280/960, sounds familiar ?
 		near_clip,        // Near clipping plane. Keep as big as possible, or you'll get precision issues.
 		far_clip       // Far clipping plane. Keep as little as possible.
@@ -154,37 +154,55 @@ mat4 View::getCam() {
 vec2 View::unproject(vec2 screenpos) {
 	if (mode == ViewMode::PROJECT) {
 		update();
+		mat4 invVP = glm::inverse(view * cam);
 
-		// mat4 mvp = view * cam;
-		// for (float i = -0; i <=5000; i++) {
-		// 	vec4 test(i, 0, 0, 1);
-		// 	vec4 res = mvp * test;
-		// 	printf("==== %f : => : %f\n", i, res.x);
-		// }
-		// printf("%0.3f  ;  %0.3f  ;  %0.3f  ;  %0.3f\n", mvp[0][0], mvp[1][0], mvp[2][0], mvp[3][0]);
-		// printf("%0.3f  ;  %0.3f  ;  %0.3f  ;  %0.3f\n", mvp[0][1], mvp[1][1], mvp[2][1], mvp[3][1]);
-		// printf("%0.3f  ;  %0.3f  ;  %0.3f  ;  %0.3f\n", mvp[0][2], mvp[1][2], mvp[2][2], mvp[3][2]);
-		// printf("%0.3f  ;  %0.3f  ;  %0.3f  ;  %0.3f\n", mvp[0][3], mvp[1][3], mvp[2][3], mvp[3][3]);
-		// exit(0);
+		float mousex = ((screenpos.x / w) - 0.5f) * 2.0f;
+		float mousey = ((screenpos.y / h) - 0.5f) * 2.0f;
+		vec4 screen_vec = glm::vec4(mousex, -mousey, 1.0f, 1.0f);
+		vec4 worldPos = invVP * screen_vec;
+		vec3 dir = glm::normalize(vec3(worldPos));
+		printf("===== mouse (%d x %d  //  %f x %f) => (%f x %f x %f)\n", (int)screenpos.x, (int)screenpos.y, mousex, mousey, dir.x, dir.y, dir.z);
 
-		vec4 ray = vec4((w-screenpos.x)/w, 0, screenpos.y/h, 1);
-		// vec4 ray = vec4(screenpos.x / w - 1, screenpos.y / h - 1, -1, 1);
-		ray = glm::inverse(view) * ray;
-		printf("=====1 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, ray.x, ray.y);
-		ray = glm::inverse(cam) * ray;
-		ray.w = 0;
-		printf("=====2 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, ray.x, ray.y);
+		vec4 center_vec = glm::vec4(0, 0, 1.0f, 1.0f);
+		vec4 worldPosCenter = invVP * center_vec;
+		vec3 centerdir = glm::normalize(vec3(worldPosCenter));
+		printf("===== center => (%f x %f x %f)\n", centerdir.x, centerdir.y, centerdir.z);
 
-		vec3 sp(w-screenpos.x, 0, screenpos.y);
-		vec4 port(0, 0, w, h);
-		vec3 near = glm::unProject(sp, cam, view, port);
-		printf("=====3 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, near.x, near.y);
-		sp.z = 1;
-		vec3 far = glm::unProject(sp, cam, view, port);
-		printf("=====3 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, far.x, far.y);
+		vec3 orig(0, 0, 1);
+		vec3 planeOrig(0, 0, 0);
+		vec3 planeNormal(0, 0, 1);
+		float dist = 0, centerdist = 0;
+		if (glm::intersectRayPlane(orig, dir, planeOrig, planeNormal, dist), glm::intersectRayPlane(orig, centerdir, planeOrig, planeNormal, centerdist)) {
+			vec3 p = orig + dir * dist;
+			vec3 c = orig + centerdir * centerdist;
+			printf("--- INTERSECT at %f => (%f x %f x %f)\n", dist, p.x, p.y, p.z);
+			printf("--- CENTER    at %f => (%f x %f x %f)\n", centerdist, c.x, c.y, c.z);
+
+			vec4 p4(p.x, p.y, p.z, 1), c4(c.x, c.y, c.z, 1);
+			p4 = (view * cam) * p4;
+			c4 = (view * cam) * c4;
+			printf("   => final %f x %f\n", (p.x - c.x) * w-3121-3106, (p.y - c.y) * h);
+			printf("   => final2 %f x %f\n", p4.x - c4.x, p4.y - c4.y);
+		}
+
+		// vec4 ray = vec4((w-screenpos.x)/w, 0, screenpos.y/h, 1);
+		// // vec4 ray = vec4(screenpos.x / w - 1, screenpos.y / h - 1, -1, 1);
+		// ray = glm::inverse(view) * ray;
+		// printf("=====1 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, ray.x, ray.y);
+		// ray = glm::inverse(cam) * ray;
+		// ray.w = 0;
+		// printf("=====2 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, ray.x, ray.y);
+
+		// vec3 sp(w-screenpos.x, 0, screenpos.y);
+		// vec4 port(0, 0, w, h);
+		// vec3 near = glm::unProject(sp, cam, view, port);
+		// printf("=====3 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, near.x, near.y);
+		// sp.z = 1;
+		// vec3 far = glm::unProject(sp, cam, view, port);
+		// printf("=====3 mous(%0.2f x %0.2f) => picks(%0.2f x %0.2f)\n", screenpos.x, screenpos.y, far.x, far.y);
 
 
-		return vec2(ray);
+		return vec2();
 	} else {
 		return screenpos;
 	}

@@ -54,6 +54,7 @@ enum {
 	VERTEX_MAP_INFO = 1,
 	VERTEX_KIND_INFO = 2,
 	VERTEX_MODEL_INFO = 4,
+	VERTEX_PICKING_INFO = 8,
 };
 
 struct vertex {
@@ -66,7 +67,10 @@ struct vertex_map_info {
 	vec4 mapcoords;
 };
 struct vertex_kind_info {
- 	float kind;
+	float kind;
+};
+struct vertex_picking_info {
+	float id[4];
 };
 struct vertex_model_info {
 	mat4 model;
@@ -87,6 +91,13 @@ enum TweenSlot : unsigned char {
 	UNI1 = 14, UNI2 = 15, UNI3 = 16, 
 	MAX = 17
 };
+
+inline void pickingConvertTo(uint32_t id, vertex_picking_info &picking) {
+	picking.id[0] = (float)(id & 0xFF) / 255.0;
+	picking.id[1] = (float)((id >> 8) & 0xFF) / 255.0;
+	picking.id[2] = (float)((id >> 16) & 0xFF) / 255.0;
+	picking.id[3] = 1.0;
+}
 
 typedef float (*easing_ptr)(float,float,float);
 
@@ -224,6 +235,7 @@ protected:
 	vector<vertex_map_info> vertices_map_info;
 	vector<vertex_kind_info> vertices_kind_info;
 	vector<vertex_model_info> vertices_model_info;
+	vector<vertex_picking_info> vertices_picking_info;
 	array<int, DO_MAX_TEX> tex_lua_ref{{ LUA_NOREF, LUA_NOREF, LUA_NOREF}};
 	array<GLuint, DO_MAX_TEX> tex{{0, 0, 0}};
 	int tex_max = 1;
@@ -274,6 +286,7 @@ public:
 	int addQuad(vertex v1, vertex v2, vertex v3, vertex v4);
 	int addQuadKindInfo(float v1, float v2, float v3, float v4);
 	int addQuadMapInfo(vertex_map_info v1, vertex_map_info v2, vertex_map_info v3, vertex_map_info v4);
+	int addQuadPickingInfo(vertex_picking_info v1, vertex_picking_info v2, vertex_picking_info v3, vertex_picking_info v4);
 
 	int addPoint(
 		float x1, float y1, float z1, float u1, float v1, 

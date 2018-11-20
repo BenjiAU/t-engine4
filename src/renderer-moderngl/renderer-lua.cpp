@@ -712,6 +712,21 @@ static int gl_target_use(lua_State *L)
 	return 1;
 }
 
+static int gl_target_enable_picking(lua_State *L)
+{
+	DORTarget *c = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
+	c->enablePicking(lua_tonumber(L, 2));
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
+static int gl_target_picking(lua_State *L)
+{
+	DORTarget *c = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
+	lua_pushnumber(L, c->picking(lua_tonumber(L, 2), lua_tonumber(L, 3)));
+	return 1;
+}
+
 static int gl_target_displaysize(lua_State *L)
 {
 	DORTarget *c = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
@@ -773,7 +788,12 @@ static int gl_target_target_texture(lua_State *L)
 		lua_error(L);
 	}
 	lua_pushvalue(L, 2);
-	v->setTexture(t->getTexture(lua_tonumber(L, 3)), luaL_ref(L, LUA_REGISTRYINDEX), id);
+
+	int tex_id = lua_tonumber(L, 3);
+	int tex;
+	if (tex_id == -1) tex = t->getDepthTexture();
+	else tex = t->getTexture(tex_id);
+	v->setTexture(tex, luaL_ref(L, LUA_REGISTRYINDEX), id);
 
 	lua_pushvalue(L, 1);
 	return 1;
@@ -996,6 +1016,7 @@ static int gl_vertexes_quad(lua_State *L)
 		vertex vs[4];
 		float vk[4];
 		vertex_map_info vm[4];
+		vertex_picking_info picking[4];
 		for (int i = 0; i < 4; i++) {
 			vs[i].pos.w = 1;
 			lua_pushliteral(L, "x"); lua_rawget(L, i + 2); vs[i].pos.x = lua_tonumber(L, -1); lua_pop(L, 1);
@@ -1021,10 +1042,17 @@ static int gl_vertexes_quad(lua_State *L)
 			lua_pushliteral(L, "ty"); lua_rawget(L, i + 2); vm[i].texcoords.y = lua_tonumber(L, -1); lua_pop(L, 1);
 			lua_pushliteral(L, "tw"); lua_rawget(L, i + 2); vm[i].texcoords.z = lua_tonumber(L, -1); lua_pop(L, 1);
 			lua_pushliteral(L, "th"); lua_rawget(L, i + 2); vm[i].texcoords.w = lua_tonumber(L, -1); lua_pop(L, 1);
+
+			lua_pushliteral(L, "picking"); lua_rawget(L, i + 2); if (lua_isnumber(L, -1)) {
+				data_kinds |= VERTEX_PICKING_INFO;
+				uint32_t id = lua_tonumber(L, -1);
+				pickingConvertTo(id, picking[i]);
+			} lua_pop(L, 1);
 		}
 		v->addQuad(vs[0], vs[1], vs[2], vs[3]);
 		if (data_kinds & VERTEX_KIND_INFO) v->addQuadKindInfo(vk[0], vk[1], vk[2], vk[3]);
 		if (data_kinds & VERTEX_MAP_INFO) v->addQuadMapInfo(vm[0], vm[1], vm[2], vm[3]);
+		if (data_kinds & VERTEX_PICKING_INFO) v->addQuadPickingInfo(picking[0], picking[1], picking[2], picking[3]);
 		v->setDataKinds(data_kinds);
 	}
 	lua_pushvalue(L, 1);
@@ -1082,8 +1110,12 @@ static int gl_vertexes_target_texture(lua_State *L)
 	DORVertexes *v = userdata_to_DO<DORVertexes>(L, 1, "gl{vertexes}");
 	DORTarget *t = userdata_to_DO<DORTarget>(L, 2, "gl{target}");
 	int id = lua_tonumber(L, 4);
+	int tex_id = lua_tonumber(L, 3);
 	lua_pushvalue(L, 2);
-	v->setTexture(t->getTexture(lua_tonumber(L, 3)), luaL_ref(L, LUA_REGISTRYINDEX), id);
+	int tex;
+	if (tex_id == -1) tex = t->getDepthTexture();
+	else tex = t->getTexture(tex_id);
+	v->setTexture(tex, luaL_ref(L, LUA_REGISTRYINDEX), id);
 
 	lua_pushvalue(L, 1);
 	return 1;
@@ -1470,6 +1502,22 @@ static int gl_spriter_load_entity(lua_State *L)
 {
 	DORSpriter *v = userdata_to_DO<DORSpriter>(L, 1, "gl{spriter}");
 	v->loadEntity(luaL_checkstring(L, 2));
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
+static int gl_spriter_enable_picking(lua_State *L)
+{
+	DORSpriter *v = userdata_to_DO<DORSpriter>(L, 1, "gl{spriter}");
+	v->enablePicking(lua_tonumber(L, 2));
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
+static int gl_spriter_enable_billboarding(lua_State *L)
+{
+	DORSpriter *v = userdata_to_DO<DORSpriter>(L, 1, "gl{spriter}");
+	v->enableBillboardingInfo(lua_toboolean(L, 2));
 	lua_pushvalue(L, 1);
 	return 1;
 }
@@ -1981,6 +2029,8 @@ static const struct luaL_Reg gl_target_reg[] =
 	{"toScreen", gl_target_toscreen},
 	{"compute", gl_target_compute},
 	{"use", gl_target_use},
+	{"enablePicking", gl_target_enable_picking},
+	{"picking", gl_target_picking},
 	{"displaySize", gl_target_displaysize},
 	{"clearColor", gl_target_clearcolor},
 	{"view", gl_target_view},
@@ -2087,6 +2137,8 @@ static const struct luaL_Reg gl_spriter_reg[] =
 	{"characterMap", gl_spriter_character_map},
 	{"shader", gl_spriter_shader},
 	{"loadEntity", gl_spriter_load_entity},
+	{"enablePicking", gl_spriter_enable_picking},
+	{"enableBillboarding", gl_spriter_enable_billboarding},
 	{"setAnim", gl_spriter_set_anim},
 	{"getObjectPosition", gl_spriter_get_object_position},
 	INJECT_GENERIC_DO_METHODS

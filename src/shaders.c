@@ -175,6 +175,17 @@ static int shader_free(lua_State *L)
 	return 1;
 }
 
+static int shader_check(lua_State *L)
+{
+	GLuint *s = (GLuint*)auxiliar_checkclass(L, "gl{shader}", 1);
+
+	int success;
+	glGetShaderiv(*s, GL_COMPILE_STATUS, &success);
+
+	lua_pushboolean(L, success == GL_TRUE);
+	return 1;
+}
+
 static int program_new(lua_State *L)
 {
 	if (!shaders_active) return 0;
@@ -716,6 +727,7 @@ static int program_compile(lua_State *L)
 	p->mapcoord_attrib = glGetAttribLocation(p->shader, "te4_mapcoord");
 	p->kind_attrib = glGetAttribLocation(p->shader, "te4_kind");
 	p->model_attrib = glGetAttribLocation(p->shader, "te4_model");
+	p->picking_attrib = glGetAttribLocation(p->shader, "te4_picking");
 	// printf("Attri locations %d %d %d\n", p->vertex_attrib, p->texcoord_attrib, p->color_attrib);
 
 	lua_pushboolean(L, TRUE);
@@ -822,6 +834,7 @@ static const struct luaL_Reg program_reg[] =
 static const struct luaL_Reg shader_reg[] =
 {
 	{"__gc", shader_free},
+	{"check", shader_check},
 	{NULL, NULL},
 };
 

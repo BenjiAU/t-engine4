@@ -141,6 +141,10 @@ protected:
 	View *view;
 	TargetSpecialMode *mode = NULL;
 
+	GLuint picking_fbo = 0;
+	GLuint picking_pbo[2] = {0, 0};
+	int picking_pbo_idx = 0;
+
 	VBO *toscreen_vbo = NULL;
 
 	virtual void cloneInto(DisplayObject *into);
@@ -174,6 +178,9 @@ public:
 	void makeFramebuffer(int w, int h, int nbt, bool hdr, bool depth, Fbo *fbo);
 	void deleteFramebuffer(Fbo *fbo);
 	void useFramebuffer(Fbo *fbo);
+
+	void enablePicking(int tex_id);
+	uint32_t picking(int x, int y);
 };
 
 #endif

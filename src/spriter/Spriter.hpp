@@ -155,7 +155,9 @@ protected:
 
 	int trigger_cb_lua_ref = LUA_NOREF;
 
-	bool render_z;
+	vertex_picking_info picking_id;
+	bool picking = false;
+	bool billboarding = false;
 	float render_microz;
 	mat4 render_model;
 	vec4 render_color;
@@ -180,6 +182,9 @@ public:
 	void removeCharacterMap(const char *name);
 
 	vec2 getObjectPosition(const char *name, uint8_t i_idx = 0);
+
+	void enablePicking(uint32_t id) { if (id) { picking = true; pickingConvertTo(id, picking_id); } else { picking = false; } };
+	void enableBillboardingInfo(bool p = true) { billboarding = p; };
 
 	void setShader(shader_type *s) { shader = s; };
 	virtual void render(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);

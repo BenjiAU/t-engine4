@@ -74,6 +74,8 @@ DORTarget::~DORTarget() {
 	refcleaner(&subrender_lua_ref);
 
 	deleteFramebuffer(&fbo);
+
+	if (picking_fbo) glDeleteFramebuffers(1, &picking_fbo);
 }
 
 void DORTarget::makeFramebuffer(int w, int h, int nbt, bool hdr, bool depth, Fbo *fbo) {
@@ -184,14 +186,11 @@ void DORTarget::useFramebuffer(Fbo *fbo) {
 
 static stack<GLuint> fbo_stack;
 void DORTarget::use(bool activate) {
-	if (activate)
-	{
+	if (activate) {
 		useFramebuffer(&fbo);
 		fbo_stack.push(fbo.fbo);
 		if (view) view->use(true);
-	}
-	else
-	{
+	} else {
 		fbo_stack.pop();
 		tglClearColor(0, 0, 0, 1);
 
@@ -269,6 +268,72 @@ void DORTarget::toScreen(int x, int y) {
 		toscreen_vbo->setShader(shader);
 	}
 	toscreen_vbo->toScreen(x, y, 0, 1, 1);
+}
+
+void DORTarget::enablePicking(int tex_id) {
+	glGenFramebuffers(1, &picking_fbo);
+	tglBindFramebuffer(GL_FRAMEBUFFER, picking_fbo);
+
+	tfglBindTexture(GL_TEXTURE_2D, fbo.textures[tex_id].texture);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo.textures[tex_id].texture, 0);
+
+	tglBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glGenBuffers(2, picking_pbo);
+	for (int i = 0; i < 2; i++) {
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, picking_pbo[i]);
+		glBufferData(GL_PIXEL_PACK_BUFFER, w * h * 4, 0, GL_STREAM_READ);
+	}
+	glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+}
+
+uint32_t DORTarget::picking(int x, int y) {
+	if (!picking_fbo) return 0;
+
+	uint32_t fres = 0;
+
+	// Bind the FBO, note that we do not use use() because this clears the FBO and we dont want that
+	tglBindFramebuffer(GL_FRAMEBUFFER, picking_fbo);
+
+	if (picking_pbo[0]) {
+		picking_pbo_idx = (picking_pbo_idx + 1) % 2;
+		int next_idx = (picking_pbo_idx + 1) % 2;
+
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, picking_pbo[picking_pbo_idx]);
+		glReadPixels(x, h - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, picking_pbo[next_idx]);
+		GLubyte* res = (GLubyte*)glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+		if (res) {
+			fres = res[0];
+			fres += res[1] << 8;
+			fres += res[2] << 16;
+			glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+		}
+
+		// back to conventional pixel operation
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+	} else {
+		uint8_t res[4];
+
+		glPixelStorei(GL_PACK_ALIGNMENT, 1);
+		glReadPixels(x, h - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &res);
+
+		fres = res[0];
+		fres += res[1] << 8;
+		fres += res[2] << 16;
+	}
+
+	// printf("---------- %d %d %d %d\n", res[0], res[1], res[2], res[3]);
+
+
+	// Unbind texture from FBO and then unbind FBO
+	if (!fbo_stack.empty()) {
+		tglBindFramebuffer(GL_FRAMEBUFFER, fbo_stack.top());
+	} else {
+		tglBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+	return fres;
 }
 
 /*************************************************************************

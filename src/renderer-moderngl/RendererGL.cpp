@@ -78,6 +78,7 @@ void releaseDisplayList(DisplayList *dl) {
 		dl->list_kind_info.clear();
 		dl->list_map_info.clear();
 		dl->list_model_info.clear();
+		dl->list_picking_info.clear();
 		dl->tex = {0,0,0};
 		dl->shader = NULL;
 		dl->sub = NULL;
@@ -92,14 +93,14 @@ void releaseDisplayList(DisplayList *dl) {
 }
 
 DisplayList::DisplayList() {
-	glGenBuffers(4, vbo);
+	glGenBuffers(5, vbo);
 	list.reserve(4096);
 	// printf("Making new DL! %x with vbo %d\n", this, vbo);
 }
 // This really should never be actually used
 DisplayList::~DisplayList() {
 	// printf("Deleteing DL! %x with vbo %d\n", this, vbo);
-	glDeleteBuffers(4, vbo);
+	glDeleteBuffers(5, vbo);
 }
 
 /***************************************************************************
@@ -309,6 +310,11 @@ void RendererGL::update() {
 				glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_model_info) * (*dl)->list_model_info.size(), NULL, (GLuint)mode);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_model_info) * (*dl)->list_model_info.size(), (*dl)->list_model_info.data());				
 			}
+			if ((*dl)->data_kind & VERTEX_PICKING_INFO) {
+				glBindBuffer(GL_ARRAY_BUFFER, (*dl)->vbo[4]);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_picking_info) * (*dl)->list_picking_info.size(), NULL, (GLuint)mode);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_picking_info) * (*dl)->list_picking_info.size(), (*dl)->list_picking_info.data());
+			}
 		}
 	}
 
@@ -478,6 +484,14 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 					glVertexAttribPointer(shader->model_attrib+2, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_model_info), (void*)(offsetof(vertex_model_info, model) + sizeof(float) * 8));
 					glEnableVertexAttribArray(shader->model_attrib+3);
 					glVertexAttribPointer(shader->model_attrib+3, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_model_info), (void*)(offsetof(vertex_model_info, model) + sizeof(float) * 12));
+				}
+			}
+
+			if ((*dl)->data_kind & VERTEX_PICKING_INFO) {
+				glBindBuffer(GL_ARRAY_BUFFER, (*dl)->vbo[4]);
+				if (shader->picking_attrib != -1) {
+					glEnableVertexAttribArray(shader->picking_attrib);
+					glVertexAttribPointer(shader->picking_attrib, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_picking_info), (void*)offsetof(vertex_picking_info, id));
 				}
 			}
 

@@ -651,6 +651,19 @@ int DORVertexes::addQuadMapInfo(vertex_map_info v1, vertex_map_info v2, vertex_m
 	return 0;
 }
 
+int DORVertexes::addQuadPickingInfo(vertex_picking_info v1, vertex_picking_info v2, vertex_picking_info v3, vertex_picking_info v4) {
+	int size = vertices_picking_info.size();
+	if (size + 4 >= vertices_picking_info.capacity()) {vertices_picking_info.reserve(vertices_picking_info.capacity() * 2);}
+
+	vertices_picking_info.push_back(v1);
+	vertices_picking_info.push_back(v2);
+	vertices_picking_info.push_back(v3);
+	vertices_picking_info.push_back(v4);
+
+	setChanged();
+	return 0;
+}
+
 int DORVertexes::addQuadPie(
 		float x1, float y1, float x2, float y2,
 		float u1, float v1, float u2, float v2,
@@ -1032,6 +1045,14 @@ void DORVertexes::render(RendererGL *container, mat4& cur_model, vec4& cur_color
 		int startat = dl->list_map_info.size();
 		dl->list_map_info.reserve(startat + nb);
 		dl->list_map_info.insert(std::end(dl->list_map_info), std::begin(this->vertices_map_info), std::end(this->vertices_map_info));
+	}
+
+	if (data_kind & VERTEX_PICKING_INFO) {
+		// Make sure we do not have to reallocate each step
+		int nb = vertices_picking_info.size();
+		int startat = dl->list_picking_info.size();
+		dl->list_picking_info.reserve(startat + nb);
+		dl->list_picking_info.insert(std::end(dl->list_picking_info), std::begin(this->vertices_picking_info), std::end(this->vertices_picking_info));
 	}
 
 	resetChanged();

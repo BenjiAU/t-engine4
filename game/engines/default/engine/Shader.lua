@@ -142,7 +142,12 @@ function _M:getFragment(name, def)
 	-- local nb = 1 for line in code:gmatch("([^\n]*)\n") do print(nb, line) nb = nb + 1 end
 	-- print("======")
 	self.frags[name] = core.shader.newShader(code, 0)
-	print("[SHADER] created fragment shader from /data/gfx/shaders/"..name..".frag")
+	if not self.frags[name]:check() then
+		print("[SHADER] FAILED to create fragment shader from /data/gfx/shaders/"..name..".frag")
+		if config.settings.cheat then os.crash() end
+	else
+		print("[SHADER] created fragment shader from /data/gfx/shaders/"..name..".frag")
+	end
 	return self.frags[name]
 end
 
@@ -156,7 +161,12 @@ function _M:getVertex(name, def)
 	-- local nb = 1 for line in code:gmatch("([^\n]*)\n") do print(nb, line) nb = nb + 1 end
 	-- print("======")
 	self.verts[name] = core.shader.newShader(code, 1)
-	print("[SHADER] created vertex shader from /data/gfx/shaders/"..name..".vert")
+	if not self.verts[name]:check() then
+		print("[SHADER] FAILED to create vertex shader from /data/gfx/shaders/"..name..".vert")
+		if config.settings.cheat then os.crash() end
+	else
+		print("[SHADER] created vertex shader from /data/gfx/shaders/"..name..".vert")
+	end
 	return self.verts[name]
 end
 
@@ -171,7 +181,12 @@ function _M:getGeometry(name, def)
 	-- local nb = 1 for line in code:gmatch("([^\n]*)\n") do print(nb, line) nb = nb + 1 end
 	-- print("======")
 	self.geoms[name] = core.shader.newShader(code, 2)
-	print("[SHADER] created vertex shader from /data/gfx/shaders/"..name..".geom")
+	if not self.geoms[name]:check() then
+		print("[SHADER] FAILED to create vertex shader from /data/gfx/shaders/"..name..".geom")
+		if config.settings.cheat then os.crash() end
+	else
+		print("[SHADER] created vertex shader from /data/gfx/shaders/"..name..".geom")
+	end
 	return self.geoms[name]
 end
 
