@@ -199,6 +199,7 @@ public:
 	vec4 getColor() { return color; };
 	void getRotate(float *dx, float *dy, float *dz) { *dx = rot_x; *dy = rot_y; *dz = rot_z; };
 	void getTranslate(float *dx, float *dy, float *dz) { *dx = x; *dy = y; *dz = z; };
+	vec4 getTranslate() { return vec4(x, y, z, 1); };
 	void getScale(float *dx, float *dy, float *dz) { *dx = scale_x; *dy = scale_y; *dz = scale_z; };
 	bool getShown() { return visible; };
 

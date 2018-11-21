@@ -34,7 +34,7 @@ private:
 	bool in_use = false;
 	bool from_screen_size = false;
 	ViewMode mode = ViewMode::ORTHO;
-	mat4 view;
+	mat4 projection;
 
 	mat4 cam;
 	int camera_lua_ref = LUA_NOREF;
