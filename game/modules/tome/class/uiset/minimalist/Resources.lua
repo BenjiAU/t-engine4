@@ -57,7 +57,7 @@ function _M:init(minimalist, w, h)
 
 	MiniContainer.init(self, minimalist)
 
-	self.do_container = core.renderer.renderer("dynamic"):setRendererName("Resources MiniContainer")
+	self.do_container = core.renderer.renderer("dynamic"):setRendererName("Resources MiniContainer"):zSort(true)
 
 	self.resources_defs = {}
 	self.frames = {}
@@ -217,11 +217,11 @@ function _M:init(minimalist, w, h)
 		if res_def.display.simple then
 			local d = table.get(res_def, "Minimalist", "simple")
 			local shadow, front = self:imageLoader(d.shadow), self:imageLoader(d.front)
-			rc:add(shadow)
-			rc:add(front)
+			rc:add(shadow:translate(0, 0, 0))
+			rc:add(front:translate(0, 0, 1))
 			res_gfx.valtext = core.renderer.text(font_r):shadow(1, 1)
-			rc:add(res_gfx.valtext)
-			res_gfx.fill = core.renderer.container():translate(31, 16) -- Only to not bork later logic
+			rc:add(res_gfx.valtext:translate(0, 0, 10))
+			res_gfx.fill = core.renderer.container():translate(31, 16, 5) -- Only to not bork later logic
 		else
 			-- load graphic images
 			local res_imgs = table.merge({front = "resources/front_"..rname..".png", front_dark = "resources/front_"..rname.."_dark.png"}, table.get(res_def, "Minimalist", "images") or {})
@@ -406,7 +406,7 @@ function _M:update(nb_keyframes)
 				res_gfx.valtext:text(status_text)
 				local x, y = res_gfx.fill:getTranslate()
 				local w, h = res_gfx.valtext:getStats()
-				res_gfx.valtext:translate(x + 15, y + math.floor((self.fh - h) / 2))
+				res_gfx.valtext:translate(x + 15, y + math.floor((self.fh - h) / 2), 10)
 				res_gfx.old.vc = vc res_gfx.old.vn = vn res_gfx.old.vm = vm
 
 				-- Update shader
@@ -423,7 +423,7 @@ function _M:update(nb_keyframes)
 						res_gfx.regentext:text(status_text)
 						local x, y = res_gfx.fill:getTranslate()
 						local w, h = res_gfx.regentext:getStats()
-						res_gfx.regentext:translate(x + self.fw - w - 19, y + math.floor((self.fh - h) / 2)):shown(true)
+						res_gfx.regentext:translate(x + self.fw - w - 19, y + math.floor((self.fh - h) / 2), 9):shown(true)
 					end
 					res_gfx.old.vr = vr
 

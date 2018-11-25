@@ -1062,7 +1062,7 @@ void DORVertexes::sortCoords(RendererGL *container, mat4& cur_model) {
 	mat4 vmodel = cur_model * model;
 
 	sort_coords = vmodel * sort_center;
-	// printf(" * %f x %f!\n", sort_coords.x, sort_coords.y);
+	printf(" * %f x %f x %f!\n", sort_coords.x, sort_coords.y, sort_coords.z);
 	sort_shader = shader;
 	sort_tex = tex;
 	container->sorted_dos.push_back(this);
