@@ -1062,7 +1062,7 @@ void DORVertexes::sortCoords(RendererGL *container, mat4& cur_model) {
 	mat4 vmodel = cur_model * model;
 
 	sort_coords = vmodel * sort_center;
-	printf(" * %f x %f x %f!\n", sort_coords.x, sort_coords.y, sort_coords.z);
+	// printf(" * %f x %f x %f!\n", sort_coords.x, sort_coords.y, sort_coords.z);
 	sort_shader = shader;
 	sort_tex = tex;
 	container->sorted_dos.push_back(this);
@@ -1240,6 +1240,15 @@ void SubRenderer::render(RendererGL *container, mat4& cur_model, vec4& cur_color
 	stopDisplayList(); // Needed to make sure we break texture chaining
 	dl->sub = this;
 	// resetChanged(); // DGDGDGDG: investigate why things break if this is on
+}
+
+void SubRenderer::sortCoords(RendererGL *container, mat4& cur_model) {
+	mat4 vmodel = cur_model * model;
+
+	sort_coords = vmodel * sort_center;
+	sort_shader = nullptr;
+	sort_tex = {0, 0, 0};
+	container->sorted_dos.push_back(this);
 }
 
 // void SubRenderer::renderZ(RendererGL *container, mat4& cur_model, vec4& cur_color, bool cur_visible) {

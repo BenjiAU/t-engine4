@@ -236,9 +236,10 @@ void RendererGL::update() {
 			}
 		} else if (zsort == SortMode::FAST) {
 			// If nothing that can alter sort order changed, we can just quickly recompute the DisplayLists just like in the no sort method
+			// printf("UPDATE in renderer: %s\n", renderer_name);
 			if (recompute_fast_sort) {
 				recompute_fast_sort = false;
-				// printf("FST SORT\n");
+				// printf("FST SORT in renderer: %s with %d subs\n", renderer_name, dos.size());
 				sorted_dos.clear();
 
 				// First we iterate over the DOs tree to "flatten" in
@@ -246,6 +247,7 @@ void RendererGL::update() {
 				for (auto it = dos.begin() ; it != dos.end(); ++it) {
 					DisplayObject *i = dynamic_cast<DisplayObject*>(*it);
 					if (i) {
+						// printf(" * type %s\n", i->getKind());
 						i->sortCoords(this, cur_model);
 					}
 				}
@@ -254,6 +256,7 @@ void RendererGL::update() {
 				// Also since we are not sorting vertices we likely dont need to use a stable sort -- DGDGDGDG: don't we ?
 				sort(sorted_dos.begin(), sorted_dos.end(), sort_method);
 			}
+			// printf("SORTED DOS in renderer: %s with %d subs\n", renderer_name, sorted_dos.size());
 
 			// And now we can iterate the sorted flattened tree and render as a normal no sort render
 			// printf("FST redraw\n");
@@ -262,8 +265,10 @@ void RendererGL::update() {
 				if (i && i->parent) {
 					recomputematrix cur = i->parent->computeParentCompositeMatrix(this, {cur_model, color, true});
 					i->render(this, cur.model, cur.color, cur.visible);
+					// printf(" * type %s\n", i->getKind());
 				}
 			}
+			// printf("DONE DOS in renderer: %s with %d subs\n", renderer_name, sorted_dos.size());
 		} else if (zsort == SortMode::FULL) {
 			printf("[RendererGL] ERROR! SortMode::FULL CURRENTLY UNSUPPORTED\n");
 			// zvertices.clear();
@@ -356,9 +361,9 @@ void RendererGL::activateCutting(mat4 cur_model, bool v) {
 
 void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	if (!visible) return;
+	printf("Displaying renderer %s with %d and sorting %d\n", getRendererName(), displays.size(), zsort != SortMode::NO_SORT);
 	if (changed_children) update();
 	if (displays.empty()) return;
-	// printf("Displaying renderer %s with %d and sorting %d\n", getRendererName(), displays.size(), zsort != SortMode::NO_SORT);
 
 	long int start_time;
 	int nb_draws_start;

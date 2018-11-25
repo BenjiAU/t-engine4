@@ -360,6 +360,7 @@ public:
 	void setRendererName(char *name, bool copy);
 
 	virtual void render(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
+	virtual void sortCoords(RendererGL *container, mat4& cur_model);
 
 	virtual void toScreenSimple();
 	virtual void toScreen(mat4 cur_model, vec4 color) = 0;
