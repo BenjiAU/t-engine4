@@ -65,7 +65,7 @@ char *override_home = NULL;
 int g_argc = 0;
 char **g_argv;
 float screen_zoom = 1;
-bool offscreen_render = FALSE;
+bool offscreen_render = false;
 int locked_w = 0, locked_h = 0;
 SDL_Window *window = NULL;
 SDL_Surface *windowIconSurface = NULL;
@@ -73,23 +73,22 @@ SDL_GLContext maincontext; /* Our opengl context handle */
 SDL_GameController *gamepad = NULL;
 SDL_Joystick *gamepadjoy = NULL;
 int gamepad_instance_id = -1;
-bool is_fullscreen = FALSE;
-bool is_borderless = FALSE;
+bool is_fullscreen = false;
+bool is_borderless = false;
 lua_State *L = NULL;
 int nb_cpus;
-bool no_debug = FALSE;
-bool safe_mode = FALSE;
+bool no_debug = false;
+bool safe_mode = false;
 int current_mousehandler = LUA_NOREF;
 int current_keyhandler = LUA_NOREF;
 int current_gamepadhandler = LUA_NOREF;
 int current_game = LUA_NOREF;
 core_boot_type *core_def = NULL;
-bool exit_engine = FALSE;
-bool no_sound = FALSE;
-bool no_steam = FALSE;
-bool isActive = TRUE;
-bool tickPaused = FALSE;
-bool anims_paused = FALSE;
+bool exit_engine = false;
+bool no_sound = false;
+bool no_steam = false;
+bool tickPaused = false;
+bool anims_paused = false;
 int mouse_cursor_ox, mouse_cursor_oy;
 int mousex = 0, mousey = 0;
 float gamma_correction = 1;
@@ -104,10 +103,8 @@ int max_ms_per_frame = 33;
 int requested_fps_idle = DEFAULT_IDLE_FPS;
 /* The currently "saved" fps, used for idle transitions. */
 int requested_fps_idle_saved = 0;
-bool forbid_idle_mode = FALSE;
-bool no_connectivity = FALSE;
-
-SDL_TimerID realtime_timer_id = 0;
+bool forbid_idle_mode = false;
+bool no_connectivity = false;
 
 /* OpenGL capabilities */
 GLint max_texture_size = 1024;
@@ -115,15 +112,16 @@ extern bool shaders_active;
 bool fbo_active;
 bool multitexture_active;
 
-/* Error handling */
-lua_err_type *last_lua_error_head = NULL, *last_lua_error_tail = NULL;
-
 /*
- * Locks for thread safety with respect to the rendering and realtime timers.
+ * Locks for thread safety with respect to the rendering.
  * The locks are used to control access to each timer's respective id and flag.
  */
-SDL_mutex *realtimeLock;
-int realtime_pending = 0;
+SDL_mutex *renderingLock;
+SDL_TimerID display_timer_id = 0;
+int redraw_pending = 0;
+
+/* Error handling */
+lua_err_type *last_lua_error_head = NULL, *last_lua_error_tail = NULL;
 
 /*
  * Used to clean up a lock and its corresponding timer/flag.
@@ -314,9 +312,109 @@ int event_filter(void *userdata, SDL_Event* event)
 
 extern SDL_Cursor *mouse_cursor;
 extern SDL_Cursor *mouse_cursor_down;
+
+// Calls the lua music callback
+void on_music_stop()
+{
+	if (current_game != LUA_NOREF)
+	{
+		lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
+		lua_pushliteral(L, "onMusicStop");
+		lua_gettable(L, -2);
+		lua_remove(L, -2);
+		if (lua_isfunction(L, -1))
+		{
+			lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
+			docall(L, 1, 0);
+		}
+		else
+			lua_pop(L, 1);
+	}
+}
+
 bool on_event(SDL_Event *event)
 {
 	switch (event->type) {
+	case SDL_WINDOWEVENT: {
+		switch (event->window.event) {
+		case SDL_WINDOWEVENT_RESIZED:
+			/* Note: SDL can't resize a fullscreen window, so don't bother! */
+			if (!is_fullscreen) {
+				printf("SDL_WINDOWEVENT_RESIZED: %d x %d\n", event->window.data1, event->window.data2);
+				do_resize(event->window.data1, event->window.data2, is_fullscreen, is_borderless, screen_zoom);
+				if (current_game != LUA_NOREF)
+				{
+					lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
+					lua_pushliteral(L, "onResolutionChange");
+					lua_gettable(L, -2);
+					lua_remove(L, -2);
+					lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
+					docall(L, 1, 0);
+				}
+			} else {
+				printf("SDL_WINDOWEVENT_RESIZED: ignored due to fullscreen\n");
+
+			}
+			break;
+		case SDL_WINDOWEVENT_MOVED: {
+			int x, y;
+			/* Note: SDL can't resize a fullscreen window, so don't bother! */
+			if (!is_fullscreen) {
+				SDL_GetWindowPosition(window, &x, &y);
+				if (current_game != LUA_NOREF)
+				{
+					lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
+					lua_pushliteral(L, "onWindowMoved");
+					lua_gettable(L, -2);
+					lua_remove(L, -2);
+					lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
+					lua_pushnumber(L, x);
+					lua_pushnumber(L, y);
+					docall(L, 3, 0);
+				}
+			} else {
+				printf("SDL_WINDOWEVENT_MOVED: ignored due to fullscreen\n");
+			}
+			break;
+		}
+		case SDL_WINDOWEVENT_CLOSE:
+			event->type = SDL_QUIT;
+			SDL_PushEvent(event);
+			break;
+
+		case SDL_WINDOWEVENT_SHOWN:
+		case SDL_WINDOWEVENT_FOCUS_GAINED:
+			SDL_SetModState(KMOD_NONE);
+			/* break from idle */
+			//printf("[EVENT HANDLER]: Got a SHOW/FOCUS_GAINED event, restoring full FPS.\n");
+			handleIdleTransition(0);
+			break;
+
+		case SDL_WINDOWEVENT_HIDDEN:
+		case SDL_WINDOWEVENT_FOCUS_LOST:
+			/* go idle */
+			SDL_SetModState(KMOD_NONE);
+			//printf("[EVENT HANDLER]: Got a HIDDEN/FOCUS_LOST event, going idle.\n");
+			handleIdleTransition(1);
+			break;
+		default:
+			break;
+
+		}
+		break;
+	}
+	case SDL_QUIT:
+		exit_engine = true;
+		break;
+	case SDL_USEREVENT:
+		switch(event->user.code) {
+		case 1:
+			on_music_stop();
+			break;
+		default:
+			break;
+		}
+		break;
 	case SDL_TEXTINPUT:
 		if (current_keyhandler != LUA_NOREF)
 		{
@@ -337,20 +435,20 @@ bool on_event(SDL_Event *event)
 			lua_pushnumber(L, 0);
 
 			SDL_Keymod _pKeyState = SDL_GetModState();
-			lua_pushboolean(L, (_pKeyState & KMOD_CTRL) ? TRUE : FALSE);
-			lua_pushboolean(L, (_pKeyState & KMOD_SHIFT) ? TRUE : FALSE);
-			lua_pushboolean(L, (_pKeyState & KMOD_ALT) ? TRUE : FALSE);
-			lua_pushboolean(L, (_pKeyState & KMOD_GUI) ? TRUE : FALSE);
+			lua_pushboolean(L, (_pKeyState & KMOD_CTRL) ? true : false);
+			lua_pushboolean(L, (_pKeyState & KMOD_SHIFT) ? true : false);
+			lua_pushboolean(L, (_pKeyState & KMOD_ALT) ? true : false);
+			lua_pushboolean(L, (_pKeyState & KMOD_GUI) ? true : false);
 
 			lua_pushstring(L, event->text.text);
-			lua_pushboolean(L, FALSE);
+			lua_pushboolean(L, false);
 			lua_pushnil(L);
 			lua_pushnil(L);
 			lua_pushnumber(L, 0);
 
 			docall(L, 11, 0);
 		}
-		return TRUE;
+		return true;
 	case SDL_KEYDOWN:
 	case SDL_KEYUP:
 		if (current_keyhandler != LUA_NOREF)
@@ -363,13 +461,13 @@ bool on_event(SDL_Event *event)
 			lua_pushnumber(L, event->key.keysym.scancode);
 
 			SDL_Keymod _pKeyState = SDL_GetModState();
-			lua_pushboolean(L, (_pKeyState & KMOD_CTRL) ? TRUE : FALSE);
-			lua_pushboolean(L, (_pKeyState & KMOD_SHIFT) ? TRUE : FALSE);
-			lua_pushboolean(L, (_pKeyState & KMOD_ALT) ? TRUE : FALSE);
-			lua_pushboolean(L, (_pKeyState & KMOD_GUI) ? TRUE : FALSE);
+			lua_pushboolean(L, (_pKeyState & KMOD_CTRL) ? true : false);
+			lua_pushboolean(L, (_pKeyState & KMOD_SHIFT) ? true : false);
+			lua_pushboolean(L, (_pKeyState & KMOD_ALT) ? true : false);
+			lua_pushboolean(L, (_pKeyState & KMOD_GUI) ? true : false);
 
 			lua_pushnil(L);
-			lua_pushboolean(L, (event->type == SDL_KEYUP) ? TRUE : FALSE);
+			lua_pushboolean(L, (event->type == SDL_KEYUP) ? true : false);
 
 			/* Convert unicode UCS-2 to UTF8 string */
 			if (event->key.keysym.sym)
@@ -403,7 +501,7 @@ bool on_event(SDL_Event *event)
 
 			docall(L, 11, 0);
 		}
-		return TRUE;
+		return true;
 	case SDL_MOUSEBUTTONDOWN:
 	case SDL_MOUSEBUTTONUP:
 		if (event->type == SDL_MOUSEBUTTONDOWN) SDL_SetCursor(mouse_cursor_down);
@@ -443,10 +541,10 @@ bool on_event(SDL_Event *event)
 			}
 			lua_pushnumber(L, event->button.x / screen_zoom);
 			lua_pushnumber(L, event->button.y / screen_zoom);
-			lua_pushboolean(L, (event->type == SDL_MOUSEBUTTONUP) ? TRUE : FALSE);
+			lua_pushboolean(L, (event->type == SDL_MOUSEBUTTONUP) ? true : false);
 			docall(L, 5, 0);
 		}
-		return TRUE;
+		return true;
 	case SDL_MOUSEWHEEL:
 		if (current_mousehandler != LUA_NOREF)
 		{
@@ -472,7 +570,7 @@ bool on_event(SDL_Event *event)
 				docall(L, 5, 0);
 			}
 		}
-		return TRUE;
+		return true;
 	case SDL_MOUSEMOTION:
 		mousex = event->motion.x / screen_zoom;
 		mousey = event->motion.y / screen_zoom;
@@ -496,7 +594,7 @@ bool on_event(SDL_Event *event)
 			lua_pushnumber(L, event->motion.yrel);
 			docall(L, 6, 0);
 		}
-		return TRUE;
+		return true;
 	case SDL_FINGERDOWN:
 	case SDL_FINGERUP:
 		if (current_mousehandler != LUA_NOREF)
@@ -512,10 +610,10 @@ bool on_event(SDL_Event *event)
 			lua_pushnumber(L, event->tfinger.dx);
 			lua_pushnumber(L, event->tfinger.dy);
 			lua_pushnumber(L, event->tfinger.pressure);
-			lua_pushboolean(L, (event->type == SDL_FINGERUP) ? TRUE : FALSE);
+			lua_pushboolean(L, (event->type == SDL_FINGERUP) ? true : false);
 			docall(L, 8, 0);
 		}
-		return TRUE;
+		return true;
 	case SDL_FINGERMOTION:
 		if (current_mousehandler != LUA_NOREF)
 		{
@@ -532,7 +630,7 @@ bool on_event(SDL_Event *event)
 			lua_pushnumber(L, event->tfinger.pressure);
 			docall(L, 7, 0);
 		}
-		return TRUE;
+		return true;
 	case SDL_MULTIGESTURE:
 		if (current_mousehandler != LUA_NOREF)
 		{
@@ -548,7 +646,7 @@ bool on_event(SDL_Event *event)
 			lua_pushnumber(L, event->mgesture.dDist);
 			docall(L, 6, 0);
 		}
-		return TRUE;
+		return true;
 	case SDL_CONTROLLERDEVICEADDED:
 		if (current_gamepadhandler != LUA_NOREF)
 		{
@@ -557,11 +655,11 @@ bool on_event(SDL_Event *event)
 			lua_gettable(L, -2);
 			lua_remove(L, -2);
 			lua_rawgeti(L, LUA_REGISTRYINDEX, current_gamepadhandler);
-			lua_pushboolean(L, TRUE);
+			lua_pushboolean(L, true);
 			lua_pushnumber(L, event->cdevice.which);
 			docall(L, 3, 0);
 		}
-		return TRUE;
+		return true;
 
 	case SDL_CONTROLLERDEVICEREMOVED:
 		if (current_gamepadhandler != LUA_NOREF)
@@ -571,11 +669,11 @@ bool on_event(SDL_Event *event)
 			lua_gettable(L, -2);
 			lua_remove(L, -2);
 			lua_rawgeti(L, LUA_REGISTRYINDEX, current_gamepadhandler);
-			lua_pushboolean(L, FALSE);
+			lua_pushboolean(L, false);
 			lua_pushnumber(L, event->cdevice.which);
 			docall(L, 3, 0);
 		}
-		return TRUE;
+		return true;
 
 	case SDL_CONTROLLERBUTTONDOWN:
 	case SDL_CONTROLLERBUTTONUP:
@@ -587,10 +685,10 @@ bool on_event(SDL_Event *event)
 			lua_remove(L, -2);
 			lua_rawgeti(L, LUA_REGISTRYINDEX, current_gamepadhandler);
 			lua_pushstring(L, SDL_GameControllerGetStringForButton((SDL_GameControllerButton)event->cbutton.button));
-			lua_pushboolean(L, event->cbutton.state == SDL_RELEASED ? TRUE : FALSE);
+			lua_pushboolean(L, event->cbutton.state == SDL_RELEASED ? true : false);
 			docall(L, 3, 0);
 		}
-		return TRUE;
+		return true;
 
 	case SDL_CONTROLLERAXISMOTION:
 		if (current_gamepadhandler != LUA_NOREF)
@@ -605,9 +703,9 @@ bool on_event(SDL_Event *event)
 			lua_pushnumber(L, v);
 			docall(L, 3, 0);
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // redraw the screen and update game logics, if any
@@ -749,7 +847,7 @@ void pass_command_args(int argc, char *argv[])
 	}
 }
 
-Uint32 realtime_timer(Uint32 interval, void *param)
+Uint32 redraw_timer(Uint32 interval, void *param)
 {
 	SDL_Event event;
 	SDL_UserEvent userevent;
@@ -759,79 +857,24 @@ Uint32 realtime_timer(Uint32 interval, void *param)
 	 same interval: */
 
 	userevent.type = SDL_USEREVENT;
-	userevent.code = 2;
+	userevent.code = 0;
 	userevent.data1 = NULL;
 	userevent.data2 = NULL;
 
 	event.type = SDL_USEREVENT;
 	event.user = userevent;
 
-	// Grab the realtime lock and see if a tick should be requested.
-	SDL_mutexP(realtimeLock);
-	// If there is no realtime tick pending, request one.  Otherwise, ignore.
-	if (!realtime_pending && isActive) {
+	// Grab the rendering lock and see if a redraw should be requested.
+	SDL_mutexP(renderingLock);
+	// If there is no redraw pending, request one.  Otherwise, ignore.
+	if (!redraw_pending) {
 		SDL_PushEvent(&event);
-		realtime_pending = 1;
+		redraw_pending = 1;
 	}
-	SDL_mutexV(realtimeLock);
+	SDL_mutexV(renderingLock);
 
 	return(interval);
 }
-
-// Calls the lua music callback
-void on_music_stop()
-{
-	if (current_game != LUA_NOREF)
-	{
-		lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
-		lua_pushliteral(L, "onMusicStop");
-		lua_gettable(L, -2);
-		lua_remove(L, -2);
-		if (lua_isfunction(L, -1))
-		{
-			lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
-			docall(L, 1, 0);
-		}
-		else
-			lua_pop(L, 1);
-	}
-}
-
-// Setup realtime
-void setupRealtime(float freq)
-{
-	SDL_mutexP(realtimeLock);
-
-	if (!freq)
-	{
-		if (realtime_timer_id) SDL_RemoveTimer(realtime_timer_id);
-		realtime_timer_id = 0;
-		printf("[ENGINE] Switching to turn based\n");
-	}
-	else
-	{
-		float interval = 1000 / freq;
-		if (realtime_timer_id) SDL_RemoveTimer(realtime_timer_id);
-		realtime_timer_id = SDL_AddTimer((int)interval, realtime_timer, NULL);
-		printf("[ENGINE] Switching to realtime, interval %d ms\n", (int)interval);
-	}
-	
-	SDL_mutexV(realtimeLock);
-	
-}
-
-void setupDisplayTimer(int fps)
-{
-	requested_fps = fps;
-	if (requested_fps) {
-		max_ms_per_frame = 1000 / fps;
-		printf("[ENGINE] Setting requested FPS to %d (%d ms)\n", fps, 1000 / fps);
-	} else {
-		max_ms_per_frame = 0;
-		printf("[ENGINE] Setting requested FPS to unbound\n");
-	}
-}
-
 
 /* general OpenGL initialization function */
 int initGL()
@@ -853,7 +896,7 @@ int initGL()
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
 
-	return( TRUE );
+	return( true );
 }
 
 int resizeWindow(int width, int height)
@@ -892,7 +935,7 @@ int resizeWindow(int width, int height)
 	printf("OpenGL max texture size: %d\n", max_texture_size);
 
 
-	return( TRUE );
+	return( true );
 }
 
 /* @see main.h#resizeNeedsNewWindow */
@@ -1001,7 +1044,7 @@ void do_resize(int w, int h, bool fullscreen, bool borderless, float zoom)
 
 		/* Set the window icon. */
 		windowIconSurface = IMG_Load_RW(PHYSFSRWOPS_openRead(WINDOW_ICON_PATH)
-				, TRUE);
+				, true);
 		SDL_SetWindowIcon(window, windowIconSurface);
 		if (offscreen_render) SDL_HideWindow(window);
 
@@ -1184,7 +1227,7 @@ void boot_lua(int state, bool rebooting, int argc, char *argv[])
 
 		// Will be useful
 #ifdef __APPLE__
-		lua_pushboolean(L, TRUE);
+		lua_pushboolean(L, true);
 		lua_setglobal(L, "__APPLE__");
 #endif
 
@@ -1330,6 +1373,117 @@ void handleIdleTransition(int goIdle)
 	}
 }
 
+void event_loop_realtime() {
+	SDL_Event event;
+
+	int ticks = SDL_GetTicks();
+	on_redraw();
+
+#ifdef SELFEXE_WINDOWS
+	if (os_autoflush) _commit(_fileno(stdout));
+#endif
+#ifdef SELFEXE_MACOSX
+	if (os_autoflush) fflush(stdout);
+#endif
+
+	while (true) {
+		on_tick();
+
+		/* handle the events in the queue */
+		while (SDL_PollEvent(&event))
+		{
+			if (on_event(&event)) {
+				tickPaused = false;
+			}
+		}
+		if (tickPaused) break; // No more ticks to process
+		if (SDL_GetTicks() - ticks >= max_ms_per_frame) break; // We took too long! DRAW A FRAME! DRAW A FRAME !!!!!
+	}
+
+	ticks_per_frame = SDL_GetTicks() - ticks;
+	if (ticks_per_frame < max_ms_per_frame) SDL_Delay(max_ms_per_frame - ticks_per_frame);
+}
+
+void event_loop_tickbased() {
+	SDL_Event event;
+
+	static int ticks = SDL_GetTicks();
+
+	if (tickPaused) SDL_WaitEvent(NULL);
+
+	/* handle the events in the queue */
+	while (SDL_PollEvent(&event))
+	{
+		if (event.type == SDL_USEREVENT && event.user.code == 0) {
+			on_redraw();
+			int now_ticks = SDL_GetTicks();
+			ticks_per_frame = now_ticks - ticks;
+			ticks = now_ticks;
+			SDL_mutexP(renderingLock);
+			redraw_pending = 0;
+			SDL_mutexV(renderingLock);
+
+			#ifdef SELFEXE_WINDOWS
+				if (os_autoflush) _commit(_fileno(stdout));
+			#endif
+			#ifdef SELFEXE_MACOSX
+				if (os_autoflush) fflush(stdout);
+			#endif
+			break;
+		} else {
+			if (on_event(&event)) {
+				tickPaused = false;
+			}
+			break;
+		}
+	}
+
+	if (!tickPaused) {
+		on_tick();
+	}
+}
+
+void (*event_loop)() = event_loop_tickbased;
+
+// Setup realtime / turnbased
+void setupRealtime(float freq)
+{
+	if (!freq) {
+		event_loop = event_loop_tickbased;
+		printf("[ENGINE] Switching to turn based\n");
+	} else {
+		event_loop = event_loop_realtime;
+		printf("[ENGINE] Switching to realtime\n");
+	}
+	
+	// Make sure we upadte the display event timer if needed
+	setupDisplayTimer(requested_fps);
+}
+
+void setupDisplayTimer(int fps)
+{
+	requested_fps = fps;
+	if (requested_fps) {
+		max_ms_per_frame = 1000 / fps;
+		printf("[ENGINE] Setting requested FPS to %d (%d ms)\n", fps, 1000 / fps);
+	} else {
+		max_ms_per_frame = 0;
+		printf("[ENGINE] Setting requested FPS to unbound\n");
+	}
+
+	// We only use the display timer in tickbased event loop
+	SDL_mutexP(renderingLock);
+	if (event_loop == event_loop_tickbased) {
+		if (display_timer_id) SDL_RemoveTimer(display_timer_id);
+		display_timer_id = SDL_AddTimer(max_ms_per_frame, redraw_timer, NULL);
+		
+	} else {
+		if (display_timer_id) SDL_RemoveTimer(display_timer_id);
+		display_timer_id = 0;
+	}
+	SDL_mutexV(renderingLock);
+}
+
 /**
  * Core entry point.
  */
@@ -1342,10 +1496,10 @@ int main(int argc, char *argv[])
 	g_argc = argc;
 	g_argv = argv;
 
-	bool logtofile = FALSE;
-	bool is_zygote = FALSE;
-	bool os_autoflush = FALSE;
-	bool no_web = FALSE;
+	bool logtofile = false;
+	bool is_zygote = false;
+	bool os_autoflush = false;
+	bool no_web = false;
 	FILE *logfile = NULL;
 
 	// Parse arguments
@@ -1361,21 +1515,21 @@ int main(int argc, char *argv[])
 		{
 			setvbuf(stdout, (char *) NULL, _IOLBF, 0);
 #ifdef SELFEXE_WINDOWS
-			os_autoflush = TRUE;
+			os_autoflush = true;
 #endif
 		}
-		if (!strncmp(arg, "--no-debug", 10)) no_debug = TRUE;
+		if (!strncmp(arg, "--no-debug", 10)) no_debug = true;
 		if (!strncmp(arg, "--xpos", 6)) start_xpos = strtol(argv[++i], NULL, 10);
 		if (!strncmp(arg, "--ypos", 6)) start_ypos = strtol(argv[++i], NULL, 10);
-		if (!strncmp(arg, "--safe-mode", 11)) safe_mode = TRUE;
+		if (!strncmp(arg, "--safe-mode", 11)) safe_mode = true;
 		if (!strncmp(arg, "--home", 6)) override_home = strdup(argv[++i]);
-		if (!strncmp(arg, "--no-steam", 10)) no_steam = TRUE;
-		if (!strncmp(arg, "--type=zygote", 13)) is_zygote = TRUE;
-		if (!strncmp(arg, "--type=renderer", 15)) is_zygote = TRUE;
-		if (!strncmp(arg, "--no-sandbox", 12)) is_zygote = TRUE;
-		if (!strncmp(arg, "--logtofile", 11)) logtofile = TRUE;
-		if (!strncmp(arg, "--no-web", 8)) no_web = TRUE;
-		if (!strncmp(arg, "--offscreen", 11)) offscreen_render = TRUE;
+		if (!strncmp(arg, "--no-steam", 10)) no_steam = true;
+		if (!strncmp(arg, "--type=zygote", 13)) is_zygote = true;
+		if (!strncmp(arg, "--type=renderer", 15)) is_zygote = true;
+		if (!strncmp(arg, "--no-sandbox", 12)) is_zygote = true;
+		if (!strncmp(arg, "--logtofile", 11)) logtofile = true;
+		if (!strncmp(arg, "--no-web", 8)) no_web = true;
+		if (!strncmp(arg, "--offscreen", 11)) offscreen_render = true;
 		if (!strncmp(arg, "--lock-size", 11)) {
 			char *arg = argv[++i];
 			char *next;
@@ -1385,7 +1539,7 @@ int main(int argc, char *argv[])
 	}
 
 #ifdef SELFEXE_WINDOWS
-	logtofile = TRUE;
+	logtofile = true;
 #endif
 	if (!is_zygote && logtofile) {
 		logfile = freopen("te4_log.txt", "w", stdout);
@@ -1401,9 +1555,6 @@ int main(int argc, char *argv[])
 
 	if (!no_web) te4_web_load();
 
-	// Initialize display lock for thread safety.
-	realtimeLock = SDL_CreateMutex();
-	
 	// Get cpu cores
 	nb_cpus = get_number_cpus();
 	printf("[CPU] Detected %d CPUs\n", nb_cpus);
@@ -1448,9 +1599,9 @@ int main(int argc, char *argv[])
 	// Filter events, to catch the quit event
 	SDL_SetEventFilter(event_filter, NULL);
 
-	boot_lua(1, FALSE, argc, argv);
+	boot_lua(1, false, argc, argv);
 
-	do_resize(WIDTH, HEIGHT, FALSE, FALSE, screen_zoom);
+	do_resize(WIDTH, HEIGHT, false, false, screen_zoom);
 	if (screen==NULL) {
 		printf("error opening screen: %s\n", SDL_GetError());
 		return 3;
@@ -1466,10 +1617,10 @@ int main(int argc, char *argv[])
 	SDL_StartTextInput();
 
 	// Get OpenGL capabilities
-	multitexture_active = TRUE;
-	shaders_active = TRUE;
-	fbo_active = TRUE;
-	if (!multitexture_active) shaders_active = FALSE;
+	multitexture_active = true;
+	shaders_active = true;
+	fbo_active = true;
+	if (!multitexture_active) shaders_active = false;
 	if (!GLEW_VERSION_2_1)
 	{
 		printf("OpenGL 2.1 required.\n");
@@ -1479,160 +1630,13 @@ int main(int argc, char *argv[])
 
 	init_blank_surface();
 
-	boot_lua(2, FALSE, argc, argv);
+	boot_lua(2, false, argc, argv);
 
 	pass_command_args(argc, argv);
 
-	SDL_Event event;
 	while (!exit_engine)
 	{
-		int ticks = SDL_GetTicks();
-		on_redraw();
-
-#ifdef SELFEXE_WINDOWS
-		if (os_autoflush) _commit(_fileno(stdout));
-#endif
-#ifdef SELFEXE_MACOSX
-		if (os_autoflush) fflush(stdout);
-#endif
-
-		while (TRUE) {
-			on_tick();
-			// DGDGDGDG make two game loops, one for realtime one for turnbased!
-
-			/* handle the events in the queue */
-			while (SDL_PollEvent(&event))
-			{
-				switch(event.type)
-				{
-				case SDL_WINDOWEVENT:
-					switch (event.window.event)
-					{
-					case SDL_WINDOWEVENT_RESIZED:
-						/* Note: SDL can't resize a fullscreen window, so don't bother! */
-						if (!is_fullscreen) {
-							printf("SDL_WINDOWEVENT_RESIZED: %d x %d\n", event.window.data1, event.window.data2);
-							do_resize(event.window.data1, event.window.data2, is_fullscreen, is_borderless, screen_zoom);
-							if (current_game != LUA_NOREF)
-							{
-								lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
-								lua_pushliteral(L, "onResolutionChange");
-								lua_gettable(L, -2);
-								lua_remove(L, -2);
-								lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
-								docall(L, 1, 0);
-							}
-						} else {
-							printf("SDL_WINDOWEVENT_RESIZED: ignored due to fullscreen\n");
-
-						}
-						break;
-					case SDL_WINDOWEVENT_MOVED: {
-						int x, y;
-						/* Note: SDL can't resize a fullscreen window, so don't bother! */
-						if (!is_fullscreen) {
-							SDL_GetWindowPosition(window, &x, &y);
-							printf("move %d x %d\n", x, y);
-							if (current_game != LUA_NOREF)
-							{
-								lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
-								lua_pushliteral(L, "onWindowMoved");
-								lua_gettable(L, -2);
-								lua_remove(L, -2);
-								lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
-								lua_pushnumber(L, x);
-								lua_pushnumber(L, y);
-								docall(L, 3, 0);
-							}
-						} else {
-							printf("SDL_WINDOWEVENT_MOVED: ignored due to fullscreen\n");
-						}
-						break;
-					}
-					case SDL_WINDOWEVENT_CLOSE:
-						event.type = SDL_QUIT;
-						SDL_PushEvent(&event);
-						break;
-
-					case SDL_WINDOWEVENT_SHOWN:
-					case SDL_WINDOWEVENT_FOCUS_GAINED:
-						SDL_SetModState(KMOD_NONE);
-						/* break from idle */
-						//printf("[EVENT HANDLER]: Got a SHOW/FOCUS_GAINED event, restoring full FPS.\n");
-						handleIdleTransition(0);
-						break;
-
-					case SDL_WINDOWEVENT_HIDDEN:
-					case SDL_WINDOWEVENT_FOCUS_LOST:
-						/* go idle */
-						SDL_SetModState(KMOD_NONE);
-						//printf("[EVENT HANDLER]: Got a HIDDEN/FOCUS_LOST event, going idle.\n");
-						handleIdleTransition(1);
-						break;
-					default:
-						break;
-
-					}
-					break;
-				case SDL_QUIT:
-					/* handle quit requests */
-					exit_engine = TRUE;
-					break;
-				case SDL_USEREVENT:
-					/* TODO: Enumerate user event codes */
-					switch(event.user.code)
-					{
-					case 1:
-						on_music_stop();
-						break;
-
-					case 2:
-					/* DGDGDGDG Ibroke realtime mode
-						if (isActive) {
-							on_tick();
-							SDL_mutexP(realtimeLock);
-							realtime_pending = 0;
-							SDL_mutexV(realtimeLock);
-						}
-						break;
-					*/
-
-					default:
-						break;
-					}
-					break;
-				default:
-					/* handle key presses */
-					if (on_event(&event)) {
-						tickPaused = FALSE;
-					}
-					break;
-				}
-			}
-			if (tickPaused) break; // No more ticks to process
-			if (SDL_GetTicks() - ticks >= max_ms_per_frame) break; // We took too long! DRAW A FRAME! DRAW A FRAME !!!!!
-		}
-
-		ticks_per_frame = SDL_GetTicks() - ticks;
-		if (ticks_per_frame < max_ms_per_frame) SDL_Delay(max_ms_per_frame - ticks_per_frame);
-
-		/* draw the scene */
-		// Note: since realtime_timer_id is accessed, have to lock first
-		/* DGDGDGDG I broke realtime mode! slap me!
-		int doATick = 0;
-		SDL_mutexP(realtimeLock);
-			if (!realtime_timer_id && isActive && !tickPaused) {
-				doATick = 1;
-				realtime_pending = 1;
-			}
-		SDL_mutexV(realtimeLock);
-		if (doATick) {
-			on_tick();
-			SDL_mutexP(realtimeLock);
-			realtime_pending = 0;	
-			SDL_mutexV(realtimeLock);
-		}
-		*/
+		event_loop();
 
 		/* Reboot the lua engine */
 		if (core_def->corenum)
@@ -1640,11 +1644,11 @@ int main(int argc, char *argv[])
 			// Just reboot the lua VM
 			if (core_def->corenum == TE4CORE_VERSION)
 			{
-				tickPaused = FALSE;
+				tickPaused = false;
 				setupRealtime(0);
 				reset_physic_simulation();
-				boot_lua(1, TRUE, argc, argv);
-				boot_lua(2, TRUE, argc, argv);
+				boot_lua(1, true, argc, argv);
+				boot_lua(2, true, argc, argv);
 			}
 			// Clean up and tell the runner to run a different core
 			else
@@ -1659,7 +1663,7 @@ int main(int argc, char *argv[])
 
 	// Clean up locks.
 	printf("Cleaning up!\n");
-	cleanupTimerLock(realtimeLock, &realtime_timer_id, &realtime_pending);
+	cleanupTimerLock(renderingLock, &display_timer_id, &redraw_pending);
 	
 	printf("Terminating!\n");
 	te4_web_terminate();
