@@ -70,27 +70,27 @@ function _M:init(minimalist, w, h)
 	local font, smallfont = FontPackage:get("resources_normal", true), FontPackage:get("resources_small", true)
 
 	self.do_container = core.renderer.renderer("static"):zSort(true):setRendererName("playerframe") -- Should we use renderer or container ?
-	-- self.do_container:add(pf_shadow) pf_shadow:translate(0, 0, -0.1)
-	-- self.do_container:add(pf_bg) pf_bg:translate(config.bg.x, config.bg.y, 0)
+	self.do_container:add(pf_shadow) pf_shadow:translate(0, 0, -0.1)
+	self.do_container:add(pf_bg) pf_bg:translate(config.bg.x, config.bg.y, 0)
 	self.do_container:add(self.pf_defend) self.pf_defend:translate(config.attack.x, config.attack.y, 0)
 	self.do_container:add(self.pf_attack) self.pf_attack:translate(config.attack.x, config.attack.y, 0)
-	-- self.do_container:add(self.pf_levelup) self.pf_levelup:translate(config.levelup.x, config.levelup.y, 0)
-	-- self.do_container:add(self.pf_encumber) self.pf_encumber:translate(config.encumber.x, config.encumber.y, 0)
-	-- self.do_container:add(self.pf_exp) self.pf_exp:translate(config.expbar.x, config.expbar.y - expbar_h / 2, 0)
-	-- self.do_container:add(self.pf_exp_levelup) self.pf_exp_levelup:translate(config.expbar.x, config.expbar.y - lexpbar_h / 2, 0)
+	self.do_container:add(self.pf_levelup) self.pf_levelup:translate(config.levelup.x, config.levelup.y, 0)
+	self.do_container:add(self.pf_encumber) self.pf_encumber:translate(config.encumber.x, config.encumber.y, 0)
+	self.do_container:add(self.pf_exp) self.pf_exp:translate(config.expbar.x, config.expbar.y - expbar_h / 2, 0)
+	self.do_container:add(self.pf_exp_levelup) self.pf_exp_levelup:translate(config.expbar.x, config.expbar.y - lexpbar_h / 2, 0)
 
 	self.text_level = core.renderer.text(font)
-	-- self.do_container:add(self.text_level) self.text_level:translate(config.level.x, config.level.y, 10)
+	self.do_container:add(self.text_level) self.text_level:translate(config.level.x, config.level.y, 10)
 
 	self.text_name = core.renderer.text(font)
-	-- self.do_container:add(self.text_name) self.text_name:translate(config.name.x, config.name.y, 10)
+	self.do_container:add(self.text_name) self.text_name:translate(config.name.x, config.name.y, 10)
 
 	self.text_exp = core.renderer.text(font)
-	-- self.do_container:add(self.text_exp) self.text_exp:translate(config.exp.x, config.exp.y, 10)
+	self.do_container:add(self.text_exp) self.text_exp:translate(config.exp.x, config.exp.y, 10)
 
 	self.text_money = core.renderer.text(font)
 	self.text_money:textColor(colors.unpack1(colors.GOLD))
-	-- self.do_container:add(self.text_money) self.text_money:translate(config.money.x, config.money.y, 10)
+	self.do_container:add(self.text_money) self.text_money:translate(config.money.x, config.money.y, 10)
 
 	self.full_container = core.renderer.container()
 	self.full_container:add(self.do_container)
@@ -134,7 +134,7 @@ function _M:update(nb_keyframes)
 			self.do_container:shown(true)
 			if self.player_do then self.do_container:remove(self.player_do) end
 			self.player_do = player:getDO(40, 40):translate(config.player.x, config.player.y, 1)
-			-- self.do_container:add(self.player_do)
+			self.do_container:add(self.player_do)
 		end
 	end
 	self.old_player = player
