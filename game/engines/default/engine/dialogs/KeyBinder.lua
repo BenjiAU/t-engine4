@@ -82,7 +82,10 @@ function _M:use(item)
 		local title = "      Press a key (escape to cancel, backspace to remove) for: "..tostring(t.name)
 		local font = self.font
 		local w, h = font:size(title:removeColorCodes())
-		local d = engine.ui.Dialog.new(title, w + 20, h + 25)
+		local d = Dialog.new(title, w + 20, h + 25, nil, nil, nil, nil, false)
+		d:loadUI{{left=0, top=0, ui=Textzone.new{auto_width=true, auto_height=true, text="Press any key, key combo or mouse click."}}}
+		d:setupUI(true, true)
+
 		d.key:addCommands{__DEFAULT=function(sym, ctrl, shift, alt, meta, unicode)
 			-- Modifier keys are not treated
 			if not t.single_key and (sym == KeyBind._LCTRL or sym == KeyBind._RCTRL or
@@ -129,15 +132,12 @@ function _M:use(item)
 				game:unregisterDialog(d)
 			end },
 		}
-
-		-- d.drawDialog = function(self, s)
-		-- 	s:drawColorStringBlendedCentered(self.font, curcol == 1 and "Bind key" or "Bind alternate key", 2, 2, self.iw - 2, self.ih - 2)
-		-- end
 		game:registerDialog(d)
 	elseif curcol == 3 then
 		local title = "Make gesture (using right mouse button) or type it (or escape) for: "..tostring(t.name)
 		local font = self.font
 		local w, h = font:size(title)
+		-- DGDGDGDG check this still works
 		local d = GetText.new(title, "Gesture", 0, 10,
 			function(gesture)
 				if item.g and item.g ~= "--" then
