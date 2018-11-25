@@ -156,7 +156,7 @@ protected:
 	vec4 color;
 	vec4 sort_center = vec4(0, 0, 0, 1);
 	bool sort_center_set = false;
-	SortAxis sort_axis = SortAxis::Y;
+	SortAxis sort_axis = SortAxis::Z;
 	bool visible = true;
 	float x = 0, y = 0, z = 0;
 	float rot_x = 0, rot_y = 0, rot_z = 0;

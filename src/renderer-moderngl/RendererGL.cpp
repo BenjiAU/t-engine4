@@ -354,10 +354,9 @@ void RendererGL::activateCutting(mat4 cur_model, bool v) {
 	}
 }
 
-bool ok =true;
 void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	if (!visible) return;
-	if (changed_children||1) update();
+	if (changed_children) update();
 	if (displays.empty()) return;
 	// printf("Displaying renderer %s with %d and sorting %d\n", getRendererName(), displays.size(), zsort != SortMode::NO_SORT);
 
