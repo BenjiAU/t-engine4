@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -769,7 +769,8 @@ function _M:addEntity(level, e, typ, x, y, no_added)
 		if x and y then level.map(x, y, Map.TRIGGER, e) end
 	end
 	e:check("addedToLevel", level, x, y)
-	e:check("on_added", level, x, y)
+	e:check("on_added", level, x, y)  -- Sustains are activated here
+	e:check("on_added_final", level, x, y)
 end
 
 --- If we are loaded we need a new uid
@@ -811,6 +812,7 @@ function _M:load(dynamic)
 		data = dynamic
 		ret = false
 		for k, e in pairs(data) do self[k] = e end
+		self:onLoadZoneFile(false)
 		self:triggerHook{"Zone:create", dynamic=dynamic}
 		if self.on_loaded then self:on_loaded() end
 	else

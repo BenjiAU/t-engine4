@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -143,7 +143,7 @@ newTalent{
 	require = undeads_req4,
 	points = 5,
 	cooldown = 10,
-	tactical = { ATTACK = {BLIGHT = 5} },  -- Ghouls really like making more ghouls
+	tactical = { ATTACK = {BLIGHT = {disease = 3}} },  -- Ghouls really like making more ghouls
 	range = 1,
 	requires_target = true,
 	is_melee = true,

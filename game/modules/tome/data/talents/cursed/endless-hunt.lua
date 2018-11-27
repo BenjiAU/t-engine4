@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -93,58 +93,10 @@ newTalent{
 }
 
 newTalent{
-	name = "Beckon",
+	name = "Harass Prey",
 	type = {"cursed/endless-hunt", 2},
 	require = cursed_wil_req2,
 	points = 5,
-	cooldown = 10,
-	hate = 2,
-	tactical = { DISABLE = 2 },
-	range = 10,
-	getDuration = function(self, t)
-		return math.min(20, math.floor(5 + self:getTalentLevel(t) * 2))
-	end,
-	getChance = function(self, t)
-		return math.min(75, math.floor(25 + (math.sqrt(self:getTalentLevel(t)) - 1) * 20))
-	end,
-	getSpellpowerChange = function(self, t)
-		return -self:combatTalentStatDamage(t, "wil", 8, 33)
-	end,
-	getMindpowerChange = function(self, t)
-		return -self:combatTalentStatDamage(t, "wil", 8, 33)
-	end,
-	action = function(self, t)
-		local range = self:getTalentRange(t)
-
-		local tg = {type="hit", pass_terrain=true, range=range}
-		local x, y, target = self:getTarget(tg)
-		if not x or not y or not target then return nil end
-		if core.fov.distance(self.x, self.y, x, y) > range then return nil end
-
-		local duration = t.getDuration(self, t)
-		local chance = t.getChance(self, t)
-		local spellpowerChange = t.getSpellpowerChange(self, t)
-		local mindpowerChange = t.getMindpowerChange(self, t)
-		target:setEffect(target.EFF_BECKONED, duration, {src=self, range=range, chance=chance, spellpowerChange=spellpowerChange, mindpowerChange=mindpowerChange })
-
-		return true
-	end,
-	info = function(self, t)
-		local duration = t.getDuration(self, t)
-		local chance = t.getChance(self, t)
-		local spellpowerChange = t.getSpellpowerChange(self, t)
-		local mindpowerChange = t.getMindpowerChange(self, t)
-		return ([[The connection between predator and prey allows you to speak to the mind of your target and beckon them closer. For %d turns, they will try to come to you, even pushing others aside to do so. They will move towards you instead of acting %d%% of the time, but can save verses Mindpower to slow the effect. If they take significant damage, the beckoning may be overcome altogether. The effect makes concentration difficult for your target, reducing Spellpower and Mindpower by %d until they reach you.
-		The Spellpower and Mindpower reduction increases with your Willpower.]]):format(duration, chance, -spellpowerChange)
-	end,
-}
-
-newTalent{
-	name = "Harass Prey",
-	type = {"cursed/endless-hunt", 3},
-	require = cursed_wil_req3,
-	points = 5,
-	random_ego = "attack",
 	cooldown = 6,
 	hate = 5,
 	tactical = { ATTACK = { PHYSICAL = 3 } },
@@ -203,12 +155,60 @@ newTalent{
 }
 
 newTalent{
+	name = "Beckon",
+	type = {"cursed/endless-hunt", 3},
+	require = cursed_wil_req3,
+	points = 5,
+	cooldown = 10,
+	hate = 2,
+	tactical = { DISABLE = 2 },
+	range = 10,
+	getDuration = function(self, t)
+		return math.min(10, math.floor(5 + self:getTalentLevel(t) * 2))
+	end,
+	getChance = function(self, t)
+		return math.min(55, math.floor(25 + (math.sqrt(self:getTalentLevel(t)) - 1) * 20))
+	end,
+	getSpellpowerChange = function(self, t)
+		return -self:combatTalentStatDamage(t, "wil", 8, 33)
+	end,
+	getMindpowerChange = function(self, t)
+		return -self:combatTalentStatDamage(t, "wil", 8, 33)
+	end,
+	action = function(self, t)
+		local range = self:getTalentRange(t)
+
+		local tg = {type="hit", pass_terrain=true, range=range}
+		local x, y, target = self:getTarget(tg)
+		if not x or not y or not target then return nil end
+		if core.fov.distance(self.x, self.y, x, y) > range then return nil end
+
+		local duration = t.getDuration(self, t)
+		local chance = t.getChance(self, t)
+		local spellpowerChange = t.getSpellpowerChange(self, t)
+		local mindpowerChange = t.getMindpowerChange(self, t)
+		target:setEffect(target.EFF_BECKONED, duration, {src=self, range=range, chance=chance, spellpowerChange=spellpowerChange, mindpowerChange=mindpowerChange })
+
+		return true
+	end,
+	info = function(self, t)
+		local duration = t.getDuration(self, t)
+		local chance = t.getChance(self, t)
+		local spellpowerChange = t.getSpellpowerChange(self, t)
+		local mindpowerChange = t.getMindpowerChange(self, t)
+		return ([[The connection between predator and prey allows you to speak to the mind of your target and beckon them closer. For %d turns, they will try to come to you, even pushing others aside to do so. They will move towards you instead of acting %d%% of the time, but can save verses Mindpower to slow the effect. If they take significant damage, the beckoning may be overcome altogether. The effect makes concentration difficult for your target, reducing Spellpower and Mindpower by %d until they reach you.
+		The Spellpower and Mindpower reduction increases with your Willpower.]]):format(duration, chance, -spellpowerChange)
+	end,
+}
+
+
+newTalent{
 	name = "Surge",
 	type = {"cursed/endless-hunt", 4},
 	mode = "sustained",
 	require = cursed_wil_req4,
 	points = 5,
-	cooldown = 10,
+	cooldown = 6,
 	no_energy = true,
 	getMovementSpeedChange = function(self, t)
 		return self:combatTalentStatDamage(t, "wil", 0.1, 1.1)
@@ -252,7 +252,7 @@ newTalent{
 		local defenseChange = t.getDefenseChange(self, t, true)
 		return ([[Let hate fuel your movements. While active, you gain %d%% movement speed. The recklessness of your movement brings you bad luck (Luck -3).
 		Cleave, Repel and Surge cannot be active simultaneously, and activating one will place the others in cooldown.
-		The speed of your movements, combined with the balance and utility of two weapons, gives you %d extra Defense while dual-wielding.
+		Sustaining Surge while Dual Wielding grants %d additional Defense.
 		Movement speed and dual-wielding Defense both increase with the Willpower stat.]]):format(movementSpeedChange * 100, defenseChange)
 	end,
 }

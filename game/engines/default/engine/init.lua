@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -45,10 +45,14 @@ fs.mkdir(fs.getHomePath().."/4.0/")
 fs.mkdir(fs.getHomePath().."/4.0/profiles/")
 fs.mkdir(fs.getHomePath().."/4.0/settings/")
 
-fs.setPathAllowed(engine.homepath)
-fs.setPathAllowed(fs.getRealPath("/addons/"))
-if fs.getRealPath("/dlcs/") then fs.setPathAllowed(fs.getRealPath("/dlcs/")) end
-fs.setPathAllowed(fs.getRealPath("/modules/"))
+fs.setPathAllowed(engine.homepath, true)
+fs.setPathAllowed(fs.getRealPath("/addons/"), true)
+if fs.getRealPath("/dlcs/") then fs.setPathAllowed(fs.getRealPath("/dlcs/"), true) end
+fs.setPathAllowed(fs.getRealPath("/modules/"), true)
+
+-- Last resort, add currently mounted paths, as readonly, so taht reset mounts work
+for _, path in ipairs(fs.getSearchPath()) do fs.setPathAllowed(path) end
+
 fs.doneSettingPathAllowed()
 fs.setWritePath(engine.homepath)
 
@@ -76,12 +80,32 @@ censor_boot = true
 chat.filter = {}
 chat.ignores = {}
 addons = {}
+allow_online_events = true
+disable_all_connectivity = true
+upload_charsheet = true
 upgrades { v1_0_5=true }
 ]]
+local loaded_config_files = {}
 for i, file in ipairs(fs.list("/settings/")) do
 	if file:find(".cfg$") then
 		config.load("/settings/"..file)
+		loaded_config_files[file] = true
 	end
+end
+
+-- Keep the same setting when upgrading
+-- What a FRELLING MESS
+if not loaded_config_files["disable_all_connectivity.cfg"] and not config.settings.firstrun_gdpr then
+	config.settings.disable_all_connectivity = false
+end
+
+if config.settings.disable_all_connectivity then
+	core.game.disableConnectivity()
+	local function void(t) for _, k in ipairs(table.keys(t)) do t[k] = nil end end
+	-- if core.steam then void(core.steam) core.steam = nil end
+	if core.discord then void(core.discord) core.discord = nil end
+	if core.webview then void(core.webview) core.webview = nil end
+	if socketcore then void(socketcore) socketcore = nil end
 end
 
 if config.settings.force_safeboot then
@@ -169,4 +193,8 @@ savefile_pipe = engine.SavefilePipe.new()
 -- Setup FPS
 core.game.setFPS(config.settings.display_fps)
 
+if config.settings.disable_discord then core.discord = nil end
+if core.discord then core.discord.init() end
+
 util.showMainMenu(true)
+

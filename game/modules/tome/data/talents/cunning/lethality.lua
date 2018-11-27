@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -42,22 +42,20 @@ newTalent{
 	name = "Expose Weakness",
 	type = {"cunning/lethality", 2},
 	points = 5,
-	random_ego = "attack",
-	cooldown = 10,
-	stamina = 15,
+	cooldown = 6,
+	stamina = 30,
 	require = cuns_req2,
 	tactical = { ATTACK = {weapon = 2}, BUFF = 1 },
 	requires_target = true,
 	is_melee = true,
 	range = 1,
-	message = false,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
 	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 0.8, 1.1) end,
 	getAPR = function(self, t) return math.floor(self:combatTalentScale(t, 4, 10, 0.75)) end,
-	getAccuracy = function(self, t) return self:combatTalentScale(t, 2, 5) + self:combatStatScale("cun", 2, 5) end,
-	getDuration = function(self, t) return math.floor(self:combatTalentLimit(t, 10, 4, 7)) end, --Limit to <10
-	getBonusDamage = function(self, t) return 4 + self:combatTalentStatDamage(t, "cun", 4, 20) end,
-	penetration = function(self, t) return self:combatTalentLimit(t, 50, 10, 25) end,
+	getAPRBuff = function(self, t) return self:combatTalentScale(t, 2, 20) + self:combatStatScale("cun", 2, 20) end,
+	getPenetration = function(self, t) return 30 end,
+	getAccuracy = function(self, t) return self:combatTalentScale(t, 2, 30) + self:combatStatScale("cun", 2, 30) end,
+	getDuration = function(self, t) return 3 end,
 	passives = function(self, t, p)
 		self:talentTemporaryValue(p, "combat_apr", t.getAPR(self, t))
 	end,
@@ -66,28 +64,21 @@ newTalent{
 		local _, x, y = self:canProject(tg, self:getTarget(tg))
 		local target = game.level.map(x, y, game.level.map.ACTOR)
 		if not target then return nil end
-
-		-- Note: this has a built in advantage for dual wielders
-		self:setEffect(self.EFF_EXPOSE_WEAKNESS, t.getDuration(self, t), {target=target, power=t.getBonusDamage(self, t), penetration=t.penetration(self, t), accuracy=t.getAccuracy(self, t)})
 		
-		local eff = self:hasEffect(self.EFF_EXPOSE_WEAKNESS)
-
-		self:logCombat(target, "#Source# #GOLD#tests the defenses#LAST# of #target#.")
 		local hitted = self:attackTarget(target, nil, t.getDamage(self, t), true)
 
-		eff.find_weakness = false -- stop accumulating bonuses
+		self:setEffect(self.EFF_EXPOSE_WEAKNESS, t.getDuration(self, t), {apr = t.getAPRBuff(self, t), penetration=t.getPenetration(self, t), accuracy=t.getAccuracy(self, t)})
 
 		return true
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		local bonus = damDesc(self, DamageType.PHYSICAL, t.getBonusDamage(self, t))
 		local duration = t.getDuration(self, t)
 		return ([[Focus on a single target and perform a probing attack to find flaws in its defences, striking with your melee weapon(s) for %d%% damage.
-		For %d turns thereafter, your attacks against that target gain %d (effective) accuracy for each probing strike that missed, plus %0.1f (effective) bonus weapon damage and %d%% additional weapon resistance penetration for each probing strike that hit.
+		For %d turns thereafter, you gain %d armor penetration, %d accuracy, and %d%% all damage peneration.
 		Learning this technique allows you to permanently gain %d armour penetration with all melee and archery attacks.
-		The bonuses to accuracy and damage increase with Cunning.]]):
-		format(100 * damage, duration, t.getAccuracy(self, t), bonus, t.penetration(self, t), t.getAPR(self, t))
+		The temporary armor penetration and accuracy bonuses increase with Cunning.]]):
+		format(100 * damage, duration, t.getAPRBuff(self, t), t.getAccuracy(self, t), t.getPenetration(self, t), t.getAPR(self, t))
 	end,
 }
 
@@ -142,7 +133,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Become a whirling storm of blades, increasing attack speed by %d%% and causing melee attacks to strike an additional adjacent target other than your primary target for %d%% weapon damage. 
-This talent is exhausting to use, draining 6 stamina each turn.]]):format(t.getSpeed(self, t)*100, t.getDamage(self,t)*100)
+This talent is exhausting to use, draining 4 stamina each turn.]]):format(t.getSpeed(self, t)*100, t.getDamage(self,t)*100)
 	end,
 }
 

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -164,9 +164,6 @@ newEffect{
 			[DamageType.LIGHTNING]=50,}
 			)
 	end,
-	on_timeout = function(self, eff)
-		if eff.dur > 7 then eff.dur = 7 end -- instakilling players is dumb and this is still lethal at 7s
-	end,
 	deactivate = function(self, eff)
 		self:removeTemporaryValue("stoned", eff.tmpid)
 		self:removeTemporaryValue("poison_immune", eff.poison)
@@ -256,16 +253,18 @@ newEffect{
 newEffect{
 	name = "VIMSENSE", image = "talents/vimsense.png",
 	desc = "Vimsense",
-	long_desc = function(self, eff) return ("Reduces blight resistance by %d%%."):format(eff.power) end,
+	long_desc = function(self, eff) return ("Reduces blight resistance by %d%% and all saves by %d."):format(eff.power, eff.saves) end,
 	type = "magical",
 	subtype = { blight=true },
 	status = "detrimental",
-	parameters = { power=10 },
+	parameters = { power=10, saves=0 },
 	activate = function(self, eff)
-		eff.tmpid = self:addTemporaryValue("resists", {[DamageType.BLIGHT]=-eff.power})
+		self:effectTemporaryValue(eff, "resists", {[DamageType.BLIGHT]=-eff.power})
+		self:effectTemporaryValue(eff, "combat_mindresist",  -eff.saves)
+		self:effectTemporaryValue(eff, "combat_spellresist", -eff.saves)
+		self:effectTemporaryValue(eff, "combat_physresist", -eff.saves)
 	end,
 	deactivate = function(self, eff)
-		self:removeTemporaryValue("resists", eff.tmpid)
 	end,
 }
 
@@ -525,7 +524,6 @@ newEffect{
 		DamageType:get(DamageType.DARKNESS).projector(eff.src, self.x, self.y, DamageType.DARKNESS, eff.dam)
 	end,
 	activate = function(self, eff)
-		eff.power = math.floor(math.max(eff.power - (self:attr("confusion_immune") or 0) * 100, 10))
 		eff.power = util.bound(eff.power, 0, 50)
 		eff.tmpid = self:addTemporaryValue("confused", eff.power)
 		if eff.power <= 0 then eff.dur = 0 end
@@ -582,18 +580,24 @@ newEffect{
 newEffect{
 	name = "LIFE_TAP", image = "talents/life_tap.png",
 	desc = "Life Tap",
-	long_desc = function(self, eff) return ("The target taps its blood's hidden power, increasing all damage done by %d%%."):format(eff.power) end,
+	long_desc = function(self, eff) return ("The target taps its blood's hidden power, healing for %d%% of all damage they deal."):format(eff.power) end,
 	type = "magical",
 	subtype = { blight=true },
 	status = "beneficial",
-	parameters = { power=10 },
-	on_gain = function(self, err) return "#Target# is overloaded with power.", "+Life Tap" end,
-	on_lose = function(self, err) return "#Target# seems less dangerous.", "-Life Tap" end,
+	parameters = { power=0 },
+	on_gain = function(self, err) return "#Target# looks healthier as he deals damage.", "+Life Tap" end,
+	on_lose = function(self, err) return "#Target# stops leeching life.", "-Life Tap" end,
 	activate = function(self, eff)
-		eff.pid = self:addTemporaryValue("inc_damage", {all=eff.power})
 	end,
 	deactivate = function(self, eff)
-		self:removeTemporaryValue("inc_damage", eff.pid)
+	end,
+	callbackOnDealDamage = function(self, eff, value, target, dead, death_node)
+		-- Lifesteal done here to avoid stacking in bad ways with other LS effects
+		if value <= 0 or not target then return end
+			local leech = math.min(value, target.life) * eff.power / 100
+			if leech > 0 then
+				self:heal(leech, self)
+			end
 	end,
 }
 
@@ -976,12 +980,30 @@ newEffect{
 }
 
 newEffect{
+	name = "CORRUPTING_STRIKE", image = "talents/dark_surprise.png",
+	desc = "Corrupting Strike",
+	long_desc = function(self, eff) return ("The targets natural essence in corrupted reducing disease resistance by 100%%."):format() end,
+	type = "magical",
+	subtype = {blight=true},
+	status = "detrimental",
+	parameters = {},
+	on_gain = function(self, err) return "#Target# is completely vulnerable to disease!" end,
+	on_lose = function(self, err) return "#Target# no longer vulnerable to disease." end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "disease_immune", -1)
+	end,
+	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
 	name = "BLOODLUST", image = "talents/bloodlust.png",
 	desc = "Bloodlust",
 	long_desc = function(self, eff) return ("The target is in a magical frenzy, improving spellpower by %d."):format(eff.power) end,
 	type = "magical",
 	subtype = { frenzy=true },
 	status = "beneficial",
+	charges = function(self, eff) return math.floor(eff.power) end,
 	parameters = { power=1 },
 	on_timeout = function(self, eff)
 		if eff.refresh_turn + 10 < game.turn then -- Decay only if it's not refreshed
@@ -1123,32 +1145,6 @@ newEffect{
 		else game.level.map:particleEmitter(self.x, self.y, tg.radius, "ball_lightning_beam", {radius=tg.radius}) end
 
 		game:playSoundNear(self, "talents/lightning")
-	end,
-}
-
-newEffect{
-	name = "RECALL", image = "effects/recall.png",
-	desc = "Recalling",
-	long_desc = function(self, eff) return "The target is waiting to be recalled back to the worldmap." end,
-	type = "magical",
-	subtype = { unknown=true },
-	status = "beneficial",
-	cancel_on_level_change = true,
-	parameters = { },
-	activate = function(self, eff)
-		eff.leveid = game.zone.short_name.."-"..game.level.level
-	end,
-	deactivate = function(self, eff)
-		if (eff.allow_override or (self == game:getPlayer(true) and self:canBe("worldport") and not self:attr("never_move"))) and eff.dur <= 0 then
-			game:onTickEnd(function()
-				if eff.leveid == game.zone.short_name.."-"..game.level.level and game.player.can_change_zone then
-					game.logPlayer(self, "You are yanked out of this place!")
-					game:changeLevel(1, eff.where or game.player.last_wilderness)
-				end
-			end)
-		else
-			game.logPlayer(self, "Space restabilizes around you.")
-		end
 	end,
 }
 
@@ -2216,6 +2212,30 @@ newEffect{
 }
 
 newEffect{
+	name = "BLOOD_GRASP", image = "talents/blood_grasp.png",
+	desc = "Sanguine Infusion",
+	long_desc = function(self, eff) return ("Maximum life increased by %d."):format(eff.life) end,
+	type = "magical",
+	subtype = {corruption=true},
+	status = "beneficial",
+	parameters = {life = 0},
+	on_merge = function(self, old_eff, new_eff)
+		self:removeTemporaryValue("max_life", old_eff.tmpid)
+
+		old_eff.life = math.max(old_eff.life, new_eff.life)
+		old_eff.tmpid = self:addTemporaryValue("max_life", old_eff.life)
+		old_eff.dur = new_eff.dur
+		return old_eff
+	end,
+	activate = function(self, eff)
+		eff.tmpid = self:addTemporaryValue("max_life", eff.life)
+	end,
+	deactivate = function(self, eff)
+		self:removeTemporaryValue("max_life", eff.tmpid)
+	end,
+}
+
+newEffect{
 	name = "ARCANE_SUPREMACY", image = "talents/arcane_supremacy.png",
 	desc = "Arcane Supremacy",
 	long_desc = function(self, eff) return ("The target's spellpower and spell save has been increased by %d"):	format(eff.power) end,
@@ -2302,23 +2322,26 @@ newEffect{
 newEffect{
 	name = "OUT_OF_PHASE", image = "talents/phase_door.png",
 	desc = "Out of Phase",
-	long_desc = function(self, eff) return ("The target is out of phase with reality, increasing defense by %d, resist all by %d%%, and reducing the duration of detrimental timed effects by %d%%."):
-	format(eff.defense or 0, eff.resists or 0, eff.effect_reduction or 0) end,
+	long_desc = function(self, eff) return ("The target is out of phase with reality, increasing defense by %d, resist all by %d%%, and reducing the duration of detrimental timed effects by %d%%.\nThese effects cap at 60%%."):format(eff.defense or 0, eff.resists or 0, eff.effect_reduction or 0) end,
 	type = "magical",
 	subtype = { teleport=true },
 	status = "beneficial",
-	parameters = { power=10 },
+	parameters = { defense=0, resists=0, effect_reduction=0 },
 	on_gain = function(self, err) return "#Target# is out of phase.", "+Phased" end,
 	on_lose = function(self, err) return "#Target# is no longer out of phase.", "-Phased" end,
 	activate = function(self, eff)
+		eff.defense = math.min(60, eff.defense + (self:attr("defense_on_teleport") or 0))
+		eff.resists = math.min(60, eff.resists + (self:attr("resist_all_on_teleport") or 0))
+		eff.effect_reduction = math.min(60, eff.effect_reduction + (self:attr("effect_reduction_on_teleport") or 0))
+
 		eff.defid = self:addTemporaryValue("combat_def", eff.defense)
 		eff.resid= self:addTemporaryValue("resists", {all=eff.resists})
 		eff.durid = self:addTemporaryValue("reduce_detrimental_status_effects_time", eff.effect_reduction)
 		eff.particle = self:addParticles(Particles.new("phantasm_shield", 1))
 	end,
 	on_merge = function(self, old_eff, new_eff)
-		old_eff.defense = math.min(50, math.max(old_eff.defense, new_eff.defense)) or 0
-		old_eff.resists = math.min(40, math.max(old_eff.resists, new_eff.resists)) or 0
+		old_eff.defense = math.min(60, math.max(old_eff.defense, new_eff.defense)) or 0
+		old_eff.resists = math.min(60, math.max(old_eff.resists, new_eff.resists)) or 0
 		old_eff.effect_reduction = math.min(60, math.max(old_eff.effect_reduction, new_eff.effect_reduction)) or 0
 
 		self:removeTemporaryValue("combat_def", old_eff.defid)
@@ -2933,19 +2956,6 @@ newEffect{
 }
 
 newEffect{
-	name = "PATH_OF_THE_SUN", image = "talents/path_of_the_sun.png",
-	desc = "Path of the Sun",
-	long_desc = function(self, eff) return ("The target is able to instantly travel alongside Sun Paths."):format() end,
-	type = "magical",
-	subtype = { sun=true, },
-	status = "beneficial",
-	parameters = {},
-	activate = function(self, eff)
-		self:effectTemporaryValue(eff, "walk_sun_path", 1)
-	end
-}
-
-newEffect{
 	name = "SUNCLOAK", image = "talents/suncloak.png",
 	desc = "Suncloak",
 	long_desc = function(self, eff) return ("The target is protected by the sun, increasing their spell casting speed by %d%%, reducing spell cooldowns by %d%%, and preventing damage over %d%% of your maximum life from a single hit."):
@@ -3116,10 +3126,9 @@ newEffect{
 		if raw_value > 0 and not eff.projecting then -- avoid feedback; it's bad to lose out on dmg but it's worse to break the game
 			eff.projecting = true
 			local dam = raw_value * eff.power / 100
-			local psrc = eff.src or src or self
-			psrc.__project_source = eff
-			DamageType:get(DamageType.BLIGHT).projector(psrc, self.x, self.y, DamageType.BLIGHT, dam)
-			psrc.__project_source = nil
+			eff.src.__project_source = eff
+			DamageType:get(DamageType.BLIGHT).projector(eff.src, self.x, self.y, DamageType.BLIGHT, dam)
+			eff.src.__project_source = nil
 			eff.projecting = false
 		end
 		return {value=0}

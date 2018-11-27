@@ -1,5 +1,5 @@
 -- ToME - Tales of Middle-Earth
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -315,7 +315,7 @@ local function createShadow(self, level, tCallShadows, tShadowWarriors, tShadowM
 				value = value * self.avoid_master_damage
 			end
 
-			if self:knowTalent(self.T_SHADOW_FADE) and not self:isTalentCoolingDown(self.T_SHADOW_FADE) then
+			if self:knowTalent(self.T_SHADOW_FADE) and not self:isTalentCoolingDown(self.T_SHADOW_FADE) and not (self.avoid_master_damage == 0) then
 				self:forceUseTalent(self.T_SHADOW_FADE, {ignore_energy=true})
 			end
 

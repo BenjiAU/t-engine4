@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -63,8 +63,6 @@ newBirthDescriptor{
 	power_source = {technique=true},
 	stats = { str=5, con=3, dex=1, },
 	talents_types = {
-		["technique/archery-training"]={false, 0.1},
-		["technique/shield-defense"]={false, -0.1},
 		["technique/2hweapon-assault"]={true, 0.3},
 		["technique/strength-of-the-berserker"]={true, 0.3},
 		["technique/combat-techniques-active"]={true, 0.3},
@@ -81,6 +79,7 @@ newBirthDescriptor{
 		[ActorTalents.T_WARSHOUT_BERSERKER] = 1,
 		[ActorTalents.T_STUNNING_BLOW_ASSAULT] = 1,
 		[ActorTalents.T_WEAPON_COMBAT] = 1,
+		[ActorTalents.T_WEAPONS_MASTERY] = 1,
 		[ActorTalents.T_ARMOUR_TRAINING] = 1,
 	},
 	copy = {
@@ -131,10 +130,8 @@ newBirthDescriptor{
 	power_source = {technique=true},
 	stats = { str=5, con=2, dex=2, },
 	talents_types = {
-		["technique/archery-training"]={false, 0.1},
 		["technique/shield-offense"]={true, 0.3},
 		["technique/shield-defense"]={true, 0.3},
-		["technique/2hweapon-offense"]={false, -0.1},
 		["technique/combat-techniques-active"]={true, 0.3},
 		["technique/combat-techniques-passive"]={true, 0.3},
 		["technique/combat-training"]={true, 0.3},
@@ -195,6 +192,9 @@ newBirthDescriptor{
 		"#LIGHT_BLUE# * +0 Magic, +0 Willpower, +2 Cunning",
 		"#GOLD#Life per level:#LIGHT_BLUE# +0",
 	},
+	unlockable_talents_types = {
+		["cunning/poisons"]={false, 0.0, "rogue_poisons"},
+	},
 	power_source = {technique=true, technique_ranged=true},
 	stats = { dex=5, str=2, cun=2, },
 	talents_types = {
@@ -204,7 +204,7 @@ newBirthDescriptor{
 		["technique/reflexes"]={true, 0.3},
 		["technique/combat-techniques-active"]={true, 0},
 		["technique/combat-techniques-passive"]={true, 0},
-		["technique/munitions"]={false, 0.3},
+		--["technique/munitions"]={false, 0.3},  Disabled pending major revision
 		["technique/sniper"]={false, 0.3},
 		["technique/agility"]={false, 0.3},
 		["technique/combat-training"]={true, 0.3},

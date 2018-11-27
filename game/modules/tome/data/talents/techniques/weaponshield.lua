@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -166,8 +166,9 @@ newTalent{
 		-- Second & third attack with weapon
 		if hit then
 			self.turn_procs.auto_phys_crit = true
-			self:attackTarget(target, nil, self:combatTalentWeaponDamage(t, 0.8, 1.3), true)
-			self:attackTarget(target, nil, self:combatTalentWeaponDamage(t, 0.8, 1.3), true)
+			local weapon = self:hasMHWeapon()
+			self:attackTargetWith(target, weapon, nil, self:combatTalentWeaponDamage(t, 0.8, 1.3))
+			self:attackTargetWith(target, weapon, nil, self:combatTalentWeaponDamage(t, 0.8, 1.3))
 			self.turn_procs.auto_phys_crit = nil
 		end
 

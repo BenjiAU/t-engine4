@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -21,12 +21,15 @@ load("/data/general/grids/basic.lua")
 
 newEntity{
 	define_as = "SUMMON_CIRCLE",
-	name = "unholy circle", image = "terrain/marble_floor.png", add_mos = {{image=resolvers.generic(function() return "object/candle_dark"..rng.range(1,3)..".png" end)}},
+	name = "unholy circle", image = "terrain/marble_floor.png",
+	-- add_mos = {{image=resolvers.generic(function() return "object/candle_dark"..rng.range(1,3)..".png" end)}},
 	force_clone = true,
 	display = ';', color=colors.GOLD, back_color=colors.GREY,
 	always_remember = true,
 	does_block_move = true,
+	nice_tiler = { method="replace", base={"SUMMON_CIRCLE", 100, 1, 3}},
 }
+for i = 1, 3 do newEntity{base = "SUMMON_CIRCLE", define_as = "SUMMON_CIRCLE"..i, embed_particles = {{name="candle", rad=1, args={candle_id="dark1"}}} } end
 
 newEntity{
 	define_as = "SUMMON_CIRCLE_BROKEN",

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -55,7 +55,6 @@ newEntity{ base = "BASE_NPC_AQUATIC_CRITTER",
 	rarity = 4,
 	autolevel = "warriormage",
 	combat = {damtype=DamageType.LIGHTNING},
-	on_melee_hit = { [DamageType.LIGHTNING] = resolvers.mbonus(5, 5), },
 	resolvers.talents{
 		[Talents.T_CHAIN_LIGHTNING]={base=0, last=4, every=3, max=7},
 		[Talents.T_LIGHTNING]={base=0, last=4, every=3, max=7},

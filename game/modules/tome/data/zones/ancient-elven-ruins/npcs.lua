@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -170,7 +170,7 @@ newEntity{ base = "BASE_NPC_MUMMY",
 newEntity{ base = "BASE_NPC_MUMMY", define_as = "GREATER_MUMMY",
 	allow_infinite_dungeon = true,
 	name = "greater mummy", color=colors.YELLOW,
-	image = "npc/undead_mummy_ancient_elven_mummy.png",
+	image = "npc/undead_mummy_greater_mummy.png",
 	desc = [[An animated corpse in mummy wrappings, both very well preserved.]],
 	level_range = {20, nil}, exp_worth = 1,
 	rank = 3,

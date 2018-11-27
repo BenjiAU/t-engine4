@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -66,15 +66,25 @@ newEntity{ define_as = "SHADE",
 	resolvers.drops{chance=100, nb=3, {tome_drops="boss"} },
 
 	resolvers.talents{
-		[Talents.T_MANATHRUST]=4, [Talents.T_FREEZE]=4, [Talents.T_TIDAL_WAVE]=2,
+		[Talents.T_MANATHRUST]=3, [Talents.T_FREEZE]=3, [Talents.T_TIDAL_WAVE]=2,
 		[Talents.T_WEAPONS_MASTERY]=2,
 	},
 	resolvers.inscriptions(1, {"shielding rune", "phase door rune"}),
 	resolvers.inscriptions(1, {"manasurge rune"}),
-	inc_damage = {all=-20},
+	inc_damage = {all=-40},
 
 	autolevel = "warriormage",
+	auto_classes={{class="Archmage", start_level=12, level_rate=75}},
 	ai = "tactical", ai_state = { talent_in=3, ai_move="move_astar", },
+
+	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
+	-- In this case safe_range being set while talent_in is above 1 still results in a lot of kiting, so we lower that too
+	on_added_to_level = function(self)
+		if self.level <= 16 then
+			self.ai_tactic.safe_range = 1
+			self.ai_tactic.escape = 0
+		end
+	end,
 
 	on_die = function(self, who)
 		game.state:activateBackupGuardian("KOR_FURY", 3, 35, ".. yes I tell you! The old ruins of Kor'Pul are still haunted!")
@@ -114,8 +124,17 @@ newEntity{ base = "BASE_NPC_THIEF", define_as = "THE_POSSESSED",
 	},
 
 	autolevel = "rogue",
+	auto_classes={{class="Arcane Blade", start_level=12, level_rate=75}},
 	ai = "tactical", ai_state = { talent_in=2, ai_move="move_astar", },
 
+	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
+	on_added_to_level = function(self)
+		if self.level <= 16 then
+			self.ai_tactic.safe_range = 1
+			self.ai_tactic.escape = 0
+		end
+	end,
+	
 	on_die = function(self, who)
 		game.state:activateBackupGuardian("KOR_FURY", 3, 35, ".. yes I tell you! The old ruins of Kor'Pul are still haunted!")
 		game.player:resolveSource():setQuestStatus("start-allied", engine.Quest.COMPLETED, "kor-pul")
@@ -174,6 +193,9 @@ newEntity{ define_as = "KOR_FURY",
 	},
 
 	autolevel = "caster",
+	auto_classes={{class="Archmage", start_level=39, level_rate=50},
+		{class="Corruptor", start_level=39, level_rate=50}
+	},
 	ai = "tactical", ai_state = { ai_target="target_player_radius", ai_move="move_complex", sense_radius=50, talent_in=1, },
 	ai_tactic = resolvers.tactic"ranged",
 	resolvers.inscriptions(4, "rune"),

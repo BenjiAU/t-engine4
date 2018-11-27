@@ -1,6 +1,6 @@
 /*
     TE4 - T-Engine 4
-    Copyright (C) 2009 - 2017 Nicolas Casalini
+    Copyright (C) 2009 - 2018 Nicolas Casalini
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -602,6 +602,12 @@ static int lua_force_next_tick(lua_State *L)
 	return 0;
 }
 
+static int lua_disable_connectivity(lua_State *L)
+{
+	no_connectivity = TRUE;
+	return 0;
+}
+
 static int lua_open_browser(lua_State *L)
 {
 #if defined(SELFEXE_LINUX) || defined(SELFEXE_BSD)
@@ -641,6 +647,7 @@ static const struct luaL_Reg gamelib[] =
 	{"checkError", lua_check_error},
 	{"resetLocale", lua_reset_locale},
 	{"openBrowser", lua_open_browser},
+	{"disableConnectivity", lua_disable_connectivity},
 	{NULL, NULL},
 };
 

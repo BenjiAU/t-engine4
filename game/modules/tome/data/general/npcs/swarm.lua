@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -36,6 +36,9 @@ newEntity{
 	ai = "dumb_talented_simple", ai_state = { ai_move="move_complex", talent_in=1, },
 	stats = { str=1, dex=20, mag=3 },
 	global_speed_base = 2,
+	rnd_boss_init = function(self, data)
+		self.inc_damage.all = (self.inc_damage.all or 0) - 30  -- Compensate for high global speed
+	end,
 	infravision = 10,
 	combat_armor = 1, combat_def = 10,
 	rank = 1,

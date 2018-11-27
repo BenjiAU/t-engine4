@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -71,6 +71,7 @@ newTalent{
 			combatSpellpower = function(self) return self.summoner:combatSpellpower() end,
 			rad = 3,
 			energy = {value=0, mod=16},
+			all_know = true,
 			detect_power = self:combatSpellpower() / 2,
 			disarm_power = self:combatSpellpower() / 2,
 			on_added = function(self, level, x, y)
@@ -104,12 +105,12 @@ newTalent{
 				self.summoner:project(tg, self.x, self.y, engine.DamageType.ARCANE, self.dam/10, nil)
 				self:project(tg, x, y, function(tx, ty)
 					-- In rare circumstances this can hit the same target 4-7 times so we need to sanity check it
-					local target = game.level.map(tx, ty, Map.ACTOR)
+					local target = game.level.map(tx, ty, engine.Map.ACTOR)
 					if not target then return end
 					if target.turn_procs.aether_beam and target.turn_procs.aether_beam > 2 then return end
 					target.turn_procs.aether_beam = target.turn_procs.aether_beam or 0
 					target.turn_procs.aether_beam = target.turn_procs.aether_beam + 1
-					DamageType:get(DamageType.ARCANE_SILENCE).projector(self, tx, ty, DamageType.ARCANE_SILENCE, {dam=self.dam, chance=25})
+					engine.DamageType:get(engine.DamageType.ARCANE_SILENCE).projector(self, tx, ty, engine.DamageType.ARCANE_SILENCE, {dam=self.dam, chance=25})
 				end)
 
 				self.summoner.__project_source = nil

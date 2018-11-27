@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
--- This concept plays well but vs. low damage levels spam bumping can make stupidly large shields
--- Leaving as is for now but will likely change somehow
 newTalent{
 	name = "Weapon of Light",
 	type = {"celestial/combat", 1},
@@ -56,16 +54,6 @@ newTalent{
 			self.damage_shield_absorb = self.damage_shield_absorb + shield_power
 			self.damage_shield_absorb_max = self.damage_shield_absorb_max + shield_power
 			shield.dur = math.max(2, shield.dur)
-
-			-- Limit the number of times a shield can be extended, Bathe in Light also uses this code
-			-- The shield is removed instead of just blocking the extension to prevent scenarios such as maxing it out of combat then engaging, but there are likely better ways
-			if shield.dur_extended then
-				shield.dur_extended = shield.dur_extended + 1
-				if shield.dur_extended >= 20 then
-					game.logPlayer(self, "#DARK_ORCHID#Your damage shield cannot be extended any farther and has exploded.")
-					self:removeEffect(self.EFF_DAMAGE_SHIELD)
-				end
-			else shield.dur_extended = 1 end
 		end
 	end,
 	info = function(self, t)
@@ -73,7 +61,6 @@ newTalent{
 		local shieldflat = t.getShieldFlat(self, t)
 		return ([[Infuse your weapon with the power of the Sun, adding %0.1f light damage on each melee hit.
 		Additionally, if you have a temporary damage shield active, melee hits will increase its power by %d once per turn.
-		If the same shield is refreshed 20 times it will become unstable and explode, removing it.
 		The damage dealt and shield bonus will increase with your Spellpower.]]):
 		format(damDesc(self, DamageType.LIGHT, damage), shieldflat)
 	end,

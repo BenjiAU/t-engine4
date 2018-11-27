@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -997,12 +997,13 @@ function _M:getTalentDisplayName(t)
 	return t.display_name
 end
 
---- Cooldown all talents by one
+--- Cooldown all talents
 -- This should be called in your actors "act()" method
-function _M:cooldownTalents()
+-- @param turns the number of turns to cooldown the talents
+function _M:cooldownTalents(turns)
 	for tid, c in pairs(self.talents_cd) do
 		self.changed = true
-		self.talents_cd[tid] = self.talents_cd[tid] - 1
+		self.talents_cd[tid] = self.talents_cd[tid] - (turns or 1)
 		if self.talents_cd[tid] <= 0 then
 			self.talents_cd[tid] = nil
 			if self.onTalentCooledDown then self:onTalentCooledDown(tid) end
@@ -1031,7 +1032,7 @@ end
 function _M:automaticTalents()
 	for tid, c in pairs(self.talents_auto) do
 		local t = self.talents_def[tid]
-		if not t.np_npc_use and (t.mode ~= "sustained" or not self.sustain_talents[tid]) and not self.talents_cd[tid] and self:preUseTalent(t, true, true) and (not t.auto_use_check or t.auto_use_check(self, t)) then
+		if not t.no_npc_use and (t.mode ~= "sustained" or not self.sustain_talents[tid]) and not self.talents_cd[tid] and self:preUseTalent(t, true, true) and (not t.auto_use_check or t.auto_use_check(self, t)) then
 			self:useTalent(tid)
 		end
 	end
@@ -1079,14 +1080,24 @@ function _M:triggerTalent(tid, name, ...)
 
 	local t = _M.talents_def[tid]
 	name = name or "trigger"
-	if t[name] then return t[name](self, t, ...) end
+	if t[name] then
+		self.__talent_running = t
+		local ret = {t[name](self, t, ...)}
+		self.__talent_running = nil
+		return unpack(ret, 1, table.maxn(ret))
+	end
 end
 
 --- Trigger a talent method
 function _M:callTalent(tid, name, ...)
 	local t = _M.talents_def[tid]
 	name = name or "trigger"
-	if t[name] then return t[name](self, t, ...) end
+	if t[name] then
+		self.__talent_running = t
+		local ret = {t[name](self, t, ...)}
+		self.__talent_running = nil
+		return unpack(ret, 1, table.maxn(ret))
+	end
 end
 
 --- Trigger all talents matching

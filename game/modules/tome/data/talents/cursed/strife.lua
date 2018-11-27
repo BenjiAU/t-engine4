@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -357,18 +357,19 @@ newTalent{
 	-- end,
 -- }
 
+-- Using shields on a class without strikes to go with the is a notable disadvantage on attacks, so were generous with the bonus here
 newTalent{
 	name = "Repel",
 	type = {"cursed/strife", 4},
 	mode = "sustained",
 	require = cursed_str_req4,
 	points = 5,
-	cooldown = 10,
+	cooldown = 6,
 	no_energy = true,
 	getChance = function(self, t)
-		local chance = self:combatLimit(self:combatTalentStatDamage(t, "str", 12, 36), 50, 0, 0, 26.45, 26.45) -- Limit <50% (56% with shield)
+		local chance = self:combatLimit(self:combatTalentStatDamage(t, "str", 12, 36), 50, 0, 0, 26.45, 26.45) -- Limit <50% (70% with shield)
 		if self:hasShield() then
-			chance = chance + 6
+			chance = chance + 20
 		end
 		return chance
 	end,
@@ -407,6 +408,6 @@ newTalent{
 		local chance = t.getChance(self, t)
 		return ([[Rather than hide from the onslaught, you face down every threat. While active you have a %d%% chance of repelling a melee attack. The recklessness of your defense brings you bad luck (Luck -3).
 		Cleave, Repel and Surge cannot be active simultaneously, and activating one will place the others in cooldown.
-		Repel chance increases with your Strength, and when equipped with a shield.]]):format(chance)
+		Repel chance increases with your Strength and by 20%% when equipped with a shield.]]):format(chance)
 	end,
 }

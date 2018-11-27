@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -395,6 +395,8 @@ newEntity{
 		purse = 5,
 		empty_before_restock = false,
 		filters = {
+		},
+		fixed = {
 			{id=true, defined="ZIGUR_HISTORY"},
 		},
 	},

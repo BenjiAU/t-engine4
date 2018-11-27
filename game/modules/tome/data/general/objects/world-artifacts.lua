@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -678,6 +678,7 @@ newEntity{
 	unique = true,
 	type = "misc", subtype="egg",
 	unided_name = "dark egg",
+	define_as = "MUMMIFIED_EGGSAC",
 	name = "Mummified Egg-sac of Ungolë", image = "object/artifact/mummified_eggsack.png",
 	level_range = {20, 35},
 	rarity = 190,
@@ -930,7 +931,7 @@ newEntity{ base = "BASE_GREATMAUL",
 	use_talent = { id = Talents.T_FEARLESS_CLEAVE, level = 3, power = 18 },
 }
 
-newEntity{ base = "BASE_MACE",
+newEntity{ base = "BASE_MACE", define_as = "CROOKED_CLUB",
 	power_source = {technique=true},
 	unique = true,
 	name = "Crooked Club", color = colors.GREEN, image = "object/artifact/weapon_crooked_club.png",
@@ -1000,7 +1001,7 @@ newEntity{ base = "BASE_HELM", define_as = "HELM_KROLTAR",
 	name = "Dragon-helm of Kroltar", image = "object/artifact/dragon_helm_of_kroltar.png",
 	unided_name = "dragon-helm",
 	desc = [[A visored steel helm, embossed and embellished with gold, that bears as its crest the head of Kroltar, the greatest of the fire drakes.]],
-	require = { talent = { {Talents.T_ARMOUR_TRAINING,1} }, stat = { str=35 }, },
+	require = { stat = { str=35 }, },
 	level_range = {37, 45},
 	rarity = 280,
 	cost = 400,
@@ -1567,7 +1568,7 @@ newEntity{ base = "BASE_LIGHT_ARMOR",
 	},
 }
 
-newEntity{ base = "BASE_LIGHT_ARMOR",
+newEntity{ base = "BASE_LIGHT_ARMOR", define_as = "SKIN_OF_MANY",
 	power_source = {technique=true},
 	unique = true,
 	name = "Skin of Many", image = "object/artifact/robe_skin_of_many.png",
@@ -1741,7 +1742,7 @@ newEntity{ base = "BASE_GREATSWORD",
 			if not target:canBe(eff) then return end
 			if not target:checkHit(who:combatAttack(combat), target:combatPhysicalResist(), 15) then return end
 			if eff == "stun" then target:setEffect(target.EFF_STUNNED, 3, {})
-			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=75})
+			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=50})
 			end
 		end},
 		melee_project={[DamageType.LIGHT] = 49, [DamageType.DARKNESS] = 49},
@@ -3388,7 +3389,7 @@ newEntity{ base = "BASE_LONGSWORD",
 			if eff == "stun" then target:setEffect(target.EFF_MADNESS_STUNNED, 3, {mindResistChange=-25})
 			elseif eff == "malign" then target:setEffect(target.EFF_MALIGNED, 3, {resistAllChange=10})
 			elseif eff == "agony" then target:setEffect(target.EFF_AGONY, 5, { src=who, damage=40, mindpower=40, range=10, minPercent=10, duration=5})
-			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=60})
+			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=50})
 			elseif eff == "silence" then target:setEffect(target.EFF_SILENCED, 3, {})
 			end
 		end},
@@ -6506,13 +6507,15 @@ newEntity{ base = "BASE_TOOL_MISC",
 			m:resolve()
 			who:logCombat(target or {name = "a spot nearby"}, "#Source# points %s %s at #target#, releasing a brilliant orb of light!", who:his_her(), self:getName({do_color = true, no_add_name = true}))
 			game.zone:addEntity(game.level, m, "actor", x, y)
-			m.remove_from_party_on_death = true,
-			game.party:addMember(m, {
-				control=false,
-				type="summon",
-				title="Summon",
-				orders = {target=true, leash=true, anchor=true, talents=true},
-			})
+			m.remove_from_party_on_death = true
+			if game.party:hasMember(who) then
+				game.party:addMember(m, {
+					control=false,
+					type="summon",
+					title="Summon",
+					orders = {target=true, leash=true, anchor=true, talents=true},
+				})
+			end
 			return {id=true, used=true}
 		end
 	},

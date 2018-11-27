@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -64,15 +64,15 @@ newBirthDescriptor{
 	talents_types = {
 		["technique/combat-training"]={true, 0.3},
 		["cunning/survival"]={false, 0.1},
-		["corruption/sanguisuge"]={true, 0.3},
+		["corruption/sanguisuge"]={true, 0.0},
 		["corruption/reaving-combat"]={true, 0.3},
 		["corruption/scourge"]={true, 0.3},
-		["corruption/plague"]={true, 0.3},
+		["corruption/plague"]={true, 0.0},
 		["corruption/hexes"]={false, 0.3},
 		["corruption/curses"]={false, 0.3},
 		["corruption/bone"]={true, 0.3},
 		["corruption/torment"]={true, 0.3},
-		["corruption/vim"]={true, 0.3},
+		["corruption/vim"]={true, 0.0},
 		["corruption/rot"]={false, 0.3},
 	},
 	talents = {
@@ -99,7 +99,7 @@ newBirthDescriptor{
 		},
 	},
 	copy_add = {
-		life_rating = 2,
+		life_rating = 1,
 	},
 }
 
@@ -136,7 +136,7 @@ newBirthDescriptor{
 		["corruption/blood"]={true, 0.3},
 		["corruption/vim"]={true, 0.3},
 		["corruption/blight"]={true, 0.3},
-		["corruption/torment"]={false, 0.3},
+		["corruption/torment"]={true, 0.3},
 	},
 	talents = {
 		[ActorTalents.T_DRAIN] = 1,

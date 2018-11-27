@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -59,6 +59,83 @@ newEffect{
 	end,
 }
 
+newEffect{
+	name = "ITEM_CHARM_PIERCING", image = "talents/intricate_tools.png",
+	desc = "Charm:  Piercing",
+	long_desc = function(self, eff) return ("All damage penetration increased by %d%%."):format(eff.penetration) end,
+	type = "other",
+	subtype = { },
+	status = "beneficial",
+	parameters = { penetration=10 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "resists_pen", {all = eff.penetration})
+	end,
+	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
+	name = "ITEM_CHARM_POWERFUL", image = "talents/intricate_tools.png",
+	desc = "Charm:  Damage",
+	long_desc = function(self, eff) return ("All damage increased by %d%%."):format(eff.damage) end,
+	type = "other",
+	subtype = { },
+	status = "beneficial",
+	parameters = { damage=10 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "inc_damage", {all = eff.damage})
+	end,
+	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
+	name = "ITEM_CHARM_SAVIOR", image = "talents/intricate_tools.png",
+	desc = "Charm:  Saves",
+	long_desc = function(self, eff) return ("All saves increased by %d."):format(eff.save) end,
+	type = "other",
+	subtype = { },
+	status = "beneficial",
+	parameters = { save=10 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "combat_physresist", eff.save)
+		self:effectTemporaryValue(eff, "combat_spellresist", eff.save)
+		self:effectTemporaryValue(eff, "combat_mentalresist", eff.save)
+	end,
+	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
+	name = "ITEM_CHARM_EVASIVE", image = "talents/intricate_tools.png",
+	desc = "Charm:  Evasion",
+	long_desc = function(self, eff) return ("%d%% chance to avoid weapon attacks"):format(eff.chance) end,
+	type = "other",
+	subtype = { },
+	status = "beneficial",
+	parameters = { chance=10 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "evasion", eff.chance)
+	end,
+	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
+	name = "ITEM_CHARM_INNERVATING", image = "talents/intricate_tools.png",
+	desc = "Charm:  Innervating",
+	long_desc = function(self, eff) return ("Fatigue reduced by %d%%."):format(eff.fatigue) end,
+	type = "other",
+	subtype = { },
+	status = "beneficial",
+	parameters = { fatigue=10, },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "fatigue", -eff.fatigue)
+	end,
+	deactivate = function(self, eff)
+	end,
+}
+
 -- Design:  Temporary immobility in exchange for a large stat buff.
 newEffect{
 	name = "TREE_OF_LIFE", image = "shockbolt/object/artifact/tree_of_life.png",
@@ -98,6 +175,7 @@ newEffect{
 	name = "INFUSION_COOLDOWN", image = "effects/infusion_cooldown.png",
 	desc = "Infusion Saturation",
 	long_desc = function(self, eff) return ("The more you use infusions, the longer they will take to recharge (+%d cooldowns)."):format(eff.power) end,
+	charges = function(self, eff) return eff.power end,
 	type = "other",
 	subtype = { infusion=true },
 	status = "detrimental",
@@ -114,6 +192,7 @@ newEffect{
 	name = "RUNE_COOLDOWN", image = "effects/rune_cooldown.png",
 	desc = "Runic Saturation",
 	long_desc = function(self, eff) return ("The more you use runes, the longer they will take to recharge (+%d cooldowns)."):format(eff.power) end,
+	charges = function(self, eff) return eff.power end,
 	type = "other",
 	subtype = { rune=true },
 	status = "detrimental",
@@ -140,6 +219,19 @@ newEffect{
 		old_eff.power = old_eff.power + new_eff.power
 		return old_eff
 	end,
+}
+
+newEffect{
+	name = "PATH_OF_THE_SUN", image = "talents/path_of_the_sun.png",
+	desc = "Path of the Sun",
+	long_desc = function(self, eff) return ("The target is able to instantly travel alongside Sun Paths."):format() end,
+	type = "other",
+	subtype = { sun=true, },
+	status = "beneficial",
+	parameters = {},
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "walk_sun_path", 1)
+	end
 }
 
 newEffect{
@@ -2282,7 +2374,7 @@ newEffect{
 		-- Bypass all shields & such
 		local old = self.onTakeHit
 		self.onTakeHit = nil
-		mod.class.interface.ActorLife.takeHit(self, self.max_life * eff.dam / 100, nil, {special_death_msg="suffocated to death"})
+		mod.class.interface.ActorLife.takeHit(self, self.max_life * eff.dam / 100, self, {special_death_msg="suffocated to death"})
 		eff.dam = util.bound(eff.dam + 5, 20, 100)
 		self.onTakeHit = old
 	end,
@@ -3036,7 +3128,7 @@ newEffect{
 	type = "other",
 	subtype = { aura=true },
 	status = "neutral",
-	zone_wide_effect = true,
+	zone_wide_effect = false,
 	parameters = {},
 	activate = function(self, eff)
 	end,
@@ -3051,6 +3143,10 @@ newEffect{
 	callbackOnActBase = function(self, eff)
 		if not eff.id_challenge_quest or not self:hasQuest(eff.id_challenge_quest) then return end
 		self:hasQuest(eff.id_challenge_quest):check("on_act_base", self)
+	end,
+	callbackOnChangeLevel = function(self, eff)
+		local q = eff.id_challenge_quest and self:hasQuest(eff.id_challenge_quest)
+		if q then q:check("on_exit_level", self) end
 	end,
 }
 
@@ -3321,5 +3417,31 @@ newEffect{
 		self:effectTemporaryValue(eff, "inc_damage", {[engine.DamageType.COLD] = 20})
 	end,
 	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
+	name = "RECALL", image = "effects/recall.png",
+	desc = "Recalling",
+	long_desc = function(self, eff) return "The target is waiting to be recalled back to the worldmap." end,
+	type = "magical",
+	subtype = { unknown=true },
+	status = "beneficial",
+	cancel_on_level_change = true,
+	parameters = { },
+	activate = function(self, eff)
+		eff.leveid = game.zone.short_name.."-"..game.level.level
+	end,
+	deactivate = function(self, eff)
+		if (eff.allow_override or (self == game:getPlayer(true) and self:canBe("worldport") and not self:attr("never_move"))) and eff.dur <= 0 then
+			game:onTickEnd(function()
+				if eff.leveid == game.zone.short_name.."-"..game.level.level and game.player.can_change_zone then
+					game.logPlayer(self, "You are yanked out of this place!")
+					game:changeLevel(1, eff.where or game.player.last_wilderness)
+				end
+			end)
+		else
+			game.logPlayer(self, "Space restabilizes around you.")
+		end
 	end,
 }

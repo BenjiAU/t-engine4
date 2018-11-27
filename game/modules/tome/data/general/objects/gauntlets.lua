@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ newEntity{
 	display = "[", color=colors.SLATE,
 	image = resolvers.image_material("hgloves", "metal"),
 	moddable_tile = resolvers.moddable_tile("gauntlets"),
-	require = { talent = { Talents.T_ARMOUR_TRAINING }, },
+	require = { flag = { "allow_wear_heavy" }, },
 	encumber = 1.5,
 	rarity = 9,
 	metallic = true,
@@ -44,6 +44,7 @@ newEntity{ base = "BASE_GAUNTLETS",
 	material_level = 1,
 	wielder = {
 		combat_armor = 1,
+		fatigue = 1,
 		combat = {
 			dam = resolvers.rngavg(7, 12),
 			apr = 3,
@@ -62,6 +63,7 @@ newEntity{ base = "BASE_GAUNTLETS",
 	material_level = 3,
 	wielder = {
 		combat_armor = 2,
+		fatigue = 3,
 		combat = {
 			dam = resolvers.rngavg(16, 22),
 			apr = 9,
@@ -80,6 +82,7 @@ newEntity{ base = "BASE_GAUNTLETS",
 	material_level = 5,
 	wielder = {
 		combat_armor = 3,
+		fatigue = 5,
 		combat = {
 			dam = resolvers.rngavg(25, 32),
 			apr = 15,

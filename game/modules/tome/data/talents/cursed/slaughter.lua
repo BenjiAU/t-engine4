@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -285,14 +285,8 @@ newTalent{
 	mode = "sustained",
 	require = cursed_str_req4,
 	points = 5,
-	cooldown = 10,
+	cooldown = 6,
 	no_energy = true,
-	getChance = function(self, t, has2h)
-		local chance = self:combatTalentIntervalDamage(t, "str", 10, 38, 0.4)
-		if (not has2h and self:hasTwoHandedWeapon()) or (has2h and has2h > 0) then chance = chance + 15 end
-		chance = self:combatLimit(chance, 100, 0, 0, 25.18, 25.18) -- Limit < 100%
-		return chance
-	end,
 	getDamageMultiplier = function(self, t, hate)
 		local damageMultiplier = self:combatLimit(self:getTalentLevel(t) * self:getStr()*getHateMultiplier(self, 0.5, 1.0, false, hate), 1, 0, 0, 0.79, 500) -- Limit < 100%
 		if self:hasTwoHandedWeapon() then
@@ -330,9 +324,6 @@ newTalent{
 	on_attackTarget = function(self, t, target)
 		if self.inCleave then return end
 		self.inCleave = true
-
-		local chance = t.getChance(self, t)
-		if rng.percent(chance) then
 			local start = rng.range(0, 8)
 			for i = start, start + 8 do
 				local x = self.x + (i % 3) - 1
@@ -346,15 +337,13 @@ newTalent{
 					return
 				end
 			end
-		end
 		self.inCleave = false
 	end,
 	info = function(self, t)
-		local chance = t.getChance(self, t, 0)
-		local chance2h = t.getChance(self, t, 1)
-		return ([[While active, every swing of your weapon has a %d%% (if one-handed) or %d%% (if two-handed) chance of striking a second nearby target for %d%% (at 0 Hate) to %d%% (at 100+ Hate) damage (+25%% for two-handed weapons). The recklessness of your attacks brings you bad luck (luck -3).
+		return ([[While active, every swing of your weapon strikes strikes other adjacent enemies for %d%% (at 0 hate) to %d%% (at 100 hate) physical damage. The recklessness of your attacks brings you bad luck (luck -3).
 		Cleave, Repel and Surge cannot be active simultaneously, and activating one will place the others in cooldown.
-		The Cleave chance and damage increase with your Strength.]]):
-		format(chance, chance2h, t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100)
+		Cleave will deal 25%% additional damage while using a two-handed weapon.
+		The Cleave damage increases with your Strength.]]):
+		format( t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100)
 	end,
 }

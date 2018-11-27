@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -139,6 +139,7 @@ newBirthDescriptor{
 		["cunning/survival"]={false, 0},
 		["technique/shield-offense"]={true, 0.2},
 		["technique/2hweapon-assault"]={true, 0.2},
+		["technique/dualweapon-attack"]={true, 0.2},
 		["technique/combat-techniques-active"]={false, 0.2},
 		["technique/combat-techniques-passive"]={true, 0.2},
 		["technique/combat-training"]={true, 0.3},
