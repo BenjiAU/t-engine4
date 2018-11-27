@@ -475,32 +475,21 @@ end
 -- Used to make escorts, adjust to game difficulty settings, etc.
 -- Triggered after the entity is resolved
 function _M:addedToLevel(level, x, y)
-	if not self:attr("difficulty_boosted") and not game.party:hasMember(self) then
-		-- make adjustments for game difficulty to talent levels, max life, add classes to bosses
-		local talent_mult, life_mult, nb_classes = 1, 1, 0
+	if not self:attr("difficulty_boosted") and not game.party:hasMember(self) and not (self.summoner or self.summoned) then
+		-- make adjustments for game difficulty to talent levels, max life, and bonus fixedboss classes
+		local talent_mult, life_mult, class_mult = 1,1,1
 		if game.difficulty == game.DIFFICULTY_NIGHTMARE then
 			talent_mult = 1.3
-			life_mult = 1.5
+			class_mult = 1.3
+			life_mult = 1.1
 		elseif game.difficulty == game.DIFFICULTY_INSANE then
 			talent_mult = 1.8
-			life_mult = 2.0
-			if self.rank >= 3.5 then
-				if self.rank >= 10 then nb_classes = 3
-				elseif self.rank >= 5 then nb_classes = 2
-				else nb_classes = 1
-				end
-			end
+			class_mult = 1.8
+			life_mult = 1.2
 		elseif game.difficulty == game.DIFFICULTY_MADNESS then
 			talent_mult = 2.7
+			class_mult = 2.7
 			life_mult = 3.0
-			if self.rank >= 3.5 then
-				if self.rank >= 10 then nb_classes = 5
-				elseif self.rank >= 5 then nb_classes = 3
-				elseif self.rank >= 4 then nb_classes = 2
-				else nb_classes = 1
-				end
-			end
-	
 		end
 		if talent_mult ~= 1 then
 			-- increase level of innate talents
@@ -510,13 +499,25 @@ function _M:addedToLevel(level, x, y)
 					self:learnTalent(tid, true, math.floor(lev*(talent_mult - 1)))
 				end
 			end
-			-- add extra character classes
-			if nb_classes > 0 and not self.randboss and not self.no_difficulty_random_class then
-				-- Note: talent levels from added classes are not adjusted for difficulty
-				-- This means that the NPC's innate talents are generally higher level, preserving its "character"
-				local data = {auto_sustain=true, forbid_equip=false, nb_classes=nb_classes, update_body=true, spend_points=true, autolevel=nb_classes<2 and self.autolevel or "random_boss"}
-				game.state:applyRandomClass(self, data, true)
+
+			-- Resolve bonus classes for fixed bosses
+			-- Note: talent levels from added classes are not adjusted for difficulty directly
+			-- This means that the NPC's innate talents are generally higher level, preserving its "character"
+			-- Fixedboss random classes start at level 14 to avoid breaking early game balance
+			-- For now if not defined the starting level of fixedboss classes is 80% of their actor level, unsure what this value should be
+			if self.rank >= 3.5 and not self.randboss and not self.no_difficulty_random_class then
+				if self.auto_classes then
+					for _, class in pairs(self.auto_classes) do
+						class.level_rate = class.level_rate * class_mult
+					end
+				else
+					local data = {auto_sustain=true, forbid_equip=false, start_level = math.max(14, self.level * 0.8), nb_classes=1, level_rate = class_mult*100, update_body=true, spend_points=true, autolevel="random_boss"}
+					game.state:applyRandomClassNew(self, data, true)
+				end
+
+				self[#self+1] = resolvers.talented_ai_tactic("instant") -- regenerate AI TACTICS with the new class(es)
 				self:resolve() self:resolve(nil, true)
+				self:resetToFull()
 			end
 			
 			-- increase maximum life

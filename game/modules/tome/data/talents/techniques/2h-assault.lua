@@ -116,7 +116,7 @@ newTalent{
 	stamina = 30,
 	tactical = { ATTACKAREA = { weapon = 3 } },
 	range = 0,
-	radius = 1,
+	radius = 2,
 	requires_target = true,
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), selffire=false, radius=self:getTalentRadius(t)}
@@ -158,6 +158,7 @@ newTalent{
 	end,
 }
 
+-- Technique talent reduction
 newTalent{
 	name = "Execution",
 	type = {"technique/2hweapon-assault", 4},

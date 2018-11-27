@@ -139,6 +139,7 @@ newBirthDescriptor{
 		["cunning/survival"]={false, 0},
 		["technique/shield-offense"]={true, 0.2},
 		["technique/2hweapon-assault"]={true, 0.2},
+		["technique/dualweapon-attack"]={true, 0.2},
 		["technique/combat-techniques-active"]={false, 0.2},
 		["technique/combat-techniques-passive"]={true, 0.2},
 		["technique/combat-training"]={true, 0.3},

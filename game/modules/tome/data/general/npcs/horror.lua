@@ -527,9 +527,12 @@ newEntity{ base = "BASE_NPC_HORROR",
 	life_regen = 0.25,
 	combat_armor = 12, combat_def = 24,
 
+	rnd_boss_init = function(self, data)
+		self.combat_physspeed = math.max(1, self.combat_physspeed - 2)  -- A bit more sanity when randbossed
+	end,
+
 	ai = "tactical", ai_state = { ai_move="move_complex", talent_in=2, ally_compassion=0 },
 
-	on_melee_hit = {[DamageType.PHYSICALBLEED]=resolvers.mbonus(14, 2)},
 	combat = { dam=resolvers.levelup(resolvers.rngavg(16,22), 1, 1.5), atk=resolvers.levelup(18, 1, 1), apr=4, dammod={wil=0.25, cun=0.1}, damtype=engine.DamageType.PHYSICALBLEED, },
 	combat_physspeed = 4, --Crazy fast attack rate
 
@@ -700,10 +703,11 @@ With each slow breath it takes reality distorts around it.  Blue twirls into red
 
 		[Talents.T_LUCID_DREAMER]={base=4, every=12, max=8},
 		[Talents.T_DREAM_WALK]={base=4, every=12, max=8},
-	--	[Talents.T_SLUMBER]={base=4, every=6, max=8},
+		[Talents.T_SLUMBER]={base=4, every=6, max=8},
 		[Talents.T_SLEEP]={base=4, every=6, max=8},
-	--	[Talents.T_RESTLESS_NIGHT]={base=4, every=6, max=8},
-		[Talents.T_DREAMSCAPE]={base=4, every=5, max=10},
+		[Talents.T_RESTLESS_NIGHT]={base=4, every=6, max=8},
+		[Talents.T_SANDMAN]={base=4, every=6, max=8},
+		--[Talents.T_DREAMSCAPE]={base=4, every=5, max=10},
 		
 		-- Summon Dream Seeds while awake
 		[Talents.T_SUMMON]=1,
@@ -760,12 +764,13 @@ With each slow breath it takes reality distorts around it.  Blue twirls into red
 				game.logSeen(self, "#LIGHT_BLUE#A dream seed escapes %s's sleeping mind.", self.name:capitalize())
 			end
 		-- Script the AI to encourage opening with dream scape
+		--[[  Disabled temporarily due to unknown bugs with Dreamscape
 		elseif self.ai_target.actor and self.ai_target.actor.game_ender and not game.zone.is_dream_scape then
 			if not self:isTalentCoolingDown(self.T_SLEEP) then
 				self:forceUseTalent(self.T_SLEEP, {})
 			elseif not self:isTalentCoolingDown(self.T_DREAMSCAPE) and self.ai_target.actor:attr("sleep") then
 				self:forceUseTalent(self.T_DREAMSCAPE, {})
-			end
+			end]]
 		end
 	end,
 	on_acquire_target = function(self, who)
@@ -1082,7 +1087,6 @@ newEntity{ base = "BASE_NPC_HORROR",
 	
 	ai = "tactical", ai_state = { ai_move="move_complex", talent_in=2, ally_compassion=0 },
 		
-	on_melee_hit = {[DamageType.PHYSICALBLEED]=resolvers.mbonus(12, 5)},
 	melee_project = {[DamageType.PHYSICALBLEED]=resolvers.mbonus(32, 5)},
 	combat = { dam=resolvers.levelup(resolvers.rngavg(20,28), 1, 1.5), physspeed = 0.25,atk=resolvers.levelup(24, 1.2, 1.2), apr=4, dammod={wil=0.3, cun=0.15}, damtype=engine.DamageType.PHYSICALBLEED, },
 	--combat_physspeed = 4, --Crazy fast attack rate
@@ -1139,7 +1143,7 @@ newEntity{ base="BASE_NPC_HORROR", define_as = "ANIMATED_BLADE",
 
 	negative_status_effect_immune = 1,
 	body = { INVEN = 10, MAINHAND=1 },
-	
+	no_drops = true,
 	resolvers.equip{
 		{type="weapon", subtype="longsword", ego_chance = 100, autoreq=true},
 	},

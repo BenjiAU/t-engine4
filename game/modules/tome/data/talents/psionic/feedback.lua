@@ -45,6 +45,7 @@ newTalent{
 	require = psi_wil_req2,
 	cooldown = 15,
 	tactical = { DEFEND = 2},
+	no_energy = true,
 	no_break_channel = true,
 	getShieldPower = function(self, t) return self:combatTalentMindDamage(t, 30, 470) end,
 	action = function(self, t)

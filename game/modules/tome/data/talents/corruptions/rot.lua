@@ -99,8 +99,8 @@ carrionworm = function(self, target, duration, x, y)
 	m.unused_talents_types = 0
 	m.no_inventory_access = true
 	m.no_points_on_levelup = true
+	m.carrion_worm = true  -- This keeps the on_death effect from spamming the damage log with 0s
 	m.save_hotkeys = true
-	m.ai_state = m.ai_state or {}
 	m.ai_state.tactic_leash = 100
 	-- Try to use stored AI talents to preserve tweaking over multiple summons
 	m.ai_talents = self.stored_ai_talents and self.stored_ai_talents[m.name] or {}
@@ -108,10 +108,10 @@ carrionworm = function(self, target, duration, x, y)
 				local t = self.summoner:getTalentFromId(self.summoner.T_INFESTATION)
 				game.level.map:addEffect(self,
 				self.x, self.y, 5,
-				engine.DamageType.WORMBLIGHT, t.getDamage(self.summoner, t),  -- Please someone make this more transparent, changing the alpha doesn't seem to work
+				engine.DamageType.WORMBLIGHT, t.getDamage(self.summoner, t),
 					2,
 					5, nil,
-					engine.MapEffect.new{color_br=150, color_bg=255, color_bb=150, effect_shader="shader_images/poison_effect.png"}
+					engine.MapEffect.new{alpha=90, color_br=1, color_bg=1, color_bb=1, effect_shader="shader_images/poison_effect.png"}
 				)
 				game.logSeen(self, "%s exudes a corrupted gas as it dies.", self.name:capitalize())
 	end
@@ -131,6 +131,7 @@ carrionworm = function(self, target, duration, x, y)
 	if game.party:hasMember(self) then
 		game.party:addMember(m, {
 			control=false,
+			temporary_level = true,
 			type="summon",
 			title="Summon",
 		})
@@ -154,7 +155,7 @@ newTalent{
 	getDamageReduction = function(self, t) 
 		return self:combatTalentLimit(t, 0.5, 0.1, 0.22)
 	end,
-	tactical = { BUFF = 2 },
+	tactical = {BUFF = 3},
 	activate = function(self, t)
 		local resist = t.getResist(self,t)
 		local affinity = t.getAffinity(self,t)
@@ -174,11 +175,10 @@ newTalent{
 		self:removeTemporaryValue("worm", p.worm)
 		return true
 	end,
-	callbackPriorities={callbackOnHit = -5},  -- High priority since we do more than just reduce damage and want to make sure the worm spawn happens often
-	callbackOnHit = function(self, t, cb)
-		if ( cb.value > (0.15 * self.max_life) ) then
-			local damageReduction = cb.value * t.getDamageReduction(self, t)
-			cb.value = cb.value - damageReduction
+	callbackOnTakeDamage = function(self, t, src, x, y, type, dam, state)
+		if ( dam > (0.15 * self.max_life) ) then
+			local damageReduction = dam * t.getDamageReduction(self, t)
+			dam = dam - damageReduction
 
 			local nb = 0 
 			if game.level then
@@ -205,7 +205,7 @@ newTalent{
 					carrionworm(self, self, 5, gx, gy)
 				end
 			end
-			return cb.value
+			return {dam = dam}
 		end
 	end,
 	info = function(self, t)

@@ -29,7 +29,7 @@ newTalent{
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/slime")
 		local ret = {
-			per = self:addTemporaryValue("combat_critical_power", self:combatTalentSpellDamage(t, 20, 60)),
+			per = self:addTemporaryValue("combat_critical_power", self:combatTalentSpellDamage(t, 20, 50)),
 		}
 		if core.shader.active() then
 			local h1x, h1y = self:attachementSpot("head", true) if h1x then self:talentParticles(ret, {type="circle", args={toback=true, shader=true, oversize=0.7, a=225, appear=8, speed=0, img="dark_ritual_aura", base_rot=0, radius=0, x=h1x, y=h1y}}) end
@@ -43,7 +43,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Increases your spell critical damage multiplier by %d%%.
 		The multiplier will increase with your Spellpower.]]):
-		format(self:combatTalentSpellDamage(t, 20, 60))
+		format(self:combatTalentSpellDamage(t, 20, 50))
 	end,
 }
 
@@ -61,7 +61,7 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", radius=self:getTalentRadius(t), range=self:getTalentRange(t), talent=t}
 	end,
-	getRemoveCount = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5, "log")) end,
+	getRemoveCount = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5, "log")) end,  -- Oh for the love of god no, fix me
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
@@ -111,7 +111,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Project a corrupted blast of power that deals %0.2f blight damage and removes up to %d magical or physical effect(s) from any creatures caught in the radius 3 ball.
+		return ([[Project a corrupted blast of power that deals %0.2f blight damage and removes up to %d magical or physical sustains or effect(s) from any creatures caught in the radius 3 ball.
 		For each effect, the creature has a chance to resist based on its spell save.
 		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 28, 120)), t.getRemoveCount(self, t))
 	end,
@@ -125,7 +125,7 @@ newTalent{
 	cooldown = 12,
 	vim = 12,
 	range = 10,
-	getResist = function(self, t) return math.ceil(self:combatTalentScale(t, 8, 35)) end,
+	getResist = function(self, t) return math.ceil(self:combatTalentScale(t, 3, 20)) end,
 	getPercent = function(self, t) return self:combatTalentSpellDamage(t, 12, 45) end, -- Scaling?
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 60) end,
 	tactical = { ATTACK = {ACID = 2}, DISABLE = 1 },
@@ -158,7 +158,7 @@ newTalent{
 	vim = 28,
 	cooldown = 24,
 	range = 0,
-	radius = 5,
+	radius = 4,
 	tactical = { ATTACKAREA = {BLIGHT = 3}, DISABLE = 2 },
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
@@ -172,7 +172,6 @@ newTalent{
 		local fail = 50*power/(power + 26) -- Limit < 50% chance
 		return power, heal_factor, fail
 	end,
-	getPoisonPenetration = function(self, t) return self:combatTalentLimit(t, 100, 15, 75) end,
 	getPoison = function(self,t) 
 		if self:getTalentLevel(t) >= 6 then return 4
 		elseif self:getTalentLevel(t) >= 4 then return 3
@@ -189,7 +188,7 @@ newTalent{
 		-- Add a lasting map effect
 		game.level.map:addEffect(self,
 			self.x, self.y, duration,
-			DamageType.BLIGHT_POISON, {dam=dam, power=power, heal_factor=heal_factor, fail=fail, penetration=t.getPoisonPenetration(self,t), poison=t.getPoison(self,t), apply_power=actor:combatSpellpower()},
+			DamageType.BLIGHT_POISON, {dam=dam, power=power, heal_factor=heal_factor, fail=fail, penetration=0, poison=t.getPoison(self,t), apply_power=actor:combatSpellpower()},
 			radius,
 			5, nil,
 			MapEffect.new{
@@ -209,13 +208,13 @@ newTalent{
 	info = function(self, t)
 		local dam = damDesc(self, DamageType.BLIGHT, t.getDamage(self,t))
 		local power, heal_factor, fail = t.getEffects(self, t)
-		return ([[A furious storm of blighted poison rages around the caster in a radius of %d for %d turns.  Each creature hit by the storm takes %0.2f blight damage and is poisoned for %0.2f blight damage over 4 turns. The blight poison is especially virulent, and has a %d%% chance to ignore poison immunity.
+		return ([[A furious storm of blighted poison rages around the caster in a radius of %d for %d turns.  Each creature hit by the storm takes %0.2f blight damage and is poisoned for %0.2f blight damage over 4 turns.
 		At talent level 2 you have a chance to inflict Insidious Blight, which reduces healing by %d%%.
 		At talent level 4 you have a chance to inflict Numbing Blight, which reduces all damage dealt by %d%%.
 		At talent level 6 you have a chance to inflict Crippling Blight, which causes talents to have a %d%% chance of failure.
 		Each possible effect is equally likely.
 		The poison damage dealt is capable of a critical strike.
 		The damage will increase with your Spellpower.]]):
-		format(self:getTalentRadius(t), t.getDuration(self, t), dam/4, dam, t.getPoisonPenetration(self,t), heal_factor, power, fail)
+		format(self:getTalentRadius(t), t.getDuration(self, t), dam/4, dam, heal_factor, power, fail)
 	end,
 }

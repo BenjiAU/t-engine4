@@ -24,26 +24,26 @@ newTalent{
 	mode = "passive",
 	points = 5,
 	cooldown = 15,
-	getHealValues = function(self, t)  --base, fraction of max life
-		return (self.life_rating or 10) + self:combatTalentStatDamage(t, "con", 2, 20), self:combatTalentLimit(t, 0.3, 0.07, 0.16)
+	getHealValues = function(self, t)
+		return 5+self:combatTalentStatDamage(t, "con", 1, 200)
 	end,
-	getWoundReduction = function(self, t) return self:combatTalentLimit(t, 1, 0.17, 0.5) end, -- Limit <100%
+	getWoundReduction = function(self, t) return self:combatTalentLimit(t, 0.6, 0.17, 0.5) end, -- Limit <60%%
 	getDuration = function(self, t) return 8 end,
 	do_vitality_recovery = function(self, t)
 		if self:isTalentCoolingDown(t) then return end
-		local baseheal, percent = t.getHealValues(self, t)
-		self:setEffect(self.EFF_RECOVERY, t.getDuration(self, t), {power = baseheal, pct = percent / t.getDuration(self, t)})
+		local baseheal = t.getHealValues(self, t)
+		self:setEffect(self.EFF_RECOVERY, t.getDuration(self, t), {regen = baseheal})
 		self:startTalentCooldown(t)
 	end,
 	info = function(self, t)
 		local wounds = t.getWoundReduction(self, t) * 100
-		local baseheal, healpct = t.getHealValues(self, t)
+		local baseheal = t.getHealValues(self, t)
 		local duration = t.getDuration(self, t)
-		local totalheal = baseheal + self.max_life*healpct/duration
+		local totalheal = baseheal
 		return ([[You recover faster from poisons, diseases and wounds, reducing the duration of all such effects by %d%%.  
-		Additionally, when your life falls below 50%%, you heal for a base %0.1f health plus %0.1f%% of your maximum life (currently %0.1f total) each turn for %d turns. This effect can only happen once every %d turns.
-		The base healing scales with your Constitution.]]):
-		format(wounds, baseheal, healpct/duration*100, totalheal, duration, self:getTalentCooldown(t))
+			Whenever your life falls below 50%%, your life regeneration increases by %0.1f for %d turns (%d total). This effect can only happen once every %d turns.
+		The regeneration scales with your Constitution.]]):
+		format(wounds, baseheal, duration, baseheal*duration, self:getTalentCooldown(t))
 	end,
 }
 
@@ -150,7 +150,11 @@ newTalent{
 	require = techs_con_req4,
 	points = 5,
 	cooldown = 24,
-	tactical = { STAMINA = 1, BUFF = 2 },
+	tactical = { STAMINA = 1, BUFF = 1 },
+	on_pre_use_ai = function(self, t) -- save it for combat
+		local tgt = self.ai_target.actor
+		if self.stamina/self.max_stamina < 0.5 or tgt and core.fov.distance(self.x, self.y, tgt.x, tgt.y) < 10 and self:hasLOS(tgt.x, tgt.y) then return true end
+	end,
 	getAttackPower = function(self, t) return self:combatTalentStatDamage(t, "con", 5, 25) end,
 	getDuration = function(self, t) return math.floor(self:combatTalentLimit(t, 24, 3, 7)) end, -- Limit < 24
 	no_energy = true,

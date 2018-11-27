@@ -67,20 +67,23 @@ newTalent{
 	proj_speed = 20,
 	tactical = { ATTACK = {BLIGHT = 1.75}, HEAL = {BLIGHT = 1}}, -- damage to foe heals self
 	requires_target = true,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 10, 190) end,
 	target = function(self, t)
-		return {type="bolt", range=self:getTalentRange(t), talent=t, display={particle="bolt_blood"}}
+		return {type="bolt", range=self:getTalentRange(t), selffire=false, friendlyfire=false, talent=t, display={particle="bolt_blood"}}
 	end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		self:projectile(tg, x, y, DamageType.DRAINLIFE, {dam=self:spellCrit(self:combatTalentSpellDamage(t, 10, 290)), healfactor=0.5}, {type="blood"})
+		local damage = self:spellCrit(t.getDamage(self, t))
+		self:projectile(tg, x, y, DamageType.SANGUINE, {dam=damage}, {type="blood"})
 		game:playSoundNear(self, "talents/slime")
 		return true
 	end,
 	info = function(self, t)
-		return ([[Project a bolt of corrupted blood, doing %0.2f blight damage and healing you for half the damage done.
-		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 10, 290)))
+		return ([[Project a bolt of corrupted blood, doing %0.2f blight damage and healing you for 20%% the damage dealt.
+			50%% of the damage dealt will be gained as maximum life for 7 turns (before the healing).
+		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.BLIGHT, t.getDamage(self, t)))
 	end,
 }
 
@@ -89,25 +92,44 @@ newTalent{
 	type = {"corruption/blood", 3},
 	require = corrs_req3,
 	points = 5,
-	cooldown = 12,
+	cooldown = 8,
 	vim = 30,
-	tactical = { ATTACKAREA = {BLIGHT = 2}, DISABLE = 1 },
+	tactical = { ATTACKAREA = {BLIGHT = 0.5} },  -- Needs a better tactical table, setting to low priority for now so it gets used later in the rotation when diseases are up
 	range = 0,
-	radius = function(self, t) return math.floor(self:combatTalentScale(t, 3, 7)) end,
+	radius = function(self, t) return 10 end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 10, 250) end,
+	getSlow = function(self, t) return self:combatTalentLimit(t, 100, 20, 70) end,
+	getHeal = function(self, t) return self:combatTalentSpellDamage(t, 10, 90) end,
 	requires_target = true,
 	target = function(self, t)
-		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=false, talent=t}
+		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=false, friendlyfire=false, talent=t}
 	end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
-		self:project(tg, self.x, self.y, DamageType.BLOOD_BOIL, self:spellCrit(self:combatTalentSpellDamage(t, 28, 190)))
+		local x, y = self.x, self.y
+		local damage = self:spellCrit(t.getDamage(self, t))
+		local slow = t.getSlow(self, t) / 100
+		local heal = t.getHeal(self, t)
+		local amount = 0
+		self:project(tg, x, y, function(px, py)
+			local target = game.level.map(px, py, Map.ACTOR)
+			if not target then return end
+			local eff = target:removeEffectsFilter(function(e) return e.subtype.poison or e.subtype.disease or e.subtype.wound end, 1)
+			if eff and eff > 0 then
+				local dealt = DamageType:get(DamageType.BLIGHT).projector(self, target.x, target.y, DamageType.BLIGHT, damage)
+				target:setEffect(target.EFF_SLOW, 5, {src=self, power=slow})
+				amount = amount + 1
+			end
+		end)
+		if amount > 0 then self:heal(heal * amount, self) end
 		game.level.map:particleEmitter(self.x, self.y, tg.radius, "circle", {oversize=1, a=180, appear=8, limit_life=8, speed=-3, img="blood_circle", radius=tg.radius})
 		game:playSoundNear(self, "talents/slime")
 		return true
 	end,
 	info = function(self, t)
-		return ([[Make the blood of all creatures around you in radius %d boil, doing %0.2f blight damage and slowing them by 20%%.
-		The damage will increase with your Spellpower.]]):format(self:getTalentRadius(t), damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 28, 190)))
+		return ([[Make the impure blood of all creatures around you in radius %d boil.
+				Each enemy afflicted by a disease, poison, or wound will have one removed at random dealing %0.2f blight damage, healing you for %d, and slowing them by %d%% for 5 turns.
+			The damage will increase with your Spellpower.]]):format(self:getTalentRadius(t), damDesc(self, DamageType.BLIGHT, t.getDamage(self, t)), t.getHeal(self, t), t.getSlow(self, t))
 	end,
 }
 

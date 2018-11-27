@@ -56,9 +56,8 @@ newTalent{
 	base_tactical = { buff=1, defend=0.5, escape=1 , closein=1},
 	adept_deac_tactical = {escape = -0.5, closein = -0.5}, -- adept tactic adjustments when deactivating (negated)
 	range = 0,
-	moveSpeed = function(self, t) return self:combatTalentSpellDamage(t, 10, 40) end,
-	castSpeed = function(self, t) return self:combatTalentSpellDamage(t, 5, 20) end,
-	evade = function(self, t) return self:combatStatLimit(self:combatTalentSpellDamage(t, 10, 100), 50, 5, 25) end,
+	moveSpeed = function(self, t) return self:combatTalentSpellDamage(t, 20, 50) end,
+	castSpeed = function(self, t) return self:combatTalentSpellDamage(t, 7, 20) end,
 	callbackOnActBase = function(self, t)
 		if self:isTalentActive(self.T_HYMN_NOCTURNALIST) then
 			local t2 = self:getTalentFromId(self.T_HYMN_NOCTURNALIST)
@@ -71,7 +70,6 @@ newTalent{
 		local ret = {}
 		self:talentTemporaryValue(ret, "movement_speed", t.moveSpeed(self, t)/100)
 		self:talentTemporaryValue(ret, "combat_spellspeed", t.castSpeed(self, t)/100)
-		self:talentTemporaryValue(ret, "evasion", t.evade(self, t))
 		ret.particle = self:addParticles(Particles.new("darkness_shield", 1))
 		
 		if self:knowTalent(self.T_HYMN_INCANTOR) then
@@ -106,10 +104,10 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Chant the glory of the Moons, gaining the agility of shadows.
-		This increases your movement speed by %d%%, your spell speed by %d%% and grants %d%% evasion.
+		This increases your movement speed by %d%% and your spell speed by %d%%.
 		You may only have one Hymn active at once.
 		The effects will increase with your Spellpower.]]):
-		format(t.moveSpeed(self, t), t.castSpeed(self, t), t.evade(self, t))
+		format(t.moveSpeed(self, t), t.castSpeed(self, t))
 	end,
 }
 
@@ -399,14 +397,14 @@ newTalent{
 			local t3 = self:getTalentFromId(self.T_HYMN_OF_PERSEVERANCE)
 			ret = ([[You have learned to sing the praises of the Moons, in the form of three defensive Hymns:
 
-Hymn of Shadows: Increases your movement speed by %d%%, your spell casting speed by %d%% and grants %d%% evasion.
+Hymn of Shadows: Increases your movement speed by %d%% and your spell casting speed by %d%%.
 
 Hymn of Detection: Increases your ability to see stealthy creatures by %d and invisible creatures by %d, and increases your critical power by %d%%.
 
 Hymn of Perseverance: Increases your resistance to stun, confusion and blinding by %d%%.
 
 You may only have one Hymn active at a time.]]):
-			format(t1.moveSpeed(self, t1), t1.castSpeed(self, t1), t1.evade(self, t1), t2.getSeeStealth(self, t2), t2.getSeeInvisible(self, t2), t2.critPower(self, t2), t3.getImmunities(self, t3)*100)
+			format(t1.moveSpeed(self, t1), t1.castSpeed(self, t1), t2.getSeeStealth(self, t2), t2.getSeeInvisible(self, t2), t2.critPower(self, t2), t3.getImmunities(self, t3)*100)
 		end)
 		self.talents[self.T_HYMN_OF_SHADOWS] = old1
 		self.talents[self.T_HYMN_OF_DETECTION] = old2
@@ -421,7 +419,7 @@ newTalent{
 	require = divi_req2,
 	points = 5,
 	mode = "passive",
-	getDamageOnMeleeHit = function(self, t) return self:combatTalentSpellDamage(t, 5, 50) end,
+	getDamageOnMeleeHit = function(self, t) return self:combatTalentSpellDamage(t, 10, 30) end,
 	getDarkDamageIncrease = function(self, t) return self:combatTalentSpellDamage(t, 10, 30) end,
 	info = function(self, t)
 		return ([[Your Hymns now focus darkness near you, which increases your darkness damage by %d%% and does %0.2f darkness damage to anyone who hits you in melee.

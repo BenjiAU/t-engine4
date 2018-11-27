@@ -60,6 +60,8 @@ newEntity{ base="BASE_NPC_CRYSTAL", define_as = "SPELLBLAZE_CRYSTAL",
 	autolevel = "caster",
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	ai_tactic = resolvers.tactic"ranged",
+	
+	auto_classes={{class="Archmage", start_level=12, level_rate=75}},
 
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("start-shaloren", engine.Quest.COMPLETED, "spellblaze")

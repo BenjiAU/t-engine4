@@ -108,22 +108,26 @@ newTalent{
 	sustain_mana = 20,
 	cooldown = 10,
 	tactical = { BUFF = 2 },
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 120) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 1, 80) end,
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/heal")
 		return {
 			particle = self:addParticles(Particles.new("phantasm_shield", 1)),
 			onhit = self:addTemporaryValue("on_melee_hit", {[DamageType.LIGHT]=t.getDamage(self, t)}),
+			evasion = self:addTemporaryValue("evasion", 10),
+
 		}
 	end,
 	deactivate = function(self, t, p)
 		self:removeParticles(p.particle)
 		self:removeTemporaryValue("on_melee_hit", p.onhit)
+		self:removeTemporaryValue("evasion", p.evasion)
+
 		return true
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		return ([[The caster is surrounded by a phantasmal shield. If hit in melee, the shield will deal %d light damage to the attacker.
+		return ([[The caster is surrounded by a phantasmal shield granting 10%% chance to evade weapon attacks. If hit in melee, the shield will deal %d light damage to the attacker.
 		The damage will increase with your Spellpower.]]):
 		format(damDesc(self, DamageType.LIGHT, damage))
 	end,

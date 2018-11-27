@@ -56,7 +56,7 @@ newEntity{ base = "BASE_NPC_YAECH",
 	},
 	resolvers.talents{
 		[Talents.T_KINETIC_SHIELD]={base=1, every=15, max=3},
-		[Talents.T_EXOTIC_WEAPONS_MASTERY]={base=1, every=10, max=5},
+		[Talents.T_EXOTIC_WEAPONS_MASTERY]={base=0, every=10, max=5},
 	},
 }
 
@@ -70,7 +70,7 @@ newEntity{ base = "BASE_NPC_YAECH",
 		{type="weapon", subtype="trident", autoreq=true, special_rarity="trident_rarity"},
 	},
 	resolvers.talents{
-		[Talents.T_EXOTIC_WEAPONS_MASTERY]={base=1, every=10, max=5},
+		[Talents.T_EXOTIC_WEAPONS_MASTERY]={base=0, every=10, max=5},
 		[Talents.T_MINDHOOK]={base=1, every=7, max=5},
 		[Talents.T_PERFECT_CONTROL]={base=2, every=7, max=5},
 	},
@@ -90,7 +90,7 @@ newEntity{ base = "BASE_NPC_YAECH",
 		[Talents.T_KINETIC_AURA]={base=1, every=7, max=5},
 		[Talents.T_CHARGED_AURA]={base=1, every=7, max=5},
 		[Talents.T_KINETIC_SHIELD]={base=2, every=7, max=5},
-		[Talents.T_EXOTIC_WEAPONS_MASTERY]={base=1, every=10, max=5},
+		[Talents.T_EXOTIC_WEAPONS_MASTERY]={base=0, every=10, max=5},
 	},
 }
 

@@ -148,7 +148,7 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 		end
 
 		if src:attr("stunned") then
-			dam = dam * 0.4
+			dam = dam * 0.5
 			print("[PROJECTOR] stunned dam", dam)
 		end
 		if src:attr("invisible_damage_penalty") then
@@ -178,20 +178,6 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 			if dam ~= lastdam then
 				game:delayedLogDamage(src, target, 0, ("%s(%d warded)#LAST#"):format(DamageType:get(type).text_color or "#aaaaaa#", lastdam-dam), false)
 			end
-		end
-
-		-- Block talent from shields
-		if dam > 0 and target:attr("block") then
-			local e = target.tempeffect_def[target.EFF_BLOCKING]
-			lastdam = dam
-			dam = e.do_block(type, dam, target.tmp[target.EFF_BLOCKING], target, src)
-			if lastdam - dam > 0 then game:delayedLogDamage(src, target, 0, ("%s(%d blocked)#LAST#"):format(DamageType:get(type).text_color or "#aaaaaa#", lastdam-dam), false) end
-		end
-		if dam > 0 and target.isTalentActive and target:isTalentActive(target.T_FORGE_SHIELD) then
-			local t = target:getTalentFromId(target.T_FORGE_SHIELD)
-			lastdam = dam
-			dam = t.doForgeShield(type, dam, t, target, src)
-			if lastdam - dam > 0 then game:delayedLogDamage(src, target, 0, ("%s(%d blocked)#LAST#"):format(DamageType:get(type).text_color or "#aaaaaa#", lastdam-dam), false) end
 		end
 
 		-- Increases damage
@@ -385,6 +371,20 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 			game:delayedLogDamage(src, target, 0, ("%s(%d to psi shield)#LAST#"):format(DamageType:get(type).text_color or "#aaaaaa#", lastdam-dam), false)
 		end
 
+		-- Block talent from shields
+		if dam > 0 and target:attr("block") then
+			local e = target.tempeffect_def[target.EFF_BLOCKING]
+			lastdam = dam
+			dam = e.do_block(type, dam, target.tmp[target.EFF_BLOCKING], target, src)
+			if lastdam - dam > 0 then game:delayedLogDamage(src, target, 0, ("%s(%d blocked)#LAST#"):format(DamageType:get(type).text_color or "#aaaaaa#", lastdam-dam), false) end
+		end
+		if dam > 0 and target.isTalentActive and target:isTalentActive(target.T_FORGE_SHIELD) then
+			local t = target:getTalentFromId(target.T_FORGE_SHIELD)
+			lastdam = dam
+			dam = t.doForgeShield(type, dam, t, target, src)
+			if lastdam - dam > 0 then game:delayedLogDamage(src, target, 0, ("%s(%d blocked)#LAST#"):format(DamageType:get(type).text_color or "#aaaaaa#", lastdam-dam), false) end
+		end
+
 		--Vim based defence
 		if target:attr("demonblood_def") and target.getVim then
 			local demon_block = math.min(dam*0.5,target.demonblood_def*(target:getVim() or 0))
@@ -542,10 +542,6 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 			end
 		end
 
-		if not target.dead and dam > 0 and src.knowTalent and src:knowTalent(src.T_ENDLESS_WOES) then
-			src:triggerTalent(src.T_ENDLESS_WOES, nil, target, type, dam)
-		end
-
 		-- damage affinity healing
 		if not target.dead and affinity_heal > 0 then
 			target:heal(affinity_heal, src)
@@ -577,6 +573,8 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 			end
 
 			if src.__projecting_for then
+				-- Disable friendly fire for procs since players can't control when they happen or where they hit
+				src.nullify_all_friendlyfire = 1
 				if src.talent_on_spell and next(src.talent_on_spell) and t.is_spell and not src.turn_procs.spell_talent then
 					for id, d in pairs(src.talent_on_spell) do
 						if rng.percent(d.chance) and t.id ~= d.talent then
@@ -609,6 +607,7 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 						end
 					end
 				end
+				src.nullify_all_friendlyfire = nil
 
 				if not target.dead and (t.is_spell or t.is_mind) and not src.turn_procs.meteoric_crash and src.knowTalent and src:knowTalent(src.T_METEORIC_CRASH) then
 					src.turn_procs.meteoric_crash = true
@@ -632,15 +631,6 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 					src.turn_procs.unstoppable_nature = true
 				end
 			end
-		end
-
-		-- Use state, because we don't care if it was shrugged off.
-		if state.crit_power > 1 and not state.crit_elemental_surge then
-			if src.knowTalent and src:knowTalent(src.T_ELEMENTAL_SURGE) then
-				src:triggerTalent(src.T_ELEMENTAL_SURGE, nil, target, type, dam)
-			end
-
-			state.crit_elemental_surge = true
 		end
 
 		if src.turn_procs and not src.turn_procs.dazing_damage and src.hasEffect and src:hasEffect(src.EFF_DAZING_DAMAGE) then
@@ -840,6 +830,9 @@ newDamageType{
 		if src and src.knowTalent and realdam > 0 and target and src:knowTalent(src.T_PESTILENT_BLIGHT) then
 			src:callTalent(src.T_PESTILENT_BLIGHT, "do_rot", target, realdam)
 		end
+		if src and src.knowTalent and realdam > 0 and target and src:knowTalent(src.T_VIRULENT_DISEASE) and (not state or not state.from_disease) then
+			src:callTalent(src.T_VIRULENT_DISEASE, "do_disease", target, realdam)
+		end
 		return realdam
 	end,
 	death_message = {"diseased", "poxed", "infected", "plagued", "debilitated by noxious blight before falling", "fouled", "tainted"},
@@ -874,7 +867,7 @@ newDamageType{
 -- Mind damage
 -- Most uses of this have their damage effected by mental save and do not trigger cross tiers, ie, melee items
 newDamageType{
-	name = "mind", type = "MIND", text_color = "#YELLOW#",
+	name = "mind", type = "MIND", text_color = "#ORANGE#",
 	projector = function(src, x, y, type, dam, state)
 		state = initState(state)
 		useImplicitCrit(src, state)
@@ -1488,7 +1481,7 @@ newDamageType{
 		local target = game.level.map(x, y, Map.ACTOR)
 		if target and dam.daze > 0 and rng.percent(dam.daze) then
 			if target:canBe("stun") then
-				game:onTickEnd(function() target:setEffect(target.EFF_DAZED, 3, {src=src, apply_power=dam.power_check or math.max(src:combatSpellpower(), src:combatMindpower(), src:combatAttack())}) end) -- Do it at the end so we don't break our own daze
+				game:onTickEnd(function() target:setEffect(target.EFF_DAZED, (dam.daze_duration or 3), {src=src, apply_power=dam.power_check or math.max(src:combatSpellpower(), src:combatMindpower(), src:combatAttack())}) end) -- Do it at the end so we don't break our own daze
 				if src:isTalentActive(src.T_HURRICANE) then
 					local t = src:getTalentFromId(src.T_HURRICANE)
 					t.do_hurricane(src, t, target)
@@ -1733,7 +1726,7 @@ newDamageType{
 		local realdam = DamageType:get(DamageType.NATURE).projector(src, x, y, DamageType.NATURE, dam / 6, state)
 		local target = game.level.map(x, y, Map.ACTOR)
 		if target and target:canBe("poison") then
-			target:setEffect(target.EFF_POISONED, 5, {src=src, power=dam / 6, apply_power=power or (src.combatAttack and src:combatAttack()) or 0})
+			target:setEffect(target.EFF_POISONED, 5, {src=src, power=dam / 6})
 		end
 		return realdam
 	end,
@@ -1766,7 +1759,6 @@ newDamageType{
 }
 
 -- Spydric poison: prevents movement
--- Very special, does not have a power check
 newDamageType{
 	name = "spydric poison", type = "SPYDRIC_POISON",
 	projector = function(src, x, y, type, dam, state)
@@ -1939,7 +1931,7 @@ newDamageType{
 		local target = game.level.map(x, y, Map.ACTOR)
 		if target then
 			if target:canBe("confusion") then
-				target:setEffect(target.EFF_CONFUSED, dam.dur, {power=dam.dam, apply_power=(dam.power_check or src.combatSpellpower)(src)})
+				target:setEffect(target.EFF_CONFUSED, dam.dur, {power=dam.dam or 30, apply_power=(dam.power_check or src.combatSpellpower)(src)})
 			else
 				game.logSeen(target, "%s resists!", target.name:capitalize())
 			end
@@ -1957,7 +1949,7 @@ newDamageType{
 		local target = game.level.map(x, y, Map.ACTOR)
 		if target and rng.percent(dam.dam) then
 			if target:canBe("confusion") then
-				target:setEffect(target.EFF_CONFUSED, 4, {power=75, apply_power=(dam.power_check or src.combatSpellpower)(src), no_ct_effect=true})
+				target:setEffect(target.EFF_CONFUSED, 4, {power=dam.power or 30, apply_power=(dam.power_check or src.combatSpellpower)(src), no_ct_effect=true})
 			else
 				game.logSeen(target, "%s resists!", target.name:capitalize())
 			end
@@ -1975,7 +1967,7 @@ newDamageType{
 		local target = game.level.map(x, y, Map.ACTOR)
 		if target and rng.percent(dam.dam) then
 			if target:canBe("confusion") then
-				target:setEffect(target.EFF_CONFUSED, 4, {power=75, apply_power=src:combatPhysicalpower(), no_ct_effect=true})
+				target:setEffect(target.EFF_CONFUSED, 4, {power=dam.power or 30, apply_power=src:combatPhysicalpower(), no_ct_effect=true})
 			else
 				game.logSeen(target, "%s resists!", target.name:capitalize())
 			end
@@ -2440,6 +2432,22 @@ newDamageType{
 	end,
 }
 
+-- Used by Blood Grasp, heal+temporary max life based on damage
+newDamageType{
+	name = "sanguine blight", type = "SANGUINE", text_color = "#DARK_GREEN#",
+	projector = function(src, x, y, type, dam, state)
+		state = initState(state)
+		useImplicitCrit(src, state)
+		if _G.type(dam) == "number" then dam = {dam=dam} end
+		local target = game.level.map(x, y, Map.ACTOR) -- Get the target first to make sure we heal even on kill
+		local dealt = DamageType:get(DamageType.BLIGHT).projector(src, x, y, DamageType.BLIGHT, dam.dam, state)
+		if dealt > 0 then 
+			src:setEffect(src.EFF_BLOOD_GRASP, 7, {life = dealt * 0.5} )
+			src:heal(dealt * 0.2, src)
+		end
+		return dealt
+	end,
+}
 -- Drain Vim
 newDamageType{
 	name = "vim draining blight", type = "DRAIN_VIM", text_color = "#DARK_GREEN#",
@@ -2868,7 +2876,7 @@ newDamageType{
 		if target and src:reactionToward(target) < 0 then
 			DamageType:get(DamageType.NATURE).projector(src, x, y, DamageType.NATURE, dam.dam, state)
 			if target:canBe("confusion") and rng.percent(dam.chance) then
-				target:setEffect(target.EFF_CONFUSED, 2, {apply_power=src:combatMindpower(), power=dam.power}, true)
+				target:setEffect(target.EFF_CONFUSED, 2, {apply_power=src:combatMindpower(), power=dam.power or 30}, true)
 			else
 				game.logSeen(target, "%s resists the confusion!", target.name:capitalize())
 			end
@@ -3082,7 +3090,7 @@ newDamageType{
 				end
 			elseif chance == 4 then
 				if target:canBe("confusion") then
-					target:setEffect(target.EFF_CONFUSED, 3, {power=50, apply_power=src:combatSpellpower()})
+					target:setEffect(target.EFF_CONFUSED, 3, {power=dam.power or 30, apply_power=src:combatSpellpower()})
 				else
 					game.logSeen(target, "%s resists the confusion!", target.name:capitalize())
 				end
@@ -3725,7 +3733,7 @@ newDamageType{
 			end
 		elseif eff == 4 then
 			if target:canBe("confusion") then
-				target:setEffect(target.EFF_CONFUSED, dur, {power=50, apply_power=power})
+				target:setEffect(target.EFF_CONFUSED, dur, {power=dam.power or 30, apply_power=power})
 			else
 				game.logSeen(target, "%s resists the confusion!", target.name:capitalize())
 			end
@@ -3882,7 +3890,7 @@ newDamageType{
 			if effect == 1 then
 				-- confusion
 				if target:canBe("confusion") and not target:hasEffect(target.EFF_CONFUSED) then
-					target:setEffect(target.EFF_CONFUSED, dam.dur, {power=50})
+					target:setEffect(target.EFF_CONFUSED, dam.dur, {power=dam.power or 30})
 					game.level.map:particleEmitter(target.x, target.y, 1, "circle", {base_rot=0, oversize=0.7, a=130, limit_life=8, appear=8, speed=0, img="curse_gfx_04", radius=0})					
 				end
 			elseif effect == 2 then

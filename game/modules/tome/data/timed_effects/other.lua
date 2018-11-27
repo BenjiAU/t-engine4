@@ -25,6 +25,132 @@ local Map = require "engine.Map"
 local Level = require "engine.Level"
 local Combat = require "mod.class.interface.Combat"
 
+-- Elemental Surge effects here to avoid interaction with duration increases since so many can be up at once
+newEffect{
+	name = "ETHEREAL_FORM", image = "talents/displace_damage.png",
+	desc = "Ethereal Form",
+	long_desc = function(self, eff) return ("Ethereal Form bonuses reduced by %d%%"):format(eff.stacks * 5) end,
+	type = "other",
+	subtype = { },
+	status = "detrimental",
+	parameters = { stacks = 0},
+	charges = function(self, eff) return eff.stacks end,
+	updateEffect = function(self, eff)
+		eff.stacks = math.min(5, eff.stacks)
+		if eff.resists then self:removeTemporaryValue("resists", eff.resists) end
+		if eff.damage then self:removeTemporaryValue("resists_pen", eff.damage) end
+		eff.resists = self:addTemporaryValue("resists", {absolute = -(eff.stacks * 5)})
+		eff.damage = self:addTemporaryValue("resists_pen", {all = -(eff.stacks * 5)})
+	end,
+	on_merge = function(self, old_eff, new_eff, e)
+		old_eff.stacks = old_eff.stacks + 1
+		e.updateEffect(self, old_eff)
+		return old_eff
+	end,
+	activate = function(self, eff, e)
+		eff.stacks = 1
+		e.updateEffect(self, eff)
+	end,
+	deactivate = function(self, eff, e)
+		if eff.resists then self:removeTemporaryValue("resists", eff.resists) end
+		if eff.damage then self:removeTemporaryValue("resists_pen", eff.damage) end
+	end,
+
+}
+
+newEffect{
+	name = "ELEMENTAL_SURGE_ARCANE", image = "talents/elemental_surge.png",
+	desc = "Elemental Surge: Arcane",
+	long_desc = function(self, eff) return ("Spell and mind speed increased by 30%") end,
+	type = "other",
+	subtype = {elemental = true },
+	status = "beneficial",
+	parameters = { },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "combat_spellspeed", 0.3)
+		self:effectTemporaryValue(eff, "combat_mindspeed", 0.3)
+	end,
+}
+
+newEffect{
+	name = "ELEMENTAL_SURGE_PHYSICAL", image = "talents/elemental_surge.png",
+	desc = "Elemental Surge: Physical",
+	long_desc = function(self, eff) return ("Immune to detrimental physical effects") end,
+	type = "other",
+	subtype = {elemental = true },
+	status = "beneficial",
+	parameters = { },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "physical_negative_status_effect_immune", 1)
+	end,
+}
+
+newEffect{
+	name = "ELEMENTAL_SURGE_NATURE", image = "talents/elemental_surge.png",
+	desc = "Elemental Surge: Nature",
+	long_desc = function(self, eff) return ("Immune to detrimental magical effects") end,
+	type = "other",
+	subtype = {elemental = true },
+	status = "beneficial",
+	parameters = { },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "spell_negative_status_effect_immune", 1)
+	end,
+}
+
+newEffect{
+	name = "ELEMENTAL_SURGE_FIRE", image = "talents/elemental_surge.png",
+	desc = "Elemental Surge: Fire",
+	long_desc = function(self, eff) return ("All damage increased by %d%%"):format(eff.damage) end,
+	type = "other",
+	subtype = {elemental = true },
+	status = "beneficial",
+	parameters = {damage = 30 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff,"inc_damage", {all = eff.damage})
+	end,
+}
+
+newEffect{
+	name = "ELEMENTAL_SURGE_COLD", image = "talents/elemental_surge.png",
+	desc = "Elemental Surge: Cold",
+	long_desc = function(self, eff) return ("Armor increased by %d, deals %d ice damage when hit in melee."):format(eff.armor, eff.dam) end,
+	type = "other",
+	subtype = {elemental = true },
+	status = "beneficial",
+	parameters = {armor=0, dam=100 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "combat_armor", eff.armor)
+		self:effectTemporaryValue(eff, "on_melee_hit", {[DamageType.ICE]=eff.dam})
+	end,
+}
+
+newEffect{
+	name = "ELEMENTAL_SURGE_LIGHTNING", image = "talents/elemental_surge.png",
+	desc = "Elemental Surge: Lightning",
+	long_desc = function(self, eff) return ("Movement speed increased by %d%%."):format(eff.move) end,
+	type = "other",
+	subtype = {elemental = true },
+	status = "beneficial",
+	parameters = { move = 50},
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "movement_speed", eff.move/100)
+	end,
+}
+
+newEffect{
+	name = "ELEMENTAL_SURGE_LIGHT", image = "talents/elemental_surge.png",
+	desc = "Elemental Surge: Light",
+	long_desc = function(self, eff) return ("All talent cooldowns reduced by %d%%."):format(eff.cooldown) end,
+	type = "other",
+	subtype = {elemental = true },
+	status = "beneficial",
+	parameters = {cooldown = 20 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "talent_cd_reduction", {allpct = eff.cooldown / 100})
+	end,
+}
+
 newEffect{
 	name = "FLASH_SHIELD", image = "talents/flash_of_the_blade.png",
 	desc = "Protected by the Sun",
@@ -56,6 +182,83 @@ newEffect{
 	activate = function(self, eff)
 		self:effectTemporaryValue(eff, "resists", {[DamageType.LIGHT]=-eff.power})
 		self:effectTemporaryValue(eff, "numbed", eff.numb)
+	end,
+}
+
+newEffect{
+	name = "ITEM_CHARM_PIERCING", image = "talents/intricate_tools.png",
+	desc = "Charm:  Piercing",
+	long_desc = function(self, eff) return ("All damage penetration increased by %d%%."):format(eff.penetration) end,
+	type = "other",
+	subtype = { },
+	status = "beneficial",
+	parameters = { penetration=10 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "resists_pen", {all = eff.penetration})
+	end,
+	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
+	name = "ITEM_CHARM_POWERFUL", image = "talents/intricate_tools.png",
+	desc = "Charm:  Damage",
+	long_desc = function(self, eff) return ("All damage increased by %d%%."):format(eff.damage) end,
+	type = "other",
+	subtype = { },
+	status = "beneficial",
+	parameters = { damage=10 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "inc_damage", {all = eff.damage})
+	end,
+	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
+	name = "ITEM_CHARM_SAVIOR", image = "talents/intricate_tools.png",
+	desc = "Charm:  Saves",
+	long_desc = function(self, eff) return ("All saves increased by %d."):format(eff.save) end,
+	type = "other",
+	subtype = { },
+	status = "beneficial",
+	parameters = { save=10 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "combat_physresist", eff.save)
+		self:effectTemporaryValue(eff, "combat_spellresist", eff.save)
+		self:effectTemporaryValue(eff, "combat_mentalresist", eff.save)
+	end,
+	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
+	name = "ITEM_CHARM_EVASIVE", image = "talents/intricate_tools.png",
+	desc = "Charm:  Evasion",
+	long_desc = function(self, eff) return ("%d%% chance to avoid weapon attacks"):format(eff.chance) end,
+	type = "other",
+	subtype = { },
+	status = "beneficial",
+	parameters = { chance=10 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "evasion", eff.chance)
+	end,
+	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
+	name = "ITEM_CHARM_INNERVATING", image = "talents/intricate_tools.png",
+	desc = "Charm:  Innervating",
+	long_desc = function(self, eff) return ("Fatigue reduced by %d%%."):format(eff.fatigue) end,
+	type = "other",
+	subtype = { },
+	status = "beneficial",
+	parameters = { fatigue=10, },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "fatigue", -eff.fatigue)
+	end,
+	deactivate = function(self, eff)
 	end,
 }
 
@@ -98,6 +301,7 @@ newEffect{
 	name = "INFUSION_COOLDOWN", image = "effects/infusion_cooldown.png",
 	desc = "Infusion Saturation",
 	long_desc = function(self, eff) return ("The more you use infusions, the longer they will take to recharge (+%d cooldowns)."):format(eff.power) end,
+	charges = function(self, eff) return eff.power end,
 	type = "other",
 	subtype = { infusion=true },
 	status = "detrimental",
@@ -114,6 +318,7 @@ newEffect{
 	name = "RUNE_COOLDOWN", image = "effects/rune_cooldown.png",
 	desc = "Runic Saturation",
 	long_desc = function(self, eff) return ("The more you use runes, the longer they will take to recharge (+%d cooldowns)."):format(eff.power) end,
+	charges = function(self, eff) return eff.power end,
 	type = "other",
 	subtype = { rune=true },
 	status = "detrimental",
@@ -140,6 +345,19 @@ newEffect{
 		old_eff.power = old_eff.power + new_eff.power
 		return old_eff
 	end,
+}
+
+newEffect{
+	name = "PATH_OF_THE_SUN", image = "talents/path_of_the_sun.png",
+	desc = "Path of the Sun",
+	long_desc = function(self, eff) return ("The target is able to instantly travel alongside Sun Paths."):format() end,
+	type = "other",
+	subtype = { sun=true, },
+	status = "beneficial",
+	parameters = {},
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "walk_sun_path", 1)
+	end
 }
 
 newEffect{
@@ -2282,7 +2500,7 @@ newEffect{
 		-- Bypass all shields & such
 		local old = self.onTakeHit
 		self.onTakeHit = nil
-		mod.class.interface.ActorLife.takeHit(self, self.max_life * eff.dam / 100, nil, {special_death_msg="suffocated to death"})
+		mod.class.interface.ActorLife.takeHit(self, self.max_life * eff.dam / 100, self, {special_death_msg="suffocated to death"})
 		eff.dam = util.bound(eff.dam + 5, 20, 100)
 		self.onTakeHit = old
 	end,
@@ -3325,5 +3543,31 @@ newEffect{
 		self:effectTemporaryValue(eff, "inc_damage", {[engine.DamageType.COLD] = 20})
 	end,
 	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
+	name = "RECALL", image = "effects/recall.png",
+	desc = "Recalling",
+	long_desc = function(self, eff) return "The target is waiting to be recalled back to the worldmap." end,
+	type = "magical",
+	subtype = { unknown=true },
+	status = "beneficial",
+	cancel_on_level_change = true,
+	parameters = { },
+	activate = function(self, eff)
+		eff.leveid = game.zone.short_name.."-"..game.level.level
+	end,
+	deactivate = function(self, eff)
+		if (eff.allow_override or (self == game:getPlayer(true) and self:canBe("worldport") and not self:attr("never_move"))) and eff.dur <= 0 then
+			game:onTickEnd(function()
+				if eff.leveid == game.zone.short_name.."-"..game.level.level and game.player.can_change_zone then
+					game.logPlayer(self, "You are yanked out of this place!")
+					game:changeLevel(1, eff.where or game.player.last_wilderness)
+				end
+			end)
+		else
+			game.logPlayer(self, "Space restabilizes around you.")
+		end
 	end,
 }

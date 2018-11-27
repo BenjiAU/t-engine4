@@ -166,8 +166,9 @@ newTalent{
 		-- Second & third attack with weapon
 		if hit then
 			self.turn_procs.auto_phys_crit = true
-			self:attackTarget(target, nil, self:combatTalentWeaponDamage(t, 0.8, 1.3), true)
-			self:attackTarget(target, nil, self:combatTalentWeaponDamage(t, 0.8, 1.3), true)
+			local weapon = self:hasMHWeapon()
+			self:attackTargetWith(target, weapon, nil, self:combatTalentWeaponDamage(t, 0.8, 1.3))
+			self:attackTargetWith(target, weapon, nil, self:combatTalentWeaponDamage(t, 0.8, 1.3))
 			self.turn_procs.auto_phys_crit = nil
 		end
 

@@ -41,36 +41,55 @@ uberTalent{
 	name = "Meteoric Crash",
 	mode = "passive",
 	cooldown = 15,
-	getDamage = function(self, t) return math.max(100 + self:combatSpellpower() * 5, 100 + self:combatMindpower() * 5) end,
+	getDamage = function(self, t) return math.max(50 + self:combatSpellpower() * 5, 50 + self:combatMindpower() * 5) end,
+	getLava = function(self, t) return math.max(self:combatSpellpower() + 30, self:combatMindpower() + 30) end,
 	require = { special={desc="Have witnessed a meteoric crash", fct=function(self) return game.state.birth.ignore_prodigies_special_reqs or self:attr("meteoric_crash") end} },
+	passives = function(self, t, tmptable)
+		self:talentTemporaryValue(tmptable, "auto_highest_inc_damage", {[DamageType.FIRE] = 0})
+		self:talentTemporaryValue(tmptable, "auto_highest_resists_pen", {[DamageType.FIRE] = 0})
+		self:talentTemporaryValue(tmptable, "inc_damage", {[DamageType.FIRE] = 0.00001})  -- 0 so that it shows up in the UI
+		self:talentTemporaryValue(tmptable, "resists_pen", {[DamageType.FIRE] = 0.00001})
+	end,	
 	trigger = function(self, t, target)
 		self:startTalentCooldown(t)
 		local terrains = t.terrains or mod.class.Grid:loadList("/data/general/grids/lava.lua")
 		t.terrains = terrains -- cache
 
+		local lava_dam = t.getLava(self, t)
+		local dam = t.getDamage(self, t)
+		if self:combatMindCrit() > self:combatSpellCrit() then 
+			_dam = self:mindCrit(dam)
+			lava_dam = self:mindCrit(lava_dam)
+		else 
+			dam = self:spellCrit(dam)
+			lava_dam = self:spellCrit(lava_dam)
+		end
 		local meteor = function(src, x, y, dam)
-			game.level.map:particleEmitter(x, y, 10, "meteor", {x=x, y=y}).on_remove = function(self)
-				local x, y = self.args.x, self.args.y
+			game.level.map:particleEmitter(x, y, 10, "meteor", {x=x, y=y})
 				game.level.map:particleEmitter(x, y, 10, "fireflash", {radius=2})
 				game:playSoundNear(game.player, "talents/fireflash")
 
 				local grids = {}
-				for i = x-1, x+1 do for j = y-1, y+1 do
+				for i = x-3, x+3 do for j = y-3, y+3 do
 					local oe = game.level.map(i, j, engine.Map.TERRAIN)
-					if oe and not oe:attr("temporary") and
-					(core.fov.distance(x, y, i, j) < 1 or rng.percent(40)) and (game.level.map:checkEntity(i, j, engine.Map.TERRAIN, "dig") or game.level.map:checkEntity(i, j, engine.Map.TERRAIN, "grow")) then
+					-- Create "patchy" lava, but guarantee that the center tiles are lava
+					if oe and not oe:attr("temporary") and not oe.special and not game.level.map:checkEntity(i, j, engine.Map.TERRAIN, "block_move") and (core.fov.distance(x, y, i, j) < 1 or rng.percent(40)) then
 						local g = terrains.LAVA_FLOOR:clone()
 						g:resolve() g:resolve(nil, true)
 						game.zone:addEntity(game.level, g, "terrain", i, j)
 						grids[#grids+1] = {x=i,y=j,oe=oe}
 					end
 				end end
-				for i = x-1, x+1 do for j = y-1, y+1 do
+				for i = x-3, x+3 do for j = y-3, y+3 do
 					game.nicer_tiles:updateAround(game.level, i, j)
 				end end
 				for _, spot in ipairs(grids) do
 					local i, j = spot.x, spot.y
 					local g = game.level.map(i, j, engine.Map.TERRAIN)
+
+					g.mindam = lava_dam
+					g.maxdam = lava_dam
+					g.faction = src.faction -- Don't hit self or allies
 					g.temporary = 8
 					g.x = i g.y = j
 					g.canAct = false
@@ -82,16 +101,17 @@ uberTalent{
 						self.temporary = self.temporary - 1
 						if self.temporary <= 0 then
 							game.level.map(self.x, self.y, engine.Map.TERRAIN, self.old_feat)
-							game.level:removeEntity(self)
+							game.level:removeEntity(self, true)
 							game.nicer_tiles:updateAround(game.level, self.x, self.y)
 						end
 					end
+					g:altered()
 					game.level:addEntity(g)
 				end
 
-				src:project({type="ball", radius=2, selffire=false}, x, y, engine.DamageType.FIRE, dam/2)
-				src:project({type="ball", radius=2, selffire=false}, x, y, engine.DamageType.PHYSICAL, dam/2)
-				src:project({type="ball", radius=2, selffire=false}, x, y, function(px, py)
+				src:project({type="ball", radius=2, selffire=false, friendlyfire=false}, x, y, engine.DamageType.FIRE, dam/2)
+				src:project({type="ball", radius=2, selffire=false, friendlyfire=false}, x, y, engine.DamageType.PHYSICAL, dam/2)
+				src:project({type="ball", radius=2, selffire=false, friendlyfire=false}, x, y, function(px, py)
 					local target = game.level.map(px, py, engine.Map.ACTOR)
 					if target then
 						if target:canBe("stun") then
@@ -104,7 +124,6 @@ uberTalent{
 				if core.shader.allow("distort") then game.level.map:particleEmitter(x, y, 2, "shockwave", {radius=2}) end
 				game:getPlayer(true):attr("meteoric_crash", 1)
 			end
-		end
 
 		local dam = t.getDamage(self, t)
 		if self:combatMindCrit() > self:combatSpellCrit() then dam = self:mindCrit(dam)
@@ -117,9 +136,14 @@ uberTalent{
 	info = function(self, t)
 		local dam = t.getDamage(self, t)/2
 		return ([[When casting damaging spells or mind attacks, the release of your willpower can call forth a meteor to crash down near your foes.
-		The affected area is turned into lava for 8 turns, and the crash itself will deal %0.2f fire and %0.2f physical damage.
-		The meteor also stuns affected creatures for 3 turns. The damage scales with your Spellpower or Mindpower.]])
-		:format(damDesc(self, DamageType.FIRE, dam), damDesc(self, DamageType.PHYSICAL, dam))
+		The meteor deals %0.2f fire and %0.2f physical damage in radius 2 and stuns enemies for 3 turns.
+		Lava is created in radius 3 around the impact dealing %0.2f fire damage per turn for 8 turns.  This will overwrite tiles that already have modified terrain.
+		You and your allies take no damage from either effect.
+
+		Additionally, your fire damage and penetration will now use your highest type if that value would be greater.
+		
+		The damage scales with your Spellpower or Mindpower.]])
+		:format(damDesc(self, DamageType.FIRE, dam), damDesc(self, DamageType.PHYSICAL, dam), damDesc(self, DamageType.FIRE, t.getLava(self, t)))
 	end,
 }
 
@@ -201,7 +225,7 @@ uberTalent{
 uberTalent{
 	name = "Unbreakable Will",
 	mode = "passive",
-	cooldown = 7,
+	cooldown = 5,
 	trigger = function(self, t)
 		self:startTalentCooldown(t)
 		game.logSeen(self, "#LIGHT_BLUE#%s's unbreakable will shrugs off the effect!", self.name:capitalize())
@@ -209,7 +233,7 @@ uberTalent{
 	end,
 	info = function(self, t)
 		return ([[Your will is so strong that you simply ignore mental effects used against you.
-		Warning: this has a cooldown.]])
+		This effect can only occur once every 5 turns.]])
 		:format()
 	end,
 }

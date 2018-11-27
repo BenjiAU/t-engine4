@@ -44,6 +44,12 @@ _M.logCombat = Combat.logCombat
 -- ego fields that are appended as a list when the ego is applied (by Zone:applyEgo)
 _M._special_ego_rules = {special_on_hit=true, special_on_crit=true, special_on_kill=true, charm_on_use=true}
 
+_M.requirement_flags_names = {
+	allow_wear_massive = "Massive armour training",
+	allow_wear_heavy = "Heavy armour training",
+	allow_wear_shield = "Shield usage training",
+}
+
 function _M:getRequirementDesc(who)
 	local base_getRequirementDesc = engine.Object.getRequirementDesc
 	
@@ -292,7 +298,9 @@ function _M:use(who, typ, inven, item)
 	if not typ and #types == 1 then typ = types[1] end
 
 	if typ == "use" then
+		who.__object_use_running = self
 		local ret = self:useObject(who, inven, item)
+		who.__object_use_running = nil
 		if ret.used then
 			if self.charm_on_use then
 				for i, d in ipairs(self.charm_on_use) do
@@ -1409,6 +1417,15 @@ function _M:getTextualDesc(compare_with, use_actor)
 			end
 		end)
 
+		compare_table_fields(w, compare_with, field, "talents_mastery_bonus", "+%0.2f ", "Talent category bonus: ", function(item)
+		local _, _, t, st = item:find("^([^/]+)/?(.*)$")
+			if st and st ~= "" then
+				return st:capitalize()
+			else
+				return t:capitalize()
+			end
+		end)
+
 		compare_table_fields(w, compare_with, field, "damage_affinity", "%+d%%", "Damage affinity(heal): ", function(item)
 				local col = (DamageType.dam_def[item] and DamageType.dam_def[item].text_color or "#WHITE#"):toTString()
 				return col[2], (" %s"):format(item == "all" and "all" or (DamageType.dam_def[item] and DamageType.dam_def[item].name or "??")), {"color","LAST"}
@@ -1790,7 +1807,7 @@ function _M:getTextualDesc(compare_with, use_actor)
 			compare_unarmed[i] = compare_with[i].wielder or {}
 		end
 
-		if (w and w.combat or can_combat_unarmed) and (use_actor:knowTalent(use_actor.T_EMPTY_HAND) or use_actor:attr("show_gloves_combat")) then
+		if (w and w.combat or can_combat_unarmed) and (use_actor:knowTalent(use_actor.T_EMPTY_HAND) or use_actor:attr("show_gloves_combat") or config.settings.tome.display_glove_stats) then
 			desc:add({"color","YELLOW"}, "When used to modify unarmed attacks:", {"color", "LAST"}, true)
 			compare_tab = { dam=1, atk=1, apr=0, physcrit=0, physspeed =(use_actor:knowTalent(use_actor.T_EMPTY_HAND) and 0.6 or 1), dammod={str=1}, damrange=1.1 }
 			desc_combat(w, compare_unarmed, "combat", compare_tab, true)
@@ -2033,9 +2050,9 @@ function _M:getUseDesc(use_actor)
 			ret = tstring{{"color","YELLOW"}, ("It can be used to %s, with %d charges out of %d."):format(desc, math.floor(self.power / usepower(self.use_power.power)), math.floor(self.max_power / usepower(self.use_power.power))), {"color","LAST"}}
 		elseif self.talent_cooldown then
 			local t_name = self.talent_cooldown == "T_GLOBAL_CD" and "all charms" or "Talent "..use_actor:getTalentDisplayName(use_actor:getTalentFromId(self.talent_cooldown))
-			ret = tstring{{"color","YELLOW"}, ("It can be used to %s, putting %s on cooldown for %d turns."):format(desc:format(self:getCharmPower(use_actor)), t_name, usepower(self.use_power.power)), {"color","LAST"}}
+			ret = tstring{{"color","YELLOW"}, ("It can be used to %s\n\nActivation puts %s on cooldown for %d turns."):format(desc:format(self:getCharmPower(use_actor)), t_name, usepower(self.use_power.power)), {"color","LAST"}}
 		else
-			ret = tstring{{"color","YELLOW"}, ("It can be used to %s, costing %d power out of %d/%d."):format(desc, usepower(self.use_power.power), self.power, self.max_power), {"color","LAST"}}
+			ret = tstring{{"color","YELLOW"}, ("It can be used to %s\n\nActivation costs %d power out of %d/%d."):format(desc, usepower(self.use_power.power), self.power, self.max_power), {"color","LAST"}}
 		end
 	elseif self.use_simple then
 		ret = tstring{{"color","YELLOW"}, ("It can be used to %s."):format(util.getval(self.use_simple.name, self, use_actor)), {"color","LAST"}}
@@ -2055,7 +2072,13 @@ function _M:getUseDesc(use_actor)
 	if self.charm_on_use then
 		ret:add(true, "When used:", true)
 		for i, d in ipairs(self.charm_on_use) do
-			ret:add(tostring(d[1]), "% chance to ", d[2](self, use_actor), ".", true)
+			-- Clean up the description if our chance to proc is 100%
+			local percent = d[1]
+			if percent < 100 then
+				ret:add({"color","ORCHID"}, "* ", tostring(d[1]), "% chance to ", d[2](self, use_actor), ".", true, {"color","LAST"})
+			else
+				ret:add({"color","ORCHID"}, "* ", d[2](self, use_actor):capitalize(), ".", true, {"color","LAST"})
+			end
 		end
 	end
 

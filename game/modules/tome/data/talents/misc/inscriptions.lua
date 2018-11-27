@@ -631,7 +631,7 @@ newInscription{
 		local data = self:getInscriptionData(t.short_name)
 		return data.range + data.inc_stat
 	end,
-	target = function(self, t) return {type="hit", nolock=true, pass_terrain=false, nowarning=true, range=t.range(self, t), 
+	target = function(self, t) return {type="hit", nolock=true, pass_terrain=false, nowarning=true, range=self:getTalentRange(t), 
 		grid_params = {want_range = (not self.ai_target.actor or self.ai_state.tactic == "escape") and 6 or 1	} } end,
 	getDur = function(self, t) return 3 end,
 	action = function(self, t)
@@ -642,16 +642,16 @@ newInscription{
 		if not self:hasLOS(x, y) then return end
 
 		local _ _, x, y = self:canProject(tg, x, y)
-		local rad = 1
+		local rad = 0
 		
 		game.level.map:particleEmitter(self.x, self.y, 1, "teleport")
 		self:teleportRandom(x, y, rad)
 		game.level.map:particleEmitter(self.x, self.y, 1, "teleport")
 
 		self:setEffect(self.EFF_OUT_OF_PHASE, data.dur or 3, {
-			defense = data.power + data.inc_stat * 3 + (self:attr("defense_on_teleport") or 0), -- This is a very odd way to handle OOP merging, fix me
-			resists = data.power + data.inc_stat * 3 + (self:attr("resist_all_on_teleport") or 0),
-			effect_reduction = data.power + data.inc_stat * 3 + (self:attr("effect_reduction_on_teleport") or 0),
+			defense = data.power + data.inc_stat * 3,
+			resists = data.power + data.inc_stat * 3,
+			effect_reduction = data.power + data.inc_stat * 3,
 		})
 		return true
 	end,
@@ -1324,9 +1324,9 @@ newInscription{
 		self:teleportRandom(self.x, self.y, data.range + data.inc_stat)
 		game.level.map:particleEmitter(self.x, self.y, 1, "teleport")
 		self:setEffect(self.EFF_OUT_OF_PHASE, data.dur or 3, {
-			defense=(data.power or data.range) + data.inc_stat * 3 + (self:attr("defense_on_teleport") or 0),
-			resists=(data.power or data.range) + data.inc_stat * 3 + (self:attr("resist_all_on_teleport") or 0),
-			effect_reduction=(data.power or data.range) + data.inc_stat * 3 + (self:attr("effect_reduction_on_teleport") or 0),
+			defense=(data.power or 0) + data.inc_stat * 3,
+			resists=(data.power or 0) + data.inc_stat * 3,
+			effect_reduction=(data.power or 0) + data.inc_stat * 3,
 		})
 		return true
 	end,

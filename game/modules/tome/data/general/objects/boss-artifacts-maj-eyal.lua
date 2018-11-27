@@ -518,7 +518,7 @@ newEntity{ base = "BASE_SHIELD",
 
 		lite = 1,
 		talents_types_mastery = {["celestial/star-fury"]=0.2,["celestial/twilight"]=0.1,},
-		learn_talent = { [Talents.T_BLOCK] = 5, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 	talent_on_spell = { {chance=10, talent=Talents.T_MOONLIGHT_RAY, level=2} },
 }
@@ -553,7 +553,7 @@ newEntity{ base = "BASE_SHIELD",
 			[DamageType.COLD] = 20,
 			[DamageType.NATURE] = 20,
 		},
-		learn_talent = { [Talents.T_BLOCK] = 3, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
 
@@ -678,13 +678,12 @@ newEntity{ base = "BASE_WARAXE",
 	cost = 450,
 	material_level = 4,
 	combat = {
-		dam = 55,
+		dam = 40,
 		apr = 15,
 		physcrit = 10,
 		dammod = {str=1},
 		damrange = 1.2,
 		burst_on_hit={[DamageType.BLIGHT] = 25},
-		lifesteal=5, --You can counter the life regen by fighting, muhuhahah
 		talent_on_hit = {
 				[Talents.T_CURSE_OF_VULNERABILITY] = {level=3, chance=10},
 				[Talents.T_CURSE_OF_DEATH] = {level=3, chance=10},
@@ -958,7 +957,7 @@ newEntity{ base = "BASE_SHIELD",
 		fatigue = 19,
 		resists = { [DamageType.BLIGHT] = 25, },
 		life_regen = 5,
-		learn_talent = { [Talents.T_BLOCK] = 5, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
 

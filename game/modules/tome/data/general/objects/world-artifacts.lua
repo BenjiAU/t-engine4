@@ -505,7 +505,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 16,
 		combat_def_ranged = 15,
 		fatigue = 20,
-		learn_talent = { [Talents.T_BLOCK] = 5, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 	on_block = {desc = "30% chance that you'll breath stunning fire in a cone at the attacker (if within range 6).", fct = function(self, who, target, type, dam, eff)
 	if rng.percent(30) then
@@ -543,7 +543,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def_ranged = 10,
 		fatigue = 30,
 		combat_armor_hardiness = 20,
-		learn_talent = { [Talents.T_BLOCK] = 4, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
 
@@ -573,7 +573,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 8,
 		combat_def_ranged = 8,
 		fatigue = 6,
-		learn_talent = { [Talents.T_BLOCK] = 3, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 		resists = { [DamageType.BLIGHT] = 25, [DamageType.DARKNESS] = 25, },
 		inc_stats = { [Stats.STAT_WIL] = 5, },
 	},
@@ -931,7 +931,7 @@ newEntity{ base = "BASE_GREATMAUL",
 	use_talent = { id = Talents.T_FEARLESS_CLEAVE, level = 3, power = 18 },
 }
 
-newEntity{ base = "BASE_MACE",
+newEntity{ base = "BASE_MACE", define_as = "CROOKED_CLUB",
 	power_source = {technique=true},
 	unique = true,
 	name = "Crooked Club", color = colors.GREEN, image = "object/artifact/weapon_crooked_club.png",
@@ -1001,7 +1001,7 @@ newEntity{ base = "BASE_HELM", define_as = "HELM_KROLTAR",
 	name = "Dragon-helm of Kroltar", image = "object/artifact/dragon_helm_of_kroltar.png",
 	unided_name = "dragon-helm",
 	desc = [[A visored steel helm, embossed and embellished with gold, that bears as its crest the head of Kroltar, the greatest of the fire drakes.]],
-	require = { talent = { {Talents.T_ARMOUR_TRAINING,1} }, stat = { str=35 }, },
+	require = { stat = { str=35 }, },
 	level_range = {37, 45},
 	rarity = 280,
 	cost = 400,
@@ -1568,7 +1568,7 @@ newEntity{ base = "BASE_LIGHT_ARMOR",
 	},
 }
 
-newEntity{ base = "BASE_LIGHT_ARMOR",
+newEntity{ base = "BASE_LIGHT_ARMOR", define_as = "SKIN_OF_MANY",
 	power_source = {technique=true},
 	unique = true,
 	name = "Skin of Many", image = "object/artifact/robe_skin_of_many.png",
@@ -1742,7 +1742,7 @@ newEntity{ base = "BASE_GREATSWORD",
 			if not target:canBe(eff) then return end
 			if not target:checkHit(who:combatAttack(combat), target:combatPhysicalResist(), 15) then return end
 			if eff == "stun" then target:setEffect(target.EFF_STUNNED, 3, {})
-			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=75})
+			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=50})
 			end
 		end},
 		melee_project={[DamageType.LIGHT] = 49, [DamageType.DARKNESS] = 49},
@@ -3389,7 +3389,7 @@ newEntity{ base = "BASE_LONGSWORD",
 			if eff == "stun" then target:setEffect(target.EFF_MADNESS_STUNNED, 3, {mindResistChange=-25})
 			elseif eff == "malign" then target:setEffect(target.EFF_MALIGNED, 3, {resistAllChange=10})
 			elseif eff == "agony" then target:setEffect(target.EFF_AGONY, 5, { src=who, damage=40, mindpower=40, range=10, minPercent=10, duration=5})
-			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=60})
+			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=50})
 			elseif eff == "silence" then target:setEffect(target.EFF_SILENCED, 3, {})
 			end
 		end},
@@ -6552,7 +6552,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_spellpower=12,
 		combat_spellresist = 20,
 		resists = {[DamageType.TEMPORAL] = 30},
-		learn_talent = { [Talents.T_BLOCK] = 5, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 		flat_damage_armor = {all=20},
 		slow_projectiles = 50,
 	},
@@ -6750,7 +6750,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 5,
 		combat_def_ranged = 10,
 		fatigue = 12,
-		learn_talent = { [Talents.T_BLOCK] = 4, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 		resists = { [DamageType.PHYSICAL] = 10, [DamageType.ACID] = 10, [DamageType.LIGHTNING] = 10, [DamageType.FIRE] = 10,},
 	},
 	on_block = {desc = "30% chance of petrifying the attacker.", fct = function(self, who, src, type, dam, eff)
@@ -6897,7 +6897,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 5,
 		combat_def_ranged = 12,
 		fatigue = 10,
-		learn_talent = { [Talents.T_BLOCK] = 4, [Talents.T_SHIELDSMAIDEN_AURA] = 1,  },
+		learn_talent = { [Talents.T_BLOCK] = 1, [Talents.T_SHIELDSMAIDEN_AURA] = 1,  },
 		resists = { [DamageType.COLD] = 25, [DamageType.FIRE] = 25,},
 	},
 }

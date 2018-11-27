@@ -22,8 +22,7 @@ newTalent{
 	type = {"cursed/dark-sustenance", 1},
 	require = cursed_wil_req1,
 	points = 5,
-	random_ego = "attack",
-	cooldown = 6,
+	cooldown = 15,
 	range = 7,
 	hate = 0,
 	no_energy = true,
@@ -56,12 +55,6 @@ newTalent{
 		local damageGain = 0
 		local resistGain = 0
 
-		--local tFeedHealth = self:getTalentFromId(self.T_FEED_HEALTH)
-		--if tFeedHealth and self:getTalentLevelRaw(tFeedHealth) > 0 then
-		--	constitutionGain = tFeedHealth.getConstitutionGain(self, tFeedHealth, target)
-		--	lifeRegenGain = tFeedHealth.getLifeRegenGain(self, tFeedHealth)
-		--end
-
 		local tFeedPower = self:getTalentFromId(self.T_FEED_POWER)
 		if tFeedPower and self:getTalentLevelRaw(tFeedPower) > 0 then
 			damageGain = tFeedPower.getDamageGain(self, tFeedPower, target)
@@ -72,13 +65,55 @@ newTalent{
 			resistGain = tFeedStrengths.getResistGain(self, tFeedStrengths, target)
 		end
 
+		local devour = self:getTalentFromId(self.T_DEVOUR_LIFE)
+		if devour and self:getTalentLevelRaw(devour) > 0 then
+			lifeRegenGain = devour.getLifeRegen(self, devour, target)
+		end
+
 		self:setEffect(self.EFF_FEED, 40, { target=target, range=range, hateGain=hateGain, constitutionGain=constitutionGain, lifeRegenGain=lifeRegenGain, damageGain=damageGain, resistGain=resistGain })
 
 		return true
 	end,
+	-- QOL behavior mostly
+	callbackOnActBase = function(self, t)
+		if self:hasEffect(self.EFF_FEED) then return end
+		if not self.in_combat then return end
+
+		local nb_foes = 0
+		local act
+		for i = 1, #self.fov.actors_dist do
+			act = self.fov.actors_dist[i]
+			if act and self:reactionToward(act) < 0 and core.fov.distance(self.x, self.y, act.x, act.y) <= self:getTalentRange(t) and self:canSee(act) and self:hasLOS(act.x, act.y) then 
+				local hateGain = t.getHateGain(self, t)
+				local constitutionGain = 0
+				local lifeRegenGain = 0
+				local damageGain = 0
+				local resistGain = 0
+
+				local tFeedPower = self:getTalentFromId(self.T_FEED_POWER)
+				if tFeedPower and self:getTalentLevelRaw(tFeedPower) > 0 then
+					damageGain = tFeedPower.getDamageGain(self, tFeedPower, target)
+				end
+
+				local tFeedStrengths = self:getTalentFromId(self.T_FEED_STRENGTHS)
+				if tFeedStrengths and self:getTalentLevelRaw(tFeedStrengths) > 0 then
+					resistGain = tFeedStrengths.getResistGain(self, tFeedStrengths, target)
+				end
+
+				local devour = self:getTalentFromId(self.T_DEVOUR_LIFE)
+				if devour and self:getTalentLevelRaw(devour) > 0 then
+					lifeRegenGain = devour.getLifeRegen(self, devour, target)
+				end
+				self:setEffect(self.EFF_FEED, 40, 
+					{ target=act, range=range, hateGain=hateGain, constitutionGain=constitutionGain, lifeRegenGain=lifeRegenGain, damageGain=damageGain, resistGain=resistGain })
+			end
+		end		
+
+	end,
 	info = function(self, t)
 		local hateGain = t.getHateGain(self, t)
 		return ([[Feed from the essence of your enemy. Draws %0.1f hate per turn from a targeted foe, as long as they remain in your line of sight.
+			If you aren't already feeding this will be automatically applied to the nearest enemy.
 		Hate gain improves with your Mindpower.]]):format(hateGain)
 	end,
 }
@@ -88,48 +123,14 @@ newTalent{
 	type = {"cursed/dark-sustenance", 2},
 	require = cursed_wil_req2,
 	points = 5,
-	random_ego = "attack",
-	cooldown = 6,
-	range = 7,
-	tactical = { BUFF = 2, DEFEND = 1 },
-	direct_hit = true,
-	requires_target = true,
-	getLifeSteal = function(self, t, target)
-		return self:combatTalentMindDamage(t, 0, 140)
-	end,
-	action = function(self, t)
-		local effect = self:hasEffect(self.EFF_FEED)
-		if not effect then
-			if self:getTalentLevel(t) >= 5 then
-				local tFeed = self:getTalentFromId(self.T_FEED)
-				if not tFeed.action(self, tFeed) then return nil end
-				effect = self:hasEffect(self.EFF_FEED)
-			else
-				game.logPlayer(self, "You must begin feeding before you can Devour Life.");
-				return nil
-			end
-		end
-		if not effect then return nil end
-		local target = effect.target
-
-		if target and not target.dead then
-			local lifeSteal = t.getLifeSteal(self, t)
-			self:project({type="hit", talent=t, x=target.x,y=target.y}, target.x, target.y, DamageType.DEVOUR_LIFE, { dam=lifeSteal })
-
-			game.level.map:particleEmitter(self.x, self.y, math.max(math.abs(target.x-self.x), math.abs(target.y-self.y)), "dark_torrent", {tx=target.x-self.x, ty=target.y-self.y})
-			--local dx, dy = target.x - self.x, target.y - self.y
-			--game.level.map:particleEmitter(self.x, self.y,math.max(math.abs(dx), math.abs(dy)), "feed_hate", { tx=dx, ty=dy })
-			game:playSoundNear(self, "talents/fire")
-
-			return true
-		end
-
-		return nil
+	mode = "passive",
+	getLifeRegen = function(self, t, target)
+		return self:combatTalentMindDamage(t, 1, 40)  -- Essentially damage without damage synergies like crit, damage%, etc
 	end,
 	info = function(self, t)
-		local lifeSteal = t.getLifeSteal(self, t)
-		return ([[Devours life from the target of your feeding. %d life from the victim will be added to your own. This healing cannot be reduced. At level 5, Devour Life can be used like the Feed talent to begin feeding.
-		Improves with your Mindpower.]]):format(lifeSteal)
+		local regen = t.getLifeRegen(self, t)
+		return ([[Devours life from the target of your feeding reducing their life regeneration by %d and adding half of that to yours.
+		Improves with your Mindpower.]]):format(regen)
 	end,
 }
 

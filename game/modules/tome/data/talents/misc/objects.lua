@@ -216,11 +216,11 @@ newTalent{
 	name = "Block",
 	type = {"technique/objects", 1},
 	cooldown = function(self, t)
-		return 8 - util.bound(self:getTalentLevelRaw(t), 1, 5)
+		return 8
 	end,
 	speed = 'shield',
-	points = 5,
-	hard_cap = 5,
+	points = 1,
+	hard_cap = 1,
 	range = 1,
 	requires_target = true,
 	tactical = { ATTACK = 3, DEFEND = 3 },
@@ -238,39 +238,40 @@ newTalent{
 	getBlockValue = function(self, t) return self:combatShieldBlock() or 0 end,
 	getBlockedTypes = function(self, t)
 		local shield1, combat1, shield2, combat2 = self:hasShield()
-		local bt = {[DamageType.PHYSICAL]=true}
+		local bt = {
+			[DamageType.PHYSICAL]= true,
+			[DamageType.FIRE] = true,
+			[DamageType.LIGHTNING] = true,
+			[DamageType.COLD] = true,
+			[DamageType.ACID] = true,
+			[DamageType.NATURE] = true,
+			[DamageType.BLIGHT] = true,
+			[DamageType.LIGHT] = true,
+			[DamageType.DARKNESS] = true,
+			[DamageType.ARCANE] = true,
+			[DamageType.TEMPORAL] = true,
+		}
+		local bonuses = {}  -- Bonuses to damage resist on base type put in a separate table to avoid changing the structure of the bt table and breaking addons
+
 		if not shield1 then return bt, "error!" end
 
 		if not self:attr("spectral_shield") then
-			if shield1.wielder.resists then for res, v in pairs(shield1.wielder.resists) do if v > 0 then bt[res] = true end end end
-			if shield1.wielder.on_melee_hit then for res, v in pairs(shield1.wielder.on_melee_hit) do if v > 0 then bt[res] = true end end end
-			if shield2 and shield2.wielder.resists then for res, v in pairs(shield2.wielder.resists) do if v > 0 then bt[res] = true end end end
-			if shield2 and shield2.wielder.on_melee_hit then for res, v in pairs(shield2.wielder.on_melee_hit) do if v > 0 then bt[res] = true end end end
-		else
-			bt[DamageType.FIRE] = true
-			bt[DamageType.LIGHTNING] = true
-			bt[DamageType.COLD] = true
-			bt[DamageType.ACID] = true
-			bt[DamageType.NATURE] = true
-			bt[DamageType.BLIGHT] = true
-			bt[DamageType.LIGHT] = true
-			bt[DamageType.DARKNESS] = true
-			bt[DamageType.ARCANE] = true
-			bt[DamageType.MIND] = true
-			bt[DamageType.TEMPORAL] = true
+			if shield1.wielder.resists then for res, v in pairs(shield1.wielder.resists) do if bt[res] and v > 0 then bonuses[res] = 1.5 end end end
+			if shield2 and shield2.wielder.resists then for res, v in pairs(shield2.wielder.resists) do if bt[res] and v > 0 then bonuses[res] = 1.5 end end end
 		end
 
-		bt.all = nil
+		bonuses.MIND = nil
 
-		local list = table.keys(bt)
+		local list = table.keys(bonuses)
 		local n = #list
 		if n < 1 then return bt, "(error 2)" end
 		local e_string = ""
 		if n == 1 then
-			e_string = DamageType.dam_def[next(bt)].name
+			e_string = DamageType.dam_def[next(bonuses)].name
 		else
-			for i = 1, #list do if DamageType.dam_def[list[i]] then
-				list[i] = DamageType.dam_def[list[i]].name
+			for i = 1, #list do 
+				if DamageType.dam_def[list[i]] and bt[list[i]] then
+					list[i] = DamageType.dam_def[list[i]].text_color..string.lower(DamageType.dam_def[list[i]].name).."#LAST#"
 			end end
 			e_string = table.concatNice(list, ", ", " and ")
 		end
@@ -279,7 +280,7 @@ newTalent{
 	action = function(self, t)
 		local properties = t.getProperties(self, t)
 		local bt, bt_string = t.getBlockedTypes(self, t)
-		self:setEffect(self.EFF_BLOCKING, 1 + (self:knowTalent(self.T_ETERNAL_GUARD) and 1 or 0), {power = t.getBlockValue(self, t), d_types=bt, properties=properties})
+		self:setEffect(self.EFF_BLOCKING, 2, {power = t.getBlockValue(self, t), d_types=bt, bonus_block_pct = bonuses, properties=properties})
 		return true
 	end,
 	info = function(self, t)
@@ -297,7 +298,13 @@ newTalent{
 			br_text = " All blocked damage heals the wielder."
 		end
 		local bt, bt_string = t.getBlockedTypes(self, t)
-		return ([[Raise your shield into blocking position for one turn, reducing the damage of all %s attacks by %d. If you block all of an attack's damage, the attacker will be vulnerable to a deadly counterstrike (a normal attack will instead deal 200%% damage) for one turn.%s%s%s]]):format(bt_string, t.getBlockValue(self, t), sp_text, ref_text, br_text)
+		return ([[Raise your shield into blocking position for 2 turns or until the start of your next turn, reducing all non-Mind damage by %d. If you block all of an attack's damage, the attacker will be vulnerable to a deadly counterstrike (the next weapon attack will instead deal 200%% damage) for one turn.
+			Counterstrike can normally only effect one enemy per block.
+			
+			If the shield has damage resistance to the blocked damage type the block value is increased by 50%%.
+			
+			Current Bonuses:  %s%s%s%s]]):
+			format(t.getBlockValue(self, t), bt_string, sp_text, ref_text, br_text)
 	end,
 }
 

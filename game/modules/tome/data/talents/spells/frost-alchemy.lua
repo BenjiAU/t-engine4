@@ -116,14 +116,14 @@ newTalent{
 	range = 6,
 	tactical = { DEFEND = 2 },
 	critResist = function(self, t) return self:combatTalentScale(t, 10, 50) end,
-	getResistance = function(self, t) return self:combatTalentSpellDamage(t, 5, 45) end,
+	getResistance = function(self, t) return self:combatTalentSpellDamage(t, 5, 45) * 0.6 end,
 	getAffinity = function(self, t) return self:combatTalentLimit(t, 50, 5, 20) end, -- Limit <50%
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/ice")
 		local ret = {}
 		self:addShaderAura("body_of_ice", "crystalineaura", {}, "particles_images/spikes.png")
 		ret.particle = self:addParticles(Particles.new("snowfall", 1))
-		self:talentTemporaryValue(ret, "resists", {[DamageType.PHYSICAL] = t.getResistance(self, t) * 0.6})
+		self:talentTemporaryValue(ret, "resists", {[DamageType.PHYSICAL] = t.getResistance(self, t)})
 		self:talentTemporaryValue(ret, "damage_affinity", {[DamageType.COLD] = t.getAffinity(self, t)})
 		self:talentTemporaryValue(ret, "ignore_direct_crits", t.critResist(self, t))
 		return ret

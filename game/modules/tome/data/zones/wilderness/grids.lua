@@ -512,7 +512,7 @@ newEntity{ base="TOWN", define_as = "TOWN_DERTH",
 	change_zone="town-derth",
 }
 newEntity{ base="TOWN", define_as = "TOWN_LAST_HOPE",
-	name = "Last Hope (Town)", add_mos = {{image="terrain/village_01.png"}},
+	name = "Last Hope (Town)", add_displays = {class.new{image="terrain/last_hope.png", display_w=2, display_x=-0.5, z=5}, class.new{image="terrain/last_hope_up.png", display_w=2, display_x=-0.5, display_h=2, display_y=-2, z=16}},
 	desc = "Capital city of the Allied Kingdoms ruled by King Tolak",
 	change_zone="town-last-hope",
 }
@@ -553,6 +553,7 @@ newEntity{ base="TOWN", define_as = "TOWN_ZIGUR",
 	name = "Zigur (Town)", add_mos = {{image="terrain/village_01.png"}},
 	desc = "Ziguranth main training ground",
 	change_zone="town-zigur",
+	change_level_check = function() local p = game.party:findMember{main=true} if p:attr("has_arcane_knowledge") or p:attr("undead") then require("engine.ui.Dialog"):simplePopup("Zigur", "Somehow as magic user you feel this place is not safe for you.") return true end return false end,
 }
 newEntity{ base="TOWN", define_as = "TOWN_IRON_COUNCIL",
 	name = "Iron Council (Town)",

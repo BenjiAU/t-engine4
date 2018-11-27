@@ -103,7 +103,7 @@ newEntity{ base = "BASE_SHIELD", define_as = "SHIELD_UNSETTING",
 		fatigue = 14,
 		combat_spellresist = 19,
 		resists = {[DamageType.BLIGHT] = 30, [DamageType.DARKNESS] = 30},
-		learn_talent = { [Talents.T_BLOCK] = 5, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 	set_list = { {"define_as","SWORD_DAWN"} },
 	set_desc = {

@@ -393,7 +393,7 @@ newEntity{
 			if eff == "stun" then target:setEffect(target.EFF_STUNNED, 4, {})
 			elseif eff == "blind" then target:setEffect(target.EFF_BLINDED, 4, {})
 			elseif eff == "pin" then target:setEffect(target.EFF_PINNED, 4, {})
-			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 4, {power=50})
+			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 4, {power=30})
 			end
 		end},
 	},
@@ -799,7 +799,7 @@ newEntity{
 			if eff == "stun" then target:setEffect(target.EFF_STUNNED, 3, {})
 			elseif eff == "blind" then target:setEffect(target.EFF_BLINDED, 3, {})
 			elseif eff == "pin" then target:setEffect(target.EFF_PINNED, 3, {})
-			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=60})
+			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=30})
 			elseif eff == "silence" then target:setEffect(target.EFF_SILENCED, 3, {})
 			end
 		end},

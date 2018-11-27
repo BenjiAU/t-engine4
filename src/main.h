@@ -58,6 +58,7 @@ extern void setupRealtime(float freq);
 extern void setupDisplayTimer(int fps);
 extern int docall (lua_State *L, int narg, int nret);
 extern bool no_steam;
+extern bool no_connectivity;
 extern bool safe_mode;
 extern bool fbo_active;
 extern bool multitexture_active;
@@ -85,7 +86,8 @@ extern void del_lua_error();
 extern core_boot_type *core_def;
 
 extern void physfs_reset_dir_allowed(lua_State *L);
-extern bool physfs_check_allow_path(lua_State *L, const char *path);
+extern bool physfs_check_allow_path_read(lua_State *L, const char *path);
+extern bool physfs_check_allow_path_write(lua_State *L, const char *path);
 
 #ifdef STEAM_TE4
 #include "steam-te4.h"

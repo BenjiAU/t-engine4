@@ -31,7 +31,7 @@ newEntity{
 	name = " of clairvoyance", addon=true, instant_resolve=true,
 	keywords = {clairvoyance=true},
 	level_range = {1, 50},
-	rarity = 8,
+	rarity = 20,
 
 	charm_power_def = {add=8, max=10, floor=true},
 	resolvers.charm(function(self, who)
@@ -56,69 +56,43 @@ newEntity{
 }
 
 newEntity{
-	name = " of trap destruction", addon=true, instant_resolve=true,
-	keywords = {trap=true},
+	name = " of lightning storm", addon=true, instant_resolve=true,
+	keywords = {lightning_storm=true},
 	level_range = {1, 50},
-	rarity = 14,
-
-	charm_power_def = {add=resolvers.genericlast(function(e) return e.material_level * 8 end), max=100, floor=true,
-		range = function(self, who) return who:combatStatScale("mag", 2, 4) end},
-	resolvers.charm(
-		function(self, who) return ("disarm traps (%d bonus disarm power, based on Magic) along a range %d line"):format( self:getCharmPower(who), self.charm_power_def:range(who)) end,
-		15,
-		function(self, who)
-		local tg = {type="beam", range = self.charm_power_def:range(who)}
-		local x, y = who:getTarget(tg)
-		if not x or not y then return nil end
-		game.logSeen(who, "%s uses %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
-		who:project(tg, x, y, function(px, py)
-			local trap = game.level.map(px, py, engine.Map.TRAP)
-			if not trap then return end
-			local inc = self:getCharmPower(who)
-			who:attr("can_disarm", 1)
-			who:attr("disarm_bonus", inc)
-
-			trap:disarm(px, py, who)
-
-			who:attr("disarm_bonus", -inc)
-			who:attr("can_disarm", -1)
-		end)
-		return {id=true, used=true}
-	end,
-	"T_GLOBAL_CD",
-	{no_npc_use=true}),
-}
-
-newEntity{
-	name = " of firewall", addon=true, instant_resolve=true,
-	keywords = {firewall=true},
-	level_range = {15, 50},
 	rarity = 10,
 
-	charm_power_def = {add=25, max=400, floor=true},
+	charm_power_def = {add=10, max=400, floor=true},
 	resolvers.charm(function(self, who)
-		local dam = who:damDesc(engine.DamageType.FIRE, self.use_power.damage(self, who))
-		return ("creates a wall of flames lasting 4 turns (dealing %d fire damage overall)"):format(dam)
+		local dam = who:damDesc(engine.DamageType.LIGHTNING, self.use_power.damage(self, who))
+		local radius = self.use_power.radius
+		local duration = 5
+		return ("create a radius %d storm for %d turns. Each turn, enemies within take %d lightning damage and will be dazed for 1 turn"):format(radius, duration, math.floor(dam / duration))
 	end,
-	6,
+	15,
 	function(self, who)
 		local tg = self.use_power.target(self, who)
 		local x, y = who:getTarget(tg)
 		if not x or not y then return nil end
-		local dam = self.use_power.damage(self, who)
-		game.logSeen(who, "%s conjures a wall of fire from %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
+		local dam = {dam = who:spellCrit(self.use_power.damage(self, who)) / 5, daze = 100, daze_duration = 1}
+		game.logSeen(who, "%s conjures a lightning storm from %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
+		local DamageType = require "engine.DamageType"
+		local MapEffect = require "engine.MapEffect"
 		who:project(tg, x, y, function(px, py)
-			game.level.map:addEffect(who, px, py, 4, engine.DamageType.FIRE, dam / 4, 0, 5, nil, {type="inferno"}, nil, true)
+			game.level.map:addEffect(who, px, py, 5, DamageType.LIGHTNING_DAZE, dam, 0, 5, nil, 
+				MapEffect.new{color_br=30, color_bg=150, color_bb=160, effect_shader="shader_images/retch_effect.png"}, nil, true)
+			--overlay_particle={zdepth=6, only_one=true, type="circle", args={appear=8, oversize=0, img="moon_circle", radius=self:getTalentRadius(t)}}
 		end)
-		game:playSoundNear(who, "talents/fire")
+		game:playSoundNear(who, "talents/lightning")
 		return {id=true, used=true}
 	end,
 	"T_GLOBAL_CD",
-	{range = 5,
+	{
+	range = 8,
+	radius = 4,
 	requires_target = true,
 	no_npc_use = function(self, who) return self:restrictAIUseObject(who) end, -- don't let dumb ai hurt friends
-	target = function(self, who) return {type="wall", range=self.use_power.range, halflength=3, halfmax_spots=3+1} end,
-	tactical = {ATTACKAREA = {FIRE = 2}},
+	target = function(self, who) return {type="ball", range=self.use_power.range, radius=self.use_power.radius} end,
+	tactical = {ATTACKAREA = {LIGHTNING = 2}},
 	damage = function(self, who) return self:getCharmPower(who) end
 	}),
 }
@@ -126,13 +100,22 @@ newEntity{
 newEntity{
 	name = " of conjuration", addon=true, instant_resolve=true,
 	keywords = {conjure=true},
-	level_range = {6, 50},
-	rarity = 6,
+	level_range = {1, 50},
+	rarity = 10,
+	resolvers.genericlast(function(e)
+		local DamageType = require "engine.DamageType"
+		e.elem = rng.table{
+			{DamageType.FIRE, "flame", "fire"},
+			{DamageType.COLD, "freeze", "cold"},
+			{DamageType.LIGHTNING, "lightning_explosion", "lightning"},
+			{DamageType.ACID, "acid", "acid"},
+		}
+	end),
 
-	charm_power_def = {add=25, max=600, floor=true},
+	charm_power_def = {add=30, max=800, floor=true},
 	resolvers.charm(function(self, who)
 			local dam = self.use_power.damage(self, who)
-			return ("fire a bolt of a random element with (base) damage %d to %d"):format(dam/2, dam)
+			return ("fire a magical bolt dealing %d %s damage"):format(dam, self.elem[3] )
 		end,
 		10,
 		function(self, who)
@@ -140,16 +123,9 @@ newEntity{
 			local x, y = who:getTarget(tg)
 			if not x or not y then return nil end
 			local dam = self.use_power.damage(self, who)
-			local elem = rng.table{
-				{engine.DamageType.FIRE, "flame"},
-				{engine.DamageType.COLD, "freeze"},
-				{engine.DamageType.LIGHTNING, "lightning_explosion"},
-				{engine.DamageType.ACID, "acid"},
-				{engine.DamageType.NATURE, "slime"},
-				{engine.DamageType.BLIGHT, "slime"},
-			}
+			local elem = self.elem
 			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
-			who:project(tg, x, y, elem[1], rng.avg(dam / 2, dam, 3), {type=elem[2]})
+			who:project(tg, x, y, elem[1], who:spellCrit(dam), {type=elem[2]})
 			game:playSoundNear(who, "talents/fire")
 			return {id=true, used=true}
 		end,
@@ -160,4 +136,41 @@ newEntity{
 		damage = function(self, who) return self:getCharmPower(who) end,
 		tactical = {ATTACK = 1}}
 	),
+}
+
+-- gfx
+newEntity{
+	name = " of shielding", addon=true, instant_resolve=true,
+	keywords = {shielding=true},
+	level_range = {1, 50},
+	rarity = 8,
+
+	charm_power_def = {add=50, max=500, floor=true},
+	resolvers.charm(
+		function(self, who) 
+			local shield = self.use_power.shield(self, who)
+			return ("create a shield absorbing up to %d damage on yourself and all friendly characters within 10 spaces for %d turns"):
+				format(shield, 4) end,
+		20,
+		function(self, who)
+			local tg = self.use_power.target(self, who)
+			local shield = who:spellCrit(self.use_power.shield(self, who))
+			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
+			who:project(tg, who.x, who.y, function(px, py)
+				local target = game.level.map(px, py, engine.Map.ACTOR)
+				if not target then return end
+				if target:reactionToward(who) < 0 then return end
+				target:setEffect(target.EFF_DAMAGE_SHIELD, 4, {power=shield})
+
+				--game:playSoundNear(who, "talents/heal")
+			end) 
+			return {id=true, used=true}
+		end,
+	"T_GLOBAL_CD",
+	{
+	radius = function(self, who) return 10 end,
+	shield = function(self, who) return self:getCharmPower(who) end,
+	target = function(self, who) return {type="ball", nowarning=true, radius=self.use_power.radius(self, who)} end,
+	tactical = {HEAL = 1},
+	})
 }

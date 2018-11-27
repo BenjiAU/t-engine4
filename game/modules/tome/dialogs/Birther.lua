@@ -137,7 +137,7 @@ function _M:init(title, actor, order, at_end, quickbirth, w, h)
 		on_drawitem=function(item, s, startx, h)
 			if not item.def or not item.def.display_entity32 then return startx end
 			local sc = item.def.display_entity32:getEntityFinalSurface(self.tiles, h, h)
-			s:merge(sc, startx, 0)
+			if sc then s:merge(sc, startx, 0) end
 			return startx + h
 		end,
 	}
@@ -1461,6 +1461,7 @@ function _M:selectTile()
 		"player/ascii_player_bunny_01.png",
 		"player/ascii_player_exotic_01.png",
 		"player/ascii_player_shopper_01.png",
+		"player/original_handdrawn_player.png",
 	}
 
 	fs.mkdir("/data/gfx/custom-tiles/")

@@ -836,7 +836,7 @@ newEntity{
 			on_kill = 1,
 			desc=function(self, who, special)
 				local targets = self.combat.projection_targets
-				return ("Projects up to %d attacks dealing 30%% weapon damage to random targets in range 7 (cannot hit the initial target)"):format(targets or 0)
+				return ("Projects up to %d attacks dealing 30%% weapon damage to random targets in range 7 as mind damage (cannot hit the initial target)"):format(targets or 0)
 			end,
 			fct=function(combat, who, target)
 				if who.turn_procs.ego_projection then return end
@@ -931,7 +931,7 @@ newEntity{
 		},
 	},
 	combat = {
-		special_on_hit = {desc="20% chance to torment the target", fct=function(combat, who, target)
+		special_on_hit = {desc="20% chance to stun, blind, pin, confuse, or silence the target", fct=function(combat, who, target)
 			if not rng.percent(20) then return end
 			local eff = rng.table{"stun", "blind", "pin", "confusion", "silence",}
 			if not target:canBe(eff) then return end
@@ -940,7 +940,7 @@ newEntity{
 			if eff == "stun" then target:setEffect(target.EFF_STUNNED, 3, {})
 			elseif eff == "blind" then target:setEffect(target.EFF_BLINDED, 3, {})
 			elseif eff == "pin" then target:setEffect(target.EFF_PINNED, 3, {})
-			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=60})
+			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=30})
 			elseif eff == "silence" then target:setEffect(target.EFF_SILENCED, 3, {})
 			end
 		end},

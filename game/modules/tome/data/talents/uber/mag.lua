@@ -19,6 +19,7 @@
 
 uberTalent{
 	name = "Spectral Shield",
+	not_listed = true,  -- Functionality was baselined on shields
 	mode = "passive",
 	require = { special={desc="Know the Block talent, have cast 100 spells, and have a block value over 200", fct=function(self)
 		return self:knowTalent(self.T_BLOCK) and self:getTalentFromId(self.T_BLOCK).getBlockValue(self) >= 200 and self.talent_kind_log and self.talent_kind_log.spell and self.talent_kind_log.spell >= 100
@@ -32,6 +33,36 @@ uberTalent{
 	info = function(self, t)
 		return ([[By infusing your shield with raw magic, your block can now block any damage type.]])
 		:format()
+	end,
+}
+
+-- Re-used icon
+uberTalent{
+	name = "Ethereal Form", image = "talents/displace_damage.png",
+	mode = "passive",
+	require = { special={desc="Have an effective defense of at least 40", fct=function(self)
+		if self:combatDefense() >= 40 then return true end
+	end} },
+	passives = function(self, t, tmptable)
+		self:talentTemporaryValue(tmptable, "resists_pen", {all = 25})
+		self:talentTemporaryValue(tmptable, "resists", {absolute = 25})
+		self:talentTemporaryValue(tmptable, "combat_def", self:getMag() * 0.7)	
+	end,
+	callbackOnStatChange = function(self, t, stat, v)
+		if stat == self.STAT_MAG then
+			self:updateTalentPassives(t)
+		end
+	end,
+	callbackOnMeleeHit = function(self, t, src, dam)
+		self:setEffect(self.EFF_ETHEREAL_FORM, 8, {})
+	end,
+	callbackOnArcheryHit = function(self, t, src, dam)
+		self:setEffect(self.EFF_ETHEREAL_FORM, 8, {})
+	end,
+	info = function(self, t)
+		return ([[You gain 25%% absolute damage resistance and 25%% all damage penetration.  Each time you are struck by a weapon these bonuses are reduced by 5%% but fully recovered after 8 turns.
+			Additionally, you gain 70%% of your Magic stat as defense (%d)]])
+		:format(self:getMag() * 0.7)
 	end,
 }
 
@@ -66,11 +97,11 @@ uberTalent{
 		return self:knowTalent(self.T_APPLY_POISON) or self:knowTalent(self.T_TRAP_MASTERY)
 	end} },
 	autolearn_talent = {Talents.T_VULNERABILITY_POISON, Talents.T_GRAVITIC_TRAP}, -- requires uber.lua loaded last
-	on_learn = function(self, t)
-		self:attr("combat_spellresist", 20)
-	end,
-	on_unlearn = function(self, t)
-		self:attr("combat_spellresist", -20)
+	passives = function(self, t, tmptable)
+		self:talentTemporaryValue(tmptable, "talents_types_mastery", {["cunning/trapping"] = 1})
+		self:talentTemporaryValue(tmptable, "talents_types_mastery", {["cunning/poisons"] = 1})
+		self:talentTemporaryValue(tmptable, "talent_cd_reduction", {[Talents.T_VENOMOUS_STRIKE] = 3})
+		self:talentTemporaryValue(tmptable, "talent_cd_reduction", {[Talents.T_LURE] = 5})
 	end,
 	info = function(self, t)
 		local descs = ""
@@ -80,10 +111,14 @@ uberTalent{
 				descs = ("%s\n#YELLOW#%s#LAST#\n%s\n"):format(descs, bonus_t.name, self:callTalent(bonus_t.id, "info"))
 			end
 		end
-		return ([[Your study of arcane forces has let you develop a new way of applying your aptitude for  trapping and poisons.
+		return ([[Your study of arcane forces has let you develop a new way of applying your aptitude for trapping and poisons.
+
+		You gain 1.0 mastery in the Cunning/Poisons and Cunning/Trapping talent trees.
+		Your Venomous Strike talent cooldown is reduced by 3.
+		Your Lure talent cooldown is reduced by 5.
+
 		You learn the following talents:
-%s
-		You also permanently gain 20 Spell Save.]])
+%s]])
 		:format(descs)
 	end,
 }

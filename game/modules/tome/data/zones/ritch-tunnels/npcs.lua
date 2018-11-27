@@ -141,6 +141,15 @@ newEntity{ base = "BASE_NPC_RITCH_REL", define_as = "HIVE_MOTHER",
 	autolevel = "dexmage",
 	ai = "tactical", ai_state = { talent_in=2, },
 
+	auto_classes={{class="Summoner", start_level=12, level_rate=75},},
+
+	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
+	on_added_to_level = function(self)
+		if self.level <= 16 then
+			self.ai_tactic.escape = 0
+		end
+	end,
+	
 	on_die = function(self, who)
 		game.player:setQuestStatus("start-yeek", engine.Quest.COMPLETED, "ritch")
 	end,

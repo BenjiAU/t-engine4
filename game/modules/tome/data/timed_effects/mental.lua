@@ -68,14 +68,14 @@ newEffect{
 	name = "CONFUSED", image = "effects/confused.png",
 	desc = "Confused",
 	long_desc = function(self, eff) return ("The target is confused, acting randomly (chance %d%%) and unable to perform complex actions."):format(eff.power) end,
+	charges = function(self, eff) return (tostring(eff.power).."%") end,
 	type = "mental",
 	subtype = { confusion=true },
 	status = "detrimental",
-	parameters = { power=50 },
+	parameters = { power=30 },
 	on_gain = function(self, err) return "#Target# wanders around!.", "+Confused" end,
 	on_lose = function(self, err) return "#Target# seems more focused.", "-Confused" end,
 	activate = function(self, eff)
-		eff.power = math.floor(math.max(eff.power - (self:attr("confusion_immune") or 0) * 100, 10))
 		eff.power = util.bound(eff.power, 0, 50)
 		eff.tmpid = self:addTemporaryValue("confused", eff.power)
 		if eff.power <= 0 then eff.dur = 0 end
@@ -261,7 +261,7 @@ newEffect{
 newEffect{
 	name = "GLOOM_STUNNED", image = "effects/gloom_stunned.png",
 	desc = "Stunned by the gloom",
-	long_desc = function(self, eff) return ("The gloom has stunned the target, reducing damage by 70%%, putting random talents on cooldown and reducing movement speed by 50%%. While stunned talents do not cooldown."):format() end,
+	long_desc = function(self, eff) return ("The gloom has stunned the target, reducing damage by 50%%, putting 4 random talents on cooldown and reducing movement speed by 50%%.  While stunned talents cooldown twice as slow."):format() end,
 	type = "mental",
 	subtype = { gloom=true, stun=true },
 	status = "detrimental",
@@ -270,11 +270,9 @@ newEffect{
 	on_lose = function(self, err) return "#Target# overcomes the gloom", "-Stunned" end,
 	activate = function(self, eff)
 		eff.particle = self:addParticles(Particles.new("gloom_stunned", 1))
-
 		eff.tmpid = self:addTemporaryValue("stunned", 1)
-		eff.tcdid = self:addTemporaryValue("no_talents_cooldown", 1)
 		eff.speedid = self:addTemporaryValue("movement_speed", -0.5)
-
+		eff.lockid = self:addTemporaryValue("half_talents_cooldown", 1)
 		local tids = {}
 		for tid, lev in pairs(self.talents) do
 			local t = self:getTalentFromId(tid)
@@ -283,15 +281,14 @@ newEffect{
 		for i = 1, 4 do
 			local t = rng.tableRemove(tids)
 			if not t then break end
-			self.talents_cd[t.id] = 1 -- Just set cooldown to 1 since cooldown does not decrease while stunned
+			self.talents_cd[t.id] = 1
 		end
 	end,
 	deactivate = function(self, eff)
 		self:removeParticles(eff.particle)
-
 		self:removeTemporaryValue("stunned", eff.tmpid)
-		self:removeTemporaryValue("no_talents_cooldown", eff.tcdid)
 		self:removeTemporaryValue("movement_speed", eff.speedid)
+		self:removeTemporaryValue("half_talents_cooldown", eff.lockid)
 	end,
 }
 
@@ -300,6 +297,7 @@ newEffect{
 	desc = "Confused by the gloom",
 	long_desc = function(self, eff) return ("The gloom has confused the target, making it act randomly (%d%% chance) and unable to perform complex actions."):format(eff.power) end,
 	type = "mental",
+	charges = function(self, eff) return (tostring(eff.power).."%") end,
 	subtype = { gloom=true, confusion=true },
 	status = "detrimental",
 	parameters = { power = 10 },
@@ -307,7 +305,6 @@ newEffect{
 	on_lose = function(self, err) return "#Target# overcomes the gloom", "-Confused" end,
 	activate = function(self, eff)
 		eff.particle = self:addParticles(Particles.new("gloom_confused", 1))
-		eff.power = math.floor(math.max(eff.power - (self:attr("confusion_immune") or 0) * 100, 10))
 		eff.power = util.bound(eff.power, 0, 50)
 		eff.tmpid = self:addTemporaryValue("confused", eff.power)
 		if eff.power <= 0 then eff.dur = 0 end
@@ -623,7 +620,7 @@ newEffect{
 			eff.constitutionGainId = self:addTemporaryValue("inc_stats", { [Stats.STAT_CON] = eff.constitutionGain })
 		end
 		if eff.lifeRegenGain and eff.lifeRegenGain > 0 then
-			eff.lifeRegenGainId = self:addTemporaryValue("life_regen", eff.lifeRegenGain)
+			eff.lifeRegenGainId = self:addTemporaryValue("life_regen", eff.lifeRegenGain / 2)
 		end
 
 		-- power
@@ -905,7 +902,7 @@ newEffect{
 newEffect{
 	name = "MADNESS_STUNNED", image = "effects/madness_stunned.png",
 	desc = "Stunned by madness",
-	long_desc = function(self, eff) return ("Madness has stunned the target, reducing damage by 70%%, lowering mind resistance by %d%%, putting random talents on cooldown and reducing movement speed by 50%%. While stunned talents do not cooldown."):format(eff.mindResistChange) end,
+	long_desc = function(self, eff) return ("Madness has stunned the target, reducing damage by 50%%, lowering mind resistance by %d%%, putting 4 random talents on cooldown and reducing movement speed by 50%%.  While stunned talents cooldown twice as slow."):format(eff.mindResistChange) end,
 	type = "mental",
 	subtype = { madness=true, stun=true },
 	status = "detrimental",
@@ -917,8 +914,8 @@ newEffect{
 
 		eff.mindResistChangeId = self:addTemporaryValue("resists", { [DamageType.MIND]=eff.mindResistChange })
 		eff.tmpid = self:addTemporaryValue("stunned", 1)
-		eff.tcdid = self:addTemporaryValue("no_talents_cooldown", 1)
 		eff.speedid = self:addTemporaryValue("movement_speed", -0.5)
+		eff.lockid = self:addTemporaryValue("half_talents_cooldown", 1)
 
 		local tids = {}
 		for tid, lev in pairs(self.talents) do
@@ -928,7 +925,7 @@ newEffect{
 		for i = 1, 4 do
 			local t = rng.tableRemove(tids)
 			if not t then break end
-			self.talents_cd[t.id] = 1 -- Just set cooldown to 1 since cooldown does not decrease while stunned
+			self.talents_cd[t.id] = 1
 		end
 	end,
 	deactivate = function(self, eff)
@@ -936,25 +933,25 @@ newEffect{
 
 		self:removeTemporaryValue("resists", eff.mindResistChangeId)
 		self:removeTemporaryValue("stunned", eff.tmpid)
-		self:removeTemporaryValue("no_talents_cooldown", eff.tcdid)
 		self:removeTemporaryValue("movement_speed", eff.speedid)
+		self:removeTemporaryValue("half_talents_cooldown", eff.lockid)
 	end,
 }
 
 newEffect{
 	name = "MADNESS_CONFUSED", image = "effects/madness_confused.png",
 	desc = "Confused by madness",
-	long_desc = function(self, eff) return ("Madness has confused the target, lowering mind resistance by %d%% and making it act randomly (%d%% chance) and unable to perform complex actions."):format(eff.mindResistChange, eff.power) end,
+	long_desc = function(self, eff) return ("Madness has confused the target, lowering mind resistance by %d%% and making it act randomly (%d%% chance)"):format(eff.mindResistChange, eff.power) end,
 	type = "mental",
-	subtype = { madness=true, confusion=true },
+	subtype = { madness=true, confusion=true, power=50 },
 	status = "detrimental",
+	charges = function(self, eff) return (tostring(eff.power).."%") end,
 	parameters = { power=10 },
 	on_gain = function(self, err) return "#F53CBE##Target# is lost in madness!", "+Confused" end,
 	on_lose = function(self, err) return "#Target# overcomes the madness", "-Confused" end,
 	activate = function(self, eff)
 		eff.particle = self:addParticles(Particles.new("gloom_confused", 1))
 		eff.mindResistChangeId = self:addTemporaryValue("resists", { [DamageType.MIND]=eff.mindResistChange })
-		eff.power = math.floor(math.max(eff.power - (self:attr("confusion_immune") or 0) * 100, 10))
 		eff.power = util.bound(eff.power, 0, 50)
 		eff.tmpid = self:addTemporaryValue("confused", eff.power)
 	end,
@@ -1574,7 +1571,7 @@ newEffect{
 				end
 			elseif chance == 3 then
 				if self:canBe("confusion") then
-					self:setEffect(self.EFF_CONFUSED, 3, {power=50})
+					self:setEffect(self.EFF_CONFUSED, 3, {power=30})
 				end
 			end
 			game.logSeen(self, "#F53CBE#%s succumbs to the nightmare!", self.name:capitalize())
@@ -2235,7 +2232,7 @@ newEffect{
 newEffect{
 	name = "BRAINLOCKED",
 	desc = "Brainlocked",
-	long_desc = function(self, eff) return ("Renders a random talent unavailable. No talents will cool down until the effect has worn off."):format() end,
+	long_desc = function(self, eff) return ("Renders a random talent unavailable. Talent cooldown is halved until the effect has worn off."):format() end,
 	type = "mental",
 	subtype = { ["cross tier"]=true },
 	status = "detrimental",
@@ -2243,11 +2240,11 @@ newEffect{
 	on_gain = function(self, err) return nil, "+Brainlocked" end,
 	on_lose = function(self, err) return nil, "-Brainlocked" end,
 	activate = function(self, eff)
-		eff.tcdid = self:addTemporaryValue("no_talents_cooldown", 1)
+		eff.tcdid = self:addTemporaryValue("half_talents_cooldown", 1)
 		local tids = {}
 		for tid, lev in pairs(self.talents) do
 			local t = self:getTalentFromId(tid)
-			if t and not self.talents_cd[tid] and t.mode == "activated" and not t.innate then tids[#tids+1] = t end
+			if t and not self.talents_cd[tid] and t.mode == "activated" and not t.innate and not t.no_energy then tids[#tids+1] = t end
 		end
 		for i = 1, 1 do
 			local t = rng.tableRemove(tids)
@@ -2256,7 +2253,7 @@ newEffect{
 		end
 	end,
 	deactivate = function(self, eff)
-		self:removeTemporaryValue("no_talents_cooldown", eff.tcdid)
+		self:removeTemporaryValue("half_talents_cooldown", eff.tcdid)
 	end,
 }
 
@@ -2323,12 +2320,12 @@ newEffect{
 	type = "mental",
 	subtype = { confusion=true },
 	status = "detrimental",
+	charges = function(self, eff) return (tostring(eff.confuse).."%") end,
 	on_gain = function(self, err) return "#Target# higher mental functions have been imparied.", "+Lobotomized" end,
 	on_lose = function(self, err) return "#Target#'s regains its senses.", "-Lobotomized" end,
 	parameters = { power=1, confuse=10, dam=1 },
 	activate = function(self, eff)
 		DamageType:get(DamageType.MIND).projector(eff.src or self, self.x, self.y, DamageType.MIND, {dam=eff.dam, alwaysHit=true})
-		eff.confuse = math.floor(math.max(eff.confuse - (self:attr("confusion_immune") or 0) * 100, 10))
 		eff.confuse = util.bound(eff.confuse, 0, 50) -- Confusion cap of 50%
 		eff.tmpid = self:addTemporaryValue("confused", eff.confuse)
 		eff.cid = self:addTemporaryValue("inc_stats", {[Stats.STAT_CUN]=-eff.power/2})
@@ -2377,6 +2374,11 @@ newEffect{
 				[DamageType.DARKNESS] = eff.power,
 				})
 			eff.what = "lightning, blight, mind, darkness"
+		elseif eff.kind == "all" then
+			eff.sid = self:addTemporaryValue("flat_damage_armor", {
+				all = eff.power,
+				})
+			eff.what = "all"
 		end
 	end,
 	deactivate = function(self, eff)
@@ -3270,55 +3272,5 @@ newEffect{
 			[Stats.STAT_WIL] = eff.dur,
 			[Stats.STAT_CUN] = eff.dur,
 		})
-	end,
-}
-
-newEffect{
-	name = "EXPOSE_WEAKNESS", image = "talents/expose_weakness.png",
-	desc = "Exploiting Weaknesses",
-	long_desc = function(self, eff)
-		local bonuses = {}
-		if eff.bonus_accuracy > 0 then table.insert(bonuses, ("have %+d accuracy"):format(eff.bonus_accuracy)) end
-		if eff.bonus_power > 0 then table.insert(bonuses, ("deal %+0.1f damage"):format(eff.bonus_power)) end
-		if eff.bonus_pen > 0 then table.insert(bonuses, ("have %+d%% resistance penetration"):format(eff.bonus_pen)) end
-		if #bonuses > 0 then bonuses = table.concatNice(bonuses, ", ", " and ") else bonuses = "are not affected" end
-		return ("You are focused on weaknesses you have found in your target's defences.  Your melee attacks against %s %s."):format(eff.target and eff.target.name:capitalize() or "noone", bonuses)
-	end,
-	type = "mental",
-	subtype = { tactical=true},
-	status = "beneficial",
-	parameters = {power=10, hardiness=10, penetration=10, accuracy=0, find_weakness=true},
-	on_gain = function(self, eff) return ("#Target# #GOLD#focuses on weaknesses#LAST# in %s's defenses!"):format(eff.target and eff.target.name:capitalize() or self:his_her().." target"), "+Expose Weakness" end,
-	on_lose = function(self, eff) return "#Target#'s attacks are less focused.", "-Expose Weakness" end,
-	on_timeout = function(self, eff)
-		eff.find_weakness = false
-		if not eff.target or eff.target.dead or not game.level:hasEntity(eff.target) then
-			self:removeEffect(eff.effect_id)
-		end
-	end,
-	activate = function(self, eff)
-		eff.bonus_power = 0
-		eff.bonus_accuracy = 0
-		eff.bonus_pen = 0
-	end,
-	deactivate = function(self, eff)
-	end,
-	-- pre attack: assign bonuses already set up  Note: This is post rescaleCombatStats (i.e. applied directly)
-	callbackOMeleeAttackBonuses = function(self, eff, hd)
-		if not eff.find_weakness then
-			hd.atk = hd.atk + eff.bonus_accuracy
-			hd.dam = hd.dam + eff.bonus_power
-		end
-	end,
-	-- after attack, accumulate weakness bonuses (1 turn only) based on combat result
-	callbackOnMeleeAttack = function(self, eff, target, hitted, crit, weapon, damtype, mult, dam)
-		if eff.find_weakness then -- compile bonuses
-			if hitted then
-				eff.bonus_power = eff.bonus_power + eff.power
-				eff.bonus_pen = eff.bonus_pen + eff.penetration
-			else -- missed, add accuracy
-				eff.bonus_accuracy = eff.bonus_accuracy + eff.accuracy
-			end
-		end
 	end,
 }

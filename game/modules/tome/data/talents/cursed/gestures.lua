@@ -258,7 +258,6 @@ newTalent{
 	type = {"cursed/gestures", 4},
 	require = cursed_cun_req4,
 	mode = "passive",
-	cooldown = 10,
 	points = 5,
 	getGuardPercent = function(self, t) return self:combatTalentLimit(t, 80, 20, 45) end,
 	-- Damage reduction handled in _M:attackTargetWith function in mod.class.interface.Combat.lua

@@ -541,15 +541,16 @@ newTalent{
 	tactical = { DISABLE = { confusion = 3 } },
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t), talent=t} end,
 	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 3, 7)) end,
+	getConfusion = function(self, t) return self:combatTalentLimit(t, 50, 15, 45) end, -- Confusion hard cap is 50%
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		self:project(tg, x, y, DamageType.CONFUSION, {dur=t.getDuration(self, t), dam=50+self:getTalentLevelRaw(t)*10}, {type="manathrust"})
+		self:project(tg, x, y, DamageType.CONFUSION, {dur=t.getDuration(self, t), dam=t.getConfusion(self,t)}, {type="manathrust"})
 		return true
 	end,
 	info = function(self, t)
-		return ([[Try to confuse the target's mind for %d turns.]]):format(t.getDuration(self, t))
+		return ([[Try to confuse the target's mind for %d (power %d%%) turns.]]):format(t.getDuration(self, t), t.getConfusion(self, t))
 	end,
 }
 
@@ -3421,5 +3422,32 @@ newTalent{
 		return ([[Attack your foes in a frontal arc with a roundhouse kick, which deals %0.2f physical damage and knocks your foes back 4 grids. This will break any grapples you're maintaining
 		The damage improves with your Physical Power.]]):
 		format(damDesc(self, DamageType.PHYSICAL, (damage)))
+	end,
+}
+
+newTalent{
+	name = "Bone Nova",
+	type = {"corruption/other", 1},
+	require = corrs_req3,
+	points = 5,
+	vim = 25,
+	cooldown = 12,
+	tactical = { ATTACKAREA = {PHYSICAL = 2} },
+	random_ego = "attack",
+	radius = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5)) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 8, 180) end,
+	target = function(self, t)
+		return {type="ball", radius=self:getTalentRadius(t), selffire=false, talent=t}
+	end,
+	action = function(self, t)
+		local tg = self:getTalentTarget(t)
+		self:project(tg, self.x, self.y, DamageType.PHYSICALBLEED, self:spellCrit(t.getDamage(self, t)))
+		game.level.map:particleEmitter(self.x, self.y, tg.radius, "circle", {oversize=1.1, a=255, limit_life=8, grow=true, speed=0, img="bone_nova", radius=self:getTalentRadius(t)})
+		game:playSoundNear(self, "talents/arcane")
+		return true
+	end,
+	info = function(self, t)
+		return ([[Fire bone spears in all directions, hitting all foes within radius %d for %0.2f physical damage, and inflicting bleeding for another %0.2f damage over 5 turns.
+		The damage will increase with your Spellpower.]]):format(self:getTalentRadius(t), damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)/2))
 	end,
 }

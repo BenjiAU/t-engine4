@@ -23,120 +23,22 @@ local DamageType = require "engine.DamageType"
 load("/data/general/objects/egos/charms.lua")
 
 newEntity{
-	name = "arcane ", prefix=true, second=true,
-	keywords = {arcane=true},
-	level_range = {10, 50},
-	rarity = 12,
-	cost = 5,
-
-	charm_on_use = {
-		{100, function(self, who) return ("regenerate %d mana"):format(self:getCharmPower(who, true) / 5) end, function(self, who)
-			who:incMana(self:getCharmPower(who, true) / 5)
-		end},
-	},
-	use_power = {tactical = {MANA = 0.5}}
-}
-
-newEntity{
-	name = "defiled ", prefix=true, second=true,
-	keywords = {defiled=true},
-	level_range = {10, 50},
-	rarity = 12,
-	cost = 5,
-
-	wielder = {
-		max_vim = resolvers.mbonus_material(15, 5),
-	}
-}
-
-newEntity{
-	name = "bright ", prefix=true, second=true,
-	keywords = {bright=true},
-	level_range = {10, 50},
-	rarity = 12,
-	cost = 5,
-
-	charm_on_use = {
-		{100, function(self, who) return ("regenerate %d positive energy"):format(self:getCharmPower(who, true) / 8) end, function(self, who)
-			who:incPositive(self:getCharmPower(who, true) / 8)
-		end},
-	},
-	use_power = {tactical = {POSITIVE = 0.5}}
-}
-
-newEntity{
-	name = "shadowy ", prefix=true, second=true,
-	keywords = {shadow=true},
-	level_range = {10, 50},
-	rarity = 12,
-	cost = 5,
-
-	charm_on_use = {
-		{100, function(self, who) return ("regenerate %d negative energy"):format(self:getCharmPower(who, true) / 8) end, function(self, who)
-			who:incNegative(self:getCharmPower(who, true) / 8)
-		end},
-	},
-	use_power = {tactical = {NEGATIVE = 0.5}}
-}
-
-newEntity{
 	name = "warded ", prefix=true, second=true,
 	keywords = {ward=true},
-	level_range = {30, 50},
+	level_range = {20, 50},
 	rarity = 12,
 	greater_ego = 1,
 	cost = 5,
-
 	wielder = {
-		wards = {
-			[DamageType.FIRE] = resolvers.mbonus_material(4, 1),
-			[DamageType.COLD] = resolvers.mbonus_material(4, 1),
-			[DamageType.LIGHTNING] = resolvers.mbonus_material(4, 1),
-			[DamageType.TEMPORAL] = resolvers.mbonus_material(4, 1),
-			[DamageType.BLIGHT] = resolvers.mbonus_material(4, 1),
-		},
+		wards = {},
+		resolvers.genericlast(function(e)
+			local types = {"FIRE", "LIGHTNING", "COLD", "ACID", "MIND", "ARCANE", "BLIGHT", "NATURE", "TEMPORAL", "LIGHT", "DARKNESS"}
+			local wards = {}
+			for _ = 1,4 do
+				local pick = rng.tableRemove(types)
+				e.wielder.wards[pick] = resolvers.mbonus_material(4, 2)
+			end
+		end),
 		learn_talent = {[Talents.T_WARD] = 1},
-	},
-}
-
-newEntity{
-	name = "void ", prefix=true, second=true,
-	keywords = {void=true},
-	level_range = {30, 50},
-	rarity = 12,
-	greater_ego = 1,
-	cost = 5,
-
-	wielder = {
---		talent_cd_reduction={[Talents.T_VOID_BLAST]=-6},
-		learn_talent = {[Talents.T_VOID_BLAST] = resolvers.mbonus_material(4, 1)},
-	},
-}
-
-newEntity{
-	name = "volcanic ", prefix=true, second=true,
-	keywords = {volcanic=true},
-	level_range = {30, 50},
-	rarity = 12,
-	greater_ego = 1,
-	cost = 5,
-
-	wielder = {
-		talent_cd_reduction={[Talents.T_VOLCANO]=2},
-		learn_talent = {[Talents.T_VOLCANO] = resolvers.mbonus_material(4, 1)},
-	},
-}
-
-newEntity{
-	name = "striking ", prefix=true, second=true,
-	keywords = {striking=true},
-	level_range = {30, 50},
-	rarity = 12,
-	greater_ego = 1,
-	cost = 5,
-
-	wielder = {
-		talent_cd_reduction={[Talents.T_STRIKE]=1},
-		learn_talent = {[Talents.T_STRIKE] = resolvers.mbonus_material(4, 1)},
 	},
 }

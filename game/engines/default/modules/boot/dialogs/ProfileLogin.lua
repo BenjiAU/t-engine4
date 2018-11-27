@@ -27,7 +27,7 @@ local Textzone = require "engine.ui.Textzone"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init(dialogdef, profile_help_text)
-	Dialog.init(self, "Online profile "..dialogdef.name, 600, 400)
+	Dialog.init(self, "Online profile "..dialogdef.name, math.min(800, game.w * 0.9), 400)
 	self.profile_help_text = profile_help_text
 	self.dialogdef = dialogdef
 	self.alpha = 230
@@ -65,9 +65,10 @@ function _M:init(dialogdef, profile_help_text)
 		self.c_pass = Textbox.new{title="Password: ", size_title=pwa, text="", chars=30, max_len=20, hide=true, filter=pass_filter, fct=function(text) self:okclick() end}
 		self.c_pass2 = Textbox.new{title=pwa, text="", size_title=pwa, chars=30, max_len=20, hide=true, filter=pass_filter, fct=function(text) self:okclick() end}
 		self.c_email = Textbox.new{title="Email: ", size_title=pwa, text="", chars=30, max_len=60, filter=pass_filter, fct=function(text) self:okclick() end}
-		self.c_news = Checkbox.new{title="Accept to receive #{bold}#very infrequent#{normal}# (a few per year) mails", default=true, fct=function() self:okclick() end}
-		self.c_news2 = Textzone.new{text="about important game events from us.", width=self.iw - 20, auto_height=true}
+		self.c_news = Checkbox.new{title="Accept to receive #{bold}#very infrequent#{normal}# (a few per year) mails about important game events from us.", default=false, fct=function() self:okclick() end}
+		self.c_age = Checkbox.new{title="You at least 16 years old, or have parental authorization to play the game.", default=false, fct=function() self:okclick() end}
 		local ok = require("engine.ui.Button").new{text="Create", fct=function() self:okclick() end}
+		local privacy = require("engine.ui.Button").new{text="Privacy Policy (opens in browser)", fct=function() self:privacypolicy() end}
 		local cancel = require("engine.ui.Button").new{text="Cancel", fct=function() self:cancelclick() end}
 
 		self:loadUI{
@@ -77,9 +78,10 @@ function _M:init(dialogdef, profile_help_text)
 			{left=0, top=self.c_desc.h+self.c_login.h+self.c_pass.h+5, ui=self.c_pass2},
 			{left=0, top=self.c_desc.h+self.c_login.h+self.c_pass.h+self.c_pass2.h+10, ui=self.c_email},
 			{left=0, top=self.c_desc.h+self.c_login.h+self.c_pass.h+self.c_pass2.h+self.c_email.h+10, ui=self.c_news},
-			{left=0, top=self.c_desc.h+self.c_login.h+self.c_pass.h+self.c_pass2.h+self.c_email.h+self.c_news2.h+10, ui=self.c_news2},
+			{left=0, top=self.c_desc.h+self.c_login.h+self.c_pass.h+self.c_pass2.h+self.c_email.h+self.c_news.h+10, ui=self.c_age},
 			{left=0, bottom=0, ui=ok},
 			{right=0, bottom=0, ui=cancel},
+			{hcenter=0, bottom=0, ui=privacy},
 		}
 		self:setFocus(self.c_login)
 	end
@@ -108,6 +110,10 @@ function _M:okclick()
 		self:simplePopup("Email", "Your email seems invalid")
 		return
 	end
+	if not self.c_age.checked then
+		self:simplePopup("Age Check", "You need to be 16 years old or more or to have parental authorization to play this game.")
+		return
+	end
 
 	game:unregisterDialog(self)
 	game:createProfile({create=self.c_email and true or false, login=self.c_login.text, pass=self.c_pass.text, email=self.c_email and self.c_email.text, news=self.c_news and self.c_news.checked})
@@ -115,4 +121,8 @@ end
 
 function _M:cancelclick()
 	self.key:triggerVirtual("EXIT")
+end
+
+function _M:privacypolicy()
+	util.browserOpenUrl("https://te4.org/privacy-policy-data", {is_external=true})	
 end

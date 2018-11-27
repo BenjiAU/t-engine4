@@ -118,7 +118,9 @@ function _M:onBirth(birther)
 	-- Make a list of random escort levels
 	local race_def = birther.birth_descriptor_def.race[self.descriptor.race]
 	local subrace_def = birther.birth_descriptor_def.subrace[self.descriptor.subrace]
+	local world = birther.birth_descriptor_def.world[self.descriptor.world]
 	local def = subrace_def.random_escort_possibilities or race_def.random_escort_possibilities
+	if world.random_escort_possibilities then def = world.random_escort_possibilities end -- World overrides
 	if def then
 		local zones = {}
 		for i, zd in ipairs(def) do for j = zd[2], zd[3] do zones[#zones+1] = {zd[1], j} end end
@@ -180,7 +182,7 @@ function _M:onEnterLevel(zone, level)
 
 	-- Clear existing player created effects on the map
 	for i, eff in ipairs(level.map.effects) do
-		if eff.src and eff.src.player then
+		if (eff.src and (eff.src.player or (eff.src.summoner and eff.src:resolveSource().player))) then
 			eff.duration = 0
 			eff.grids = {}
 			print("[onEnterLevel] Cancelling player created effect ", tostring(eff.name))
@@ -458,8 +460,8 @@ function _M:updateMainShader()
 		end
 
 		-- Colorize shader
-		if self:attr("stealth") and self:attr("stealth") > 0 then game.fbo_shader:setUniform("colorize", {0.9,0.9,0.9,0.6})
-		elseif self:attr("invisible") and self:attr("invisible") > 0 then game.fbo_shader:setUniform("colorize", {0.3,0.4,0.9,0.8})
+		if self:attr("stealth") and self:attr("stealth") > 0 then game.fbo_shader:setUniform("colorize", {0.9,0.9,0.9,0.4})
+		elseif self:attr("invisible") and self:attr("invisible") > 0 then game.fbo_shader:setUniform("colorize", {0.3,0.4,0.9,0.3})
 		elseif self:attr("unstoppable") then game.fbo_shader:setUniform("colorize", {1,0.2,0,1})
 		elseif self:attr("lightning_speed") then game.fbo_shader:setUniform("colorize", {0.2,0.3,1,1})
 		elseif game.level and game.level.data.is_eidolon_plane then game.fbo_shader:setUniform("colorize", {1,1,1,1})
@@ -980,7 +982,12 @@ function _M:restCheck()
 
 	-- Resting improves regen
 	for act, def in pairs(game.party.members) do if game.level:hasEntity(act) and not act.dead then
-		local perc = math.min(self.resting.cnt / 10, 8)
+		-- Drastically improve regen while resting as this is one of the most common areas lag causes frustration
+		-- To avoid interactions with life regen buffs and minimize any other non-QOL impacts we wait 15 turns before doing any enhancement
+		local perc = 0
+		if self.resting.cnt >= 15 then
+			perc = math.min(self.resting.cnt, 16)
+		end
 		local old_shield = act.arcane_shield
 		act.arcane_shield = nil
 		act:heal(act.life_regen * perc)

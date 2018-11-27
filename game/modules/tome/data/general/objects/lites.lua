@@ -37,7 +37,7 @@ newEntity{ base = "BASE_LITE",
 	material_level = 1,
 
 	wielder = {
-		lite = 2,
+		lite = 3,
 	},
 }
 
@@ -51,7 +51,7 @@ newEntity{ base = "BASE_LITE",
 	material_level = 3,
 
 	wielder = {
-		lite = 3,
+		lite = 4,
 	},
 }
 
@@ -65,7 +65,7 @@ newEntity{ base = "BASE_LITE",
 	material_level = 5,
 
 	wielder = {
-		lite = 4,
+		lite = 5,
 	},
 }
 

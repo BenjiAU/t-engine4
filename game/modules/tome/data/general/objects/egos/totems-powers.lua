@@ -24,71 +24,79 @@ Totems
 *thorny skin
 ]]
 
+-- gfx
 newEntity{
-	name = " of cure ailments", addon=true, instant_resolve=true,
-	keywords = {ailments=true},
+	name = " of healing", addon=true, instant_resolve=true,
+	keywords = {healing=true},
 	level_range = {1, 50},
 	rarity = 8,
 
-	charm_power_def = {add=1, max=5, floor=true},
+	charm_power_def = {add=50, max=500, floor=true},
 	resolvers.charm(
-		function(self, who) return ("remove up to %d poisons or diseases from a target within range %d (based on Willpower)"):format(self.use_power.cures(self, who), self.use_power.range(self, who)) end,
-		10,
+		function(self, who) 
+			local heal = self.use_power.heal(self, who)
+			return ("heals yourself and all friendly characters within 10 spaces for %d"):
+				format(heal) end,
+		20,
 		function(self, who)
-		local tg = self.use_power.target(self, who)
-		local x, y = who:getTarget(tg)
-		if not x or not y then return nil end
-		local nb = self.use_power.cures(self, who)
-		game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
-		who:project(tg, x, y, function(px, py)
-			local target = game.level.map(px, py, engine.Map.ACTOR)
-			if not target then return end
-			local effs = {}
-
-			-- Go through all temporary effects
-			for eff_id, p in pairs(target.tmp) do
-				local e = target.tempeffect_def[eff_id]
-				if e.subtype.poison or e.subtype.disease then
-					effs[#effs+1] = {"effect", eff_id}
-				end
-			end
-
-			for i = 1, nb do
-				if #effs == 0 then break end
-				local eff = rng.tableRemove(effs)
-
-				if eff[1] == "effect" then
-					target:removeEffect(eff[2])
-				end
-			end
-		end)
-		game:playSoundNear(who, "talents/heal")
-		return {id=true, used=true}
-	end,
+			local tg = self.use_power.target(self, who)
+			local heal = who:mindCrit(self.use_power.heal(self, who))
+			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
+			who:project(tg, who.x, who.y, function(px, py)
+				local target = game.level.map(px, py, engine.Map.ACTOR)
+				if not target then return end
+				if target:reactionToward(who) < 0 then return end
+				target:attr("allow_on_heal", 1)
+				target:heal(heal, who)
+				target:attr("allow_on_heal", -1)
+				game:playSoundNear(who, "talents/heal")
+			end) 
+			return {id=true, used=true}
+		end,
 	"T_GLOBAL_CD",
-	{range = function(self, who) return math.floor(who:combatStatScale("wil", 6, 10)) end,
-	cures = function(self, who) return self:getCharmPower(who) end,
-	target = function(self, who) return {default_target=who, type="hit", nowarning=true, range=self.use_power.range(self, who), first_target="friend"} end,
-	tactical = {CURE = function(who, t, aitarget) -- count number of effects that can be removed
-			local nb = 0
-			for eff_id, p in pairs(who.tmp) do
-				local e = who.tempeffect_def[eff_id]
-				if e.status == "detrimental" and (e.subtype.poison or e.subtype.disease) then
-					nb = nb + 1
-				end
-			end
-			return nb
-			end,
-			__wt_cache_turns = 0
-			},
-	}),
+	{
+	radius = function(self, who) return 10 end,
+	heal = function(self, who) return self:getCharmPower(who) end,
+	target = function(self, who) return {type="ball", nowarning=true, radius=self.use_power.radius(self, who)} end,
+	tactical = {HEAL = 1},
+	})
+}
+
+newEntity{
+	name = " of stinging", addon=true, instant_resolve=true,
+	keywords = {conjure=true},
+	level_range = {1, 50},
+	rarity = 8,
+
+	charm_power_def = {add=15, max=800, floor=true},
+	resolvers.charm(function(self, who)
+			local dam = self.use_power.damage(self, who)
+			return ("instantly sting an enemy dealing %d nature damage over 7 turns and reducing their healing by 50%%%%"):format(dam, 50)
+		end,
+		12,
+		function(self, who)
+			local tg = self.use_power.target(self, who)
+			local x, y = who:getTarget(tg)
+			if not x or not y then return nil end
+			local dam = {dam = who:mindCrit(self.use_power.damage(self, who)), heal_factor = 0.5, dur = 7}
+			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
+			who:project(tg, x, y, engine.DamageType.INSIDIOUS_POISON, dam, {type="slime"})
+			return {id=true, used=true}
+		end,
+		"T_GLOBAL_CD",
+		{ range = 10,
+		requires_target = true,
+		target = function(self, who) return {type="hit", range=self.use_power.range} end,
+		damage = function(self, who) return self:getCharmPower(who) end,
+		tactical = {ATTACK = 1}}
+	),
 }
 
 newEntity{
 	name = " of thorny skin", addon=true, instant_resolve=true,
 	keywords = {thorny=true},
 	level_range = {1, 50},
-	rarity = 6,
+	rarity = 16,
 
 	charm_power_def = {add=5, max=100, floor=true},
 	resolvers.charm(function(self) return ("harden the skin for 7 turns increasing armour by %d and armour hardiness by %d%%%%"):format(self:getCharmPower(who), 20 + self.material_level * 10) end, 20, function(self, who)
@@ -104,30 +112,127 @@ newEntity{
 	tactical = {DEFEND = 1.5}}),
 }
 
+-- This is out of theme with nature, but then, it always was, and people are used to tentacle totems.  Consider retheming to Vine Lasher or some such.
 newEntity{
-	name = " of healing", addon=true, instant_resolve=true,
-	keywords = {heal=true},
-	level_range = {25, 50},
-	rarity = 20,
-
-	charm_power_def = {add=50, max=250, floor=true},
-	resolvers.charm(
-		function(self, who) return ("heal a target within range %d (based on Willpower) for %d"):format(self.use_power.range(self, who), self.use_power.damage(self, who)) end,
-		20,
-		function(self, who)
-			local tg = self.use_power.target(self, who)
-			local x, y = who:getTarget(tg)
-			if not x or not y then return nil end
-			local dam = self.use_power.damage(self, who)
-			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
-			who:project(tg, x, y, engine.DamageType.HEAL, dam)
-			game:playSoundNear(who, "talents/heal")
-			return {id=true, used=true}
+	name = " of summon tentacle", addon=true, instant_resolve=true,
+	keywords = {tentacle=true},
+	level_range = {1, 50},
+	rarity = 12,
+	charm_power_def = {add=45, max=500, floor=true},
+	resolvers.charm(function(self, who)
+		local stats = self.use_power.tentacleStats(self, who)
+		local str = ("(Tentacle Stats)\nLife:  %d\nBase Damage:  %d\nArmor:  %d\nAll Resist:  %d"):format(stats.max_life, stats.combat.dam, stats.combat_armor, stats.resists.all)
+		return	("summon a resilient tentacle up to %d spaces away for %d turns.  Each turn the tentacle will strike a random enemy in range 3 dealing physical damage and attempting to pin them.\n\n%s"):
+			format(5, stats.summon_time, str) 
 		end,
-		"T_GLOBAL_CD",
-		{range = function(self, who) return math.floor(who:combatStatScale("wil", 6, 10)) end,
-		damage = function(self, who) return self:getCharmPower(who) end,
-		target = function(self, who) return {default_target=who, type="hit", nowarning=true, range=self.use_power.range(self, who), first_target="friend"} end,
-		tactical = {HEAL = 2}}
+		 20, 
+		 function(self, who)
+			if not who:canBe("summon") then game.logPlayer(who, "You cannot summon; you are suppressed!") return end
+			local tg = self.use_power.target(self, who)
+			local tx, ty, target = who:getTarget(tg)
+			if not tx or not ty then return nil end
+			local _ _, _, _, tx, ty = who:canProject(tg, tx, ty)
+			target = game.level.map(tx, ty, engine.Map.ACTOR)
+			if target == who then target = nil end
+			local x, y = util.findFreeGrid(tx, ty, 5, true, {[engine.Map.ACTOR]=true})
+			if not x then
+				game.logPlayer(self, "Not enough space to summon!")
+				return
+			end
+			local Talents = require "engine.interface.ActorTalents"
+			local NPC = require "mod.class.NPC"
+			local m = NPC.new{
+				resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_eldritch_grgglck_s_tentacle.png", display_h=1, display_y=0}}},
+				name = "Lashing Tentacle",
+				type = "horror", subtype = "tentacle",
+				desc = "A lashing tentacle.",
+				rank = 1,
+				display = "T", color = colors.GREY,
+				life_rating=1,
+				combat = {
+					dam=50,
+					atk=900, apr=900,  -- Complex as is, let the players not worry about the more fiddly melee stats
+					dammod={str=1},
+				},
+				level_range = {1, who.level}, exp_worth = 0,
+				silent_levelup = true,
+				combat_armor=20,
+				combat_armor_hardiness=100,
+				resists = {all = 30},
+				autolevel = "warrior",
+				ai = "summoned", ai_real = "dumb_talented_simple", ai_state = { talent_in=1, },
+				never_move=1,
+				stats = { str=14, dex=18, con=20, },
+				size_category = 3,
+				no_breath = 1,
+				cant_be_moved = 1,
+				knockback_resist=1,
+				combat_physresist=100,
+				combat_spellresist=100,
+				on_act = function(self)
+					local tg = {type="ball", radius=3}
+					local grids = self:project(tg, self.x, self.y, function() end)
+					local tgts = {}
+					for x, ys in pairs(grids) do for y, _ in pairs(ys) do
+						local target = game.level.map(x, y, engine.Map.ACTOR)
+						if target and self:reactionToward(target) < 0 then tgts[#tgts+1] = target end
+					end end
+
+					local target = rng.tableRemove(tgts)
+					if target then
+						if self:attackTarget(target, nil, 1, true) and target:canBe("pin") then target:setEffect(target.EFF_PINNED, 2, {}) end
+					end
+					self.energy.value = 0
+				end,
+				faction = who.faction,
+				summoner = who, summoner_gain_exp=true,
+				summon_time = 0,
+			}
+
+			m:resolve()
+			who:logCombat(target or {name = "a spot nearby"}, "#Source# points %s %s at #target#, releasing a writhing tentacle!", who:his_her(), self:getName({do_color = true, no_add_name = true}))
+			game.zone:addEntity(game.level, m, "actor", x, y)
+			m.remove_from_party_on_death = true,
+			game.party:addMember(m, {
+				control=false,
+				type="summon",
+				title="Summon",
+			})
+
+			local stats = self.use_power.tentacleStats(self, who)
+			table.mergeAdd(m, stats, true)
+			m.life = m.max_life
+
+		game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
+		return {id=true, used=true}
+	end,
+	"T_GLOBAL_CD",
+	{
+	power = 25,
+	range = 5,
+	radius = 3,
+	target = function(self, who) return {type="ball", nowarning=true, range=self.use_power.range, radius=self.use_power.radius, friendlyfire=false, nolock=true} end,
+	-- Stats are part randomly resolved, part linked to charm power
+	tentacle_stats = {
+		combat = {dam = resolvers.mbonus_material(100, 0)},
+		max_life = resolvers.mbonus_material(400, 0),
+		combat_armor = resolvers.mbonus_material(50, 0),
+		resists = {all = resolvers.mbonus_material(50, 0)},
+		summon_time = resolvers.mbonus_material(10, 3),
+	},
+	tentacleStats = function(self, who)
+		local stats = {
+			combat = {dam = self:getCharmPower(who)},
+			max_life = self:getCharmPower(who)*2,
+		}
+
+		-- Add the resolved stat bonuses
+		table.mergeAdd(stats, table.clone(self.use_power.tentacle_stats, true), true)
+
+		return stats
+	end,
+	requires_target = true,
+	tactical = {DEFEND = 1.5}}
+
 	),
 }

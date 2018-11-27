@@ -28,7 +28,7 @@ newTalent{
 		if self.turn_procs.blood_splash_on_crit then return end
 		self.turn_procs.blood_splash_on_crit = true
 
-		self:heal(t.heal(self, t), self)
+		self:heal(self:spellCrit(t.heal(self, t)), self)
 		if core.shader.active(4) then
 			self:addParticles(Particles.new("shader_shield_temp", 1, {toback=true , size_factor=1.5, y=-0.3, img="healgreen", life=25}, {type="healing", time_factor=2000, beamsCount=20, noup=2.0, circleDescendSpeed=3.5}))
 			self:addParticles(Particles.new("shader_shield_temp", 1, {toback=false, size_factor=1.5, y=-0.3, img="healgreen", life=25}, {type="healing", time_factor=2000, beamsCount=20, noup=1.0, circleDescendSpeed=3.5}))
@@ -38,14 +38,14 @@ newTalent{
 		if self.turn_procs.blood_splash_on_kill then return end
 		self.turn_procs.blood_splash_on_kill = true
 
-		self:heal(t.heal(self, t), self)
+		self:heal(self:spellCrit(t.heal(self, t)), self)
 		if core.shader.active(4) then
 			self:addParticles(Particles.new("shader_shield_temp", 1, {toback=true , size_factor=1.5, y=-0.3, img="healgreen", life=25}, {type="healing", time_factor=2000, beamsCount=20, noup=2.0, circleDescendSpeed=3.5}))
 			self:addParticles(Particles.new("shader_shield_temp", 1, {toback=false, size_factor=1.5, y=-0.3, img="healgreen", life=25}, {type="healing", time_factor=2000, beamsCount=20, noup=1.0, circleDescendSpeed=3.5}))
 		end
 	end,
 	info = function(self, t)
-		return ([[Inflicting pain and death invogorates you.
+		return ([[Inflicting pain and death invigorates you.
 		Each time you deal a critical strike you gain %d life (this effect can only happen once per turn).
 		Each time you kill a creature you gain %d life (this effect can only happen once per turn).]]):
 		format(t.heal(self, t), t.heal(self, t))
@@ -75,11 +75,17 @@ newTalent{
 		if type == DamageType.FIRE then
 			src:setEffect(src.EFF_BURNING, 5, {src=self, apply_power=self:combatSpellpower(), power=t.getFire(self, t) / 5})
 		elseif type == DamageType.COLD then
-			src:setEffect(src.EFF_FROZEN, 3, {apply_power=self:combatSpellpower(), hp=t.getCold(self, t)})
+			if src:canBe("stun") then
+				src:setEffect(src.EFF_FROZEN, 3, {apply_power=self:combatSpellpower(), hp=t.getCold(self, t)})
+			end
 		elseif type == DamageType.ACID then
-			src:setEffect(src.EFF_BLINDED, t.getAcid(self, t), {apply_power=self:combatSpellpower()})
+			if src:canBe("blind") then
+				src:setEffect(src.EFF_BLINDED, t.getAcid(self, t), {apply_power=self:combatSpellpower()})
+			end
 		elseif type == DamageType.LIGHTNING then
-			src:setEffect(src.EFF_DAZED, t.getLightning(self, t), {apply_power=self:combatSpellpower()})
+			if src:canBe("stun") then
+				src:setEffect(src.EFF_DAZED, t.getLightning(self, t), {apply_power=self:combatSpellpower()})
+			end
 		elseif type == DamageType.NATURE then
 			src:setEffect(src.EFF_SLOW, 4, {apply_power=self:combatSpellpower(), power=t.getNature(self, t) / 100})
 		end
@@ -101,7 +107,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Use elemental damage deal to you to trigger terrible effects on the source:
+		return ([[Use elemental damage dealt to you to trigger terrible effects on the source:
 		- Fire: burn for %0.2f fire damage over 5 turns
 		- Cold: freeze for 3 turns with %d iceblock power
 		- Acid: blind for %d turns
@@ -126,7 +132,7 @@ newTalent{
 	points = 5,
 	cooldown = 15,
 	vim = 16,
-	range = 5,
+	range = 10,
 	tactical = { DISABLE = 2 },
 	direct_hit = true,
 	requires_target = true,
@@ -139,7 +145,7 @@ newTalent{
 		self:project(tg, x, y, function(tx, ty)
 			local target = game.level.map(tx, ty, Map.ACTOR)
 			if not target or target == self then return end
-			target:setEffect(target.EFF_HEALING_INVERSION, 5, {apply_power=self:combatSpellpower(), power=t.getPower(self, t)})
+			target:setEffect(target.EFF_HEALING_INVERSION, 5, {src=self, apply_power=self:combatSpellpower(), power=t.getPower(self, t)})
 		end)
 		game:playSoundNear(self, "talents/slime")
 		return true
@@ -160,7 +166,7 @@ newTalent{
 	vim = 18,
 	direct_hit = true,
 	requires_target = true,
-	range = 1,
+	range = 4,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t), talent=t} end,
 	getNb = function(self, t) return math.floor(self:combatTalentScale(t, 2, 4, "log")) end,
 	getDam = function(self, t) return self:combatTalentLimit(t, 2, 10, 5) end, --Limit < 10% life/effect
@@ -188,13 +194,16 @@ newTalent{
 					local p = self.tmp[eff_id]
 					local e = self.tempeffect_def[eff_id]
 					local effectParam = self:copyEffect(eff_id)
-					effectParam.src = self
+					effectParam.__tmpparticles = nil
+					if effectParam then
+						effectParam.src = self
 
-					target:setEffect(eff_id, p.dur, effectParam)
-					self:removeEffect(eff_id)
-					local dead, val = self:takeHit(dam, self, {source_talent=t})
-					target:heal(val, self)
-					game:delayedLogMessage(self, target, "vile_transplant"..e.desc, ("#CRIMSON##Source# transfers an effect (%s) to #Target#!"):format(e.desc))
+						target:setEffect(eff_id, p.dur, effectParam)
+						self:removeEffect(eff_id)
+						local dead, val = self:takeHit(dam, self, {source_talent=t})
+						target:heal(val, self)
+						game:delayedLogMessage(self, target, "vile_transplant"..e.desc, ("#CRIMSON##Source# transfers an effect (%s) to #Target#!"):format(e.desc))
+					end
 				end
 				nb = nb - 1
 			end

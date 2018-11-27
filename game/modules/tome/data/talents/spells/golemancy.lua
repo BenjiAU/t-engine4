@@ -38,6 +38,7 @@ function makeAlchemistGolem(self)
 --		level_range = {1, 50}, exp_worth=0,
 		level_range = {1, self.max_level}, exp_worth=0,
 		life_rating = 13,
+		life_regen = 1,  -- Prevent resting tedium
 		never_anger = true,
 		save_hotkeys = true,
 
@@ -68,8 +69,8 @@ function makeAlchemistGolem(self)
 		},
 
 		resolvers.equip{ id=true,
-			{type="weapon", subtype="battleaxe", autoreq=true, id=true, ego_chance=-1000},
-			{type="armor", subtype="heavy", autoreq=true, id=true, ego_chance=-1000}
+			{type="weapon", subtype="battleaxe", autoreq=true, id=true, ego_chance=-1000, not_properties = {"unique"}},
+			{type="armor", subtype="heavy", autoreq=true, id=true, ego_chance=-1000, not_properties = {"unique"}}
 		},
 
 		talents_types = {
