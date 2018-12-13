@@ -18,4 +18,5 @@
 -- darkgod@te4.org
 
 print("[ERROR] TRYING TO USE engine.Dialog! Class is removed, please use engine.ui.Dialog")
+util.show_backtrace()
 if os.crash then os.crash() else os.exit() end
