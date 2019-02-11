@@ -110,6 +110,7 @@ function _M:init()
 	else
 		core.game.setRealtime(8)
 	end
+	self.realtime_frames = 0
 
 	self:loaded()
 	profile:currentCharacter("Main Menu", "Main Menu")
@@ -476,12 +477,6 @@ end
 
 function _M:tick()
 	if self.stopped then engine.Game.tick(self) return true end
-	if self.level then
-		engine.GameEnergyBased.tick(self)
-		-- Fun stuff: this can make the game realtime, although calling it in display() will make it work better
-		-- (since display is on a set FPS while tick() ticks as much as possible
-		-- engine.GameEnergyBased.tick(self)
-	end
 	return false
 end
 
@@ -554,6 +549,15 @@ function _M:display(nb_keyframes)
 
 	self.full_fbo:use(false)
 	self.full_fborenderer:toScreen(0, 0, 1, 1, 1, 1)
+
+	-- Realtime level moving
+	if not self.stopped and self.level then
+		self.realtime_frames = self.realtime_frames + nb_keyframes
+		if self.realtime_frames >= 3 then
+			engine.GameEnergyBased.tick(self)
+			self.realtime_frames = 0
+		end
+	end
 end
 
 --[[
