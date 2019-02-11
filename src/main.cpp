@@ -1412,8 +1412,7 @@ void event_loop_tickbased() {
 	if (tickPaused) SDL_WaitEvent(NULL);
 
 	/* handle the events in the queue */
-	while (SDL_PollEvent(&event))
-	{
+	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_USEREVENT && event.user.code == 0) {
 			on_redraw();
 			int now_ticks = SDL_GetTicks();
