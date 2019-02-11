@@ -23,7 +23,7 @@ newTalentType{ allow_random=true, type="cursed/endless-hunt", name = "endless hu
 newTalentType{ allow_random=true, type="cursed/strife", name = "strife", description = "The battlefield is your home; death and confusion, your comfort." }
 newTalentType{ allow_random=true, is_mind=true, type="cursed/gloom", name = "gloom", description = "All those in your sight must share your despair." }
 newTalentType{ allow_random=true, type="cursed/rampage", name = "rampage", description = "Let loose the hate that has grown within." }
-newTalentType{ allow_random=true, type="cursed/predator", name = "predator", description = "Track and kill your prey with single-minded focus." }
+newTalentType{ allow_random=false, type="cursed/predator", name = "predator", description = "Track and kill your prey with single-minded focus." }
 
 -- Doomed
 newTalentType{ allow_random=true, is_mind=true, type="cursed/dark-sustenance", name = "dark sustenance", generic = true, description = "Invoke the powerful force of your will." }

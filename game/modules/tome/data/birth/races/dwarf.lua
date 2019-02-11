@@ -66,7 +66,7 @@ newBirthDescriptor
 		"#LIGHT_BLUE# * +4 Strength, -2 Dexterity, +3 Constitution",
 		"#LIGHT_BLUE# * -2 Magic, +3 Willpower, +0 Cunning",
 		"#GOLD#Life per level:#LIGHT_BLUE# 12",
-		"#GOLD#Experience penalty:#LIGHT_BLUE# 25%",
+		"#GOLD#Experience penalty:#LIGHT_BLUE# 0%",
 	},
 	inc_stats = { str=4, con=3, wil=3, mag=-2, dex=-2 },
 	talents_types = { ["race/dwarf"]={true, 0} },
@@ -77,13 +77,12 @@ newBirthDescriptor
 		moddable_tile = "dwarf_#sex#",
 		moddable_tile_ornament2 = {male="beard_02", female="braid_01"},
 		random_name_def = "dwarf_#sex#",
-		life_rating = 12,
+		life_rating = 14,
 		can_see_iron_council = 1,
 		resolvers.inscription("INFUSION:_REGENERATION", {cooldown=10, dur=5, heal=100}),
 		resolvers.inscription("INFUSION:_WILD", {cooldown=14, what={physical=true}, dur=4, power=14}),
 		resolvers.inventory({id=true, transmo=false, alter=function(o) o.inscription_data.cooldown=12 o.inscription_data.heal=50 end, {type="scroll", subtype="infusion", name="healing infusion", ego_chance=-1000, ego_chance=-1000}}),
 	},
-	experience = 1.25,
 	cosmetic_unlock = {
 		cosmetic_race_dwarf_female_beard = {
 			{priority=2, name="Beard [donator only]", donator=true, on_actor=function(actor) if actor.moddable_tile then actor.moddable_tile_ornament={female="beard_"..(actor.is_redhead and "redhead_" or "").."01"} end end, check=function(birth) return birth.descriptors_by_type.sex == "Female" end},

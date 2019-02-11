@@ -71,7 +71,7 @@ newTalent{
 	points = 5,
 	require = { stat = { dex=function(level) return 12 + level * 6 end }, },
 	mode = "passive",
-	getDamage = function(self, t) return 0 end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	getReload = function(self, t)
 		return math.floor(self:combatTalentScale(t, 0, 2.7, "log"))
@@ -88,7 +88,7 @@ newTalent{
 		local inc = t.getPercentInc(self, t)
 		local reload = t.getReload(self,t)
 		local chance = t.getChance(self,t)
-		return ([[Increases weapon damage by %d%% when using bows or slings, as well as your reload rate by %d.
+		return ([[Increases weapon damage by %d%% and physical power by 30 when using bows or slings, as well as your reload rate by %d.
 		In addition, your Shoot has a %d%% chance to mark targets on hit.
 The mark lasts for 5 turns, grants you visibility of the target (even through walls and other concealment), and causes them to become vulnerable to Headshot, Volley and Called Shots.]]):
 format(inc * 100, reload, chance)

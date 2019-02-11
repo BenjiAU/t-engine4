@@ -48,16 +48,14 @@ newTalent{
 		if not x or not y or not target then return nil end
 
 		local mult = t.getDamage(self,t)
+		if (target.life / target.max_life <= 0.3) then mult = mult * 1.5 end
 		-- Attack with offhand first
 		local hits = 0
 		hits = hits + (self:attackTargetWith(target, offweapon.combat, nil, self:getOffHandMult(offweapon.combat, mult)) and 1 or 0)
 		hits = hits + (self:attackTargetWith(target, weapon.combat, nil, mult) and 1 or 0)
 		
-		local percent = t.getPercent(self, t)/util.bound(target.rank or 2, 1, 5)
-		local dam = (target.max_life - target.life) * percent
 		if hits > 0 then
-			DamageType:get(DamageType.PHYSICAL).projector(self, target.x, target.y, DamageType.PHYSICAL, dam*hits)
-			if target:checkHit(self:combatAttack(), target:combatPhysicalResist(), 0, 95) and target:canBe("instakill") and target.life > target.die_at and target.life < target.max_life * 0.2 then
+			if target:checkHit(self:combatAttack(), target:combatPhysicalResist(), 0, 95) and target:canBe("instakill") and target.life < target.max_life * 0.2 then
 				-- KILL IT !
 				self:logCombat(target, "#Source# delivers a Coup de Grace against #Target#!")
 				target:die(self)
@@ -82,7 +80,7 @@ newTalent{
 	info = function(self, t)
 		dam = t.getDamage(self,t)*100
 		perc = t.getPercent(self,t)*100
-		return ([[Attempt to finish off a wounded enemy, striking them with both weapons for %d%% weapon damage, plus additional physical damage for each hit that lands equal to %d%% of their missing life (divided by rank: from 1 (critter) to 5 (elite boss)).  A target brought below 20%% of its maximum life may be instantly slain.
+		return ([[Attempt to finish off a wounded enemy, striking them with both weapons for %d%% increased by 50%% if their life is below 30%%.  A target brought below 20%% of its maximum life must make a physical save against your Accuracy or be instantly slain.
 		You may take advantage of finishing your foe this way to activate stealth (if known).]]):
 		format(dam, perc)
 	end,

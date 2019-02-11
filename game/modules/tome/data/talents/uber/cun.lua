@@ -85,13 +85,13 @@ uberTalent{
 uberTalent{
 	name = "Endless Woes",
 	mode = "passive",
-	require = { special={desc="Have dealt over 50000 acid, blight, darkness, mind or temporal damage", fct=function(self) return 
+	require = { special={desc="Have dealt over 10000 acid, blight, darkness, mind or temporal damage", fct=function(self) return 
 		self.damage_log and (
-			(self.damage_log[DamageType.ACID] and self.damage_log[DamageType.ACID] >= 50000) or
-			(self.damage_log[DamageType.BLIGHT] and self.damage_log[DamageType.BLIGHT] >= 50000) or
-			(self.damage_log[DamageType.DARKNESS] and self.damage_log[DamageType.DARKNESS] >= 50000) or
-			(self.damage_log[DamageType.MIND] and self.damage_log[DamageType.MIND] >= 50000) or
-			(self.damage_log[DamageType.TEMPORAL] and self.damage_log[DamageType.TEMPORAL] >= 50000)
+			(self.damage_log[DamageType.ACID] and self.damage_log[DamageType.ACID] >= 10000) or
+			(self.damage_log[DamageType.BLIGHT] and self.damage_log[DamageType.BLIGHT] >= 10000) or
+			(self.damage_log[DamageType.DARKNESS] and self.damage_log[DamageType.DARKNESS] >= 10000) or
+			(self.damage_log[DamageType.MIND] and self.damage_log[DamageType.MIND] >= 10000) or
+			(self.damage_log[DamageType.TEMPORAL] and self.damage_log[DamageType.TEMPORAL] >= 10000)
 		)
 	end} },
 	getBlight = function(self, t)
@@ -104,7 +104,7 @@ uberTalent{
 	range = 10,
 	radius = 3,
 	dts = {TEMPORAL=true, BLIGHT=true, ACID=true, DARKNESS=true, MIND=true,},
-	getThreshold = function(self, t) return 20*self.level end,
+	getThreshold = function(self, t) return 16*self.level end,
 	getDamage = function(self, t) return self:combatStatScale("cun", 10, 350) end,
 	doProject = function(self, t, damtype, effect, part)
 		local tgts = {}
@@ -242,14 +242,14 @@ uberTalent{
 uberTalent{
 	name = "Elemental Surge",
 	mode = "passive",
-	require = { special={desc="Have dealt over 50000 arcane, fire, cold, lightning, light or nature damage", fct=function(self) return 
+	require = { special={desc="Have dealt over 10000 arcane, fire, cold, lightning, light or nature damage", fct=function(self) return 
 		self.damage_log and (
-			(self.damage_log[DamageType.ARCANE] and self.damage_log[DamageType.ARCANE] >= 50000) or
-			(self.damage_log[DamageType.FIRE] and self.damage_log[DamageType.FIRE] >= 50000) or
-			(self.damage_log[DamageType.COLD] and self.damage_log[DamageType.COLD] >= 50000) or
-			(self.damage_log[DamageType.LIGHTNING] and self.damage_log[DamageType.LIGHTNING] >= 50000) or
-			(self.damage_log[DamageType.LIGHT] and self.damage_log[DamageType.LIGHT] >= 50000) or
-			(self.damage_log[DamageType.NATURE] and self.damage_log[DamageType.NATURE] >= 50000)
+			(self.damage_log[DamageType.ARCANE] and self.damage_log[DamageType.ARCANE] >= 10000) or
+			(self.damage_log[DamageType.FIRE] and self.damage_log[DamageType.FIRE] >= 10000) or
+			(self.damage_log[DamageType.COLD] and self.damage_log[DamageType.COLD] >= 10000) or
+			(self.damage_log[DamageType.LIGHTNING] and self.damage_log[DamageType.LIGHTNING] >= 10000) or
+			(self.damage_log[DamageType.LIGHT] and self.damage_log[DamageType.LIGHT] >= 10000) or
+			(self.damage_log[DamageType.NATURE] and self.damage_log[DamageType.NATURE] >= 10000)
 		)
 	end} },
 	dts = {PHYSICAL=true, ARCANE=true, LIGHT=true, COLD=true, LIGHTNING=true, FIRE=true, NATURE=true,},	
@@ -264,7 +264,7 @@ uberTalent{
 	getFire = function(self, t) return 30 end,
 	range = 10,
 	radius = 3,
-	getThreshold = function(self, t) return 20*self.level end,
+	getThreshold = function(self, t) return 16*self.level end,
 	getDamage = function(self, t) return self:combatStatScale("cun", 10, 250) end,
 	doProject = function(self, t, damtype, part)
 		local tgts = {}
@@ -291,7 +291,8 @@ uberTalent{
 	callbackOnRest = function(self, t) self.elemental_surge = nil end, -- No storing damage out of combat
 	callbackOnRun = function(self, t) self.elemental_surge = nil end,
 	callbackOnDealDamage = function(self, t, value, target, dead, death_note)
-		local damtype = death_note.damtype
+		local damtype = death_note and death_note.damtype
+		if not damtype then return end
 		if not t.dts[damtype] then return end
 		self.elemental_surge = self.elemental_surge or {}
 		self.elemental_surge[damtype] = (self.elemental_surge[damtype] or 0) + value

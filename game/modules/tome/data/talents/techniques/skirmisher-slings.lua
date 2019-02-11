@@ -24,7 +24,7 @@ newTalent {
 	points = 5,
 	require = { stat = { dex=function(level) return 12 + level * 6 end }, },
 	mode = "passive",
-	getDamage = function(self, t) return 0 end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	ammo_mastery_reload = function(self, t)
 		return math.floor(self:combatTalentScale(t, 0, 2.7, "log"))
@@ -36,8 +36,8 @@ newTalent {
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
 		local reloads = t.ammo_mastery_reload(self, t)
-		return ([[Increases weapon damage by %d%% when using slings.
-		Also, increases your reload rate by %d.]]):format(damage, inc * 100, reloads)
+		return ([[Increases weapon damage by %d%% and physical power by 30 when using slings.
+		Also, increases your reload rate by %d.]]):format(inc * 100, reloads)
 	end,
 }
 

@@ -180,12 +180,12 @@ newTalent{
 	points = 5,
 	require = { stat = { str=function(level) return 12 + level * 6 end }, },
 	mode = "passive",
-	getDamage = function(self, t) return 0 end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
-		return ([[Increases weapon damage by %d%% when using swords, axes or maces.]]):
+		return ([[Increases weapon damage by %d%% and physical power by 30 when using swords, axes or maces.]]):
 		format(100*inc)
 	end,
 }
@@ -198,12 +198,12 @@ newTalent{
 	points = 5,
 	require = { stat = { dex=function(level) return 10 + level * 6 end }, },
 	mode = "passive",
-	getDamage = function(self, t) return 0 end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
-		return ([[Increases weapon damage by %d%% when using daggers.]]):
+		return ([[Increases weapon damage by %d%% and physical power by 30 when using daggers.]]):
 		format(100*inc)
 	end,
 }
@@ -216,12 +216,12 @@ newTalent{
 	points = 5,
 	require = { stat = { str=function(level) return 10 + level * 6 end, dex=function(level) return 10 + level * 6 end }, },
 	mode = "passive",
-	getDamage = function(self, t) return 0 end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
-		return ([[Increases weapon damage by %d%% when using exotic weapons.]]):
+		return ([[Increases weapon damage by %d%% and physical power by 30 when using exotic weapons.]]):
 		format(100*inc)
 	end,
 }

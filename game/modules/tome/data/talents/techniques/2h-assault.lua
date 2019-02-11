@@ -64,7 +64,7 @@ newTalent{
 	require = techs_req2,
 	points = 5,
 	cooldown = 0,
-	stamina = 16,
+	stamina = 8,
 	tactical = { ATTACK = { weapon = 2 }, CLOSEIN = 0.5 },
 	requires_target = true,
 	is_melee = true,

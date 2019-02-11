@@ -105,17 +105,17 @@ uberTalent{
 	end} },
 	-- called by _M:combatArmor in mod\class\interface\Combat.lua
 	ArmourBonus = function(self, t) return math.max(30, 0.5*self:getCon()) end,
-	on_learn = function(self, t)
-		self:attr("darkness_darkens", 1)
-	end,
-	on_unlearn = function(self, t)
-		self:attr("darkness_darkens", -1)
+	getStealth = function(self, t) return 30 end,
+	passives = function(self, t, p)
+		self:talentTemporaryValue(p, "inc_stealth", t.getStealth(self, t))
+		self:talentTemporaryValue(p, "darkness_darkens", 1)
 	end,
 	info = function(self, t)
-		return ([[You know how to protect yourself with the deepest shadows. As long as you stand on an unlit tile you gain %d armour, 50%% armour hardiness and 20%% evasion.
+		return ([[You know how to protect yourself with the deepest shadows. As long as you stand on an unlit tile you gain %d armour, 50%% armour hardiness, and 20%% evasion.
 		Any time you deal darkness damage, you will unlight both the target tile and yours.
+		Passively increases your stealth rating by %d.
 		The armor bonus scales with your Constitution.]])
-		:format(t.ArmourBonus(self,t))
+		:format(t.ArmourBonus(self,t), t.getStealth(self, t))
 	end,
 }
 

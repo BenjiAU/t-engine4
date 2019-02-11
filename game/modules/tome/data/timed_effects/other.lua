@@ -35,6 +35,7 @@ newEffect{
 	status = "detrimental",
 	parameters = { stacks = 0},
 	charges = function(self, eff) return eff.stacks end,
+	no_stop_enter_worlmap = true, no_stop_resting = true,
 	updateEffect = function(self, eff)
 		eff.stacks = math.min(5, eff.stacks)
 		if eff.resists then self:removeTemporaryValue("resists", eff.resists) end
@@ -3588,11 +3589,10 @@ newEffect{
 	activate = function(self, eff)
 	end,
 	on_merge = function(self, old_eff, new_eff)
-		--old_eff.dur = new_eff.dur
 		old_eff.target = new_eff.target
 		return old_eff
 	end,
 	deactivate = function(self, eff)
-		self:setTarget(eff.target.actor, {x=eff.target.x, y=eff.target.y})
+		self:setTarget(eff.target.actor, eff.target.last)
 	end,
 }

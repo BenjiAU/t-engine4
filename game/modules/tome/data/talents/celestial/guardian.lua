@@ -68,15 +68,15 @@ newTalent{
 	require = divi_req_high2,
 	points = 5,
 	cooldown = 8,
-	positive = 25,
+	positive = 15,
 	tactical = { ATTACK = {LIGHT = 2} },
 	requires_target = true,
 	range = 1,
 	is_melee = true,
-	getWeaponDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1, 3) end,
-	getShieldDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1, 2, self:getTalentLevel(self.T_SHIELD_EXPERTISE)) end,
-	getLightDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 200) end,
-	radius = function(self, t) return math.floor(self:combatTalentScale(t, 2.5, 4.5)) end,
+	getWeaponDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1, 1.8) end,
+	getShieldDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1, 1.8, self:getTalentLevel(self.T_SHIELD_EXPERTISE)) end,
+	getLightDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 300) end,
+	radius = function(self, t) return math.min(math.floor(self:combatTalentScale(t, 2.5, 4.5), 8)) end,
 	action = function(self, t)
 		local shield, shield_combat = self:hasShield()
 		if not shield then

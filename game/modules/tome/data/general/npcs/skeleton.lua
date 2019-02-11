@@ -161,7 +161,7 @@ newEntity{ base = "BASE_NPC_SKELETON",
 	resolvers.inscriptions(1, "rune"),
 	resolvers.talents{
 		[Talents.T_WEAPON_COMBAT]={base=1, every=10, max=5},
-		[Talents.T_WEAPONS_MASTERY]={base=1, every=10, max=5},
+		[Talents.T_WEAPONS_MASTERY]={base=0, every=10, max=5},
 		[Talents.T_ARMOUR_TRAINING]={base=2, every=11, max=5},
 		[Talents.T_SHIELD_PUMMEL]={base=1, every=7, max=5},
 		[Talents.T_RIPOSTE]={base=3, every=7, max=7},

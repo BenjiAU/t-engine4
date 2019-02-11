@@ -27,7 +27,7 @@ newEntity{ define_as = "BEN_CRUTHDAR",
 	desc = [[This madman looks extremely dangerous. He wields a big axe and means to use it.
 A gloomy aura emanates from him.]],
 	level_range = {10, nil}, exp_worth = 2,
-	max_life = 250, life_rating = 15, fixed_rating = true,
+	max_life = 250, life_rating = 20, fixed_rating = true,
 	max_stamina = 85,
 	stats = { str=20, dex=15, wil=18, con=20 },
 	rank = 4,
@@ -38,9 +38,12 @@ A gloomy aura emanates from him.]],
 
 	body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1 },
 	resolvers.equip{ {type="weapon", subtype="battleaxe", tome_drops="boss", force_drop=true, autoreq=true}, },
+	resolvers.equip{ {type="armor", subtype="massive", force_drop=true, tome_drops="boss", autoreq=true}, },
+
 	resolvers.drops{chance=100, nb=2, {tome_drops="boss"} },
 
 	resolvers.talents{
+		[Talents.T_WEAPON_COMBAT]=1,
 		[Talents.T_GLOOM]=3,
 		[Talents.T_WEAKNESS]=3,
 		[Talents.T_DISMAY]=3,
@@ -53,9 +56,10 @@ A gloomy aura emanates from him.]],
 	resolvers.sustains_at_birth(),
 
 	autolevel = "warriorwill",
+	auto_classes={{class="Cursed", start_level=10, level_rate=75},},
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	ai_tactic = resolvers.tactic"melee",
-	resolvers.inscriptions(1, "healing infusion"),
+	resolvers.inscriptions(2, "healing infusion"),
 
 	on_die = function(self, who)
 		local Chat = require "engine.Chat"

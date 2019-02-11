@@ -345,6 +345,7 @@ newTalent{
 	require = gifts_req4,
 	mode = "passive",
 	points = 5,
+	no_npc_use = true,
 	-- Effects implemented in setupsummon function in data\talents\gifts\gifts.lua
 	lifetime = function(self,t)	return math.floor(self:combatTalentScale(t, 5, 17, "log", 0, 4)) end,
 	DamReduc = function(self,t)

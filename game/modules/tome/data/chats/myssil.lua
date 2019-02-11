@@ -36,7 +36,10 @@ newChat{ id="welcome",
 I am Protector Myssil. Welcome to Zigur.]],
 	answers = {
 		{"I require all the help I can get, not for my sake but for the town of Derth, to the northwest of here.", jump="save-derth", cond=function(npc, player) local q = player:hasQuest("lightning-overload") return q and q:isCompleted("saved-derth") and not q:isCompleted("tempest-entrance") and not q:isStatus(q.DONE) end},
-		{"Protector, I have dispatched the Tempest as you commanded.", jump="tempest-dead", cond=function(npc, player) local q = player:hasQuest("lightning-overload") return q and q:isCompleted("tempest-entrance") and not q:isCompleted("antimagic-reward") and q:isStatus(q.DONE) end},
+		{"Protector, I have dispatched the Tempest as you commanded.", jump="tempest-dead", cond=function(npc, player) 
+			local q = player:hasQuest("lightning-overload") 
+			return q and q:isCompleted("tempest-urkis-slain") and not q:isCompleted("antimagic-reward")
+		end},
 		{"Farewell, Protector."},
 	}
 }
@@ -76,6 +79,7 @@ This shall help you on your travels. Farewell!]],
 				game.party:learnLore("zigur-purging-trap")
 			end	
 			player:hasQuest("lightning-overload"):setStatus(engine.Quest.COMPLETED, "antimagic-reward")
+			player:setQuestStatus("lightning-overload", engine.Quest.COMPLETED)
 		end},
 	}
 }

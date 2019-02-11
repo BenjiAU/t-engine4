@@ -76,6 +76,7 @@ newTalent{
 		if heal > 0 then
 			local amt = (heal / 100) * (t.getTurn(self, t) * game.energy_to_act)
 			self.energy.value = game.energy_to_act + amt
+			self.energy.value = math.min(self.energy.value, game.energy_to_act * 2.5)
 			game.logSeen(self, "#LIGHT_GREEN#%s gains %d%% of a turn from the healing.#LAST#", self.name, amt / 10 )
 		end
 	end,
@@ -83,7 +84,7 @@ newTalent{
 		local eq = t.getEq(self, t)
 		local turn = t.getTurn(self, t)
 		return ([[Your fungus reaches into the primordial ages of the world, granting you ancient instincts.
-		Each time you receive a direct heal you gain %d%% of a turn per 100 life healed.
+		Each time you receive a direct heal you gain %d%% of a turn per 100 life healed.  This effect can't add energy past 2.5 stored turns.
 		Also, regeneration effects on you will decrease your equilibrium by %0.1f each turn.
 		The turn gain increases with your Mindpower.]]):
 		format(turn * 100, eq)
@@ -98,7 +99,7 @@ newTalent{
 	equilibrium = 22,
 	cooldown = 15,
 	tactical = { HEAL = function(self, t, target) return self.life_regen > 0 and math.log(self.life_regen + 1)/2 or nil end },
-	getMult = function(self, t) return util.bound(6 + self:getTalentLevel(t), 3, 12) end,
+	getMult = function(self, t) return util.bound(3 + self:getTalentLevel(t), 3, 12) end,
 	action = function(self, t)
 		local amt = self:mindCrit(self.life_regen * t.getMult(self, t))
 

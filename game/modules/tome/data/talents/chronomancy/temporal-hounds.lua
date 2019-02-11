@@ -23,7 +23,7 @@
 summonTemporalHound = function(self, t)  
 	if game.zone.wilderness then return false end
 	if self.summoner then return false end
-	
+	if not game.level then return false end
 	local x, y = util.findFreeGrid(self.x, self.y, 8, true, {[Map.ACTOR]=true})
 	if not x then
 		return false
@@ -98,7 +98,6 @@ summonTemporalHound = function(self, t)
 		local p = self.summoner:isTalentActive(self.summoner.T_TEMPORAL_HOUNDS)
 		local tid = self.summoner:getTalentFromId(self.summoner.T_TEMPORAL_HOUNDS)
 		if p then
-			p.hounds = p.hounds - 1
 			if p.rest_count == 0 then p.rest_count = self.summoner:getTalentCooldown(tid) end
 		end
 	end
@@ -144,6 +143,16 @@ summonTemporalHound = function(self, t)
 	self:attr("summoned_times", 1)
 end
 
+countHounds = function(self)
+	local hounds = 0
+	for _, e in pairs(game.level.entities) do
+		if e and e.summoner and e.summoner == self and e.name == "temporal hound" and game.party:hasMember(e) then 
+			hounds = hounds + 1 
+		end
+	end
+	return hounds
+end
+
 newTalent{
 	name = "Temporal Hounds",
 	type = {"chronomancy/temporal-hounds", 1},
@@ -158,10 +167,12 @@ newTalent{
 	callbackOnActBase = function(self, t)
 		local p = self:isTalentActive(t.id)
 		if p.rest_count > 0 then p.rest_count = p.rest_count - 1 end
-		if p.rest_count == 0 and p.hounds < p.max_hounds then
-			summonTemporalHound(self, t)
-			p.rest_count = self:getTalentCooldown(t)
-			p.hounds = p.hounds + 1
+		if p.rest_count == 0 then
+			local hounds = countHounds(self)
+			if hounds < p.max_hounds then
+				summonTemporalHound(self, t)
+				p.rest_count = self:getTalentCooldown(t)
+			end
 		end
 	end,
 	iconOverlay = function(self, t, p)
@@ -190,24 +201,22 @@ newTalent{
 		
 		return {
 			rest_count = self:getTalentCooldown(t), 
-			hounds = 1, max_hounds = 3
+			max_hounds = 3
 		}
 	end,
 	deactivate = function(self, t, p)
 		-- unsummon the hounds :(
 		if game.party:hasMember(self) then
-			for i=1, p.hounds do
-				local e = game.party:findMember({type="hound"})
+			for i, e in ripairs(game.party.m_list) do
 				if e and e.summoner and e.summoner == self and e.name == "temporal hound" then
 					e.summon_time = 0
 					game.party:removeMember(e, true)
 				end
 			end
-		else
-			for _, e in pairs(game.level.entities) do
-				if e and e.summoner and e.summoner == self and e.name == "temporal hound" then
-					e.summon_time = 0
-				end
+		end
+		for _, e in pairs(game.level.entities) do
+			if e and e.summoner and e.summoner == self and e.name == "temporal hound" then
+				e.summon_time = 0
 			end
 		end
 		return true
@@ -265,9 +274,8 @@ newTalent{
 		if self:getTalentLevel(t) >=5 then
 			local p = self:isTalentActive(self.T_TEMPORAL_HOUNDS)
 			local talent = self:getTalentFromId(self.T_TEMPORAL_HOUNDS)
-			if p.hounds < p.max_hounds then
+			if countHounds(self) < p.max_hounds then
 				summonTemporalHound(self, talent)
-				p.hounds = p.hounds + 1
 			end
 		end
 	
@@ -371,7 +379,7 @@ newTalent{
 	direct_hit = true,
 	on_pre_use = function(self, t, silent)
 		local p = self:isTalentActive(self.T_TEMPORAL_HOUNDS)
-		if not p or p.hounds < 1 then
+		if not p or countHounds(self) < 1 then
 			if not silent then
 				game.logPlayer(self, "You must have temporal hounds to use this talent.")
 			end

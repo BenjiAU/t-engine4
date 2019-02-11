@@ -78,8 +78,9 @@ newBirthDescriptor{
 	talents = {
 		[ActorTalents.T_CORRUPTED_STRENGTH] = 1,
 		[ActorTalents.T_WEAPON_COMBAT] = 1,
+		[ActorTalents.T_WEAPONS_MASTERY] = 1,
 		[ActorTalents.T_DRAIN] = 1,
-		[ActorTalents.T_REND] = 1,
+		[ActorTalents.T_ARMOUR_TRAINING] = 1,
 	},
 	copy = {
 		resolvers.auto_equip_filters{
@@ -95,7 +96,7 @@ newBirthDescriptor{
 		resolvers.equipbirth{ id=true,
 			{type="weapon", subtype="waraxe", name="iron waraxe", autoreq=true, ego_chance=-1000},
 			{type="weapon", subtype="waraxe", name="iron waraxe", autoreq=true, ego_chance=-1000},
-			{type="armor", subtype="light", name="rough leather armour", autoreq=true, ego_chance=-1000}
+			{type="armor", subtype="heavy", name="iron mail armour", autoreq=true, ego_chance=-1000}
 		},
 	},
 	copy_add = {

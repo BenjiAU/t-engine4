@@ -97,7 +97,6 @@ newTalent{
 	name = "Throwing Knives",
 	type = {"technique/throwing-knives", 1},
 	points = 5,
-	random_ego = "attack",
 	require = {
 		stat = { dex=function(level) return 12 + (level-1) * 2 end },
 		level = function(level) return 0 + (level-1) * 8  end,
@@ -119,7 +118,8 @@ newTalent{
 	end,
 	speed = "throwing",
 	proj_speed = 10,
-	tactical = { ATTACK = { PHYSICAL = 2 } },
+	tactical = { ATTACK = { PHYSICAL = 0.2 } },
+	no_break_stealth = true,
 	range = function(self, t) return math.floor(self:combatTalentLimit(t, 10, 4.2, 7)) end,
 	requires_target = true,
 	target = function(self, t)
@@ -355,6 +355,7 @@ newTalent{
 	speed = "throwing",
 	proj_speed = 10,
 	tactical = { ATTACK = { NATURE = 2 } },
+	no_break_stealth = true,
 	range = function(self, t) 
 		local t = self:getTalentFromId(self.T_THROWING_KNIVES)
 		return self:getTalentRange(t) 

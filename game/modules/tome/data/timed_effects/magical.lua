@@ -30,6 +30,7 @@ newEffect{
 	name = "ITEM_NUMBING_DARKNESS", image = "effects/bane_blinded.png",
 	desc = "Numbing Darkness",
 	long_desc = function(self, eff) return ("The target is losing hope, all damage it does is reduced by %d%%."):format(eff.reduce) end,
+	charges = function(self, eff) return (tostring(math.floor(eff.reduce))) end,
 	type = "magical",
 	subtype = { darkness=true,}, no_ct_effect = true,
 	status = "detrimental",
@@ -53,6 +54,7 @@ newEffect{
 	name = "ITEM_BLIGHT_ILLNESS", image = "talents/decrepitude_disease.png",
 	desc = "Illness",
 	long_desc = function(self, eff) return ("The target is infected by a disease, reducing its dexterity, strength, and constitution by %d."):format(eff.reduce) end,
+	charges = function(self, eff) return (tostring(math.floor(eff.reduce))) end,
 	type = "magical",
 	subtype = {disease=true, blight=true},
 	status = "detrimental",
@@ -76,6 +78,7 @@ newEffect{
 	name = "ITEM_ACID_CORRODE", image = "talents/acidic_skin.png",
 	desc = "Armor Corroded",
 	long_desc = function(self, eff) return ("The target has been splashed with acid, reducing armour by %d%% (#RED#%d#LAST#)."):format(eff.pct*100 or 0, eff.reduce or 0) end,
+	charges = function(self, eff) return (tostring(math.floor(eff.reduce))) end,
 	type = "magical",
 	subtype = { acid=true, sunder=true },
 	status = "detrimental",
@@ -85,7 +88,7 @@ newEffect{
 	on_timeout = function(self, eff)
 	end,
 	activate = function(self, eff)
-		local armor = self.combat_armor * eff.pct
+		local armor = math.max(0, self.combat_armor * eff.pct)
 		eff.reduce = armor
 		self:effectTemporaryValue(eff, "combat_armor", -armor)
 	end,
@@ -514,6 +517,7 @@ newEffect{
 	name = "BANE_CONFUSED", image = "effects/bane_confused.png",
 	desc = "Bane of Confusion",
 	long_desc = function(self, eff) return ("The target is confused, acting randomly (chance %d%%), unable to perform complex actions and takes %0.2f darkness damage per turn."):format(eff.power, eff.dam) end,
+	charges = function(self, eff) return (tostring(math.floor(eff.power)).."%") end,	
 	type = "magical",
 	subtype = { bane=true, confusion=true },
 	status = "detrimental",

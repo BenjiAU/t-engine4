@@ -34,7 +34,6 @@ newTalent{
 		local tg = {type="beam", range=self:getTalentRange(t), talent=t}
 		return tg
 	end,
-	allow_for_arcane_combat = true,
 	getDigs = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5, "log")) end,
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 30, 300) end,
 	action = function(self, t)

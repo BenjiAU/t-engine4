@@ -823,6 +823,26 @@ newEffect{
 }
 
 newEffect{
+	name = "HIGHBORN_WRATH", image = "talents/higher_heal.png",
+	desc = "Wrath of the Highborn",
+	long_desc = function(self, eff) return ("The target calls upon its inner resources, improving all damage by %d%% and reducing all damage taken by %d%%."):format(eff.power, eff.power) end,
+	type = "physical",
+	subtype = { },
+	status = "beneficial",
+	parameters = { power=10 },
+	on_gain = function(self, err) return "#Target# radiates power." end,
+	on_lose = function(self, err) return "#Target#'s aura of power vanishes." end,
+	activate = function(self, eff)
+		eff.pid1 = self:addTemporaryValue("inc_damage", {all=eff.power})
+		eff.pid2 = self:addTemporaryValue("resists", {all=eff.power})
+	end,
+	deactivate = function(self, eff)
+		self:removeTemporaryValue("inc_damage", eff.pid1)
+		self:removeTemporaryValue("resists", eff.pid2)
+	end,
+}
+
+newEffect{
 	name = "SHELL_SHIELD", image = "talents/shell_shield.png",
 	desc = "Shell Shield",
 	long_desc = function(self, eff) return ("The target takes cover in its shell, reducing all damage taken by %d%%."):format(eff.power) end,
@@ -3209,12 +3229,10 @@ newEffect{
 		self:effectParticles(eff, {type="circle", args={toback=true, oversize=1.8, base_rot=180, a=255, shader=true, appear=12, img="marked_death_aura", speed=0, radius=0}})
 	end,
 	deactivate = function(self, eff)
-		if eff.turns >= eff.max_dur then
-			eff.src.__project_source = eff
-			eff.src:project({type="hit", x=self.x, y=self.y}, self.x, self.y, DamageType.PHYSICAL, eff.dam, nil)
-			game.level.map:particleEmitter(self.x, self.y, 1, "blood")
-			eff.src.__project_source = nil
-		end
+		eff.src.__project_source = eff
+		eff.src:project({type="hit", x=self.x, y=self.y}, self.x, self.y, DamageType.PHYSICAL, eff.dam, nil)
+		game.level.map:particleEmitter(self.x, self.y, 1, "blood")
+		eff.src.__project_source = nil
 	end,
 	on_timeout = function(self, eff)
 		eff.turns = eff.turns + 1

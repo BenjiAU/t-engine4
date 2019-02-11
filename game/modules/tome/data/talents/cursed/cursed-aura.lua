@@ -459,7 +459,7 @@ newTalent{
 			no_breath = 1,
 			disarm_immune = 1,
 			never_move = 1,
-			--no_drops = true, -- remove to drop the weapon
+			no_drops = true, -- remove to drop the weapon
 			exp_worth = 0,
 			resolvers.talents{
 				[Talents.T_WEAPON_COMBAT]={base=1, every=10},
@@ -479,6 +479,8 @@ newTalent{
 			summon_quiet = true,
 			on_die = function(self, who)
 				-- Add weapon to inventory
+				local _, item, id = self:findInAllInventoriesByObject(self.cursed_item)
+				if item then self:removeObject(id, item) end
 				self.summoner:addObject(self.summoner.INVEN_INVEN, self.cursed_item )
 			end,
 		}

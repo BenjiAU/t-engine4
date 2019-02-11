@@ -286,7 +286,7 @@ function _M:seen_by(who)
 	
 	-- If we have no current target but the passed target is stealthed, delay aquiring for 3 turns but make sure they can't avoid aggro entirely
 	if who_target:attr("stealthed_prevents_targetting") and not (self.ai_target and self.ai_target.actor) then
-		self:setEffect(self.EFF_STEALTH_SKEPTICAL, 3, {target = {actor=who_target, x=who_target.x, y=who_target.y}})
+		self:setEffect(self.EFF_STEALTH_SKEPTICAL, 3, {target = {actor=who_target, last = who.ai_state.target_last_seen}})
 		return
 	end
 	self:setTarget(who_target, who.ai_state.target_last_seen)

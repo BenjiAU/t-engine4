@@ -56,8 +56,6 @@ newEntity{ base = "BASE_NPC_YAECH", define_as = "MURGOL",
 		[Talents.T_PYROKINESIS]=2,
 		[Talents.T_MINDLASH]=2,
 		[Talents.T_MINDHOOK]=2,
-		[Talents.T_KINETIC_SHIELD]=3,
-		[Talents.T_THERMAL_SHIELD]=3,
 	},
 	resolvers.sustains_at_birth(),
 

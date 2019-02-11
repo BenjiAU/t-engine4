@@ -59,12 +59,12 @@ newTalent{
 	points = 5,
 	require = { stat = { cun=function(level) return 12 + level * 6 end }, },
 	mode = "passive",
-	getDamage = function(self, t) return 0 end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
-		return ([[Increases all unarmed damage by %d%% (including grapples and kicks).
+		return ([[Increases all unarmed damage by %d%% and physical power by 30 (including grapples and kicks).
 		Note that brawlers naturally gain 0.5 Physical Power per character level while unarmed (current brawler physical power bonus: %0.1f) and attack 20%% faster while unarmed.]]):
 		format(100*inc, self.level * 0.5)
 	end,

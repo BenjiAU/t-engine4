@@ -1529,6 +1529,7 @@ local standard_rnd_boss_adjust = function(b)
 
 		-- Early game melee don't have much mobility which makes randbosses too good at running and pulling more enemies in or being generally frustrating
 		b.ai_tactic.escape = -1
+		b.ai_tactic.safe_range = 1
 
 		-- Cap the talent level of crippling debuffs (stun, ...) at 1 + floor(level / 10)
 		-- rnd_boss_restrict is the right way to handle this for most things

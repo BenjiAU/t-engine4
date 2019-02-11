@@ -82,13 +82,13 @@ newTalent{
 	callbackOnDealDamage = function(self, t, val, target, dead, death_note)
 		if not dead or self.turn_procs.overkilling then return end
 
-		self.turn_procs.overkill = true
+		self.turn_procs.overkilling = true
 		local dam = (target.die_at - target.life) * t.getOversplash(self, t) / 100
 		local incdam = self.inc_damage
 		self.inc_damage = {}
 		local ok, err = pcall(function() self:project({type="ball", radius=2, selffire=false, x=target.x, y=target.y, talent=t}, target.x, target.y, DamageType.BLIGHT, dam, {type="acid"}) end)
 		self.inc_damage = incdam
-		self.turn_procs.overkill = nil
+		self.turn_procs.overkilling = nil
 		if not ok then error(err) end
 	end,
 	activate = function(self, t)

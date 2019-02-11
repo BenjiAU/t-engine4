@@ -37,24 +37,23 @@ racial_req4 = {
 newTalentType{ type="race/higher", name = "higher", generic = true, description = "The various racial bonuses a character can have." }
 
 newTalent{
-	short_name = "HIGHER_HEAL",
-	name = "Gift of the Highborn",
+	short_name = "HIGHER_HEAL",  -- Backwards compatibility, two tier 1 racials were swapped
+	name = "Wrath of the Highborn",
 	type = {"race/higher", 1},
 	require = racial_req1,
 	points = 5,
 	no_energy = true,
-	cooldown = function(self, t) return math.ceil(self:combatTalentLimit(t, 10, 45, 25)) end, -- Limit >10
-	tactical = { HEAL = 2 },
-	on_pre_use = function(self, t) return not self:hasEffect(self.EFF_REGENERATION) end,
-	getHealMod = function(self, t) return self:combatTalentLimit(t, 50, 10, 30) end,
+	cooldown = function(self, t) return math.ceil(self:combatTalentLimit(t, 5, 45, 25)) end, -- Limit > 5
+	getPower = function(self, t) return self:combatStatScale("mag", 11, 25) end,
+	tactical = { ATTACK = 1, DEFEND = 1 },
 	action = function(self, t)
-		self:setEffect(self.EFF_REGENERATION, 10, {power=5 + self:getWil() * 0.5})
-		self:setEffect(self.EFF_EMPOWERED_HEALING, 10, {power=t.getHealMod(self, t) / 100})
+		self:setEffect(self.EFF_HIGHBORN_WRATH, 5, {power=t.getPower(self, t)})
 		return true
 	end,
 	info = function(self, t)
-		return ([[Call upon the gift of the highborn to regenerate your body for %d life every turn and increase healing mod by %d%% for 10 turns.
-		The life healed will increase with your Willpower.]]):format(5 + self:getWil() * 0.5, t.getHealMod(self, t))
+		return ([[Call upon the power of the Highborn, increasing all damage by %d%% and reducing all damage taken by %d%% for 5 turns.
+		The bonus will increase with your Magic.]]):
+		format(t.getPower(self, t), t.getPower(self, t))
 	end,
 }
 
@@ -309,41 +308,45 @@ newTalent{
 ------------------------------------------------------------------
 newTalentType{ type="race/thalore", name = "thalore", generic = true, is_nature=true, description = "The various racial bonuses a character can have." }
 newTalent{
-	short_name = "THALOREN_WRATH",
-	name = "Wrath of the Woods",
+	short_name = "THALOREN_WRATH",  -- Backwards compatibility..
+	name = "Gift of the Woods",
 	type = {"race/thalore", 1},
 	require = racial_req1,
 	points = 5,
 	no_energy = true,
-	cooldown = function(self, t) return math.ceil(self:combatTalentLimit(t, 5, 45, 25)) end, -- Limit > 5
-	getPower = function(self, t) return self:combatStatScale("wil", 11, 20) end,
-	tactical = { ATTACK = 1, DEFEND = 1 },
+	cooldown = function(self, t) return math.ceil(self:combatTalentLimit(t, 10, 45, 25)) end, -- Limit >10
+	tactical = { HEAL = 2 },
+	on_pre_use = function(self, t) return not self:hasEffect(self.EFF_REGENERATION) end,
+	getHealMod = function(self, t) return self:combatTalentLimit(t, 50, 10, 30) end,
 	action = function(self, t)
-		self:setEffect(self.EFF_ETERNAL_WRATH, 5, {power=t.getPower(self, t)})
+		self:setEffect(self.EFF_REGENERATION, 10, {power=5 + self:getWil() * 0.5})
+		self:setEffect(self.EFF_EMPOWERED_HEALING, 10, {power=t.getHealMod(self, t) / 100})
 		return true
 	end,
 	info = function(self, t)
-		return ([[Call upon the power of the Eternals, increasing all damage by %d%% and reducing all damage taken by %d%% for 5 turns.
-		The bonus will increase with your Willpower.]]):
-		format(t.getPower(self, t), t.getPower(self, t))
+		return ([[Call upon nature to regenerate your body for %d life every turn and increase healing mod by %d%% for 10 turns.
+		The life healed will increase with your Willpower.]]):format(5 + self:getWil() * 0.5, t.getHealMod(self, t))
 	end,
 }
 
 newTalent{
-	name = "Unshackled",
+	name = "Verdant",
+	short_name = "UNSHACKLED",
 	type = {"race/thalore", 2},
 	require = racial_req2,
 	points = 5,
 	mode = "passive",
-	getSave = function(self, t) return self:combatTalentScale(t, 6, 25, 0.75) end,
+	getAffinity = function(self, t) return self:combatTalentScale(t, 25, 35) end,
 	passives = function(self, t, p)
-		self:talentTemporaryValue(p, "combat_physresist", t.getSave(self, t))
-		self:talentTemporaryValue(p, "combat_mentalresist", t.getSave(self, t))
+		self:talentTemporaryValue(p, "damage_affinity", {
+			[DamageType.ACID] = t.getAffinity(self, t),
+			[DamageType.NATURE] = t.getAffinity(self, t)
+			})
 	end,
 	info = function(self, t)
-		return ([[Thaloren have always been a free people, living in their beloved forest and never caring much about the world outside.
-		Increase Physical and Mental Save by +%d.]]):
-		format(t.getSave(self, t))
+		return ([[Thaloren have an affinity for natural elements allowing them to heal for a portion of damage taken from them.
+		You gain %d%% Nature and Acid damage affinity.]]):
+		format(t.getAffinity(self, t))
 	end,
 }
 
@@ -404,26 +407,31 @@ newTalent{
 				body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1 },
 
 				rank = 3,
-				life_rating = 13,
+				life_rating = 16,
 				max_life = resolvers.rngavg(50,80),
 				infravision = 10,
-
 				autolevel = "none",
-				ai = "summoned", ai_real = "tactical", ai_state = { talent_in=2, },
+				ai = "summoned", ai_real = "tactical", ai_state = { talent_in=1, },
 				stats = {str=0, dex=0, con=0, cun=0, wil=0, mag=0},
-				combat = { dam=resolvers.levelup(resolvers.rngavg(15,25), 1, 1.3), atk=resolvers.levelup(resolvers.rngavg(15,25), 1, 1.6), dammod={str=1.1} },
+				combat = { dam=resolvers.levelup(resolvers.rngavg(15,25), 1, 2), atk=resolvers.levelup(resolvers.rngavg(15,25), 1, 2), dammod={str=3} },
+				combat_dam = resolvers.levelup(1, 1, 2),
+				combat_atk = resolvers.levelup(1, 1, 2),
+
 				inc_stats = {
-					str=25 + self:combatScale(self:getWil() * self:getTalentLevel(t), 0, 0, 100, 500, 0.75),
-					dex=18,
-					con=10 + self:combatTalentScale(t, 3, 10, 0.75),
+					str=25 + self:getWil(),
+					dex=18 + self:getWil(),
+					con=10 + self:getWil(),
+					wil=25 + self:getWil(),
+					cun=25 + self:getWil(),
 				},
-				level_range = {1, nil}, exp_worth = 0,
+				level_range = {1, self.level}, exp_worth = 0,
 				silent_levelup = true,
 
 				resists = {all = self:combatGetResist(DamageType.BLIGHT)},
 
-				combat_armor = 13, combat_def = 8,
-				resolvers.talents{ [Talents.T_STUN]=self:getTalentLevelRaw(t), [Talents.T_KNOCKBACK]=self:getTalentLevelRaw(t), [Talents.T_TAUNT]=self:getTalentLevelRaw(t), },
+				combat_armor = 13 + self.level / 2, combat_def = 8,
+				combat_armor_hardiness = 30,  -- 50% total
+				resolvers.talents{ [Talents.T_STUN]=self:getTalentLevel(t), [Talents.T_KNOCKBACK]=self:getTalentLevel(t), [Talents.T_TAUNT]=self:getTalentLevel(t), },
 
 				faction = self.faction,
 				summoner = self, summoner_gain_exp=true,
@@ -437,10 +445,12 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
+		local base_stats = self:combatScale(self:getWil() * self:getTalentLevel(t), 25, 0, 125, 500, 0.75)
 		return ([[Nature is with you; you can always feel the call of the woods.
 		Summons two elite Treants to your side for 8 turns.
 		The treants have a global resistance equal to your blight resistance, and can stun, knockback and taunt your foes.
-		Their power increases with your Willpower and Talent Level.]]):format()
+		Your Willpower (%d) will be added to all of their non-Magic primary stats and their talent levels will increase with your Nature's Pride talent level.
+		Your increased damage, damage penetration, and many other stats will be inherited.]]):format(self:getWil())
 	end,
 }
 
@@ -1119,7 +1129,7 @@ newTalent{
 	cooldown = function(self, t) return math.ceil(self:combatTalentLimit(t, 6, 47, 35)) end, -- Limit >6
 	getDuration = function(self, t) return math.floor(self:combatTalentLimit(t, 15, 5, 10)) end,
 	on_levelup_close = function(self, t, lvl, old_lvl, lvl_raw, old_lvl_raw)
-		if lvl >= 5 and old_lvl < 5 then
+		if lvl_raw >= 5 and old_lvl_raw < 5 then
 			self.inscriptions_slots_added = self.inscriptions_slots_added - 1
 			game.logPlayer(self, "#PURPLE#Your mastery over inscriptions is unmatched! One more inscriptions slot available to buy.")
 		end

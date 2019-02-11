@@ -122,7 +122,7 @@ newTalent{
 			tg.radius,
 			5, nil,
 			MapEffect.new{color_br=30, color_bg=180, color_bb=60, effect_shader="shader_images/retch_effect.png"},
-			nil, self:spellFriendlyFire()
+			nil
 		)
 		game.logSeen(self, "%s #YELLOW_GREEN#VOMITS#LAST# on the ground!", self.name:capitalize())
 		game:playSoundNear(self, "talents/cloud")
@@ -144,7 +144,7 @@ newTalent{
 	require = undeads_req4,
 	points = 5,
 	cooldown = 10,
-	tactical = { ATTACK = {BLIGHT = {disease = 3}} },  -- Ghouls really like making more ghouls
+	tactical = { ATTACK = {BLIGHT = {disease = 6}} },  -- Ghouls really like making more ghouls
 	range = 1,
 	requires_target = true,
 	is_melee = true,
@@ -197,10 +197,6 @@ newTalent{
 				[Talents.T_STUN]={base=1, every=10, max=3},
 				[Talents.T_ROTTING_DISEASE]={base=1, max=1},  -- The scaling on this is completely insane, TL1 is plenty
 			},
-
-			--log_detail_ai = 2,
-
-			open_door = true,
 
 			blind_immune = 1,
 			see_invisible = 2,

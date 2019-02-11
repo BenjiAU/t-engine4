@@ -86,15 +86,14 @@ newBirthDescriptor
 	desc = {
 		"Highers are a special branch of Humans that have been imbued with latent magic since the Age of Allure.",
 		"They usually do not breed with other Humans, trying to keep their blood 'pure'.",
-		"They possess the #GOLD#Gift of the Highborn#WHITE# which allows them to regenerate their wounds once in a while.",
+		"They possess the #GOLD#Wrath of the Highborn#WHITE# which allows them to increase damage dealt and decrease damage taken once in a while.",
 		"#GOLD#Stat modifiers:",
 		"#LIGHT_BLUE# * +1 Strength, +1 Dexterity, +0 Constitution",
 		"#LIGHT_BLUE# * +1 Magic, +1 Willpower, +0 Cunning",
 		"#GOLD#Life per level:#LIGHT_BLUE# 11",
-		"#GOLD#Experience penalty:#LIGHT_BLUE# 15%",
+		"#GOLD#Experience penalty:#LIGHT_BLUE# 0%",
 	},
 	inc_stats = { str=1, mag=1, dex=1, wil=1 },
-	experience = 1.15,
 	talents_types = { ["race/higher"]={true, 0} },
 	talents = {
 		[ActorTalents.T_HIGHER_HEAL]=1,

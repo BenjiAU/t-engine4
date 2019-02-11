@@ -55,7 +55,7 @@ newTalent{
 		local mp = self:combatMindpower()
 		return{ 
 			str=15 + (fake and mp or self:mindCrit(mp)) * 2 * self:combatTalentScale(t, 0.2, 1, 0.75) + self:combatTalentScale(t, 2, 10, 0.75),
-			dex=15 + (fake and mp or self:mindCrit(mp)) * 2 * self:combatTalentScale(t, 0.2, 1, 0.75) + self:combatTalentScale(t, 2, 10, 0.75),
+			dex=15 + (fake and mp or self:mindCrit(mp)) * 1 * self:combatTalentScale(t, 0.2, 1, 0.75) + self:combatTalentScale(t, 2, 10, 0.75),
 			con=15 + self:callTalent(self.T_RESILIENCE, "incCon")
 		}
 	end,

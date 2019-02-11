@@ -2922,7 +2922,7 @@ newTalent{
 	is_melee = true,
 	range = 1,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 2, 6)) end,
+	getDuration = function(self, t) return 3 end,
 	on_pre_use = function(self, t)
 		if self:attr("never_move") then return false end
 		return true

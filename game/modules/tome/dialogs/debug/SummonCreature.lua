@@ -172,6 +172,9 @@ function _M:generateList()
 		m:resolve()
 		m:resolve(nil, true)
 		self:placeCreature(m)
+		game.level.dummy_count = game.level.dummy_count or 0
+		game.level.dummy_count = game.level.dummy_count + 1
+		m.name = m.name.."#RED#"..game.level.dummy_count.."#LAST#"
 	end})
 	
 	local chars = {}

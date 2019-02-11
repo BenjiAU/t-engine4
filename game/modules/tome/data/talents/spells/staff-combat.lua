@@ -96,12 +96,12 @@ newTalent{
 	mode = "passive",
 	require = spells_req2,
 	points = 5,
-	getDamage = function(self, t) return 0 end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
-		return ([[Increases weapon damage by %d%% when using staves.]]):
+		return ([[Increases weapon damage by %d%% and physical power by 30 when using staves.]]):
 		format(100 * inc)
 	end,
 }

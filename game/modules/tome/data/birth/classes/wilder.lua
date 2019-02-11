@@ -139,7 +139,6 @@ newBirthDescriptor{
 		["cunning/survival"]={false, 0},
 		["technique/shield-offense"]={true, 0.2},
 		["technique/2hweapon-assault"]={true, 0.2},
-		["technique/dualweapon-attack"]={true, 0.2},
 		["technique/combat-techniques-active"]={false, 0.2},
 		["technique/combat-techniques-passive"]={true, 0.2},
 		["technique/combat-training"]={true, 0.3},
@@ -149,6 +148,7 @@ newBirthDescriptor{
 		[ActorTalents.T_MEDITATION] = 1,
 		[ActorTalents.T_WEAPONS_MASTERY] = 1,
 		[ActorTalents.T_WEAPON_COMBAT] = 1,
+		[ActorTalents.T_ARMOUR_TRAINING] = 1,
 	},
 	copy = {
 		drake_touched = 2,

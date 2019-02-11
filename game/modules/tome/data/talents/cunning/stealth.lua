@@ -202,6 +202,7 @@ newTalent{
 	require = cuns_req4,
 	no_energy = true,
 	no_break_stealth = true,
+	no_npc_use = true,  -- This turns into a 100% crit hyperscaler with bonus crit mult pretty easily
 	points = 5,
 	stamina = 30,
 	cooldown = function(self, t) return self:combatTalentLimit(t, 10, 30, 15) end,

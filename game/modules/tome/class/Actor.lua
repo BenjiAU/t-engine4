@@ -2448,7 +2448,7 @@ function _M:onTakeHit(value, src, death_note)
 			game.logSeen(self, "#YELLOW#%s has been healed by a blast of positive energy!#LAST#", self.name:capitalize())
 			if value > 0 then
 				if self.player then
-					self:setEmote(Emote.new("The Sun Protects!", 45))
+					self:setEmote(require("engine.Emote").new("The Sun Protects!", 45))
 					world:gainAchievement("AVOID_DEATH", self)
 				end
 			end
@@ -2698,10 +2698,12 @@ function _M:emptyDrops()
 end
 
 function _M:die(src, death_note)
+	if self.in_resurrect then return end
 	if self.dead then self:disappear(src) self:deleteFromMap(game.level.map) if game.level:hasEntity(self) then game.level:removeEntity(self, true) end return true end
 
 	-- Self resurrect, mouhaha!
 	if self:attr("self_resurrect") and not self.no_resurrect then
+		self.in_resurrect = true
 		self:attr("self_resurrect", -1)
 		game.logSeen(self, self.self_resurrect_msg or "#LIGHT_RED#%s rises from the dead!", self.name:capitalize()) -- src, not self as the source, to make sure the player knows his doom ;>
 		local sx, sy = game.level.map:getTileToScreen(self.x, self.y, true)
@@ -2727,7 +2729,7 @@ function _M:die(src, death_note)
 			chat:invoke()
 			self.self_resurrect_chat = nil
 		end
-
+		self.in_resurrect = nil
 		return
 	end
 
@@ -6561,7 +6563,8 @@ function _M:canSeeNoCache(actor, def, def_pct)
 	end
 
 	-- Blindness means can't see anything
-	if self:attr("blind") then
+	if self:attr("blind") and not (actor == game.player) then
+
 		return false, 0
 	end
 	
