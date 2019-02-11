@@ -19,7 +19,7 @@
 
 require "engine.class"
 local Map = require "engine.Map"
-local BSP = require "engine.BSP"
+local BSP = require "engine.algorithms.BSP"
 require "engine.Generator"
 local RoomsLoader = require "engine.generator.map.RoomsLoader"
 

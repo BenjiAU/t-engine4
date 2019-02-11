@@ -75,6 +75,10 @@ newEntity{ base="BASE_NPC_ORC_GRUSHNAK", define_as = "GNARG",
 		[Talents.T_SHATTERING_SHOUT]={base=5, every=7, max=7},
 		[Talents.T_SECOND_WIND]={base=5, every=7, max=7},
 	},
+
+	resolvers.auto_equip_filters("Berserker"),
+	auto_classes={{class="Berserker", start_level=35, level_rate=75}},
+	
 	resolvers.sustains_at_birth(),
 }
 

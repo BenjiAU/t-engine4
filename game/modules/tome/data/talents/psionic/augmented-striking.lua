@@ -313,8 +313,8 @@ newTalent{
 	info = function(self, t)
 		return ([[Focus charged energy and strike an enemy for %d%% weapon damage as lightning.
 		Energy will then discharge from your weapon, doing an extra %0.2f lightning damage and halving their stun/daze/freeze/pin resistance for %d turns.
-		If Charged Shield is sustained and the target pinned it will increase the absorbed value by %0.2f.
-		If the target frozen the ice will melt in a flash of vapour, knocking back all creatures around it in radius 2.
+		If the target is pinned and Charged Shield is sustained, its absorb value will be increased by %0.2f.
+		If the target is frozen, the ice will melt in a flash of vapour, knocking back all creatures around it in radius 2.
 		The discharge damage will scale with your Mindpower.]]):
 		format(100 * self:combatTalentWeaponDamage(t, 0.5, 2.0), damDesc(self, DamageType.LIGHTNING, t.getDam(self, t)), t.getDur(self, t), 1.5 * damDesc(self, DamageType.LIGHTNING, t.getDam(self, t)))
 	end,

@@ -23,12 +23,12 @@ newTalent{
 	mode = "sustained",
 	points = 5,
 	require = cuns_req1,
-	sustain_stamina = 20,
-	mana = 0,
+	sustain_stamina = 10,
+	mana = 50,
 	cooldown = 5,
 	tactical = { BUFF = 2 },
-	getDamage = function(self, t) return 2 + self:combatTalentSpellDamage(t, 2, 50) end,
-	getManaCost = function(self, t) return 2 end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 1, 150) end,  -- This doesn't crit or generally scale easily so its safe to be aggressive
+	getManaCost = function(self, t) return 0 end,
 	activate = function(self, t)
 		local ret = {}
 		if core.shader.active(4) then
@@ -43,10 +43,9 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		local manacost = t.getManaCost(self, t)
-		return ([[Channel raw magical energy into your melee attacks; each blow you land will do an additional %.2f darkness damage and cost %.2f mana.
+		return ([[Channel raw magical energy into your melee attacks; each blow you land will do an additional %.2f darkness damage.
 		The damage will improve with your Spellpower.]]):
-		format(damDesc(self, DamageType.DARKNESS, damage), manacost)
+		format(damDesc(self, DamageType.DARKNESS, damage))
 	end,
 }
 
@@ -71,11 +70,12 @@ newTalent{
 	mode = "sustained",
 	points = 5,
 	cooldown = 5,
-	sustain_stamina = 40,
+	sustain_stamina = 10,
+	mana = 20,
 	require = cuns_req3,
 	range = 10,
 	tactical = { BUFF = 2 },
-	getManaRegen = function(self, t) return self:combatTalentScale(t, 1.5/5, 1, 0.75) / (1 - t.getAtkSpeed(self, t)/100) end, -- scale with atk speed bonus to allow enough mana for one shadow combat proc per turn at talent level 5
+	getManaRegen = function(self, t) return self:combatTalentScale(t, 1.5/5, 1, 0.75) / (1 - t.getAtkSpeed(self, t)/100) end,
 	getAtkSpeed = function(self, t) return self:combatTalentScale(t, 2.2, 11, 0.75) end,
 	activate = function(self, t)
 		local speed = t.getAtkSpeed(self, t)/100
@@ -103,19 +103,19 @@ newTalent{
 	name = "Shadowstep",
 	type = {"cunning/shadow-magic", 4},
 	points = 5,
-	random_ego = "attack",
 	cooldown = 6,
-	stamina = 30,
+	stamina = 20,
+	mana = 20,
 	require = cuns_req4,
 	tactical = { CLOSEIN = 2, DISABLE = { stun = 1 } },
-	range = function(self, t) return math.floor(self:combatTalentScale(t, 6, 10)) end,
+	range = function(self, t) return math.min(math.floor(self:combatTalentScale(t, 6, 10), 10)) end,
 	direct_hit = true,
 	requires_target = true,
 	is_melee = true,
 	is_teleport = true,
-	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
+	target = function(self, t) return {type="hit", range=self:getTalentRange(t), talent=t} end,
 	getDuration = function(self, t) return math.min(5, 2 + math.ceil(self:getTalentLevel(t) / 2)) end,
-	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1.2, 2.5) end,
+	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 0.8, 2) end,
 	action = function(self, t)
 		if self:attr("never_move") then game.logPlayer(self, "You cannot do that currently.") return end
 		

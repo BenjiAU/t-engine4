@@ -86,7 +86,7 @@ newEntity{ base = "BASE_LEATHER_CAP", define_as = "CROWN_ETERNAL_NIGHT",
 	level_range = {1, 50},
 	cost = 100,
 	rarity = 20, -- not particularly rare, to be loaded only with mummy NPCs
-	material_level = 3,
+	material_level = 4,
 	wielder = {
 		combat_armor = 3,
 		fatigue = 3,

@@ -27,7 +27,7 @@ newEntity{ base = "BASE_NPC_HORROR", define_as="WEIRDLING_BEAST",
 	killer_message = "and slowly consumed",
 	level_range = {19, nil}, exp_worth = 3,
 	rank = 3.5,
-	autolevel = "warriormage",
+	autolevel = "caster",
 	max_life = 300, life_rating = 16,
 	combat_armor = 10, combat_def = 0,
 
@@ -72,6 +72,15 @@ newEntity{ base = "BASE_NPC_HORROR", define_as="WEIRDLING_BEAST",
 	resolvers.inscription("RUNE:_SHIELDING", {cooldown=10, dur=5, power=500}),
 	resolvers.inscription("TAINT:_DEVOURER", {cooldown=10, effects=4, heal=75}),
 	resolvers.inscriptions(1, {"manasurge rune"}),
+
+	
+	-- The theme of this boss confuses me, I assume its supposed to just feel very random and weird, so, ADHD classes it is
+	auto_classes={
+		{class="Anorithil", start_level=19, level_rate=25},
+		{class="Doomed", start_level=19, level_rate=25},
+		{class="Corruptor", start_level=19, level_rate=25},
+		{class="Archmage", start_level=19, level_rate=25},
+	},
 
 	resolvers.sustains_at_birth(),
 

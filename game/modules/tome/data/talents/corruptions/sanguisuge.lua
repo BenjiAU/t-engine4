@@ -23,19 +23,19 @@ newTalent{
 	require = corrs_req1,
 	points = 5,
 	vim = 0,
-	cooldown = 9,
+	cooldown = 5,
 	reflectable = true,
 	proj_speed = 15,
 	tactical = { ATTACK = {BLIGHT = 1.75},
 		VIM = {BLIGHT = function(self, t, target) return 2*target:getRankVimAdjust()^.5 end}
 	},
 	requires_target = true,
-	range = function(self, t) return math.floor(self:combatTalentScale(t, 5, 9)) end,
+	range = function(self, t) return math.min(10, math.floor(self:combatTalentScale(t, 6, 10))) end,
 	action = function(self, t)
-		local tg = {type="bolt", range=self:getTalentRange(t), talent=t, display={particle="bolt_slime"}}
+		local tg = {type="bolt", friendlyblock=false, range=self:getTalentRange(t), talent=t, display={particle="bolt_slime"}}
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		self:projectile(tg, x, y, DamageType.DRAIN_VIM, self:spellCrit(self:combatTalentSpellDamage(t, 25, 200)), {type="slime"})
+		self:project(tg, x, y, DamageType.DRAIN_VIM, self:spellCrit(self:combatTalentSpellDamage(t, 25, 200)), {type="slime"})
 		game:playSoundNear(self, "talents/slime")
 		return true
 	end,
@@ -47,68 +47,22 @@ newTalent{
 	end,
 }
 
---[[
-newTalent{
-	name = "Blood Sacrifice",
-	type = {"corruption/sanguisuge", 2},
-	require = corrs_req2,
-	points = 5,
-	vim = 0,
-	cooldown = 30,
-	range = 10,
-	tactical = { VIM = 1 },
-	action = function(self, t)
-		local amount = self.life * 0.5
-		if self.life <= amount + 1 then
-			game.logPlayer(self, "Doing this would kill you.")
-			return
-		end
-
-		local seen = false
-		-- Check for visible monsters, only see LOS actors, so telepathy wont prevent resting
-		core.fov.calc_circle(self.x, self.y, game.level.map.w, game.level.map.h, 20, function(_, x, y) return game.level.map:opaque(x, y) end, function(_, x, y)
-			local actor = game.level.map(x, y, game.level.map.ACTOR)
-			if actor and self:reactionToward(actor) < 0 and self:canSee(actor) and game.level.map.seens(x, y) then
-				seen = {x=x,y=y,actor=actor}
-			end
-		end, nil)
-		if not seen then
-			game.logPlayer(self, "There are no foes in sight.")
-			return
-		end
-
-		self:incVim(30 + self:combatTalentSpellDamage(t, 5, 150))
-		self:takeHit(amount, self)
-		game:playSoundNear(self, "talents/spell_generic2")
-		return true
-	end,
-	info = function(self, t)
-		return ([=[Sacrifices 50%% of your current life to restore %d vim.
-		This only works if there is at least one foe in sight.
-		The effect will increase with your Magic stat.]=]):
-		format(30 + self:combatTalentSpellDamage(t, 5, 150))
-	end,
-}
-]]
+-- Sustain?
 newTalent{
 	name = "Bloodcasting",
 	type = {"corruption/sanguisuge", 2},
 	require = corrs_req2,
 	points = 5,
-	vim = 0,
-	cooldown = 18,
-	no_energy = true,
-	range = 10,
+	mode = "passive",
 	no_npc_use = true,
-	getDuration = function(self, t) return math.floor(self:combatTalentLimit(t, 18, 3, 7)) end, --Limit duration < 18
-	action = function(self, t)
-		self:setEffect(self.EFF_BLOODCASTING, t.getDuration(self,t), {})
-		game:playSoundNear(self, "talents/spell_generic2")
-		return true
+	getLifeCost = function(self, t) return math.floor(self:combatTalentScale(t, 250, 100)) end,
+	passives = function(self, t, p)
+		self:talentTemporaryValue(p, "bloodcasting", t.getLifeCost(self, t))
 	end,
 	info = function(self, t)
-		return ([[For %d turns, your corruption spells will consume health instead of vim if their cost is higher than your vim.]]):
-		format(t.getDuration(self,t))
+		return ([[Your corruption spells will consume health instead of vim if their cost is higher than your vim.
+			The health cost is equal to %d%% of the vim cost.]]):
+		format(t.getLifeCost(self,t))
 	end,
 }
 
@@ -121,6 +75,7 @@ newTalent{
 	sustain_vim = 5,
 	cooldown = 30,
 	range = 10,
+	no_energy = true,
 	tactical = { BUFF = 2 },
 	VimOnDeath = function(self, t) return self:combatTalentScale(t, 6, 16) end,
 	activate = function(self, t)
@@ -155,15 +110,17 @@ newTalent{
 	cooldown = 20,
 	range = 10,
 	no_energy = true,
-	tactical = { BUFF = 2 },
-	getMult = function(self,t) return self:combatTalentScale(t, 8, 16) end,
+	tactical = { HEAL = 2 },
+	getMult = function(self,t) return self:combatTalentSpellDamage(t, 4, 30) end,
 	action = function(self, t)
-		self:setEffect(self.EFF_LIFE_TAP, 7, {power=t.getMult(self,t)})
+		self:setEffect(self.EFF_LIFE_TAP, 2, {power=t.getMult(self,t)})
 		game:playSoundNear(self, "talents/spell_generic2")
 		return true
 	end,
 	info = function(self, t)
-		return ([[Tap your life force to provide a furious boost, increasing all damage you deal by %0.1f%% for 7 turns.]]):
+		return ([[Feed on the pain you cause your foes.
+			For 2 turns you gain %d%% lifesteal on all damage dealt.
+			The lifesteal will increase with your Spellpower.]]):
 		format(t.getMult(self,t))
 	end,
 }

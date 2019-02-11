@@ -221,13 +221,13 @@ newTalent{
 	tactical = { ATTACKAREA = { PHYSICAL = 2}},
 	speed = "throwing",
 	proj_speed = 10,
-	getDamage = function (self, t) return self:combatTalentLimit(t, 1, 0.6, 0.75) end,
-	getNb = function(self, t) return math.floor(self:combatTalentScale(t, 4, 8)) end,
+	getDamage = function (self, t) return self:combatTalentLimit(t, 1, 0.3, 0.75) end,
+	getNb = function(self, t) return math.floor(self:combatTalentScale(t, 8, 20)) end,
 	range = 0,
 	cooldown = 10,
-	stamina = 30,
-	radius = function(self, t) return math.floor(self:combatTalentLimit(t, 10, 4.2, 7)) end,
-	target = function(self, t) return {type="cone", range=0, stop_block = true, friendlyfire=false, radius=t.radius(self, t), display_line_step=false} end,
+	stamina = 20,
+	radius = function(self, t) return 5 end,
+	target = function(self, t) return {type="cone", cone_angle = 75, range=0, stop_block = true, friendlyfire=false, radius=t.radius(self, t), display_line_step=false} end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
@@ -250,7 +250,7 @@ newTalent{
 
 		local tgt_cnt = #tgts
 		if tgt_cnt > 0 then
-			local tgt_max = math.min(3, math.ceil(count/tgt_cnt))
+			local tgt_max = math.min(5, math.ceil(count/tgt_cnt))
 			while count > 0 and #tgts > 0 do
 				local tgt, id = rng.table(tgts)
 				if tgt then
@@ -269,7 +269,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[You keep a special stash of %d throwing knives in your bandolier, which you can throw all at once at enemies within a radius %d cone, for %d%% damage each.
-		Each target can be hit up to 3 times, if the number of knives exceeds the number of enemies.  Creatures block knives from hitting targets behind them.]]):
+		Each target can be hit up to 5 times, if the number of knives exceeds the number of enemies.  Creatures block knives from hitting targets behind them.]]):
 		format(t.getNb(self,t), self:getTalentRadius(t), t.getDamage(self, t)*100)
 	end,
 }

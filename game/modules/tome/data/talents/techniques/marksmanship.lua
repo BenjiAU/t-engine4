@@ -138,7 +138,7 @@ newTalent{
 		if not x or not y then return nil end
 
 		local _ _, x, y = self:canProject(tg, x, y)
-		self:project({type="ball", x=x, y=y, radius=3, selffire=false}, x, y, DamageType.FLARE, t.getBlindDuration(self, t), {type="light"})
+		self:project({type="ball", x=x, y=y, radius=self:getTalentRadius(t), selffire=false}, x, y, DamageType.FLARE, t.getBlindDuration(self, t), {type="light"})
 		-- Add a lasting map effect
 		game.level.map:addEffect(self,
 			x, y, t.getDuration(self,t),
@@ -152,11 +152,12 @@ newTalent{
 	end,
 	info = function(self, t)
 		local blind = t.getBlindDuration(self,t)
+		local rad = self:getTalentRadius(t)
 		local dur = t.getDuration(self,t)
 		local def = t.getDefensePenalty(self,t)
-		return ([[Fire a shot at the target tile that blinds enemies for %d turns, marks them for 2 turns and illuminates the area within radius 2 for %d turns. Enemies within the illuminated area lose %d defence and stealth power and cannot benefit from concealment.
+		return ([[Fire a shot at the target tile that blinds enemies for %d turns, marks them for 2 turns and illuminates the area within radius %d for %d turns. Enemies within the illuminated area lose %d defence and stealth power and cannot benefit from concealment.
 		The status chance increases with your Accuracy, and the defense reduction with your Dexterity.]])
-		:format(blind, dur, def)
+		:format(blind, rad, dur, def)
 	end,
 }
 

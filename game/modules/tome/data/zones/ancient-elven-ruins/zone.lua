@@ -19,7 +19,7 @@
 
 return {
 	name = "Elven Ruins",
-	level_range = {33,42},
+	level_range = {43,52},
 	level_scheme = "player",
 	max_level = 3,
 	decay = {300, 800},
@@ -29,8 +29,8 @@ return {
 --	all_lited = true,
 	persistent = "zone",
 	ambient_music = {"Anne_van_Schothorst_-_Passed_Tense.ogg", "weather/dungeon_base.ogg"},
-	min_material_level = 3,
-	max_material_level = 4,
+	min_material_level = 4,
+	max_material_level = 5,
 	generator =  {
 		map = {
 			class = "engine.generator.map.TileSet",

@@ -97,6 +97,11 @@ newEntity{ base="BASE_NPC_ORC_GORBAT", define_as = "GORBAT",
 		[Talents.T_MASSIVE_BLOW]=1,
 		[Talents.T_BLIGHTED_SUMMONING]=1,
 	},
+
+	auto_classes={
+		{class="Wyrmic", start_level=40, level_rate=50},
+		{class="Summoner", start_level=40, level_rate=50},
+	},
 	resolvers.sustains_at_birth(),
 
 	on_die = function(self, who)

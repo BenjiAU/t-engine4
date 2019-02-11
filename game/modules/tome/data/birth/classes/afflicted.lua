@@ -77,7 +77,7 @@ newBirthDescriptor{
 		["technique/combat-training"]={true, 0.3},
 		["cunning/survival"]={false, 0.0},
 		["cursed/rampage"]={false, 0.0},
-		["cursed/predator"]={false, 0.0},
+		["cursed/predator"]={true, 0.0},
 		["cursed/fears"]={false, 0.0},
 	},
 	talents = {

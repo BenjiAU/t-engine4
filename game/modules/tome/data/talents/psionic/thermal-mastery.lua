@@ -28,7 +28,7 @@ newTalent{
 	getPower = function(self, t) return self:combatTalentMindDamage(t, 10, 30) end,
 	getDamagePenalty = function(self, t) return self:combatTalentLimit(t, 100, 15, 50) end, --Limit < 100%
 	getPenetration = function(self, t) return self:combatLimit(self:combatTalentMindDamage(t, 10, 20), 100, 4.2, 4.2, 13.4, 13.4) end, -- Limit < 100%
-	getDuration = function(self, t) return math.floor(self:combatTalentLimit(t, 30, 5, 10)) end, --Limit < 30
+	getDuration = function(self, t) return 5 end, --Limit < 30
 	action = function(self, t)
 		self:setEffect(self.EFF_TRANSCENDENT_PYROKINESIS, t.getDuration(self, t), {power=t.getPower(self, t), penetration=t.getPenetration(self, t), weaken=t.getDamagePenalty(self, t)})
 		self:removeEffect(self.EFF_TRANSCENDENT_TELEKINESIS)

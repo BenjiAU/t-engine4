@@ -26,7 +26,7 @@ newTalent{
 	require = techs_dex_req1,
 	points = 5,
 	random_ego = "attack",
-	cooldown = 10,
+	cooldown = 20,
 	stamina = 40,
 	message = "@Source@ unleashes a flurry of disrupting kicks.",
 	tactical = { ATTACK = { weapon = 2 }, },
@@ -36,7 +36,7 @@ newTalent{
 	requires_target = true,
 	--on_pre_use = function(self, t, silent) if not self:hasEffect(self.EFF_COMBO) then if not silent then game.logPlayer(self, "You must have a combo going to use this ability.") end return false end return true end,
 	getStrikes = function(self, t) return self:getCombo() end,
-	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 0.1, 0.4) + getStrikingStyle(self, dam) end,
+	getDamage = function(self, t) return 0.1 + getStrikingStyle(self, dam) end,  -- Multihits already do plenty of damage and this has a ton of utility
 	checkType = function(self, t, talent)
 		if talent.is_spell and self:getTalentLevel(t) < 3 then
 			return false
@@ -189,6 +189,7 @@ newTalent{
 		target.evasion = 0
 		local oldlife = target.life
 		self:logCombat(target, "#Source# strikes at a vital spot on #target#!")
+		-- SIGH
 		local do_attack = function() self:attackTarget(target, nil, t.getDamage(self, t), true) end
 		local ok, err = pcall(do_attack)
 		target.evasion = evasion

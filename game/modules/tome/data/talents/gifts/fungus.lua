@@ -22,33 +22,23 @@ newTalent{
 	type = {"wild-gift/fungus", 1},
 	require = gifts_req1,
 	points = 5,
-	mode = "sustained",
-	sustain_equilibrium = 15,
-	cooldown = 20,
-	tactical = { BUFF = 2 },
-	getDur = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5, "log")) end,
-	activate = function(self, t)
-		local dur = t.getDur(self, t)
-		game:playSoundNear(self, "talents/heal")
-		local ret = {
-			dur = self:addTemporaryValue("liferegen_dur", dur),
-		}
-		if self:knowTalent(self.T_FUNGAL_GROWTH) then
-			local t= self:getTalentFromId(self.T_FUNGAL_GROWTH)
-			ret.fg = self:addTemporaryValue("fungal_growth", t.getPower(self, t))
-		end
-		return ret
+	mode = "passive",
+	getLife = function(self, t) return self:combatTalentStatDamage(t, "wil", 10, 600) end,
+	getRegen = function(self, t) return self:combatTalentStatDamage(t, "wil", 1, 30) end,
+	passives = function(self, t, tmptable)
+		self:talentTemporaryValue(tmptable, "max_life", t.getLife(self, t))
+		self:talentTemporaryValue(tmptable, "life_regen", t.getRegen(self, t))
 	end,
-	deactivate = function(self, t, p)
-		self:removeTemporaryValue("liferegen_dur", p.dur)
-		if p.fg then self:removeTemporaryValue("fungal_growth", p.fg) end
-		return true
+	callbackOnStatChange = function(self, t, stat, v)
+		if stat == self.STAT_WIL then
+			self:updateTalentPassives(t)
+		end
 	end,
 	info = function(self, t)
-		local dur = t.getDur(self, t)
-		return ([[Surround yourself with a myriad of tiny, nearly invisible, healing fungi.
-		Any regeneration effect active on you will have its duration increased by +%d turns.]]):
-		format(dur)
+		return ([[Surround yourself with a myriad of tiny, nearly invisible, reinforcing fungi.
+		You gain %d maximum life and %d life regeneration.
+		The effects will increase with your Willpower.]]):
+		format(t.getLife(self, t), t.getRegen(self, t))
 	end,
 }
 
@@ -58,13 +48,18 @@ newTalent{
 	require = gifts_req2,
 	points = 5,
 	mode = "passive",
-	getPower = function(self, t) return self:combatLimit(self:combatTalentMindDamage(t, 5, 500), 100, 20, 0, 56.8, 368.5) end, --limit <100%
+	getDurationBonus = function(self, t) return math.min(150, self:combatTalentMindDamage(t, 1, 100)) / 100 end,  -- +1 on 5 duration effects (Regeneration infusion) every 20%
+	callbackOnTemporaryEffectAdd = function(self, t, eff_id, e_def, eff)
+		if e_def.subtype.regeneration and e_def.type ~= "other" then
+			local add = math.ceil(eff.dur * t.getDurationBonus(self, t)) + 1
+			eff.dur = eff.dur + add
+		end
+	end,
 	info = function(self, t)
-		local p = t.getPower(self, t)
-		return ([[Improve your fungus to allow it to take a part of any healing you receive and improve it.
-		Each time you are healed, you get a regeneration effect for 6 turns that heals you for %d%% of the direct heal you received.
+		return ([[The fungus on your body allows regeneration effects to last longer.
+		Each time you gain a beneficial effect with the regeneration subtype you increase its duration by %d%% + 1 rounded up.
 		The effect will increase with your Mindpower.]]):
-		format(p)
+		format(t.getDurationBonus(self, t) * 100)
 	end,
 }
 
@@ -75,15 +70,23 @@ newTalent{
 	points = 5,
 	mode = "passive",
 	getEq = function(self, t) return self:combatTalentScale(t, 0.5, 2.5, 0.5, 0.5) end,
-	getTurn = function(self, t) return util.bound(50 + self:combatTalentMindDamage(t, 5, 500) / 10, 50, 160) end,
+	getTurn = function(self, t) return math.min(30, self:combatTalentMindDamage(t, 1, 20)) / 100 end,
+	callbackOnHeal = function(self, t, value, src, raw_value)
+		local heal = (self.life + value) < self.max_life and value or self.max_life - self.life
+		if heal > 0 then
+			local amt = (heal / 100) * (t.getTurn(self, t) * game.energy_to_act)
+			self.energy.value = game.energy_to_act + amt
+			game.logSeen(self, "#LIGHT_GREEN#%s gains %d%% of a turn from the healing.#LAST#", self.name, amt / 10 )
+		end
+	end,
 	info = function(self, t)
 		local eq = t.getEq(self, t)
 		local turn = t.getTurn(self, t)
-		return ([[Your fungus can reach into the primordial ages of the world, granting you ancient instincts.
-		Each time a regeneration effect is used on you, you gain %d%% of a turn.
+		return ([[Your fungus reaches into the primordial ages of the world, granting you ancient instincts.
+		Each time you receive a direct heal you gain %d%% of a turn per 100 life healed.
 		Also, regeneration effects on you will decrease your equilibrium by %0.1f each turn.
 		The turn gain increases with your Mindpower.]]):
-		format(turn, eq)
+		format(turn * 100, eq)
 	end,
 }
 
@@ -93,11 +96,11 @@ newTalent{
 	require = gifts_req4,
 	points = 5,
 	equilibrium = 22,
-	cooldown = 25,
+	cooldown = 15,
 	tactical = { HEAL = function(self, t, target) return self.life_regen > 0 and math.log(self.life_regen + 1)/2 or nil end },
-	getMult = function(self, t) return util.bound(5 + self:getTalentLevel(t), 3, 12) end,
+	getMult = function(self, t) return util.bound(6 + self:getTalentLevel(t), 3, 12) end,
 	action = function(self, t)
-		local amt = self.life_regen * t.getMult(self, t)
+		local amt = self:mindCrit(self.life_regen * t.getMult(self, t))
 
 		self:heal(amt, t)
 
@@ -106,7 +109,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		local mult = t.getMult(self, t)
-		return ([[A wave of energy passes through your fungus, making it release immediate healing energies on you, healing you for %d%% of your current life regeneration rate.]]):
-		format(mult * 100)
+		return ([[A wave of energy passes through your fungus, making it release immediate healing energies on you, healing you for %d%% of your current life regeneration rate (#GREEN#%d#LAST#).]]):
+		format(mult * 100,  self.life_regen * mult)
 	end,
 }

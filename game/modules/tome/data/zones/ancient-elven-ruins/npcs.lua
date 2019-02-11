@@ -95,6 +95,12 @@ newEntity{ define_as = "GREATER_MUMMY_LORD",
 	resolvers.inscriptions(1, "rune", "attack"),
 	resolvers.inscriptions(1, "rune", "protect"),
 	resolvers.inscriptions(2, "rune"),
+
+	auto_classes={
+		{class="Bulwark", start_level=30, level_rate=50},
+		{class="Archmage", start_level=30, level_rate=50},
+		add_trees = {["spell/ice"]=true}
+	},
 }
 
 -- Some mummies
@@ -110,14 +116,14 @@ newEntity{ base = "BASE_NPC_MUMMY",
 	resolvers.auto_equip_filters("Berserker"),
 	resolvers.equip{
 		{type="weapon", subtype="greatsword", forbid_power_source={antimagic=true}, autoreq=true},
-		{type="armor", subtype="mummy", ignore_material_restriction=true, force_drop=true, base_list=object_list, forbid_power_source={antimagic=true}, autoreq=true},
+		{type="armor", subtype="mummy", ignore_material_restriction=true, force_drop=true, base_list=object_list, forbid_power_source={antimagic=true, nature=true}, autoreq=true},
 	},
 	resolvers.talents{
 		[Talents.T_STUNNING_BLOW]={base=2, every=7, max=6},
 		[Talents.T_CRUSH]={base=3, every=7, max=7},
 		[Talents.T_MANATHRUST]={base=3, every=7, max=7},
 	},
-	resolvers.inscriptions(1, "rune"),
+	resolvers.inscriptions(2, "rune"),
 	resolvers.drops{chance=70, nb=1, {tome={money=1}} },
 }
 
@@ -127,13 +133,13 @@ newEntity{ base = "BASE_NPC_MUMMY",
 	desc = [[An animated set of mummy wrappings, without a corpse inside; it seems like it cannot move.]],
 	level_range = {7, nil}, exp_worth = 1,
 	rarity = 4,
-	max_life = resolvers.rngavg(20,40), life_rating=4,
+	max_life = resolvers.rngavg(20,40), life_rating=6,
 	ai_state = { talent_in=2, },
 	never_move = 1,
 	size_category = 2,
 
 	resolvers.equip{
-		{type="armor", subtype="mummy", ignore_material_restriction=true, force_drop=true, base_list=object_list, forbid_power_source={antimagic=true}, autoreq=true},
+		{type="armor", subtype="mummy", ignore_material_restriction=true, force_drop=true, base_list=object_list, forbid_power_source={antimagic=true, nature=true}, autoreq=true},
 	},
 	autolevel = "caster",
 	resolvers.talents{
@@ -142,7 +148,7 @@ newEntity{ base = "BASE_NPC_MUMMY",
 		[Talents.T_LIGHTNING]={base=3, every=7, max=7},
 		[Talents.T_STRIKE]={base=3, every=7, max=7},
 	},
-	resolvers.inscriptions(1, "rune"),
+	resolvers.inscriptions(2, "rune"),
 }
 
 newEntity{ base = "BASE_NPC_MUMMY",
@@ -151,11 +157,11 @@ newEntity{ base = "BASE_NPC_MUMMY",
 	desc = [[A rotting animated corpse in mummy wrappings.]],
 	level_range = {7, nil}, exp_worth = 1,
 	rarity = 2,
-	max_life = resolvers.rngavg(60,80), life_rating=7,
+	max_life = resolvers.rngavg(60,80), life_rating=9,
 	ai_state = { talent_in=4, },
 
 	resolvers.equip{
-		{type="armor", subtype="mummy", ignore_material_restriction=true, force_drop=true, base_list=object_list, forbid_power_source={antimagic=true}, autoreq=true},
+		{type="armor", subtype="mummy", ignore_material_restriction=true, force_drop=true, base_list=object_list, forbid_power_source={antimagic=true, nature=true}, autoreq=true},
 	},
 	autolevel = "ghoul",
 	resolvers.talents{
@@ -170,12 +176,12 @@ newEntity{ base = "BASE_NPC_MUMMY",
 newEntity{ base = "BASE_NPC_MUMMY", define_as = "GREATER_MUMMY",
 	allow_infinite_dungeon = true,
 	name = "greater mummy", color=colors.YELLOW,
-	image = "npc/undead_mummy_ancient_elven_mummy.png",
+	image = "npc/undead_mummy_greater_mummy.png",
 	desc = [[An animated corpse in mummy wrappings, both very well preserved.]],
 	level_range = {20, nil}, exp_worth = 1,
 	rank = 3,
 	rarity = 8,
-	max_life = resolvers.rngavg(150,180), life_rating=12,
+	max_life = resolvers.rngavg(150,180), life_rating=14,
 	autolevel = "warriormage",
 	ai = "tactical", ai_state = { talent_in=2, ai_move="move_astar", },
 	global_speed_base = 1,
@@ -190,7 +196,7 @@ newEntity{ base = "BASE_NPC_MUMMY", define_as = "GREATER_MUMMY",
 		{type="armor", subtype="head", ignore_material_restriction=true, base_list=object_list, forbid_power_source={antimagic=true}, autoreq=true},
 	},
 	resolvers.inscriptions(1, "rune", "attack"),
-	resolvers.inscriptions(1, "rune"),
+	resolvers.inscriptions(2, "rune"),
 	resolvers.drops{nb=2, {base_list=object_list, tome_drops="store"}, {tome={money=1}}},
 	resolvers.talents{
 		[Talents.T_WEAPONS_MASTERY]={base=3, every=10, max=5},

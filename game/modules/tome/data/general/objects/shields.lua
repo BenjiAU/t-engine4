@@ -77,7 +77,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 6,
 		combat_def_ranged = 6,
 		fatigue = 8,
-		learn_talent = { [Talents.T_BLOCK] = 2, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
 
@@ -98,7 +98,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 8,
 		combat_def_ranged = 8,
 		fatigue = 12,
-		learn_talent = { [Talents.T_BLOCK] = 3, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
 
@@ -119,7 +119,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 10,
 		combat_def_ranged = 10,
 		fatigue = 14,
-		learn_talent = { [Talents.T_BLOCK] = 4, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
 
@@ -140,6 +140,6 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 12,
 		combat_def_ranged = 12,
 		fatigue = 14,
-		learn_talent = { [Talents.T_BLOCK] = 5, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }

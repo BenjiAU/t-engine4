@@ -77,16 +77,39 @@ newEntity{ base = "BASE_NPC_BONE_GIANT", define_as = "HALF_BONE_GIANT",
 This specimen looks like it was hastily assembled and is not really complete yet.]],
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/undead_giant_half_finished_bone_giant.png", display_h=2, display_y=-1}}},
 	level_range = {7, nil}, exp_worth = 1,
+	stats = { str=10, dex=5, mag=16, con=10 },
 	rank = 4,
-	max_life = resolvers.rngavg(100,120), life_rating = 14,
-	combat_armor = 7, combat_def = 0,
+	max_life = 60, life_rating = 14,
+	combat_armor = 1, combat_def = -10,
 	melee_project = {[DamageType.BLIGHT]=resolvers.mbonus(5, 2)},
-	resolvers.talents{ [Talents.T_BONE_ARMOUR]=3, [Talents.T_THROW_BONES]=1, },
+	resolvers.talents{ [Talents.T_BONE_ARMOUR]=1, [Talents.T_THROW_BONES]=1, },
 	resolvers.sustains_at_birth(),
-	movement_speed = 1.0,
+	movement_speed = 0.7,  -- Allow weak builds to still be able to win, albeit very slowly
 	tier1 = true,
 
-	body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1, CLOAK=1, QUIVER=1 , LITE=1},
+	-- Prevent random gear from screwing weak starts early
+	resolvers.auto_equip_filters{
+		MAINHAND = {special=function(e, filter)
+			local who = filter._equipping_entity
+			if who and who.level > 10 then return true end
+			return false
+		end},
+		OFFHAND = {special=function(e, filter)
+			local who = filter._equipping_entity
+			if who and who.level > 10 then return true end
+			return false
+		end},
+		BODY = {special=function(e, filter)
+			local who = filter._equipping_entity
+			if who and who.level > 10 then return true end
+			return false
+		end},
+		OFFHAND = {special=function(e, filter)
+			local who = filter._equipping_entity
+			if who and who.level > 10 then return true end
+			return false
+		end}
+	},
 	resolvers.drops{chance=100, nb=3, {tome_drops="boss"} },
 	equipment = resolvers.equip{
 		{type="lite", defined="WINTERTIDE_PHIAL", random_art_replace={chance=75}, autoreq=true},

@@ -413,6 +413,15 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Toggles display of glove unarmed attack properties.#WHITE#"}
+	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Display glove combat stats#WHITE##{normal}#", status=function(item)
+		return tostring(config.settings.tome.display_glove_stats and "enabled" or "disabled")
+	end, fct=function(item)
+		config.settings.tome.display_glove_stats = not config.settings.tome.display_glove_stats
+		game:saveSettings("tome.display_glove_stats", ("tome.display_glove_stats = %s\n"):format(tostring(config.settings.tome.display_glove_stats)))
+		self.c_list:drawItem(item)
+	end,}
+
 	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="When you do a mouse gesture (right click + drag) a color coded trail is displayed.#WHITE#"}
 	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Display mouse gesture trails#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.hide_gestures and "disabled" or "enabled")
@@ -587,7 +596,7 @@ function _M:generateListOnline()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Keep a copy of your character sheets (not the whole savefile) on the online vault at te4.org.\nFor each characters you will be given a link to this online character sheet so that you drag about your heroic deeds or sad deaths to your friends or the whole community.#WHITE#"}
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Keep a copy of your character sheets (not the whole savefile) on the online vault at te4.org.\nFor each character you will be given a link to this online character sheet so that you can brag about your heroic deeds or sad deaths to your friends or the whole community.#WHITE#"}
 	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Upload characters sheets to the online vault#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.upload_charsheet and "enabled" or "disabled")
 	end, fct=function(item)
@@ -621,7 +630,7 @@ This includes, but is not limited to:
 - Ingame game news: The main menu will stop showing you info about new updates to the game.
 
 Note that this setting only affects the game itself. If you use the game launcher, whose sole purpose is to make sure the game is up to date, it will still do so.
-If you do not want that, simply run the game directly: the #{bold}#only#{normal}# of the launcher is to update the game.
+If you do not want that, simply run the game directly: the #{bold}#only#{normal}# use of the launcher is to update the game.
 
 #{bold}##CRIMSON#This is an extremely restrictive setting. It is recommended you only activate it if you have no other choice as it will remove many fun and acclaimed features.
 A full exit and restart of the game is neccessary to apply this setting.#{normal}#]]}

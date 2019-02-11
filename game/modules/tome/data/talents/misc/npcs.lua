@@ -541,15 +541,16 @@ newTalent{
 	tactical = { DISABLE = { confusion = 3 } },
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t), talent=t} end,
 	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 3, 7)) end,
+	getConfusion = function(self, t) return self:combatTalentLimit(t, 50, 15, 45) end, -- Confusion hard cap is 50%
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		self:project(tg, x, y, DamageType.CONFUSION, {dur=t.getDuration(self, t), dam=50+self:getTalentLevelRaw(t)*10}, {type="manathrust"})
+		self:project(tg, x, y, DamageType.CONFUSION, {dur=t.getDuration(self, t), dam=t.getConfusion(self,t)}, {type="manathrust"})
 		return true
 	end,
 	info = function(self, t)
-		return ([[Try to confuse the target's mind for %d turns.]]):format(t.getDuration(self, t))
+		return ([[Try to confuse the target's mind for %d (power %d%%) turns.]]):format(t.getDuration(self, t), t.getConfusion(self, t))
 	end,
 }
 
@@ -3421,5 +3422,202 @@ newTalent{
 		return ([[Attack your foes in a frontal arc with a roundhouse kick, which deals %0.2f physical damage and knocks your foes back 4 grids. This will break any grapples you're maintaining
 		The damage improves with your Physical Power.]]):
 		format(damDesc(self, DamageType.PHYSICAL, (damage)))
+	end,
+}
+
+newTalent{
+	name = "Bone Nova",
+	type = {"corruption/other", 1},
+	points = 5,
+	vim = 25,
+	cooldown = 12,
+	tactical = { ATTACKAREA = {PHYSICAL = 2} },
+	random_ego = "attack",
+	radius = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5)) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 8, 180) end,
+	target = function(self, t)
+		return {type="ball", radius=self:getTalentRadius(t), selffire=false, talent=t}
+	end,
+	action = function(self, t)
+		local tg = self:getTalentTarget(t)
+		self:project(tg, self.x, self.y, DamageType.PHYSICALBLEED, self:spellCrit(t.getDamage(self, t)))
+		game.level.map:particleEmitter(self.x, self.y, tg.radius, "circle", {oversize=1.1, a=255, limit_life=8, grow=true, speed=0, img="bone_nova", radius=self:getTalentRadius(t)})
+		game:playSoundNear(self, "talents/arcane")
+		return true
+	end,
+	info = function(self, t)
+		return ([[Fire bone spears in all directions, hitting all foes within radius %d for %0.2f physical damage, and inflicting bleeding for another %0.2f damage over 5 turns.
+		The damage will increase with your Spellpower.]]):format(self:getTalentRadius(t), damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)/2))
+	end,
+}
+
+newTalent{
+	name = "Shadow Ambush",
+	type = {"spell/other", 1},
+	points = 5,
+	cooldown = 20,
+	stamina = 15,
+	mana = 15,
+	range = 7,
+	tactical = { DISABLE = {silence = 2}, CLOSEIN = 2 },
+	requires_target = true,
+	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 2, 6)) end,
+	speed = "combat",
+	action = function(self, t)
+		local tg = {type="hit", range=self:getTalentRange(t)}
+		local x, y, target = self:getTarget(tg)
+		if not x or not y or not target then return nil end
+		local _ _, x, y = self:canProject(tg, x, y)
+		target = game.level.map(x, y, Map.ACTOR)
+		if not target then return nil end
+
+		local sx, sy = util.findFreeGrid(self.x, self.y, 5, true, {[engine.Map.ACTOR]=true})
+		if not sx then return end
+
+		target:move(sx, sy, true)
+
+		if core.fov.distance(self.x, self.y, sx, sy) <= 1 then
+			if target:canBe("stun") then
+				target:setEffect(target.EFF_DAZED, 2, {apply_power=self:combatAttack()})
+			end
+			if target:canBe("silence") then
+				target:setEffect(target.EFF_SILENCED, t.getDuration(self, t), {apply_power=self:combatAttack()})
+			else
+				game.logSeen(target, "%s resists the shadow!", target.name:capitalize())
+			end
+		end
+
+		return true
+	end,
+	info = function(self, t)
+		local duration = t.getDuration(self, t)
+		return ([[You reach out with shadowy vines toward your target, pulling it to you and silencing it for %d turns and dazing it for 2 turns.
+		The chance to hit improves with your Accuracy.]]):
+		format(duration)
+	end,
+}
+
+newTalent{
+	name = "Ambuscade",
+	type = {"spell/other", 1},
+	points = 5,
+	cooldown = 20,
+	stamina = 35,
+	mana = 35,
+	requires_target = true,
+	unlearn_on_clone = true,
+	tactical = { ATTACK = {DARKNESS = 3} },
+	getStealthPower = function(self, t) return self:combatScale(self:getCun(15, true) * self:getTalentLevel(t), 25, 0, 100, 75) end,
+	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 4, 8)) end,
+	getHealth = function(self, t) return self:combatLimit(self:combatTalentSpellDamage(t, 20, 500), 1, 0.2, 0, 0.584, 384) end, -- Limit to < 100% health of summoner
+	getDam = function(self, t) return self:combatLimit(self:combatTalentSpellDamage(t, 10, 500), 1.6, 0.4, 0, 0.761 , 361) end, -- Limit to <160% Nerf?
+	speed = "spell",
+	action = function(self, t)
+		-- Find space
+		local x, y = util.findFreeGrid(self.x, self.y, 1, true, {[Map.ACTOR]=true})
+		if not x then
+			game.logPlayer(self, "Not enough space to invoke your shadow!")
+			return
+		end
+
+		local m = self:cloneActor({name = "Shadow of "..self.name,
+			desc = ([[A dark shadowy form in the shape of %s.]]):format(self.name),
+			summoner=self, summoner_gain_exp=true, exp_worth=0,
+			summon_time=t.getDuration(self, t),
+			ai_target={actor=nil}, ai="summoned", ai_real="tactical",
+			forceLevelup = function() end,
+			on_die = function(self) self:removeEffect(self.EFF_ARCANE_EYE,true) end,
+			cant_teleport=true,	stealth = t.getStealthPower(self, t),
+			force_melee_damage_type = DamageType.DARKNESS,
+		
+		})
+		m:removeTimedEffectsOnClone()
+		m:unlearnTalentsOnClone() -- unlearn certain talents (no recursive projections)
+		m:unlearnTalentFull(m.T_STEALTH)
+		m:unlearnTalentFull(m.T_HIDE_IN_PLAIN_SIGHT)
+		m.max_life = m.max_life * t.getHealth(self, t)
+		table.mergeAdd(m.resists, {[DamageType.LIGHT]=-70, [DamageType.DARKNESS]=130, all=-30})
+		m.inc_damage.all = ((100 + (m.inc_damage.all or 0)) * t.getDam(self, t)) - 100
+		m.life = util.bound(m.life, 0, m.max_life)
+		m.on_act = function(self)
+			if self.summoner.dead or not self:hasLOS(self.summoner.x, self.summoner.y) then
+				if not self:hasEffect(self.EFF_AMBUSCADE_OFS) then
+					self:setEffect(self.EFF_AMBUSCADE_OFS, 2, {})
+				end
+			else
+				if self:hasEffect(self.EFF_AMBUSCADE_OFS) then
+					self:removeEffect(self.EFF_AMBUSCADE_OFS)
+				end
+			end
+		end,
+
+		self:removeEffect(self.EFF_SHADOW_VEIL) -- Remove shadow veil from creator
+		game.zone:addEntity(game.level, m, "actor", x, y)
+		game.level.map:particleEmitter(x, y, 1, "shadow")
+
+		if game.party:hasMember(self) then
+			game.party:addMember(m, {
+				control="full",
+				type="shadow",
+				title="Shadow of "..self.name,
+				temporary_level=1,
+				orders = {target=true},
+				on_control = function(self)
+					self.summoner.ambuscade_ai = self.summoner.ai
+					self.summoner.ai = "none"
+				end,
+				on_uncontrol = function(self)
+					self.summoner.ai = self.summoner.ambuscade_ai
+					game:onTickEnd(function() game.party:removeMember(self) self:removeEffect(self.EFF_ARCANE_EYE, true) self:disappear() end)
+				end,
+			})
+		end
+		game:onTickEnd(function() game.party:setPlayer(m) end)
+
+		game:playSoundNear(self, "talents/spell_generic2")
+		return true
+	end,
+	info = function(self, t)
+		return ([[You take full control of your own shadow for %d turns.
+		Your shadow possesses your talents and stats, has %d%% life and deals %d%% damage, -30%% all resistances, -100%% light resistance and +100%% darkness resistance.
+		Your shadow is permanently stealthed (%d power), and all melee damage it deals is converted to darkness damage.
+		The shadow cannot teleport.
+		If you release control early or if it leaves your sight for too long, your shadow will dissipate.]]):
+		format(t.getDuration(self, t), t.getHealth(self, t) * 100, t.getDam(self, t) * 100, t.getStealthPower(self, t))
+	end,
+}
+
+newTalent{
+	name = "Shadow Leash",
+	type = {"spell/other", 1},
+	points = 5,
+	cooldown = 20,
+	stamina = 15,
+	mana = 15,
+	range = 1,
+	tactical = { DISABLE = {disarm = 2} },
+	requires_target = true,
+	is_melee = true,
+	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
+	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 2, 6)) end,
+	speed = "weapon",
+	action = function(self, t)
+		local tg = self:getTalentTarget(t)
+		local x, y, target = self:getTarget(tg)
+		if not target or not self:canProject(tg, x, y) then return nil end
+
+		if target:canBe("disarm") then
+			target:setEffect(target.EFF_DISARMED, t.getDuration(self, t), {apply_power=self:combatAttack()})
+		else
+			game.logSeen(target, "%s resists the shadow!", target.name:capitalize())
+		end
+
+		return true
+	end,
+	info = function(self, t)
+		local duration = t.getDuration(self, t)
+		return ([[For an instant, your weapons turn into a shadow leash that tries to grab the target's weapon, disarming it for %d turns.
+		The chance to hit improves with your Accuracy.]]):
+		format(duration)
 	end,
 }

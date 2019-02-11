@@ -17,24 +17,29 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
+-- Reaver gets an abnormally low number of melee strikes so its important that cooldowns and such reflect this, otherwise it encourages playing as a ranged caster
+
 local DamageType = require "engine.DamageType"
 
 newTalent{
-	name = "Rend",
+	name = "Virulent Strike",
+	short_name = "REND",
 	type = {"corruption/scourge", 1},
 	require = corrs_req1,
 	points = 5,
-	vim = 9,
-	cooldown = 6,
+	vim = 15,
+	cooldown = 4,
 	range = 1,
 	is_melee = true,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
 	tactical = { ATTACK = {PHYSICAL = 2} },
 	requires_target = true,
+	getIncrease = function(self, t) return math.floor(self:combatTalentLimit(t, 4, 1, 3.5)) end,
+	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 0.8, 1.6) end,
 	action = function(self, t)
 		local weapon, offweapon = self:hasDualWeapon()
 		if not weapon then
-			game.logPlayer(self, "You cannot use Rend without two weapons!")
+			game.logPlayer(self, "You cannot use Virulent Strike without two weapons!")
 			return nil
 		end
 
@@ -43,32 +48,30 @@ newTalent{
 		if not target or not self:canProject(tg, x, y) then return nil end
 
 		DamageType:projectingFor(self, {project_type={talent=t}})
-		local speed1, hit1 = self:attackTargetWith(target, weapon.combat, nil, self:combatTalentWeaponDamage(t, 0.8, 1.6))
-		local speed2, hit2 = self:attackTargetWith(target, offweapon.combat, nil, self:getOffHandMult(offweapon.combat, self:combatTalentWeaponDamage(t, 0.8, 1.6)))
+		local speed1, hit1 = self:attackTargetWith(target, weapon.combat, nil, t.getDamage(self, t))
+		local speed2, hit2 = self:attackTargetWith(target, offweapon.combat, nil, self:getOffHandMult(offweapon.combat, t.getDamage(self, t)))
 		DamageType:projectingFor(self, nil)
 
-		-- Try to bleed !
 		if hit1 then
-			if target:canBe("cut") then
-				target:setEffect(target.EFF_CUT, 5, {power=self:combatTalentSpellDamage(t, 5, 40), src=self, apply_power=self:combatPhysicalpower()})
-			else
-				game.logSeen(target, "%s resists the cut!", target.name:capitalize())
+			local effs = target:effectsFilter(function(e) return e.subtype.disease end, 1)
+			local eff2 = target:hasEffect(effs[1])
+			if eff2 then
+				eff2.dur = eff2.dur + t.getIncrease(self, t)
 			end
 		end
 		if hit2 then
-			if target:canBe("cut") then
-				target:setEffect(target.EFF_CUT, 5, {power=self:combatTalentSpellDamage(t, 5, 40), src=self, apply_power=self:combatPhysicalpower()})
-			else
-				game.logSeen(target, "%s resists the cut!", target.name:capitalize())
+			local effs = target:effectsFilter(function(e) return e.subtype.disease end, 1)
+			local eff2 = target:hasEffect(effs[1])
+			if eff2 then 
+				eff2.dur = eff2.dur + t.getIncrease(self, t)
 			end
 		end
 
 		return true
 	end,
 	info = function(self, t)
-		return ([[Hit the target with both weapons, doing %d%% damage with each hit. For each hit, the target will bleed for %0.2f damage each turn for 5 turns.
-		The bleeding effect will increase with your Spellpower.]]):
-		format(100 * self:combatTalentWeaponDamage(t, 0.8, 1.6), self:combatTalentSpellDamage(t, 5, 40))
+		return ([[Strike the target with both weapons dealing %d%% damage with each hit.  Each strike that hits will increase the duration of a random disease effect by %d.]]):
+		format(100 * t.getDamage(self, t), t.getIncrease(self, t))
 	end,
 }
 
@@ -107,17 +110,19 @@ newTalent{
 	type = {"corruption/scourge", 3},
 	require = corrs_req3,
 	points = 5,
-	vim = 18,
-	cooldown = 12,
+	vim = 20,
+	cooldown = 8,
 	range = 1,
-	radius = 1,
+	radius = function(self, t) return self:combatTalentLimit(t, 7, 1, 5) end,
 	requires_target = true,
 	is_melee = true,
-	tactical = { ATTACK = {ACID = 2}, DISABLE = 1 },
+	tactical = { ATTACK = {ACID = 2}},
 	target = function(self, t)
 		-- Tries to simulate the acid splash
-		return {type="ballbolt", range=1, radius=self:getTalentRadius(t), selffire=false, talent=t}
+		return {type="ballbolt", range=1, radius=self:getTalentRadius(t), selffire=false, friendlyfire=false, talent=t}
 	end,
+	getSplash = function(self, t) return self:combatTalentSpellDamage(t, 10, 200) end,
+	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 0.8, 1.6) end,
 	action = function(self, t)
 		local weapon, offweapon = self:hasDualWeapon()
 		if not weapon then
@@ -130,8 +135,8 @@ newTalent{
 		if not target or not self:canProject(tg, x, y) then return nil end
 
 		DamageType:projectingFor(self, {project_type={talent=t}})
-		local speed1, hit1 = self:attackTargetWith(target, weapon.combat, DamageType.ACID, self:combatTalentWeaponDamage(t, 0.8, 1.6))
-		local speed2, hit2 = self:attackTargetWith(target, offweapon.combat, DamageType.ACID, self:getOffHandMult(offweapon.combat, self:combatTalentWeaponDamage(t, 0.8, 1.6)))
+		local speed1, hit1 = self:attackTargetWith(target, weapon.combat, DamageType.ACID, t.getDamage(self, t))
+		local speed2, hit2 = self:attackTargetWith(target, offweapon.combat, DamageType.ACID, self:getOffHandMult(offweapon.combat, t.getDamage(self, t)))
 		DamageType:projectingFor(self, nil)
 
 		-- Acid splash !
@@ -139,35 +144,37 @@ newTalent{
 			local tg = self:getTalentTarget(t)
 			tg.x = target.x
 			tg.y = target.y
-			self:project(tg, target.x, target.y, DamageType.ACID, self:spellCrit(self:combatTalentSpellDamage(t, 10, 130)))
+			self:project(tg, target.x, target.y, DamageType.ACID, self:spellCrit(t.getSplash(self, t)))
 		end
 
 		return true
 	end,
 	info = function(self, t)
 		return ([[Strike with each of your weapons, doing %d%% acid weapon damage with each hit.
-		If at least one of the strikes hits, an acid splash is generated, doing %0.2f acid damage to all targets other than yourself adjacent to the foe you struck.
+		If at least one of the strikes hits, an acid splash is generated, doing %0.2f acid damage to all enemies in radius %d around the foe you struck.
 		The splash damage will increase with your Spellpower.]]):
-		format(100 * self:combatTalentWeaponDamage(t, 0.8, 1.6), damDesc(self, DamageType.ACID, self:combatTalentSpellDamage(t, 10, 130)))
+		format(100 * t.getDamage(self, t), damDesc(self, DamageType.ACID, t.getSplash(self, t)), self:getTalentRadius(t))
 	end,
 }
 
 newTalent{
-	name = "Dark Surprise",
+	name = "Corrupting Strike",
+	short_name = "DARK_SURPRISE",
 	type = {"corruption/scourge", 4},
 	require = corrs_req4,
 	points = 5,
-	vim = 14,
+	vim = 30,
 	cooldown = 8,
 	range = 1,
 	is_melee = true,
 	requires_target = true,
-	tactical = { ATTACK = {DARKNESS = 1, BLIGHT = 1}, DISABLE = 2 },
+	tactical = { ATTACK = {BLIGHT = 1},},
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
+	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1, 2) end,
 	action = function(self, t)
 		local weapon, offweapon = self:hasDualWeapon()
 		if not weapon then
-			game.logPlayer(self, "You cannot use Dark Surprise without two weapons!")
+			game.logPlayer(self, "You cannot use Corrupting Strike without two weapons!")
 			return nil
 		end
 
@@ -175,25 +182,19 @@ newTalent{
 		local x, y, target = self:getTarget(tg)
 		if not target or not self:canProject(tg, x, y) then return nil end
 
-		DamageType:projectingFor(self, {project_type={talent=t}})
-		local speed1, hit1 = self:attackTargetWith(target, weapon.combat, DamageType.DARKNESS, self:combatTalentWeaponDamage(t, 0.6, 1.4))
+		-- Awkward to have this happen first, but part of the point of the talent is to help guarantee any misc disease on hit effects can't be immuned
+		target:removeSustainsFilter(function(e) return e.is_nature end, 2)
+		target:setEffect(target.EFF_CORRUPTING_STRIKE, 2, {})
 
-		if hit1 then
-			self.turn_procs.auto_phys_crit = true
-			local speed2, hit2 = self:attackTargetWith(target, offweapon.combat, DamageType.BLIGHT, self:getOffHandMult(offweapon.combat, self:combatTalentWeaponDamage(t, 0.6, 1.4)))
-			self.turn_procs.auto_phys_crit = nil
-			if hit2 and target:canBe("blind") then
-				target:setEffect(target.EFF_BLINDED, 4, {apply_power=self:combatPhysicalpower()})
-			else
-				game.logSeen(self, "%s resists the darkness.", target.name:capitalize())
-			end
-		end
+		DamageType:projectingFor(self, {project_type={talent=t}})
+		local speed1, hit1 = self:attackTargetWith(target, weapon.combat, DamageType.PHYSICAL, t.getDamage(self, t))
+		local speed2, hit2 = self:attackTargetWith(target, offweapon.combat, DamageType.PHYSICAL, self:getOffHandMult(offweapon.combat, t.getDamage(self, t)))
 		DamageType:projectingFor(self, nil)
 
 		return true
 	end,
 	info = function(self, t)
-		return ([[Hits the target with your main weapon, doing %d%% darkness weapon damage. If the attack hits you attack with your second weapon, doing %d%% blight weapon damage and granting an automatic critical. If the second attack hits, the target is blinded for 4 turns.]]):
-		format(100 * self:combatTalentWeaponDamage(t, 0.6, 1.4), 100 * self:combatTalentWeaponDamage(t, 0.6, 1.4))
+		return ([[Corrupt the target reducing disease immunity by 100%% for 2 turns and stripping up to 2 nature sustains then strike with both your weapons dealing %d%% damage.]]):
+		format(100 * t.getDamage(self, t))
 	end,
 }

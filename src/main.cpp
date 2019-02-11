@@ -36,6 +36,7 @@ extern "C" {
 #include "script.h"
 #include "physfs.h"
 #include "physfsrwops.h"
+#include "wfc/lua_wfc_external.h"
 #include "getself.h"
 #include "music.h"
 #include "serial.h"
@@ -1192,6 +1193,7 @@ void boot_lua(int state, bool rebooting, int argc, char *argv[])
 		luaopen_wait(L);
 		luaopen_clipper(L);
 		luaopen_navmesh(L);
+		luaopen_wfc(L);
 
 		// Disable automatic GC, we'l do it when we want
 		lua_gc(L, LUA_GCSTOP, 0);

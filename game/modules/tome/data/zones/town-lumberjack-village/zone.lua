@@ -37,7 +37,7 @@ return {
 			map = "towns/lumberjack-village",
 		},
 		actor = {
-			class = "mod.class.generator.actor.Random",
+			class = "engine.generator.actor.Random",
 			nb_npc = {20, 20},
 			randelite = 0,
 		},

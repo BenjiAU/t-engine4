@@ -81,6 +81,14 @@ newBirthDescriptor{
 	},
 	game_state = {
 		force_town_respec = 1,
+		rare_minimum_level = 8,  -- Player level rare NPCs start appearing, handled by the actor generator defined by zones
+		random_boss_minimum_level = 10,  -- Player level random bosses above rare start spawning, handled by the actor generator typically defined by zones
+		fixedboss_class_minimum_level = 10,  -- Player level fixed bosses can gain levels in bonus classes, handled in Actor.levelupClass
+		default_fixedboss_class_level_rate = 0.5,  -- Default level rate of classes applied to fixedbosses, handled in NPC.addedToLevel
+		default_fixedboss_class_start_level_pct = 0.8, -- Default % of level to use as start level if not explicitly defined, handled in NPC.addedToLevel
+		
+		--random_boss_adjust_fct = function(act) act.testRAF = true end,  -- Function to be applied to all randbosses after they're fully resolved and added to level
+
 	}
 }
 
@@ -149,7 +157,6 @@ newBirthDescriptor{
 		"All damage done to the player decreased by 30%",
 		"All healing for the player increased by 30%",
 		"All detrimental status effects durations reduced by 50%",
-		"Player starts with 15 gold",
 		"Achievements are not granted.",
 	},
 	descriptor_choices =
@@ -170,7 +177,6 @@ newBirthDescriptor{
 	{
 		"#GOLD##{bold}#Normal mode#WHITE##{normal}#",
 		"Provides the normal level of challenges.",
-		"Player starts with 15 gold",
 		"Stairs can not be used for 2 turns after a kill.",
 	},
 	descriptor_choices =
@@ -193,10 +199,10 @@ newBirthDescriptor{
 		"Unfair game setting",
 		"All zone levels increased by 50% by the time Player reaches level 10",
 		"All creature talent levels increased by 30%",
-		"All enemies have 50% more life",
+		"Unique (fixed) bosses advance in bonus classes 30% faster",		
+		"All enemies have 10% more life",
 		"Rare creatures are slightly more frequent",
 		"Stairs can not be used for 3 turns after a kill.",
-		"Player starts with 50 gold",
 		"Player can earn Nightmare version of achievements if also playing in Roguelike or Adventure permadeath mode.",
 	},
 	descriptor_choices =
@@ -207,10 +213,16 @@ newBirthDescriptor{
 	copy = {
 		instakill_immune = 1,
 		__game_difficulty = 3,
-		money = 50,
 	},
 	game_state = {
 		default_random_rare_chance = 15,
+		
+		difficulty_level_mult = 1.5,  -- Level multiplier for Zone.level_range, handled in Game.applyDifficulty
+		difficulty_level_add = 0,  -- Flat value added to Zone.level_range, handled in Game.applyDifficulty 
+
+		difficulty_talent_mult = 1.3,  -- Talent level multiplier for non-summoned NPC talents and base (non-autoclass) fixedboss talents, handled in NPC.addedToLevel
+		difficulty_life_mult = 1.1,  -- Max life multiplier for hostile non-summoned NPCs, handled in NPC.addedToLevel
+		fixedboss_class_level_rate_mult = 1.3,  -- Multiplier for auto_classes level rates, handled in Actor.levelupClass
 	},
 }
 newBirthDescriptor{
@@ -225,11 +237,10 @@ newBirthDescriptor{
 		"Similar rules to Nightmare, but with more random bosses!",
 		"All zone levels increased by 50% + 1 by the time Player reaches level 10",
 		"All creature talent levels increased by 80%",
-		"All enemies have 100% more life",
+		"Unique (fixed) bosses advance in bonus classes 80% faster",
+		"All enemies have 20% more life",
 		"Rare creatures are far more frequent and random bosses start to appear",
-		"Nonrandom bosses will have randomly selected talents",
 		"Stairs can not be used for 5 turns after a kill.",
-		"Player starts with 100 gold",
 		"Player can earn Insane version of achievements if also playing in Roguelike or Adventure permadeath mode.",
 	},
 	descriptor_choices =
@@ -240,11 +251,17 @@ newBirthDescriptor{
 	copy = {
 		instakill_immune = 1,
 		__game_difficulty = 4,
-		money = 100,
 	},
 	game_state = {
 		default_random_rare_chance = 3,
 		default_random_boss_chance = 20,
+
+		difficulty_level_mult = 1.5,  -- Level multiplier for Zone.level_range, handled in Game.applyDifficulty
+		difficulty_level_add = 1,  -- Flat value added to Zone.level_range, handled in Game.applyDifficulty 
+
+		difficulty_talent_mult = 1.8,  -- Talent level multiplier for non-summoned NPC talents and base (non-autoclass) fixedboss talents, handled in NPC.addedToLevel
+		difficulty_life_mult = 1.2,  -- Max life multiplier for hostile non-summoned NPCs, handled in NPC.addedToLevel
+		fixedboss_class_level_rate_mult = 1.8,  -- Multiplier for auto_classes level rates, handled in Actor.levelupClass
 	},
 }
 newBirthDescriptor{
@@ -259,12 +276,11 @@ newBirthDescriptor{
 		"Absolutely unfair game setting.  You are really mentally ill and wish to get worse to play this mode!",
 		"All zone levels increased by 150% + 2 by the time Player reaches level 10",
 		"All creature talent levels increased by 170%",
+		"Unique (fixed) bosses advance in bonus classes 170% faster",
 		"All enemies have 200% more life",
 		"Rare creatures are far more frequent and random bosses start to appear",
-		"Bosses will have randomly selected talents",
 		"Stairs can not be used for 9 turns after a kill.",
 		"Player is being hunted! Randomly all foes in a radius will get a feeling of where she/he is",
-		"Player starts with 150 gold",
 		"Player can earn Madness version of achievements if also playing in Roguelike or Adventure permadeath mode.",
 	},
 	descriptor_choices =
@@ -278,11 +294,17 @@ newBirthDescriptor{
 	copy = {
 		instakill_immune = 1,
 		__game_difficulty = 5,
-		money = 150,
 	},
 	game_state = {
 		default_random_rare_chance = 3,
 		default_random_boss_chance = 20,
+
+		difficulty_level_mult = 2.5,  -- Level multiplier for Zone.level_range, handled in Game.applyDifficulty
+		difficulty_level_add = 2,  -- Flat value added to Zone.level_range, handled in Game.applyDifficulty 
+
+		difficulty_talent_mult = 2.7,  -- Talent level multiplier for non-summoned NPC talents and base (non-autoclass) fixedboss talents, handled in NPC.addedToLevel
+		difficulty_life_mult = 3,  -- Max life multiplier for hostile non-summoned NPCs, handled in NPC.addedToLevel
+		fixedboss_class_level_rate_mult = 2.7,  -- Multiplier for auto_classes level rates, handled in Actor.levelupClass
 	},
 }
 

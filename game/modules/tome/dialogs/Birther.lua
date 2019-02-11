@@ -1454,6 +1454,7 @@ function _M:selectTile()
 		"player/ascii_player_bunny_01.png",
 		"player/ascii_player_exotic_01.png",
 		"player/ascii_player_shopper_01.png",
+		"player/original_handdrawn_player.png",
 	}
 
 	fs.mkdir("/data/gfx/custom-tiles/")

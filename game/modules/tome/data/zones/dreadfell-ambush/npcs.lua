@@ -45,15 +45,20 @@ newEntity{ base="BASE_NPC_ORC", define_as = "UKRUK",
 	resolvers.equip{
 		{type="weapon", subtype="longsword", force_drop=true, tome_drops="boss", autoreq=true},
 		{type="armor", subtype="shield", force_drop=true, tome_drops="boss", autoreq=true},
+		{type="armor", subtype="massive", tome_drops="boss", autoreq=true, }
+
 	},
 	resolvers.drop_randart{},
 	resolvers.drops{chance=100, nb=3, {tome_drops="boss"} },
 	resolvers.drops{chance=100, nb=1, {defined="UKRUK_NOTE"} },
 
 	resolvers.talents{
-		[Talents.T_WEAPONS_MASTERY]=5, [Talents.T_ASSAULT]=5, [Talents.T_OVERPOWER]=5, [Talents.T_RUSH]=5,
+		[Talents.T_WEAPONS_MASTERY]=5, [Talents.T_ASSAULT]=5, [Talents.T_SHIELD_SLAM]=5, [Talents.T_RUSH]=5,
 	},
-	combat_atk = 1000,
+
+	auto_classes={
+		{class="Bulwark", start_level=30, level_rate=75},
+	},
 
 	autolevel = "warrior",
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },

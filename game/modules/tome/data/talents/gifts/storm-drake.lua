@@ -121,14 +121,15 @@ newTalent{
 	points = 5,
 	equilibrium = 14,
 	cooldown = 15,
-	proj_speed = 4, -- This is purely indicative
+	proj_speed = 1, -- This is purely indicative
 	tactical = { ATTACK = { LIGHTNING = 2 }, DISABLE = { stun = 2 } },
-	range = function(self, t) return math.floor(self:combatTalentScale(t, 3, 6)) end,
+	range = function(self, t) return 10 end,
 	requires_target = true,
 	on_learn = function(self, t) self.resists[DamageType.LIGHTNING] = (self.resists[DamageType.LIGHTNING] or 0) + 1 end,
 	on_unlearn = function(self, t) self.resists[DamageType.LIGHTNING] = (self.resists[DamageType.LIGHTNING] or 0) - 1 end,
+	getMoveDamage = function(self, t) return self:combatTalentMindDamage(t, 10, 30) end,
+	getDamage = function(self, t) return self:combatTalentMindDamage(t, 10, 150) end,
 	getRadius = function(self, t) return math.floor(self:combatTalentScale(t, 2, 4, 0.5, 0, 0, true)) end,
-	getStunDuration = function(self, t) return self:combatTalentScale(t, 3, 6, 0.5, 0, 0, true) end,
 	action = function(self, t)
 		local tg = {type="hit", range=self:getTalentRange(t), selffire=false, talent=t}
 		local x, y = self:getTarget(tg)
@@ -137,30 +138,37 @@ newTalent{
 		local target = game.level.map(x, y, Map.ACTOR)
 		if not target then return nil end
 
-		local movedam = self:mindCrit(self:combatTalentMindDamage(t, 10, 110))
-		local dam = self:mindCrit(self:combatTalentMindDamage(t, 15, 190))
+		local movedam = self:mindCrit(t.getMoveDamage(self, t))
+		local dam = self:mindCrit(t.getDamage(self, t))
 		local rad = t.getRadius(self, t)
-		local dur = t.getStunDuration(self, t)
 
 		local proj = require("mod.class.Projectile"):makeHoming(
 			self,
 			{particle="bolt_lightning", trail="lightningtrail"},
-			{speed=4, name="Tornado", dam=dam, movedam=movedam, rad=rad, dur=dur},
+			{speed=1, name="Tornado", dam=dam, movedam=movedam, rad=rad, dur=dur},
 			target,
 			self:getTalentRange(t),
 			function(self, src)
 				local DT = require("engine.DamageType")
-				DT:get(DT.LIGHTNING).projector(src, self.x, self.y, DT.LIGHTNING, self.def.movedam)
+				local Map = require("engine.Map")
+				local kb_func = function(px, py)
+					local target = game.level.map(px, py, Map.ACTOR)
+
+					if not target or target == self then return end
+					if target:canBe("knockback") then
+						target:knockback(src.x, src.y, 2)
+						game.logSeen(target, "%s is knocked back!", target.name:capitalize())
+					else
+						game.logSeen(target, "%s resists the knockback!", target.name:capitalize())
+					end
+				end
+				src:project({type="ball", radius=2, selffire=false, x=self.x, y=self.y, friendlyfire=false}, self.x, self.y, DT.LIGHTNING, self.def.movedam)
+				src:project({type="ball", radius=2, selffire=false, x=self.x, y=self.y, friendlyfire=false}, self.x, self.y, kb_func)
 			end,
 			function(self, src, target)
 				local DT = require("engine.DamageType")
 				src:project({type="ball", radius=self.def.rad, selffire=false, x=self.x, y=self.y}, self.x, self.y, DT.LIGHTNING, self.def.dam)
 				src:project({type="ball", radius=self.def.rad, selffire=false, x=self.x, y=self.y}, self.x, self.y, DT.MINDKNOCKBACK, self.def.dam)
-				if target:canBe("stun") then
-					target:setEffect(target.EFF_STUNNED, self.def.dur, {apply_power=src:combatMindpower()})
-				else
-					game.logSeen(target, "%s resists the tornado!", target.name:capitalize())
-				end
 
 				-- Lightning ball gets a special treatment to make it look neat
 				local sradius = (1 + 0.5) * (engine.Map.tile_w + engine.Map.tile_h) / 2
@@ -175,24 +183,24 @@ newTalent{
 				game:playSoundNear(self, "talents/lightning")
 			end
 		)
+		proj.energy.value = 1500 -- Give it a boost so it moves before our next turn
+		proj.homing.count = 20  -- 20 turns max
 		game.zone:addEntity(game.level, proj, "projectile", self.x, self.y)
 		game:playSoundNear(self, "talents/lightning")
 		return true
 	end,
 	info = function(self, t)
 		local rad = t.getRadius(self, t)
-		local duration = t.getStunDuration(self, t)
-		return ([[Summons a tornado that moves slowly toward its target, following it if it changes position.
-		Any foe caught in its path takes %0.2f lightning damage.
-		When it reaches its target, it explodes in a radius of %d for %0.2f lightning damage and %0.2f physical damage. All affected creatures will be knocked back, and the targeted creature will be stunned for %d turns. The blast will ignore the talent user.
+		return ([[Summons a tornado that moves very slowly toward its target, following it if it changes position for up to 20 turns.
+		Each time it moves every foe within radius 2 takes %0.2f lightning damage and is knocked back 2 spaces.
+		When it reaches its target, it explodes in a radius of %d for %0.2f lightning damage and %0.2f physical damage. All affected creatures will be knocked back. The blast will ignore the talent user.
 		The tornado will last for %d turns, or until it reaches its target.
-		Damage will increase with your Mindpower, and the stun chance is based on your Mindpower vs target Physical Save.
+		Damage will increase with your Mindpower.
 		Each point in storm drake talents also increases your lightning resistance by 1%%.]]):format(
-			damDesc(self, DamageType.LIGHTNING, self:combatTalentMindDamage(t, 10, 110)),
+			damDesc(self, DamageType.LIGHTNING, t.getMoveDamage(self, t)),
 			rad,
-			damDesc(self, DamageType.LIGHTNING, self:combatTalentMindDamage(t, 15, 190)),
-			damDesc(self, DamageType.PHYSICAL, self:combatTalentMindDamage(t, 15, 190)),
-			duration,
+			damDesc(self, DamageType.LIGHTNING, t.getDamage(self, t)),
+			damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)),
 			self:getTalentRange(t)
 		)
 	end,
@@ -207,9 +215,9 @@ newTalent{
 	equilibrium = 12,
 	cooldown = 12,
 	message = "@Source@ breathes lightning!",
-	tactical = { ATTACKAREA = {LIGHTNING = 2}, DISABLE = { daze = 1 } },
+	tactical = { ATTACKAREA = {LIGHTNING = 2}, DISABLE = { stun = 1 } },
 	range = 0,
-	radius = function(self, t) return math.floor(self:combatTalentScale(t, 5, 9)) end,
+	radius = function(self, t) return math.min(13, math.floor(self:combatTalentScale(t, 5, 9))) end,
 	direct_hit = true,
 	requires_target = true,
 	on_learn = function(self, t) self.resists[DamageType.LIGHTNING] = (self.resists[DamageType.LIGHTNING] or 0) + 1 end,
@@ -218,23 +226,30 @@ newTalent{
 		return {type="cone", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=false, talent=t}
 	end,
 	getDamage = function(self, t)
-		return self:combatTalentStatDamage(t, "str", 30, 670)
-	end,
-	getDaze = function(self, t) 
-		return 20+self:combatTalentMindDamage(t, 10, 30) 
+		local bonus = self:knowTalent(self.T_CHROMATIC_FURY) and self:combatTalentStatDamage(t, "wil", 30, 670) or 0
+		return self:combatTalentStatDamage(t, "str", 30, 670) + bonus
 	end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		local dam = self:mindCrit(t.getDamage(self, t))
-		self:project(tg, x, y, DamageType.LIGHTNING_DAZE, {daze=t.getDaze(self, t), power_check=self:combatMindpower(), dam=rng.avg(dam / 3, dam, 3)})
+		local damage = self:mindCrit(t.getDamage(self, t))
+		self:project(tg, x, y, function(tx, ty)
+			local target = game.level.map(tx, ty, Map.ACTOR)
+			if not target or target == self then return end
+			
+			DamageType:get(DamageType.LIGHTNING).projector(self, tx, ty, DamageType.LIGHTNING, damage)
+			if target:canBe("stun") then
+				target:setEffect(target.EFF_STUNNED, 3, {apply_power = self:combatMindpower()})
+			else
+				game.logSeen(target, "%s resists the stun!", target.name:capitalize())
+			end
+		end)
 
 		if core.shader.active() then game.level.map:particleEmitter(self.x, self.y, tg.radius, "breath_lightning", {radius=tg.radius, tx=x-self.x, ty=y-self.y}, {type="lightning"})
 		else game.level.map:particleEmitter(self.x, self.y, tg.radius, "breath_lightning", {radius=tg.radius, tx=x-self.x, ty=y-self.y})
 		end
 
-		
 		if core.shader.active(4) then
 			local bx, by = self:attachementSpot("back", true)
 			self:addParticles(Particles.new("shader_wings", 1, {img="lightningwings", x=bx, y=by, life=18, fade=-0.006, deploy_speed=14}))
@@ -244,14 +259,12 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		local daze = t.getDaze(self, t)
-		return ([[You breathe lightning in a frontal cone of radius %d. Any target caught in the area will take %0.2f to %0.2f lightning damage, and have a %d%% chance to be dazed for 3 turns.
-		The damage will increase with your Strength, and the critical chance is based on your Mental crit rate. The Daze chance is based on your Mindpower.
+		return ([[You breathe lightning in a frontal cone of radius %d. Any target caught in the area will take %0.2f to %0.2f lightning damage and be stunned for 3 turns.
+		The damage will increase with your Strength, and the critical chance is based on your Mental crit rate, and the Stun apply power is based on your Mindpower.
 		Each point in storm drake talents also increases your lightning resistance by 1%%.]]):format(
 			self:getTalentRadius(t),
 			damDesc(self, DamageType.LIGHTNING, damage / 3),
-			damDesc(self, DamageType.LIGHTNING, damage),
-			daze
+			damDesc(self, DamageType.LIGHTNING, damage)
 		)
 	end,
 }

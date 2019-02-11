@@ -21,7 +21,7 @@ require "engine.class"
 
 --- Abstract binary space partitioning  
 -- Can be used to generator levels and so on
--- @classmod engine.BSP
+-- @classmod engine.algorithms.BSP
 module(..., package.seeall, class.make)
 
 --- Init

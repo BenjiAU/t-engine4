@@ -61,8 +61,8 @@ newTalent{
 	require = spells_req1,
 	points = 5,
 	random_ego = "utility",
-	mana = function(self, t) return game.zone and game.zone.force_controlled_teleport and 1 or 10 end,
-	cooldown = function(self, t) return game.zone and game.zone.force_controlled_teleport and 3 or 8 end,
+	mana = function(self, t) return game.zone and game.zone.force_controlled_teleport and 1 or 30 end,
+	cooldown = function(self, t) return game.zone and game.zone.force_controlled_teleport and 3 or 12 end,
 	tactical = teleport_tactical,
 	getRange = function(self, t) return self:combatLimit(self:combatTalentSpellDamage(t, 10, 15), 40, 4, 0, 13.4, 9.4) end, -- Limit to range 40
 	range = function(self, t) return self:getTalentLevel(t) >= 4 and 10 or 0 end, -- for targeting enemies

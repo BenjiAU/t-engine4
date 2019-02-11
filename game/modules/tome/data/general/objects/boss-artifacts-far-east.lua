@@ -507,7 +507,7 @@ newEntity{ base = "BASE_GREATMAUL", define_as="ROTTING_MAUL",
 	use_power = {
 		name = function(self, who)
 			local dam = who:damDesc(engine.DamageType.PHYSICAL, self.use_power.damage(self, who))
-			return ("knock away other craatures within radius %d), dealing %0.2f to %0.2f physical damage (based on Strength) to each"):format(self.use_power.radius, dam, dam*2)
+			return ("knock away other creatures within radius %d), dealing %0.2f to %0.2f physical damage (based on Strength) to each"):format(self.use_power.radius, dam, dam*2)
 		end,
 		power = 50,
 		damage = function(self, who) return 125 + 3*who:getStr() end,

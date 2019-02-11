@@ -50,7 +50,7 @@ newEntity{ define_as = "THE_MASTER",
 	move_others=true,
 
 	body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1, NECK=1, },
-	resolvers.auto_equip_filters("Berzerker"),
+	resolvers.auto_equip_filters("Berserker"),
 	equipment = resolvers.equip{
 		{type="weapon", subtype="greatsword", forbid_power_source={antimagic=true}, force_drop=true, tome_drops="boss", autoreq=true},
 		{type="armor", subtype="heavy", forbid_power_source={antimagic=true}, force_drop=true, tome_drops="boss", autoreq=true},
@@ -98,6 +98,11 @@ newEntity{ define_as = "THE_MASTER",
 		[Talents.T_SPELL_SHIELD]={base=4, every=5, max=8},
 		[Talents.T_BLINDING_SPEED]={base=4, every=5, max=8},
 		[Talents.T_PERFECT_STRIKE]={base=3, every=5, max=7},
+	},
+
+	-- It works better to leave the Berserker part of his identity in the base talents and let just the Necromancer part scale
+	auto_classes={
+		{class="Necromancer", start_level=23, level_rate=75},
 	},
 	resolvers.sustains_at_birth(),
 

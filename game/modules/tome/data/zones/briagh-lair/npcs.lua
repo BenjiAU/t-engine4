@@ -21,6 +21,7 @@ load("/data/general/npcs/sandworm.lua", rarity(0))
 
 local Talents = require("engine.interface.ActorTalents")
 
+-- This boss definitely needs some revision and an actual identity.  Probability Travel??
 newEntity{ define_as = "BRIAGH",
 	allow_infinite_dungeon = true,
 	type = "dragon", subtype = "sand", unique = true,
@@ -61,13 +62,17 @@ newEntity{ define_as = "BRIAGH",
 		[Talents.T_STUN]={base=5, every=5, max=8},
 		[Talents.T_KNOCKBACK]={base=5, every=5, max=8},
 	},
+
+	auto_classes={
+		{class="Summoner", start_level=35, level_rate=100},
+	},
 	resolvers.sustains_at_birth(),
 
 	summon = {
 		{type="vermin", subtype="sandworm", number=8, hasxp=false},
 	},
 
-	autolevel = "warrior",
+	autolevel = "summoner",
 	ai = "tactical", ai_state = { ai_target="target_player_radius", sense_radius=400, talent_in=1, },
 	resolvers.inscriptions(3, {"wild infusion", "healing infusion", "regeneration infusion", "heroism infusion"}),
 }

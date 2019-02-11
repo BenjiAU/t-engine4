@@ -30,10 +30,27 @@ function _M:init(zone, map, level, spots)
 	self.on_spot_chance = data.on_spot_chance or 70
 	self.spot_radius = data.spot_radius or 5
 	self.spot_filters = data.spot_filters or {}
+	self.nb_spots = data.nb_spots or 2
+
+	if self.nb_spots == true then
+		self.nb_spots = 0
+		for _, spot in ipairs(level.spots) do
+			if #self.spot_filters == 0 then
+				self.nb_spots = self.nb_spots + 1
+			else
+				for _, filter in ipairs(self.spot_filters) do
+					if zone:checkFilter(spot, filter) then
+						self.nb_spots = self.nb_spots + 1
+						break
+					end
+				end
+			end
+		end
+	end
 
 	-- Pick a number of spots
 	self.genspots = {}
-	for i = 1, self.nb_spots or 2 do
+	for i = 1, self.nb_spots do
 		local spot = self.level:pickSpot(rng.table(self.spot_filters))
 		if spot then self.genspots[#self.genspots+1] = spot end
 	end
@@ -41,13 +58,15 @@ end
 
 function _M:getSpawnSpot(m)
 	-- Spawn near a spot
-	if rng.percent(self.on_spot_chance) then
+	local done = true
+	
+	while rng.percent(self.on_spot_chance) do -- NOT A WHILE, this is used as a breakable if
 		-- Cycle through spots, looking for one with empty spaces
 		local tries = 0
 		local spot = rng.table(self.genspots)
 		if not spot then
 			print("No spots for spawning")
-			return
+			break
 		end
 		local _, _, gs = util.findFreeGrid(spot.x, spot.y, self.spot_radius, "block_move", {[Map.ACTOR]=true})
 		while not gs and tries < 10 do
@@ -57,7 +76,7 @@ function _M:getSpawnSpot(m)
 		end
 		if not gs then
 			print("No more free space for spawning")
-			return
+			break
 		end
 		-- Cycle through available spaces
 		tries = 0
@@ -75,17 +94,18 @@ function _M:getSpawnSpot(m)
 			return x, y
 		end
 
-	-- Spawn randomly
-	else
-		local x, y = rng.range(self.area.x1, self.area.x2), rng.range(self.area.y1, self.area.y2)
-		local tries = 0
-		while (not m:canMove(x, y) or (self.map.room_map[x][y] and self.map.room_map[x][y].special)) and tries < 100 do
-			x, y = rng.range(self.area.x1, self.area.x2), rng.range(self.area.y1, self.area.y2)
-			tries = tries + 1
-		end
-		if tries < 100 then
-			return x, y
-		end
+		break
+	end
+
+	-- Otherwise, spawn randomly
+	local x, y = rng.range(self.area.x1, self.area.x2), rng.range(self.area.y1, self.area.y2)
+	local tries = 0
+	while (not m:canMove(x, y) or (self.map.room_map[x][y] and self.map.room_map[x][y].special)) and tries < 100 do
+		x, y = rng.range(self.area.x1, self.area.x2), rng.range(self.area.y1, self.area.y2)
+		tries = tries + 1
+	end
+	if tries < 100 then
+		return x, y
 	end
 end
 

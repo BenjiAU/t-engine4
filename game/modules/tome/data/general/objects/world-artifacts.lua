@@ -87,6 +87,7 @@ newEntity{ base = "BASE_INFUSION",
 
 newEntity{ base = "BASE_RUNE",
 	name = "Prismatic Rune", unique=true, define_as="RUNE_PRISMATIC",
+	image = "object/artifact/prismatic_rune.png",
 	level_range = {5, 50},
 	rarity = 300,
 	cost = 500,
@@ -110,6 +111,7 @@ newEntity{ base = "BASE_RUNE",
 
 newEntity{ base = "BASE_RUNE",
 	name = "Mirror Image Rune", unique=true, define_as="RUNE_MIRROR_IMAGE",
+	image = "object/artifact/mirror_image_rune.png",
 	level_range = {5, 50},
 	rarity = 300,
 	cost = 500,
@@ -505,7 +507,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 16,
 		combat_def_ranged = 15,
 		fatigue = 20,
-		learn_talent = { [Talents.T_BLOCK] = 5, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 	on_block = {desc = "30% chance that you'll breath stunning fire in a cone at the attacker (if within range 6).", fct = function(self, who, target, type, dam, eff)
 	if rng.percent(30) then
@@ -543,7 +545,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def_ranged = 10,
 		fatigue = 30,
 		combat_armor_hardiness = 20,
-		learn_talent = { [Talents.T_BLOCK] = 4, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
 
@@ -573,7 +575,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 8,
 		combat_def_ranged = 8,
 		fatigue = 6,
-		learn_talent = { [Talents.T_BLOCK] = 3, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 		resists = { [DamageType.BLIGHT] = 25, [DamageType.DARKNESS] = 25, },
 		inc_stats = { [Stats.STAT_WIL] = 5, },
 	},
@@ -1742,7 +1744,7 @@ newEntity{ base = "BASE_GREATSWORD",
 			if not target:canBe(eff) then return end
 			if not target:checkHit(who:combatAttack(combat), target:combatPhysicalResist(), 15) then return end
 			if eff == "stun" then target:setEffect(target.EFF_STUNNED, 3, {})
-			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=75})
+			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=50})
 			end
 		end},
 		melee_project={[DamageType.LIGHT] = 49, [DamageType.DARKNESS] = 49},
@@ -3389,7 +3391,7 @@ newEntity{ base = "BASE_LONGSWORD",
 			if eff == "stun" then target:setEffect(target.EFF_MADNESS_STUNNED, 3, {mindResistChange=-25})
 			elseif eff == "malign" then target:setEffect(target.EFF_MALIGNED, 3, {resistAllChange=10})
 			elseif eff == "agony" then target:setEffect(target.EFF_AGONY, 5, { src=who, damage=40, mindpower=40, range=10, minPercent=10, duration=5})
-			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=60})
+			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=50})
 			elseif eff == "silence" then target:setEffect(target.EFF_SILENCED, 3, {})
 			end
 		end},
@@ -6552,7 +6554,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_spellpower=12,
 		combat_spellresist = 20,
 		resists = {[DamageType.TEMPORAL] = 30},
-		learn_talent = { [Talents.T_BLOCK] = 5, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 		flat_damage_armor = {all=20},
 		slow_projectiles = 50,
 	},
@@ -6750,7 +6752,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 5,
 		combat_def_ranged = 10,
 		fatigue = 12,
-		learn_talent = { [Talents.T_BLOCK] = 4, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 		resists = { [DamageType.PHYSICAL] = 10, [DamageType.ACID] = 10, [DamageType.LIGHTNING] = 10, [DamageType.FIRE] = 10,},
 	},
 	on_block = {desc = "30% chance of petrifying the attacker.", fct = function(self, who, src, type, dam, eff)
@@ -6897,7 +6899,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_def = 5,
 		combat_def_ranged = 12,
 		fatigue = 10,
-		learn_talent = { [Talents.T_BLOCK] = 4, [Talents.T_SHIELDSMAIDEN_AURA] = 1,  },
+		learn_talent = { [Talents.T_BLOCK] = 1, [Talents.T_SHIELDSMAIDEN_AURA] = 1,  },
 		resists = { [DamageType.COLD] = 25, [DamageType.FIRE] = 25,},
 	},
 }
@@ -7382,7 +7384,7 @@ newEntity{ base = "BASE_LEATHER_CAP",
 	moddable_tile_big = true,
 	encumber = 2,
 	rarity = 200,
-	desc = [[This mask appears to be carved out of the skull of a creature that never should have existed, malformed and distorted. You shiver as you look upon it, and it's hollow eye sockets seem to stare back into you.]],
+	desc = [[This mask appears to be carved out of the skull of a creature that never should have existed, malformed and distorted. You shiver as you look upon it, and its hollow eye sockets seem to stare back into you.]],
 	cost = 200,
 	material_level=3,
 	wielder = {

@@ -118,6 +118,7 @@ function _M:set(str, ...)
 			if part then
 				if type(part) == "string" then
 					part = part:toTString()
+					str[i] = part
 				end
 				if part.is_tstring then
 					local width = part:maxWidth(self.font)
@@ -137,7 +138,8 @@ function _M:set(str, ...)
 		for i=1, #str do
 			-- if the item is tstring then merge it with main ts
 			if str[i] then
-				if str[i].is_tstring or type(part) == "string" then
+
+				if str[i].is_tstring then
 					if i > 1 then 
 						if str[i - 1] and str[i - 1].is_tstring then 
 							ts:add(true) 
@@ -194,7 +196,7 @@ function _M:set(str, ...)
 	self.w = max_w + self.frame.b4.w
 	
 	local clip_h = self.h
-	if game.tooltip:tooltip_bound_y2() < clip_h then clip_h = game.tooltip:tooltip_bound_y2() end
+	if self:tooltip_bound_y2() < clip_h then clip_h = self:tooltip_bound_y2() end
 	
 	self.container:resize(self.w, clip_h - self.frame.b2.h, self.w, clip_h - self.frame.b2.h)
 	self.h = clip_h

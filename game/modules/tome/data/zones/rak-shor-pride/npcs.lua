@@ -91,6 +91,11 @@ newEntity{ base="BASE_NPC_ORC_RAK_SHOR", define_as = "RAK_SHOR",
 		[Talents.T_BLIGHTED_SUMMONING]=1,
 		[Talents.T_ENDLESS_WOES]=1,
 	},
+
+	auto_classes={
+		{class="Necromancer", start_level=35, level_rate=50},
+		{class="Corruptor", start_level=35, level_rate=50},
+	},
 	resolvers.sustains_at_birth(),
 
 	on_die = function(self, who)

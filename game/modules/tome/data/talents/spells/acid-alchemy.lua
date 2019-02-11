@@ -67,7 +67,7 @@ newTalent{
 		local chance = t.getChance(self, t)
 		local dam = self.alchemy_golem and self.alchemy_golem:damDesc(engine.DamageType.ACID, t.getDamage(self, t)) or 0
 		return ([[While Acid Infusion is active, your bombs coat your golem in acid for %d turns when they hit it.
-		While coated, any melee hit agaist your golem has a %d%% chance to trigger a radius 4 cone of acid towards the attacker that does %0.1f Acid damage to all caught inside. (This can only happen once per turn.)
+		While coated, any melee hit against your golem has a %d%% chance to trigger a radius 4 cone of acid towards the attacker that does %0.1f Acid damage to all caught inside. (This can only happen once per turn.)
 		The effects increase with your talent level and with the Spellpower and damage modifiers of your golem.]]):
 		format(duration, chance, dam)
 	end,
@@ -183,7 +183,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		return ([[Acid errupts all around your target, dealing %0.1f acid damage.
+		return ([[Acid erupts all around your target, dealing %0.1f acid damage.
 		The acid attack is extremely distracting, and may remove up to %d physical or mental temporary effects or mental sustains (depending on the Spell Save of the target).
 		The damage and chance to remove effects will increase with your Spellpower.]]):format(damDesc(self, DamageType.ACID, damage), t.getRemoveCount(self, t))
 	end,

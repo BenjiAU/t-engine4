@@ -356,7 +356,7 @@ newTalent{
 		local secondHitChance = t.getSecondHitChance(self, t)
 		local hits = 1 + math.floor(secondHitChance/100)
 		local chance = secondHitChance - math.floor(secondHitChance/100)*100
-		return ([[Your fury becomes an unseen force that randomly lashes out at foes around you. For %d turns you strike %d (%d%% chance for %d) nearby target(s) within range 5 doing %d damage and %d knockback.  The number of extra strikes increases at higher talent levels.
+		return ([[Your fury becomes an unseen force that randomly lashes out at foes around you. For %d turns you strike %d (%d%% chance for %d) nearby target(s) within range 5 doing %d damage and %d knockback. The number of extra strikes increases at higher talent levels.
 		In addition, your ability to channel force with this talent increases all critical damage by %d%% (currently: %d%%)
 		Damage increases with your Mindpower.]]):format(duration, hits, chance, hits+1, damDesc(self, DamageType.PHYSICAL, damage), knockback, t.critpower(self, t), self.combat_critical_power or 0)
 	end,

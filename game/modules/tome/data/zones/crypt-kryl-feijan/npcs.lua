@@ -76,6 +76,12 @@ newEntity{ base="BASE_NPC_MAJOR_DEMON", define_as = "KRYL_FEIJAN",
 		[Talents.T_BURNING_HEX]={base=5, every=5, max=8},
 		[Talents.T_BLOOD_LOCK]={base=5, every=5, max=8},
 	},
+
+
+	auto_classes={
+		{class="Corruptor", start_level=29, level_rate=50},
+		{class="Archmage", start_level=29, level_rate=50},
+	},	
 	resolvers.sustains_at_birth(),
 }
 

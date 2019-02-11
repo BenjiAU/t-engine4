@@ -97,7 +97,8 @@ _M.clone_nodes = table.merge({running_fov=false, running_prev=false,
 
 --- cloneActor default post copy fields (merged by cloneActor)
 _M.clone_copy = table.merge({no_drops=true, no_rod_recall=true, no_inventory_access=true, no_levelup_access=true,
-	remove_from_party_on_death=true, keep_inventory_on_death=false,
+	remove_from_party_on_death=true, keep_inventory_on_death=false, no_source_remove=true,
+
 	energy={value=0},
 	}, _M.clone_copy or {})
 	
@@ -475,9 +476,6 @@ function _M:useEnergy(val)
 	-- Curse of Shrouds: turn shroud of passing on or off
 	local eff = self:hasEffect(self.EFF_CURSE_OF_SHROUDS)
 	if eff then self.tempeffect_def[self.EFF_CURSE_OF_SHROUDS].doShroudOfPassing(self, eff) end
-
-	-- Do not fire those talents if this is not turn's end
-	if self:enoughEnergy() or game.zone.wilderness then return end
 end
 
 -- Called at the start of a turn before the actor chooses their action, energy is handled, etc
@@ -611,9 +609,32 @@ function _M:actBase()
 	end
 
 	-- Cooldown talents after effects, because some of them involve breaking sustains.
-	if not self:attr("no_talents_cooldown") then self:cooldownTalents() end
+
+	if not self:attr("no_talents_cooldown") then
+		if self:attr("half_talents_cooldown") then self:cooldownTalents(0.5) else self:cooldownTalents(1) end
+	end
 
 	self:checkStillInCombat()
+end
+
+function _M:hasProc(proc)
+	if not self.turn_procs then return end
+	if self.turn_procs[proc] then 
+		return self.turn_procs[proc] 
+	elseif self.turn_procs.multi then 
+		return self.turn_procs.multi[proc] 
+	end
+end
+
+function _M:setProc(name, val, turns)
+	turns = turns or 1
+	val = val or true
+	local proc = {val = val, turns = turns}
+	if turns > 1 then
+		table.set(self, "turn_procs", "multi", name, proc)
+	else 
+		self.turn_procs[name] = proc
+	end
 end
 
 -- General entry point for Actors to act, called by NPC:act or Player:act
@@ -621,7 +642,20 @@ function _M:act()
 	if not engine.Actor.act(self) then return end
 
 	self.changed = true
+
+	-- Store procs with more than 1 turn remaining and re-add them after we clear turn_procs
+	local temp = {}
+	if self.turn_procs.multi then
+		for proc, val in pairs(self.turn_procs.multi) do
+			if proc then
+				self.turn_procs.multi[proc].turns = self.turn_procs.multi[proc].turns - 1
+				if self.turn_procs.multi[proc].turns > 0 then temp[proc] = val end
+			end
+		end
+	end
+
 	self.turn_procs = {}
+	if temp then self.turn_procs.multi = temp end
 
 	-- Break some sustains if certain resources are too low
 	-- Note: force_talent_ignore_ressources has no effect here
@@ -1015,7 +1049,7 @@ function _M:move(x, y, force)
 
 		-- Confused ?
 		if not force and self:attr("confused") then
-			if rng.percent(self:attr("confused")) then
+			if rng.percent(util.bound(self:attr("confused"), 0, 50)) then
 				x, y = self.x + rng.range(-1, 1), self.y + rng.range(-1, 1)
 			end
 		end
@@ -1109,7 +1143,7 @@ function _M:move(x, y, force)
 	end
 
 	-- Break channels
-	if moved then
+	if not force and moved and ox and oy and (ox ~= self.x or oy ~= self.y) then
 		self:breakPsionicChannel()
 		self:breakSpacetimeTuning()
 	end
@@ -1296,7 +1330,7 @@ function _M:teleportRandom(x, y, dist, min_dist)
 		
 		-- after moving
 		if self:attr("defense_on_teleport") or self:attr("resist_all_on_teleport") or self:attr("effect_reduction_on_teleport") then
-			self:setEffect(self.EFF_OUT_OF_PHASE, 5, {defense=self:attr("defense_on_teleport") or 0, resists=self:attr("resist_all_on_teleport") or 0, effect_reduction=self:attr("effect_reduction_on_teleport") or 0})
+			self:setEffect(self.EFF_OUT_OF_PHASE, 5, {})
 		end
 	end
 	
@@ -1566,7 +1600,23 @@ function _M:tooltip(x, y, seen_by)
 	if self.hide_level_tooltip then ts:add({"color", 0, 255, 255}, "Level: unknown", {"color", "WHITE"}, true)
 	else ts:add({"color", 0, 255, 255}, ("Level: %d"):format(self.level), {"color", "WHITE"}, true) end
 	if self:attr("invulnerable") then ts:add({"color", "PURPLE"}, "INVULNERABLE!", true) end
-	ts:add({"color", 255, 0, 0}, ("HP: %d (%d%%)"):format(self.life, self.life * 100 / self.max_life), {"color", "WHITE"})
+	ts:add({"color", 255, 0, 0}, ("HP: %d (%d%%) #GREEN#+%0.2f#LAST#"):format(self.life, self.life * 100 / self.max_life, self.life_regen * util.bound(self.healing_factor or 1)), {"color", "WHITE"})
+	
+	-- Avoid cluttering tooltip if resources aren't relevant (add menu option?)
+	if game.player:knowTalentType("wild-gift/antimagic") then
+		if self:knowTalent(self.T_MANA_POOL) then 
+			ts:add(("\nMana:  "..self.resources_def.mana.color.."%d / %d#LAST#"):format(self.mana, self.max_mana, true))
+		end
+		if self:knowTalent(self.T_VIM_POOL) then
+			ts:add(("\nVim:  "..self.resources_def.vim.color.."%d / %d#LAST#"):format(self.vim, self.max_vim, true))
+		end
+		if self:knowTalent(self.T_POSITIVE_POOL) then
+			ts:add(("\nPositive:  "..self.resources_def.positive.color.."%d / %d#LAST#"):format(self.positive, self.max_positive, true))
+		end
+		if self:knowTalent(self.T_NEGATIVE_POOL) then
+			ts:add(("\nNegative:  "..self.resources_def.negative.color.."%d / %d#LAST#"):format(self.negative, self.max_negative, true))
+		end
+	end
 
 	if self:knowTalent(self.T_SOLIPSISM) then
 		local psi_percent = 100*self.psi/self.max_psi
@@ -1580,23 +1630,30 @@ function _M:tooltip(x, y, seen_by)
 	--ts:add(("Stats: %d / %d / %d / %d / %d / %d"):format(self:getStr(), self:getDex(), self:getCon(), self:getMag(), self:getWil(), self:getCun()), true)
 	--if #resists > 0 then ts:add("Resists: ", table.concat(resists, ','), true) end
 
+	local dt_order = function(a, b)
+		if a[1] == "all" then return true
+		elseif b[1] == "all" then return false
+		else return a[2] > b[2] end
+	end
+
 	local resists = tstring{}
 	local first = true
 	ts:add({"color", "ANTIQUE_WHITE"}, "Resists: ")
-	for t, v in pairs(self.resists) do
+	for t, _ in table.orderedPairs2(self.resists, dt_order) do
+		local v = self:combatGetResist(t)
 		if t == "all" or t == "absolute" then
-			if first then first = false else ts:add(", ") end
 			ts:add({"color", "LIGHT_BLUE"}, tostring(math.floor(v)) .. "%", " ", {"color", "LAST"}, t..", ")
 		elseif type(t) == "string" and math.abs(v) >= 20 then
-			local res = tostring ( math.floor(self:combatGetResist(t)) ) .. "%"
+			local res = tostring(math.floor(v)) .. "%"
 			if first then first = false else ts:add(", ") end
 			if v > 0 then
-				ts:add({"color", "LIGHT_GREEN"}, res, " ", {"color", "LAST"}, DamageType:get(t).name, ", ")
+				ts:add({"color", "LIGHT_GREEN"}, res, " ", {"color", "LAST"}, DamageType:get(t).name)
 			else
-				ts:add({"color", "LIGHT_RED"}, res, " ", {"color", "LAST"}, DamageType:get(t).name, ", ")
+				ts:add({"color", "LIGHT_RED"}, res, " ", {"color", "LAST"}, DamageType:get(t).name)
 			end
 		end
 	end
+
 	if self:attr("speed_resist") then
 		local res = 100 - (util.bound(self.global_speed * self.movement_speed, (100-(self.speed_resist_cap or 70))/100, 1)) * 100
 		if res > 0 then
@@ -1722,7 +1779,11 @@ function _M:tooltip(x, y, seen_by)
 			if e.type == "physical" then
 				effphysical:add(true, "- ", {"color", "LIGHT_RED"}, desceffect(e, p, dur), {"color", "WHITE"} )
 			elseif e.type == "magical" then
-				effmagical:add(true, "- ", {"color", "DARK_ORCHID"}, desceffect(e, p, dur), {"color", "WHITE"} )
+				if e.subtype and e.subtype.disease then
+					effmagical:add(true, "- ", {"color", "DARK_GREEN"}, desceffect(e, p, dur), {"color", "WHITE"} )
+				else
+					effmagical:add(true, "- ", {"color", "DARK_ORCHID"}, desceffect(e, p, dur), {"color", "WHITE"} )
+				end
 			elseif e.type == "mental" then
 				effmental:add(true, "- ", {"color", "YELLOW"}, desceffect(e, p, dur), {"color", "WHITE"} )
 			elseif e.type == "other" then
@@ -1811,10 +1872,6 @@ function _M:onHeal(value, src)
 
 	if self:attr("arcane_shield") and self:attr("allow_on_heal") and value > 0 then
 		self:setEffect(self.EFF_DAMAGE_SHIELD, 3, {power=value * self.arcane_shield / 100})
-	end
-
-	if self:attr("fungal_growth") and self:attr("allow_on_heal") and value > 0 and not self:hasEffect(self.EFF_REGENERATION) then
-		self:setEffect(self.EFF_REGENERATION, 6, {power=(value * self.fungal_growth / 100) / 6, no_wild_growth=true})
 	end
 
 	-- Must be last!
@@ -2099,14 +2156,6 @@ function _M:onTakeHit(value, src, death_note)
 		end
 	end
 
-	if value > 0 and self:isTalentActive(self.T_BONE_SHIELD) then
-		local t = self:getTalentFromId(self.T_BONE_SHIELD)
-		if t.absorb(self, t, self:isTalentActive(self.T_BONE_SHIELD)) then
-			game:delayedLogDamage(src, self, 0, ("#SLATE#(%d to bones)#LAST#"):format(value), false)
-			value = 0
-		end
-	end
-
 	if value <=0 then return 0 end
 	if self.knowTalent and (self:knowTalent(self.T_SEETHE) or self:knowTalent(self.T_GRIM_RESOLVE)) then
 		if not self:hasEffect(self.EFF_CURSED_FORM) then
@@ -2296,7 +2345,7 @@ function _M:onTakeHit(value, src, death_note)
 	end
 
 	-- Bloodlust!
-	if value > 0 and src and src.knowTalent and src:knowTalent(src.T_BLOODLUST) then
+	if value > 0 and src and not (src == self) and src.knowTalent and src:knowTalent(src.T_BLOODLUST) then
 		src:setEffect(src.EFF_BLOODLUST, 1, {})
 	end
 
@@ -2398,7 +2447,10 @@ function _M:onTakeHit(value, src, death_note)
 			local value = self:heal(sl, self)
 			game.logSeen(self, "#YELLOW#%s has been healed by a blast of positive energy!#LAST#", self.name:capitalize())
 			if value > 0 then
-				if self.player then world:gainAchievement("AVOID_DEATH", self) end
+				if self.player then
+					self:setEmote(Emote.new("The Sun Protects!", 45))
+					world:gainAchievement("AVOID_DEATH", self)
+				end
 			end
 		end
 
@@ -2435,7 +2487,7 @@ function _M:onTakeHit(value, src, death_note)
 		local vt = self:getTalentFromId(self.T_LEECH)
 		self:incVim(vt.getVim(self, vt))
 		self:heal(vt.getHeal(self, vt), src)
-		if self.player then src:logCombat(src, "#AQUAMARINE#You leech a part of #Target#'s vim.") end
+		--if self.player then src:logCombat(src, "#AQUAMARINE#You leech a part of #Target#'s vim.") end
 	end
 
 	-- Invisible on hit
@@ -3029,7 +3081,7 @@ end
 -- @field level_rate: rate levels in character class are gained as % of actor level <100>
 -- @field check_talents_level: set true to enforce character level limits on talent levels (i.e. level 5 at level 50) <nil>
 -- @field level_by_class: set true to use class level rather than actor level when checking talent/stat limits <nil>
--- @foe;d ignore_special: set true to skip checking talent special requirements
+-- @field ignore_special: set true to skip checking talent special requirements
 -- @field auto_sustain: set true to automatically turn on sustained talents learned <nil>
 -- @field tt_focus: talent type focus, higher values cause talent selections to be focused within fewer talent types <3>
 -- @field use_actor_points: set true to apply stat/talent points from base actor levels in addtion to class levels <nil>
@@ -3038,14 +3090,19 @@ end
 --		{talent_type_name = {[1]=known, [2]=mastery_add}, ...}
 -- @field auto_stats: ordered list of stat ids to use when applying unused_stats points
 --		generated from class descriptor by default, set false to disable, see Actor:learnStats
+-- @field calculate_tactical:  set true to recalculate ai_tactic weights based on learned talents <nil>
 -- Additional talent inputs for each talent definition t:
 --	t.random_boss_rarity: if defined, the percent chance the talent may be learned each time randomly selected
 function _M:levelupClass(c_data)
+	if game.player.level <= (game.state.birth.fixedboss_class_minimum_level or 0) then return end
+	local difficulty_adjusted_level_rate = (game.state.birth.fixedboss_class_level_rate_mult or 1) * (c_data.level_rate or 100)	
+	
+	
 	c_data.last_level = c_data.last_level or 0
 	c_data.start_level = c_data.start_level or 1
-
-	local new_level = math.ceil((self.level - c_data.start_level + 1)*(c_data.level_rate or 100)/100)
+	if c_data.calculate_tactical then self.ai_calculate_tactical = true end
 	
+	local new_level = math.ceil((self.level - c_data.start_level + 1)*difficulty_adjusted_level_rate/100)
 	if new_level <= c_data.last_level then return end
 	print("[Actor:levelupClass]", self.name, "auto level up", c_data.class, c_data.last_level, "-->", new_level, c_data)
 	
@@ -3075,7 +3132,7 @@ function _M:levelupClass(c_data)
 			return 
 		end
 
-		print(("[Actor:levelupClass] %s %s ## Initialzing auto_class %s (%s) %s%% level_rate from level %s ##"):format(self.uid, self.name, c_data.class, mclass.name, c_data.level_rate, c_data.start_level))
+		print(("[Actor:levelupClass] %s %s ## Initialzing auto_class %s (%s) %s%% level_rate from level %s ##"):format(self.uid, self.name, c_data.class, mclass.name, difficulty_adjusted_level_rate, c_data.start_level))
 
 		-- update class descriptor list and build inherent power sources
 		self.descriptor = self.descriptor or {}
@@ -3664,7 +3721,7 @@ end
 
 function _M:getMaxEncumbrance()
 	local add = 0
-	return math.floor(40 + self:getStr() * 1.8 + (self.max_encumber or 0) + add)
+	return math.floor(70 + self:getStr() * 1.8 + (self.max_encumber or 0) + add)
 end
 
 function _M:getEncumbrance()
@@ -4227,7 +4284,7 @@ function _M:onTakeoff(o, inven_id, bypass_set, silent)
 	-- If objected buffed us, remove
 	local todel = {}
 	for eff_id, p in pairs(self.tmp) do
-		if p.__object_source == o then todel[#todel+1] = eff_id end
+		if p.__object_source == o and not self.no_source_remove and not o.no_source_remove then todel[#todel+1] = eff_id end
 	end
 	if #todel > 0 then for _, eff_id in ipairs(todel) do self:removeEffect(eff_id) end end
 
@@ -4479,7 +4536,15 @@ function _M:searchAllInventories(o, fct)
 	end)
 	return inv, slot, attached
 end
-		
+
+local oldGetTalentTypeMastery = _M.getTalentTypeMastery
+function _M:getTalentTypeMastery(tt)
+	local mastery = oldGetTalentTypeMastery(self, tt)
+	local bonus1 = self.talents_mastery_bonus and self.talents_mastery_bonus[tt.category] or 0
+	local bonus2 = self.talents_mastery_bonus and self.talents_mastery_bonus.all or 0
+	return mastery + bonus1 + bonus2
+end
+
 function _M:lastLearntTalentsMax(what)
 	if self:attr("infinite_respec") then return 99999 end
 	return what == "generic" and 3 or 4
@@ -4689,7 +4754,7 @@ function _M:unlearnTalent(t_id, nb, no_unsustain, extra)
 	-- Remove buffs ?
 	local todel = {}
 	for eff_id, p in pairs(self.tmp) do
-		if p.__talent_source == t_id then todel[#todel+1] = eff_id end
+		if p.__talent_source == t_id and not self.no_source_remove and not t.no_source_remove then todel[#todel+1] = eff_id end
 	end
 	if #todel > 0 then for _, eff_id in ipairs(todel) do self:removeEffect(eff_id) end end
 
@@ -4922,9 +4987,10 @@ end
 local previous_incVim = _M.incVim
 function _M:incVim(v)
 	if v < 0 and self:attr("bloodcasting") then
+		local mult = self:attr("bloodcasting") / 100
 		local cost = math.abs(v)
 		if self.vim - cost < 0 then
-			local damage = cost - (self.vim or 0)
+			local damage = (cost - (self.vim or 0)) * mult
 			self:incVim(-self.vim or 0)
 			self.life = self.life - damage
 		else
@@ -4939,7 +5005,7 @@ end
 local previous_getVim = _M.getVim
 function _M:getVim()
 	if self:attr("bloodcasting") and self.on_preuse_checking_resources then
-		return self.life
+		return math.max(self.vim, self.life)
 	else
 		return previous_getVim(self)
 	end
@@ -5207,7 +5273,7 @@ function _M:preUseTalent(ab, silent, fake)
 	if not ab.never_fail then
 		-- Confused ? lose a turn!
 		if self:attr("confused") and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) and util.getval(ab.no_energy, self, ab) ~= true and not fake and not self:attr("force_talent_ignore_ressources") then
-			if rng.percent(self:attr("confused")) then
+			if rng.percent(util.bound(self:attr("confused"), 0, 50)) then
 				if not silent then game.logSeen(self, "%s is confused and fails to use %s.", self.name:capitalize(), ab.name) end
 				self:useEnergy()
 				return false
@@ -5273,14 +5339,27 @@ end
 -- @param ab the talent (not the id, the table)
 function _M:logTalentMessage(ab)
 	if ab.message ~= false and not util.getval(ab.no_message, self, ab) then
+	local color = "#ORCHID#"  -- Default
 		if ab.message then
-			game.logSeen(self, "%s", self:useTalentMessage(ab))
+			-- Should this not be colored?
+			if ab.is_mind then color = "#YELLOW#"
+			elseif ab.is_melee then color = "#RED#"
+			elseif ab.is_inscription then color = "#GREEN#"
+			end
+			game.logSeen(self, color.."#{bold}#%s#{normal}##LAST#", self:useTalentMessage(ab))
 		elseif ab.mode == "sustained" then
-			game.logSeen(self, "%s %s %s.", self.name:capitalize(), self:isTalentActive(ab.id) and "deactivates" or "activates", ab.name)
+			game.logSeen(self, "%s %s #{bold}##ORANGE#%s#LAST#.", self.name:capitalize(), self:isTalentActive(ab.id) and "deactivates" or "activates", ab.name)
 		elseif ab.is_spell then
-			game.logSeen(self, "%s casts %s.", self.name:capitalize(), ab.name)
+			if ab.is_inscription then color = "#GREEN#"
+			else color = "#PURPLE#"
+			end
+			game.logSeen(self, "%s casts #{bold}#"..color.."%s.#{normal}##LAST#", self.name:capitalize(), ab.name)
 		else
-			game.logSeen(self, "%s uses %s.", self.name:capitalize(), ab.name)
+			if ab.is_mind then color = "#YELLOW#"
+			elseif ab.is_melee then color = "#RED#"
+			elseif ab.is_inscription then color = "#GREEN#"
+			end
+			game.logSeen(self, "%s uses #{bold}#"..color.."%s.#{normal}##LAST#", self.name:capitalize(), ab.name)
 		end
 	end
 end
@@ -5294,6 +5373,7 @@ local sustainCallbackCheck = {
 	callbackOnHit = "talents_on_hit",
 	callbackOnAct = "talents_on_act",
 	callbackOnActBase = "talents_on_act_base",
+	callbackOnActEnd = "talents_on_act_end",
 	callbackOnMove = "talents_on_move",
 	callbackOnRest = "talents_on_rest",
 	callbackOnWait = "talents_on_wait",
@@ -5518,6 +5598,8 @@ function _M:getTalentSpeedType(t)
 		return "weapon"
 	elseif t.is_mind then
 		return "mind"
+	elseif t.is_melee then
+		return "weapon"
 	else
 		return "standard"
 	end
@@ -5582,7 +5664,7 @@ function _M:postUseTalent(ab, ret, silent)
 			if #tgts > 0 then
 				self.turn_procs.corrupted_strength = true
 				DamageType:projectingFor(self, {project_type={talent=self:getTalentFromId(self.T_CORRUPTED_STRENGTH)}})
-				self:attackTarget(rng.table(tgts), DamageType.BLIGHT, self:combatTalentWeaponDamage(self.T_CORRUPTED_STRENGTH, 0.5, 1.1), true)
+				self:attackTarget(rng.table(tgts), DamageType.BLIGHT, self:combatTalentWeaponDamage(self.T_CORRUPTED_STRENGTH, 0.2, 0.7), true)
 				DamageType:projectingFor(self, nil)
 			end
 		end
@@ -6752,7 +6834,7 @@ function _M:on_set_temporary_effect(eff_id, e, p)
 		end
 	end
 
-	if e.status == "detrimental" and self:knowTalent(self.T_RESILIENT_BONES) then
+	if e.status == "detrimental" and e.type ~= "other" and self:knowTalent(self.T_RESILIENT_BONES) then
 		p.dur = math.ceil(p.dur * (1 - self:callTalent(self.T_RESILIENT_BONES,"durresist")))
 	end
 	if e.status == "detrimental" and e.type ~= "other" and self:attr("reduce_detrimental_status_effects_time") then
@@ -7392,4 +7474,12 @@ function _M:updateInCombatStatus()
 	else
 		self:fireTalentCheck("callbackOnCombat", false)
 	end
+end
+
+-- Projects with a specified source and preserves the old one
+function _M:projectSource(t, x, y, damtype, dam, particles, source)
+	local old_source = self.__project_source
+	self.__project_source = source
+	self:project(t, x, y, damtype, dam, particles)
+	self.__project_source = old_source
 end

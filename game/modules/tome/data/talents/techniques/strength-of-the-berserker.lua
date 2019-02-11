@@ -218,7 +218,14 @@ newTalent{
 	getDur = function(self, t) return math.floor(self:combatTalentLimit(t, 19, 4, 8)) end,
 	getStamina = function(self, t) return self:combatStatScale("con", 4, 25) end,
 	getSpeed = function(self, t) return self:combatTalentLimit(t, 70, 10, 30) end,
-	on_pre_use = function(self, t, silent) if not self:hasTwoHandedWeapon() or self:getStamina() > self:getMaxStamina() * 0.3 then if not silent then game.logPlayer(self, "You require a two handed weapon to use this talent.") end return false end return true end,
+	on_pre_use = function(self, t, silent)
+	if not self:hasTwoHandedWeapon() and self:getStamina() > self:getMaxStamina() * 0.3 then if not silent then
+		game.logPlayer(self, "You require a two handed weapon and less stamina to use this talent.") end return false end
+	if not self:hasTwoHandedWeapon() then if not silent then
+		game.logPlayer(self, "You require a two handed weapon to use this talent.") end return false end
+	if self:getStamina() > self:getMaxStamina() * 0.3 then if not silent then
+		game.logPlayer(self, "You require less stamina to use this talent.") end return false end
+	return true end,
 	action = function(self, t)
 		self:setEffect(self.EFF_RELENTLESS_FURY, t.getDur(self, t), {stamina=t.getStamina(self, t), speed=t.getSpeed(self, t)})
 		return true

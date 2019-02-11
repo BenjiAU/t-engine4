@@ -46,59 +46,9 @@ newTalent{
 }
 
 newTalent{
-	name = "Vimsense",
+	name = "Dark Portal",
 	type = {"corruption/vim", 2},
 	require = corrs_req2,
-	points = 5,
-	cooldown = 25,
-	vim = 25,
-	requires_target = true,
-	no_npc_use = true,
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 4, 8)) end,
-	getResistPenalty = function(self, t) return self:combatTalentSpellDamage(t, 10, 45) end, -- Consider reducing this
-	action = function(self, t)
-		local rad = 10
-		self:setEffect(self.EFF_VIMSENSE_DETECT, t.getDuration(self,t), {
-			range = rad,
-			actor = 1,
-			VimsensePenalty = t.getResistPenalty(self,t), -- Compute resist penalty at time of activation
-			on_detect = function(self, x, y)
-				local a = game.level.map(x, y, engine.Map.ACTOR)
-				if not a or self:reactionToward(a) >= 0 then return end
-				a:setTarget(game.player)
-				a:setEffect(a.EFF_VIMSENSE, 2, {power=self:hasEffect(self.EFF_VIMSENSE_DETECT).VimsensePenalty or 0})
-			end,
-		})
-		game:playSoundNear(self, "talents/spell_generic")
-		return true
-	end,
-	info = function(self, t)
-		return ([[Feel the very existence of creatures around you for %d turns, in a radius of 10.
-		The evil touch will reduce their blight resistance by %d%%, but also make them aware of you.
-		The resistance reduction will improve with your Spellpower.]]):
-		format(t.getDuration(self,t), t.getResistPenalty(self,t))
-	end,
-}
-
-newTalent{
-	name = "Leech",
-	type = {"corruption/vim", 3},
-	require = corrs_req3,
-	mode = "passive",
-	points = 5,
-	-- called by _M:onTakeHit function in mod\class\Actor.lua	
-	getVim = function(self, t) return self:combatTalentScale(t, 3.7, 6.5, 0.75) end,
-	getHeal = function(self, t) return self:combatTalentScale(t, 8, 20, 0.75) end,
-	info = function(self, t)
-		return ([[Each time a creature affected by vimsense hurts you, you regain %0.2f vim and %0.2f health.]]):
-		format(t.getVim(self,t),t.getHeal(self,t))
-	end,
-}
-
-newTalent{
-	name = "Dark Portal",
-	type = {"corruption/vim", 4},
-	require = corrs_req4,
 	points = 5,
 	vim = 30,
 	cooldown = 15,
@@ -108,7 +58,7 @@ newTalent{
 	radius = 3,
 	requires_target = true,
 	target = function(self, t)
-		return {type="ball", radius=self:getTalentRadius(t), range=self:getTalentRange(t), selffire=false, talent=t}
+	return {type="ball", radius=self:getTalentRadius(t), range=self:getTalentRange(t), selffire=false, talent=t}
 	end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
@@ -149,3 +99,58 @@ newTalent{
 		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 12, 80)), self:combatTalentSpellDamage(t, 5, 25))
 	end,
 }
+
+newTalent{
+	name = "Vimsense",
+	type = {"corruption/vim", 3},
+	require = corrs_req3,
+	points = 5,
+	cooldown = 15,
+	vim = 35,
+	requires_target = true,
+	no_npc_use = true,
+	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 4, 8)) end,
+	getResistPenalty = function(self, t) return self:combatTalentSpellDamage(t, 10, 30) end,
+	getSaves = function(self, t) return self:combatTalentSpellDamage(t, 8, 50) end,
+	action = function(self, t)
+		local rad = 10
+		self:setEffect(self.EFF_VIMSENSE_DETECT, t.getDuration(self,t), {
+			range = rad,
+			actor = 1,
+			VimsensePenalty = t.getResistPenalty(self,t), -- Compute resist penalty at time of activation
+			VimsenseSaves = t.getSaves(self,t),
+
+			on_detect = function(self, x, y)
+				local a = game.level.map(x, y, engine.Map.ACTOR)
+				if not a or self:reactionToward(a) >= 0 then return end
+				a:setTarget(game.player)
+				a:setEffect(a.EFF_VIMSENSE, 2, {power=self:hasEffect(self.EFF_VIMSENSE_DETECT).VimsensePenalty or 0, saves=self:hasEffect(self.EFF_VIMSENSE_DETECT).VimsenseSaves or 0})
+			end,
+		})
+		game:playSoundNear(self, "talents/spell_generic")
+		return true
+	end,
+	info = function(self, t)
+		return ([[Feel the very existence of creatures around you for %d turns, in a radius of 10.
+		The evil touch will reduce their blight resistance by %d%% and all saves by %d, but also make them aware of you.
+		The resistance and save reduction will improve with your Spellpower.]]):
+		format(t.getDuration(self,t), t.getResistPenalty(self,t), t.getSaves(self, t))
+	end,
+}
+
+newTalent{
+	name = "Leech",
+	type = {"corruption/vim", 4},
+	require = corrs_req4,
+	mode = "passive",
+	points = 5,
+	-- called by _M:onTakeHit function in mod\class\Actor.lua	
+	getVim = function(self, t) return self:combatTalentScale(t, 1.7, 6.5, 0.75) end,
+	getHeal = function(self, t) return self:combatTalentScale(t, 4, 15, 0.75) end,
+	info = function(self, t)
+		return ([[Each time a creature affected by vimsense hurts you, you regain %0.2f vim and %0.2f health.]]):
+		format(t.getVim(self,t),t.getHeal(self,t))
+	end,
+}
+
+

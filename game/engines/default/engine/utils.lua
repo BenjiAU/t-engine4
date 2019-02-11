@@ -96,6 +96,15 @@ function ripairs(t)
 	end
 end
 
+function table.empty(t)
+	while next(t) do t[next(t)] = nil end
+end
+
+function table.replaceWith(t, nt)
+	table.empty(t)
+	for k, e in pairs(nt) do t[k] = e end
+end
+
 function table.count(t)
 	local i = 0
 	for k, v in pairs(t) do

@@ -136,7 +136,7 @@ newTalent{
 	getDamage = function(self, t) return 8 + self:combatTalentStatDamage(t, "cun", 10, 60) * 0.6 end,
 	ApplyPoisons = function(self, t, target, weapon) -- apply poison(s) to a target
 		if self:knowTalent(self.T_VULNERABILITY_POISON) then -- apply vulnerability first
-			target:setEffect(target.EFF_VULNERABILITY_POISON, t.getDuration(self, t), {src=self, power=self:callTalent(self.T_VULNERABILITY_POISON, "getDamage") , apply_power=self:combatAttack(), no_ct_effect=true})
+			target:setEffect(target.EFF_VULNERABILITY_POISON, t.getDuration(self, t), {src=self, power=self:callTalent(self.T_VULNERABILITY_POISON, "getDamage") , no_ct_effect=true})
 		end
 		if target:canBe("poison") then
 			local insidious = 0
@@ -150,7 +150,7 @@ newTalent{
 			local volatile = 0
 			if self:isTalentActive(self.T_VOLATILE_POISON) then volatile = self:callTalent(self.T_VOLATILE_POISON, "getEffect")/100 end
 			local dam = t.getDamage(self,t) * (1 + volatile)
-			target:setEffect(target.EFF_DEADLY_POISON, t.getDuration(self, t), {src=self, power=dam, max_power=dam*4, insidious=insidious, crippling=crippling, numbing=numbing, leeching=leeching, volatile=volatile, apply_power=self:combatAttack(), no_ct_effect=true})
+			target:setEffect(target.EFF_DEADLY_POISON, t.getDuration(self, t), {src=self, power=dam, max_power=dam*4, insidious=insidious, crippling=crippling, numbing=numbing, leeching=leeching, volatile=volatile, no_ct_effect=true})
 			if self.vile_poisons then
 				for tid, val in pairs(self.vile_poisons) do -- apply any special procs
 					local tal = self:getTalentFromId(tid)
@@ -159,6 +159,8 @@ newTalent{
 					end
 				end
 			end
+		else
+			game.logSeen(target, "%s resists the vile poison!", target.name:capitalize())
 		end
 	end,
 	callbackOnMeleeAttack = function(self, t, target, hitted, crit, weapon, damtype, mult, dam)
@@ -208,7 +210,7 @@ newTalent{
 		end
 		-- Note: New effects functions are called in order: merge, on_gain, activate
 		if to_spread > 0 then
-			local tg = {type="ball", range = 10, radius=t.getRadius(self, t), selffire = false, friendlyfire = false, talent=t, stop_block=true}
+			local tg = {type="ball", range = 10, radius=t.getRadius(self, t), selffire = false, friendlyfire = false, talent=t}
 			target.dead = false -- for combat log purposes
 			game.logSeen(target, "#GREEN#Poison bursts out of %s's corpse!", target.name:capitalize())
 			game.level.map:particleEmitter(target.x, target.y, tg.radius, "slime")
@@ -552,7 +554,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-	return ([[Enhances your Deadly Poison with a volatile agent, causing the poison to deal %d%% increased damage to the victim and damage all of your enemies adjacent to it.]]):
+	return ([[Enhances your Deadly Poison with a volatile agent, causing the poison to deal %d%% increased damage to the victim and damage all of your enemies adjacent to it for 50%%.]]):
 	format(t.getEffect(self, t))
 	end,
 }

@@ -28,6 +28,7 @@ newTalent{
 	range = 1,
 	is_melee = true,
 	tactical = { ATTACK = { PHYSICAL = 1, COLD = 1, FIRE = 1, LIGHTNING = 1, ACID = 1 } },
+	on_pre_use = function(self, t, silent) if not self:hasMHWeapon() then if not silent then game.logPlayer(self, "You require a mainhand weapon to use this talent.") end return false end return true end,
 	requires_target = true,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
 	getWeaponDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1.6, 2.3) end,
@@ -46,37 +47,49 @@ newTalent{
 
 		local elem = rng.table{"phys", "cold", "fire", "lightning", "acid",}
 
-			if elem == "phys" then
-				self:attackTarget(target, DamageType.PHYSICAL, t.getWeaponDamage(self, t), true)
-				local tg = {type="ball", range=1, selffire=false, radius=self:getTalentRadius(t), talent=t}
-				local grids = self:project(tg, x, y, DamageType.SAND, {dur=3, dam=self:mindCrit(t.getBurstDamage(self, t))})
-				game.level.map:particleEmitter(x, y, tg.radius, "ball_matter", {radius=tg.radius, grids=grids, tx=x, ty=y, max_alpha=80})
-				game:playSoundNear(self, "talents/flame")
-			elseif elem == "cold" then
-				self:attackTarget(target, DamageType.ICE, t.getWeaponDamage(self, t), true)
-				local tg = {type="ball", range=1, selffire=false, radius=self:getTalentRadius(t), talent=t}
-				local grids = self:project(tg, x, y, DamageType.ICE_SLOW, self:mindCrit(t.getBurstDamage(self, t)))
-				game.level.map:particleEmitter(x, y, tg.radius, "ball_ice", {radius=tg.radius, grids=grids, tx=x, ty=y, max_alpha=80})
-				game:playSoundNear(self, "talents/flame")
-			elseif elem == "fire" then
-				self:attackTarget(target, DamageType.FIREBURN, t.getWeaponDamage(self, t), true)
-				local tg = {type="ball", range=1, selffire=false, radius=self:getTalentRadius(t), talent=t}
-				local grids = self:project(tg, x, y, DamageType.FIRE_STUN, self:mindCrit(t.getBurstDamage(self, t)))
-				game.level.map:particleEmitter(x, y, tg.radius, "ball_fire", {radius=tg.radius, grids=grids, tx=x, ty=y, max_alpha=80})
-				game:playSoundNear(self, "talents/flame")
-			elseif elem == "lightning" then
-				self:attackTarget(target, DamageType.LIGHTNING_DAZE, t.getWeaponDamage(self, t), true)
-				local tg = {type="ball", range=1, selffire=false, radius=self:getTalentRadius(t), talent=t}
-				local grids = self:project(tg, x, y, DamageType.LIGHTNING_DAZE, self:mindCrit(t.getBurstDamage(self, t)))
-				game.level.map:particleEmitter(x, y, tg.radius, "ball_lightning", {radius=tg.radius, grids=grids, tx=x, ty=y, max_alpha=80})
-				game:playSoundNear(self, "talents/flame")
-			elseif elem == "acid" then
-				self:attackTarget(target, DamageType.ACID_DISARM, t.getWeaponDamage(self, t), true)
-				local tg = {type="ball", range=1, selffire=false, radius=self:getTalentRadius(t), talent=t}
-				local grids = self:project(tg, x, y, DamageType.ACID_DISARM, self:mindCrit(t.getBurstDamage(self, t)))
-				game.level.map:particleEmitter(x, y, tg.radius, "ball_acid", {radius=tg.radius, grids=grids, tx=x, ty=y, max_alpha=80})
-				game:playSoundNear(self, "talents/flame")
+		-- We need to alter behavior slightly to accomodate shields since they aren't used in attackTarget
+		local attack_mode = function(self, target, dt, dam)
+			local shield, shield_combat = self:hasShield()
+			local weapon = self:hasMHWeapon().combat
+			if not shield then
+				self:attackTarget(target, dt, dam, true)
+			else
+				self:attackTargetWith(target, weapon, dt, dam)
+				self:attackTargetWith(target, shield_combat, dt, dam)
 			end
+		end
+
+		if elem == "phys" then
+			attack_mode(self, target, DamageType.PHYSICAL, t.getWeaponDamage(self, t))
+			local tg = {type="ball", range=1, selffire=false, radius=self:getTalentRadius(t), talent=t}
+			local grids = self:project(tg, x, y, DamageType.SAND, {dur=3, dam=self:mindCrit(t.getBurstDamage(self, t))})
+			game.level.map:particleEmitter(x, y, tg.radius, "ball_matter", {radius=tg.radius, grids=grids, tx=x, ty=y, max_alpha=80})
+			game:playSoundNear(self, "talents/flame")
+		elseif elem == "cold" then
+			attack_mode(self, target, DamageType.ICE, t.getWeaponDamage(self, t))
+			local tg = {type="ball", range=1, selffire=false, radius=self:getTalentRadius(t), talent=t}
+			local grids = self:project(tg, x, y, DamageType.ICE_SLOW, self:mindCrit(t.getBurstDamage(self, t)))
+			game.level.map:particleEmitter(x, y, tg.radius, "ball_ice", {radius=tg.radius, grids=grids, tx=x, ty=y, max_alpha=80})
+			game:playSoundNear(self, "talents/flame")
+		elseif elem == "fire" then
+			attack_mode(self, target, DamageType.FIREBURN, t.getWeaponDamage(self, t))
+			local tg = {type="ball", range=1, selffire=false, radius=self:getTalentRadius(t), talent=t}
+			local grids = self:project(tg, x, y, DamageType.FIRE_STUN, self:mindCrit(t.getBurstDamage(self, t)))
+			game.level.map:particleEmitter(x, y, tg.radius, "ball_fire", {radius=tg.radius, grids=grids, tx=x, ty=y, max_alpha=80})
+			game:playSoundNear(self, "talents/flame")
+		elseif elem == "lightning" then
+			attack_mode(self, target, DamageType.LIGHTNING_DAZE, t.getWeaponDamage(self, t))
+			local tg = {type="ball", range=1, selffire=false, radius=self:getTalentRadius(t), talent=t}
+			local grids = self:project(tg, x, y, DamageType.LIGHTNING_DAZE, self:mindCrit(t.getBurstDamage(self, t)))
+			game.level.map:particleEmitter(x, y, tg.radius, "ball_lightning", {radius=tg.radius, grids=grids, tx=x, ty=y, max_alpha=80})
+			game:playSoundNear(self, "talents/flame")
+		elseif elem == "acid" then
+			attack_mode(self, target, DamageType.ACID_DISARM, t.getWeaponDamage(self, t))
+			local tg = {type="ball", range=1, selffire=false, radius=self:getTalentRadius(t), talent=t}
+			local grids = self:project(tg, x, y, DamageType.ACID_DISARM, self:mindCrit(t.getBurstDamage(self, t)))
+			game.level.map:particleEmitter(x, y, tg.radius, "ball_acid", {radius=tg.radius, grids=grids, tx=x, ty=y, max_alpha=80})
+			game:playSoundNear(self, "talents/flame")
+		end
 		return true
 	end,
 	info = function(self, t)
@@ -86,7 +99,9 @@ newTalent{
 		return ([[Unleash raw, chaotic elemental damage upon your enemy.
 		You strike your enemy for %d%% weapon damage in one of blinding sand, disarming acid, freezing and slowing ice, dazing lightning or stunning flames, with equal odds.
 		Additionally, you will cause a burst that deals %0.2f of that damage to enemies in radius %d, regardless of if you hit with the blow.
-		Levels in Prismatic Slash increase your Physical and Mental attack speeds by %d%%.]]):format(100 * self:combatTalentWeaponDamage(t, 1.2, 2.0), burstdamage, radius, 100*speed)
+		Levels in Prismatic Slash increase your Physical and Mental attack speeds by %d%%.
+
+		This talent will also attack with your shield, if you have one equipped.]]):format(100 * self:combatTalentWeaponDamage(t, 1.2, 2.0), burstdamage, radius, 100*speed)
 	end,
 }
 
@@ -101,9 +116,12 @@ newTalent{
 	message = "@Source@ breathes venom!",
 	tactical = { ATTACKAREA = { poison = 2 } },
 	range = 0,
-	radius = function(self, t) return math.floor(self:combatTalentScale(t, 5, 9)) end,
+	radius = function(self, t) return math.min(13, math.floor(self:combatTalentScale(t, 5, 9))) end,
 	requires_target = true,
-	getDamage = function(self, t) return self:combatTalentStatDamage(t, "str", 60, 750) end,
+	getDamage = function(self, t) 
+		local bonus = self:knowTalent(self.T_CHROMATIC_FURY) and self:combatTalentStatDamage(t, "wil", 60, 750) or 0
+		return self:combatTalentStatDamage(t, "str", 60, 750) + bonus
+	end,
 	getEffect = function(self, t) return math.ceil(self:combatTalentLimit(t, 50, 10, 20)) end,
 	on_learn = function(self, t)
 		self.resists[DamageType.NATURE] = (self.resists[DamageType.NATURE] or 0) + 3
@@ -154,25 +172,18 @@ newTalent{
 	mode = "passive",
 	resistKnockback = function(self, t) return self:combatTalentLimit(t, 1, .17, .5) end, -- Limit < 100%
 	resistBlindStun = function(self, t) return self:combatTalentLimit(t, 1, .07, .25) end, -- Limit < 100%
-	CDreduce = function(self, t) return math.floor(self:combatTalentLimit(t, 8, 1, 6)) end, -- Limit < 8
-	on_learn = function(self, t)
-		self.inc_stats[self.STAT_CUN] = self.inc_stats[self.STAT_CUN] + 2
-	end,
-	on_unlearn = function(self, t)
-		self.inc_stats[self.STAT_CUN] = self.inc_stats[self.STAT_CUN] - 2
-	end,
+	getStat = function(self, t) return self:combatTalentScale(t, 1, 12) end,
 	passives = function(self, t, p)
-		local cdr = t.CDreduce(self, t)
 		self:talentTemporaryValue(p, "knockback_immune", t.resistKnockback(self, t))
 		self:talentTemporaryValue(p, "stun_immune", t.resistBlindStun(self, t))
 		self:talentTemporaryValue(p, "blind_immune", t.resistBlindStun(self, t))
-		self:talentTemporaryValue(p, "talent_cd_reduction",
-{[Talents.T_VENOMOUS_BREATH]=cdr, [Talents.T_ICE_BREATH]=cdr, [Talents.T_FIRE_BREATH]=cdr, [Talents.T_LIGHTNING_BREATH]=cdr, [Talents.T_CORROSIVE_BREATH]=cdr, [Talents.T_SAND_BREATH]=cdr})
+		self:talentTemporaryValue(p, "inc_stats", {[self.STAT_STR] = t.getStat(self, t)})
+		self:talentTemporaryValue(p, "inc_stats", {[self.STAT_WIL] = t.getStat(self, t)})
 	end,
 	info = function(self, t)
-		return ([[You have the mental prowess of a Wyrm.
-		Your Cunning is increased by %d, and your breath attack cooldowns are reduced by %d.
-		You gain %d%% knockback resistance, and your blindness and stun resistances are increased by %d%%.]]):format(2*self:getTalentLevelRaw(t), t.CDreduce(self, t), 100*t.resistKnockback(self, t), 100*t.resistBlindStun(self, t))
+		return ([[You have mastered your draconic nature.
+		Your Strength and Willpower are increased by %d.
+		You gain %d%% knockback resistance, and your blindness and stun resistances are increased by %d%%.]]):format(t.getStat(self, t), 100*t.resistKnockback(self, t), 100*t.resistBlindStun(self, t))
 	end,
 }
 
@@ -182,36 +193,49 @@ newTalent{
 	require = gifts_req_high4,
 	points = 5,
 	mode = "passive",
-	getDamageIncrease = function(self, t) return self:combatTalentScale(t, 2.5, 10) end,
+	getDamageIncrease = function(self, t) return self:combatTalentScale(t, 2.5, 20) end,
 	getResists = function(self, t) return self:combatTalentScale(t, 0.6, 2.5) end,
-	getResistPen = function(self, t) return self:combatTalentLimit(t, 100, 5, 20) end, -- Limit < 100%
+	getResistPen = function(self, t) return self:combatTalentLimit(t, 50, 5, 30) end, -- Limit < 50%
 	passives = function(self, t, p)
 		local dam_inc = t.getDamageIncrease(self, t)
 		local resists = t.getResists(self, t)
 		local resists_pen = t.getResistPen(self, t)
-		self:talentTemporaryValue(p, "heightened_senses",  t.getDamageIncrease(self, t))
-		self:talentTemporaryValue(p, "inc_damage", {[DamageType.PHYSICAL]=dam_inc,
+		self:talentTemporaryValue(p, "inc_damage", {
+			[DamageType.PHYSICAL]=dam_inc,
 			[DamageType.COLD]=dam_inc,
 			[DamageType.FIRE]=dam_inc,
 			[DamageType.LIGHTNING]=dam_inc,
-			[DamageType.ACID]=dam_inc
+			[DamageType.ACID]=dam_inc,
+			[DamageType.NATURE]=dam_inc,
+			[DamageType.BLIGHT]=dam_inc,
+			[DamageType.DARKNESS]=dam_inc,
 			})
-		self:talentTemporaryValue(p, "resists", {[DamageType.PHYSICAL]=resists,
+		self:talentTemporaryValue(p, "resists", {
+			[DamageType.PHYSICAL]=resists,
 			[DamageType.COLD]=resists,
 			[DamageType.FIRE]=resists,
 			[DamageType.LIGHTNING]=resists,
-			[DamageType.ACID]=resists
-			})
-		self:talentTemporaryValue(p, "resists_pen", {[DamageType.PHYSICAL]=resists_pen,
+			[DamageType.ACID]=resists,
+			[DamageType.NATURE]=resists,
+			[DamageType.BLIGHT]=resists,
+			[DamageType.DARKNESS]=resists,
+		})
+		self:talentTemporaryValue(p, "resists_pen", {
+			[DamageType.PHYSICAL]=resists_pen,
 			[DamageType.COLD]=resists_pen,
 			[DamageType.FIRE]=resists_pen,
 			[DamageType.LIGHTNING]=resists_pen,
-			[DamageType.ACID]=resists_pen
-			})
+			[DamageType.ACID]=resists_pen,
+			[DamageType.NATURE]=resists_pen,
+			[DamageType.BLIGHT]=resists_pen,
+			[DamageType.DARKNESS]=resists_pen,
+		})
 	end,
 	info = function(self, t)
-		return ([[You have gained the full power of the multihued dragon, and have become both resistant and attuned to physical, fire, cold, lightning and acid damage.
-		Your resistance to these elements is increased by %0.1f%% and all damage you deal with them is increased by %0.1f%% with %0.1f%% resistance penetration.]])
+		return ([[You have gained the full power of the various drakes throughout the world, and have become both resistant and attuned to physical, fire, cold, lightning, acid, nature, blight, and darkness damage.
+		Your resistance to these elements is increased by %0.1f%% and all damage you deal with them is increased by %0.1f%% with %0.1f%% resistance penetration.
+
+		Learning this talent will add a Willpower bonus to your breath talent damage with the same scaling as Strength, effectively doubling it when the stats are equal.]])
 		:format(t.getResists(self, t), t.getDamageIncrease(self, t), t.getResistPen(self, t))
 	end,
 }

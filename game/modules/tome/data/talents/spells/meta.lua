@@ -24,7 +24,7 @@ newTalent{
 	points = 5,
 	random_ego = "utility",
 	mana = 40,
-	cooldown = 7,
+	cooldown = 25,
 	tactical = { CURE = function(self, t, aitarget)
 			local nb = 0
 			for eff_id, p in pairs(self.tmp) do

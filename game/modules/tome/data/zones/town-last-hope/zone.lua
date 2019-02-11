@@ -34,7 +34,6 @@ return {
 	allow_respec = "limited",
 
 	max_material_level = 3,
-	--store_levels_by_restock = { 20, 35, 45 },
 	store_levels_by_restock = { 10, 20, 35, 45, 50, 60 },
 
 	generator =  {
@@ -43,7 +42,7 @@ return {
 			map = "towns/last-hope",
 		},
 		actor = {
-			class = "mod.class.generator.actor.Random",
+			class = "engine.generator.actor.Random",
 			nb_npc = {10, 10},
 		},
 		object = {

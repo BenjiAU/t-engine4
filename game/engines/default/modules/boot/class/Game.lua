@@ -35,6 +35,7 @@ local Shader = require "engine.Shader"
 local Zone = require "mod.class.Zone"
 local Map = require "engine.Map"
 local Level = require "engine.Level"
+local Tooltip = require "engine.Tooltip"
 local LogDisplay = require "engine.LogDisplay"
 local FlyingText = require "engine.FlyingText"
 local FontPackage = require "engine.FontPackage"
@@ -95,6 +96,8 @@ function _M:init()
 	
 	self:handleEvents()
 	if not profile.connected then core.webview, core.webview_inactive = nil, core.webview end
+
+	self.floating_tooltip = Tooltip.new(nil, 14, nil, colors.DARK_GREY, 467)
 
 --	self.refuse_threads = true
 	self.normal_key = self.key
@@ -241,6 +244,16 @@ A usual problem is shaders and thus should be your first target to disable.]], 7
 	end
 
 	self:checkBootLoginRegister()
+end
+
+function _M:floatingTooltip(x, y, pos, txt)
+	if not x then
+		game.floating_tooltip_pos = nil
+	else
+		game.floating_tooltip:set(txt)
+		if pos == "top" then y = y - game.floating_tooltip.h end
+		game.floating_tooltip_pos = {x=x, y=y}
+	end
 end
 
 function _M:grabAddons()
@@ -533,6 +546,11 @@ function _M:display(nb_keyframes)
 	engine.GameEnergyBased.display(self, nb_keyframes)
 -- print("[draw calls] UI", core.display.countDraws())
 	self.flyers = old
+
+	if self.floating_tooltip_pos and (#self.dialogs == 0 or self.dialogs[#self.dialogs].__main_menu) then
+		self.floating_tooltip:display()
+		self.floating_tooltip:toScreen(self.floating_tooltip_pos.x, self.floating_tooltip_pos.y)
+	end
 
 	self.full_fbo:use(false)
 	self.full_fborenderer:toScreen(0, 0, 1, 1, 1, 1)

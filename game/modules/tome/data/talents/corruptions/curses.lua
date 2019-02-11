@@ -22,7 +22,7 @@ newTalent{
 	type = {"corruption/curses", 1},
 	require = corrs_req1,
 	points = 5,
-	cooldown = 20,
+	cooldown = 15,
 	vim = 20,
 	range = 10,
 	tactical = { DISABLE = 2 },
@@ -35,14 +35,14 @@ newTalent{
 		self:project(tg, x, y, function(tx, ty)
 			local target = game.level.map(tx, ty, Map.ACTOR)
 			if not target then return end
-			target:setEffect(target.EFF_CURSE_DEFENSELESSNESS, 10, {power=self:combatTalentSpellDamage(t, 30, 60), apply_power=self:combatSpellpower()})
+			target:setEffect(target.EFF_CURSE_DEFENSELESSNESS, 5, {power=self:combatTalentSpellDamage(t, 30, 60)})
 			game.level.map:particleEmitter(tx, ty, 1, "circle", {base_rot=0, oversize=0.7, a=130, limit_life=8, appear=8, speed=0, img="curse_gfx", radius=0})
 		end)
 		game:playSoundNear(self, "talents/slime")
 		return true
 	end,
 	info = function(self, t)
-		return ([[Curses your target, decreasing its Defense and all saves by %d for 10 turns.
+		return ([[Curses your target, decreasing its Defense and all saves by %d for 5 turns.  This cannot be saved against.
 		The effects will improve with your Spellpower.]]):format(self:combatTalentSpellDamage(t, 30, 60))
 	end,
 }
@@ -103,8 +103,8 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Curses your target, stopping any natural healing and dealing %0.2f darkness damage each turn for 10 turns.
-		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.DARKNESS, self:combatTalentSpellDamage(t, 10, 70)))
+		return ([[Curses your target, preventing normal life regeneration and dealing %0.2f darkness damage over 10 turns.
+		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.DARKNESS, self:combatTalentSpellDamage(t, 10, 70)*10))
 	end,
 }
 

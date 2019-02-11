@@ -80,6 +80,13 @@ function _M:act()
 	end
 end
 
+function _M:useEnergy(val)
+	mod.class.Actor.useEnergy(self, val)
+	if self.player and self.energy.value < game.energy_to_act then
+		game.paused = false
+	end
+end
+
 -- Precompute FOV form, for speed
 local fovdist = {}
 for i = 0, 30 * 30 do

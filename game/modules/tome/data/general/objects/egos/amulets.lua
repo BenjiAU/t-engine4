@@ -217,28 +217,6 @@ newEntity{
 		poison_immune = resolvers.mbonus_material(30, 20, function(e, v) return 0, v/100 end),
 	},
 }
-newEntity{
-	power_source = {arcane=true},
-	name = " of teleportation", suffix=true, instant_resolve=true,
-	keywords = {teleport=true},
-	level_range = {20, 50},
-	rarity = 10,
-	cost = 40,
-	wielder = {
-		teleport_immune = 0.5,
-	},
-	charm_power = resolvers.mbonus_material(70, 30),
-	charm_power_def = {add=15, max=50, floor=true},
-	resolvers.charm("teleport you randomly (rad %d)", 15, function(self, who)
-		game.level.map:particleEmitter(who.x, who.y, 1, "teleport")
-		who:teleportRandom(who.x, who.y, self:getCharmPower(who))
-		game.level.map:particleEmitter(who.x, who.y, 1, "teleport")
-		game.logSeen(who, "%s uses %s!", who.name:capitalize(), self:getName{no_add_name = true, do_color = true, no_count=true})
-		return {id=true, used=true}
-	end,
-	"T_GLOBAL_CD",
-	{no_npc_use = true}),  --would be very irritating to have npc's teleporting away
-}
 
 --[[ Disabled pending revamp of concept which will probably never come
 newEntity{

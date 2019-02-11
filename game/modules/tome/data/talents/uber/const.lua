@@ -69,7 +69,7 @@ uberTalent{
 	mode = "passive",
 	require = { special={desc="Know the Block talent", fct=function(self) return self:knowTalent(self.T_BLOCK) end} },
 	info = function(self, t)
-		return ([[Your block now lasts 1 more turn and does not end when hit.]])
+		return ([[Your Block talent now lasts for 2 game turns and you can apply Counterstrike to any number of enemies.]])
 		:format()
 	end,
 }

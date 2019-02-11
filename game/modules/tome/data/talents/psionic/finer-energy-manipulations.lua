@@ -148,7 +148,7 @@ newTalent{
 	info = function(self, t)
 		local amt = t.energy_per_turn(self, t)
 		return ([[Matter is energy, as any good Mindslayer knows. Unfortunately, the various bonds and particles involved are just too numerous and complex to make the conversion feasible in most cases. The ordered, crystalline structure of a gem, however, make it possible to transform a small percentage of its matter into usable energy.
-		This talent consumes one gem and grants %d energy per turn for between 5 and 13 turns, depending on the quality of the gem used.
+		This talent consumes one gem and grants %d psi per turn for between 5 and 13 turns, depending on the quality of the gem used.
 		This process also creates a resonance field that provides the (imbued) effects of the gem to you while this effect lasts.]]):
 		format(amt)
 	end,

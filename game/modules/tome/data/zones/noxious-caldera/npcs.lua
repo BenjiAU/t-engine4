@@ -78,6 +78,10 @@ newEntity{ define_as = "MINDWORM",
 		[Talents.T_PSYCHIC_LOBOTOMY]={base=4, every=4, max=7},
 		[Talents.T_SYNAPTIC_STATIC]={base=3, every=4, max=7},
 	},
+
+	auto_classes={
+		{class="Solipsist", start_level=25, level_rate=75},
+	},
 	resolvers.inscriptions(2, "infusion"),
 
 	autolevel = "wildcaster",

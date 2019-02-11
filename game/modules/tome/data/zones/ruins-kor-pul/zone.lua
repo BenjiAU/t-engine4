@@ -22,11 +22,11 @@ local is_hideout = layout == "HIDEOUT"
 
 return {
 	name = "Ruins of Kor'Pul",
-	level_range = {1, 5},
+	level_range = {1, 7},
 	level_scheme = "player",
 	max_level = 3,
 	decay = {300, 800},
-	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(-1,2) end,
+	actor_adjust_level = function(zone, level, e) return zone.base_level + level.level-1 + e:getRankLevelAdjust() + 1 end,
 	width = 50, height = 50,
 	tier1 = true,
 	tier1_escort = 1,

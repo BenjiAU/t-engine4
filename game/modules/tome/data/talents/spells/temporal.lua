@@ -22,12 +22,11 @@ newTalent{
 	type = {"spell/temporal",1},
 	require = spells_req1,
 	points = 5,
-	random_ego = "utility",
 	mana = 10,
 	cooldown = 30,
 	tactical = { DISABLE = 2 },
 	reflectable = true,
-	proj_speed = 2,
+	proj_speed = 3,
 	range = 6,
 	direct_hit = true,
 	requires_target = true,
@@ -53,7 +52,8 @@ newTalent{
 }
 
 newTalent{
-	name = "Time Shield",
+	name = "Temporal Shield",
+	short_name = "TIME_SHIELD",
 	type = {"spell/temporal", 2},
 	require = spells_req2,
 	points = 5,
@@ -62,11 +62,11 @@ newTalent{
 	tactical = { DEFEND = 2, HEAL = 1 },
 	range = 10,
 	no_energy = true,
-	getMaxAbsorb = function(self, t) return 50 + self:combatTalentSpellDamage(t, 50, 450) end,
+	getMaxAbsorb = function(self, t) return self:combatTalentSpellDamage(t, 50, 450) end,
 	getDuration = function(self, t) return util.bound(5 + math.floor(self:getTalentLevel(t)), 5, 15) end,
 	getTimeReduction = function(self, t) return 25 + util.bound(15 + math.floor(self:getTalentLevel(t) * 2), 15, 35) end,
 	action = function(self, t)
-		self:setEffect(self.EFF_TIME_SHIELD, t.getDuration(self, t), {power=t.getMaxAbsorb(self, t), dot_dur=5, time_reducer=t.getTimeReduction(self, t)})
+		self:setEffect(self.EFF_TIME_SHIELD, t.getDuration(self, t), {power=t.getMaxAbsorb(self, t), dot_dur=5, time_reducer=0})
 		game:playSoundNear(self, "talents/spell_generic")
 		return true
 	end,
@@ -77,9 +77,8 @@ newTalent{
 		return ([[This intricate spell instantly erects a time shield around the caster, preventing any incoming damage and sending it forward in time.
 		Once either the maximum damage (%d) is absorbed, or the time runs out (%d turns), the stored damage will return as a temporal restoration field over time (5 turns).
 		Each turn the restoration field is active, you get healed for 10%% of the absorbed damage (Aegis Shielding talent affects the percentage).
-		While under the effect of Time Shield, all newly applied magical, physical and mental effects will have their durations reduced by %d%%.
 		The shield's max absorption will increase with your Spellpower.]]):
-		format(maxabsorb, duration, time_reduc)
+		format(maxabsorb, duration)
 	end,
 }
 
@@ -121,9 +120,9 @@ newTalent{
 	points = 5,
 	mode = "sustained",
 	sustain_mana = 250,
-	cooldown = 30,
+	cooldown = 20,
 	tactical = { BUFF = 2 },
-	getHaste = function(self, t) return self:combatTalentScale(t, 0.09, 0.45, 0.75) end,
+	getHaste = function(self, t) return self:combatTalentLimit(t, 0.35, 0.05, 0.25) end,
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/spell_generic")
 		local power = t.getHaste(self, t)

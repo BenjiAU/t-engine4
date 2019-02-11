@@ -67,6 +67,7 @@ newEntity{ base = "BASE_NPC_ELVEN_CASTER", define_as = "GRAND_CORRUPTOR",
 	},
 	resolvers.sustains_at_birth(),
 
+	auto_classes={{class="Corruptor", start_level=25, level_rate=75}},
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	ai_tactic = resolvers.tactic"ranged",
 	resolvers.inscriptions(2, "rune"),

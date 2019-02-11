@@ -104,7 +104,7 @@ newTalent{
 	points = 5,
 	mode = "sustained",
 	cooldown = 15,
-	sustain_stamina = 40,
+	sustain_stamina = 10,
 	callbackOnRest = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
 	callbackOnRun = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
 	tactical = { DEFEND = 2 }, -- AI for this could be better
@@ -117,14 +117,32 @@ newTalent{
 		local p = self:isTalentActive(t.id)
 		return 1 + (turn or (p and p.turns) or 0)*0.3
 	end,
-	callbackOnActBase = function(self, t) --called by mod.class.Actor:actBase
+	iconOverlay = function(self, t, p)
+		local p = self.sustain_talents[t.id]
+		if not p then return end
+		return tostring("#RED##{bold}#"..math.floor(t.getResist(self, t))).."#LAST##{normal}#", "buff_font_small"
+	end,
+	callbackOnActBase = function(self, t)
 		local p = self:isTalentActive(t.id)
-		if p.resid then self:removeTemporaryValue("resists", p.resid) end
-		if p.cresid then self:removeTemporaryValue("resists_cap", p.cresid) end
+		if not p then return end
 		if p.stamina then self:removeTemporaryValue("stamina_regen", p.stamina) end
 		if p.turns then p.turns = p.turns + 1 end
 		p.stamina = self:addTemporaryValue("stamina_regen", -(t.drain_stamina(self, t, p.turns) - t.drain_stamina(self, t, 0)))
-		
+
+		-- This should be redundant but there are cases the value won't properly update, ie direct life reductions
+		if p.resid then self:removeTemporaryValue("resists", p.resid) end
+		if p.cresid then self:removeTemporaryValue("resists_cap", p.cresid) end
+		local resistbonus = t.getResist(self, t)
+		p.resid = self:addTemporaryValue("resists", {all=resistbonus})
+		local capbonus = t.getResistCap(self, t)
+		p.cresid = self:addTemporaryValue("resists_cap", {all=capbonus})	
+	end,
+	callbackOnTakeDamage = function(self, t)
+		local p = self:isTalentActive(t.id)
+		if not p then return end
+		if p.resid then self:removeTemporaryValue("resists", p.resid) end
+		if p.cresid then self:removeTemporaryValue("resists_cap", p.cresid) end
+
 		--This makes it impossible to get 100% resist all cap from this talent, and most npc's will get no cap increase
 		local resistbonus = t.getResist(self, t)
 		p.resid = self:addTemporaryValue("resists", {all=resistbonus})
@@ -141,7 +159,7 @@ newTalent{
 	deactivate = function(self, t, p)
 		if p.resid then self:removeTemporaryValue("resists", p.resid) end
 		if p.cresid then self:removeTemporaryValue("resists_cap", p.cresid) end
-		self:removeTemporaryValue("stamina_regen", p.stamina)
+		if p.stamina then self:removeTemporaryValue("stamina_regen", p.stamina) end
 		return true
 	end,
 	info = function(self, t)
@@ -152,7 +170,7 @@ newTalent{
 		(So if you have lost 70%% of your life, you gain %d%% all resistance.)
 		In addition, your all damage resistance cap increases %0.1f%% closer to 100%%.
 		This consumes stamina rapidly the longer it is sustained (%0.1f stamina/turn, increasing by 0.3/turn).
-		The effects are refreshed at the start of each turn.]]):
+		The resist is recalculated each time you take damage.]]):
 		format(resistC, resistC*0.7, t.getCapApproach(self, t)*100, drain)
 	end,
 }

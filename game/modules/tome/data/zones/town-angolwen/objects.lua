@@ -40,6 +40,7 @@ newEntity{ base = "BASE_LORE",
 -- Reward for killing Urkis
 newEntity{ base = "BASE_RUNE",
 	name = "Rune of Dissipation", unique=true, define_as="RUNE_DISSIPATION",
+	image = "object/artifact/rune_of_dissipation.png",
 	level_range = {5, 50},
 	cost = 20,
 	inscription_kind = "protect",

@@ -35,7 +35,7 @@ newTalentType{ allow_random=true, is_mind=true, type="cursed/one-with-shadows", 
 newTalentType{ allow_random=true, is_mind=true, type="cursed/advanced-shadowmancy", name = "advanced shadowmancy", min_lev = 10, description = "Gain more direct control over your shadows with physical damage talents." }
 
 -- Generic
-newTalentType{ allow_random=true, is_mind=true, type="cursed/gestures", name = "gestures", generic = true, description = "Enhance the power of you mind with gestures." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/gestures", name = "gestures", generic = true, description = "Enhance the power of your mind with gestures." }
 newTalentType{ allow_random=true, is_mind=true, type="cursed/cursed-form", name = "cursed form", generic = true, description = "You are wracked with the dark energies of the curse." }
 newTalentType{ allow_random=true, is_mind=true, type="cursed/cursed-aura", name = "cursed aura", generic = true, description = "The things you surround yourself with soon wither away." }
 newTalentType{ allow_random=false, is_mind=true, type="cursed/curses", name = "curses", hide = true, description = "The effects of cursed objects." }

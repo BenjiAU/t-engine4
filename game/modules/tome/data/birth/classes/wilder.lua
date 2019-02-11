@@ -139,6 +139,7 @@ newBirthDescriptor{
 		["cunning/survival"]={false, 0},
 		["technique/shield-offense"]={true, 0.2},
 		["technique/2hweapon-assault"]={true, 0.2},
+		["technique/dualweapon-attack"]={true, 0.2},
 		["technique/combat-techniques-active"]={false, 0.2},
 		["technique/combat-techniques-passive"]={true, 0.2},
 		["technique/combat-training"]={true, 0.3},
@@ -154,8 +155,7 @@ newBirthDescriptor{
 		max_life = 110,
 		resolvers.equipbirth{ id=true,
 			{type="weapon", subtype="battleaxe", name="iron battleaxe", autoreq=true, ego_chance=-1000},
-			{type="armor", subtype="light", name="rough leather armour", autoreq=true, ego_chance=-1000}
-		},
+			{type="armor", subtype="heavy", name="iron mail armour", autoreq=true, ego_chance=-1000, ego_chance=-1000}		},
 	},
 	copy_add = {
 		life_rating = 2,

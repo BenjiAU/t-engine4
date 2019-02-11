@@ -68,7 +68,11 @@ newEntity{ define_as = "URKIS",
 		[Talents.T_TEMPEST]={base=5, every=6, max=6},
 	},
 
-	autolevel = "warriormage",
+	auto_classes={
+		{class="Archmage", start_level=17, level_rate=30},
+	},
+
+	autolevel = "caster",
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	resolvers.inscriptions(1, "rune"),
 	resolvers.inscriptions(1, {"manasurge rune"}),

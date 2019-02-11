@@ -29,7 +29,7 @@ function _M:init()
 
 	self.ui = "parchment"
 
-	self.bsize = 22
+	self.bsize = 10
 	local map = game.level.map
 	local mw, mh = map.w * self.bsize, map.h * self.bsize
 	local Mw, Mh = math.floor(game.w * 0.9), math.floor(game.h * 0.9)

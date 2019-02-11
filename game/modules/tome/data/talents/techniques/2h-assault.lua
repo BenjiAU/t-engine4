@@ -116,7 +116,7 @@ newTalent{
 	stamina = 30,
 	tactical = { ATTACKAREA = { weapon = 3 } },
 	range = 0,
-	radius = 1,
+	radius = 2,
 	requires_target = true,
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), selffire=false, radius=self:getTalentRadius(t)}
@@ -143,7 +143,7 @@ newTalent{
 				self:attackTargetWith(target, weapon.combat, nil, self:combatTalentWeaponDamage(t, 1.4, 2.1))
 				local life_diff = oldlife - target.life
 				if life_diff > 0 and target:canBe('cut') and scale then
-					target:setEffect(target.EFF_CUT, 5, {power=life_diff * scale / 5, src=self, apply_power=self:combatPhysicalpower()})
+					target:setEffect(target.EFF_CUT, 5, {power=life_diff * scale / 5, src=self})
 				end
 			end
 		end)
@@ -158,6 +158,7 @@ newTalent{
 	end,
 }
 
+-- Technique talent reduction
 newTalent{
 	name = "Execution",
 	type = {"technique/2hweapon-assault", 4},

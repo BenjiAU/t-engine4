@@ -24,7 +24,7 @@ local function getShieldStrength(self, t)
 end
 
 local function getEfficiency(self, t)
-	return self:combatTalentLimit(t, 100, 20, 55)/100 -- Limit to <100%
+	return 0.4
 end
 
 local function maxPsiAbsorb(self, t) -- Max psi/turn to prevent runaway psi gains (solipsist randbosses)
@@ -137,6 +137,9 @@ newTalent{
 	name = "Kinetic Shield",
 	type = {"psionic/absorption", 1},
 	require = psi_cun_req1,
+	rnd_boss_restrict = function(self, t, data) -- Flat damage reduction can be obnoxious early game
+		return data.level < 15
+	end,
 	mode = "sustained", no_sustain_autoreset = true,
 	points = 5,
 	sustain_psi = 10,
@@ -197,6 +200,9 @@ newTalent{
 	name = "Thermal Shield",
 	type = {"psionic/absorption", 1},
 	require = psi_cun_req2,
+	rnd_boss_restrict = function(self, t, data) -- Flat damage reduction can be obnoxious early game
+		return data.level < 15
+	end,
 	mode = "sustained", no_sustain_autoreset = true,
 	points = 5,
 	sustain_psi = 10,
@@ -259,6 +265,9 @@ newTalent{
 	name = "Charged Shield",
 	type = {"psionic/absorption", 1},
 	require = psi_cun_req3,
+	rnd_boss_restrict = function(self, t, data) -- Flat damage reduction can be obnoxious early game
+		return data.level < 15
+	end,
 	mode = "sustained", no_sustain_autoreset = true,
 	points = 5,
 	sustain_psi = 10,

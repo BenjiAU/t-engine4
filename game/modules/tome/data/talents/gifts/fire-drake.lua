@@ -25,22 +25,23 @@ newTalent{
 	points = 5,
 	random_ego = "attack",
 	equilibrium = 5,
-	cooldown = 8,
+	cooldown = 10,
 	range = 0,
 	on_learn = function(self, t) 
 		self.resists[DamageType.FIRE] = (self.resists[DamageType.FIRE] or 0) + 1 
-		self.combat_atk = self.combat_atk + 4
-		self.combat_dam = self.combat_dam + 4
+		self.combat_atk = self.combat_atk + 2
+		self.combat_dam = self.combat_dam + 2
 	end,
 	on_unlearn = function(self, t) 
 		self.resists[DamageType.FIRE] = (self.resists[DamageType.FIRE] or 0) - 1 
-		self.combat_atk = self.combat_atk - 4
-		self.combat_dam = self.combat_dam - 4
+		self.combat_atk = self.combat_atk - 2
+		self.combat_dam = self.combat_dam - 2
 	end,
-	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1.1, 1.6) end,
-	radius = function(self, t) return math.floor(self:combatTalentScale(t, 3, 6)) end,
+	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1.1, 1.7) end,
+	radius = function(self, t) return 3 end,
 	direct_hit = true,
 	tactical = { DEFEND = { knockback = 2 }, ESCAPE = { knockback = 2 } },
+	on_pre_use = function(self, t, silent) if not self:hasMHWeapon() then if not silent then game.logPlayer(self, "You require a mainhand weapon to use this talent.") end return false end return true end,
 	requires_target = true,
 	target = function(self, t)
 		return {type="cone", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=false, talent=t}
@@ -49,10 +50,20 @@ newTalent{
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
+		local state = {}
 		self:project(tg, x, y, function(px, py, tg, self)
 			local target = game.level.map(px, py, Map.ACTOR)
-			if target and target ~= self then
-				local hit = self:attackTarget(target, DamageType.PHYSKNOCKBACK, self:combatTalentWeaponDamage(t, 1.1, 1.6), true)
+			if target and target ~= self and not state[target] then				
+				-- We need to alter behavior slightly to accomodate shields since they aren't used in attackTarget
+				state[target] = true
+				local shield, shield_combat = self:hasShield()
+				local weapon = self:hasMHWeapon().combat
+				if not shield then
+					self:attackTarget(target, DamageType.PHYSKNOCKBACK, t.getDamage(self, t), true)
+				else
+					self:attackTargetWith(target, weapon, DamageType.PHYSKNOCKBACK, t.getDamage(self, t))
+					self:attackTargetWith(target, shield_combat, DamageType.PHYSKNOCKBACK, t.getDamage(self, t))
+				end
 			end
 		end)
 		game:playSoundNear(self, "talents/breath")
@@ -65,9 +76,11 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		return ([[You summon a powerful gust of wind, knocking back your foes within a radius of %d up to 3 tiles away and damaging them for %d%% weapon damage.
-		Every level in Wing Buffet additionally raises your Physical Power and Accuracy by 4, passively.
-		Each point in fire drake talents also increases your fire resistance by 1%%.]]):format(self:getTalentRadius(t),damage*100)
+		return ([[You summon a powerful gust of wind, knocking back your foes within a radius of %d up to 3 tiles away and hitting them for %d%% weapon damage.
+		Every level in Wing Buffet additionally raises your Physical Power and Accuracy by 2, passively.
+		Each point in fire drake talents also increases your fire resistance by 1%%.
+
+		This talent will also attack with your shield, if you have one equipped.]]):format(self:getTalentRadius(t),damage*100)
 	end,
 }
 
@@ -103,10 +116,11 @@ newTalent{
 	end,
 	info = function(self, t)
 		local radius = self:getTalentRadius(t)
-		return ([[You let out a powerful roar that sends your foes into utter confusion for 3 turns in a radius of %d.
+		local power = 20 + 6 * self:getTalentLevel(t)
+		return ([[You let out a powerful roar that sends your foes in radius %d into utter confusion (power: %d%%) for 3 turns.
 		The sound wave is so strong, your foes also take %0.2f physical damage.
 		The damage improves with your Strength.
-		Each point in fire drake talents also increases your fire resistance by 1%%.]]):format(radius, self:combatTalentStatDamage(t, "str", 30, 380))
+		Each point in fire drake talents also increases your fire resistance by 1%%.]]):format(radius, power, self:combatTalentStatDamage(t, "str", 30, 380))
 	end,
 }
 
@@ -174,9 +188,9 @@ newTalent{
 	equilibrium = 12,
 	cooldown = 12,
 	message = "@Source@ breathes fire!",
-	tactical = { ATTACKAREA = { FIRE = 2 }, DISABLE = {stun = 1}},
+	tactical = { ATTACKAREA = { FIRE = 2 }},
 	range = 0,
-	radius = function(self, t) return math.floor(self:combatTalentScale(t, 5, 9)) end,
+	radius = function(self, t) return math.min(13, math.floor(self:combatTalentScale(t, 5, 9))) end,
 	direct_hit = true,
 	requires_target = true,
 	on_learn = function(self, t) self.resists[DamageType.FIRE] = (self.resists[DamageType.FIRE] or 0) + 1 end,
@@ -184,11 +198,15 @@ newTalent{
 	target = function(self, t)
 		return {type="cone", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=false, talent=t}
 	end,
+	getDamage = function(self, t)
+		local bonus = self:knowTalent(self.T_CHROMATIC_FURY) and self:combatTalentStatDamage(t, "wil", 30, 850) or 0
+		return self:combatTalentStatDamage(t, "str", 30, 850) + bonus
+	end,  -- Higher damage because no debuff and delayed
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		self:project(tg, x, y, DamageType.FIRE_STUN, {dam=self:mindCrit(self:combatTalentStatDamage(t, "str", 30, 650)), dur=3, initial=70})
+		self:project(tg, x, y, DamageType.FIREBURN, {dam=self:mindCrit(t.getDamage(self, t)), dur=3})
 		game.level.map:particleEmitter(self.x, self.y, tg.radius, "breath_fire", {radius=tg.radius, tx=x-self.x, ty=y-self.y})
 
 		if core.shader.active(4) then
@@ -199,8 +217,8 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[You breathe fire in a frontal cone of radius %d. Any target caught in the area will take %0.2f fire damage over 3 turns, and has a 25%% chance of being Flameshocked for 3 turns, stunning them.
-		The damage will increase with your Strength, and the critical chance is based on your Mental crit rate.
-		Each point in fire drake talents also increases your fire resistance by 1%%.]]):format(self:getTalentRadius(t), damDesc(self, DamageType.FIRE, self:combatTalentStatDamage(t, "str", 30, 650)))
+		return ([[You breathe fire in a frontal cone of radius %d. Any target caught in the area will take %0.2f fire damage over 3 turns.
+		The damage will increase with your Strength and the critical chance is based on your Mental crit rate.
+		Each point in fire drake talents also increases your fire resistance by 1%%.]]):format(self:getTalentRadius(t), damDesc(self, DamageType.FIRE, t.getDamage(self, t)))
 	end,
 }

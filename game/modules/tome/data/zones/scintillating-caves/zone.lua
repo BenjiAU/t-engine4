@@ -22,11 +22,11 @@ if layout == "TWISTED" then
 
 return {
 	name = "Scintillating Caves",
-	level_range = {1, 5},
+	level_range = {1, 7},
 	level_scheme = "player",
 	max_level = 5,
 	decay = {300, 800},
-	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(-1,2) end,
+	actor_adjust_level = function(zone, level, e) return zone.base_level + level.level-1 + e:getRankLevelAdjust() + 1 end,
 	width = 30, height = 30,
 --	all_remembered = true,
 	tier1 = true,

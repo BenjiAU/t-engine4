@@ -119,10 +119,16 @@ newEntity{
 	},
 	resolvers.sustains_at_birth(),
 
+	-- L75ish Normal
+	-- L97-99 Insane
+	auto_classes={
+		{class="Archmage", start_level=77, level_rate=100},
+	},
+
 	autolevel = "caster",
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", sense_radius=25, ai_target="target_simple_or_player_radius" },
 	ai_tactic = resolvers.tactic"ranged",
-	resolvers.inscriptions(6, {"healing infusion", "regeneration infusion", "shielding rune", "invisibility rune", "movement infusion", "wild infusion"}),
+	resolvers.inscriptions(5, {"regeneration infusion", "shielding rune", "invisibility rune", "movement infusion", "wild infusion"}),
 
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("high-peak", engine.Quest.COMPLETED, "elandar-dead")
@@ -154,7 +160,6 @@ newEntity{
 	confusion_immune = 0.5,
 	blind_immune = 1,
 
-	combat_armor = 20,
 	combat_def = 20,
 
 	no_auto_resists = true,
@@ -198,21 +203,25 @@ newEntity{
 		[Talents.T_SOUL_ROT]={base=7, every=6},
 		[Talents.T_ACID_STRIKE]={base=7, every=6},
 		[Talents.T_ELEMENTAL_DISCORD]={base=7, every=6},
-		[Talents.T_BLOOD_SPLASH]={base=7, every=6},
+		[Talents.T_BLOOD_SPLASH]={base=7, every=15},
 
 		[Talents.T_WEAPON_COMBAT]=5,
 		[Talents.T_WEAPONS_MASTERY]={base=4, every=10},
 		[Talents.T_ARMOUR_TRAINING]={base=5, every=6},
 
 		[Talents.T_ENDLESS_WOES]=1,
-		[Talents.T_SPINE_OF_THE_WORLD]=1,
 	},
 	resolvers.sustains_at_birth(),
+
+	resolvers.auto_equip_filters("Reaver"),
+	auto_classes={
+		{class="Reaver", start_level=77, level_rate=100},
+	},
 
 	autolevel = "warriormage",
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", sense_radius=25, ai_target="target_simple_or_player_radius" },
 	ai_tactic = resolvers.tactic"melee",
-	resolvers.inscriptions(6, {"healing infusion", "regeneration infusion", "shielding rune", "heroism infusion", "movement infusion", "wild infusion"}),
+	resolvers.inscriptions(5, {"regeneration infusion", "shielding rune", "heroism infusion", "movement infusion", "wild infusion"}),
 
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("high-peak", engine.Quest.COMPLETED, "argoniel-dead")
@@ -241,7 +250,7 @@ newEntity{ define_as = "FALLEN_SUN_PALADIN_AERYN",
 	open_door = true,
 
 	autolevel = "warriormage",
-	ai = "tactical", ai_state = { talent_in=2, ai_move="move_astar", },
+	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	ai_tactic = resolvers.tactic"melee",
 	resolvers.inscriptions(4, {}),
 	
@@ -287,7 +296,6 @@ newEntity{ define_as = "FALLEN_SUN_PALADIN_AERYN",
 		[Talents.T_PROVIDENCE]=7,
 		[Talents.T_THICK_SKIN]=5,
 
-		[Talents.T_SPECTRAL_SHIELD]=1,
 		[Talents.T_IRRESISTIBLE_SUN]=1,
 	},
 	auto_classes={{class="Sun Paladin", start_level=57, level_rate=100}},
@@ -302,7 +310,7 @@ newEntity{ define_as = "HIGH_SUN_PALADIN_AERYN",
 	name = "High Sun Paladin Aeryn", color=colors.VIOLET, unique = "High Sun Paladin Aeryn High Peak Help",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/humanoid_human_high_sun_paladin_aeryn.png", display_h=2, display_y=-1}}},
 	desc = [[A beautiful woman, clad in shining plate armour. Power radiates from her.]],
-	level_range = {56, 56}, exp_worth = 2,
+	level_range = {56, nil}, exp_worth = 2,
 	rank = 5,
 	size_category = 3,
 	female = true,
@@ -318,8 +326,10 @@ newEntity{ define_as = "HIGH_SUN_PALADIN_AERYN",
 	
 	no_auto_resists = true,
 
+	auto_classes={{class="Sun Paladin", start_level=57, level_rate=100}},
+
 	autolevel = "warriormage",
-	ai = "tactical", ai_state = { talent_in=2, ai_move="move_astar", },
+	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	ai_tactic = resolvers.tactic"melee",
 	resolvers.inscriptions(4, {}),
 
@@ -353,7 +363,6 @@ newEntity{ define_as = "HIGH_SUN_PALADIN_AERYN",
 		[Talents.T_PROVIDENCE]=7,
 		[Talents.T_THICK_SKIN]=5,
 
-		[Talents.T_SPECTRAL_SHIELD]=1,
 		[Talents.T_IRRESISTIBLE_SUN]=1,
 	},
 	resolvers.sustains_at_birth(),

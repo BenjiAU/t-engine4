@@ -94,6 +94,10 @@ newEntity{ base="BASE_NPC_ORC_GRUSHNAK", define_as = "GRUSHNAK",
 		[Talents.T_UNBREAKABLE_WILL]=1,
 		[Talents.T_GIANT_LEAP]=1,
 	},
+
+	auto_classes={
+		{class="Bulwark", start_level=45, level_rate=75},
+	},
 	resolvers.sustains_at_birth(),
 
 	on_die = function(self, who)

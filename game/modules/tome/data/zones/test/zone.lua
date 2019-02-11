@@ -24,16 +24,28 @@ return {
 	max_level = 4,
 	decay = {300, 800},
 	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(-1,2) end,
-	width = 50, height = 50,
-	all_remembered = true,
+	width = 80, height = 80,
+	-- all_remembered = true,
 	all_lited = true,
 	no_level_connectivity = true,
 	
+	nicer_tiler_overlay = "DungeonWallsGrass",
 --	events_by_level = true,
 --	_max_level_generation_count = 2,
 	
 	generator =  {
 		map = {
+-- [[
+			class = "engine.generator.map.MapScript",
+			['<'] = "UP", ['>'] = "DOWN",
+			['.'] = "FLOOR", ['+'] = "DOOR", ['#'] = "WALL",
+			['_'] = "FLOOR", ['O'] = "WALL", 
+			[';'] = "GRASS", ['T'] = "TREE",
+			['='] = "DEEP_WATER",
+			-- mapscript = "!cavernous_forest",
+			mapscript = "!testroom2",
+			-- mapscript = "!inner_outer",
+--]]
 --[[
 			class = "engine.generator.map.Hexacle",
 			up = "FLOOR",
@@ -75,7 +87,7 @@ return {
 			down = "JUNGLE_GRASS_DOWN6",
 			door = "JUNGLE_GRASS",
 --]]
--- [[
+--[[
 			class = "engine.generator.map.Roomer",
 			nb_rooms = 10,
 			edge_entrances = {4,6},
@@ -91,8 +103,9 @@ return {
 --]]
 		},
 		actor = {
-			class = "mod.class.generator.actor.Random",
+			class = "engine.generator.actor.OnSpots",
 			nb_npc = {0, 0},
+			nb_spots = true, on_spot_chance = 90, spot_filters = {{type="spawn-spot"}},
 		},
 --[[
 		object = {
@@ -106,7 +119,7 @@ return {
 ]]
 	},
 	post_process = function(level) -- testing level generation failure
-		if level.level >=3 then level.force_recreate = true end
+		-- if level.level >=3 then level.force_recreate = true end
 	end,
 	
 --[[

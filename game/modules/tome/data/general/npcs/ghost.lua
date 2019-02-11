@@ -137,7 +137,6 @@ newEntity{ base = "BASE_NPC_GHOST",
 	ai = "tactical",
 
 	combat_armor = 0, combat_def = resolvers.mbonus(10, 50),
-	on_melee_hit = {[DamageType.BLIGHT]=resolvers.mbonus(25, 25)},
 	melee_project = {[DamageType.BLIGHT]=resolvers.mbonus(25, 25)},
 	stealth = resolvers.mbonus(50, 20),
 

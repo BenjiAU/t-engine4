@@ -81,7 +81,6 @@ newEntity{ base = "BASE_NPC_PLANT",
 	combat = { dam=5, atk=15, apr=3, damtype=DamageType.POISON},
 	can_multiply = 2,
 
-	on_melee_hit = {[DamageType.POISON]=10},
 	inc_damage = {all=-30},
 	talent_cd_reduction = {[Talents.T_POISONOUS_SPORES]=-20},
 	resolvers.talents{

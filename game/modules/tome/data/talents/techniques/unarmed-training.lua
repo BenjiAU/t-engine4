@@ -104,7 +104,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		local power = t.getPower(self, t)
-		return ([[When you're targeted by a projectile, your global speed is increased by %d%% for 1 turn.  Taking any action other then movement will break the effect.]]):
+		return ([[When you're targeted by a projectile, your global speed is increased by %d%% for 1 turn.  Taking any action other than movement will break the effect.]]):
 		format(power * 100)
 	end,
 }

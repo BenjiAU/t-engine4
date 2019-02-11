@@ -42,7 +42,6 @@ newEntity{ define_as = "RANTHA_THE_WORM",
 	level_range = {12, nil}, exp_worth = 2,
 	max_life = 230, life_rating = 17, fixed_rating = true,
 	max_stamina = 85,
-	max_mana = 200,
 	stats = { str=25, dex=10, cun=8, mag=20, wil=20, con=20 },
 	rank = 4,
 	size_category = 5,
@@ -64,16 +63,22 @@ newEntity{ define_as = "RANTHA_THE_WORM",
 	resolvers.talents{
 		[Talents.T_KNOCKBACK]=3,
 
-		[Talents.T_ICE_STORM]=2,
-		[Talents.T_FREEZE]=3,
-
 		[Talents.T_ICE_CLAW]={base=4, every=6},
 		[Talents.T_ICY_SKIN]={base=3, every=7},
 		[Talents.T_ICE_BREATH]={base=4, every=5},
 	},
 	resolvers.sustains_at_birth(),
 
-	autolevel = "warriormage",
+	autolevel = "warriorwill",
+	-- Not a lot of mindpower ice talents around, so lets let the dragon spam breaths
+	talent_cd_reduction = {
+		[Talents.T_ICE_BREATH] = 4,
+	},
+	auto_classes={
+		{class="Wyrmic", start_level=20, level_rate=125},-- Autoclasses don't generate gear and neither do the Daikara bosses so we inflate the level instead, more thematic than giving them actual wyrmic gear
+	},
+	resolvers.auto_equip_filters("Wyrmic"),
+
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	resolvers.inscriptions(1, "infusion"),
 
@@ -99,7 +104,6 @@ newEntity{ define_as = "VARSHA_THE_WRITHING",
 	level_range = {12, nil}, exp_worth = 2,
 	max_life = 230, life_rating = 17, fixed_rating = true,
 	max_stamina = 85,
-	max_mana = 200,
 	stats = { str=25, dex=10, cun=8, mag=20, wil=20, con=20 },
 	rank = 4,
 	size_category = 5,
@@ -121,15 +125,23 @@ newEntity{ define_as = "VARSHA_THE_WRITHING",
 	resolvers.talents{
 		[Talents.T_KNOCKBACK]=3,
 
-		[Talents.T_FIRE_STORM]=3,
-
 		[Talents.T_WING_BUFFET]={base=4, every=6},
 		[Talents.T_BELLOWING_ROAR]={base=3, every=7},
 		[Talents.T_FIRE_BREATH]={base=4, every=5},
 	},
+
+	talent_cd_reduction = {
+		[Talents.T_FIRE_BREATH] = 2,
+	},
+
 	resolvers.sustains_at_birth(),
 
-	autolevel = "warriormage",
+	autolevel = "warriorwill",
+	
+	resolvers.auto_equip_filters("Wyrmic"),
+	auto_classes={
+		{class="Wyrmic", start_level=20, level_rate=125},  -- Autoclasses don't generate gear and neither do the Daikara bosses so we inflate the level instead, more thematic than giving them actual wyrmic gear
+	},
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	resolvers.inscriptions(1, "infusion"),
 

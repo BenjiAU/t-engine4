@@ -63,6 +63,7 @@ newEntity{ define_as = "RING_MASTER",
 	resolvers.inscriptions(2, {"shielding rune", "speed rune"}),
 
 	autolevel = "warriorwill",
+	auto_classes={{class="Mindslayer", start_level=22, level_rate=35}},
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 
 	on_die = function(self, who)

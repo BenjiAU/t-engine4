@@ -373,14 +373,9 @@ function _M:applyDifficulty(zone, level_range)
 			zone.level_range = table.clone(level_range)
 		end
 		-- difficulty effects are phased in as the player reaches level 10
-		local lev_mult, lev_add, diff_adjust = 1, 0, math.min(1, game:getPlayer(true).level/10)
-		if self.difficulty == self.DIFFICULTY_NIGHTMARE then
-			lev_mult, lev_add = 1.5, 0
-		elseif self.difficulty == self.DIFFICULTY_INSANE then
-			lev_mult, lev_add = 1.5, 1
-		elseif self.difficulty == self.DIFFICULTY_MADNESS then
-			lev_mult, lev_add = 2.5, 2
-		end
+		local diff_adjust = math.min(1, game:getPlayer(true).level/10)
+		local lev_mult = game.state.birth.difficulty_level_mult or 1
+		local lev_add = game.state.birth.difficulty_level_add or 0
 		
 		if lev_mult ~= 1 then
 			local diff_adjust = math.min(1, game:getPlayer(true).level/10)
@@ -1158,6 +1153,8 @@ function _M:changeLevelReal(lev, zone, params)
 			if newx and newy then blocking_actor:move(newx, newy, true)
 			else blocking_actor:teleportRandom(x, y, 10) end
 		end
+		self.player:move(x, y, true)
+		self.player.last_wilderness = self.zone.short_name
 	-- Place the player on the level
 	else
 		local x, y = nil, nil
@@ -1986,7 +1983,11 @@ function _M:setupCommands()
 			print("===============")
 		end end,
 		[{"_g","ctrl"}] = function() if config.settings.cheat then
-			self:changeLevel(1, "cults+godfeaster")
+			if self.zone.short_name ~= "test" then
+				self:changeLevel(1, "test")
+			else
+				self:changeLevel(game.level.level + 1)
+			end
 do return end
 			local m = game.zone:makeEntity(game.level, "actor", {name="elven mage"}, nil, true)
 			local x, y = util.findFreeGrid(game.player.x, game.player.y, 20, true, {[Map.ACTOR]=true})

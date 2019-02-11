@@ -43,7 +43,7 @@ newEntity{ define_as = "ASSASSIN_LORD",
 	open_door = true,
 
 	autolevel = "roguemage",
-	ai = "dumb_talented_simple", ai_state = { talent_in=5, },
+	ai = "dumb_talented_simple", ai_state = { talent_in=1, },
 	stats = { str=8, dex=15, mag=15, cun=15, con=7 },
 
 	resolvers.tmasteries{ ["cunning/stealth"]=1.3, },
@@ -61,13 +61,13 @@ newEntity{ define_as = "ASSASSIN_LORD",
 		[engine.interface.ActorTalents.T_VENOMOUS_STRIKE]={base=3, every=4, max=10},
 		[engine.interface.ActorTalents.T_SHADOWSTEP]={base=3, every=4, max=10},
 		[engine.interface.ActorTalents.T_SHADOW_VEIL]={base=-1, every=4, max=5},
-		[engine.interface.ActorTalents.T_AMBUSCADE]={base=0, every=4, max=5},
 		[engine.interface.ActorTalents.T_APPLY_POISON]={base=3, every=4, max=10},
-		[engine.interface.ActorTalents.T_SHADOW_DANCE]={base=3, every=4, max=10},
-		[engine.interface.ActorTalents.T_EXPOSE_WEAKNESS]={base=1, every=4, max=5},
 	},
-	stamina_regen = 5,
-	mana_regen = 6,
+
+	auto_classes={{class="Shadowblade", start_level=20, level_rate=35},},
+
+	stamina_regen = 1,
+	mana_regen = 1,
 
 	can_talk = "assassin-lord",
 

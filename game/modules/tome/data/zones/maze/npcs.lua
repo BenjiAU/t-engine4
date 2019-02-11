@@ -84,6 +84,9 @@ newEntity{ define_as = "HORNED_HORROR",
 	autolevel = "warrior",
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	ai_tactic = resolvers.tactic"melee",
+
+	auto_classes={{class="Brawler", start_level=20, level_rate=30}},
+	
 	resolvers.inscriptions(1, {"invisibility rune"}),
 
 	on_die = function(self, who)
@@ -134,6 +137,9 @@ newEntity{ define_as = "MINOTAUR_MAZE",
 	autolevel = "warrior",
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	ai_tactic = resolvers.tactic"melee",
+
+	auto_classes={{class="Berserker", start_level=20, level_rate=50}},
+
 	resolvers.inscriptions(2, "infusion"),
 
 	on_die = function(self, who)

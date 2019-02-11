@@ -931,7 +931,7 @@ newEntity{
 		},
 	},
 	combat = {
-		special_on_hit = {desc="20% chance to torment the target", fct=function(combat, who, target)
+		special_on_hit = {desc="20% chance to stun, blind, pin, confuse, or silence the target", fct=function(combat, who, target)
 			if not rng.percent(20) then return end
 			local eff = rng.table{"stun", "blind", "pin", "confusion", "silence",}
 			if not target:canBe(eff) then return end
@@ -940,7 +940,7 @@ newEntity{
 			if eff == "stun" then target:setEffect(target.EFF_STUNNED, 3, {})
 			elseif eff == "blind" then target:setEffect(target.EFF_BLINDED, 3, {})
 			elseif eff == "pin" then target:setEffect(target.EFF_PINNED, 3, {})
-			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=60})
+			elseif eff == "confusion" then target:setEffect(target.EFF_CONFUSED, 3, {power=30})
 			elseif eff == "silence" then target:setEffect(target.EFF_SILENCED, 3, {})
 			end
 		end},

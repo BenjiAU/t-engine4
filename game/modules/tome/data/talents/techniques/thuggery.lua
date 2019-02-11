@@ -74,7 +74,7 @@ newTalent{
 		return ([[You smack your forehead against your enemy's head (or whatever sensitive part you can find), causing %0.1f Physical damage.
 		If the attack hits, the target is confused (%d%% effect) for %d turns.
 		Damage done increases with the quality of your headgear, your Strength, and your physical damage bonuses.
-		Confusion power and chance increase with your Dexterity and Accuracy.]]):
+		Confusion power increases with your Dexerity, and chance increases Accuracy.]]):
 		format(dam, t.getConfusion(self, t), duration)
 	end,
 }

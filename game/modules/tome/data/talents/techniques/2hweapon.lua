@@ -119,6 +119,7 @@ newTalent{
 	range = 0,
 	radius = function(self, t) return math.floor(self:combatTalentScale(t, 4, 8)) end,
 	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 4, 8)) end,
+	getConfusion = function(self, t) return self:combatTalentLimit(t, 50, 15, 45) end,
 	requires_target = true,
 	target = function(self, t)
 		return {type="cone", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=false}
@@ -136,7 +137,7 @@ newTalent{
 		if not x or not y then return nil end
 		self:project(tg, x, y, DamageType.CONFUSION, {
 			dur=t.getDuration(self, t),
-			dam=50+self:getTalentLevelRaw(t)*10,
+			dam=t.getConfusion(self, t),
 			power_check=function() return self:combatPhysicalpower() end,
 			resist_check=self.combatPhysicalResist,
 		})
@@ -144,8 +145,8 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Shout your warcry in a frontal cone of radius %d. Any targets caught inside will be confused for %d turns.]]):
-		format(self:getTalentRadius(t), t.getDuration(self, t))
+		return ([[Shout your warcry in a frontal cone of radius %d. Any targets caught inside will be confused (power %d%%) for %d turns.]]):
+		format(self:getTalentRadius(t),t.getConfusion(self, t), t.getDuration(self, t))
 	end,
 }
 

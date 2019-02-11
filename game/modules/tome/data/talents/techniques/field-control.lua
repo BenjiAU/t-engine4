@@ -110,7 +110,7 @@ newTalent{
 	info = function(self, t)
 		return ([[A mighty kick that pushes your target away %d grids.
 		If another creature is in the way, it will also be pushed away.
-		The Knockback chance increase with your Accuracy or your Physical Power, whichever is greater.]])
+		The Knockback chance increases with your Accuracy or your Physical Power, whichever is greater.]])
 		:format(t.getDist(self, t))
 	end,
 }

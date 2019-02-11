@@ -769,7 +769,8 @@ function _M:addEntity(level, e, typ, x, y, no_added)
 		if x and y then level.map(x, y, Map.TRIGGER, e) end
 	end
 	e:check("addedToLevel", level, x, y)
-	e:check("on_added", level, x, y)
+	e:check("on_added", level, x, y)  -- Sustains are activated here
+	e:check("on_added_final", level, x, y)
 end
 
 --- If we are loaded we need a new uid
@@ -1200,5 +1201,7 @@ function _M:runPostGeneration(level)
 		end
 	end
 
-	level.map.room_map = nil -- delete the room map
+	if not config.settings.cheat then
+		level.map.room_map = nil -- delete the room map, but keep it for debugging
+	end
 end

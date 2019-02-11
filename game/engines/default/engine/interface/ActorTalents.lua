@@ -52,6 +52,7 @@ function _M:newTalentType(t)
 	assert(t.name, "no talent type name")
 	assert(t.type, "no talent type type")
 	t.description = t.description or ""
+	t.category = t.category or t.type:gsub("/.*", "")
 	t.points = t.points or 1
 	t.talents = {}
 	table.insert(self.talents_types_def, t)
@@ -96,7 +97,8 @@ end
 function _M:init(t)
 	self.talents = t.talents or {}
 	self.talents_types = t.talents_types or {}
-	self.talents_types_mastery = self.talents_types_mastery  or {}
+	self.talents_types_mastery = self.talents_types_mastery or {}
+	self.talents_mastery_bonus = self.talents_mastery_bonus or {}
 	self.talents_cd = self.talents_cd or {}
 	self.sustain_talents = self.sustain_talents or {}
 	self.talents_auto = self.talents_auto or {}
@@ -832,7 +834,8 @@ function _M:getTalentLevel(id)
 	else
 		t = _M.talents_def[id]
 	end
-	return t and (self:getTalentLevelRaw(id)) * ((self.talents_types_mastery[t.type[1]] or 0) + 1) or 0
+	return t and (self:getTalentLevelRaw(id)) * (self:getTalentMastery(t) or 0) or 0
+
 end
 
 --- Talent type level, sum of all raw levels of talents inside
@@ -998,12 +1001,13 @@ function _M:getTalentDisplayName(t)
 	return t.display_name
 end
 
---- Cooldown all talents by one
+--- Cooldown all talents
 -- This should be called in your actors "act()" method
-function _M:cooldownTalents()
+-- @param turns the number of turns to cooldown the talents
+function _M:cooldownTalents(turns)
 	for tid, c in pairs(self.talents_cd) do
 		self.changed = true
-		self.talents_cd[tid] = self.talents_cd[tid] - 1
+		self.talents_cd[tid] = self.talents_cd[tid] - (turns or 1)
 		if self.talents_cd[tid] <= 0 then
 			self.talents_cd[tid] = nil
 			if self.onTalentCooledDown then self:onTalentCooledDown(tid) end

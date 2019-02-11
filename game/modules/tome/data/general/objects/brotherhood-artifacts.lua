@@ -268,7 +268,7 @@ newEntity{
 -- The four possible final rewards for the Brotherhood of Alchemists quest:
 
 newEntity{ base = "BASE_TAINT",
-	name = "Taint of Purging", unique = true, define_as = "TAINT_PURGING",
+	name = "Taint of Purging", unique = true, define_as = "TAINT_PURGING", image = "object/taint_of_telepathy.png",
 	level_range = {5, 50},
 	cost = 20,
 	material_level = 3,

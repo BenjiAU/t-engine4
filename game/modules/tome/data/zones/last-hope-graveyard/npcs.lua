@@ -57,6 +57,7 @@ newEntity{ define_as = "CELIA",
 	life_rating = 20,
 
 	soul = 6,
+	soul_regen = 1,
 	resolvers.talents{
 		[Talents.T_STAFF_MASTERY]={base=2, every=8, max = 5},
 		[Talents.T_INVOKE_DARKNESS]={base=5, every=5, max=10},
@@ -74,12 +75,19 @@ newEntity{ define_as = "CELIA",
 		[Talents.T_FORGERY_OF_HAZE]={base=3, every=5, max=10},
 		[Talents.T_FROSTDUSK]={base=3, every=5, max=10},
 	},
+
+	ai_talents = {[Talents.T_CREATE_MINIONS] = 4, [Talents.T_FORGERY_OF_HAZE] = 4},  -- Iconic Necromancer antics
+
 	resolvers.sustains_at_birth(),
 
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	ai_tactic = resolvers.tactic"ranged",
 	resolvers.inscriptions(2, "rune"),
 	resolvers.inscriptions(1, {"manasurge rune"}),
+	
+	auto_classes={
+		{class="Necromancer", start_level=20, level_rate=75},
+	},
 
 	on_takehit = function(self, val)
 		if not game.zone.open_all_coffins then return val end

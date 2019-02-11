@@ -16,7 +16,8 @@
 --
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
--- Obsolete but undeleted incase something uses it
+
+-- Obsolete but left in for compatibility incase something uses it
 newTalent{
 	name = "Grappling Stance",
 	type = {"technique/unarmed-other", 1},
@@ -57,15 +58,14 @@ newTalent{
 	type = {"technique/grappling", 1},
 	require = techs_req1,
 	points = 5,
-	random_ego = "attack",
-	cooldown = 6,
+	cooldown = 8,
 	stamina = 5,
 	tactical = { ATTACK = 2, DISABLE = 2 },
 	requires_target = true,
 	range = 1,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 3, 7)) end,
-	getPower = function(self, t) return self:combatTalentPhysicalDamage(t, 20, 60) end,
+	getDuration = function(self, t) return 5 end,
+	getPower = function(self, t) return self:combatTalentPhysicalDamage(t, 20, 90) end,
 	getDrain = function(self, t) return 6 end,
 	getSharePct = function(self, t) return math.min(0.35, self:combatTalentScale(t, 0.05, 0.25)) end,
 	getDamage = function(self, t) return 1 end,
@@ -77,16 +77,16 @@ newTalent{
 
 		local grappled = false
 
+		-- end the talent without effect if the target is to big
+		if self:grappleSizeCheck(target) then
+			return false
+		end
+		
 		-- breaks active grapples if the target is not grappled
 		if target:isGrappled(self) then
 			grappled = true
 		else
 			self:breakGrapples()
-		end
-
-		-- end the talent without effect if the target is to big
-		if self:grappleSizeCheck(target) then
-			return true
 		end
 
 		-- start the grapple; this will automatically hit and reapply the grapple if we're already grappling the target
@@ -101,13 +101,13 @@ newTalent{
 		local drain = t.getDrain(self, t)
 		local share = t.getSharePct(self, t)*100
 		local damage = t.getDamage(self, t)*100
-		return ([[Make a melee attack for %d%% damage and then attempt to grapple a target up to one size category larger than yourself for %d turns. A grappled opponent will be unable to move, take %d damage each turn, and %d%% of the damage you receive from any source will be redirected to them.  Any movement from the target or you will break the grapple.  Maintaining a grapple drains %d stamina per turn.
+		return ([[Make a melee attack for %d%% damage and then attempt to grapple a target up to one size category larger than yourself for %d turns. A grappled opponent will be unable to move, take %d damage each turn, and %d%% of the damage you receive from any source will be redirected to them as physical damage.
+		Any movement from the target or you will break the grapple.  Maintaining a grapple drains %d stamina per turn.
 		You may only grapple a single target at a time, and using any targeted unarmed talent on a target that you're not grappling will break the grapple.]])
 		:format(damage, duration, power, share, drain)
 	end,
 }
 
--- I tried to keep this relatively consistent with the existing Grappling code structure, but it wound up pretty awkward as a result
 newTalent{
 	name = "Crushing Hold",
 	type = {"technique/grappling", 2},
@@ -119,13 +119,13 @@ newTalent{
 	getDamage = function(self, t) return self:combatTalentPhysicalDamage(t, 5, 50) * getUnarmedTrainingBonus(self) end, -- this function shouldn't be used any more but I left it in to be safe, Clinch now handles the damage
 	getSlow = function(self, t)
 		if self:getTalentLevel(self.T_CRUSHING_HOLD) >= 5 then
-			return self:combatTalentPhysicalDamage(t, 0.05, 0.65)
+			return self:combatTalentPhysicalDamage(t, 0.05, 0.45)
 		else
 			return 0
 		end
 	end,
 	getDamageReduction = function(self, t)
-		return self:combatTalentPhysicalDamage(t, 1, 15)
+		return self:combatTalentPhysicalDamage(t, 10, 30)
 	end,
 	getSilence = function(self, t) -- this is a silence without an immunity check by design, if concerned about NPC use this is the talent to block
 		if self:getTalentLevel(self.T_CRUSHING_HOLD) >= 3 then
@@ -142,7 +142,7 @@ newTalent{
 		local slow = t.getSlow(self, t)
 
 		return ([[Enhances your grapples with additional effects.  All additional effects will apply to every grapple with no additional save or resist check.
-		#RED#Talent Level 1:  Reduces base weapon damage by %d
+		#RED#Talent Level 1:  Reduces physical power by %d
 		Talent Level 3:  Silences
 		Talent Level 5:  Reduces global action speed by %d%%]])
 		:format(reduction, slow*100)
@@ -249,12 +249,13 @@ newTalent{
 	points = 5,
 	random_ego = "attack",
 	requires_target = true,
+	no_npc_use = true,  -- Feel free to add a tactical table to this, until then, banned as the AI won't use it intelligently
 	cooldown = function(self, t)
 		return 8
 	end,
 	stamina = 20,
 	range = function(self, t)
-		return 8
+		return 10
 	end,
 	radius = function(self, t)
 		return 1
@@ -264,10 +265,21 @@ newTalent{
 		return self:combatTalentWeaponDamage(t, 1, 3.5) -- no interaction with Striking Stance so we make the base damage higher to compensate
 	end,
 	target = function(self, t)
-		return {type="ball", range=self:getTalentRange(t), selffire=false, radius=self:getTalentRadius(t)}
+		return {type="ball", range=self:getTalentRange(t), selffire=false, radius=self:getTalentRadius(t), talent=t}
+	end,
+	on_pre_use = function(self, t, silent)
+		local grappled = self:hasEffect(self.EFF_GRAPPLING)
+		if not grappled or not grappled["trgt"] then 
+			if not silent then game.logPlayer(self, "You must be grappling something to use this talent.") end
+			return false 
+		end
+		if grappled["trgt"]:attr("never_move_before_grapple") then 
+			if not silent then game.logPlayer(self, "Your grapple victim must be able to move to use this talent.") end
+			return false 
+		end
+		return true
 	end,
 	action = function(self, t)
-
 		if self:hasEffect(self.EFF_GRAPPLING) then
 			local grappled = self:hasEffect(self.EFF_GRAPPLING)["trgt"]
 
@@ -295,22 +307,32 @@ newTalent{
 			end
 
 			-- pick all targets around the landing point and do a melee attack
+			local hit = false
 			self:project(tg, grappled.x, grappled.y, function(px, py, tg, self)
 				local target = game.level.map(px, py, Map.ACTOR)
-				if target and target ~= self then
-
-					local hit = self:attackTarget(target, nil, t.getDamage(self, t), true)
+				if target and self:reactionToward(target) < 0 then
+					self:attackTarget(target, nil, t.getDamage(self, t), true)
 					self:breakGrapples()
+					if target ~= self then
+						hit = true
+					end
 				end
 			end)
-			return true
 
+			if hit then
+				game.logSeen(grappled, "#RED#%s is shaken by the collision and loses a turn!#LAST#", grappled.name:capitalize())
+				grappled.energy.value = grappled.energy.value - game.energy_to_act
+			end
+
+			return true
 		else
 			-- only usable if you have something Grappled
 			return false
 		end
 	end,
 	info = function(self, t)
-		return ([[In a mighty show of strength you whirl your grappled victim around and throw them into the air causing %d%% damage to them and any nearby enemies they collide with on landing.]]):format(t.getDamage(self, t)*100)
+		return ([[In a mighty show of strength you whirl your grappled victim around and throw them into the air causing %d%% damage to them and enemies in radius %d on landing.  
+			If at least 1 other enemy is hit the thrown enemy will be shaken by the impact losing a full turn.
+			You can only throw enemies that could move normally.]]):format(t.getDamage(self, t)*100, self:getTalentRadius(t))
 	end,
 }

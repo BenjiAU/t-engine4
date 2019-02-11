@@ -171,7 +171,7 @@ newTalent{
 	cooldown = 15,
 	negative = 15,
 	tactical = { DISABLE = 3 },
-	radius = 3,
+	radius = 5,
 	direct_hit = true,
 	requires_target = true,
 	target = function(self, t)
@@ -202,7 +202,7 @@ newTalent{
 	require = divi_req4,
 	random_ego = "attack",
 	points = 5,
-	cooldown = 30,
+	cooldown = 50,
 	negative = 10,
 	tactical = { ATTACK = 2 },
 	requires_target = true,
@@ -210,7 +210,7 @@ newTalent{
 --	no_npc_use = true,
 	unlearn_on_clone = true,
 	target = function(self, t) return {type="bolt", range=self:getTalentRange(t), talent=t} end,
-	getDuration = function(self, t) return math.floor(self:combatScale(self:getTalentLevel(t)+self:getCun(10), 3, 0, 18, 15)) end,
+	getDuration = function(self, t) return math.floor(self:combatTalentStatDamage(t, "cun", 3, 10)+1) end,		
 	getPercent = function(self, t) return self:combatLimit(self:getCun(10, true)*self:getTalentLevel(t), 90, 0, 0, 50, 50) end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
@@ -228,18 +228,13 @@ newTalent{
 		end
 
 		if target:attr("summon_time") then
-			game.logPlayer(self, "Wrong target!")
+			game.logSeen(self, "You can't target summons!")
 			return
 		end
 
-		local allowed = 2 + math.ceil(self:getTalentLevelRaw(t) / 2 )
-
-		if target.rank >= 3.5 or -- No bosses
-			target:reactionToward(self) >= 0 or -- No friends
-			target.size_category > allowed
-			then
-			game.logSeen(target, "%s resists!", target.name:capitalize())
-			return true
+		if target:reactionToward(self) >= 0 then
+			game.logSeen(self, "You can't target allies!")
+			return
 		end
 
 		local modifier = t.getPercent(self, t)
@@ -256,7 +251,8 @@ newTalent{
 			ai = "summoned", ai_real = target.ai,
 			desc = [[A dark, shadowy shape whose form resembles the creature it was copied from. It is not a perfect replica, though, and it makes you feel uneasy to look at it.]],
 		}
-		table.mergeAdd(m.resists, {all = modifier, [DamageType.DARKNESS]=50, [DamageType.LIGHT]=- 50})
+		table.mergeAdd(m.resists, {[DamageType.DARKNESS]=50, [DamageType.LIGHT]=- 50})
+		table.mergeAdd(m.inc_damage, {all = -50})
 		m:removeTimedEffectsOnClone()
 		m:unlearnTalentsOnClone()
 		
@@ -271,19 +267,10 @@ newTalent{
 	end,
 	info = function(self, t)
 		local duration = t.getDuration(self, t)
-		local allowed = 2 + math.ceil(self:getTalentLevelRaw(t) / 2 )
-		local size = "gargantuan"
-		if allowed < 4 then
-			size = "medium"
-		elseif allowed < 5 then
-			size = "big"
-		elseif allowed < 6 then
-			size = "huge"
-		end
-		return ([[Creates a shadowy copy of a hostile target of up to %s size. The copy will attack its progenitor immediately and lasts for %d turns.
-		The duplicate has %d%% of the target's life, +%d%% all damage resistance, +50%% darkness resistance and -50%% light resistance.
-		The duration, life and all damage resistance scale with your Cunning and this ability will not work on bosses.]]):
-		format(size, duration, t.getPercent(self, t), t.getPercent(self, t))
+		return ([[Creates a shadowy copy of a hostile target. The copy will attack its progenitor immediately and lasts for %d turns.
+		The duplicate has %d%% of the target's life, +50%% darkness resistance, -50%% light resistance, and deals 50%% less damage.
+		The duration and life scale with your Cunning.]]):
+		format(duration, t.getPercent(self, t))
 	end,
 }
 

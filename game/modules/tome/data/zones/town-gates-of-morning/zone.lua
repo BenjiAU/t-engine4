@@ -43,7 +43,7 @@ return {
 			map = "towns/gates-of-morning",
 		},
 		actor = {
-			class = "mod.class.generator.actor.Random",
+			class = "engine.generator.actor.Random",
 			area = {x1=6, x2=46, y1=3, y2=47},
 			nb_npc = {10, 10},
 		},

@@ -70,7 +70,8 @@ This shall help you on your travels. Farewell!]],
 			end
 			-- Make sure a previous amulet didnt bug it out
 			if player:getTalentTypeMastery("wild-gift/fungus") == 0 then player:setTalentTypeMastery("wild-gift/fungus", 1) end
-			game.logPlayer(player, "#00FF00#You gain the fungus talents school.")
+			game.logPlayer(player, "#00FF00#You gain the fungus talents school and your Mana Clash is enhanced.")
+			game.player:learnTalent(game.player.T_ANTIMAGIC_ADEPT, true, nil, {no_unlearn=true})		
 			if player:knowTalentType("cunning/trapping") then
 				game.party:learnLore("zigur-purging-trap")
 			end	

@@ -133,6 +133,7 @@ newTalent{
 		return ([[Vomit on the ground around you, healing any undead in the area and damaging anyone else.
 		Lasts %d turns, and deals %d blight damage or heals %d life.
 		Creatures standing in the retch also have %d%% chance to remove a physical effect each turn.
+		When you stand in your own retch your racial -20%% global speed is cancelled.
 		Undeads will be stripped from a detrimental effect while others will be stripped from a beneficial effect.]]):format(t.getduration(self, t), damDesc(self, DamageType.BLIGHT, dam), dam * 1.5, t.getPurgeChance(self, t))
 	end,
 }

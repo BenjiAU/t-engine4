@@ -38,6 +38,7 @@ function makeAlchemistGolem(self)
 --		level_range = {1, 50}, exp_worth=0,
 		level_range = {1, self.max_level}, exp_worth=0,
 		life_rating = 13,
+		life_regen = 1,  -- Prevent resting tedium
 		never_anger = true,
 		save_hotkeys = true,
 

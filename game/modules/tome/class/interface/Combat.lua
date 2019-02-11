@@ -248,13 +248,6 @@ function _M:attackTarget(target, damtype, mult, noenergy, force_unarmed)
 		t.on_attackTarget(self, t, target)
 	end
 
-	if self:attr("unharmed_attack_on_hit") then
-		local v = self:attr("unharmed_attack_on_hit")
-		self:attr("unharmed_attack_on_hit", -v)
-		if rng.percent(60) then self:attackTarget(target, nil, 1, true, true) end
-		self:attr("unharmed_attack_on_hit", v)
-	end
-
 	-- Cancel stealth!
 	if break_stealth then self:breakStealth() end
 	self:breakLightningSpeed()
@@ -693,6 +686,13 @@ function _M:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult,
 		self.__global_accuracy_damage_bonus = self.__global_accuracy_damage_bonus / self.__attacktargetwith_recursing_procs_reduce
 	end
 
+	if self:attr("unharmed_attack_on_hit") then
+		local v = self:attr("unharmed_attack_on_hit")
+		self:attr("unharmed_attack_on_hit", -v)
+		if rng.percent(30) then self:attackTarget(target, nil, 1, true, true) end
+		self:attr("unharmed_attack_on_hit", v)
+	end
+
 	-- handle stalk targeting for hits (also handled in Actor for turn end effects)
 	if hitted and target ~= self then
 		local effStalker = self:hasEffect(self.EFF_STALKER)
@@ -732,13 +732,9 @@ function _M:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult,
 	end end
 
 	-- Shadow cast
-	if hitted and not target.dead and self:knowTalent(self.T_SHADOW_COMBAT) and self:isTalentActive(self.T_SHADOW_COMBAT) and self:getMana() > 0 then
-		local dam = 2 + self:combatTalentSpellDamage(self.T_SHADOW_COMBAT, 2, 50)
-		local mana = 2
-		if self:getMana() > mana then
-			DamageType:get(DamageType.DARKNESS).projector(self, target.x, target.y, DamageType.DARKNESS, dam)
-			self:incMana(-mana)
-		end
+	if hitted and not target.dead and self:knowTalent(self.T_SHADOW_COMBAT) and self:isTalentActive(self.T_SHADOW_COMBAT) then
+		local dam = self:callTalent(self.T_SHADOW_COMBAT, "getDamage")
+		DamageType:get(DamageType.DARKNESS).projector(self, target.x, target.y, DamageType.DARKNESS, dam)
 	end
 
 	-- Ruin
@@ -760,6 +756,9 @@ function _M:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult,
 	end
 
 	-- On hit talent
+	-- Disable friendly fire for procs since players can't control when they happen or where they hit
+	local old_ff = self.nullify_all_friendlyfire
+	self.nullify_all_friendlyfire = true
 	if hitted and not target.dead and weapon and weapon.talent_on_hit and next(weapon.talent_on_hit) and not self.turn_procs.melee_talent then
 		for tid, data in pairs(weapon.talent_on_hit) do
 			if rng.percent(data.chance) then
@@ -777,6 +776,7 @@ function _M:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult,
 			end
 		end
 	end
+	self.nullify_all_friendlyfire = old_ff
 
 	-- Shattering Impact
 	if hitted and self:attr("shattering_impact") and (not self.shattering_impact_last_turn or self.shattering_impact_last_turn < game.turn) then
@@ -1241,8 +1241,12 @@ function _M:combatDefenseBase(fake)
 			local t = self:getTalentFromId(self.T_SURGE)
 			add = add + t.getDefenseChange(self, t)
 		end
+		if self:knowTalent(self.T_UMBRAL_AGILITY) then
+			local t = self:getTalentFromId(self.T_UMBRAL_AGILITY)
+			add = add + t.getDefense(self, t)
+		end
 	end
-	local d = math.max(0, self.combat_def + (self:getDex() - 10) * 0.35 + (self:getLck() - 50) * 0.4)
+	local d = math.max(0, self.combat_def + (self:getDex() - 10) * 0.7 + (self:getLck() - 50) * 0.4)
 	local mult = 1
 	if light_armor then
 		if self:knowTalent(self.T_MOBILE_DEFENCE) then
@@ -1343,6 +1347,7 @@ function _M:combatAttackBase(weapon, ammo)
 	local atk = 4 + self.combat_atk + talent + (weapon.atk or 0) + (ammo and ammo.atk or 0) + (self:getLck() - 50) * 0.4
 
 	if self:knowTalent(self["T_FORM_AND_FUNCTION"]) then atk = atk + self:callTalent(self["T_FORM_AND_FUNCTION"], "getDamBoost", weapon) end
+	if self:knowTalent(self["T_UMBRAL_AGILITY"]) then atk = atk + self:callTalent(self["T_UMBRAL_AGILITY"], "getAccuracy") end
 
 	if self:attr("hit_penalty_2h") then atk = atk * (1 - math.max(0, 20 - (self.size_category - 4) * 5) / 100) end
 
@@ -1408,7 +1413,7 @@ end
 --- Gets the weapon speed
 function _M:combatSpeed(weapon, add)
 	weapon = weapon or self.combat or {}
-	return (weapon.physspeed or 1) / math.max(self.combat_physspeed + (add or 0), 0.1)
+	return (weapon.physspeed or 1) / math.max(self.combat_physspeed + (add or 0), 0.4)
 end
 
 --- Gets the crit rate
@@ -1852,17 +1857,17 @@ end
 
 --- Gets spellspeed
 function _M:combatSpellSpeed()
-	return 1 / math.max(self.combat_spellspeed, 0.1)
+	return 1 / math.max(self.combat_spellspeed, 0.4)
 end
 
 -- Gets mental speed
 function _M:combatMindSpeed()
-	return 1 / math.max(self.combat_mindspeed, 0.1)
+	return 1 / math.max(self.combat_mindspeed, 0.4)
 end
 
 --- Gets summon speed
 function _M:combatSummonSpeed()
-	return math.max(1 - ((self:attr("fast_summons") or 0) / 100), 0.1)
+	return math.max(1 - ((self:attr("fast_summons") or 0) / 100), 0.4)
 end
 
 --- Computes physical crit chance reduction
@@ -2092,12 +2097,18 @@ function _M:combatTalentMindDamage(t, base, max)
 end
 
 --- Gets damage based on talent
-function _M:combatTalentStatDamage(t, stat, base, max)
+-- stat == "str", "con", ....
+-- base = value to match when stat = 10 before diminishing returns
+-- max = value to match when stat = 100 before diminishing returns
+-- no_dr = set true to skip extra diminishing returns and force values to match at base = TL1, Stat10 max = TL5, Stat100
+function _M:combatTalentStatDamage(t, stat, base, max, no_dr)
 	-- Compute at "max"
 	local mod = max / ((base + 100) * ((math.sqrt(5) - 1) * 0.8 + 1))
 	-- Compute real
 	local dam = (base + (self:getStat(stat))) * ((math.sqrt(self:getTalentLevel(t)) - 1) * 0.8 + 1) * mod
-	dam =  dam * (1 - math.log10(dam * 2) / 7)
+	if not no_dr then
+		dam =  dam * (1 - math.log10(dam * 2) / 7)
+	end
 	dam = dam ^ (1 / 1.04)
 	return self:rescaleDamage(dam)
 end
@@ -2213,7 +2224,7 @@ end
 function _M:combatGetFlatResist(type)
 	if not self.flat_damage_armor then return 0 end
 	local dec = (self.flat_damage_armor.all or 0) + (self.flat_damage_armor[type] or 0)
-	return self:rescaleCombatStats(dec, 40)
+	return dec
 end
 
 --- Returns the resistance
@@ -2231,10 +2242,29 @@ function _M:combatGetResist(type)
 end
 
 --- Returns the resistance penetration
-function _M:combatGetResistPen(type)
+function _M:combatGetResistPen(type, straight)
 	if not self.resists_pen then return 0 end
 	local pen = (self.resists_pen.all or 0) + (self.resists_pen[type] or 0)
-	return pen
+	if straight then return pen end
+	local add = 0
+
+	if self.auto_highest_resists_pen and self.auto_highest_resists_pen[type] then
+		local highest = self.resists_pen.all or 0
+		for kind, v in pairs(self.resists_pen) do
+			if kind ~= "all" then
+				local inc = self:combatGetResistPen(kind, true)
+				highest = math.max(highest, inc)
+			end
+		end
+		return highest + self.auto_highest_resists_pen[type]
+	end
+
+	if self:knowTalent(self.T_UMBRAL_AGILITY) and type == "DARKNESS" then
+		local t = self:getTalentFromId(self.T_UMBRAL_AGILITY)
+		add = add + t.getPenetration(self, t)
+	end
+
+	return pen + add
 end
 
 --- Returns the damage affinity
@@ -2288,7 +2318,7 @@ function _M:combatMovementSpeed(x, y)
 		local t = self:getTalentFromId(self.T_DARK_VISION)
 		movement_speed = movement_speed + t.getMovementSpeedChange(self, t)
 	end
-	movement_speed = math.max(movement_speed, 0.1)
+	movement_speed = math.max(movement_speed, 0.4)
 	return mult * (self.base_movement_speed or 1) / movement_speed
 end
 
@@ -2342,6 +2372,20 @@ function _M:hasAxeWeapon()
 	if not self:getInven("MAINHAND") then return end
 	local weapon = self:getInven("MAINHAND")[1]
 	if not weapon or (weapon.subtype ~= "battleaxe" and weapon.subtype ~= "waraxe") then
+		return nil
+	end
+	return weapon
+end
+
+--- Check if the actor has a 1H in mainhand
+function _M:hasMHWeapon()
+	if self:attr("disarmed") then
+		return nil, "disarmed"
+	end
+
+	if not self:getInven("MAINHAND") then return end
+	local weapon = self:getInven("MAINHAND")[1]
+	if not weapon or not weapon.combat then
 		return nil
 	end
 	return weapon

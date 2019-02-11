@@ -43,7 +43,7 @@ return {
 			map = "towns/angolwen",
 		},
 		actor = {
-			class = "mod.class.generator.actor.Random",
+			class = "engine.generator.actor.Random",
 			nb_npc = {10, 10},
 		},
 		object = {

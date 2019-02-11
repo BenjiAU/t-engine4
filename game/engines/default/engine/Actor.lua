@@ -481,8 +481,6 @@ function _M:useEnergy(val)
 	val = val or game.energy_to_act
 	self.energy.value = self.energy.value - val
 	self.energy.used = true
-	if self.player and self.energy.value < game.energy_to_act then game.paused = false end
---	print("USE ENERGY", self.name, self.uid, "::", self.energy.value, game.paused, "::", self.player)
 end
 
 --- What is our reaction toward the target

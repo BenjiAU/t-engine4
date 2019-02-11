@@ -20,10 +20,12 @@
 require "engine.class"
 local Dialog = require "engine.ui.Dialog"
 local List = require "engine.ui.List"
+local Image = require "engine.ui.Image"
 local Button = require "engine.ui.Button"
 local ButtonImage = require "engine.ui.ButtonImage"
 local Textzone = require "engine.ui.Textzone"
 local Textbox = require "engine.ui.Textbox"
+local Checkbox = require "engine.ui.Checkbox"
 local Separator = require "engine.ui.Separator"
 local KeyBind = require "engine.KeyBind"
 local FontPackage = require "engine.FontPackage"
@@ -34,6 +36,7 @@ module(..., package.seeall, class.inherit(Dialog))
 function _M:init()
 	Dialog.init(self, "Main Menu", 250, 400, 450, 50)
 	self.__showup = false
+	self.__main_menu = true
 	self.absolute = true
 
 	local l = {}
@@ -81,8 +84,9 @@ function _M:init()
 	-- if config.settings.cheat then l[#l+1] = {name="foo", fct=function() Dialog:simpleWaiter("Test", "Test", 500, nil, 500) end} end
 	-- if config.settings.cheat then l[#l+1] = {name="foo", fct=function() if core.game.CProfiler then core.game.CProfiler("luastarted.profiler.prof") end end} end
 
-	self.c_background = Button.new{text=game.stopped and "Enable background" or "Disable background", fct=function() self:switchBackground() end}
-	self.c_version = Textzone.new{font={FontPackage:getFont("default"), 10}, auto_width=true, auto_height=true, text=("#B9E100#T-Engine4 version: %d.%d.%d"):format(engine.version[1], engine.version[2], engine.version[3])}
+	self.c_background = Checkbox.new{title="Disable animated background", checked=game.stopped and true or false, on_change=function() self:switchBackground() end}
+	-- self.c_background = Button.new{text=game.stopped and "Enable background" or "Disable background", fct=function() self:switchBackground() end}
+	self.c_version = Textzone.new{font={FontPackage:getFont("default"), 10}, auto_width=true, auto_height=true, text=("#{bold}##B9E100#T-Engine4 version: %d.%d.%d"):format(engine.version[1], engine.version[2], engine.version[3])}
 
 	self.c_list = List.new{width=self.iw, nb_items=#self.list, list=self.list, fct=function(item) end, font={FontPackage:getFont("default")}}
 
@@ -93,13 +97,14 @@ function _M:init()
 
 	self.base_uis = {
 		{left=0, top=0, ui=self.c_list},
-		{left=0, bottom=0, absolute=true, ui=self.c_background},
-		{right=self.c_facebook.w, bottom=0, absolute=true, ui=self.c_version},
+		{right=self.c_facebook.w, bottom=0, absolute=true, ui=self.c_background},
+		{right=0, top=0, absolute=true, ui=self.c_version},
 		{right=0, bottom=self.c_facebook.h+self.c_twitter.h+self.c_forums.h, absolute=true, ui=self.c_discord},
 		{right=0, bottom=self.c_facebook.h+self.c_twitter.h, absolute=true, ui=self.c_forums},
 		{right=0, bottom=self.c_twitter.h, absolute=true, ui=self.c_facebook},
 		{right=0, bottom=0, absolute=true, ui=self.c_twitter},
 	}
+	self:setupDLCButtons()
 
 	self:enableWebtooltip()
 
@@ -115,6 +120,80 @@ function _M:init()
 	self:updateUI()
 
 	self.key:setupRebootKeys()
+end
+
+function _M:setupDLCButtons()
+	local has_ashes, has_embers, has_cults = false, false, false
+
+	local function checker(file)
+		if file == "ashes-urhrok.teaac" then has_ashes = true end
+		if file == "orcs.teaac" then has_embers = true end
+		if file == "cults.teaac" then has_cults = true end
+	end
+	for file in fs.iterate("/addons/") do checker(file) end
+	for file in fs.iterate("/dlcs/") do checker(file) end
+
+	self.c_dlc_ashes = ButtonImage.new{no_decoration=true, alpha_unfocus=1, file="dlcs-icons/"..(has_ashes and "" or "no-").."ashes.png", fct=function() util.browserOpenUrl("https://te4.org/dlc/ashes-urhrok") end}
+	self.c_dlc_embers = ButtonImage.new{no_decoration=true, alpha_unfocus=1, file="dlcs-icons/"..(has_embers and "" or "no-").."embers.png", fct=function() util.browserOpenUrl("https://te4.org/dlc/orcs") end}
+	self.c_dlc_cults = ButtonImage.new{no_decoration=true, alpha_unfocus=1, file="dlcs-icons/"..(has_cults and "" or "no-").."cults.png", fct=function() util.browserOpenUrl("https://te4.org/dlc/cults") end}
+	self.c_dlc_ashes.on_focus_change = function(self, v)
+		if v then game:floatingTooltip(self.last_display_x, self.last_display_y, "top", {
+			Image.new{file="dlcs-icons/ashes-banner.png", width=467, height=181},
+[[#{bold}##GOLD#Ashes of Urh'Rok - Expansion#LAST##{normal}#
+#{italic}##ANTIQUE_WHITE#Many in Maj'Eyal have heard of "demons", sadistic creatures who appear seemingly from nowhere, leaving a trail of suffering and destruction whereever they go.#{normal}##LAST#
+
+#{bold}#Features#{normal}#:
+#LIGHT_UMBER#New class:#WHITE# Doombringers. These avatars of demonic destruction charge into battle with massive two-handed weapons, cutting swaths of firey devastation through hordes of opponents. Armed with flame magic and demonic strength, they delight in fighting against overwhelming odds
+#LIGHT_UMBER#New class:#WHITE# Demonologists. Bearing a shield and the magic of the Spellblaze itself, these melee-fighting casters can grow demonic seeds from their fallen enemies. Imbue these seeds onto your items to gain a wide array of new talents and passive benefits, and summon the demons within them to fight!
+#LIGHT_UMBER#New race:#WHITE# Doomelves. Shalore who've taken to the demonic alterations especially well, corrupting their typical abilities into a darker form.
+#LIGHT_UMBER#New artifacts, lore, zones, events...#WHITE# For your demonic delight!
+
+]]..(has_ashes and "\n#LIGHT_GREEN#Installed" or "#YELLOW#Not installed - Click to download / purchase")})
+		else game:floatingTooltip(nil)
+		end
+	end
+	self.c_dlc_embers.on_focus_change = function(self, v)
+		if v then game:floatingTooltip(self.last_display_x, self.last_display_y, "top", {
+			Image.new{file="dlcs-icons/embers-banner.png", width=467, height=181},
+[[#{bold}##GOLD#Embers of Rage - Expansion#LAST##{normal}#
+#{italic}##ANTIQUE_WHITE#One year has passed since the one the Orcs call the "Scourge from the West" came and single-handedly crushed the Orc Prides of Grushnak, Vor, Gorbat, and Rak'Shor.  The Allied Kingdoms, now linked by farportal to their distant, long-lost Sunwall allies, have helped them conquer most of Var'Eyal.  The few remnants of the ravaged Prides are caged...  but one Pride remains.#{normal}##LAST#
+
+#{bold}#Features#{normal}#:
+#LIGHT_UMBER#A whole new campaign:#WHITE# Set one year after the events of the main game, the final destiny of the Orc Prides is up to you. Discover the Far East like you never knew it. 
+#LIGHT_UMBER#New classes:#WHITE# Sawbutchers, Gunslingers and Psyshots. Harness the power of steam to power deadly contraptions to lay waste to all those that oppose the Pride!  
+#LIGHT_UMBER#New races:#WHITE# Orcs, Yetis, Whitehooves. Discover the orcs and their unlikely 'allies' as you try to save your Pride from the disasters caused by the one you call 'The Scourge from the West'.
+#LIGHT_UMBER#Tinker system:#WHITE# Augment your items with powerful crafted tinkers. Attach rockets to your boots, gripping systems to your gloves and many more.
+#LIGHT_UMBER#Salves:#WHITE# Bound to the tinker system, create powerful medical salves to inject into your skin, replacing the infusions§runes system.
+#LIGHT_UMBER#A ton#WHITE# of artifacts, lore, zones, events... 
+
+]]..(has_embers and "\n#LIGHT_GREEN#Installed" or "#YELLOW#Not installed - Click to download / purchase")})
+		else game:floatingTooltip(nil)
+		end
+	end
+	self.c_dlc_cults.on_focus_change = function(self, v)
+		if v then game:floatingTooltip(self.last_display_x, self.last_display_y, "top", {
+			Image.new{file="dlcs-icons/cults-banner.png", width=467, height=181},
+[[#{bold}##GOLD#Forgotten Cults - Expansion#LAST##{normal}#
+#{italic}##ANTIQUE_WHITE#Not all adventurers seek fortune, not all that defend the world have good deeds in mind. Lately the number of sightings of horrors have grown tremendously. People wander off the beaten paths only to be found years later, horribly mutated and partly insane, if they are found at all. It is becoming evident something is stirring deep below Maj'Eyal. That something is you.#{normal}##LAST#
+
+#{bold}#Features#{normal}#:
+#LIGHT_UMBER#New class:#WHITE# Writhing Ones. Give in to the corrupting forces and turn yourself gradually into an horror, summon horrors to do your bidding, shed your skin and melt your face to assault your foes. With your arm already turned into a tentacle, what creature can stop you?
+#LIGHT_UMBER#New class:#WHITE# Cultists of Entropy. Using its insanity and control of entropic forces to unravel the normal laws of physic this caster class can turn healing into attacks and call upon the forces of the void to reduce its foes to dust.
+#LIGHT_UMBER#New race:#WHITE# Drems. A corrupt subrace of dwarves, that somehow managed to keep a shred of sanity to not fully devolve into mindless horrors. They can enter a frenzy and even learn to summon horrors.
+#LIGHT_UMBER#New race:#WHITE# Krogs. Ogres transformed by the very thing that should kill them. Their powerful attacks can stun their foes and they are so strong they can dual wield any one handed weapons.
+#LIGHT_UMBER#Many new zones:#WHITE# Explore the Scourge Pits, fight your way out of a giant worm (don't ask how you get *in*), discover the wonders of the Occult Egress and many more strange and tentacle-filled zones!
+#LIGHT_UMBER#New horrors:#WHITE# You liked radiant horrors? You'll love searing horrors! And Nethergames. And Entropic Shards. And ... more
+#LIGHT_UMBER#Sick of your own head:#WHITE#  Replace it with a nice cozy horror!
+#LIGHT_UMBER#A ton#WHITE# of artifacts, lore, events... 
+
+]]..(has_cults and "\n#LIGHT_GREEN#Installed" or "#YELLOW#Not installed - Click to download / purchase")})
+		else game:floatingTooltip(nil)
+		end
+	end
+
+	table.insert(self.base_uis, {left=0, bottom=0, absolute=true, ui=self.c_dlc_ashes})
+	table.insert(self.base_uis, {left=self.c_dlc_ashes.w, bottom=0, absolute=true, ui=self.c_dlc_embers})
+	table.insert(self.base_uis, {left=self.c_dlc_ashes.w+self.c_dlc_embers.w, bottom=0, absolute=true, ui=self.c_dlc_cults})
 end
 
 function _M:enableWebtooltip()

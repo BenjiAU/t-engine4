@@ -27,14 +27,16 @@ newTalent{
 	range = 1,
 	no_message = true,
 	tactical = { ATTACK = { weapon = 1 }, EQUILIBRIUM = 0.5},
+	on_pre_use = function(self, t, silent) if not self:hasMHWeapon() then if not silent then game.logPlayer(self, "You require a mainhand weapon to use this talent.") end return false end return true end,
 	requires_target = true,
 	no_npc_use = true,
 	is_melee = true,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
-	maxSwallow = function(self, t, target) return -- Limit < 50%
-		self:combatLimit(self:getTalentLevel(t)*(self.size_category or 3)/(target.size_category or 3), 50, 13, 1, 25, 5)
+	maxSwallow = function(self, t, size) return -- Limit < 50%
+		self:combatLimit(self:getTalentLevel(t)*(self.size_category or 3)/(size or 3), 50, 13, 1, 25, 5)
 	end,
 	getPassiveCrit = function(self, t) return self:combatTalentScale(t, 2, 10, 0.5) end,
+	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1.6, 2.5) end,
 	on_learn = function(self, t) self.resists[DamageType.PHYSICAL] = (self.resists[DamageType.PHYSICAL] or 0) + 0.5 end,
 	on_unlearn = function(self, t) self.resists[DamageType.PHYSICAL] = (self.resists[DamageType.PHYSICAL] or 0) - 0.5 end,
 	passives = function(self, t, p)
@@ -47,10 +49,18 @@ newTalent{
 		if not target or not self:canProject(tg, x, y) then return nil end
 
 		self:logCombat(target, "#Source# tries to swallow #Target#!")
-		local hit = self:attackTarget(target, DamageType.NATURE, self:combatTalentWeaponDamage(t, 1.6, 2.5), true)
+		local shield, shield_combat = self:hasShield()
+		local weapon = self:hasMHWeapon().combat
+		local hit = false
+		if not shield then
+			hit = self:attackTarget(target, DamageType.NATURE, t.getDamage(self, t), true)
+		else
+			hit = self:attackTargetWith(target, weapon, DamageType.NATURE, t.getDamage(self, t))
+			if self:attackTargetWith(target, shield_combat, DamageType.NATURE, t.getDamage(self, t)) or hit then hit = true end
+		end
 		if not hit then return true end
 
-		if (target.life * 100 / target.max_life > t.maxSwallow(self, t, target)) and not target.dead then
+		if (target.life * 100 / target.max_life > t.maxSwallow(self, t, target.size_category)) and not target.dead then
 			return true
 		end
 
@@ -71,12 +81,26 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Attack the target for %d%% Nature weapon damage.
-		If the attack brings your target below %d%% life or kills it, you can try to swallow it, killing it automatically and regaining life and equilibrium depending on its level.
-		The chance to swallow depends on your talent level and the relative size of the target.
-		Levels in Swallow additionally raises your Physical and Mental critical rate by %d%%, passively.
-		Each point in sand drake talents also increases your physical resistance by 0.5%%.]]):
-		format(100 * self:combatTalentWeaponDamage(t, 1.6, 2.5), t.maxSwallow(self, t, self), t.getPassiveCrit(self, t))
+return ([[Attack the target for %d%% Nature weapon damage.
+		If the attack brings your target below a percent of its max life (based on talent level and relative size) or kills it, you attempt to swallow it, killing it automatically and regaining life and equilibrium depending on its level.
+		The target may save against your physical power to prevent this attempt.
+		Levels in Swallow raise your Physical and Mental critical rate by %d%%.
+		Each point in sand drake talents increase your physical resistance by 0.5%%.
+
+		Max life threshold at your current size:
+		Tiny:  %d%%
+		Small:  %d%%
+		Medium:  %d%%
+		Big:  %d%%
+		Huge:  %d%%
+		Gargantuan:  %d%%]]):
+		format(100 * t.getDamage(self, t), t.getPassiveCrit(self, t),
+			t.maxSwallow(self, t, 1),
+			t.maxSwallow(self, t, 2),
+			t.maxSwallow(self, t, 3),
+			t.maxSwallow(self, t, 4),
+			t.maxSwallow(self, t, 5),
+			t.maxSwallow(self, t, 6))
 	end,
 }
 
@@ -154,7 +178,7 @@ newTalent{
 	message = "@Source@ breathes sand!",
 	tactical = { ATTACKAREA = {PHYSICAL = 2}, DISABLE = { blind = 2 } },
 	range = 0,
-	radius = function(self, t) return math.floor(self:combatTalentScale(t, 5, 9)) end,
+	radius = function(self, t) return math.min(13, math.floor(self:combatTalentScale(t, 5, 9))) end,
 	direct_hit = true,
 	requires_target = true,
 	on_learn = function(self, t) self.resists[DamageType.PHYSICAL] = (self.resists[DamageType.PHYSICAL] or 0) + 0.5 end,
@@ -163,9 +187,10 @@ newTalent{
 		return {type="cone", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=false, talent=t}
 	end,
 	getDamage = function(self, t)
-		return self:combatTalentStatDamage(t, "str", 30, 480)
+		local bonus = self:knowTalent(self.T_CHROMATIC_FURY) and self:combatTalentStatDamage(t, "wil", 10, 400) or 0
+		return self:combatTalentStatDamage(t, "str", 10, 400) + bonus
 	end,
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 3, 4)) end,
+	getDuration = function(self, t) return 3 end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
@@ -184,7 +209,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local duration = t.getDuration(self, t)
 		return ([[You breathe sand in a frontal cone of radius %d. Any target caught in the area will take %0.2f physical damage, and will be blinded for %d turns.
-		The damage will increase with your Strength, and the critical chance is based on your Mental crit rate.
+		The damage will increase with your Strength, the critical chance is based on your Mental crit rate, and the Blind apply power is based on your Mindpower.
 		Each point in sand drake talents also increases your physical resistance by 0.5%%.]]):format(self:getTalentRadius(t), damDesc(self, DamageType.PHYSICAL, damage), duration)
 	end,
 }

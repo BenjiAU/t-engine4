@@ -149,7 +149,7 @@ newTalent{
 		local avoid = t.getAvoidance(self,t)*3
 		local range = t.getSight(self,t)
 		local radius = t.getRadius(self,t)
-		return ([[Enter a concealed sniping stance, increasing our weapon's attack range and vision range by %d, giving all incoming damage a %d%% chance to miss you, and causing your Headshot, Volley and Called Shots to behave as if the target was marked.
+		return ([[Enter a concealed sniping stance, increasing your weapon's attack range and vision range by %d, giving all incoming damage a %d%% chance to miss you, and causing your Headshot, Volley and Called Shots to behave as if the target was marked.
 Any non-instant, non-movement action will break concealment, but the increased range and vision and damage avoidance will persist for 3 turns, with the damage avoidance decreasing in power by 33%% each turn.
 This requires a bow to use, and cannot be used if there are foes in sight within range %d.]]):
 		format(range, avoid, radius)

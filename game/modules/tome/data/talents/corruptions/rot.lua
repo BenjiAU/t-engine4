@@ -99,8 +99,8 @@ carrionworm = function(self, target, duration, x, y)
 	m.unused_talents_types = 0
 	m.no_inventory_access = true
 	m.no_points_on_levelup = true
+	m.carrion_worm = true  -- This keeps the on_death effect from spamming the damage log with 0s
 	m.save_hotkeys = true
-	m.ai_state = m.ai_state or {}
 	m.ai_state.tactic_leash = 100
 	-- Try to use stored AI talents to preserve tweaking over multiple summons
 	m.ai_talents = self.stored_ai_talents and self.stored_ai_talents[m.name] or {}
@@ -155,7 +155,7 @@ newTalent{
 	getDamageReduction = function(self, t) 
 		return self:combatTalentLimit(t, 0.5, 0.1, 0.22)
 	end,
-	tactical = { BUFF = 2 },
+	tactical = {BUFF = 3},
 	activate = function(self, t)
 		local resist = t.getResist(self,t)
 		local affinity = t.getAffinity(self,t)
@@ -175,11 +175,10 @@ newTalent{
 		self:removeTemporaryValue("worm", p.worm)
 		return true
 	end,
-	callbackPriorities={callbackOnHit = -5},  -- High priority since we do more than just reduce damage and want to make sure the worm spawn happens often
-	callbackOnHit = function(self, t, cb)
-		if ( cb.value > (0.15 * self.max_life) ) then
-			local damageReduction = cb.value * t.getDamageReduction(self, t)
-			cb.value = cb.value - damageReduction
+	callbackOnTakeDamage = function(self, t, src, x, y, type, dam, state)
+		if ( dam > (0.15 * self.max_life) ) then
+			local damageReduction = dam * t.getDamageReduction(self, t)
+			dam = dam - damageReduction
 
 			local nb = 0 
 			if game.level then
@@ -206,7 +205,7 @@ newTalent{
 					carrionworm(self, self, 5, gx, gy)
 				end
 			end
-			return cb.value
+			return {dam = dam}
 		end
 	end,
 	info = function(self, t)

@@ -134,8 +134,7 @@ newTalent{
 		end
 	end,
 	callbackOnMove = function(self, t, moved, force, ox, oy)
-		if force or not moved or (ox == self.x and oy == self.y) or not self:hasLightArmor() then return end
-
+		if not moved or (ox == self.x and oy == self.y) or not self:hasLightArmor() then return end
 		local nb_foes = 0
 		local add_if_visible_enemy = function(x, y)
 			local target = game.level.map(x, y, game.level.map.ACTOR)
@@ -147,7 +146,7 @@ newTalent{
 		self:project(adjacent_tg, self.x, self.y, add_if_visible_enemy)
 
 		if nb_foes > 0 then
-			self:setEffect(self.EFF_MOBILE_DEFENCE, 2, {power=t.getDefense(self,t)/2, stamina=0})
+			self:setEffect(self.EFF_MOBILE_DEFENCE, 3, {power=t.getDefense(self,t)/2, stamina=0})
 		end
 	end,
 	info = function(self, t)

@@ -23,11 +23,11 @@ if layout == "FLOODED" then
 
 return {
 	name = "Trollmire",
-	level_range = {1, 5},
+	level_range = {1, 7},
 	level_scheme = "player",
 	max_level = 3,
 	decay = {300, 800},
-	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(-1,2) end,
+	actor_adjust_level = function(zone, level, e) return zone.base_level + level.level-1 + e:getRankLevelAdjust() + 1 end,
 	width = 65, height = 40,
 --	all_remembered = true,
 	all_lited = true,
