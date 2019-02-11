@@ -873,7 +873,6 @@ Uint32 redraw_timer(Uint32 interval, void *param)
 		redraw_pending = 1;
 	}
 	SDL_mutexV(renderingLock);
-
 	return(interval);
 }
 
@@ -1474,6 +1473,7 @@ void setupDisplayTimer(int fps)
 
 	// We only use the display timer in tickbased event loop
 	SDL_mutexP(renderingLock);
+	redraw_pending = 0;
 	if (event_loop == event_loop_tickbased) {
 		if (display_timer_id) SDL_RemoveTimer(display_timer_id);
 		display_timer_id = SDL_AddTimer(max_ms_per_frame, redraw_timer, NULL);
