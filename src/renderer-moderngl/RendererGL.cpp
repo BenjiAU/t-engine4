@@ -172,12 +172,21 @@ static bool sort_dos_z(DORFlatSortable *i, DORFlatSortable *j) {
 		return i->sort_coords.z < j->sort_coords.z;
 	}
 }
+static bool sort_dos_gfx(DORFlatSortable *i, DORFlatSortable *j) {
+	if (i->sort_coords.z == j->sort_coords.z) {
+		if (i->sort_shader == j->sort_shader) return i->sort_tex < j->sort_tex;
+		else return i->sort_shader < j->sort_shader;
+	} else {
+		return i->sort_coords.z < j->sort_coords.z;
+	}
+}
 
 void RendererGL::enableSorting(SortMode mode, SortAxis axis) {
 	zsort = mode;
 	if (axis == SortAxis::X) sort_method = sort_dos_x;
 	else if (axis == SortAxis::Y) sort_method = sort_dos_y;
-	else sort_method = sort_dos_z;
+	else if (axis == SortAxis::Z) sort_method = sort_dos_z;
+	else sort_method = sort_dos_gfx;
 }
 
 void RendererGL::sortedToDL() {

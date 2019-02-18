@@ -125,7 +125,7 @@ public:
 
 extern int donb;
 
-enum class SortAxis { NONE, X, Y, Z }; 
+enum class SortAxis { NONE, X, Y, Z, GFX }; 
 
 /****************************************************************************
  ** All childs of that can be sorted in fast mode by RendererGl

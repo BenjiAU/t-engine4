@@ -487,8 +487,9 @@ static int gl_renderer_sort(lua_State *L)
 		if (!strcmp(ma, "x")) axis = SortAxis::X;
 		else if (!strcmp(ma, "y")) axis = SortAxis::Y;
 		else if (!strcmp(ma, "z")) axis = SortAxis::Z;
+		else if (!strcmp(ma, "gfx")) axis = SortAxis::GFX;
 		else {
-			lua_pushstring(L, "Parameter to sort() must be no/fast/full/gl and x/y/z");
+			lua_pushstring(L, "Parameter to sort() must be no/fast/full/gl and x/y/z/gfx");
 			lua_error(L);
 		}		
 
