@@ -503,6 +503,10 @@ function _M:display(nb_keyframes)
 		self.renderer:toScreen()
 		self.logdisplay:toScreen()
 		engine.GameEnergyBased.display(self, nb_keyframes)
+		if self.floating_tooltip_pos and (#self.dialogs == 0 or self.dialogs[#self.dialogs].__main_menu) then
+			print("---")
+			self.floating_tooltip:toScreen(self.floating_tooltip_pos.x, self.floating_tooltip_pos.y)
+		end
 		self.full_fbo:use(false)
 		self.full_fborenderer:toScreen(0, 0, 1, 1, 1, 1)
 		return

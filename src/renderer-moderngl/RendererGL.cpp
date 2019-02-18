@@ -368,6 +368,7 @@ void RendererGL::activateCutting(mat4 cur_model, bool v) {
 	}
 }
 
+int nb_rgl = 0;
 void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	if (!visible) return;
 	// printf("Displaying renderer %s with %d and sorting %d\n", getRendererName(), displays.size(), zsort != SortMode::NO_SORT);
@@ -380,6 +381,7 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	if (count_draws) {
 		nb_draws_start = nb_draws;
 	}
+	nb_rgl++;
 
 	cur_model = cur_model * model; // This is .. undeeded ..??
 	// View *use_view = view ? view : View::getCurrent();
@@ -423,14 +425,14 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 			if (!shader) shader = my_default_shader;
 			if (!shader) {
 				useNoShader();
-				if (!current_shader) return;
+				if (!current_shader) continue;
 			} else {
 				useShaderSimple(shader);
 				current_shader = shader;
 			}
 
 			shader = current_shader;
-			if (shader->vertex_attrib == -1) return;
+			if (shader->vertex_attrib == -1) continue;
 			// printf("=r= binding shader %s in renderer %s : %lx (default %lx)\n", shader->name, getRendererName(), shader, default_shader);
 
 			if (shader->p_tick != -1) {

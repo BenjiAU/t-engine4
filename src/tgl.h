@@ -96,6 +96,7 @@ extern GLuint gl_c_shader;
 	}
 
 
+extern int nb_rgl;
 extern int nb_draws;
 #define glDrawArrays(a, b, c) \
 	{ \

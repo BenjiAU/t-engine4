@@ -237,7 +237,8 @@ end
 function _M:updateFPSCounter()
 	fps_counter_frames = 0
 	local fps, msframe = core.display.getFPS()
-	return ("%0.1f FPS\n%d draws/frame\n%d ms/frame\n%d mb lua memory"):format(fps, core.display.countDraws(), msframe, collectgarbage("count", 0)/1024)
+	local nb_draws, nb_rgl = core.display.countDraws()
+	return ("%0.1f FPS\n%d draws/frame\n%d rGL calls/frame\n%d ms/frame\n%d mb lua memory"):format(fps, nb_draws, nb_rgl, msframe, collectgarbage("count", 0)/1024)
 end
 
 --- Return the DisplayObject to draw

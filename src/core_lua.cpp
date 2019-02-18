@@ -1601,8 +1601,10 @@ static int gl_get_max_texture_size(lua_State *L) {
 
 static int gl_counts_draws(lua_State *L) {
 	lua_pushnumber(L, nb_draws);
+	lua_pushnumber(L, nb_rgl);
 	nb_draws = 0;
-	return 1;
+	nb_rgl = 0;
+	return 2;
 }
 
 static int gl_get_fps(lua_State *L) {
