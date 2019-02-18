@@ -133,6 +133,7 @@ function table.max(t)
 	return m
 end
 
+<<<<<<< HEAD
 function table.maxKey(t)
 	local m = nil
 	for k, v in pairs(t) do
@@ -149,6 +150,8 @@ function table.findValue(t, fv)
 	end
 end
 
+=======
+>>>>>>> master
 function table.print_shallow(src, offset, line_feed)
 	if not line_feed then line_feed = '\n' end
 	if type(src) ~= "table" then io.stdout:write("table.print has no table:", src) io.stdout:write(line_feed) return end
