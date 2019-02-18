@@ -114,7 +114,6 @@ void noise_data::set(SDL_Surface *s) {
 		unsigned char b = ((unsigned char*)s->pixels)[i];
 		data[i] = ((float)b / (float)255.0) - avg;
 	}
-	printf("==== %f avg\n", avg);
 }
 
 class LoaderNoise : public Loader {

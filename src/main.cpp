@@ -955,7 +955,7 @@ void do_move(int w, int h) {
 		start_xpos = w;
 		start_ypos = h;
 	} else {
-		w = start_xpos;
+		// w = start_xpos;
 		h = start_ypos;
 	}
 
