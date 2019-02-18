@@ -218,45 +218,6 @@ newEntity{
 	},
 }
 
---[[ Disabled pending revamp of concept which will probably never come
-newEntity{
-	power_source = {psionic=true},
-	name = " of seduction", suffix=true, instant_resolve=true,
-	keywords = {seduction=true},
-	level_range = {35, 50},
-	greater_ego = 1,
-	rarity = 50,
-	cost = 50,
-	wielder = {
-		inc_damage = {
-			[DamageType.MIND] = resolvers.mbonus_material(8, 2),
-		},
-		resists_pen = {
-			[DamageType.MIND] = resolvers.mbonus_material(8, 2),
-		},
-		inc_stats = { [Stats.STAT_CUN] = resolvers.mbonus_material(5, 2) },
-		stamina_regen_when_hit = resolvers.mbonus_material(20, 2, function(e, v) v=v/10 return 0, v end),
-		mana_regen_when_hit = resolvers.mbonus_material(40, 4, function(e, v) v=v/10 return 0, v end),
-		equilibrium_regen_when_hit = resolvers.mbonus_material(20, 2, function(e, v) v=v/10 return 0, v end),
-		hate_regen_when_hit = resolvers.mbonus_material(1, 1, function(e, v) v=v/10 return 0, v end),
-		psi_regen_when_hit = resolvers.mbonus_material(20, 2, function(e, v) v=v/10 return 0, v end),
-	},
-	charm_power = resolvers.mbonus_material(80, 20),
-	charm_power_def = {add=5, max=10, floor=true},
-	resolvers.charm("forces nearby enemies to attack you (rad %d)", 15, function(self, who)
-		local rad = self:getCharmPower(who)
-		local tg = {type="ball", range=0, radius=rad, friendlyfire=false}
-		who:project(tg, who.x, who.y, function(tx, ty)
-			local a = game.level.map(tx, ty, engine.Map.ACTOR)
-			if a then
-				a:setTarget(who)
-			end
-		end)
-		game.logSeen(who, "%s uses %s!", who.name:capitalize(), self:getName{no_count=true})
-		return {id=true, used=true}
-	end),
-}
---]]
 
 newEntity{
 	power_source = {technique=true},
@@ -267,7 +228,7 @@ newEntity{
 	cost = 10,
 	wielder = {
 		fatigue = resolvers.mbonus_material(6, 4, function(e, v) return 0, -v end),
-		life_regen = resolvers.mbonus_material(36, 9, function(e, v) v=v/10 return 0, v end),
+		life_regen = resolvers.mbonus_material(4, 1, function(e, v) return 0, v end),
 	},
 }
 
@@ -285,7 +246,7 @@ newEntity{
 		},
 		combat_physresist = resolvers.mbonus_material(15, 5),
 		max_life = resolvers.mbonus_material(50, 30),
-		life_regen = resolvers.mbonus_material(24, 6, function(e, v) v=v/10 return 0, v end),
+		life_regen = resolvers.mbonus_material(10, 1, function(e, v) return 0, v end),
 	},
 }
 
@@ -479,7 +440,7 @@ newEntity{
 		},
 		fatigue = resolvers.mbonus_material(6, 4, function(e, v) return 0, -v end),
 		movement_speed = 0.1,
-		life_regen = resolvers.mbonus_material(12, 3, function(e, v) v=v/10 return 0, v end),
+		life_regen = resolvers.mbonus_material(4, 1, function(e, v) return 0, v end),
 		stamina_regen = resolvers.mbonus_material(12, 3, function(e, v) v=v/10 return 0, v end),
 	},
 }

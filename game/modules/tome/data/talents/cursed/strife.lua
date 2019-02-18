@@ -61,7 +61,16 @@ newTalent{
 
 		-- attack if adjacent
 		if core.fov.distance(self.x, self.y, x, y) <= 1 then
-			self:attackTarget(target, nil, 1, true)
+			-- We need to alter behavior slightly to accomodate shields since they aren't used in attackTarget
+			local shield, shield_combat = self:hasShield()
+			local weapon = self:hasMHWeapon() and self:hasMHWeapon().combat or self.combat --can do unarmed attack
+			local hit = false
+			if not shield then
+				hit = self:attackTarget(target, nil, 1, true)
+			else
+				hit = self:attackTargetWith(target, weapon, nil, 1)
+				if self:attackTargetWith(target, shield_combat, nil, 1) or hit then hit = true end
+			end
 		end
 
 		return true
@@ -72,7 +81,9 @@ newTalent{
 		local defenseChange = t.getDefenseChange(self, t)
 		local resistPenetration = t.getResistPenetration(self, t)
 		return ([[Turn your attention to a nearby foe, and dominate them with your overwhelming presence. If the target fails to save versus your Mindpower, it will be unable to move for %d turns and vulnerable to attacks. They will lose %d Armour, %d Defense and your attacks will gain %d%% resistance penetration. If the target is adjacent to you, your domination will include a melee attack.
-		Effects will improve with your Willpower.]]):format(duration, -armorChange, -defenseChange, resistPenetration)
+		Effects will improve with your Willpower.
+
+		This talent will also attack with your shield, if you have one equipped.]]):format(duration, -armorChange, -defenseChange, resistPenetration)
 	end,
 }
 

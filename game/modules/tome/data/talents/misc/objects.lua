@@ -698,3 +698,12 @@ for i = 1, (ActorObjectUse.max_object_use_talents or 0) do
 end
 print("[Talents] Defined", ActorObjectUse.max_object_use_talents or 0, "ActorObjectUse Talents base_name:", ActorObjectUse.base_object_talent_name )
 
+newTalent{
+	name = "Melee retaliation",
+	type = {"misc/objects", 1},
+	points = 1,
+	mode = "passive",
+	info = function(self, t)
+		return ([[Intermediary for melee retaliation.]])
+	end,
+}

@@ -76,7 +76,7 @@ newEntity{ base = "BASE_INFUSION",
 	inscription_kind = "protect",
 	inscription_data = {
 		cooldown = 18,
-		dur = 5,
+		dur = 10,
 		reduce = 1,
 		power = 10,
 		use_stat_mod = 0.02, -- +2 duration reduction and +20% affinity at 100 stat
@@ -178,7 +178,7 @@ newEntity{ base = "BASE_RING",
 	use_power = {
 		name = function(self, who)
 			local dam = self.use_power.damage(self, who)
-			return ("summon a radius %d tidal wave that expands slowly over %d turns, dealing %0.2f cold and %0.2f physical damage (based on Willpower) each turn and knocking opponents back"):
+			return ("summon a radius %d tidal wave that expands slowly over %d turns, dealing %0.2f cold and %0.2f physical damage (based on Willpower) each turn, knocking opponents back, and lowering their stun resistance"):
 			format(self.use_power:radius(who), self.use_power.duration(self, who), who:damDesc(engine.DamageType.COLD, dam/2), who:damDesc(engine.DamageType.PHYSICAL, dam/2)) 
 		end,
 		power = 60,
@@ -193,7 +193,7 @@ newEntity{ base = "BASE_RING",
 			-- Add a lasting map effect
 			local wave = game.level.map:addEffect(who,
 				who.x, who.y, duration,
-				engine.DamageType.WAVE, {dam=dam, x=who.x, y=who.y},
+				engine.DamageType.WAVE, {dam=dam, x=who.x, y=who.y, apply_wet=true},
 				radius,
 				5, nil,
 				engine.MapEffect.new{color_br=30, color_bg=60, color_bb=200, effect_shader="shader_images/water_effect1.png"},
@@ -244,6 +244,7 @@ newEntity{ base = "BASE_RING",
 	one_shot_life_saving = true,
 }
 
+-- Mostly useful for getting through specific defenses or for cute multiDT synergies (Elemental Surge)
 newEntity{ base = "BASE_RING",
 	power_source = {arcane=true},
 	unique = true,
@@ -257,12 +258,18 @@ newEntity{ base = "BASE_RING",
 	special_desc = function(self) return "All your damage is converted and split into arcane, fire, cold and lightning." end,
 	wielder = {
 		elemental_mastery = 0.25,
-		inc_stats = { [Stats.STAT_MAG] = 3,[Stats.STAT_CUN] = 3, },
+		inc_stats = { [Stats.STAT_MAG] = 6, [Stats.STAT_CUN] = 6, },
 		inc_damage = {
-			[DamageType.ARCANE]    = 12,
-			[DamageType.FIRE]      = 12,
-			[DamageType.COLD]      = 12,
-			[DamageType.LIGHTNING] = 12,
+			[DamageType.ARCANE]    = 25,
+			[DamageType.FIRE]      = 25,
+			[DamageType.COLD]      = 25,
+			[DamageType.LIGHTNING] = 25,
+		},
+		resists_pen = {
+			[DamageType.ARCANE]    = 25,
+			[DamageType.FIRE]      = 25,
+			[DamageType.COLD]      = 25,
+			[DamageType.LIGHTNING] = 25,
 		},
 	},
 }
@@ -783,6 +790,7 @@ newEntity{ base = "BASE_KNIFE",
 	wielder = {combat_atk = 10},
 }
 
+-- The Moon/Star set offers an alternative damage scaling that works well with Dexterity and Cunning but doesn't play nice with the usual high weapon damage+physical dam/pen+crit setups
 newEntity{ base = "BASE_KNIFE", define_as = "ART_PAIR_MOON",
 	power_source = {arcane=true},
 	unique = true,
@@ -791,32 +799,46 @@ newEntity{ base = "BASE_KNIFE", define_as = "ART_PAIR_MOON",
 	moddable_tile = "special/%s_dagger_moon",
 	moddable_tile_big = true,
 	desc = [[A viciously curved blade that a folk story says is made from a material that originates from the moon.  Devouring the light around it, it fades.]],
-	level_range = {20, 30},
+	level_range = {20, 50},
 	rarity = 200,
 	require = { stat = { dex=24, cun=24 }, },
 	cost = 300,
 	material_level = 3,
 	combat = {
-		dam = 30,
-		apr = 30,
-		physcrit = 10,
-		dammod = {dex=0.45,str=0.45},
-		melee_project={[DamageType.DARKNESS] = 20},
+		damtype = DamageType.DARKNESS,
+		dam = 10,
+		physspeed = 0.8,
+		dammod = {dex=0.2,str=0.2},
+		special_on_hit = {desc=function(self, who, special)
+				local dam = special.damage(self, who)
+				local str
+				if self.set_complete then
+					str = ("Deal 200%% of your Cunning as Darkness damage (%d)."):format(dam)
+				else
+					str = ("Deal %d Darkness damage."):format(dam)
+				end
+				return str
+			end,
+			damage = function(self, who)
+				return self.set_complete and who:getCun()*2 or 70
+			end,
+			fct=function(self, who, target, dam, special)
+				local tg = {type="hit", range=1, radius=0, selffire=false}
+				local damage = special.damage(self, who)
+				who:project(tg, target.x, target.y, engine.DamageType.DARKNESS, damage)
+		end},
 	},
 	wielder = {
 		lite = -1,
-		inc_damage={
-			[DamageType.DARKNESS] = 10,
-		},
 	},
 	set_list = { {"define_as","ART_PAIR_STAR"} },
 	set_desc = {
 		moon = "The moon shines alone in a starless sky.",
 	},
 	on_set_complete = function(self, who)
-		self:specialSetAdd({"wielder","lite"}, 1)
-		self:specialSetAdd({"combat","melee_project"}, {[engine.DamageType.RANDOM_CONFUSION]=10})
-		self:specialSetAdd({"wielder","inc_damage"}, {[engine.DamageType.DARKNESS]=15})
+		self:specialSetAdd({"wielder","lite"}, 2)
+		self:specialSetAdd({"wielder","inc_damage"}, {[engine.DamageType.DARKNESS]=25})
+		self:specialSetAdd({"wielder","resists_pen"}, {[engine.DamageType.DARKNESS]=25})
 		game.logSeen(who, "#ANTIQUE_WHITE#The two blades glow brightly as they are brought close together.")
 	end,
 	on_set_broken = function(self, who)
@@ -832,32 +854,46 @@ newEntity{ base = "BASE_KNIFE", define_as = "ART_PAIR_STAR",
 	moddable_tile = "special/%s_dagger_star",
 	moddable_tile_big = true,
 	desc = [[Legend tells of a blade, shining bright as a star. Forged from a material fallen from the skies, it glows.]],
-	level_range = {20, 30},
+	level_range = {20, 50},
 	rarity = 200,
 	require = { stat = { dex=24, cun=24 }, },
 	cost = 300,
 	material_level = 3,
 	combat = {
-		dam = 25,
-		apr = 20,
-		physcrit = 20,
-		dammod = {dex=0.45,str=0.45},
-		melee_project={[DamageType.LIGHT] = 20},
+		damtype = DamageType.LIGHT,
+		dam = 10,
+		physspeed = 0.8,
+		dammod = {dex=0.2,str=0.2},
+		special_on_hit = {desc=function(self, who, special)
+				local dam = special.damage(self, who)
+				local str
+				if self.set_complete then
+					str = ("Deal 200%% of your Dexterity as Light damage (%d)."):format(dam)
+				else
+					str = ("Deal %d Light damage."):format(dam)
+				end
+				return str
+			end,
+			damage = function(self, who)
+				return self.set_complete and who:getDex()*2 or 70
+			end,
+			fct=function(self, who, target, dam, special)
+				local tg = {type="hit", range=1, radius=0, selffire=false}
+				local damage = special.damage(self, who)
+				who:project(tg, target.x, target.y, engine.DamageType.LIGHT, damage)
+		end},
 	},
 	wielder = {
 		lite = 1,
-		inc_damage={
-			[DamageType.LIGHT] = 10,
-		},
 	},
 	set_list = { {"define_as","ART_PAIR_MOON"} },
 	set_desc = {
 		star = "The star shines alone in a moonless sky.",
 	},
 	on_set_complete = function(self, who)
-		self:specialSetAdd({"wielder","lite"}, 1)
-		self:specialSetAdd({"combat","melee_project"}, {[engine.DamageType.RANDOM_BLIND]=10})
-		self:specialSetAdd({"wielder","inc_damage"}, {[engine.DamageType.LIGHT]=15})
+		self:specialSetAdd({"wielder","lite"}, 2)
+		self:specialSetAdd({"wielder","inc_damage"}, {[engine.DamageType.LIGHT]=25})
+		self:specialSetAdd({"wielder","resists_pen"}, {[engine.DamageType.LIGHT]=25})
 	end,
 
 }
@@ -877,31 +913,8 @@ newEntity{ base = "BASE_RING",
 		combat_apr = 15,
 		combat_dam = 10,
 		combat_physcrit = 5,
-		talents_types_mastery = {
-			["technique/strength-of-the-berserker"] = 0.3,
-			["technique/2hweapon-cripple"] = 0.3,
-			["technique/2hweapon-offense"] = 0.3,
-			["technique/2hweapon-assault"] = 0.3,
-			["technique/archery-bow"] = 0.3,
-			["technique/archery-sling"] = 0.3,
-			["technique/archery-training"] = 0.3,
-			["technique/archery-utility"] = 0.3,
-			["technique/archery-excellence"] = 0.3,
-			["technique/combat-techniques-active"] = 0.3,
-			["technique/combat-techniques-passive"] = 0.3,
-			["technique/combat-training"] = 0.3,
-			["technique/dualweapon-attack"] = 0.3,
-			["technique/dualweapon-training"] = 0.3,
-			["technique/shield-defense"] = 0.3,
-			["technique/shield-offense"] = 0.3,
-			["technique/warcries"] = 0.3,
-			["technique/superiority"] = 0.3,
-			["technique/thuggery"] = 0.3,
-			["technique/pugilism"] = 0.3,
-			["technique/unarmed-discipline"] = 0.3,
-			["technique/unarmed-training"] = 0.3,
-			["technique/grappling"] = 0.3,
-			["technique/finishing-moves"] = 0.3,
+		talents_mastery_bonus = {
+			["technique"] = 0.3,
 		},
 	},
 }
@@ -1230,6 +1243,7 @@ newEntity{ base = "BASE_LEATHER_BELT",
 	end,
 }
 
+-- Benefits are large but mostly mutually exclusive, Rogues don't easily use the proc, etc, etc
 newEntity{ base = "BASE_CLOAK",
 	power_source = {nature=true},
 	unique = true,
@@ -1241,13 +1255,15 @@ newEntity{ base = "BASE_CLOAK",
 	cost = 200,
 	material_level = 3,
 	wielder = {
-		combat_def = 10,
-		inc_stats = { [Stats.STAT_CUN] = 6, [Stats.STAT_CON] = 5, },
-		resists_pen = { [DamageType.NATURE] = 15 },
-		talents_types_mastery = { ["cunning/stealth"] = 0.1, },
+		combat_def = 20,
+		poison_immune = 0.5,
+		inc_stats = { [Stats.STAT_CUN] = 4, [Stats.STAT_DEX] = 4, [Stats.STAT_WIL] = 4 },
+		resists_pen = { [DamageType.NATURE] = 20 },
+		inc_damage = { [DamageType.NATURE] = 20 },
+		talents_types_mastery = { ["cunning/stealth"] = 0.2, ["cunning/poisons"] = 0.5, },
 	},
-	max_power = 60, power_regen = 1,
-	use_talent = { id = Talents.T_PHASE_DOOR, level = 2, power = 30 },
+	talent_on_mind = { {chance=10, talent=Talents.T_POISON_STRIKE, level=1} }
+
 }
 
 newEntity{ base = "BASE_CLOTH_ARMOR", define_as = "CONCLAVE_ROBE",
@@ -1535,7 +1551,7 @@ newEntity{ base = "BASE_LEATHER_BELT",
 			[DamageType.BLIGHT] = 20,
 			[DamageType.NATURE] = 20,
 		},
-		healing_factor = 0.3,
+		healing_factor = 0.15,
 	},
 }
 
@@ -1628,14 +1644,12 @@ newEntity{ base = "BASE_HEAVY_ARMOR",
 			[DamageType.BLIGHT] = 10,
 		},
 		talents_types_mastery = { ["technique/bloodthirst"] = 0.1 },
-		life_regen = 0.5,
+		life_regen = 3,
 		healing_factor = 0.3,
 		combat_def = 2,
 		combat_armor = 4,
 		fatigue = 12,
 	},
-	max_power = 60, power_regen = 1,
-	use_talent = { id = Talents.T_BLOODCASTING, level = 2, power = 60 },
 }
 
 
@@ -1886,6 +1900,7 @@ newEntity{ base = "BASE_CLOAK",
 	end,
 }
 
+-- Anti-mitigation DoT weapon
 newEntity{ base = "BASE_WARAXE",
 	power_source = {psionic=true},
 	unique = true, unided_name = "razor sharp war axe",
@@ -1899,7 +1914,7 @@ It is said the wielder will slowly grow mad. This, however, has never been prove
 	rarity = 250,
 	material_level = 5,
 	combat = {
-		dam = 58,
+		dam = 38,
 		apr = 16,
 		physcrit = 7,
 		dammod = {str=1},
@@ -1908,8 +1923,9 @@ It is said the wielder will slowly grow mad. This, however, has never been prove
 	},
 	wielder = {
 		inc_stats = { [Stats.STAT_STR] = 4, [Stats.STAT_DEX] = 4, },
-		see_invisible = 5,
-		inc_damage = { [DamageType.PHYSICAL]=10 },
+		combat_atk = 40,
+		combat_apr = 30,
+		resists_pen = { [DamageType.PHYSICAL]=30 },
 	},
 }
 
@@ -2207,7 +2223,7 @@ newEntity{ base = "BASE_SHIELD",
 		combat_spellresist = 24,
 		talents_types_mastery = { ["wild-gift/antimagic"] = 0.2, },
 		fatigue = 22,
-		learn_talent = { [Talents.T_BLOCK] = 5,},
+		learn_talent = { [Talents.T_BLOCK] = 1,},
 		disease_immune = 0.6,
 	},
 	max_power = 40, power_regen = 1,
@@ -2334,7 +2350,7 @@ newEntity{ base = "BASE_MINDSTAR",
 		dam = 16,
 		apr = 28,
 		physcrit = 5,
-		dammod = {wil=0.45, cun=0.25},
+		dammod = {wil=0.5, cun=0.3},
 		damtype = DamageType.MIND,
 		convert_damage = {
 			[DamageType.DARKNESS] = 30,
@@ -2470,7 +2486,7 @@ newEntity{ base = "BASE_MINDSTAR",
 		dam = 15,
 		apr = 26,
 		physcrit = 6,
-		dammod = {wil=0.45, cun=0.22},
+		dammod = {wil=0.5, cun=0.3},
 		damtype = DamageType.MIND,
 	},
 	wielder = {
@@ -2561,7 +2577,7 @@ newEntity{ base = "BASE_MINDSTAR",
 		dam = 17,
 		apr = 25,
 		physcrit = 7,
-		dammod = {wil=0.5, cun=0.2},
+		dammod = {wil=0.5, cun=0.3},
 		damtype = DamageType.SLIME,
 	},
 	wielder = {
@@ -2608,7 +2624,7 @@ newEntity{ base = "BASE_MINDSTAR",
 		dam = 8,
 		apr = 13,
 		physcrit = 7,
-		dammod = {wil=0.25, cun=0.1},
+		dammod = {wil=0.5, cun=0.3},
 		damtype = DamageType.NATURE,
 	},
 	wielder = {
@@ -2679,7 +2695,7 @@ newEntity{ base = "BASE_MINDSTAR",
 		dam = 16,
 		apr = 24,
 		physcrit = 2.5,
-		dammod = {wil=0.4, cun=0.1, str=0.2},
+		dammod = {wil=0.5, cun=0.1, str=0.2},
 		damtype=DamageType.PHYSICAL,
 		convert_damage = {
 			[DamageType.COLD] = 18,
@@ -2729,15 +2745,15 @@ newEntity{ base = "BASE_MINDSTAR",
 			if inven_id == "MAINHAND" then
 				game.logPlayer(who, "#PURPLE#You feel the spirit of the wyrm stirring inside you!")
 			end
-			self:specialSetAdd({"wielder","blind_immune"}, self.material_level / 10)
-			self:specialSetAdd({"wielder","stun_immune"}, self.material_level / 10)
+			self:specialSetAdd({"wielder","blind_immune"}, self.material_level / 10, "harmonious")
+			self:specialSetAdd({"wielder","stun_immune"}, self.material_level / 10, "harmonious")
 		end,
 		wyrm = function(self, who, inven_id)
 			if inven_id == "MAINHAND" then
 				game.logPlayer(who, "#PURPLE#You feel the spirit of the wyrm stirring inside you!")
 			end
-			self:specialSetAdd({"wielder","blind_immune"}, self.material_level / 10)
-			self:specialSetAdd({"wielder","stun_immune"}, self.material_level / 10)
+			self:specialSetAdd({"wielder","blind_immune"}, self.material_level / 10, "wyrm")
+			self:specialSetAdd({"wielder","stun_immune"}, self.material_level / 10, "wyrm")
 		end,
 	},
 	on_set_broken = {
@@ -2789,7 +2805,7 @@ newEntity{ base = "BASE_MINDSTAR",
 		dam = 10,
 		apr = 18,
 		physcrit = 2.5,
-		dammod = {wil=0.35, cun=0.5},
+		dammod = {wil=0.3, cun=0.5},
 		damtype=DamageType.NATURE,
 	},
 	wielder = {
@@ -2905,7 +2921,6 @@ newEntity{ base = "BASE_LONGBOW",
 	rarity = 200,
 	require = { stat = { dex=18 }, },
 	cost = 20,
-	use_no_energy = "fake",
 	material_level = 1,
 	combat = {
 		range = 9,
@@ -2918,8 +2933,6 @@ newEntity{ base = "BASE_LONGBOW",
 		combat_physcrit=5,
 		apr = 10,
 	},
-	max_power = 8, power_regen = 1,
-	use_talent = { id = Talents.T_STEADY_SHOT, level = 2, power = 8 },
 }
 
 newEntity{ base = "BASE_SHOT",
@@ -3210,7 +3223,7 @@ newEntity{ base = "BASE_MINDSTAR",
 		dam = 7,
 		apr = 15,
 		physcrit = 7,
-		dammod = {wil=0.30, cun=0.1},
+		dammod = {wil=0.5, cun=0.3},
 		damtype = DamageType.NATURE,
 		convert_damage={[DamageType.POISON] = 30,}
 	},
@@ -3347,11 +3360,21 @@ newEntity{ base = "BASE_LONGSWORD", define_as="CORPUS",
 				resolvers.sustains_at_birth(),
 				faction = who.faction,
 				summoner = who, summoner_gain_exp=true,
+				summon_time = 30,
 			}
 
 			m:resolve()
 
 			game.zone:addEntity(game.level, m, "actor", x, y)
+			if game.party:hasMember(who) then
+				m.remove_from_party_on_death = true
+				game.party:addMember(m, {
+					control="no",
+					temporary_level = true,
+					type="minion",
+					title="Vilespawn",
+				})
+			end
 	end,
 	wielder = {
 		inc_damage={[DamageType.BLIGHT] = 5,},
@@ -3907,7 +3930,7 @@ newEntity{ base = "BASE_SHIELD",
 			[DamageType.MIND] 	= 10,
 			[DamageType.FIRE] 	= 10,
 		},
-		learn_talent = { [Talents.T_BLOCK] = 5, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 		inc_stats = { [Stats.STAT_WIL] = 5, [Stats.STAT_CUN] = 3, },
 	},
 	max_power = 30, power_regen = 1,
@@ -4648,7 +4671,7 @@ newEntity{ base = "BASE_SHIELD", --Thanks SageAcrin!
 			[DamageType.COLD] = 15,
 			[DamageType.FIRE] = 10,
 		},
-		learn_talent = { [Talents.T_BLOCK] = 2, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 		max_air = 20,
 	},
 	on_block = {desc = "30% chance to spray freezing water (radius 4 cone) at the target.", fct = function(self, who, target, type, dam, eff)
@@ -5082,7 +5105,7 @@ newEntity{ base = "BASE_RING",
 		inc_stats = {[Stats.STAT_WIL] = 4, [Stats.STAT_STR] = 4,},
 		inc_damage={ [DamageType.PHYSICAL] = 8, [DamageType.NATURE] = 8,},
 		resists={[DamageType.NATURE] = 10,},
-		life_regen=0.15,
+		life_regen=3,
 		healing_factor=0.2,
 	},
 }
@@ -5099,11 +5122,9 @@ newEntity{ base = "BASE_CLOAK",
 	material_level = 2,
 	wielder = {
 		combat_spellpower=6,
-		combat_armor=10,
-		combat_armor_hardiness=15,
 		talents_types_mastery = {
 			["spell/earth"] = 0.2,
-			["spell/stone"] = 0.1,
+			["spell/stone"] = 0.2,
 			["chronomancy/gravity"] = 0.2,
 			["chronomancy/matter"] = 0.1,
 		},
@@ -5638,6 +5659,7 @@ newEntity{ base = "BASE_BATTLEAXE",
 	name = "Eksatin's Ultimatum", color = colors.GREY, image = "object/artifact/eskatins_ultimatum.png",
 	moddable_tile = "special/%s_eskatins_ultimatum",
 	moddable_tile_big = true,
+	cost = 500,
 	desc = [[This gore-stained battleaxe was once used by an infamously sadistic king, who took the time to personally perform each and every execution he ordered. He kept a vault of every head he ever removed, each and every one of them carefully preserved. When he was overthrown, his own head was added as the centrepiece of the vault, which was maintained as a testament to his cruelty.]],
 	require = { stat = { str=50 }, },
 	level_range = {39, 46},
@@ -5674,25 +5696,19 @@ newEntity{ base = "BASE_CLOAK",
 	material_level = 5,
 	wielder = {
 		combat_def = 15,
-		combat_spellpower = 8,
+		combat_spellpower = 20,
 		inc_stats = { 
-			[Stats.STAT_MAG] = 8, 
-			[Stats.STAT_CUN] = 6, 
-			[Stats.STAT_DEX] = 10, 
+			[Stats.STAT_MAG] = 10, 
+			[Stats.STAT_CUN] = 10, 
 		},
-		inc_damage = { [DamageType.LIGHT]= 15 },
+		inc_damage = { [DamageType.LIGHT]= 25 },
 		resists_cap = { [DamageType.LIGHT] = 10, },
-		resists = { [DamageType.LIGHT] = 20, [DamageType.DARKNESS] = 20, },
-		talents_types_mastery = {
-			["celestial/light"] = 0.2,
-			["celestial/sun"] = 0.2,
-			["spell/phantasm"] = 0.2,
-			["celestial/radiance"] = 0.2, 
+		resists = { [DamageType.LIGHT] = 30, [DamageType.DARKNESS] = 30, },
+		talents_mastery_bonus = {
+			["celestial"] = 0.2,
 		},
 		on_melee_hit={[DamageType.LIGHT_BLIND] = 30},
 	},
-	max_power = 40, power_regen = 1,
-	use_talent = { id = Talents.T_BARRIER, level = 3, power = 40 },
 }
 
 newEntity{ base = "BASE_HEAVY_BOOTS",
@@ -6361,7 +6377,6 @@ newEntity{ base = "BASE_GLOVES",
 			physcrit = 4,
 			dammod = {dex=0.4, str=-0.6, cun=0.4 },
 			talent_on_hit = { T_SLIME_SPIT = {level=1, chance=35} },
-			convert_damage = { [DamageType.ITEM_NATURE_SLOW] = 40,},
 		},
 	},
 }
@@ -6513,6 +6528,7 @@ newEntity{ base = "BASE_TOOL_MISC",
 			if game.party:hasMember(who) then
 				game.party:addMember(m, {
 					control=false,
+					temporary_level = true,
 					type="summon",
 					title="Summon",
 					orders = {target=true, leash=true, anchor=true, talents=true},
@@ -7804,7 +7820,7 @@ newEntity{ base = "BASE_MINDSTAR", define_as = "EYE_OF_SUMMER",
 		dam = 8,
 		apr = 18,
 		physcrit = 5,
-		dammod = {wil=0.35, cun=0.15},
+		dammod = {wil=0.5, cun=0.3},
 		damtype = DamageType.FIRE,
 	},
 	wielder = {
@@ -7828,13 +7844,13 @@ newEntity{ base = "BASE_MINDSTAR", define_as = "EYE_OF_SUMMER",
 	on_set_complete = {
 		multiple = true,
 		seasons = function(self, who)
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.COLD]=20 })
-			self:specialSetAdd({"wielder","combat_mindpower"}, 4)
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.COLD]=20 }, "seasons")
+			self:specialSetAdd({"wielder","combat_mindpower"}, 4, "seasons")
 			game.logSeen(who, "#GREEN#You feel the seasons in perfect balance.")
 		end,
 		harmonious = function(self, who)
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.COLD]=20 })
-			self:specialSetAdd({"wielder","combat_mindpower"}, 4)
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.COLD]=20 }, "harmonious")
+			self:specialSetAdd({"wielder","combat_mindpower"}, 4, "harmonious")
 			game.logSeen(who, "#GREEN#You feel the seasons in perfect balance.")
 		end,
 	},
@@ -7860,7 +7876,7 @@ newEntity{ base = "BASE_MINDSTAR", define_as = "EYE_OF_WINTER",
 		dam = 8,
 		apr = 18,
 		physcrit = 5,
-		dammod = {wil=0.35, cun=0.15},
+		dammod = {wil=0.5, cun=0.3},
 		damtype = DamageType.COLD,
 	},
 	wielder = {
@@ -7884,12 +7900,12 @@ newEntity{ base = "BASE_MINDSTAR", define_as = "EYE_OF_WINTER",
 	on_set_complete = {
 		multiple = true,
 		seasons = function(self, who)
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.FIRE]=20 })
-			self:specialSetAdd({"wielder","combat_mindpower"}, 4)
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.FIRE]=20 }, "seasons")
+			self:specialSetAdd({"wielder","combat_mindpower"}, 4, "seasons")
 		end,
 		harmonious = function(self, who)
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.FIRE]=20 })
-			self:specialSetAdd({"wielder","combat_mindpower"}, 4)
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.FIRE]=20 }, "harmonious")
+			self:specialSetAdd({"wielder","combat_mindpower"}, 4, "harmonious")
 		end,
 	},
 	on_set_broken = function(self, who)
@@ -8063,7 +8079,7 @@ newEntity{ base = "BASE_MINDSTAR", define_as = "KINETIC_FOCUS",
 		dam = 6,
 		apr = 18,
 		physcrit = 5,
-		dammod = {wil=0.35, cun=0.15},
+		dammod = {wil=0.5, cun=0.3},
 		damtype = DamageType.PHYSICAL,
 	},
 	wielder = {
@@ -8090,36 +8106,36 @@ newEntity{ base = "BASE_MINDSTAR", define_as = "KINETIC_FOCUS",
 	on_set_complete = { 
 		multiple = true,
 		kinchar = function(self, who)
-			self:specialSetAdd({"wielder","combat_mindpower"}, 6)
-			self:specialSetAdd({"wielder","combat_mindcrit"}, 3)
-			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.PHYSICAL]=10 })
-			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.PHYSICAL]=6 })
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.PHYSICAL]=10 })
-			self:specialSetAdd({"wielder","psi_on_crit"}, 1)
-			self:specialSetAdd({"wielder","combat_physresist"}, 6)
-			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/kinetic-mastery"] = 0.1 })
+			self:specialSetAdd({"wielder","combat_mindpower"}, 6, "kinchar")
+			self:specialSetAdd({"wielder","combat_mindcrit"}, 3, "kinchar")
+			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.PHYSICAL]=10 }, "kinchar")
+			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.PHYSICAL]=6 }, "kinchar")
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.PHYSICAL]=10 }, "kinchar")
+			self:specialSetAdd({"wielder","psi_on_crit"}, 1, "kinchar")
+			self:specialSetAdd({"wielder","combat_physresist"}, 6, "kinchar")
+			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/kinetic-mastery"] = 0.1 }, "kinchar")
 			game.logSeen(who, "#YELLOW#You feel psionic energy linking the mindstars.")
 		end,
 		kinther = function(self, who)
-			self:specialSetAdd({"wielder","combat_mindpower"}, 6)
-			self:specialSetAdd({"wielder","combat_mindcrit"}, 3)
-			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.PHYSICAL]=10 })
-			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.PHYSICAL]=6 })
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.PHYSICAL]=10 })
-			self:specialSetAdd({"wielder","psi_on_crit"}, 1)
-			self:specialSetAdd({"wielder","combat_physresist"}, 6)
-			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/kinetic-mastery"] = 0.1 })
+			self:specialSetAdd({"wielder","combat_mindpower"}, 6, "kinther")
+			self:specialSetAdd({"wielder","combat_mindcrit"}, 3, "kinther")
+			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.PHYSICAL]=10 }, "kinther")
+			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.PHYSICAL]=6 }, "kinther")
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.PHYSICAL]=10 }, "kinther")
+			self:specialSetAdd({"wielder","psi_on_crit"}, 1, "kinther")
+			self:specialSetAdd({"wielder","combat_physresist"}, 6, "kinther")
+			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/kinetic-mastery"] = 0.1 }, "kinther")
 			game.logSeen(who, "#YELLOW#You feel psionic energy linking the mindstars.")
 		end,
 		resonating = function(self, who)
-			self:specialSetAdd({"wielder","combat_mindpower"}, 2)
-			self:specialSetAdd({"wielder","combat_mindcrit"}, 1)
-			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.PHYSICAL]=5 })
-			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.PHYSICAL]=3 })
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.PHYSICAL]=5 })
-			self:specialSetAdd({"wielder","psi_on_crit"}, 0.5)
-			self:specialSetAdd({"wielder","combat_physresist"}, 3)
-			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/kinetic-mastery"] = 0.05 })
+			self:specialSetAdd({"wielder","combat_mindpower"}, 2, "resonating")
+			self:specialSetAdd({"wielder","combat_mindcrit"}, 1, "resonating")
+			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.PHYSICAL]=5 }, "resonating")
+			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.PHYSICAL]=3 }, "resonating")
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.PHYSICAL]=5 }, "resonating")
+			self:specialSetAdd({"wielder","psi_on_crit"}, 0.5, "resonating")
+			self:specialSetAdd({"wielder","combat_physresist"}, 3, "resonating")
+			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/kinetic-mastery"] = 0.05 }, "resonating")
 			game.logSeen(who, "#YELLOW#You feel psionic energy linking the mindstars.")
 		end,
 	},
@@ -8144,7 +8160,7 @@ newEntity{ base = "BASE_MINDSTAR", define_as = "CHARGED_FOCUS",
 		dam = 10,
 		apr = 24,
 		physcrit = 5,
-		dammod = {wil=0.4, cun=0.2},
+		dammod = {wil=0.5, cun=0.3},
 		damtype = DamageType.LIGHTNING,
 	},
 	wielder = {
@@ -8171,34 +8187,34 @@ newEntity{ base = "BASE_MINDSTAR", define_as = "CHARGED_FOCUS",
 	on_set_complete = { 
 		multiple = true,
 		kinchar = function(self, who)
-			self:specialSetAdd({"wielder","combat_mindpower"}, 2)
-			self:specialSetAdd({"wielder","combat_mindcrit"}, 1)
-			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.LIGHTNING]=5 })
-			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.LIGHTNING]=3 })
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.LIGHTNING]=5 })
-			self:specialSetAdd({"wielder","max_psi"}, 10)
-			self:specialSetAdd({"wielder","combat_mentalresist"}, 3)
-			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/charged-mastery"] = 0.05 })
+			self:specialSetAdd({"wielder","combat_mindpower"}, 2, "kinchar")
+			self:specialSetAdd({"wielder","combat_mindcrit"}, 1, "kinchar")
+			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.LIGHTNING]=5 }, "kinchar")
+			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.LIGHTNING]=3 }, "kinchar")
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.LIGHTNING]=5 }, "kinchar")
+			self:specialSetAdd({"wielder","max_psi"}, 10, "kinchar")
+			self:specialSetAdd({"wielder","combat_mentalresist"}, 3, "kinchar")
+			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/charged-mastery"] = 0.05 }, "kinchar")
 		end,
 		charther = function(self, who)
-			self:specialSetAdd({"wielder","combat_mindpower"}, 6)
-			self:specialSetAdd({"wielder","combat_mindcrit"}, 3)
-			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.LIGHTNING]=10 })
-			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.LIGHTNING]=6 })
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.LIGHTNING]=10 })
-			self:specialSetAdd({"wielder","max_psi"}, 20)
-			self:specialSetAdd({"wielder","combat_mentalresist"}, 6)
-			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/charged-mastery"] = 0.1 })
+			self:specialSetAdd({"wielder","combat_mindpower"}, 6, "charther")
+			self:specialSetAdd({"wielder","combat_mindcrit"}, 3, "charther")
+			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.LIGHTNING]=10 }, "charther")
+			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.LIGHTNING]=6 }, "charther")
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.LIGHTNING]=10 }, "charther")
+			self:specialSetAdd({"wielder","max_psi"}, 20, "charther")
+			self:specialSetAdd({"wielder","combat_mentalresist"}, 6, "charther")
+			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/charged-mastery"] = 0.1 }, "charther")
 		end,
 		resonating = function(self, who)
-			self:specialSetAdd({"wielder","combat_mindpower"}, 2)
-			self:specialSetAdd({"wielder","combat_mindcrit"}, 1)
-			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.LIGHTNING]=5 })
-			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.LIGHTNING]=3 })
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.LIGHTNING]=5 })
-			self:specialSetAdd({"wielder","max_psi"}, 10)
-			self:specialSetAdd({"wielder","combat_mentalresist"}, 3)
-			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/charged-mastery"] = 0.05 })
+			self:specialSetAdd({"wielder","combat_mindpower"}, 2, "resonating")
+			self:specialSetAdd({"wielder","combat_mindcrit"}, 1, "resonating")
+			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.LIGHTNING]=5 }, "resonating")
+			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.LIGHTNING]=3 }, "resonating")
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.LIGHTNING]=5 }, "resonating")
+			self:specialSetAdd({"wielder","max_psi"}, 10, "resonating")
+			self:specialSetAdd({"wielder","combat_mentalresist"}, 3, "resonating")
+			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/charged-mastery"] = 0.05 }, "resonating")
 		end,
 	},
 	on_set_broken = function(self, who)
@@ -8222,7 +8238,7 @@ newEntity{ base = "BASE_MINDSTAR", define_as = "THERMAL_FOCUS",
 		dam = 14,
 		apr = 32,
 		physcrit = 5,
-		dammod = {wil=0.45, cun=0.25},
+		dammod = {wil=0.5, cun=0.3},
 		damtype = DamageType.FIRE,
 		convert_damage = {
 			[DamageType.COLD] = 50,
@@ -8252,34 +8268,34 @@ newEntity{ base = "BASE_MINDSTAR", define_as = "THERMAL_FOCUS",
 	on_set_complete = { 
 		multiple = true,
 		kinther = function(self, who)
-			self:specialSetAdd({"wielder","combat_mindpower"}, 2)
-			self:specialSetAdd({"wielder","combat_mindcrit"}, 1)
-			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, })
-			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.FIRE]=3, [engine.DamageType.COLD]=3, })
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, })
-			self:specialSetAdd({"wielder","psi_regen"}, 1)
-			self:specialSetAdd({"wielder","combat_spellresist"}, 3)
-			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/thermal-mastery"] = 0.05 })
+			self:specialSetAdd({"wielder","combat_mindpower"}, 2, "kinther")
+			self:specialSetAdd({"wielder","combat_mindcrit"}, 1, "kinther")
+			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, }, "kinther")
+			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.FIRE]=3, [engine.DamageType.COLD]=3, }, "kinther")
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, }, "kinther")
+			self:specialSetAdd({"wielder","psi_regen"}, 1, "kinther")
+			self:specialSetAdd({"wielder","combat_spellresist"}, 3, "kinther")
+			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/thermal-mastery"] = 0.05 }, "kinther")
 		end,
 		charther = function(self, who)
-			self:specialSetAdd({"wielder","combat_mindpower"}, 2)
-			self:specialSetAdd({"wielder","combat_mindcrit"}, 1)
-			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, })
-			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.FIRE]=3, [engine.DamageType.COLD]=3, })
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, })
-			self:specialSetAdd({"wielder","psi_regen"}, 1)
-			self:specialSetAdd({"wielder","combat_spellresist"}, 3)
-			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/thermal-mastery"] = 0.05 })
+			self:specialSetAdd({"wielder","combat_mindpower"}, 2, "charther")
+			self:specialSetAdd({"wielder","combat_mindcrit"}, 1, "charther")
+			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, }, "charther")
+			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.FIRE]=3, [engine.DamageType.COLD]=3, }, "charther")
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, }, "charther")
+			self:specialSetAdd({"wielder","psi_regen"}, 1, "charther")
+			self:specialSetAdd({"wielder","combat_spellresist"}, 3, "charther")
+			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/thermal-mastery"] = 0.05 }, "charther")
 		end,
 		resonating = function(self, who)
-			self:specialSetAdd({"wielder","combat_mindpower"}, 2)
-			self:specialSetAdd({"wielder","combat_mindcrit"}, 1)
-			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, })
-			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.FIRE]=3, [engine.DamageType.COLD]=3, })
-			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, })
-			self:specialSetAdd({"wielder","psi_regen"}, 1)
-			self:specialSetAdd({"wielder","combat_spellresist"}, 3)
-			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/thermal-mastery"] = 0.05 })
+			self:specialSetAdd({"wielder","combat_mindpower"}, 2, "resonating")
+			self:specialSetAdd({"wielder","combat_mindcrit"}, 1, "resonating")
+			self:specialSetAdd({"wielder","inc_damage"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, }, "resonating")
+			self:specialSetAdd({"wielder","resists_pen"}, { [engine.DamageType.FIRE]=3, [engine.DamageType.COLD]=3, }, "resonating")
+			self:specialSetAdd({"wielder","resists"}, { [engine.DamageType.FIRE]=5, [engine.DamageType.COLD]=5, }, "resonating")
+			self:specialSetAdd({"wielder","psi_regen"}, 1, "resonating")
+			self:specialSetAdd({"wielder","combat_spellresist"}, 3, "resonating")
+			self:specialSetAdd({"wielder","talents_types_mastery"},{ ["psionic/thermal-mastery"] = 0.05 }, "resonating")
 		end,
 	},
 	on_set_broken = function(self, who)

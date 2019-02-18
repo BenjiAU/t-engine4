@@ -29,6 +29,7 @@ newTalentType{ type="psionic/other", name = "other", hide = true, description = 
 newTalentType{ type="other/other", name = "other", hide = true, description = "Talents of the various entities of the world." }
 newTalentType{ type="undead/other", name = "other", hide = true, description = "Talents of the various entities of the world." }
 newTalentType{ type="undead/keepsake", name = "keepsake shadow", generic = true, description = "Keepsake shadows's innate abilities." }
+newTalentType{ is_mind=true, type="cursed/misc", name = "misc", description = "Talents of the various entities of the world." }
 
 local oldTalent = newTalent
 local newTalent = function(t) if type(t.hide) == "nil" then t.hide = true end return oldTalent(t) end
@@ -905,6 +906,33 @@ newTalent{
 	info = function(self, t)
 		return ([[Spit poison at your target, doing %0.2f poison damage over six turns.
 		The damage will increase with your Strength or Dexterity (whichever is higher).]]):
+		format(damDesc(self, DamageType.POISON, t.getDamage(self,t)))
+	end,
+}
+
+
+newTalent{
+	name = "Poison Strike",
+	type = {"technique/other", 1},
+	points = 5,
+	cooldown = 6,
+	range = 10,
+	requires_target = true,
+	tactical = { ATTACK = { NATURE = 1, poison = 1} },
+	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
+	getDamage = function(self, t) return self:combatTalentMindDamage(t, 10, 400) end,
+	is_mind = true,
+	action = function(self, t)
+		local tg = self:getTalentTarget(t)
+		local x, y = self:getTarget(tg)
+		if not x or not y then return nil end
+		self:project(tg, x, y, DamageType.POISON, t.getDamage(self,t), {type="slime"})
+		game:playSoundNear(self, "talents/slime")
+		return true
+	end,
+	info = function(self, t)
+		return ([[Strike your target with poison, doing %0.2f poison damage over six turns.
+		The damage will increase with your mindpower.]]):
 		format(damDesc(self, DamageType.POISON, t.getDamage(self,t)))
 	end,
 }
@@ -3619,5 +3647,60 @@ newTalent{
 		return ([[For an instant, your weapons turn into a shadow leash that tries to grab the target's weapon, disarming it for %d turns.
 		The chance to hit improves with your Accuracy.]]):
 		format(duration)
+	end,
+}
+
+newTalent{
+	name = "Dismay",
+	type = {"psionic/other", 1},
+	mode = "passive",
+	points = 1,
+	getChance = function(self, t) return self:combatLimit(self:getTalentLevel(t)^.5, 100, 3.5, 1, 7.83, 2.23) end, -- Limit < 100%
+	getDuration = function(self, t)
+		return 3
+	end,
+	info = function(self, t)
+		local chance = t.getChance(self, t)
+		local duration = t.getDuration(self, t)
+		return ([[Each turn, those caught in your gloom must save against your Mindpower or have an %0.1f%% chance of becoming dismayed for %d turns. When dismayed, the first melee attack against the foe will result in a critical hit.]]):format(chance, duration, mindpowerChange)
+	end,
+}
+
+newTalent{
+	name = "Shadow Empathy",
+	type = {"cursed/misc", 1},
+	points = 5,
+	hate = 10,
+	cooldown = 25,
+	getRandomShadow = function(self, t)
+		local shadows = {}
+		if game.party and game.party:hasMember(self) then
+			for act, def in pairs(game.party.members) do
+				if act.summoner and act.summoner == self and act.is_doomed_shadow and not act.dead then
+					shadows[#shadows+1] = act
+				end
+			end
+		else
+			for uid, act in pairs(game.level.entities) do
+				if act.summoner and act.summoner == self and act.is_doomed_shadow and not act.dead then
+					shadows[#shadows+1] = act
+				end
+			end
+		end
+		return #shadows > 0 and rng.table(shadows)
+	end,
+	getDur = function(self, t) return math.floor(self:combatTalentScale(t, 3, 10)) end,
+	getPower = function(self, t) return 5 + self:combatTalentMindDamage(t, 0, 300) / 8 end,
+	on_pre_use = function(self, t) return self:callTalent(self.T_CALL_SHADOWS, "nbShadowsUp") > 0 end,
+	action = function(self, t)
+		self:setEffect(self.EFF_SHADOW_EMPATHY, t.getDur(self, t), {power=t.getPower(self, t)})
+		return true
+	end,
+	info = function(self, t)
+		local power = t.getPower(self, t)
+		local duration = t.getDur(self, t)
+		return ([[You are linked to your shadows for %d turns, diverting %d%% of all damage you take to a random shadow.
+		Effect increases with Mindpower.]]):
+		format(duration, power)
 	end,
 }

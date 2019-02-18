@@ -25,14 +25,27 @@ newEntity{ base = "BASE_RING",
 	name = "Bloodcaller", unique=true, image = "object/artifact/jewelry_ring_bloodcaller.png",
 	desc = [[You won the Ring of Blood trial, and this is your reward.]],
 	unided_name = "bloody ring",
+	special_desc = function(self) return ("You heal for 2.5%% of the damage you deal.\nHealing during current combat:  #GREEN#%0.2f#LAST#"):format(self.bloodcaller_heal_amt or 0) end,
 	rarity = false,
 	cost = 300,
 	material_level = 4,
+	bloodcaller_heal_amt = 0,
 	wielder = {
 		combat_mentalresist = -7,
 		fatigue = -5,
-		life = 35,
-		life_leech_chance = 15,
-		life_leech_value = 30,
 	},
+	callbackOnCombat = function(self, who, combat)
+		if not combat then
+			self.bloodcaller_heal_amt = nil
+		end
+	end,
+	callbackOnDealDamage = function(self, who, value, target, dead, death_node)
+		-- Lifesteal done here to avoid stacking in bad ways with other LS effects
+		if value <= 0 then return end
+			local leech = value * 0.025
+			if leech > 0 then
+				local healed = who:heal(leech, self)
+				self.bloodcaller_heal_amt = (self.bloodcaller_heal_amt or 0) + healed
+			end
+	end,
 }

@@ -19,6 +19,7 @@
 
 local Talents = require "engine.interface.ActorTalents"
 
+-- Note:  The armor mastery talent scales this item type better than it does Mail
 newEntity{
 	define_as = "BASE_MASSIVE_ARMOR",
 	slot = "BODY",
@@ -42,9 +43,8 @@ newEntity{ base = "BASE_MASSIVE_ARMOR",
 	cost = 20,
 	material_level = 1,
 	wielder = {
-		combat_def = 3,
 		combat_armor = 7,
-		fatigue = 20,
+		fatigue = 22,
 	},
 }
 
@@ -55,7 +55,6 @@ newEntity{ base = "BASE_MASSIVE_ARMOR",
 	cost = 25,
 	material_level = 2,
 	wielder = {
-		combat_def = 4,
 		combat_armor = 9,
 		fatigue = 22,
 	},
@@ -68,9 +67,8 @@ newEntity{ base = "BASE_MASSIVE_ARMOR",
 	cost = 30,
 	material_level = 3,
 	wielder = {
-		combat_def = 5,
 		combat_armor = 11,
-		fatigue = 24,
+		fatigue = 22,
 	},
 }
 
@@ -81,9 +79,8 @@ newEntity{ base = "BASE_MASSIVE_ARMOR",
 	material_level = 4,
 	require = { stat = { str=48 }, },
 	wielder = {
-		combat_def = 7,
 		combat_armor = 13,
-		fatigue = 26,
+		fatigue = 22,
 	},
 }
 
@@ -94,8 +91,7 @@ newEntity{ base = "BASE_MASSIVE_ARMOR",
 	cost = 50,
 	material_level = 5,
 	wielder = {
-		combat_def = 9,
 		combat_armor = 16,
-		fatigue = 26,
+		fatigue = 22,
 	},
 }

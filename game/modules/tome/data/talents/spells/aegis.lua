@@ -131,6 +131,7 @@ newTalent{
 	no_energy = true,
 	tactical = { DEFEND = 2 },
 	getShield = function(self, t) return 40 + self:combatTalentSpellDamage(t, 5, 500) / 10 end,
+	getDisruption = function(self, t) return self:combatTalentSpellDamage(t, 10, 20) end,
 	getNumEffects = function(self, t) return math.max(1,math.floor(self:combatTalentScale(t, 3, 7, "log"))) end,
 	on_pre_use = function(self, t)
 		for eff_id, p in pairs(self.tmp) do
@@ -159,7 +160,10 @@ newTalent{
 		end
 
 		if self:isTalentActive(self.T_DISRUPTION_SHIELD) then
-			self:setEffect(self.EFF_MANA_OVERFLOW, math.ceil(self:combatTalentScale(t, 3, 7)), {power=shield})
+			local absorb = self.disruption_shield_absorb or 0
+			local mana = t.getDisruption(self, t) / 100 * absorb + 50
+			self:incMana(mana)
+			game.logSeen(self, "%s gains %d mana from Aegis!", self.name, mana)
 		end
 
 		game:playSoundNear(self, "talents/heal")
@@ -167,10 +171,12 @@ newTalent{
 	end,
 	info = function(self, t)
 		local shield = t.getShield(self, t)
-		return ([[Release arcane energies into any magical shield currently protecting you, further charging it by %d%% of its max absorb value.
+		local disruption = (self.disruption_shield_absorb or 0) * t.getDisruption(self, t) / 100
+		return ([[Release arcane energies into most magical shields currently protecting you.
 		It will affect at most %d shield effects.
-		Affected shields are: Damage Shield, Time Shield, Displacement Shield, and Disruption Shield.
+		Damage Shield, Time Shield, Displacement Shield:  Increase the damage absorption value by %d%%.
+		Disruption Shield:  Gain %d%% of the damage absorbed + 50 as mana (%d).
 		The charging will increase with your Spellpower.]]):
-		format(shield, t.getNumEffects(self, t))
+		format(t.getNumEffects(self, t), shield, t.getDisruption(self, t), disruption + 50)
 	end,
 }

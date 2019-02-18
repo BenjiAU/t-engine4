@@ -56,7 +56,7 @@ newEntity{
 	rarity = 5,
 	cost = 6,
 	wielder = {
-		combat_spellpower = resolvers.mbonus_material(3, 3),
+		combat_spellpower = resolvers.mbonus_material(10, 3),
 	},
 }
 
@@ -68,7 +68,7 @@ newEntity{
 	rarity = 5,
 	cost = 6,
 	wielder = {
-		combat_armor = resolvers.mbonus_material(6, 4),
+		combat_armor = resolvers.mbonus_material(8, 1),
 		infravision = resolvers.mbonus_material(2, 1),
 	},
 }
@@ -77,7 +77,7 @@ newEntity{
 	power_source = {arcane=true},
 	name = " of phasing", suffix=true, instant_resolve=true,
 	keywords = {phasing=true},
-	level_range = {20, 50},
+	level_range = {15, 50},
 	greater_ego = 1,
 	rarity = 18,
 	cost = 40,
@@ -103,14 +103,15 @@ newEntity{
 
 newEntity{
 	power_source = {technique=true},
-	name = " of uncanny dodging", suffix=true, instant_resolve=true,
-	keywords = {['u.dodge']=true},
-	level_range = {1, 50},
-	rarity = 5,
+	name = " of evasion", suffix=true, instant_resolve=true,
+	keywords = {['evasion']=true},
+	level_range = {15, 50},
+	greater_ego = 1,
+	rarity = 20,
 	cost = 6,
+	resolvers.charmt(Talents.T_EVASION, {2,3,4}, 30),
 	wielder = {
-		combat_def = resolvers.mbonus_material(8, 2),
-		combat_def_ranged = resolvers.mbonus_material(8, 2),
+		combat_def = resolvers.mbonus_material(16, 2),
 	},
 }
 
@@ -118,12 +119,11 @@ newEntity{
 	power_source = {arcane=true},
 	name = " of speed", suffix=true, instant_resolve=true,
 	keywords = {speed=true},
-	level_range = {15, 50},
-	greater_ego = 1,
+	level_range = {1, 50},
 	rarity = 20,
 	cost = 60,
 	wielder = {
-		movement_speed = 0.2,
+		movement_speed = 0.25,  -- This hits a Ghoul breakpoint for mitigating double turns
 	},
 }
 
@@ -131,7 +131,7 @@ newEntity{
 	power_source = {technique=true},
 	name = " of rushing", suffix=true, instant_resolve=true,
 	keywords = {rushing=true},
-	level_range = {20, 50},
+	level_range = {15, 50},
 	greater_ego = 1,
 	rarity = 18,
 	cost = 40,
@@ -148,7 +148,7 @@ newEntity{
 	power_source = {arcane=true},
 	name = " of void walking", suffix=true, instant_resolve=true,
 	keywords = {void=true},
-	level_range = {40, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 20,
 	cost = 60,
@@ -171,9 +171,9 @@ newEntity{
 	power_source = {technique=true},
 	name = " of disengagement", suffix=true, instant_resolve=true,
 	keywords = {disengage=true},
-	level_range = {20, 50},
+	level_range = {15, 50},
 	greater_ego = 1,
-	rarity = 18,
+	rarity = 25,
 	cost = 40,
 	resolvers.charmt(Talents.T_DISENGAGE, {1,2,3}, 15),
 	wielder = {
@@ -203,13 +203,13 @@ newEntity{
 	power_source = {nature=true},
 	name = "restorative ", prefix=true, instant_resolve=true,
 	keywords = {restorative=true},
-	level_range = {20, 50},
+	level_range = {15, 50},
 	greater_ego = 1,
 	rarity = 18,
 	cost = 60,
 	wielder = {
-		healing_factor = resolvers.mbonus_material(20, 10, function(e, v) v=v/100 return 0, v end),
-		life_regen = resolvers.mbonus_material(40, 15, function(e, v) v=v/10 return 0, v end),
+		healing_factor = resolvers.mbonus_material(10, 10, function(e, v) v=v/100 return 0, v end),
+		life_regen = resolvers.mbonus_material(10, 1, function(e, v) return 0, v end),
 	},
 }
 
@@ -217,7 +217,7 @@ newEntity{
 	power_source = {nature=true},
 	name = "invigorating ", prefix=true, instant_resolve=true,
 	keywords = {['invigor.']=true},
-	level_range = {40, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 20,
 	cost = 70,
@@ -233,7 +233,7 @@ newEntity{
 	power_source = {arcane=true},
 	name = "blightbringer's ", prefix=true, instant_resolve=true,
 	keywords = {blight=true},
-	level_range = {40, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 35,
 	cost = 80,
@@ -273,7 +273,7 @@ newEntity{
 	power_source = {arcane=true},
 	name = "undeterred ", prefix=true, instant_resolve=true,
 	keywords = {undeterred=true},
-	level_range = {10, 50},
+	level_range = {15, 50},
 	greater_ego = 1,
 	rarity = 15,
 	cost = 60,
@@ -288,7 +288,7 @@ newEntity{
 	power_source = {technique=true},
 	name = "reinforced ", prefix=true, instant_resolve=true,
 	keywords = {reinforced=true},
-	level_range = {40, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 30,
 	cost = 60,
@@ -326,11 +326,10 @@ newEntity{
 	power_source = {technique=true},
 	name = " of massiveness", suffix=true, instant_resolve=true,
 	keywords = {massive=true},
-	level_range = {40, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 30,
 	cost = 60,
-	resolvers.charmt(Talents.T_HEAVE, {2,3,4}, 10),
 	wielder = {
 		inc_stats = {
 			[Stats.STAT_STR] = resolvers.mbonus_material(7, 3),
@@ -340,6 +339,37 @@ newEntity{
 			[DamageType.PHYSICAL] = resolvers.mbonus_material(5, 5),
 	},
 		size_category = 1,
+	},
+}
+
+newEntity{
+	power_source = {technique=true},
+	name = "fleetfooted ", prefix=true, instant_resolve=true,
+	keywords = {fleetfooted=true},
+	level_range = {30, 50},
+	greater_ego = 1,
+	rarity = 20,
+	cost = 40,
+	wielder = {
+		combat_def = resolvers.mbonus_material(20, 1),
+		inc_stats = {
+			[Stats.STAT_DEX] = resolvers.mbonus_material(14, 1),
+		},
+	},
+}
+
+newEntity{
+	power_source = {technique=true, psionic=true, arcane=true},
+	name = "of force", suffix=true, instant_resolve=true,
+	keywords = {force=true},
+	level_range = {30, 50},
+	greater_ego = 1,
+	rarity = 30,
+	cost = 40,
+	wielder = {
+		combat_mindpower = resolvers.mbonus_material(16, 2),
+		combat_dam = resolvers.mbonus_material(16, 2),
+		combat_spellpower = resolvers.mbonus_material(16, 2),
 	},
 }
 
@@ -372,22 +402,7 @@ newEntity{
 		inc_stats = {
 			[Stats.STAT_MAG] = resolvers.mbonus_material(5, 1),
 		},
-		combat_spellresist = resolvers.mbonus_material(7, 1),
 		spell_cooldown_reduction = 0.1,
-	},
-}
-
-newEntity{
-	power_source = {technique=true},
-	name = " of evasion", suffix=true, instant_resolve=true,
-	keywords = {evasion=true},
-	level_range = {10, 50},
-	greater_ego = 1,
-	rarity = 15,
-	cost = 30,
-	resolvers.charmt(Talents.T_EVASION, {2,3,4}, 30),
-	wielder = {
-		combat_def = resolvers.mbonus_material(15, 10),
 	},
 }
 
@@ -430,6 +445,10 @@ newEntity{
 	rarity = 15,
 	cost = 30,
 	wielder = {
+		inc_stats = {
+			[Stats.STAT_CUN] = resolvers.mbonus_material(4, 2),
+			[Stats.STAT_WIL] = resolvers.mbonus_material(4, 2),
+		},
 		combat_spellresist = resolvers.mbonus_material(10, 5),
 		combat_mentalresist = resolvers.mbonus_material(10, 5),
 		combat_physresist = resolvers.mbonus_material(10, 5),
@@ -439,8 +458,8 @@ newEntity{
 newEntity{
 	power_source = {psionic=true},
 	name = " of strife", suffix=true, instant_resolve=true,
-	keywords = {rushing=true},
-	level_range = {40, 50},
+	keywords = {strife=true},
+	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 18,
 	cost = 40,

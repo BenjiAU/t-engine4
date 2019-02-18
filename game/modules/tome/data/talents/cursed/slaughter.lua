@@ -24,7 +24,6 @@ newTalent{
 	type = {"cursed/slaughter", 1},
 	require = cursed_str_req1,
 	points = 5,
-	random_ego = "attack",
 	cooldown = 8,
 	hate = 2,
 	tactical = { ATTACK = { PHYSICAL = 2 } },
@@ -33,7 +32,7 @@ newTalent{
 	range = 1,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t), talent=t} end,
 	-- note that EFF_CURSED_WOUND in mod.data.timed_effects.physical.lua has a cap of -75% healing per application
-	getDamageMultiplier = function(self, t, hate)
+	getDamageMultiplier = function(self, t, hate) 
 		return 1 + self:combatTalentIntervalDamage(t, "str", 0.3, 1.5, 0.4) * getHateMultiplier(self, 0.3, 1, false, hate)
 	end,
 	getHealFactorChange = function(self, t)
@@ -43,17 +42,27 @@ newTalent{
 	getWoundDuration = function(self, t)
 		return 15
 	end,
+	on_pre_use = function(self, t, silent) if not self:hasMHWeapon() then if not silent then game.logPlayer(self, "You require a mainhand weapon to use this talent.") end return false end return true end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y, target = self:getTarget(tg)
 		if not target or not self:canProject(tg, x, y) then return nil end
 
 		local damageMultiplier = t.getDamageMultiplier(self, t)
-		local hit = self:attackTarget(target, nil, damageMultiplier, true)
 
+		-- We need to alter behavior slightly to accomodate shields since they aren't used in attackTarget
+		local shield, shield_combat = self:hasShield()
+		local weapon = self:hasMHWeapon().combat
+		local hit = false
+		if not shield then
+			hit = self:attackTarget(target, nil, damageMultiplier, true)
+		else
+			hit = self:attackTargetWith(target, weapon, nil, damageMultiplier)
+			if self:attackTargetWith(target, shield_combat, nil, damageMultiplier) or hit then hit = true end
+		end
 		if hit and not target.dead then
 			local level = self:getTalentLevel(t)
-			if target:canBe("poison") and level >= 3 then
+			if target:canBe("cut") and level >= 3 then
 				local healFactorChange = t.getHealFactorChange(self, t)
 				local woundDuration = t.getWoundDuration(self, t)
 				target:setEffect(target.EFF_CURSED_WOUND, woundDuration, { healFactorChange=healFactorChange, totalDuration=woundDuration })
@@ -67,7 +76,9 @@ newTalent{
 		local woundDuration = t.getWoundDuration(self, t)
 		return ([[You slash wildly at your target for %d%% (at 0 Hate) to %d%% (at 100+ Hate) damage.
 		At level 3, any wound you inflict with this carries a part of your curse, reducing the effectiveness of healing by %d%% for %d turns. The effect will stack.
-		The damage multiplier increases with your Strength.]]):format(t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100, -healFactorChange * 100, woundDuration)
+		The damage multiplier increases with your Strength.
+
+		This talent will also attack with your shield, if you have one equipped.]]):format(t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100, -healFactorChange * 100, woundDuration)
 	end,
 }
 
@@ -89,9 +100,10 @@ newTalent{
 	end,
 	range = 0,
 	radius = 1,
-        target = function(self, t)
-                return {type="ball", range=self:getTalentRange(t), selffire=false, radius=self:getTalentRadius(t)}
-        end,
+	target = function(self, t)
+		return {type="ball", range=self:getTalentRange(t), selffire=false, radius=self:getTalentRadius(t)}
+	end,
+	on_pre_use = function(self, t, silent) if not self:hasMHWeapon() then if not silent then game.logPlayer(self, "You require a mainhand weapon to use this talent.") end return false end return true end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 
@@ -118,7 +130,18 @@ newTalent{
 				target = rng.table(targets)
 			end
 
-			if self:attackTarget(target, nil, damageMultiplier, true) and self:getTalentLevel(t) >= 3 and not target:hasEffect(target.EFF_OVERWHELMED) then
+			-- We need to alter behavior slightly to accomodate shields since they aren't used in attackTarget
+			local shield, shield_combat = self:hasShield()
+			local weapon = self:hasMHWeapon().combat
+			local hit = false
+			if not shield then
+				hit = self:attackTarget(target, nil, damageMultiplier, true)
+			else
+				hit = self:attackTargetWith(target, weapon, nil, damageMultiplier)
+				if self:attackTargetWith(target, shield_combat, nil, damageMultiplier) or hit then hit = true end
+			end
+
+			if hit and self:getTalentLevel(t) >= 3 and not target:hasEffect(target.EFF_OVERWHELMED) then
 				target:setEffect(target.EFF_OVERWHELMED, 3, {src=self, attackChange=attackChange})
 			end
 		end
@@ -129,7 +152,9 @@ newTalent{
 		local attackChange = t.getAttackChange(self, t)
 		return ([[Assault nearby foes with 4 fast attacks for %d%% (at 0 Hate) to %d%% (at 100+ Hate) damage each. Stalked prey are always targeted if nearby.
 		At level 3 the intensity of your assault overwhelms anyone who is struck, reducing their Accuracy by %d for 3 turns.
-		The damage multiplier and Accuracy reduction increase with your Strength.]]):format(t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100, -attackChange)
+		The damage multiplier and Accuracy reduction increase with your Strength.
+
+		This talent will also attack with your shield, if you have one equipped.]]):format(t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100, -attackChange)
 	end,
 }
 

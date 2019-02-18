@@ -42,7 +42,7 @@ _M.projectile_class = "mod.class.Projectile"
 _M.logCombat = Combat.logCombat
 
 -- ego fields that are appended as a list when the ego is applied (by Zone:applyEgo)
-_M._special_ego_rules = {special_on_hit=true, special_on_crit=true, special_on_kill=true, charm_on_use=true}
+_M._special_ego_rules = {special_on_hit=true, special_on_crit=true, special_on_kill=true, charm_on_use=true, on_block=true}
 
 _M.requirement_flags_names = {
 	allow_wear_massive = "Massive armour training",
@@ -926,19 +926,6 @@ function _M:descCombat(use_actor, combat, compare_with, field, add_table, is_fak
 		special = combat.special_on_hit.desc
 	end
 
-	--[[ I couldn't figure out how to make this work because tdesc goes in the same list as special_on_Hit
-	local found = false
-	for i, v in ipairs(compare_with or {}) do
-		if v[field] and v[field].special_on_hit then
-			if special ~= v[field].special_on_hit.desc then
-				desc:add({"color","RED"}, "When this weapon hits: "..v[field].special_on_hit.desc, {"color","LAST"}, true)
-			else
-				found = true
-			end
-		end
-	end
-	--]]
-
 	-- get_items takes the combat table and returns a table of items to print.
 	-- Each of these items one of the following:
 	-- id -> {priority, string}
@@ -1028,7 +1015,7 @@ function _M:descCombat(use_actor, combat, compare_with, field, add_table, is_fak
 	end
 
 	compare_list(
-		"On weapon hit:",
+		"#YELLOW#On weapon hit:#LAST#",
 		function(combat)
 			if not combat then return {} end
 			local list = {}
@@ -1036,7 +1023,11 @@ function _M:descCombat(use_actor, combat, compare_with, field, add_table, is_fak
 			for dt, amount in pairs(combat.melee_project or combat.ranged_project or {}) do
 				local dt_def = DamageType:get(dt)
 				if dt_def and dt_def.tdesc then
-					list[dt] = {0, dt_def.tdesc, amount}
+					local desc = function(dam)
+						return dt_def.tdesc(dam, nil, use_actor)
+					end
+					list[dt] = {0, desc, amount}
+					--list[dt] = {0, dt_def.tdesc, amount}
 				end
 			end
 			-- Get specials
@@ -1046,7 +1037,7 @@ function _M:descCombat(use_actor, combat, compare_with, field, add_table, is_fak
 	)
 
 	compare_list(
-		"On weapon crit:",
+		"#YELLOW#On weapon crit:#LAST#",
 		function(combat)
 			if not combat then return {} end
 			return get_special_list(combat, 'special_on_crit')
@@ -1054,7 +1045,7 @@ function _M:descCombat(use_actor, combat, compare_with, field, add_table, is_fak
 	)
 
 	compare_list(
-		"On weapon kill:",
+		"#YELLOW#On weapon kill:#LAST#",
 		function(combat)
 			if not combat then return {} end
 			return get_special_list(combat, 'special_on_kill')
@@ -1298,7 +1289,7 @@ function _M:getTextualDesc(compare_with, use_actor)
 		for i, v in pairs(w.melee_project or {}) do
 			local def = DamageType.dam_def[i]
 			if def and def.tdesc then
-				local d = def.tdesc(v)
+				local d = def.tdesc(v, nil, use_actor)
 				found = true
 				dt_string:add(d, {"color","LAST"}, true)
 			else
@@ -1317,7 +1308,7 @@ function _M:getTextualDesc(compare_with, use_actor)
 		for i, v in pairs(w.ranged_project or {}) do
 			local def = DamageType.dam_def[i]
 			if def and def.tdesc then
-				local d = def.tdesc(v)
+				local d = def.tdesc(v, nil, use_actor)
 				ranged_found = true
 				ranged:add(d, {"color","LAST"}, true)
 			else
@@ -1331,7 +1322,7 @@ function _M:getTextualDesc(compare_with, use_actor)
 		for i, v in pairs(w.on_melee_hit or {}) do
 			local def = DamageType.dam_def[i]
 			if def and def.tdesc then
-				local d = def.tdesc(v)
+				local d = def.tdesc(v, nil, use_actor)
 				found = true
 				onhit:add(d, {"color","LAST"}, true)
 			else
@@ -1364,7 +1355,103 @@ function _M:getTextualDesc(compare_with, use_actor)
 				return col[2],(" %s"):format(DamageType.dam_def[item].name),{"color","LAST"}
 			end)
 
---		desc:add({"color","ORANGE"}, "General effects: ", {"color","LAST"}, true)
+		-- get_items takes the object table and returns a table of items to print.
+		-- Each of these items one of the following:
+		-- id -> {priority, string}
+		-- id -> {priority, message_function(this, compared), value}
+		-- header is the section header.
+		local compare_list = function(header, get_items)
+			local priority_ordering = function(left, right)
+				return left[2][1] < right[2][1]
+			end
+
+			if next(compare_with) then
+				-- Grab the left and right items.
+				local left = get_items(self)
+				local right = {}
+				for i, v in ipairs(compare_with) do
+					for k, item in pairs(get_items(v[field])) do
+						if not right[k] then
+							right[k] = item
+						elseif type(right[k]) == 'number' then
+							right[k] = right[k] + item
+						else
+							right[k] = item
+						end
+					end
+				end
+				if not left then game.log("No left") end
+				if not right then game.log("No right") end
+				-- Exit early if no items.
+				if not next(left) and not next(right) then return end
+
+				desc:add(header, true)
+
+				local combined = table.clone(left)
+				table.merge(combined, right)
+
+				for k, _ in table.orderedPairs2(combined, priority_ordering) do
+					l = left[k]
+					r = right[k]
+
+					message = (l and l[2]) or (r and r[2])
+					if type(message) == 'function' then
+						desc:add(message(l and l[3], r and r[3] or 0), true)
+					elseif type(message) == 'string' then
+						local prefix = '* '
+						local color = 'WHITE'
+						if l and not r then
+							color = 'GREEN'
+							prefix = '+ '
+						end
+						if not l and r then
+							color = 'RED'
+							prefix = '- '
+						end
+						desc:add({'color',color}, prefix, message, {'color','LAST'}, true)
+					end
+				end
+			else
+				local items = get_items(self)
+				if next(items) then
+					desc:add(header, true)
+					for k, v in table.orderedPairs2(items, priority_ordering) do
+						message = v[2]
+						if type(message) == 'function' then
+							desc:add(message(v[3]), true)
+						elseif type(message) == 'string' then
+							desc:add({'color','WHITE'}, '* ', message, {'color','LAST'}, true)
+						end
+					end
+				end
+			end
+		end
+
+		local get_special_list = function(o, key)
+			local special = o[key]
+
+			-- No special
+			if not special then return {} end
+			-- Single special
+			if special.desc then
+				return {[special.desc] = {10, util.getval(special.desc, self, use_actor, special)}}
+			end
+
+			-- Multiple specials
+			local list = {}
+			for _, special in pairs(special) do
+				list[special.desc] = {10, util.getval(special.desc, self, use_actor, special)}
+			end
+			return list
+		end
+
+		compare_list(
+			"#YELLOW#On shield block:#LAST#",
+			function(o)
+				if not o then return {} end
+				return get_special_list(o, 'on_block')
+			end
+		)
 
 		compare_table_fields(w, compare_with, field, "inc_stats", "%+d", "Changes stats: ", function(item)
 				return (" %s"):format(Stats.stats_def[item].short_name:capitalize())
@@ -2362,10 +2449,19 @@ function _M:specialWearAdd(prop, value)
 	self._special_wear[prop] = self:addTemporaryValue(prop, value)
 end
 
---- Add some special properties right when completting a set
-function _M:specialSetAdd(prop, value)
+--- Add some special properties right when completing a set
+-- Items with overlapping sets (such as Kinetic/Thermal/Charged focus) must
+-- include the set_id parameter identifying which of the overlapping sets the
+-- bonus belongs to. Otherwise, breaking one of the overlapping sets will
+-- remove ALL set bonuses from the other item(s).
+function _M:specialSetAdd(prop, value, set_id)
 	self._special_set = self._special_set or {}
-	self._special_set[prop] = self:addTemporaryValue(prop, value)
+	if set_id then
+		self._special_set[set_id] = self._special_set[set_id] or {}
+		self._special_set[set_id][prop] = self:addTemporaryValue(prop, value)
+	else
+		self._special_set[prop] = self:addTemporaryValue(prop, value)
+	end
 end
 
 function _M:getCharmPower(who, raw)

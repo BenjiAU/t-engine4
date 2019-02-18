@@ -351,9 +351,7 @@ newTalent{
 	points = 5,
 	mode = "passive",
 	random_ego = "attack",
-	range = function(self, t)
-		return math.floor(self:combatTalentScale(t, 2, 6))
-	end,
+	range = 10,
 	getMovementSpeedChange = function(self, t)
 		return self:combatTalentScale(t, 0.75, 2.5, 0.75)
 	end,
@@ -404,7 +402,7 @@ newTalent{
 						end
 					end
 				end
-				if rng.percent(25) and self:knowTalent(self.T_CREEPING_DARKNESS) then
+				if self:knowTalent(self.T_CREEPING_DARKNESS) then
 					local tCreepingDarkness = self:getTalentFromId(self.T_CREEPING_DARKNESS)
 					local damage = tCreepingDarkness.getDamage(self, tCreepingDarkness)
 					tCreepingDarkness.createDark(self, x, y, damage, 3, 2, 33, 0)

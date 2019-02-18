@@ -39,10 +39,6 @@ newEntity{
 			[DamageType.COLD] = resolvers.mbonus_material(10, 5),
 			[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 5),
 	},
-		inc_stats = {
-			[Stats.STAT_CON] = resolvers.mbonus_material(5, 1),
-			[Stats.STAT_STR] = resolvers.mbonus_material(5, 1),
-		},
 		stun_immune = resolvers.mbonus_material(20, 20, function(e, v) v=v/100 return 0, v end),
 		knockback_immune = resolvers.mbonus_material(20, 20, function(e, v) v=v/100 return 0, v end),
 		disarm_immune = resolvers.mbonus_material(20, 20, function(e, v) v=v/100 return 0, v end),

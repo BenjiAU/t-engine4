@@ -228,23 +228,6 @@ newEntity{
 }
 
 newEntity{
-	power_source = {arcane=true},
-	name = " of earthrunes", suffix=true, instant_resolve=true,
-	keywords = {earthrunes=true},
-	level_range = {30, 50},
-	greater_ego = 1,
-	rarity = 35,
-	cost = 20,
-	resolvers.charmt(Talents.T_STONE_WALL, 1, 80),
-	wielder = {
-		inc_stats = {
-			[Stats.STAT_CON] = resolvers.mbonus_material(5, 1),
-		},
-		combat_armor = resolvers.mbonus_material(5, 1),
-	},
-}
-
-newEntity{
 	power_source = {technique=true},
 	name = "stabilizing ", prefix=true, instant_resolve=true,
 	keywords = {stabilize=true},

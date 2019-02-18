@@ -652,6 +652,14 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 			end
 		end
 
+		--curse of madness effect spread on crit
+		if state.crit_power > 1 and src.hasEffect and src:hasEffect(src.EFF_CURSE_OF_MADNESS) then
+			local eff = src:hasEffect(src.EFF_CURSE_OF_MADNESS)
+			local def = src.tempeffect_def[src.EFF_CURSE_OF_MADNESS]
+			def.doConspirator(src, eff, target)
+		end
+
+
 		return dam + add_dam
 	end
 	return 0 + add_dam
@@ -1359,12 +1367,13 @@ newDamageType{
 	projector = function(src, x, y, type, dam, state)
 		state = initState(state)
 		useImplicitCrit(src, state)
-		if _G.type(dam) == "number" then dam = {dam=dam, dur=4} end
+		if _G.type(dam) == "number" then dam = {dam=dam, dur=4, apply_power = math.max(src:combatSpellpower(), src:combatMindpower())} end
 		DamageType:get(DamageType.COLD).projector(src, x, y, DamageType.COLD, dam.dam, state)
 		local target = game.level.map(x, y, Map.ACTOR)
 		if target then
+			local apply = dam.apply_power
 			if target:canBe("pin") and not target:attr("fly") and not target:attr("levitation") then
-				target:setEffect(target.EFF_FROZEN_FEET, dam.dur, {apply_power=math.max(src:combatSpellpower(), src:combatMindpower())})
+				target:setEffect(target.EFF_FROZEN_FEET, dam.dur, {apply_power=dam.apply_power})
 			end
 
 			if dam.shatter_reduce and target:hasEffect(target.EFF_WET) then
@@ -2011,12 +2020,11 @@ newDamageType{
 -- tdesc is only used in item tooltips and replaces the normal melee_project display
 
 -- Name:  item - theme - debuff/effect
-
--- Log entries are included with the damage line as "<#color#..effect ...%chance>" to minimize spam, where the % indicates the chance for the special effect to occur (not its strength) as applicable
+-- This entire system should probably be moved outside of DTs/melee_project at some point
 newDamageType{
-	name = "item mind gloom", type = "ITEM_MIND_GLOOM",
-	text_color = "#YELLOW#",
-	tdesc = function(dam, oldDam)
+	name = "item darkness numbing", type = "ITEM_DARKNESS_NUMBING",
+	text_color = "#GREY#",
+	tdesc = function(dam, oldDam, src)
 		parens = ""
 		dam = dam or 0
 		if oldDam then
@@ -2027,8 +2035,9 @@ newDamageType{
 				parens = (" (#RED#%d%%#LAST#)"):format(diff)
 			end
 		end
-		return ("* #LIGHT_GREEN#%d%%#LAST# chance to cause #YELLOW#random gloom#LAST#%s")
-			:format(dam, parens)
+		local val = src and math.floor(src:combatStatScale(src:combatMindpower(), 5, 40)) or 0
+		return ("* #LIGHT_GREEN#%d%%#LAST# chance to reduce damage dealt by #YELLOW#%d%%#LAST#%s")
+			:format(dam, val, parens)
 	end,
 	projector = function(src, x, y, type, dam, state)
 		state = initState(state)
@@ -2037,37 +2046,17 @@ newDamageType{
 		if target then
 			if rng.percent(dam) then
 				local check = math.max(src:combatAttack(), src:combatSpellpower(), src:combatMindpower())
-				if not src:checkHit(check, target:combatMentalResist()) then return end
-				local effect = rng.range(1, 3)
-				local name
-				if effect == 1 then
-					-- confusion
-					if target:canBe("confusion") and not target:hasEffect(target.EFF_GLOOM_CONFUSED) then
-						target:setEffect(target.EFF_GLOOM_CONFUSED, 2, {power=25, no_ct_effect=true} )
-					end
-					name = "confusion"
-				elseif effect == 2 then
-					-- stun
-					if target:canBe("stun") and not target:hasEffect(target.EFF_GLOOM_STUNNED) then
-						target:setEffect(target.EFF_GLOOM_STUNNED, 2, {no_ct_effect=true})
-					end
-					name = "stun"
-				elseif effect == 3 then
-					-- slow
-					if target:canBe("slow") and not target:hasEffect(target.EFF_GLOOM_SLOW) then
-						target:setEffect(target.EFF_GLOOM_SLOW, 2, {power=0.3, no_ct_effect=true})
-					end
-					name = "slow'"
-				end
+				local reduction = math.floor(src:combatStatScale(src:combatMindpower(), 5, 40))
+				target:setEffect(target.EFF_ITEM_NUMBING_DARKNESS, 3, {reduce = reduction, apply_power=check, no_ct_effect=true})
 			end
 		end
 	end,
 }
 
 newDamageType{
-	name = "item darkness numbing", type = "ITEM_DARKNESS_NUMBING",
+	name = "item expose", type = "ITEM_MIND_EXPOSE",
 	text_color = "#GREY#",
-	tdesc = function(dam, oldDam)
+	tdesc = function(dam, oldDam, src)
 		parens = ""
 		dam = dam or 0
 		if oldDam then
@@ -2078,8 +2067,9 @@ newDamageType{
 				parens = (" (#RED#%d%%#LAST#)"):format(diff)
 			end
 		end
-		return ("* #LIGHT_GREEN#%d%%#LAST# chance to inflict 15%% #GREY#damage reduction#LAST#%s")
-			:format(dam, parens)
+		local val = src and math.floor(src:combatStatScale(src:combatMindpower(), 5, 50)) or 0
+		return ("* #LIGHT_GREEN#%d%%#LAST# chance to reduce all saves and defense by #YELLOW#%d#LAST#%s")
+			:format(dam, val, parens)
 	end,
 	projector = function(src, x, y, type, dam, state)
 		state = initState(state)
@@ -2088,8 +2078,8 @@ newDamageType{
 		if target then
 			if rng.percent(dam) then
 				local check = math.max(src:combatAttack(), src:combatSpellpower(), src:combatMindpower())
-				local reduction = 15
-				target:setEffect(target.EFF_ITEM_NUMBING_DARKNESS, 4, {reduce = reduction, apply_power=check, no_ct_effect=true})
+				local reduction = math.floor(src:combatStatScale(src:combatMindpower(), 5, 50))
+				target:setEffect(target.EFF_ITEM_EXPOSED, 3, {reduce = reduction, apply_power=check, no_ct_effect=true})
 			end
 		end
 	end,
@@ -2098,7 +2088,7 @@ newDamageType{
 newDamageType{
 	name = "item temporal energize", type = "ITEM_TEMPORAL_ENERGIZE",
 	text_color = "#LIGHT_STEEL_BLUE#",
-	tdesc = function(dam, oldDam)
+	tdesc = function(dam, oldDam, src)
 		parens = ""
 		dam = dam or 0
 		if oldDam then
@@ -2109,7 +2099,7 @@ newDamageType{
 				parens = (" (#RED#%d%%#LAST#)"):format(diff)
 			end
 		end
-		return ("* #LIGHT_GREEN#%d%%#LAST# chance to gain #LIGHT_STEEL_BLUE#10%% of a turn#LAST# (3/turn limit)%s")
+		return ("* #LIGHT_GREEN#%d%%#LAST# chance to gain 10%% of a turn (3/turn limit)%s")
 			:format(dam, parens)
 	end,
 	projector = function(src, x, y, type, dam, state)
@@ -2130,7 +2120,7 @@ newDamageType{
 
 newDamageType{
 	name = "item acid corrode", type = "ITEM_ACID_CORRODE", text_color = "#GREEN#",
-	tdesc = function(dam, oldDam)
+	tdesc = function(dam, oldDam, src)
 		parens = ""
 		dam = dam or 0
 		if oldDam then
@@ -2141,8 +2131,9 @@ newDamageType{
 				parens = (" (#RED#%d%%#LAST#)"):format(diff)
 			end
 		end
-		return ("* #LIGHT_GREEN#%d%%#LAST# chance to #GREEN#corrode armour#LAST# by 30%%%s")
-			:format(dam, parens)
+		local val = src and src:combatStatScale(src:combatSpellpower(), 15, 50) or 0
+		return ("* #LIGHT_GREEN#%d%%#LAST# chance to reduce armor by #ORCHID#%d%%#LAST#%s")
+			:format(dam, val, parens)
 	end,
 	projector = function(src, x, y, type, dam, state)
 		state = initState(state)
@@ -2151,73 +2142,8 @@ newDamageType{
 		if target then
 			if rng.percent(dam) then
 				local check = math.max(src:combatAttack(), src:combatSpellpower(), src:combatMindpower())
-				target:setEffect(target.EFF_ITEM_ACID_CORRODE, 5, {pct = 0.3, no_ct_effect = true, apply_power = check})
-			end
-		end
-	end,
-}
-
-newDamageType{
-	name = "item light blind", type = "ITEM_LIGHT_BLIND",
-	text_color = "#YELLOW#",
-	tdesc = function(dam, oldDam)
-		parens = ""
-		dam = dam or 0
-		if oldDam then
-			diff = dam - oldDam
-			if diff > 0 then
-				parens = (" (#LIGHT_GREEN#+%d%%#LAST#)"):format(diff)
-			elseif diff < 0 then
-				parens = (" (#RED#%d%%#LAST#)"):format(diff)
-			end
-		end
-		return ("* #LIGHT_GREEN#%d%%#LAST# chance to #YELLOW#blind#LAST#%s")
-			:format(dam, parens)
-	end,
-	projector = function(src, x, y, type, dam, state)
-		state = initState(state)
-		useImplicitCrit(src, state)
-		local target = game.level.map(x, y, Map.ACTOR)
-		if target then
-			if rng.percent(dam) then
-				if target:canBe("blind") then
-					local check = math.max(src:combatAttack(), src:combatSpellpower(), src:combatMindpower())
-					target:setEffect(target.EFF_BLINDED, 2, {apply_power=(check), no_ct_effect=true})
-				else
-					game.logSeen(target, "%s resists the blinding light!", target.name:capitalize())
-				end
-			end
-		end
-	end,
-}
-
-newDamageType{
-	name = "item lightning daze", type = "ITEM_LIGHTNING_DAZE",
-	text_color = "#ROYAL_BLUE#",
-	tdesc = function(dam, oldDam)
-		parens = ""
-		dam = dam or 0
-		if oldDam then
-			diff = dam - oldDam
-			if diff > 0 then
-				parens = (" (#LIGHT_GREEN#+%d%%#LAST#)"):format(diff)
-			elseif diff < 0 then
-				parens = (" (#RED#%d%%#LAST#)"):format(diff)
-			end
-		end
-		return ("* #LIGHT_GREEN#%d%%#LAST# chance to #ROYAL_BLUE#daze#LAST# at end of turn%s")
-			:format(dam, parens)
-	end,
-	projector = function(src, x, y, type, dam, state)
-		state = initState(state)
-		useImplicitCrit(src, state)
-		local target = game.level.map(x, y, Map.ACTOR)
-		if target then
-			if rng.percent(dam) then
-				if target:canBe("stun") then
-					local check = math.max(src:combatAttack(), src:combatSpellpower(), src:combatMindpower())
-					game:onTickEnd(function() target:setEffect(target.EFF_DAZED, 4, {apply_power=check, no_ct_effect=true}) end) --onTickEnd to avoid breaking the daze
-				end
+				local reduction = src:combatStatScale(src:combatSpellpower(), 15, 50)
+				target:setEffect(target.EFF_ITEM_ACID_CORRODE, 3, {pct = reduction / 100, no_ct_effect = true, apply_power = check})
 			end
 		end
 	end,
@@ -2225,7 +2151,7 @@ newDamageType{
 
 newDamageType{
 	name = "item blight disease", type = "ITEM_BLIGHT_DISEASE", text_color = "#DARK_GREEN#",
-	tdesc = function(dam, oldDam)
+	tdesc = function(dam, oldDam, src)
 		parens = ""
 		dam = dam or 0
 		if oldDam then
@@ -2236,8 +2162,9 @@ newDamageType{
 				parens = (" (#RED#%d%%#LAST#)"):format(diff)
 			end
 		end
-		return ("* #LIGHT_GREEN#%d%%#LAST# chance to #DARK_GREEN#disease#LAST#%s")
-			:format(dam, parens)
+		local val = src and math.floor(src:combatStatScale(src:combatSpellpower(), 10, 40))
+		return ("* #LIGHT_GREEN#%d%%#LAST# chance to reduce strength, dexterity, and constitution by #ORCHID#%d#LAST#%s")
+			:format(dam, val, parens )
 	end,
 	projector = function(src, x, y, type, dam, state)
 		state = initState(state)
@@ -2247,8 +2174,8 @@ newDamageType{
 			if rng.percent(dam) then
 				if target:canBe("disease") then
 					local check = math.max(src:combatSpellpower(), src:combatMindpower(), src:combatAttack())
-					local disease_power = math.min(30, dam / 2)
-					target:setEffect(target.EFF_ITEM_BLIGHT_ILLNESS, 5, {reduce = disease_power})
+					local disease_power = math.floor(src:combatStatScale(src:combatSpellpower(), 10, 40))
+					target:setEffect(target.EFF_ITEM_BLIGHT_ILLNESS, 3, {reduce = disease_power, no_ct_effect = true})
 				end
 			end
 		end
@@ -2282,11 +2209,12 @@ newDamageType{
 	end,
 }
 
+-- Fix on sludgefist
 newDamageType{
 	name = "item nature slow", type = "ITEM_NATURE_SLOW", text_color = "#LIGHT_GREEN#",
-	tdesc = function(dam, oldDam)
+	tdesc = function(dam, oldDam, src)
 		parens = ""
-		dam = math.min(60, dam or 0)
+		dam = dam or 0
 		if oldDam then
 			diff = dam - oldDam
 			if diff > 0 then
@@ -2295,15 +2223,17 @@ newDamageType{
 				parens = (" (#RED#%d%%#LAST#)"):format(diff)
 			end
 		end
-		return ("* Slows global speed by #LIGHT_GREEN#%d%%#LAST#%s")
-			:format(dam, parens)
+		local val = src and math.floor(src:combatStatScale(src:combatMindpower(), 30, 80) ) or 0
+		return ("* #LIGHT_GREEN#%d%%#LAST# chance to slow action speed by #YELLOW#%d%%#LAST#%s")
+			:format(dam or 0, val, parens)
 	end,
 	projector = function(src, x, y, type, dam, state)
 		state = initState(state)
 		useImplicitCrit(src, state)
 		local target = game.level.map(x, y, Map.ACTOR)
-		if target then
-			target:setEffect(target.EFF_SLOW, 3, {power= math.min(0.6, dam / 100), no_ct_effect=true})
+		if target and rng.percent(dam) then
+			local slow_power = math.floor(src:combatStatScale(src:combatMindpower(), 30, 80) ) / 100
+			target:setEffect(target.EFF_SLOW, 3, {power= math.min(0.6, slow_power), no_ct_effect=true})
 		end
 	end,
 }
@@ -2337,7 +2267,123 @@ newDamageType{
 	end,
 }
 
+------------------------------------------------------------------------------------
+-- The item damage types below have been removed from most if not all egos
+-- You can still use them, just note that they're rare/unused for a reason
 
+newDamageType{
+	name = "item lightning daze", type = "ITEM_LIGHTNING_DAZE",
+	text_color = "#ROYAL_BLUE#",
+	tdesc = function(dam, oldDam)
+		parens = ""
+		dam = dam or 0
+		if oldDam then
+			diff = dam - oldDam
+			if diff > 0 then
+				parens = (" (#LIGHT_GREEN#+%d%%#LAST#)"):format(diff)
+			elseif diff < 0 then
+				parens = (" (#RED#%d%%#LAST#)"):format(diff)
+			end
+		end
+		return ("* #LIGHT_GREEN#%d%%#LAST# chance to #ROYAL_BLUE#daze#LAST# at end of turn%s")
+			:format(dam, parens)
+	end,
+	projector = function(src, x, y, type, dam, state)
+		state = initState(state)
+		useImplicitCrit(src, state)
+		local target = game.level.map(x, y, Map.ACTOR)
+		if target then
+			if rng.percent(dam) then
+				if target:canBe("stun") then
+					local check = math.max(src:combatAttack(), src:combatSpellpower(), src:combatMindpower())
+					game:onTickEnd(function() target:setEffect(target.EFF_DAZED, 3, {apply_power=check, no_ct_effect=true}) end) --onTickEnd to avoid breaking the daze
+				end
+			end
+		end
+	end,
+}
+
+newDamageType{
+	name = "item light blind", type = "ITEM_LIGHT_BLIND",
+	text_color = "#YELLOW#",
+	tdesc = function(dam, oldDam)
+		parens = ""
+		dam = dam or 0
+		if oldDam then
+			diff = dam - oldDam
+			if diff > 0 then
+				parens = (" (#LIGHT_GREEN#+%d%%#LAST#)"):format(diff)
+			elseif diff < 0 then
+				parens = (" (#RED#%d%%#LAST#)"):format(diff)
+			end
+		end
+		return ("* #LIGHT_GREEN#%d%%#LAST# chance to #YELLOW#blind#LAST#%s")
+			:format(dam, parens)
+	end,
+	projector = function(src, x, y, type, dam, state)
+		state = initState(state)
+		useImplicitCrit(src, state)
+		local target = game.level.map(x, y, Map.ACTOR)
+		if target then
+			if rng.percent(dam) then
+				if target:canBe("blind") then
+					local check = math.max(src:combatAttack(), src:combatSpellpower(), src:combatMindpower())
+					target:setEffect(target.EFF_BLINDED, 3, {apply_power=(check), no_ct_effect=true})
+				else
+					game.logSeen(target, "%s resists the blinding light!", target.name:capitalize())
+				end
+			end
+		end
+	end,
+}
+
+newDamageType{
+	name = "item mind gloom", type = "ITEM_MIND_GLOOM",
+	text_color = "#YELLOW#",
+	tdesc = function(dam, oldDam)
+		parens = ""
+		dam = dam or 0
+		if oldDam then
+			diff = dam - oldDam
+			if diff > 0 then
+				parens = (" (#LIGHT_GREEN#+%d%%#LAST#)"):format(diff)
+			elseif diff < 0 then
+				parens = (" (#RED#%d%%#LAST#)"):format(diff)
+			end
+		end
+		return ("* #LIGHT_GREEN#%d%%#LAST# chance to cause #YELLOW#random gloom#LAST#%s")
+			:format(dam, parens)
+	end,
+	projector = function(src, x, y, type, dam, state)
+		state = initState(state)
+		useImplicitCrit(src, state)
+		local target = game.level.map(x, y, Map.ACTOR)
+		if target then
+			if rng.percent(dam) then
+				local check = math.max(src:combatAttack(), src:combatSpellpower(), src:combatMindpower())
+				if not src:checkHit(check, target:combatMentalResist()) then return end
+				local effect = rng.range(1, 3)
+				local name
+				if effect == 1 then
+					if target:canBe("confusion") and not target:hasEffect(target.EFF_GLOOM_CONFUSED) then
+						target:setEffect(target.EFF_GLOOM_CONFUSED, 2, {power=25, no_ct_effect=true} )
+					end
+					name = "confusion"
+				elseif effect == 2 then
+					if target:canBe("stun") and not target:hasEffect(target.EFF_GLOOM_STUNNED) then
+						target:setEffect(target.EFF_GLOOM_STUNNED, 2, {no_ct_effect=true})
+					end
+					name = "stun"
+				elseif effect == 3 then
+					if target:canBe("slow") and not target:hasEffect(target.EFF_GLOOM_SLOW) then
+						target:setEffect(target.EFF_GLOOM_SLOW, 2, {power=0.3, no_ct_effect=true})
+					end
+					name = "slow'"
+				end
+			end
+		end
+	end,
+}
 ------------------------------------------------------------------------------------
 
 -- Blind
@@ -2492,7 +2538,7 @@ newDamageType{
 			target:setEffect(target.EFF_RETCHED, 1, {})
 		end
 
-		if target and (target:attr("undead") or target:attr(retch_heal)) then
+		if target and (target:attr("undead") or target:attr("retch_heal")) then
 			target:heal(dam * 1.5, src)
 
 			if src.callTalent then
@@ -3350,11 +3396,25 @@ newDamageType{
 		useImplicitCrit(src, state)
 		local target = game.level.map(x, y, Map.ACTOR)
 		if target and src:reactionToward(target) < 0 then
+
+			--hateful whisper
 			if rng.chance(10) and not target:hasEffect(target.EFF_HATEFUL_WHISPER) then
-				src:forceUseTalent(src.T_HATEFUL_WHISPER, {ignore_cd=true, ignore_energy=true, force_target=target, force_level=1, ignore_ressources=true})
+				--hateful whisper uses talent level of src
+				--[[if src:knowTalent(src.T_HATEFUL_WHISPER) then tHateWhisp = src:getTalentFromId(src.T_HATEFUL_WHISPER) end
+				if src:hasEffect(src.EFF_CURSE_OF_NIGHTMARES) then efNightmare = src.tempeffect_def[src.CURSE_OF_NIGHTMARES] end
+				if tHateWhisp and efNightmare then
+					nightLevel = math.max(1, tHateWhisp.getTalentLevel(tHateWhisp), efNightmare.level - 2)
+				elseif tHateWhisp then
+					nightLevel = tHateWhisp.getTalentLevel(tHateWhisp)
+				elseif effNightmare then
+					nightLevel = math.max(1, efNightmare.level - 2)
+				else nightLevel = 1
+				end]]
+				src:forceUseTalent(src.T_HATEFUL_WHISPER, {ignore_cd=true, ignore_energy=true, force_target=target, force_level=3, ignore_ressources=true})
 			end
 
-			if rng.chance(30) then
+			--slow
+			if rng.chance(10) then
 				target:setEffect(target.EFF_SLOW, 3, {power=0.3})
 			end
 		end

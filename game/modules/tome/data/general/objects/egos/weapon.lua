@@ -23,8 +23,6 @@ local Stats = require "engine.interface.ActorStats"
 local Talents = require "engine.interface.ActorTalents"
 local DamageType = require "engine.DamageType"
 
--- Idea: Giant(technique, chance to stun on hit and increased weight), Sharp, Jagged, Deft  (of deftness-quick swap),
--- Wolf, Bear, Snake based nature egos (maybe wolf could summon wolves),
 -------------------------------------------------------
 -- Techniques------------------------------------------
 -------------------------------------------------------
@@ -82,7 +80,7 @@ newEntity{
 	rarity = 15,
 	cost = 40,
 	wielder = {
-		combat_atk = resolvers.mbonus_material(10, 5),
+		combat_atk = resolvers.mbonus_material(20, 5),
 		combat_apr = resolvers.mbonus_material(10, 5),
 		resists_pen = {
 			[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 5),
@@ -110,7 +108,6 @@ newEntity{
 	},
 }
 
--- This needs to be greater or it gets phased out late game
 newEntity{
 	power_source = {technique=true},
 	name = " of crippling", suffix=true, instant_resolve=true,
@@ -118,12 +115,13 @@ newEntity{
 	level_range = {1, 50},
 	rarity = 15,
 	greater_ego = 1,
+	unique_ego = 1,
 	cost = 40,
 	wielder = {
 		combat_physcrit = resolvers.mbonus_material(10, 5),
 	},
 	combat = {
-		special_on_crit = {desc="cripple the target", fct=function(combat, who, target)
+		special_on_crit = {desc="Cripple the target reducing mind, spell, and combat action speeds by 30%", fct=function(combat, who, target)
 			target:setEffect(target.EFF_CRIPPLE, 4, {src=who, apply_power=who:combatAttack(combat)})
 		end},
 	},
@@ -135,6 +133,7 @@ newEntity{
 	keywords = {evisc=true},
 	level_range = {30, 50},
 	greater_ego = 1,
+	unique_ego = 1,
 	rarity = 20,
 	cost = 40,
 	wielder = {
@@ -145,17 +144,18 @@ newEntity{
 		special_on_crit = {
 		desc=function(self, who, special)
 			local dam, hf = special.wound(self.combat, who)
-			return ("wounds the target for 7 turns: %d bleeding, %d%% reduced healing"):format(dam, hf)
+			return ("Wound the target dealing #RED#%d#LAST# physical damage across 5 turns and reducing healing by %d%%"):format(dam, hf)
 		end,
 		wound=function(combat, who)
-			local dam = 5 + (who:combatPhysicalpower(nil, combat)/5)
-			local hf = 150*dam/(dam + 25) -- limit healing loss < 150%
+			local dam = math.floor(who:combatStatScale(who:combatPhysicalpower(), 30, 250))
+			local hf = 50
 			return dam, hf
 		end,
 		fct=function(combat, who, target, dam, special)
 			if target:canBe("cut") then
 				local dam, hf = special.wound(combat, who)
-				target:setEffect(target.EFF_DEEP_WOUND, 7, {src=who, heal_factor=hf, power=dam, apply_power=who:combatAttack()})
+				local check = math.max(who:combatSpellpower(), who:combatMindpower(), who:combatAttack())
+				target:setEffect(target.EFF_DEEP_WOUND, 5, {src=who, heal_factor=hf, power=who:physicalCrit(dam) / 5, apply_power=check})
 			end
 		end},
 	},
@@ -165,19 +165,18 @@ newEntity{
 	power_source = {technique=true},
 	name = " of rage", suffix=true, instant_resolve=true,
 	keywords = {rage=true},
-	level_range = {35, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 25,
 	cost = 35,
 	wielder = {
-		combat_atk = resolvers.mbonus_material(10, 5),
+		combat_atk = resolvers.mbonus_material(20, 5),
 		inc_damage = {
 			[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 5),
 		},
 		inc_stats = {
-			[Stats.STAT_STR] = resolvers.mbonus_material(6, 1),
+			[Stats.STAT_STR] = resolvers.mbonus_material(10, 1),
 		},
-		stamina_regen_when_hit = resolvers.mbonus_material(20, 5, function(e, v) v=v/10 return 0, v end),
 	},
 }
 
@@ -205,12 +204,10 @@ newEntity{
 	rarity = 20,
 	cost = 40,
 	wielder = {
+		combat_atk = resolvers.mbonus_material(20, 5),
 		combat_apr = resolvers.mbonus_material(10, 5),
-		inc_damage = {
-			[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 5),
-		},
 		resists_pen = {
-			[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 5),
+			['all'] = resolvers.mbonus_material(10, 5),
 		},
 	},
 }
@@ -225,14 +222,21 @@ newEntity{
 	level_range = {1, 50},
 	rarity = 5,
 	cost = 10,
+	unique_ego = 1,
 	combat = {
-		melee_project={
-			[DamageType.ACID] = resolvers.mbonus_material(15, 5)
-		},
-		special_on_crit = {desc="splashes the target with acid", fct=function(combat, who, target)
-			local power = 5 + (who:combatSpellpower()/10)
-			local check = math.max(who:combatSpellpower(), who:combatMindpower(), who:combatAttack())
-			target:setEffect(target.EFF_ACID_SPLASH, 5, {apply_power = check, src=who, dam=power, atk=power, armor=power})
+		special_on_crit = {
+			desc=function(self, who, special)
+				local dam = special.acid_splash(who)
+				return ("Splash the target with acid dealing #ORCHID#%d#LAST# damage over 5 turns and reducing armor and accuracy by #ORCHID#%d#LAST#"):format(dam, math.ceil(dam / 10))
+			end,
+			acid_splash=function(who)
+				local dam = math.floor(who:combatStatScale(who:combatSpellpower(), 30, 250))
+				return dam
+			end,
+			fct=function(combat, who, target, dam, special)
+				local power = special.acid_splash(who)
+				local check = math.max(who:combatSpellpower(), who:combatMindpower(), who:combatAttack())
+				target:setEffect(target.EFF_ACID_SPLASH, 5, {apply_power = check, src=who, dam=who:spellCrit(power) / 5, atk = math.ceil(power / 5), armor = math.ceil(power / 5)})
 		end},
 	},
 }
@@ -246,31 +250,37 @@ newEntity{
 	rarity = 5,
 	cost = 10,
 	combat = {
-		melee_project={
-			[DamageType.LIGHTNING] = resolvers.mbonus_material(15, 5),
-		},
-		special_on_hit = {desc="25% chance for lightning to arc to a second target", on_kill=1, fct=function(combat, who, target)
-			if not rng.percent(25) then return end
-			local tgts = {}
-			local x, y = target.x, target.y
-			local grids = core.fov.circle_grids(x, y, 5, true)
-			for x, yy in pairs(grids) do for y, _ in pairs(grids[x]) do
-				local a = game.level.map(x, y, engine.Map.ACTOR)
-				if a and a ~= target and who:reactionToward(a) < 0 then
-					tgts[#tgts+1] = a
-				end
-			end end
+		special_on_hit = {
+			desc=function(self, who, special)
+				local dam = special.arc(who)
+				return ("25%% chance for lightning to arc to a second target dealing #ORCHID#%d#LAST# damage"):format(dam)
+			end,
+			arc=function(who)
+				local dam = math.floor(who:combatStatScale(who:combatSpellpower(), 30, 250))
+				return dam
+			end,
+			on_kill=1, fct=function(combat, who, target, dam, special)
+				if not rng.percent(25) then return end
+				local tgts = {}
+				local x, y = target.x, target.y
+				local grids = core.fov.circle_grids(x, y, 5, true)
+				for x, yy in pairs(grids) do for y, _ in pairs(grids[x]) do
+					local a = game.level.map(x, y, engine.Map.ACTOR)
+					if a and a ~= target and who:reactionToward(a) < 0 then
+						tgts[#tgts+1] = a
+					end
+				end end
 
-			-- Randomly take targets
-			local tg = {type="beam", range=5, friendlyfire=false, x=target.x, y=target.y}
-			if #tgts <= 0 then return end
-			local a, id = rng.table(tgts)
-			table.remove(tgts, id)
-			local dam = 30 + (who:combatSpellpower())*2
+				-- Randomly take targets
+				local tg = {type="beam", range=5, friendlyfire=false, x=target.x, y=target.y}
+				if #tgts <= 0 then return end
+				local a, id = rng.table(tgts)
+				table.remove(tgts, id)
+				local dam = who:spellCrit(special.arc(who))
 
-			who:project(tg, a.x, a.y, engine.DamageType.LIGHTNING, rng.avg(1, dam, 3))
-			game.level.map:particleEmitter(x, y, math.max(math.abs(a.x-x), math.abs(a.y-y)), "lightning", {tx=a.x-x, ty=a.y-y})
-			game:playSoundNear(who, "talents/lightning")
+				who:project(tg, a.x, a.y, engine.DamageType.LIGHTNING, rng.avg(1, dam, 3))
+				game.level.map:particleEmitter(x, y, math.max(math.abs(a.x-x), math.abs(a.y-y)), "lightning", {tx=a.x-x, ty=a.y-y})
+				game:playSoundNear(who, "talents/lightning")
 		end},
 	},
 }
@@ -355,9 +365,6 @@ newEntity{
 		resists={
 			[DamageType.TEMPORAL] = resolvers.mbonus_material(15, 5),
 		},
-		on_melee_hit = {
-			[DamageType.TEMPORAL] = resolvers.mbonus_material(15, 5),
-		},
 	},
 	combat = {
 		melee_project = {
@@ -368,13 +375,14 @@ newEntity{
 
 -- Greater Egos
 
--- Mostly flat damage because combatSpellpower is so frontloaded
+-- laggy
 newEntity{
 	power_source = {arcane=true},
 	name = "elemental ", prefix=true, instant_resolve=true,
 	keywords = {elemental=true},
-	level_range = {35, 50},
+	level_range = {20, 50},
 	greater_ego = 1,
+	unique_ego = 1,
 	rarity = 25,
 	cost = 35,
 	wielder = {
@@ -386,20 +394,28 @@ newEntity{
 		},
 	},
 	combat = {
-		-- Define this here so it stays in scope
 		elements = {
 			{engine.DamageType.FIRE, "flame"},
 			{engine.DamageType.COLD, "freeze"},
 			{engine.DamageType.LIGHTNING, "lightning_explosion"},
 			{engine.DamageType.ACID, "acid"},
 		},	
-		special_on_hit = {desc="Random elemental explosion", fct=function(combat, who, target)
+		special_on_hit = {
+			desc=function(self, who, special)
+				local dam = special.explosion(who)
+				return ("Magical explosion of a random element dealing #ORCHID#%d#LAST# damage (1/turn)"):format(dam)
+			end,
+			explosion=function(who)
+				local dam = math.floor(who:combatStatScale(who:combatSpellpower(), 30, 150))
+				return dam
+			end,
+		fct=function(combat, who, target, dam, special)
 			if who.turn_procs.elemental_explosion then return end
 			who.turn_procs.elemental_explosion = 1
 			local elem = rng.table(combat.elements)
-			local dam = 10 + (who:combatSpellpower() )
+			local dam = who:spellCrit(special.explosion(who))
 			local tg = {type="ball", radius=3, range=10, selffire = false, friendlyfire=false}
-			who:project(tg, target.x, target.y, elem[1], rng.avg(dam / 2, dam, 3), {type=elem[2]})		
+			who:project(tg, target.x, target.y, elem[1], dam, {type=elem[2]})
 		end},
 	},
 }
@@ -408,7 +424,7 @@ newEntity{
 	power_source = {arcane=true},
 	name = "plaguebringer's ", prefix=true, instant_resolve=true,
 	keywords = {plague=true},
-	level_range = {30, 50},
+	level_range = {20, 50},
 	greater_ego = 1,
 	rarity = 30,
 	cost = 60,
@@ -420,9 +436,7 @@ newEntity{
 			[DamageType.BLIGHT] = resolvers.mbonus_material(15, 5),
 			[DamageType.ITEM_BLIGHT_DISEASE] = resolvers.mbonus_material(15, 5),
 		},
-		-- Well, Brawler Gloves do this calc for on hit Talents, and the new disease egos don't do damage, so.. What could possibly go wrong?
-		-- SCIENCE
-		talent_on_hit = { [Talents.T_EPIDEMIC] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+		talent_on_hit = { [Talents.T_EPIDEMIC] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=20} },
 	},
 }
 
@@ -432,13 +446,15 @@ newEntity{
 	keywords = {corruption=true},
 	level_range = {30, 50},
 	greater_ego = 1,
+	unique_ego = 1,
 	rarity = 35,
 	cost = 40,
 	combat = {
 		melee_project = {
 			[DamageType.ITEM_DARKNESS_NUMBING] = resolvers.mbonus_material(15, 5),
 		},
-		special_on_hit = {desc="20% chance to curse the target", fct=function(combat, who, target)
+		special_on_hit = {desc="20% chance to curse the target", 
+		fct=function(combat, who, target, dam, special)
 			if not rng.percent(20) then return end
 			local eff = rng.table{"vuln", "defenseless", "impotence", "death", }
 			local check = math.max(who:combatSpellpower(), who:combatMindpower(), who:combatAttack())
@@ -462,8 +478,8 @@ newEntity{
 	wielder = {
 		combat_spellpower = resolvers.mbonus_material(10, 5),
 		inc_stats = {
-			[Stats.STAT_MAG] = resolvers.mbonus_material(6, 1),
-			[Stats.STAT_WIL] = resolvers.mbonus_material(6, 1),
+			[Stats.STAT_MAG] = resolvers.mbonus_material(10, 1),
+			[Stats.STAT_WIL] = resolvers.mbonus_material(10, 1),
 		},
 	},
 }
@@ -471,20 +487,6 @@ newEntity{
 -------------------------------------------------------
 -- Nature/Antimagic Egos:------------------------------
 -------------------------------------------------------
-
-newEntity{
-	power_source = {nature=true},
-	name = "insidious ", prefix=true, instant_resolve=true,
-	keywords = {insid=true},
-	level_range = {10, 50},
-	rarity = 5,
-	cost = 15,
-	combat = {
-		melee_project={
-			[DamageType.INSIDIOUS_POISON] = resolvers.mbonus_material(50, 10), -- this gets divided by 7 for damage
-		},
-	},
-}
 
 newEntity{
 	power_source = {nature=true},
@@ -496,7 +498,6 @@ newEntity{
 	combat = {
 		melee_project={
 			[DamageType.NATURE] = resolvers.mbonus_material(15, 5),
-			[DamageType.TEMPORAL] = resolvers.mbonus_material(15, 5),
 		},
 	},
 }
@@ -534,6 +535,7 @@ newEntity{
 		life_regen = resolvers.mbonus_material(20, 5, function(e, v) v=v/10 return 0, v end),
 		resists_pen = {
 			[DamageType.ACID] = resolvers.mbonus_material(10, 5),
+			[DamageType.NATURE] = resolvers.mbonus_material(10, 5),
 		},
 	},
 	combat = {
@@ -569,29 +571,23 @@ newEntity{
 
 newEntity{
 	power_source = {nature=true},
-	name = "thunderous ", prefix=true, instant_resolve=true,
-	keywords = {thunder=true},
+	name = "enhanced ", prefix=true, instant_resolve=true,
+	keywords = {enhanced=true},
 	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 45,
 	cost = 40,
 	wielder = {
 		inc_stats = {
-			[Stats.STAT_STR] = resolvers.mbonus_material(3, 1),
-			[Stats.STAT_DEX] = resolvers.mbonus_material(3, 1),
-			[Stats.STAT_MAG] = resolvers.mbonus_material(3, 1),
-			[Stats.STAT_WIL] = resolvers.mbonus_material(3, 1),
-			[Stats.STAT_CUN] = resolvers.mbonus_material(3, 1),
-			[Stats.STAT_CON] = resolvers.mbonus_material(3, 1),
-		},
-		resists_pen = {
-			[DamageType.LIGHTNING] = resolvers.mbonus_material(10, 5),
+			[Stats.STAT_STR] = resolvers.mbonus_material(9, 1),
+			[Stats.STAT_DEX] = resolvers.mbonus_material(9, 1),
+			[Stats.STAT_MAG] = resolvers.mbonus_material(9, 1),
+			[Stats.STAT_WIL] = resolvers.mbonus_material(9, 1),
+			[Stats.STAT_CUN] = resolvers.mbonus_material(9, 1),
+			[Stats.STAT_CON] = resolvers.mbonus_material(9, 1),
 		},
 	},
 	combat = {
-		melee_project = {
-			[DamageType.ITEM_LIGHTNING_DAZE] = resolvers.mbonus_material(30, 5),
-		},
 	},
 }
 
@@ -670,7 +666,8 @@ newEntity{
 	cost = 20,
 	combat = {
 		melee_project={[DamageType.NATURE] = resolvers.mbonus_material(15, 5)},
-		special_on_hit = {desc="25% chance to remove a magical effect", fct=function(combat, who, target)
+		special_on_hit = {desc="25% chance to remove a magical effect", 
+		fct=function(combat, who, target, dam, special)
 			if not rng.percent(25) then return end
 
 			local effs = {}
@@ -716,7 +713,8 @@ newEntity{
 		melee_project = {
 			[DamageType.ITEM_ANTIMAGIC_MANABURN] = resolvers.mbonus_material(15, 10),
 		},
-		special_on_crit = {desc="burns latent spell energy", fct=function(combat, who, target)
+		special_on_crit = {desc="burns latent spell energy", 
+		fct=function(combat, who, target, dam, special)
 			local turns = 1 + math.ceil(who:combatMindpower() / 20)
 			local check = math.max(who:combatSpellpower(), who:combatMindpower(), who:combatAttack())
 			if not who:checkHit(check, target:combatMentalResist()) then game.logSeen(target, "%s resists!", target.name:capitalize()) return nil end
@@ -754,36 +752,10 @@ newEntity{
 		inc_damage_type = {
 			unnatural=resolvers.mbonus_material(25, 5),
 		},
-		special_on_hit = {desc="disrupts spell-casting", fct=function(combat, who, target)
+		special_on_hit = {desc="disrupts spell-casting", 
+		fct=function(combat, who, target, dam, special)
 			local check = math.max(who:combatSpellpower(), who:combatMindpower(), who:combatAttack())
 			target:setEffect(target.EFF_SPELL_DISRUPTION, 10, {src=who, power = 10, max = 50, apply_power=check})
-		end},
-	},
-}
-
--- Not quite sure why this is AM but whatever
-newEntity{
-	power_source = {antimagic=true},
-	name = " of the leech", suffix=true, instant_resolve=true,
-	keywords = {leech=true},
-	level_range = {10, 50},
-	greater_ego = 1,
-	rarity = 40,
-	cost = 40,
-	wielder = {
-		on_melee_hit = {
-			[DamageType.SLIME] = resolvers.mbonus_material(15, 5),
-		},
-	},
-	combat = {
-		melee_project={[DamageType.ITEM_NATURE_SLOW] = resolvers.mbonus_material(15, 5)},
-		special_on_hit = {desc="leeches stamina from the target", fct=function(combat, who, target)
-			if target and target:getStamina() > 0 then
-				local leech = who:combatMindpower() / 50
-				local leeched = math.min(leech, target:getStamina())
-				who:incStamina(leeched)
-				target:incStamina(-leeched)
-			end
 		end},
 	},
 }
@@ -830,15 +802,16 @@ newEntity{
 	rarity = 25,
 	cost = 15,
 	greater_ego = 1,
+	unique_ego = 1,
 	combat = {
 		projection_targets = resolvers.mbonus_material(2, 1),
 		special_on_hit = {
 			on_kill = 1,
 			desc=function(self, who, special)
 				local targets = self.combat.projection_targets
-				return ("Projects up to %d attacks dealing 30%% weapon damage to random targets in range 7 as mind damage (cannot hit the initial target)"):format(targets or 0)
+				return ("Projects up to #LIGHT_STEEL_BLUE#%d#LAST# attacks dealing 30%% weapon damage to random targets in range 7 as mind damage (cannot hit the initial target)"):format(targets or 0)
 			end,
-			fct=function(combat, who, target)
+		fct=function(combat, who, target, dam, special)
 				if who.turn_procs.ego_projection then return end
 				who.turn_procs.ego_projection = true
 
@@ -853,14 +826,13 @@ newEntity{
 				for i = 1,combat.projection_targets do
 					local project_target = rng.tableRemove(tgts) -- Don't strike the same target more than once
 					if project_target then
-						who:attackTarget(project_target, engine.DamageType.MIND, 0.3, true)
+						who:attackTargetWith(project_target, combat, engine.DamageType.MIND, 0.3)
 					end
 				end
 		end},
 	},
 }
 
--- Merged with Psychic/redesigned a bit
 newEntity{
 	power_source = {psionic=true},
 	name = "thought-forged ", prefix=true, instant_resolve=true,
@@ -871,7 +843,7 @@ newEntity{
 	combat = {
 		melee_project={
 			[DamageType.MIND] = resolvers.mbonus_material(20, 5),
-			[DamageType.ITEM_MIND_GLOOM] = resolvers.mbonus_material(25, 10)
+			[DamageType.ITEM_MIND_EXPOSE] = resolvers.mbonus_material(25, 10)
 		},
 	},
 	wielder = {
@@ -890,15 +862,20 @@ newEntity{
 	rarity = 30, -- very rare because no one can remember how to make them...  haha
 	cost = 15,
 	greater_ego = 1,
+	unique_ego = 1,
 	wielder = {
 	},
 	combat = {
-		special_on_hit = {desc="25% chance to put talents on cooldown", fct=function(combat, who, target)
+		special_on_hit = {
+		desc=function(self, who, special)
+			return ("25%% chance to put 1 talent on cooldown for #YELLOW#%d#LAST# turns"):format(1 + math.ceil(who:combatMindpower() / 20))
+		end,
+		fct=function(combat, who, target, dam, special)
 			if not rng.percent(25) then return nil end
 			local turns = 1 + math.ceil(who:combatMindpower() / 20)
-			local number = 2 + math.ceil(who:combatMindpower() / 50)
+			local number = 1
 			local check = math.max(who:combatSpellpower(), who:combatMindpower(), who:combatAttack())
-			if not who:checkHit(check, target:combatMentalResist()) then game.logSeen(target, "%s resists!", target.name:capitalize()) return nil end
+			if not who:checkHit(check, target:combatMentalResist()) then game.logSeen(target, "%s resists the amnesia!", target.name:capitalize()) return nil end
 
 			local tids = {}
 			for tid, lev in pairs(target.talents) do
@@ -922,16 +899,14 @@ newEntity{
 	keywords = {torment=true},
 	level_range = {30, 50},
 	greater_ego = 1,
+	unique_ego = 1,
 	rarity = 30,
 	cost = 30,
 	wielder = {
-		resists_pen = {
-			[DamageType.MIND] = resolvers.mbonus_material(10, 5),
-			[DamageType.DARKNESS] = resolvers.mbonus_material(10, 5),
-		},
 	},
 	combat = {
-		special_on_hit = {desc="20% chance to stun, blind, pin, confuse, or silence the target", fct=function(combat, who, target)
+		special_on_hit = {desc="20% chance to stun, blind, pin, confuse, or silence the target", 
+		fct=function(combat, who, target, dam, special)
 			if not rng.percent(20) then return end
 			local eff = rng.table{"stun", "blind", "pin", "confusion", "silence",}
 			if not target:canBe(eff) then return end
@@ -946,37 +921,3 @@ newEntity{
 		end},
 	},
 }
-
-
---[[ Removed for now, concept isn't working
-newEntity{
-	power_source = {nature=true},
-	name = " of gravity", suffix=true, instant_resolve=true,
-	keywords = {gravity=true},
-	level_range = {30, 50},
-	greater_ego = 1,
-	rarity = 30,
-	cost = 30,
-	wielder = {
-		inc_damage = {
-			[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 5),
-		},
-	},
-	combat = {
-		melee_project={
-			[DamageType.GRAVITY] = resolvers.mbonus_material(15, 5),
-		},
-		special_on_hit = {desc="25% chance to crush the target", fct=function(combat, who, target)
-			if not rng.percent(25) then return end
-			if target:attr("never_move") then
-				local tg = {type="hit", range=1}
-				who:project(tg, target.x, target.y, engine.DamageType.IMPLOSION, 10 + who:combatMindpower()/4)
-			elseif target:canBe("pin") then
-				target:setEffect(target.EFF_PINNED, 3, {src=who, apply_power=who:combatAttack(combat)})
-			else
-				game.logSeen(target, "%s resists the pin!", target.name:capitalize())
-			end
-		end},
-	},
-}
---]]

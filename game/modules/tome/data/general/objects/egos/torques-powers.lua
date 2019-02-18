@@ -104,9 +104,11 @@ newEntity{
 
 			game.logSeen(who, "%s uses %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name=true, do_color=true})
 			local DamageType = require "engine.DamageType"
+			local state = {}
 			who:project(tg, x, y, function(tx, ty)
 				local target = game.level.map(tx, ty, engine.Map.ACTOR)
-				if not target or target == who then return end
+				if not target or target == who or state[target] then return end
+				state[target] = true
 				local DamageType = require "engine.DamageType"
 				DamageType:get(DamageType.PHYSICAL).projector(who, tx, ty, DamageType.PHYSICAL, dam)
 				if target:canBe("knockback") then
@@ -136,7 +138,7 @@ newEntity{
 			local dam = self.use_power.damage(self, who)
 			return ("blast the opponent's mind dealing %d mind damage and silencing them for 4 turns"):format(dam )
 		end,
-		10,
+		15,
 		function(self, who)
 			local tg = self.use_power.target(self, who)
 			local x, y = who:getTarget(tg)

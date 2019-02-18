@@ -100,12 +100,12 @@ newTalent{
 	cooldown = 6,
 	hate = 5,
 	tactical = { ATTACK = { PHYSICAL = 3 } },
-	getCooldownDuration = function(self, t) return math.floor(self:combatTalentScale(t, 3.75, 6.75, "log", 0, 1)) end,
+	getCooldownDuration = function(self, t) return math.ceil(self:combatTalentLimit(t, 5, 0.75, 2.7)) end,
 	getDamageMultiplier = function(self, t, hate)
 		return getHateMultiplier(self, 0.35, 0.67, false, hate)
 	end,
 	getTargetDamageChange = function(self, t)
-		return -self:combatLimit(self:combatTalentStatDamage(t, "wil", 0.7, 0.9), 1, 0, 0, 0.75, 0.87)*100 -- Limit < 100%
+		return -self:combatLimit(self:getTalentLevel(t), 100, 45.5, 1.3, 55, 6.5)
 	end,
 	getDuration = function(self, t)
 		return 2
@@ -114,8 +114,9 @@ newTalent{
 		local eff = self:hasEffect(self.EFF_STALKER)
 		return eff and not eff.target.dead and core.fov.distance(self.x, self.y, eff.target.x, eff.target.y) <= 1
 	end,
+	
 	action = function(self, t)
-		local damageMultipler = t.getDamageMultiplier(self, t)
+		local damageMultiplier = t.getDamageMultiplier(self, t)
 		local cooldownDuration = t.getCooldownDuration(self, t)
 		local targetDamageChange = t.getTargetDamageChange(self, t)
 		local duration = t.getDuration(self, t)
@@ -126,17 +127,27 @@ newTalent{
 		target:setEffect(target.EFF_HARASSED, duration, {src=self, damageChange=targetDamageChange })
 
 		for i = 1, 2 do
-			if not target.dead and self:attackTarget(target, nil, damageMultipler, true) then
-				-- remove effects
+			-- We need to alter behavior slightly to accomodate shields since they aren't used in attackTarget
+			local shield, shield_combat = self:hasShield()
+			local weapon = self:hasMHWeapon() and self:hasMHWeapon().combat or self.combat --can do unarmed attack
+			local hit = false
+			if not shield then
+				hit = self:attackTarget(target, nil, damageMultiplier, true)
+			else
+				hit = self:attackTargetWith(target, weapon, nil, damageMultiplier)
+				if self:attackTargetWith(target, shield_combat, nil, damageMultiplier) or hit then hit = true end
+			end
+
+			if not target.dead then
 				local tids = {}
 				for tid, lev in pairs(target.talents) do
 					local t = target:getTalentFromId(tid)
 					if not target.talents_cd[tid] and t.mode == "activated" and not t.innate then tids[#tids+1] = t end
 				end
-
+					
 				local t = rng.tableRemove(tids)
 				if t then
-					target.talents_cd[t.id] = rng.range(3, 5)
+					target.talents_cd[t.id] = getCooldownDuration
 					game.logSeen(target, "#F53CBE#%s's %s is disrupted!", target.name:capitalize(), t.name)
 				end
 			end
@@ -145,12 +156,14 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		local damageMultipler = t.getDamageMultiplier(self, t)
+		local damageMultiplier = t.getDamageMultiplier(self, t)
 		local cooldownDuration = t.getCooldownDuration(self, t)
 		local targetDamageChange = t.getTargetDamageChange(self, t)
 		local duration = t.getDuration(self, t)
 		return ([[Harass your stalked victim with two quick attacks for %d%% (at 0 Hate) to %d%% (at 100+ Hate) damage each. Each attack that scores a hit disrupts one talent, rune or infusion for %d turns. Your opponent will be unnerved by the attacks, reducing the damage they deal by %d%% for %d turns.
-		Damage reduction increases with the Willpower stat.]]):format(t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100, cooldownDuration, -targetDamageChange, duration)
+		Damage reduction increases with the Willpower stat.
+
+		This talent will also attack with your shield, if you have one equipped.]]):format(t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100, cooldownDuration, -targetDamageChange, duration)
 	end,
 }
 

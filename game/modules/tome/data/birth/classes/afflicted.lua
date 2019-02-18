@@ -94,6 +94,7 @@ newBirthDescriptor{
 			{type="weapon", subtype="battleaxe", name="iron battleaxe", autoreq=true, ego_chance=-1000},
 			{type="armor", subtype="heavy", name="iron mail armour", autoreq=true, ego_chance=-1000, ego_chance=-1000}
 		},
+		show_shield_combat = 1,
 	},
 	copy_add = {
 		life_rating = 2,

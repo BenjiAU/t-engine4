@@ -20,11 +20,13 @@
 require "engine.class"
 require "mod.class.NPC"
 require "mod.class.interface.PartyDeath"
+require "engine.interface.PlayerHotkeys"
 
-module(..., package.seeall, class.inherit(mod.class.NPC, mod.class.interface.PartyDeath))
+module(..., package.seeall, class.inherit(mod.class.NPC, mod.class.interface.PartyDeath, engine.interface.PlayerHotkeys))
 
 function _M:init(t, no_default)
 	mod.class.NPC.init(self, t, no_default)
+	engine.interface.PlayerHotkeys.init(self, t)
 
 	-- Set correct AI
 	if self.ai ~= "party_member" and not self.no_party_ai then

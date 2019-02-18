@@ -360,7 +360,7 @@ end
 function _M:getAccuracyEffect(weapon, atk, def, scale, max)
 	max = max or 10000000
 	scale = scale or 1
-	return math.min(max, math.max(0, atk - def) * scale * (weapon.accuracy_effect_scale or 1))
+	return math.min(max, math.max(0, atk - def) * scale * (weapon.accuracy_effect_scale and 0.5 or 1))
 end
 
 function _M:isAccuracyEffect(weapon, kind)
@@ -851,6 +851,11 @@ function _M:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult,
 	-- Reactive target on_melee_hit damage
 	if hitted then
 		local dr, fa, pct = 0
+
+		-- Use an intermediary talent to give retaliation damage a unique source in the combat log
+		local old = target.__project_source
+		target.__project_source = target:getTalentFromId(target.T_MELEE_RETALIATION)
+
 		for typ, dam in pairs(target.on_melee_hit) do
 			if not fa then
 				if self:knowTalent(self.T_CLOSE_COMBAT_MANAGEMENT) then
@@ -888,7 +893,9 @@ function _M:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult,
 					end
 				end
 			end
-		end 
+		end
+		target.__project_source = old
+
 	end
 	-- Acid splash
 	if hitted and not target.dead and target:knowTalent(target.T_ACID_BLOOD) then
@@ -1095,7 +1102,7 @@ function _M:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult,
 
 	if hitted and not target.dead then
 		-- Curse of Madness: Twisted Mind
-		if self.hasEffect and self:hasEffect(self.EFF_CURSE_OF_MADNESS) then
+		--[[if self.hasEffect and self:hasEffect(self.EFF_CURSE_OF_MADNESS) then
 			local eff = self:hasEffect(self.EFF_CURSE_OF_MADNESS)
 			local def = self.tempeffect_def[self.EFF_CURSE_OF_MADNESS]
 			def.doConspirator(self, eff, target)
@@ -1104,10 +1111,10 @@ function _M:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult,
 			local eff = target:hasEffect(target.EFF_CURSE_OF_MADNESS)
 			local def = target.tempeffect_def[target.EFF_CURSE_OF_MADNESS]
 			def.doConspirator(target, eff, self)
-		end
+		end]]
 
 		-- Curse of Nightmares: Suffocate
-		if self.hasEffect and self:hasEffect(self.EFF_CURSE_OF_NIGHTMARES) then
+		--[[if self.hasEffect and self:hasEffect(self.EFF_CURSE_OF_NIGHTMARES) then
 			local eff = self:hasEffect(self.EFF_CURSE_OF_NIGHTMARES)
 			local def = self.tempeffect_def[self.EFF_CURSE_OF_NIGHTMARES]
 			def.doSuffocate(self, eff, target)
@@ -1116,7 +1123,7 @@ function _M:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult,
 			local eff = target:hasEffect(target.EFF_CURSE_OF_NIGHTMARES)
 			local def = target.tempeffect_def[target.EFF_CURSE_OF_NIGHTMARES]
 			def.doSuffocate(target, eff, self)
-		end
+		end]]
 	end
 
 	if target:isTalentActive(target.T_SHARDS) and hitted and not target.dead and not target.turn_procs.shield_shards then
@@ -2067,6 +2074,12 @@ function _M:combatMindpower(mod, add)
 
 	if self:knowTalent(self.T_SUPERPOWER) then
 		add = add + 60 * self:getStr() / 100
+	end
+
+	local gloom = self:knowTalent(self.T_GLOOM)
+	if gloom then
+		local t = self:getTalentFromId(self.T_GLOOM)
+		add = add + t.getMindpower(self)
 	end
 
 	if self:knowTalent(self.T_GESTURE_OF_POWER) then

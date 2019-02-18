@@ -359,7 +359,7 @@ function _M:onTakeHit(value, src, death_note)
 	if value > 0 and src and src ~= self and src.resolveSource then
 		if not src.targetable then src = util.getval(src.resolveSource, src) end
 		if src then
-			if src.targetable and not self.ai_target.actor then self:setTarget(src) end
+			if src.targetable and not self.ai_target.actor and not (self.never_anger and self:reactionToward(src) > 0) then self:setTarget(src) end
 			-- Get angry if hurt by a friend
 			if src.faction and self:reactionToward(src) >= 0 and self.fov then
 				self:checkAngered(src, false, -50)

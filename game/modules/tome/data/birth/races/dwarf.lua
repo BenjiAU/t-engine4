@@ -79,9 +79,9 @@ newBirthDescriptor
 		random_name_def = "dwarf_#sex#",
 		life_rating = 14,
 		can_see_iron_council = 1,
-		resolvers.inscription("INFUSION:_REGENERATION", {cooldown=10, dur=5, heal=100}),
-		resolvers.inscription("INFUSION:_WILD", {cooldown=14, what={physical=true}, dur=4, power=14}),
-		resolvers.inventory({id=true, transmo=false, alter=function(o) o.inscription_data.cooldown=12 o.inscription_data.heal=50 end, {type="scroll", subtype="infusion", name="healing infusion", ego_chance=-1000, ego_chance=-1000}}),
+		resolvers.inscription("INFUSION:_REGENERATION", {cooldown=10, dur=5, heal=100}, 1),
+		resolvers.inscription("INFUSION:_WILD", {cooldown=14, what={physical=true}, dur=4, power=14}, 2),
+		resolvers.inscription("INFUSION:_HEALING", {cooldown=12, heal=50}, 3),
 	},
 	cosmetic_unlock = {
 		cosmetic_race_dwarf_female_beard = {

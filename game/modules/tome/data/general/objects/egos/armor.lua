@@ -145,17 +145,6 @@ newEntity{
 
 -- Others
 newEntity{
-	power_source = {technique=true},
-	name = "spiked ", prefix=true, instant_resolve=true,
-	keywords = {spiked=true},
-	level_range = {5, 50},
-	rarity = 6,
-	cost = 7,
-	wielder = {
-		on_melee_hit={[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 10)},
-	},
-}
-newEntity{
 	power_source = {arcane=true},
 	name = "searing ", prefix=true, instant_resolve=true,
 	keywords = {searing=true},
@@ -178,6 +167,7 @@ newEntity{
 		},
 	},
 }
+-- Retheme me adding lite to a willpower nature ego does not make it radiant
 newEntity{
 	power_source = {nature=true},
 	name = "radiant ", prefix=true, instant_resolve=true,
@@ -187,7 +177,6 @@ newEntity{
 	rarity = 18,
 	cost = 15,
 	wielder = {
-		on_melee_hit={[DamageType.LIGHT] = resolvers.mbonus_material(10, 4),},
 		resists={
 			[DamageType.BLIGHT] = resolvers.mbonus_material(20, 10),
 			[DamageType.DARKNESS] = resolvers.mbonus_material(20, 10),
@@ -207,9 +196,9 @@ newEntity{
 	rarity = 16,
 	cost = 30,
 	wielder = {
-		max_life=resolvers.mbonus_material(60, 40),
-		life_regen = resolvers.mbonus_material(30, 10, function(e, v) v=v/10 return 0, v end),
-		healing_factor = resolvers.mbonus_material(20, 10, function(e, v) v=v/100 return 0, v end),
+		max_life=resolvers.mbonus_material(60, 20),
+		life_regen = resolvers.mbonus_material(10, 1, function(e, v) return 0, v end),
+		healing_factor = resolvers.mbonus_material(10, 10, function(e, v) v=v/100 return 0, v end),
 	},
 }
 newEntity{

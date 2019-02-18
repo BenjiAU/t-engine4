@@ -27,7 +27,7 @@ end
 
 -- mindpower bonus for gloom talents
 local function gloomTalentsMindpower(self)
-	return self:combatScale(self:getTalentLevel(self.T_GLOOM) + self:getTalentLevel(self.T_WEAKNESS) + self:getTalentLevel(self.T_DISMAY) + self:getTalentLevel(self.T_SANCTUARY), 1, 1, 20, 20, 0.75)
+	return self:combatScale(self:getTalentLevel(self.T_GLOOM) + self:getTalentLevel(self.T_WEAKNESS) + self:getTalentLevel(self.T_MINDROT) + self:getTalentLevel(self.T_SANCTUARY), 1, 1, 40, 20, 0.7)
 end
 
 newTalent{
@@ -39,8 +39,9 @@ newTalent{
 	cooldown = 0,
 	range = 3,
 	no_energy = true,
-	tactical = { BUFF = 5 },
-	getChance = function(self, t) return self:combatLimit(self:getTalentLevel(t)^.5, 100, 7, 1, 15.65, 2.23) end, -- Limit < 100%
+	tactical = { BUFF = 5 },	
+	getChance = function(self, t) return math.min(25, self:combatScale(self:getTalentLevel(t), 7, 1, 15, 6.5) * math.max(1, self:combatScale(self.combat_mindspeed, 1, 1, 1.35, 1.5))) end,
+	getMindpower = gloomTalentsMindpower,
 	getDuration = function(self, t)
 		return 3
 	end,
@@ -59,11 +60,8 @@ newTalent{
 		-- all gloom effects are handled here
 		local tWeakness = self:getTalentFromId(self.T_WEAKNESS)
 		local tDismay = self:getTalentFromId(self.T_DISMAY)
-		--local tSanctuary = self:getTalentFromId(self.T_SANCTUARY)
-		--local tLifeLeech = self:getTalentFromId(self.T_LIFE_LEECH)
-		--local lifeLeeched = 0
 		
-		local mindpower = self:combatMindpower(1, gloomTalentsMindpower(self))
+		local mindpower = self:combatMindpower()
 		
 		local grids = core.fov.circle_grids(self.x, self.y, self:getTalentRange(tGloom), true)
 		for x, yy in pairs(grids) do
@@ -83,18 +81,18 @@ newTalent{
 						local effect = rng.range(1, 3)
 						if effect == 1 then
 							-- confusion
-							if target:canBe("confusion") and not target:hasEffect(target.EFF_GLOOM_CONFUSED) then
-								target:setEffect(target.EFF_GLOOM_CONFUSED, 2, {power=70})
+							if target:canBe("confusion") then
+								target:setEffect(target.EFF_GLOOM_CONFUSED, tGloom.getDuration(self, t), {power=30})
 							end
 						elseif effect == 2 then
 							-- stun
-							if target:canBe("stun") and not target:hasEffect(target.EFF_GLOOM_STUNNED) then
-								target:setEffect(target.EFF_GLOOM_STUNNED, 2, {})
+							if target:canBe("stun") then
+								target:setEffect(target.EFF_GLOOM_STUNNED, tGloom.getDuration(self, t), {})
 							end
 						elseif effect == 3 then
 							-- slow
-							if target:canBe("slow") and not target:hasEffect(target.EFF_GLOOM_SLOW) then
-								target:setEffect(target.EFF_GLOOM_SLOW, 2, {power=0.3})
+							if target:canBe("slow") then
+								target:setEffect(target.EFF_GLOOM_SLOW, tGloom.getDuration(self, t), {power=0.3})
 							end
 						end
 					end
@@ -114,32 +112,19 @@ newTalent{
 						target:setEffect(target.EFF_DISMAYED, tDismay.getDuration(self, tDismay), {})
 					end
 
-					-- Life Leech
-					--if tLifeLeech and self:getTalentLevel(tLifeLeech) > 0 and target:checkHit(mindpower, target:combatMentalResist(), 5, 95, 15) then
-					--	local damage = tLifeLeech.getDamage(self, tLifeLeech)
-					--	local actualDamage = DamageType:get(DamageType.LIFE_LEECH).projector(self, target.x, target.y, DamageType.LIFE_LEECH, damage)
-					--	lifeLeeched = lifeLeeched + actualDamage
-					--end
 				end
 			end
 		end
 
-		-- life leech
-		--if lifeLeeched > 0 then
-		--	lifeLeeched = math.min(lifeLeeched, tLifeLeech.getMaxHeal(self, tLifeLeech))
-		--	local temp = self.healing_factor
-		--	self.healing_factor = 1
-		--	self:heal(lifeLeeched)
-		--	self.healing_factor = temp
-		--	game.logPlayer(self, "#F53CBE#You leech %0.1f life from your foes.", lifeLeeched)
-		--end
 	end,
 	info = function(self, t)
 		local chance = t.getChance(self, t)
 		local duration = t.getDuration(self, t)
 		local mindpowerChange = gloomTalentsMindpower(self)
-		return ([[A terrible gloom surrounds you, affecting all those who approach to within radius 3. Each turn, those caught in your gloom must save against your Mindpower, or have an %d%% chance to suffer from slowness, stun or confusion for %d turns.
-		This ability is innate, and carries no cost to activate or deactivate. Each point in Gloom increases the mindpower of all gloom effects (current: %+d).]]):format(chance, duration, mindpowerChange)
+		return ([[A terrible gloom surrounds you, affecting all those who approach to within radius 3. At the end of each turn, those caught in your gloom must save against your Mindpower, or have a %d%% chance to suffer from slowness (30%%), stun or confusion (30%%) for %d turns.
+		The chance increases with your mind speed.
+		This ability is innate, and carries no cost to activate or deactivate.
+		Each point in Gloom talents increases your Mindpower (current total: %d).]]):format(chance, duration, mindpowerChange)
 	end,
 }
 
@@ -149,7 +134,7 @@ newTalent{
 	mode = "passive",
 	require = cursed_wil_req2,
 	points = 5,
-	getChance = function(self, t) return self:combatLimit(self:getTalentLevel(t)^.5, 100, 7, 1, 15.65, 2.23) end, -- Limit < 100%
+	getChance = function(self, t) return math.min(25, self:combatScale(self:getTalentLevel(t), 7, 1, 15, 6.5) * math.max(1, self:combatScale(self.combat_mindspeed, 1, 1, 1.35, 1.5))) end,
 	getDuration = function(self, t)
 		return 3
 	end,
@@ -163,50 +148,44 @@ newTalent{
 		local incDamageChange = t.getIncDamageChange(self, t)
 		local hateBonus = t.getHateBonus(self, t)
 		local mindpowerChange = gloomTalentsMindpower(self)
-		return ([[Each turn, those caught in your gloom must save against your Mindpower, or have an %d%% chance to be crippled by fear for %d turns, reducing damage they inflict by %d%%. The first time you melee strike a foe after they have been weakened will give you %d hate.
-		Each point in Weakness increases the Mindpower of all gloom effects (current: %+d).]]):format(chance, duration, -incDamageChange, hateBonus, mindpowerChange)
+		return ([[Each turn, those caught in your gloom must save against your Mindpower, or have a %d%% chance to be crippled by fear for %d turns, reducing damage they inflict by %d%%. The first time you melee strike a foe after they have been weakened will give you %d hate.
+		The chance increases with your mind speed.
+		Each point in Gloom talents increases your Mindpower (current total: %d).]]):format(chance, duration, -incDamageChange, hateBonus, mindpowerChange)
 	end,
 }
 
 newTalent{
-	name = "Dismay",
+	name = "Mindrot",
+	image = "talents/dismay.png",
 	type = {"cursed/gloom", 3},
 	mode = "passive",
 	require = cursed_wil_req3,
 	points = 5,
-	getChance = function(self, t) return self:combatLimit(self:getTalentLevel(t)^.5, 100, 3.5, 1, 7.83, 2.23) end, -- Limit < 100%
-	getDuration = function(self, t)
-		return 3
+	getDamage = function(self, t) return self:combatTalentMindDamage(t, 3, 35) end,
+	radius = function(self, t) return 3 end,
+	target = function(self, t)
+		return {type="ball", radius=self:getTalentRadius(t), friendlyfire=false, talent=t}
+	end,
+	hasFoes = function(self)
+		for i = 1, #self.fov.actors_dist do
+			local act = self.fov.actors_dist[i]
+			if act and self:reactionToward(act) < 0 then return true end
+		end
+		return false
+	end,
+	callbackOnActEnd = function(self, t)
+		if self:isTalentActive(self.T_GLOOM) and t.hasFoes(self) then
+			local tg = self:getTalentTarget(t)
+			self:projectSource(tg, self.x, self.y, DamageType.MIND, self:mindCrit(t.getDamage(self, t) * 0.5), nil, t)
+			self:projectSource(tg, self.x, self.y, DamageType.DARKNESS, self:mindCrit(t.getDamage(self, t) * 0.5), nil, t)
+		end
 	end,
 	info = function(self, t)
-		local chance = t.getChance(self, t)
-		local duration = t.getDuration(self, t)
-		local mindpowerChange = gloomTalentsMindpower(self)
-		return ([[Each turn, those caught in your gloom must save against your Mindpower or have an %0.1f%% chance of becoming dismayed for %d turns. When dismayed, the first melee attack against the foe will result in a critical hit.
-		Each point in Dismay increases the Mindpower of all gloom effects (current: %+d).]]):format(chance, duration, mindpowerChange)
+		return ([[Each turn, all enemies in your gloom take %0.2f mind damage and %0.2f darkness damage.
+		The damage scales with your Mindpower and mind speed.
+		Each point in Gloom talents increases your Mindpower (current total: %d).]]):format(damDesc(self, DamageType.MIND, t.getDamage(self, t) * 0.5), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t) * 0.5), gloomTalentsMindpower(self))
 	end,
 }
-
---newTalent{
---	name = "Life Leech",
---	type = {"cursed/gloom", 4},
---	mode = "passive",
---	require = cursed_wil_req4,
---	points = 5,
---	getDamage = function(self, t)
---		return combatTalentDamage(self, t, 2, 10)
---	end,
---	getMaxHeal = function(self, t)
---		return combatTalentDamage(self, t, 4, 25)
---	end,
---	info = function(self, t)
---		local damage = t.getDamage(self, t)
---		local maxHeal = t.getMaxHeal(self, t)
---		local mindpowerChange = self:getTalentLevelRaw(self.T_GLOOM) + self:getTalentLevelRaw(self.T_WEAKNESS) + self:getTalentLevelRaw(self.T_DISMAY) + self:getTalentLevelRaw(self.T_LIFE_LEECH)
---		return ([[Each turn, those caught in your gloom must save against your mindpower or have %0.1f life leeched from them. Life leeched in this way will restore up to a total of %0.1f of your own life per turn. This form of healing is unaffected by healing modifiers.
---		Each point in Life Leech increases the mindpower of all gloom effects (current: %+d).]]):format(damage, maxHeal, mindpowerChange)
---	end,
---}
 
 newTalent{
 	name = "Sanctuary",
@@ -221,6 +200,6 @@ newTalent{
 		local damageChange = t.getDamageChange(self, t)
 		local mindpowerChange = gloomTalentsMindpower(self)
 		return ([[Your gloom has become a sanctuary from the outside world. Damage from any attack that originates beyond the boundary of your gloom is reduced by %d%%.
-		Each point in Sanctuary increases the Mindpower of all gloom effects (current: %+d).]]):format(-damageChange, mindpowerChange)
+		Each point in Gloom talents increases your Mindpower (current total: %d).]]):format(-damageChange, mindpowerChange)
 	end,
 }

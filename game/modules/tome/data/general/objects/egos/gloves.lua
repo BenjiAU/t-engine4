@@ -186,8 +186,7 @@ newEntity{
 		resists = { [DamageType.LIGHT] = resolvers.mbonus_material(10, 5), },
 		melee_project= { [DamageType.LIGHT] = resolvers.mbonus_material(15, 5) },
 		combat = {
-			melee_project= { [DamageType.ITEM_LIGHT_BLIND] = resolvers.mbonus_material(10, 5) },
-			--talent_on_hit = { [Talents.T_SEARING_LIGHT] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=20} },
+			talent_on_hit = { [Talents.T_SEARING_LIGHT] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=20} },
 		},
 	},
 }
@@ -267,7 +266,7 @@ newEntity{
 	cost = 4,
 	wielder = {
 		max_stamina = resolvers.mbonus_material(30, 10),
-		life_regen = resolvers.mbonus_material(30, 10, function(e, v) v=v/10 return 0, v end),
+		life_regen = resolvers.mbonus_material(10, 1, function(e, v) return 0, v end),
 		stamina_regen = resolvers.mbonus_material(15, 5, function(e, v) v=v/10 return 0, v end),
 		combat = {
 			talent_on_hit = { [Talents.T_SLUMBER] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
@@ -548,6 +547,7 @@ newEntity{
 	},
 }
 
+--[[ Temp disable prior finding something interesting to put here
 newEntity{
 	power_source = {arcane=true},
 	name = " of dispersion", suffix=true, instant_resolve=true,
@@ -556,7 +556,7 @@ newEntity{
 	greater_ego = 1,
 	rarity = 35,
 	cost = 70,
-	resolvers.charmt(Talents.T_DISPERSE_MAGIC, 3, 20),
+	--resolvers.charmt(Talents.T_DISPERSE_MAGIC, 3, 20),
 	wielder = {
 		resists={
 			[DamageType.ARCANE] = resolvers.mbonus_material(7, 3),
@@ -573,7 +573,7 @@ newEntity{
 			talent_on_hit = { [Talents.T_MANATHRUST] = {level=3, chance=10} },
 		},
 	},
-}
+}]]
 
 newEntity{
 	power_source = {nature=true},
@@ -608,7 +608,7 @@ newEntity{
 		melee_project = {
 			[DamageType.MIND] = resolvers.mbonus_material(30, 10),
 			[DamageType.DARKNESS] = resolvers.mbonus_material(30, 10),
-			[DamageType.ITEM_MIND_GLOOM] = resolvers.mbonus_material(15, 10),
+			[DamageType.ITEM_MIND_EXPOSE] = resolvers.mbonus_material(15, 10),
 		},
 		combat = {
 			 talent_on_hit = { [Talents.T_REPROACH] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },

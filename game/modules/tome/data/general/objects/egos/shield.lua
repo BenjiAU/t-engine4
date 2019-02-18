@@ -165,7 +165,7 @@ newEntity{
 		burst_on_hit={[DamageType.FIRE] = resolvers.mbonus_material(10, 10)},
 	},
 	wielder = {
-		on_melee_hit={[DamageType.FIRE] = resolvers.mbonus_material(10, 10)},
+		on_melee_hit={[DamageType.FIRE] = resolvers.mbonus_material(20, 1)},
 		melee_project={
 			[DamageType.FIRE] = resolvers.mbonus_material(5, 5),
 	},
@@ -177,15 +177,12 @@ newEntity{
 	name = "icy ", prefix=true, instant_resolve=true,
 	keywords = {icy=true},
 	level_range = {10, 50},
-	rarity = 8,
+	rarity = 20,
 	cost = 10,
-	special_combat = {
-		melee_project={[DamageType.COLD] = resolvers.mbonus_material(10, 10)},
-	},
 	wielder = {
-		on_melee_hit={[DamageType.ICE] = resolvers.mbonus_material(10, 10)},
+		on_melee_hit={[DamageType.ICE] = resolvers.mbonus_material(20, 1)},
 		melee_project={
-			[DamageType.COLD] = resolvers.mbonus_material(5, 5),
+			[DamageType.COLD] = resolvers.mbonus_material(30, 5),
 	},
 	},
 }
@@ -196,13 +193,10 @@ newEntity{
 	level_range = {10, 50},
 	rarity = 8,
 	cost = 8,
-	special_combat = {
-		melee_project={[DamageType.ITEM_LIGHTNING_DAZE] = resolvers.mbonus_material(25, 10)},
-	},
 	wielder = {
-		on_melee_hit={[DamageType.LIGHTNING] = resolvers.mbonus_material(20, 10)},
+		on_melee_hit={[DamageType.LIGHTNING] = resolvers.mbonus_material(20, 1)},
 		melee_project={
-			[DamageType.LIGHTNING] = resolvers.mbonus_material(5, 5),
+			[DamageType.LIGHTNING] = resolvers.mbonus_material(30, 5),
 	},
 	},
 }
@@ -218,7 +212,7 @@ newEntity{
 		melee_project={[DamageType.ITEM_ACID_CORRODE] = resolvers.mbonus_material(20, 10)},
 	},
 	wielder = {
-		on_melee_hit={[DamageType.ACID] = resolvers.mbonus_material(25, 10)},
+		on_melee_hit={[DamageType.ACID] = resolvers.mbonus_material(20, 1)},
 		melee_project={
 			[DamageType.ACID] = resolvers.mbonus_material(5, 5),
 	},
@@ -232,15 +226,15 @@ newEntity{
 -- This is close to strictly better than the others in this category so it gets a higher rarity/level req
 newEntity{
 	power_source = {psionic=true},
-	name = "gloomy ", prefix=true, instant_resolve=true,
-	keywords = {gloomy=true},
-	level_range = {30, 50},
+	name = "exposing ", prefix=true, instant_resolve=true,
+	keywords = {exposing=true},
+	level_range = {10, 50},
 	rarity = 25,
 	cost = 12,
 	wielder = {
-		on_melee_hit={[DamageType.ITEM_MIND_GLOOM] = resolvers.mbonus_material(25, 10)},
+		on_melee_hit={[DamageType.ITEM_MIND_EXPOSE] = resolvers.mbonus_material(25, 10)},
 		melee_project={
-			[DamageType.ITEM_MIND_GLOOM] = resolvers.mbonus_material(10, 5),
+			[DamageType.ITEM_MIND_EXPOSE] = resolvers.mbonus_material(10, 5),
 	},
 	},
 }
@@ -267,7 +261,7 @@ newEntity{
 			[Stats.STAT_STR] = resolvers.mbonus_material(5, 1),
 		},
 		on_melee_hit = {
-			[DamageType.FIRE] = resolvers.mbonus_material(30, 10),
+			[DamageType.FIRE] = resolvers.mbonus_material(30, 1),
 		},
 	},
 }
@@ -293,7 +287,7 @@ newEntity{
 			[Stats.STAT_DEX] = resolvers.mbonus_material(5, 1),
 		},
 		on_melee_hit = {
-			[DamageType.ITEM_LIGHTNING_DAZE] = resolvers.mbonus_material(10, 10),
+			--[DamageType.ITEM_LIGHTNING_DAZE] = resolvers.mbonus_material(10, 10),
 		},
 	},
 }
@@ -324,13 +318,13 @@ newEntity{
 	},
 }
 
--- Much like Gloom this is better than any of the others and has the strictest reqs
 newEntity{
 	power_source = {nature=true},
-	name = "wintry ", prefix=true, instant_resolve=true,
+	name = " of winter", suffix=true, instant_resolve=true,
 	keywords = {wintry=true},
-	level_range = {30, 50},
+	level_range = {10, 50},
 	greater_ego = 1,
+	unique_ego = 1,
 	rarity = 30,
 	cost = 60,
 	special_combat = {
@@ -345,12 +339,31 @@ newEntity{
 		inc_stats = {
 			[Stats.STAT_WIL] = resolvers.mbonus_material(5, 1),
 		},
-		on_melee_hit = {
-			[DamageType.ICE] = resolvers.mbonus_material(10, 10),
-		},
+	},
+	on_block = {
+		desc=function(self, who, special)
+			local dam = special.shield_wintry(who)
+			return ("Deals #ORCHID#%d#LAST# cold damage and freezes enemies in radius 4 to the ground for 3 turns (1/turn)"):format(dam)
+		end,
+		shield_wintry=function(who)
+			local dam = math.floor(who:combatStatScale(who:combatSpellpower(), 10, 200))
+			return dam
+		end,
+		fct=function(self, who, target, type, dam, eff, special)
+			local DamageType = require "engine.DamageType"
+			if who.turn_procs and who.turn_procs.shield_wintry then return end
+			who.turn_procs.shield_wintry = true
+			
+			local dam = special.shield_wintry(who)
+			local damage = who:spellCrit(dam)
+			local check = math.max(who:combatSpellpower(), who:combatMindpower(), who:combatAttack())
+			local tg = {type="ball", range=0, radius=4, selffire=false, friendlyfire=false}
+			local grids = who:project(tg, who.x, who.y, DamageType.COLDNEVERMOVE, {dur=3, dam=dam, apply_power = check})
+			game.level.map:particleEmitter(who.x, who.y, tg.radius, "circle", {oversize=1.1, a=255, limit_life=16, grow=true, speed=0, img="ice_nova", radius=tg.radius})
+			game:playSoundNear(self, "talents/ice")
+		end,			
 	},
 }
-
 
 ----------------------------------------------------------------
 -- Lesser Misc
@@ -366,7 +379,7 @@ newEntity{
 		block = resolvers.mbonus_material(80, 20),
 	},
 	wielder = {
-		combat_armor = resolvers.mbonus_material(8, 4),
+		combat_armor = resolvers.mbonus_material(10, 1),
 	},
 }
 
@@ -379,19 +392,6 @@ newEntity{
 	cost = 10,
 	wielder = {
 		max_life=resolvers.mbonus_material(60, 40),
-	},
-}
-
-newEntity{
-	power_source = {technique=true},
-	name = "deflecting ", prefix=true, instant_resolve=true,
-	keywords = {deflection=true},
-	level_range = {10, 50},
-	rarity = 10,
-	cost = 10,
-	wielder = {
-		combat_def=resolvers.mbonus_material(11, 4),
-		projectile_evasion=resolvers.mbonus_material(15, 4),
 	},
 }
 
@@ -417,9 +417,6 @@ newEntity{
 			[DamageType.BLIGHT] = resolvers.mbonus_material(10, 10),
 		},
 		max_life = resolvers.mbonus_material(70, 40),
-		on_melee_hit = {
-			[DamageType.NATURE] = resolvers.mbonus_material(10, 10),
-		},
 	},
 }
 
@@ -452,8 +449,8 @@ newEntity{
 	power_source = {arcane=true},
 	name = "warded ", prefix=true, instant_resolve=true,
 	keywords = {ward=true},
-	level_range = {30, 50},
-	rarity = 15,
+	level_range = {10, 50},
+	rarity = 40,
 	greater_ego = 1,
 	cost = 5,
 	special_combat = {
@@ -466,11 +463,16 @@ newEntity{
 	},
 	wielder = {
 		wards = {
-			[DamageType.FIRE] = resolvers.mbonus_material(5, 1),
-			[DamageType.COLD] = resolvers.mbonus_material(5, 1),
-			[DamageType.LIGHTNING] = resolvers.mbonus_material(5, 1),
-			[DamageType.TEMPORAL] = resolvers.mbonus_material(5, 1),
-			[DamageType.BLIGHT] = resolvers.mbonus_material(5, 1),
+			-- Non-phys
+			[DamageType.FIRE] = resolvers.mbonus_material(5, 3),
+			[DamageType.COLD] = resolvers.mbonus_material(5, 3),
+			[DamageType.LIGHTNING] = resolvers.mbonus_material(5, 3),
+			[DamageType.TEMPORAL] = resolvers.mbonus_material(5, 3),
+			[DamageType.BLIGHT] = resolvers.mbonus_material(5, 3),
+			[DamageType.ARCANE] = resolvers.mbonus_material(5, 3),
+			[DamageType.DARKNESS] = resolvers.mbonus_material(5, 3),
+			[DamageType.LIGHT] = resolvers.mbonus_material(5, 3),
+			[DamageType.NATURE] = resolvers.mbonus_material(5, 3),
 		},
 		learn_talent = {[Talents.T_WARD] = 1},
 	},
@@ -478,43 +480,52 @@ newEntity{
 
 newEntity{
 	power_source = {arcane=true},
-	name = "cosmic ", prefix=true, instant_resolve=true,
-	keywords = {cosmic=true},
-	level_range = {30, 50},
+	name = "wrathful ", prefix=true, instant_resolve=true,
+	keywords = {wrathful=true},
+	level_range = {10, 50},
 	greater_ego = 1,
+	unique_ego = 1,
 	rarity = 20,
 	cost = 60,
-	special_combat = {
+	special_combat = {  -- Aggressive values are safe even at L10 because this is on crit
 		burst_on_crit={
+			[DamageType.FIRE] = resolvers.mbonus_material(30, 10),
 			[DamageType.LIGHT] = resolvers.mbonus_material(30, 10),
-			[DamageType.DARKNESS] = resolvers.mbonus_material(30, 10),
 		},
 	},
 	wielder = {
 		resists={
+			[DamageType.FIRE] = resolvers.mbonus_material(10, 5),
 			[DamageType.LIGHT] = resolvers.mbonus_material(10, 5),
-			[DamageType.DARKNESS] = resolvers.mbonus_material(10, 5),
 		},
 	},
-	on_block = {desc = "Unleash the fury of the cosmos, dealing light and darkness damage to your attackers", fct = function(self, who, target, type, dam, eff)
+	on_block = {
+		desc=function(self, who, special)
+			local dam = special.shield_wrathful(who)
+			return ("Deals #ORCHID#%d#LAST# light and fire damage to each enemy blocked"):format(dam)
+		end,
+		shield_wrathful=function(who)
+			local dam = math.floor(who:combatStatScale(who:combatSpellpower(), 50, 450) / 2)
+			return dam
+		end,
+		fct=function(self, who, target, type, dam, eff, special)
 			if not target or target:attr("dead") or not target.x or not target.y then return end
-			if who.turn_procs and who.turn_procs.shield_cosmic and who.turn_procs.shield_cosmic[target.uid] then return end
+			if who.turn_procs and who.turn_procs.shield_wrathful and who.turn_procs.shield_wrathful[target.uid] then return end
 
 			-- Set this *before* damage or reflect/martyr avoids the limit
-			if not who.turn_procs.shield_cosmic then who.turn_procs.shield_cosmic = {} end
-			who.turn_procs.shield_cosmic[target.uid] = true
+			if not who.turn_procs.shield_wrathful then who.turn_procs.shield_wrathful = {} end
+			who.turn_procs.shield_wrathful[target.uid] = true
 			
+
 			local tg = {type="hit", range=10}
-			local damage = 50 -- Rescale me later
+			local dam = special.shield_wrathful(who)
+			local damage = who:spellCrit(dam)
 
-			who:project(tg, target.x, target.y, engine.DamageType.DARKNESS, damage)
+			who:project(tg, target.x, target.y, engine.DamageType.FIRE, damage)
 			who:project(tg, target.x, target.y, engine.DamageType.LIGHT, damage)
-			who:logCombat(target, "#Source# unleashes cosmic retribution at #Target#!")
-			
-
-	end,},
+		end,
+	},
 }
-
 
 newEntity{
 	power_source = {technique=true},
@@ -536,6 +547,24 @@ newEntity{
 	},
 }
 
+newEntity{
+	power_source = {technique=true},
+	name = "swashbuckler's ", prefix=true, instant_resolve=true,
+	keywords = {impervious=true},
+	level_range = {10, 50},
+	greater_ego = 1,
+	rarity = 18,
+	cost = 40,
+	wielder = {
+		combat_atk = resolvers.mbonus_material(20, 4),
+		inc_stats = {
+			[Stats.STAT_DEX] = resolvers.mbonus_material(12, 1),
+			[Stats.STAT_STR] = resolvers.mbonus_material(12, 1),
+		},
+	},
+}
+
+
 ----------------------------------------------------------------
 -- Greater Suffix
 ----------------------------------------------------------------
@@ -543,7 +572,7 @@ newEntity{
 	power_source = {nature=true},
 	name = " of resistance", suffix=true, instant_resolve=true,
 	keywords = {resistance=true},
-	level_range = {30, 50},
+	level_range = {10, 50},
 	greater_ego = 1,
 	rarity = 24,
 	cost = 20,
@@ -563,19 +592,12 @@ newEntity{
 	keywords = {patience=true},
 	level_range = {30, 50},
 	greater_ego = 1,
+	unique_ego = 1,
 	rarity = 30,
 	cost = 40,
 	resolvers.charmt(Talents.T_TIME_SHIELD, {2,3,4,5}, 30 ),
-	special_combat = {
-		melee_project={
-			[DamageType.TEMPORAL] = resolvers.mbonus_material(10, 10)
-		},
-	},
 	wielder = {
 		resists={
-			[DamageType.TEMPORAL] = resolvers.mbonus_material(10, 10),
-		},
-		on_melee_hit = {
 			[DamageType.TEMPORAL] = resolvers.mbonus_material(10, 10),
 		},
 	},
@@ -583,8 +605,8 @@ newEntity{
 
 newEntity{
 	power_source = {arcane=true},
-	name = " of radiance", suffix=true, instant_resolve=true,
-	keywords = {radiance=true},
+	name = " of the stars", suffix=true, instant_resolve=true,
+	keywords = {stars=true},
 	level_range = {10, 50},
 	rarity = 14,
 	greater_ego = 1,
@@ -592,18 +614,21 @@ newEntity{
 	special_combat = {
 		melee_project={
 			[DamageType.LIGHT] = resolvers.mbonus_material(10, 10),
+			[DamageType.DARKNESS] = resolvers.mbonus_material(10, 10),
 		},
 	},
 	wielder = {
 		resists={
 			[DamageType.LIGHT] = resolvers.mbonus_material(10, 10),
+			[DamageType.DARKNESS] = resolvers.mbonus_material(10, 10),
+		},
+		inc_damage={
+			[DamageType.LIGHT] = resolvers.mbonus_material(10, 10),
+			[DamageType.DARKNESS] = resolvers.mbonus_material(10, 10),
 		},
 		inc_stats = {
-			[Stats.STAT_MAG] = resolvers.mbonus_material(5, 1),
-			[Stats.STAT_CON] = resolvers.mbonus_material(4, 3),
-		},
-		on_melee_hit = {
-			[DamageType.ITEM_LIGHT_BLIND] = resolvers.mbonus_material(30, 10),
+			[Stats.STAT_MAG] = resolvers.mbonus_material(10, 1),
+			[Stats.STAT_CUN] = resolvers.mbonus_material(10, 1),
 		},
 	},
 }
@@ -615,21 +640,52 @@ newEntity{
 	keywords = {crushing=true},
 	level_range = {30, 50},
 	greater_ego = 1,
+	unique_ego = 1,
 	rarity = 18,
 	cost = 20,
 	special_combat = {
 		dam = resolvers.mbonus_material(5, 5),
-		-- Just a retheme of Crippling, most of the weapon egos aren't getting copied though
-		special_on_crit = {desc="smash the target with your shield crippling them", fct=function(combat, who, target)
-			target:setEffect(target.EFF_CRIPPLE, 4, {src=who, apply_power=who:combatAttack(combat)})
-		end},
+		special_on_crit = {
+			desc="Smash the target reducing mind, spell, and combat action speeds by 30%", 
+			fct=function(combat, who, target)
+				target:setEffect(target.EFF_CRIPPLE, 4, {src=who, apply_power=who:combatAttack(combat)})
+			end
+		},
 	},
-
 	wielder = {
-		combat_dam = resolvers.mbonus_material(5, 5),
-		combat_physcrit = resolvers.mbonus_material(3, 3),
+		combat_dam = resolvers.mbonus_material(10, 5),
+		combat_physcrit = resolvers.mbonus_material(15, 3),
 	},
+}
 
+newEntity{
+	power_source = {techniquee=true},
+	name = " of shrapnel", suffix=true, instant_resolve=true,
+	keywords = {shrapnel=true},
+	level_range = {10, 50},
+	greater_ego = 1,
+	unique_ego = 1,
+	rarity = 20,
+	cost = 60,
+	on_block = {
+		desc=function(self, who, special)
+			local dam = special.shield_shrapnel(who)
+			return ("Cause enemies within radius 6 to bleed for #RED#%d#LAST# physical damage over 5 turns (1/turn)"):format(dam)
+		end,
+		shield_shrapnel=function(who)
+			local dam = math.floor(who:combatStatScale(who:combatPhysicalpower(), 30, 250))
+			return dam
+		end,
+		fct=function(self, who, target, type, dam, eff, special)
+			if who.turn_procs and who.turn_procs.shield_shrapnel then return end
+			who.turn_procs.shield_shrapnel = true
+			game.logSeen(who, "Shards of metal explode from %s's shield!", who.name:capitalize())
+			local tg = {type="ball", friendlyfire=false, radius=6}
+			local dam = special.shield_shrapnel(who)
+			local damage = who:physicalCrit(dam)
+			local grids = who:project(tg, who.x, who.y, engine.DamageType.BLEED, damage)
+		end,
+	},
 }
 
 newEntity{
@@ -638,10 +694,16 @@ newEntity{
 	keywords = {earth=true},
 	level_range = {30, 50},
 	greater_ego = 1,
+	unique_ego = 1,
 	rarity = 25,
 	cost = 40,
 	special_combat = {
-		special_on_hit = {desc="deal bonus physical damage equal to your armor", fct=function(combat, who, target)
+		special_on_hit = {
+		desc=function(self, who, special)
+			local dam = who:combatArmor()
+			return ("deal bonus physical damage equal to your armor (%d)"):format(dam)
+		end,
+		fct=function(combat, who, target)
 			local tg = {type="hit", range=1}
 			local damage = who:combatArmor()
 			who:project(tg, target.x, target.y, engine.DamageType.PHYSICAL, damage)
@@ -649,9 +711,7 @@ newEntity{
 		},
 	},
 	wielder = {
-		combat_armor = resolvers.mbonus_material(10, 5),
-		combat_armor_hardiness = resolvers.mbonus_material(5, 5),
-		resists={[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 10)},
+		combat_armor = resolvers.mbonus_material(10, 1),
 	},
 }
 

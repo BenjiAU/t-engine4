@@ -153,20 +153,21 @@ newTalent{
 		end
 		return max_dam * 2 -- Maximum damage is 2x total mana pool
 	end,
-	on_pre_use = function(self, t) return (self:getMana() / self:getMaxMana() <= 0.25) or self:hasEffect(self.EFF_AETHER_AVATAR) or self:attr("disruption_shield") end,
+	on_pre_use = function(self, t) return (self:getMana() / self:getMaxMana() >= 0.25) or self:hasEffect(self.EFF_AETHER_AVATAR) or self:attr("disruption_shield") end,
 	explode = function(self, t, dam)
 		game.logSeen(self, "#VIOLET#%s's disruption shield collapses and then explodes in a powerful manastorm!", self.name:capitalize())
 		dam = math.min(dam, t.getMaxDamage(self, t)) -- Damage cap
 		-- Add a lasting map effect
-		self:setEffect(self.EFF_ARCANE_STORM, 10, {power=t.getArcaneResist(self, t)})
+		--self:setEffect(self.EFF_ARCANE_STORM, 10, {power=t.getArcaneResist(self, t)})
+		local radius = self:hasEffect(self.EFF_AETHER_AVATAR) and 10 or 3
 		game.level.map:addEffect(self,
 			self.x, self.y, 10,
 			DamageType.ARCANE, dam / 10,
-			3,
+			radius,
 			5, nil,
 			{type="arcanestorm", only_one=true},
 			function(e) e.x = e.src.x e.y = e.src.y return true end,
-			true
+			false
 		)
 	end,
 	damage_feedback = function(self, t, p, src)
@@ -184,6 +185,34 @@ newTalent{
 		if val >= 1000 then fnt = "buff_font_smaller" end
 		return tostring(math.ceil(val)), fnt
 	end,
+	callbackOnCombat = function(self, t, state)
+		if state == false then
+			self.disruption_shield_absorb = 0
+		end
+	end,
+	callbackOnHit = function(self, t, cb, src, dt)
+		local p = self:isTalentActive(t.id)
+		if not p then return end
+		if not (cb.value > 0) then return end
+		if self:reactionToward(src) > 0 then return end
+
+		local power = t.getManaRatio(self, t)
+		local max = self:getMana() / power
+		local amt = math.min(cb.value * 0.25, max)
+		local mana = power * amt
+		cb.value = cb.value - amt
+		self.disruption_shield_absorb = (self.disruption_shield_absorb or 0) + amt
+		self:incMana(-mana)
+
+		if self:getMana() / self:getMaxMana() <= 0.25 then 
+			local dam = self.disruption_shield_absorb
+
+			-- Deactivate without losing energy
+			self:forceUseTalent(self.T_DISRUPTION_SHIELD, {ignore_energy=true})
+		end
+		game:delayedLogDamage(src, self, 0, ("#PURPLE#(%d mana)#LAST#"):format(amt), false)
+		return true
+	end,
 	activate = function(self, t)
 		local power = t.getManaRatio(self, t)
 		self.disruption_shield_absorb = 0
@@ -198,23 +227,26 @@ newTalent{
 		end
 
 		return {
-			shield = self:addTemporaryValue("disruption_shield", power),
 			particle = particle,
 		}
 	end,
 	deactivate = function(self, t, p)
 		self:removeParticles(p.particle)
-		self:removeTemporaryValue("disruption_shield", p.shield)
+		local dam = self.disruption_shield_absorb
+
+		-- Explode!
+		local t = self:getTalentFromId(self.T_DISRUPTION_SHIELD)
+		t.explode(self, t, dam)
 		self.disruption_shield_absorb = nil
 		return true
 	end,
 	info = function(self, t)
-		return ([[Surround yourself with arcane forces, disrupting any attempts to harm you and instead generating mana.
-		Generates %0.2f mana per damage point taken (Aegis Shielding talent affects the ratio).
-		If your mana is brought too high by the shield, it will de-activate and the chain reaction will release a deadly arcane storm around you with radius 3 for 10 turns, dealing 10%% of the damage absorbed over the sustain's duration each turn, up to a maximum of %d total damage.
-		While the arcane storm rages, you also get %d%% arcane resistance.
-		Only usable when below 25%% mana.
-		The damage to mana ratio increases with your Spellpower.]]):
-		format(t.getManaRatio(self, t), t.getMaxDamage(self, t), t.getArcaneResist(self, t))
+		local radius = self:hasEffect(self.EFF_AETHER_AVATAR) and 10 or 3
+		return ([[Surround yourself with arcane forces, disrupting any attempts to harm you and instead redirecting it to your mana.
+		25%% of all damage taken is redirected to your mana at a ratio of %0.2f mana per damage.  Damage shield bonuses will reduce this cost.
+		If your mana is brought below 25%% by the shield, it will de-activate and the chain reaction will release a deadly arcane storm around you with radius %d for 10 turns, dealing 10%% of the damage absorbed each turn, up to a maximum of %d total damage.
+		Dropping below 25%% mana will automatically deactivate this talent.
+		The mana to damage ratio improves with your Spellpower.]]):
+		format(t.getManaRatio(self, t), radius, damDesc(self, DamageType.ARCANE, t.getMaxDamage(self, t)))
 	end,
 }

@@ -33,7 +33,7 @@ newEntity{
 	metallic = true,
 	wielder={combat = {accuracy_effect = "mace"},},
 	desc = [[Metal gloves protecting the hands up to the middle of the lower arm.]],
-	randart_able = "/data/general/objects/random-artifacts/gloves.lua",
+	randart_able = "/data/general/objects/random-artifacts/generic.lua",
 	egos = "/data/general/objects/egos/gloves.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 }
 

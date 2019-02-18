@@ -382,6 +382,7 @@ end
 -- @param data.nb_powers_add = #extra random powers to add <0>
 -- @param data.powers_special = function(p) that must return true on each random power to add (from base.randart_able)
 -- @param data.nb_themes = #power themes (power groups) for random powers to use <scales to 5 with lev>
+-- @param data.nb_themes_add = #extra power themes to add <0>
 -- @param data.force_themes = additional power theme(s) to use for random powers = {"attack", "arcane", ...}
 -- @param data.egos = total #egos to include (forced + random) <3>
 -- @param data.greater_egos_bias = #egos that should be greater egos <2/3 * data.egos>
@@ -428,9 +429,11 @@ function _M:generateRandart(data)
 	-- Pick Themes
 	-----------------------------------------------------------
 	local nb_themes = data.nb_themes
+	local nb_themes_add = data.nb_themes_add or 0
 	if not nb_themes then -- Gradually increase number of themes at higher levels so there are enough powers to spend points on
 		nb_themes = math.max(2,5*lev/(lev+50)) -- Maximum 5 themes possible
 		nb_themes= math.floor(nb_themes) + (rng.percent((nb_themes-math.floor(nb_themes))*100) and 1 or 0)
+		nb_themes = math.min(5, nb_themes + nb_themes_add)
 	end
 	-- update power sources and themes lists based on base object properties
 	local psource
@@ -603,6 +606,8 @@ function _M:generateRandart(data)
 	-----------------------------------------------------------
 	-- Imbue random powers into the randart according to themes
 	-----------------------------------------------------------
+	-- Note:  The same power can be selected twice for both the base power list as well as the bias power list, this will lead to wasted points very easily at low theme/high power point counts
+	local max_reached = false
 	local function merger(d, e, k, dst, src, rules, state) --scale: factor to adjust power limits for levels higher than 50
 		if (not state.path or #state.path == 0) and not state.copy then
 			if k == "copy" then -- copy into root
@@ -616,11 +621,13 @@ function _M:generateRandart(data)
 			d.max = e.max
 			if e.max < 0 then
 				if d.v < e.max * scale then --Adjust maximum values for higher levels
-					d.v = math.floor(e.max * scale)
+					d.v = e.max * scale
+					max_reached = true
 				end
 			else
 				if d.v > e.max * scale then --Adjust maximum values for higher levels
-					d.v = math.floor(e.max * scale)
+					d.v = e.max * scale
+					max_reached = true
 				end
 			end
 			return true
@@ -637,9 +644,16 @@ function _M:generateRandart(data)
 		local p = powers[i]
 		if p and p.points <= hpoints*2 then -- Intentionally allow the budget to be exceeded slightly to guarantee powers at low levels
 			local state = {scaleup = math.max(1,(lev/(p.level_range[2] or 50))^0.5)} --Adjust scaleup factor for each power based on lev and level_range max
-		print(" * adding power: "..p.name.."("..p.points.." points)")
+			print(" * adding power: "..p.name.."("..p.points.." points), "..hpoints.." remaining")
 			selected_powers[p.name] = selected_powers[p.name] or {}
 			table.ruleMergeAppendAdd(selected_powers[p.name], p, {merger}, state)
+			if max_reached or p.unique then
+				print("Removing power from the list, ", p.name, "==", powers[i], "remaining:")
+				for i, v in ripairs(powers) do
+					if v.name == p.name then table.remove(powers, i) end
+				end
+				max_reached = false
+			end
 			hpoints = hpoints - p.points 
 			p.points = p.points * 1.5 --increased cost (=diminishing returns) on extra applications of the same power
 		else
@@ -657,15 +671,21 @@ function _M:generateRandart(data)
 	fails = 0 
 	while hpoints > 0 and fails <= #bias_powers do
 		i = util.boundWrap(i + 1, 1, #bias_powers)
-
 		local p = bias_powers[i] and bias_powers[i]
 		if p and p.points <= hpoints * 2 then
 			local state = {scaleup = math.max(1,(lev/(p.level_range[2] or 50))^0.5)} --Adjust scaleup factor for each power based on lev and level_range max
---			print(" * adding bias power: "..p.name.."("..p.points.." points)")
+			print(" * adding bias power: "..p.name.."("..p.points.." points), "..hpoints.." remaining")
 			selected_powers[p.name] = selected_powers[p.name] or {}
 			table.ruleMergeAppendAdd(selected_powers[p.name], p, {merger}, state)
+			if max_reached or p.unique then
+				print("Removing power from bias list , ", p.name)
+				for i, v in ripairs(bias_powers) do
+					if v.name == p.name then table.remove(bias_powers, i) end
+				end
+				max_reached = false
+			end
 			hpoints = hpoints - p.points
-			p.points = p.points * 1.5 --increased cost (=diminishing returns) on extra applications of the same power
+			p.points = p.points * 1.2 --increased cost (=diminishing returns) on extra applications of the same power, but less on the biased powers
 		else
 			fails = fails + 1
 		end
@@ -698,33 +718,6 @@ function _M:generateRandart(data)
 		if not next(ps) then ps = {unknown = true} end
 		print(" * using implied power source(s) ", table.concat(table.keys(ps), ','))
 		o.power_source = ps
-	end
-
-	-- Assign weapon damage
-	if o.combat and not (o.subtype == "staff" or o.subtype == "mindstar" or o.fixed_randart_damage_type) then
-		local theme_map = {
-			physical = engine.DamageType.PHYSICAL,
-			--mental = engine.DamageType.MIND,
-			fire = engine.DamageType.FIRE,
-			lightning = engine.DamageType.LIGHTNING,
-			acid = engine.DamageType.ACID,
-			mind = engine.DamageType.MIND,
-			arcane = engine.DamageType.ARCANE,
-			blight = engine.DamageType.BLIGHT,
-			nature = engine.DamageType.NATURE,
-			temporal = engine.DamageType.TEMPORAL,
-			light = engine.DamageType.LIGHT,
-			dark = engine.DamageType.DARK,
-		}
-
-		local pickDamtype = function(themes_list)
-			if not rng.percent(18) then return engine.DamageType.PHYSICAL end
-				for k, v in pairs(themes_list) do
-					if theme_map[k] then return theme_map[k] end
-				end
-			return engine.DamageType.PHYSICAL
-		end
-		o.combat.damtype = pickDamtype(themes)
 	end
 
 	o.display = display
@@ -1590,7 +1583,7 @@ function _M:entityFilterPost(zone, level, type, e, filter)
 				post = function(b, data)
 					-- Drop
 					for i = 1, data.nb_rares do -- generate rares as weak (1 ego) randarts with more and stronger powers
-						local fil = {lev=lev, egos=1, greater_egos_bias = 0, power_points_factor = 3, nb_powers_add = 2, forbid_power_source=b.not_power_source,
+						local fil = {lev=lev, egos=1, greater_egos_bias = 0, power_points_factor = 3, nb_themes_add = 1, nb_powers_add = 2, forbid_power_source=b.not_power_source,
 							base_filter = {no_tome_drops=true, ego_filter={keep_egos=true, ego_chance=-1000}, 
 							special=function(e)
 								return (not e.unique and e.randart_able) and (not e.material_level or e.material_level >= 1) and true or false
@@ -1675,8 +1668,18 @@ function _M:egoFilter(zone, level, type, etype, e, ego_filter, egos_list, picked
 		fcts[#fcts+1] = function(ego) return not ego.power_source or not ego.power_source.arcane end
 	end
 
+	-- If unique_ego is a string it represents a category a single item can only have 1 ego from, this is useful for stuff that overwrites each other like item actives, etc
+	-- If unique_ego is a non-string we just prevent it from being applied to the same item twice
 	if unique_check then
-		fcts[#fcts+1] = function(ego) 
+		fcts[#fcts+1] = function(ego)
+			if _G.type(ego.unique_ego) == "string" then
+				for k,v in pairs(e.ego_list) do
+					if v and v[1] and v[1].unique_ego and v[1].unique_ego == ego.unique_ego then
+						return false 
+					end
+				end
+			end
+
 			-- Use keywords as a proxy for name, a bit simpler than going through Object.ego_list
 			for k,v in pairs(ego.keywords) do
 				if e.keywords and e.keywords[k] then return false end

@@ -385,13 +385,14 @@ newEntity{ base = "BASE_HELM",
 
 	wielder = {
 		resists = {
+			[DamageType.PHYSICAL] = 15,
 			[DamageType.FIRE] = 15,
 			[DamageType.COLD] = 15,
 			[DamageType.ACID] = 15,
 			[DamageType.LIGHTNING] = 15,
 		},
 		esp = {dragon=1},
-		combat_armor = 2,
+		combat_armor = 20,
 		fatigue = 12,
 		combat_physresist = 12,
 		combat_mentalresist = 12,
@@ -811,18 +812,38 @@ newEntity{ base = "BASE_AMULET",
 		combat_spellpower = 5,
 		combat_dam = 5,
 	},
+	on_takeoff = function(self)
+		if self.summoned_vampire then self.summoned_vampire:die() end
+		self.summoned_vampire = nil
+	end,
 	max_power = 60, power_regen = 1,
-	use_power = { name = "summon an elder vampire to your side for 15 turns", power = 60, use = function(self, who)
+	use_power = { name = "summon an elder vampire with Taunt to your side for 15 turns", power = 60, use = function(self, who)
 		if not who:canBe("summon") then game.logPlayer(who, "You cannot summon; you are suppressed!") return end
 
-		-- Find space
-		local x, y = util.findFreeGrid(who.x, who.y, 5, true, {[engine.Map.ACTOR]=true})
+		local tg = {type="ball", radius=10, friendlyfire=false, selffire=false}
+		local tgts = {}
+		who:project(tg, who.x, who.y, function(px, py) 
+			local target = game.level.map(px, py, engine.Map.ACTOR)
+			if target then tgts[#tgts+1] = target end
+		end)
+
+		local target = rng.tableRemove(tgts)
+		if not target then
+			game.logPlayer(who, "You need an enemy nearby to summon!")
+			return
+		end
+
+		local x, y = util.findFreeGrid(target.x, target.y, 10, true, {[engine.Map.ACTOR]=true})
 		if not x then
-			game.logPlayer(who, "Not enough space to invoke the vampire!")
+			game.logPlayer(who, "Not enough space to summon!")
 			return
 		end
 		print("Invoking guardian on", x, y)
 		game.logSeen(who, "%s taps %s %s, summoning a vampire thrall!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color=true}))
+		
+		-- No gear melee that forces things to attack it, we have to do some work to make this useful..
+		-- Worse, we need to be able to beat accuracy and ppower checks to land our talents, but scaling off our source on an item is bad for those
+		-- Better to let level handle most of the scaling then
 		local NPC = require "mod.class.NPC"
 		local vampire = NPC.new{
 			type = "undead", subtype = "vampire",
@@ -830,45 +851,68 @@ newEntity{ base = "BASE_AMULET",
 			name = "elder vampire", color=colors.RED,
 			desc=[[A terrible robed undead figure, this creature has existed in its unlife for many centuries by stealing the life of others. It can summon the very shades of its victims from beyond the grave to come enslaved to its aid.]],
 
-			combat = { dam=resolvers.rngavg(9,13), atk=10, apr=9, damtype=engine.DamageType.DRAINLIFE, dammod={str=1.9} },
+			combat = { dam=resolvers.levelup(80, 1, 4), atk=10, apr=who.level / 2, damtype=engine.DamageType.DRAINLIFE, dammod={str=1.9} },
+			combat_atk = resolvers.levelup(1, 1, 4),
+			combat_dam = resolvers.levelup(1, 1, 4),
 
 			body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1 },
 
 			autolevel = "warriormage",
-			ai = "summoned", ai_real = "dumb_talented_simple", ai_state = { talent_in=3, },
+
+			ai = "summoned", ai_real = "tactical", ai_state = { talent_in=1, },
 			stats = { str=12, dex=12, mag=12, con=12 },
 			life_regen = 3,
+			life_rating = 14,
 			size_category = 3,
 			rank = 3,
 			infravision = 10,
 
 			inc_damage = table.clone(who.inc_damage, true),
+			resists_pen = table.clone(who.resists_pen, true),
 
-			resists = { [engine.DamageType.COLD] = 80, [engine.DamageType.NATURE] = 80, [engine.DamageType.LIGHT] = -50,  },
+			resists = { all = math.min(who.level / 2, 40), [engine.DamageType.COLD] = 80, [engine.DamageType.NATURE] = 80, [engine.DamageType.LIGHT] = -50,  },
 			blind_immune = 1,
 			confusion_immune = 1,
 			see_invisible = 5,
 			undead = 1,
 
-			level_range = {25, who.max_level}, exp_worth = 0,
+			level_range = {1, who.level}, exp_worth = 0,
 			max_life = resolvers.rngavg(90,100),
-			combat_armor = 12, combat_def = 10,
+			combat_armor = 12 + who.level / 2, combat_def = who.level,
+			combat_armor_hardiness = 20,  -- 50% total
 			resolvers.talents{
 				[who.T_STUN]={base=2, every=6, max=5},
 				[who.T_BLUR_SIGHT]={start = 10, base=2, every=6, max=5},
 				[who.T_PHANTASMAL_SHIELD]={start = 5, base=1, every=6, max=5},
 				[who.T_ROTTING_DISEASE]={start = 10, base=1, every=6, max=5},
-				[who.T_TAUNT] = 3,
-				},
+				[who.T_TAUNT]=3,
+				[who.T_BLURRED_MORTALITY]={base=1, every=7, max=6},
+			},
 			resolvers.sustains_at_birth(),
 			faction = who.faction,
 			summoner = who,
 			summon_time = 15,
+			summoner_gain_exp=true,
 		}
 
 		vampire:resolve()
+		vampire:resolve(nil, true)
+		vampire:forceLevelup(who.level)
 		game.zone:addEntity(game.level, vampire, "actor", x, y)
+		vampire:setTarget(target) 
 		vampire:forceUseTalent(vampire.T_TAUNT, {ignore_energy=true})
+
+		if game.party:hasMember(who) then
+			vampire.remove_from_party_on_death = true
+			game.party:addMember(vampire, {
+				control="no",
+				temporary_level = true,
+				type="minion",
+				title="Vampire",
+			})
+		end
+		self.summoned_vampire = vampire
+		
 		game:playSoundNear(who, "talents/spell_generic")
 		return {id=true, used=true}
 	end,
@@ -1315,7 +1359,6 @@ newEntity{ base = "BASE_WARAXE",
 		apr = 4,
 		physcrit = 12,
 		dammod = {str=1},
-		talent_on_hit = { [Talents.T_GREATER_WEAPON_FOCUS] = {level=2, chance=10} },
 		lifesteal = 10,
 		convert_damage = {[DamageType.BLIGHT] = 25},
 	},
@@ -1604,7 +1647,7 @@ newEntity{ base = "BASE_MINDSTAR", define_as = "PSIONIC_FURY",
 		dam = 12,
 		apr = 25,
 		physcrit = 5,
-		dammod = {wil=0.4, cun=0.2},
+		dammod = {wil=0.5, cun=0.3},
 		damtype = DamageType.MIND,
 	},
 	wielder = {
@@ -1653,13 +1696,13 @@ newEntity{ base = "BASE_GAUNTLETS", define_as = "STORM_BRINGER_GAUNTLETS",
 	material_level = 3,
 	require = nil,
 	wielder = {
-		inc_stats = { [Stats.STAT_MAG] = 4, },
+		inc_stats = { [Stats.STAT_MAG] = 6, },
+		combat_spellpower = 12,
 		resists = { [DamageType.LIGHTNING] = 15, },
-		inc_damage = { [DamageType.LIGHTNING] = 10 },
-		resists_cap = { [DamageType.LIGHTNING] = 5 },
+		inc_damage = { [DamageType.LIGHTNING] = 20 },
 		combat_spellcrit = 5,
 		combat_critical_power = 20,
-		combat_armor = 3,
+		combat_armor = 5,
 		combat = {
 			dam = 22,
 			apr = 10,
@@ -1671,8 +1714,9 @@ newEntity{ base = "BASE_GAUNTLETS", define_as = "STORM_BRINGER_GAUNTLETS",
 			damrange = 0.3,
 		},
 	},
-	max_power = 16, power_regen = 1,
-	use_talent = { id = Talents.T_CHAIN_LIGHTNING, level = 3, power = 16 },
+	talent_on_spell = {
+		{chance=10, talent=Talents.T_LIGHTNING, level=1},
+	},
 }
 
 newEntity{ base = "BASE_TRIDENT",

@@ -304,7 +304,7 @@ newEntity{
 	cost = 40,
 	wielder = {
 		inc_stats = {
-			[Stats.STAT_MAG] = resolvers.mbonus_material(5, 1),
+			[Stats.STAT_MAG] = resolvers.mbonus_material(8, 3),
 		},
 		max_mana = resolvers.mbonus_material(40, 20),
 		mana_regen = resolvers.mbonus_material(50, 10, function(e, v) v=v/100 return 0, v end),
@@ -321,8 +321,8 @@ newEntity{
 	cost = 50,
 	wielder = {
 		inc_stats = {
-			[Stats.STAT_MAG] = resolvers.mbonus_material(3, 3),
-			[Stats.STAT_WIL] = resolvers.mbonus_material(3, 3),
+			[Stats.STAT_MAG] = resolvers.mbonus_material(8, 3),
+			[Stats.STAT_WIL] = resolvers.mbonus_material(8, 3),
 		},
 		combat_spellcrit = resolvers.mbonus_material(3, 3),
 	},
@@ -459,5 +459,11 @@ newEntity{
 	cost = 40,
 	wielder = {
 		resists_actor_type = {["summoned"] = resolvers.mbonus_material(30, 15),},
+		inc_damage_actor_type = {["summoned"] = resolvers.mbonus_material(30, 15),},
+		inc_stats = {
+			[Stats.STAT_WIL] = resolvers.mbonus_material(5, 3),
+			[Stats.STAT_CUN] = resolvers.mbonus_material(5, 3),
+		},
 	},
 }
+

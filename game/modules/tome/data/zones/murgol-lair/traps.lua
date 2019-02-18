@@ -16,5 +16,3 @@
 --
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
-
-load("/data/general/traps/water.lua")

@@ -62,6 +62,7 @@ extern "C" {
 #define WINDOW_ICON_PATH ("/engines/default/data/gfx/te4-icon.png")
 
 int start_xpos = -1, start_ypos = -1;
+bool ignore_window_change_pos = false;
 char *override_home = NULL;
 int g_argc = 0;
 char **g_argv;
@@ -950,8 +951,13 @@ extern bool resizeNeedsNewWindow(int w, int h, bool fullscreen, bool borderless)
 /* @see main.h#do_move */
 void do_move(int w, int h) {
 	/* Save the origin in case a window needs to be remade later. */
-	start_xpos = w;
-	start_ypos = h;
+	if (!ignore_window_change_pos) {
+		start_xpos = w;
+		start_ypos = h;
+	} else {
+		w = start_xpos;
+		h = start_ypos;
+	}
 
 	/* Can't move a fullscreen SDL window in one go.*/
 	if (is_fullscreen) {
@@ -1522,6 +1528,7 @@ int main(int argc, char *argv[])
 		if (!strncmp(arg, "--no-debug", 10)) no_debug = true;
 		if (!strncmp(arg, "--xpos", 6)) start_xpos = strtol(argv[++i], NULL, 10);
 		if (!strncmp(arg, "--ypos", 6)) start_ypos = strtol(argv[++i], NULL, 10);
+		if (!strncmp(arg, "--ignore-window-change-pos", 26)) ignore_window_change_pos = true;
 		if (!strncmp(arg, "--safe-mode", 11)) safe_mode = true;
 		if (!strncmp(arg, "--home", 6)) override_home = strdup(argv[++i]);
 		if (!strncmp(arg, "--no-steam", 10)) no_steam = true;

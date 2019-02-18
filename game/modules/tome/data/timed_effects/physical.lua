@@ -960,6 +960,7 @@ newEffect{
 	end,
 	type = "physical",
 	subtype = { nature=true },
+	no_player_remove = true,
 	status = "beneficial",
 	parameters = { die_at = 0 },
 	activate = function(self, eff)
@@ -1724,6 +1725,7 @@ newEffect{
 	subtype = { nature=true },
 	status = "beneficial",
 	parameters = { },
+	no_player_remove = true,
 	activate = function(self, eff)
 		if eff.type == DamageType.FIRE then
 			eff.tmpid = self:addTemporaryValue("global_speed_add", self:callTalent(self.T_ELEMENTAL_HARMONY, "fireSpeed"))
@@ -2292,8 +2294,22 @@ newEffect{
 		if eff.bonus_block_pct and eff.bonus_block_pct[type] then amt = amt * eff.bonus_block_pct[type] end
 		local blocked = dam - amt
 		local shield1, combat1, shield2, combat2 = self:hasShield()
+
+		-- on_block can have two structures, an older single table, and a newer list of on_block functions used by randomly generated items
 		if shield1 and shield1.on_block and shield1.on_block.fct then shield1.on_block.fct(shield1, self, src, type, dam, eff) end
 		if shield2 and shield2.on_block and shield2.on_block.fct then shield2.on_block.fct(shield2, self, src, type, dam, eff) end
+
+		if shield1 and shield1.on_block and shield1.on_block[1] then
+			for _, on_block in pairs(shield1.on_block) do
+				on_block.fct(shield1, self, src, type, dam, eff, on_block)
+			end
+		end
+		if shield2 and shield2.on_block and shield2.on_block[1] then
+			for _, on_block in pairs(shield2.on_block) do
+				on_block.fct(shield2, self, src, type, dam, eff, on_block)
+			end
+		end
+
 		if eff.properties.br then
 			self:heal(blocked, src)
 			game:delayedLogMessage(self, src, "block_heal", "#CRIMSON##Source# heals from blocking with %s shield!", string.his_her(self))

@@ -263,7 +263,7 @@ newEntity{
 	power_source = {nature=true},
 	name = "warlord's ", prefix=true, instant_resolve=true,
 	keywords = {warlord=true},
-	level_range = {40, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 17,
 	cost = 50,
@@ -284,7 +284,7 @@ newEntity{
 	power_source = {technique=true},
 	name = "defender's ", prefix=true, instant_resolve=true,
 	keywords = {defender=true},
-	level_range = {40, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 17,
 	cost = 50,
@@ -320,7 +320,7 @@ newEntity{
 	power_source = {nature=true},
 	name = "werebeast's ", prefix=true, instant_resolve=true,
 	keywords = {werebeast=true},
-	level_range = {40, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 30,
 	cost = 80,
@@ -329,12 +329,11 @@ newEntity{
 			[DamageType.LIGHT] = resolvers.mbonus_material(25, 15, function(e, v) return 0, -v end),
 		},
 		inc_stats = {
-			[Stats.STAT_STR] = resolvers.mbonus_material(4, 1),
-			[Stats.STAT_DEX] = resolvers.mbonus_material(4, 1),
-			[Stats.STAT_CON] = resolvers.mbonus_material(4, 1),
-			[Stats.STAT_CUN] = resolvers.mbonus_material(4, 1),
+			[Stats.STAT_STR] = resolvers.mbonus_material(8, 1),
+			[Stats.STAT_DEX] = resolvers.mbonus_material(8, 1),
+			[Stats.STAT_CON] = resolvers.mbonus_material(8, 1),
+			[Stats.STAT_CUN] = resolvers.mbonus_material(8, 1),
 		},
-		life_regen = resolvers.mbonus_material(70, 10, function(e, v) v=v/10 return 0, v end),
 	},
 }
 
@@ -387,7 +386,7 @@ newEntity{
 		},
 		combat_spellresist = resolvers.mbonus_material(7, 3),
 		max_life = resolvers.mbonus_material(70, 40),
-		healing_factor = resolvers.mbonus_material(20, 10, function(e, v) v=v/100 return 0, v end),
+		healing_factor = resolvers.mbonus_material(10, 10, function(e, v) v=v/100 return 0, v end),
 	},
 }
 
@@ -414,7 +413,7 @@ newEntity{
 	power_source = {arcane=true},
 	name = " of blood magic", suffix=true, instant_resolve=true,
 	keywords = {blood=true},
-	level_range = {40, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 30,
 	cost = 100,
@@ -499,9 +498,8 @@ newEntity{
 	resolvers.charmt(Talents.T_SKULLCRACKER, 3, 20),
 	wielder = {
 		inc_stats = {
-			[Stats.STAT_STR] = resolvers.mbonus_material(3, 2),
+			[Stats.STAT_STR] = resolvers.mbonus_material(10, 2),
 		},
-		on_melee_hit={[DamageType.PHYSICAL] = resolvers.mbonus_material(5, 5)},
 	},
 }
 
@@ -514,6 +512,7 @@ newEntity{
 	rarity = 17,
 	cost = 50,
 	skullcracker_mult = resolvers.mbonus_material(2, 1),
+	resolvers.charmt(Talents.T_SKULLCRACKER, 3, 20),
 	wielder = {
 		inc_stats = {
 			[Stats.STAT_STR] = resolvers.mbonus_material(4, 5),

@@ -221,9 +221,8 @@ newEntity{ base = "BASE_AMULET",
 			[Stats.STAT_STR] = 6,
 			[Stats.STAT_CON] = 6,
 		},
+		inc_resists={ [DamageType.PHYSICAL] = 20, },
 	},
-	max_power = 60, power_regen = 1,
-	use_talent = { id = Talents.T_JUGGERNAUT, level = 2, power = 30 },
 	on_wear = function(self, who)
 		if who.descriptor and who.descriptor.race == "Halfling" then
 			local Talents = require "engine.interface.ActorStats"
@@ -426,7 +425,7 @@ It seems somebody well versed in antimagic could use it to its fullest potential
 		combat_physresist = 6,
 		combat_mentalresist = 6,
 		combat_spellresist = 6,
-		talents_types_mastery = { ["wild-gift/call"] = 0.2, ["wild-gift/antimagic"] = 0.1, },
+		talents_types_mastery = { ["wild-gift/call"] = 0.2, ["wild-gift/antimagic"] = 0.5, },
 		resists_cap = { [DamageType.BLIGHT] = 10, },
 		resists = { [DamageType.BLIGHT] = 20, },
 	},
@@ -435,10 +434,10 @@ It seems somebody well versed in antimagic could use it to its fullest potential
 			local Stats = require "engine.interface.ActorStats"
 			local DamageType = require "engine.DamageType"
 
-			self:specialWearAdd({"wielder","inc_stats"}, { [Stats.STAT_WIL] = 6, [Stats.STAT_CUN] = 6, })
-			self:specialWearAdd({"wielder","combat_physresist"}, 6)
-			self:specialWearAdd({"wielder","combat_spellresist"}, 6)
-			self:specialWearAdd({"wielder","combat_mentalresist"}, 6)
+			self:specialWearAdd({"wielder","inc_stats"}, { [Stats.STAT_WIL] = 10, [Stats.STAT_CUN] = 10, })
+			self:specialWearAdd({"wielder","combat_physresist"}, 20)
+			self:specialWearAdd({"wielder","combat_spellresist"}, 20)
+			self:specialWearAdd({"wielder","combat_mentalresist"}, 20)
 			game.logPlayer(who, "#LIGHT_BLUE#You feel a great hero guiding you!")
 		end
 	end,
@@ -644,10 +643,10 @@ newEntity{ base = "BASE_BATTLEAXE",
 	require = { stat = { str=45 }, },
 	rarity = 300,
 	cost = 400,
-	level_range = {20, 35},
-	material_level = 3,
+	level_range = {10, 35},
+	material_level = 2,
 	combat = {
-		dam = 52,
+		dam = 45,
 		apr = 21,
 		physcrit = 2,
 		dammod = {str=1.2},
@@ -658,6 +657,7 @@ newEntity{ base = "BASE_BATTLEAXE",
 		stun_immune = 0.2,
 		knockback_immune = 0.4,
 		combat_physresist = 9,
+		resists_actor_type = {["dragon"]=25},
 	},
 }
 
@@ -1170,6 +1170,7 @@ newEntity{ base = "BASE_KNIFE", -- Thanks Grayswandir!
 	},
 }
 
+-- Fix me
 newEntity{ base = "BASE_KNIFE", --Razakai's idea, slightly modified
 	power_source = {psionic=true},
 	unique = true,

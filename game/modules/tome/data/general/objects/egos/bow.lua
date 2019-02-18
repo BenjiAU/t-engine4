@@ -32,25 +32,8 @@ newEntity{
 	rarity = 7,
 	cost = 7,
 	wielder = {
-		resists_pen={ [DamageType.PHYSICAL] = resolvers.mbonus_material(15, 10), },
+		resists_pen={ [DamageType.PHYSICAL] = resolvers.mbonus_material(5, 5), },
 		inc_stats = { [Stats.STAT_DEX] = resolvers.mbonus_material(6, 2) },
-	},
-}
-
-newEntity{
-	power_source = {technique=true},
-	name = "thaloren ", prefix=true, instant_resolve=true,
-	keywords = {thaloren=true},
-	level_range = {30, 50},
-	greater_ego = 1,
-	rarity = 24,
-	cost = 40,
-	wielder = {
-		talent_cd_reduction={
-			[Talents.T_PIN_DOWN]=1,
-			[Talents.T_FRAGMENTATION_SHOT]=2,
-		},
-		inc_damage={ [DamageType.PHYSICAL] = resolvers.mbonus_material(14, 8), },
 	},
 }
 
@@ -67,11 +50,11 @@ newEntity{
 			[Talents.T_ARROW_STITCHING]=1,
 		},
 		inc_damage={ 
-			[DamageType.PHYSICAL] = resolvers.mbonus_material(14, 8),
+			[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 8),
 			[DamageType.TEMPORAL] = resolvers.mbonus_material(14, 8),
 		},
 		resists_pen = {
-			[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 5),
+			[DamageType.PHYSICAL] = resolvers.mbonus_material(5, 5),
 			[DamageType.TEMPORAL] = resolvers.mbonus_material(10, 5),
 		},
 	},

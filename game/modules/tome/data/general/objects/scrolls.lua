@@ -28,7 +28,7 @@ newEntity{
 	use_no_blind = true,
 	use_no_silence = true,
 	fire_destroy = {{10,1}, {20,2}, {40,5}, {60,10}, {120,20}},
-	desc = [[Magical scrolls can have wildly different effects! Most of them function better with a high Magic score.]],
+	desc = [[Magical scrolls can have wildly different effects!]],
 	egos = "/data/general/objects/egos/scrolls.lua", egos_chance = resolvers.mbonus(10, 5),
 }
 
@@ -42,7 +42,7 @@ newEntity{
 	use_no_blind = true,
 	use_no_silence = true,
 	fire_destroy = {{100,1}, {200,2}, {400,5}, {600,10}, {1200,20}},
-	desc = [[Natural infusions may be grafted onto your body, granting you an on-demand ability.]],
+	desc = [[Natural infusions may be grafted onto your body, granting you an on-demand nature talent.]],
 	egos = "/data/general/objects/egos/infusions.lua", egos_chance = resolvers.mbonus(30, 5),
 	material_level_min_only = true,
 
@@ -64,7 +64,7 @@ newEntity{
 	use_no_blind = true,
 	use_no_silence = true,
 	fire_destroy = {{10,1}, {20,2}, {40,5}, {60,10}, {120,20}},
-	desc = [[Magical runes may be inscribed onto your body, granting you an on-demand ability.]],
+	desc = [[Magical runes may be inscribed onto your body, granting you an on-demand spell talent.]],
 	egos = "/data/general/objects/egos/infusions.lua", egos_chance = resolvers.mbonus(30, 5),
 	material_level_min_only = true,
 
@@ -161,6 +161,7 @@ newEntity{ base = "BASE_INFUSION",
 	inscription_talent = "INFUSION:_REGENERATION",
 }
 
+-- colorme
 newEntity{ base = "BASE_INFUSION",
 	name = "wild infusion",
 	level_range = {1, 50},
@@ -197,8 +198,8 @@ newEntity{ base = "BASE_INFUSION",
 
 	inscription_kind = "movement",
 	inscription_data = {
-		cooldown = resolvers.rngrange(13, 20),  -- High variance because this is the only really important stat
-		speed = resolvers.mbonus_level(500, 300, function(e, v) return v * 0.001 end),
+		cooldown = resolvers.rngrange(10, 18),  -- High variance because this is the only really important stat
+		speed = resolvers.mbonus_level(500, 400, function(e, v) return v * 0.001 end),
 		use_stat_mod = 3,
 	},
 	inscription_talent = "INFUSION:_MOVEMENT",
@@ -212,9 +213,9 @@ newEntity{ base = "BASE_INFUSION",
 
 	inscription_kind = "utility",
 	inscription_data = {
-		cooldown = resolvers.rngrange(20, 30),
-		dur = resolvers.mbonus_level(7, 7),
-		die_at = resolvers.mbonus_level(700, 100, function(e, v) return v * 0.2 end),
+		cooldown = resolvers.rngrange(25, 35),
+		dur = resolvers.mbonus_level(5, 5),
+		die_at = resolvers.mbonus_level(600, 100, function(e, v) return v * 0.2 end),
 		use_stat_mod = 0.14, -- 30x for die_at
 	},
 	inscription_talent = "INFUSION:_HEROISM",
@@ -256,7 +257,7 @@ newEntity{ base = "BASE_RUNE",
 
 newEntity{ base = "BASE_RUNE",
 	name = "biting gale rune",
-	level_range = {20, 50},
+	level_range = {10, 50},
 	rarity = 20,
 	cost = 20,
 
@@ -272,7 +273,7 @@ newEntity{ base = "BASE_RUNE",
 
 newEntity{ base = "BASE_RUNE",
 	name = "acid wave rune",
-	level_range = {20, 50},
+	level_range = {10, 50},
 	rarity = 20,
 	cost = 20,
 
@@ -310,7 +311,7 @@ newEntity{ base = "BASE_RUNE",
 	material_level = 1,
 	inscription_kind = "movement",
 	inscription_data = {
-		cooldown = resolvers.rngrange(8, 12),
+		cooldown = resolvers.rngrange(10, 18),
 		range = resolvers.mbonus_level(4, 2, function(e, v) return v * 0.06 end),
 		power = resolvers.mbonus_level(20, 10, function(e, v) return v * 1 end),
 		use_stat_mod = 0.04, -- +4 range at 100 stat
@@ -321,7 +322,7 @@ newEntity{ base = "BASE_RUNE",
 newEntity{ base = "BASE_RUNE",
 	name = "stormshield rune",
 	level_range = {30, 50},
-	rarity = 25,
+	rarity = 35,
 	cost = 20,
 	inscription_kind = "protect",
 	inscription_data = {
@@ -342,7 +343,7 @@ newEntity{ base = "BASE_RUNE",
 	inscription_kind = "utility",
 	inscription_data = {
 		cooldown = resolvers.rngrange(16, 20),
-		shield = resolvers.mbonus_level(100, 20, function(e, v) return v * 0.06 end),
+		shield = resolvers.mbonus_level(120, 20, function(e, v) return v * 0.06 end),
 		use_stat_mod = 1 -- 1x, applied up to 3 times
 	},
 	inscription_talent = "RUNE:_SHATTER_AFFLICTIONS",
@@ -359,7 +360,7 @@ newEntity{ base = "BASE_RUNE",
 		dur = 5,
 		power = resolvers.mbonus_level(20, 7, function(e, v) return v * 1 end),
 		resist = resolvers.mbonus_level(30, 10),
-		move = resolvers.mbonus_level(20, 10),
+		move = resolvers.mbonus_level(40, 30),
 		reduction = 0.5,
 		use_stat_mod = 0.08, -- 1x for movement, 2x for resist, 2x for power
 	},

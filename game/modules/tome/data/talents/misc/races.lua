@@ -847,6 +847,7 @@ newTalent{
 ------------------------------------------------------------------
 -- Yeeks' powers
 ------------------------------------------------------------------
+-- We check for max life on boss targets to avoid people using this to engage thus ensuring all their allies target them first
 newTalentType{ type="race/yeek", name = "yeek", is_mind=true, generic = true, description = "The various racial bonuses a character can have." }
 newTalent{
 	short_name = "YEEK_WILL",
@@ -864,27 +865,37 @@ newTalent{
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t), talent=t} end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
-		local x, y = self:getTarget(tg)
+		local x, y, target = self:getTargetLimited(tg)
 		if not x or not y then return nil end
+		if not target or target.dead or target == self then return end
+		if game.party:hasMember(target) then return end
+		if target.rank > 3 and ((target.life / target.max_life) >= 0.8) then
+			game.logSeen(target, "%s must be below 70%% of their max life to be controlled!", target.name:capitalize())
+			return
+		end
 		self:project(tg, x, y, function(px, py)
 			local target = game.level.map(px, py, Map.ACTOR)
-			if not target or target.dead or target == self then return end
-			if not target:canBe("instakill") or target.rank > 3 or target:attr("undead") or game.party:hasMember(target) or not target:checkHit(self:getWil(20, true) + self.level * 1.5, target.level) then
+			if target:canBe("instakill") then
+				target:takeHit(1, self)
+				target:takeHit(1, self)
+				target:takeHit(1, self)
+				if target.rank > 3 then
+					target:setEffect(target.EFF_DOMINANT_WILL_BOSS, 3, {src=self})
+				else
+					target:setEffect(target.EFF_DOMINANT_WILL, t.getduration(self), {src=self})
+				end
+			else
 				game.logSeen(target, "%s resists the mental assault!", target.name:capitalize())
-				return
 			end
-			target:takeHit(1, self)
-			target:takeHit(1, self)
-			target:takeHit(1, self)
-			target:setEffect(target.EFF_DOMINANT_WILL, t.getduration(self), {src=self})
+
 		end)
 		return true
 	end,
 	info = function(self, t)
-		return ([[Shatters the mind of your victim, giving you full control over its actions for %s turns.
-		When the effect ends, you pull out your mind and the victim's body collapses, dead.
-		This effect does not work on rares, bosses, or undeads.
-		The duration will increase with your Willpower.]]):format(t.getduration(self))
+	return ([[Shatter the mind of your victim, giving you full control of its actions for %s turns (based on your Willpower).
+	When the effect ends, you pull out your mind and the victim's body collapses, dead.
+	Targets with ranks at or above rare must be below 80%% of their maximum life to be controlled and will break free without dying after 3 turns.
+	This effect cannot be saved against but checks instakill immunity.]]):format(t.getduration(self))
 	end,
 }
 
@@ -915,13 +926,23 @@ newTalent{
 	points = 5,
 	mode = "passive",
 	speedup = function(self, t) return self:combatTalentScale(t, 0.04, 0.15, 0.75) end,
+	cooldown = function(self, t) return math.ceil(self:combatTalentLimit(t, 20, 50, 30)) end,
 	passives = function(self, t, p)
 		self:talentTemporaryValue(p, "global_speed_base", t.speedup(self, t))
 		self:recomputeGlobalSpeed()
 	end,
+	callbackOnTakeDamage = function(self, t, src, x, y, type, dam, state)
+		if self:isTalentCoolingDown(t) then return end
+		if (self.life / self.max_life) >= 0.7 then return end
+
+		game.logSeen(self, "#RED#%s reacts immediately after taking severe wounds!#LAST#", self.name:capitalize())
+		self.energy.value = self.energy.value + game.energy_to_act * 1.5
+		self:startTalentCooldown(t)
+	end,
 	info = function(self, t)
 		return ([[Yeeks live fast, think fast, and sacrifice fast for the Way.
-		Increase global speed by %0.1f%%.]]):format(100*t.speedup(self, t))
+		Your global speed is increased by %0.1f%%.
+		If your life drops below 30%% you gain 1.5 turns.  This effect can only happen once every %d turns.]]):format(100*t.speedup(self, t), self:getTalentCooldown(t))
 	end,
 }
 
@@ -947,7 +968,7 @@ newTalent{
 			local x, y = util.findFreeGrid(tx, ty, 5, true, {[Map.ACTOR]=true})
 			if not x then
 				game.logPlayer(self, "Not enough space to summon!")
-				return
+				break
 			end
 
 			local NPC = require "mod.class.NPC"
@@ -963,6 +984,8 @@ newTalent{
 				rank = 3,
 				life_rating = 8,
 				max_life = resolvers.rngavg(50,80),
+				combat_atk = resolvers.levelup(1, 1, 3),
+
 				infravision = 10,
 
 				autolevel = "none",
@@ -970,11 +993,11 @@ newTalent{
 				stats = {str=0, dex=0, con=0, cun=0, wil=0, mag=0},
 				inc_stats = {
 					str=self:combatScale(self:getWil() * self:getTalentLevel(t), 25, 0, 125, 500, 0.75),
-					mag=10,
+					mag=self:combatScale(self:getWil() * self:getTalentLevel(t), 25, 0, 125, 500, 0.75),
 					cun=self:combatScale(self:getWil() * self:getTalentLevel(t), 25, 0, 125, 500, 0.75),
 					wil=self:combatScale(self:getWil() * self:getTalentLevel(t), 25, 0, 125, 500, 0.75),
-					dex=18,
-					con=10 + self:combatTalentScale(t, 2, 10, 0.75),
+					dex=self:combatScale(self:getWil() * self:getTalentLevel(t), 25, 0, 125, 500, 0.75),
+					con=self:combatScale(self:getWil() * self:getTalentLevel(t), 25, 0, 125, 500, 0.75),
 				},
 				resolvers.equip{
 					{type="weapon", subtype="longsword", autoreq=true},
@@ -982,7 +1005,7 @@ newTalent{
 					{type="weapon", subtype="greatsword", autoreq=true, force_inven = "PSIONIC_FOCUS"},
 				},
 
-				level_range = {1, nil}, exp_worth = 0,
+				level_range = {1, self.level}, exp_worth = 0,
 				silent_levelup = true,
 
 				combat_armor = 13, combat_def = 8,
@@ -1000,15 +1023,18 @@ newTalent{
 				no_drops = 1,
 			}
 			setupSummon(self, m, x, y)
+			m.temporary_level = true
 		end
 
 		game:playSoundNear(self, "talents/spell_generic")
 		return true
 	end,
 	info = function(self, t)
+		local base_stats = self:combatScale(self:getWil() * self:getTalentLevel(t), 25, 0, 125, 500, 0.75)
 		return ([[Reach through the collective psionic gestalt of the yeeks, the Way, to call for immediate help.
 		Summons up to 3 yeek mindslayers to your side for 6 turns.
-		Their power increases with your Willpower and Talent Level.]])
+		All their primary stats will be set to %d (based on your Willpower and Talent Level).
+		Your increased damage, damage penetration, and many other stats will be inherited.]]):format(base_stats)
 	end,
 }
 

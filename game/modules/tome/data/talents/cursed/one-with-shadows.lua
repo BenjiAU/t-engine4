@@ -35,42 +35,60 @@ newTalent{
 }
 
 newTalent{
-	name = "Shadow Empathy",
+	name = "Shadows Empathy", image = "talents/shadow_empathy.png",
 	type = {"cursed/one-with-shadows", 2},
 	require = cursed_cun_req_high2,
 	points = 5,
-	hate = 10,
-	cooldown = 25,
-	getRandomShadow = function(self, t)
-		local shadows = {}
-		if game.party and game.party:hasMember(self) then
-			for act, def in pairs(game.party.members) do
-				if act.summoner and act.summoner == self and act.is_doomed_shadow and not act.dead then
-					shadows[#shadows+1] = act
-				end
-			end
-		else
-			for uid, act in pairs(game.level.entities) do
-				if act.summoner and act.summoner == self and act.is_doomed_shadow and not act.dead then
-					shadows[#shadows+1] = act
-				end
-			end
+	cooldown = 10,
+	mode = 'sustained',
+	no_npc_use = true,
+	--count shadows in party
+	getShadows = function(self, t)
+		local shadowsCount = 0
+		for _, actor in pairs(game.level.entities) do
+			if actor.summoner and actor.summoner == self and actor.subtype == "shadow" then shadowsCount = shadowsCount + 1 end
 		end
-		return #shadows > 0 and rng.table(shadows)
+		return shadowsCount
 	end,
-	getDur = function(self, t) return math.floor(self:combatTalentScale(t, 3, 10)) end,
-	getPower = function(self, t) return 5 + self:combatTalentMindDamage(t, 0, 300) / 8 end,
-	on_pre_use = function(self, t) return self:callTalent(self.T_CALL_SHADOWS, "nbShadowsUp") > 0 end,
-	action = function(self, t)
-		self:setEffect(self.EFF_SHADOW_EMPATHY, t.getDur(self, t), {power=t.getPower(self, t)})
+	--values for resists and affinity
+	getLightResist = function(self, t) return -15 end,
+	getDarkResist = function(self, t) return self:combatTalentScale(t, 10, 25) end,
+	getAffinity = function(self, t) return self:combatTalentScale(t, 10, 25) end,
+	getAllResScale = function(self, t) return self:combatTalentScale(t, 2, 4) end,
+	getAllResist = function(self, t) return t.getAllResScale(self, t) * t.getShadows(self, t) end, 
+	--activate effects
+	activate = function(self, t)
+		local ret = {
+			shadowres = self:addTemporaryValue("resists", {all=t.getAllResist(self, t)}),
+			res = self:addTemporaryValue("resists", {[DamageType.LIGHT]=t.getLightResist(self, t), [DamageType.DARKNESS]=t.getDarkResist(self, t)}),
+			aff = self:addTemporaryValue("damage_affinity", {[DamageType.DARKNESS]=t.getAffinity(self, t)}),
+		}
+		return ret
+	end,
+	--callbacks
+	callbackOnPartyAdd = function(self, t)
+		local p = self:isTalentActive(t.id)
+		if p.shadowres then self:removeTemporaryValue("resists", p.shadowres) end
+		p.shadowres = self:addTemporaryValue("resists", {all=t.getAllResist(self, t)})
+	end,
+	callbackOnPartyRemove = function(self, t)
+		local p = self:isTalentActive(t.id)
+		game:onTickEnd(function()
+		if p.shadowres then self:removeTemporaryValue("resists", p.shadowres) end
+		p.shadowres = self:addTemporaryValue("resists", {all=t.getAllResist(self, t)})
+		end)
+	end,
+	--daectivate effects
+	deactivate = function(self, t, p)
+		self:removeTemporaryValue("resists", p.shadowres)
+		self:removeTemporaryValue("resists", p.res)
+		self:removeTemporaryValue("damage_affinity", p.aff)
 		return true
 	end,
 	info = function(self, t)
-		local power = t.getPower(self, t)
-		local duration = t.getDur(self, t)
-		return ([[You are linked to your shadows for %d turns, diverting %d%% of all damage you take to a random shadow.
-		Effect increases with Mindpower.]]):
-		format(duration, power)
+		return ([[You empathy with your shadows causes the line between you and your shadows to blur.
+		You lose %d%% light resistance, but gain %d%% darkness resistance and affinity. You also gain %0.2f%% all resistance for each shadow in your party.]]):
+		format(t.getLightResist(self, t), t.getDarkResist(self, t), t.getAllResScale(self, t))
 	end,
 }
 
@@ -119,9 +137,28 @@ newTalent{
 	cooldown = 10,
 	points = 5,
 	cooldown = 50,
-	getPower = function(self, t) return 10 + self:combatTalentMindDamage(t, 0, 300) end,
+	getPower = function(self, t) return 10 + self:combatTalentMindDamage(t, 0, 700) end, --be generous
 	onDie = function(self, t, value, src)
-		local shadow = self:callTalent(self.T_SHADOW_EMPATHY, "getRandomShadow")
+		local shadows = {}
+		if game.party and game.party:hasMember(self) then
+			for act, def in pairs(game.party.members) do
+				if act.summoner and act.summoner == self and act.is_doomed_shadow and not act.dead then
+					shadows[#shadows+1] = act
+				end
+			end
+		else
+			for uid, act in pairs(game.level.entities) do
+				if act.summoner and act.summoner == self and act.is_doomed_shadow and not act.dead then
+					shadows[#shadows+1] = act
+				end
+			end
+		end
+		local shadow = #shadows > 0 and rng.table(shadows)
+		-- Nope! -- DG
+		-- if not shadow and self:knowTalent(self.T_CALL_SHADOWS) then
+		-- 	local t = self:getTalentFromId(self.T_CALL_SHADOWS)
+		-- 	t.summonShadow(self, t) --summon a shadow if you have none
+		-- end
 		if not shadow then return false end
 
 		game:delayedLogDamage(src, self, 0, ("#GOLD#(%d decoy)#LAST#"):format(value), false)

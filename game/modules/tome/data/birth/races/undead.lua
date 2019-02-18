@@ -62,9 +62,9 @@ newBirthDescriptor{
 		undead = 1,
 		forbid_nature = 1,
 		inscription_forbids = { ["inscriptions/infusions"] = true },
-		resolvers.inscription("RUNE:_SHIELDING", {cooldown=14, dur=5, power=130}),
-		resolvers.inscription("RUNE:_SHATTER_AFFLICTIONS", {cooldown=18, shield=50}),
-		resolvers.inventory({id=true, transmo=false, alter=function(o) o.inscription_data.cooldown=7 o.inscription_data.dur=5 o.inscription_data.power=15 o.inscription_data.range=10 end, {type="scroll", subtype="rune", name="phase door rune", ego_chance=-1000, ego_chance=-1000}}), -- keep this in inventory incase people actually want it, can't add it baseline because some classes start with 3 inscribed
+		resolvers.inscription("RUNE:_SHIELDING", {cooldown=14, dur=5, power=130}, 1),
+		resolvers.inscription("RUNE:_SHATTER_AFFLICTIONS", {cooldown=18, shield=50}, 2),
+		resolvers.inscription("RUNE:_BLINK", {cooldown=18, power=10, range=4,}, 3),
 	},
 
 	cosmetic_unlock = {

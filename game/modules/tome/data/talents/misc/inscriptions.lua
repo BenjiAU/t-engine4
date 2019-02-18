@@ -80,7 +80,7 @@ newInscription{
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[heal %d over %d turns]]):format(data.heal + data.inc_stat, data.dur)
+		return ([[heal %d; %d cd]]):format(data.heal + data.inc_stat, data.cooldown)
 	end,
 }
 
@@ -90,15 +90,16 @@ newInscription{
 	points = 1,
 	tactical = { HEAL = 1,
 		CURE = function(self, t, target)
-			local cut, poison = 0, 0
+			local cut, poison, disease = 0, 0, 0
 			for eff_id, p in pairs(self.tmp) do
 				local e = self.tempeffect_def[eff_id]
 				if e.status == "detrimental" then
 					if e.subtype.wound then cut = 1 end
 					if e.subtype.poison then poison = 1 end
+					if e.subtype.disease then disease = 1 end
 				end
 			end
-			return cut + poison
+			return cut + poison + disease
 		end
 	},
 	is_heal = true,
@@ -113,7 +114,8 @@ newInscription{
 
 		self:removeEffectsFilter(function(e) return e.subtype.wound end, 1)
 		self:removeEffectsFilter(function(e) return e.subtype.poison end, 1)
-		
+		self:removeEffectsFilter(function(e) return e.subtype.disease end, 1)
+
 		if core.shader.active(4) then
 			self:addParticles(Particles.new("shader_shield_temp", 1, {toback=true , size_factor=1.5, y=-0.3, img="healgreen", life=25}, {type="healing", time_factor=2000, beamsCount=20, noup=2.0}))
 			self:addParticles(Particles.new("shader_shield_temp", 1, {toback=false, size_factor=1.5, y=-0.3, img="healgreen", life=25}, {type="healing", time_factor=2000, beamsCount=20, noup=1.0}))
@@ -122,7 +124,7 @@ newInscription{
 	end,
 	info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[Activate the infusion to instantly heal yourself for %d and cleanse 1 wound and 1 poison effect.]]):format(data.heal + data.inc_stat)
+		return ([[Activate the infusion to instantly heal yourself for %d then cleanse 1 wound, poison, and disease effect.]]):format(data.heal + data.inc_stat)
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
@@ -168,10 +170,10 @@ newInscription{
 		return ([[Activate the infusion to cure yourself of one random %s effect and reduce all damage taken by %d%% for %d turns.
 Also removes cross-tier effects of the affected types for free.]]):format(what, data.power+data.inc_stat, data.dur)
 	end,
-	short_info = function(self, t)
+	short_info = function(self, t)	
 		local data = self:getInscriptionData(t.short_name)
 		local what = table.concat(table.keys(data.what), ", ")
-		return ([[resist %d%%; cure %s; dur %d]]):format(data.power + data.inc_stat, what, data.dur)
+		return ([[resist %d%%; cure %s; cd %d; dur %d]]):format(data.power + data.inc_stat, what, data.cooldown, data.dur)
 	end,
 }
 
@@ -218,7 +220,7 @@ newInscription{
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[%d%% speed]]):format(data.speed + data.inc_stat)
+		return ([[%d%% speed; %d cd]]):format(data.speed + data.inc_stat, data.cooldown)
 	end,
 }
 
@@ -230,14 +232,19 @@ newInscription{
 	tactical = { DEFEND = 1 },
 	action = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		self:setEffect(self.EFF_HEROISM, data.dur, {die_at=data.die_at + data.inc_stat * 30})
+		local bonus = 1 + (1 - self.life / self.max_life)
+		self:setEffect(self.EFF_HEROISM, math.floor(data.dur * bonus), {die_at=data.die_at + data.inc_stat * 30 * bonus})
 		return true
 	end,
 	info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
+		local bonus = 1 + (1 - self.life / self.max_life)
+		local bonus1 = data.die_at + data.inc_stat * 30 * bonus
+		local bonus2 = math.floor(data.dur * bonus)
 		return ([[Activate the infusion to endure even the most grievous of wounds for %d turns.
 		While Heroism is active, you will only die when reaching -%d life.
-		If your life is below 0 when this effect wears off it will be set to 1.]]):format(data.dur, data.die_at + data.inc_stat * 30)
+		The duration and life will increase by 1%% for every 1%% life you have lost (currently %d life, %d duration)
+		If your life is below 0 when this effect wears off it will be set to 1.]]):format(data.dur, data.die_at + data.inc_stat * 30, bonus1, bonus2)
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
@@ -414,7 +421,7 @@ newInscription{
 	info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		return ([[Activate the rune to direct a cone of chilling stormwind doing %0.2f cold damage.
-			The storm will soak enemies hit reducing their resistance to stuns by 50%% then attempt to freeze them for %d.
+			The storm will soak enemies hit reducing their resistance to stuns by 50%% then attempt to freeze them for %d turns.
 			These effects can be resisted but not saved against.]]):
 			format(damDesc(self, DamageType.COLD, data.power + data.inc_stat), data.dur)
 	end,
@@ -619,6 +626,7 @@ newInscription{
 }
 
 -- New name for the merged Phase Doors
+-- Fix requiring vision
 newInscription{
 	name = "Rune: Blink",
 	image = "talents/rune__controlled_phase_door.png",
@@ -629,7 +637,7 @@ newInscription{
 	tactical = {  ESCAPE = 1, CLOSEIN = 1 },
 	range = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return data.range + data.inc_stat
+		return math.floor(data.range + data.inc_stat)
 	end,
 	target = function(self, t) return {type="hit", nolock=true, pass_terrain=false, nowarning=true, range=self:getTalentRange(t), 
 		grid_params = {want_range = (not self.ai_target.actor or self.ai_state.tactic == "escape") and 6 or 1	} } end,
@@ -664,7 +672,7 @@ newInscription{
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		local power = data.power + data.inc_stat * 3
-		return ([[range %d; power %d; dur %d]]):format(data.range + data.inc_stat, power, t.getDur(self, t) )
+		return ([[range %d; power %d; cd %d]]):format(self:getTalentRange(t), power, data.cooldown )
 	end,
 }
 
@@ -772,8 +780,8 @@ newInscription{
 			str = str .. ", " .. v .. " " .. k:lower()
 		end
 		str = string.sub(str, 2)
-		return ([[Activate the rune to create a shield blocking several instances of damage of the following types:%s]]) -- color me
-				:format(str)
+		return ([[Activate the rune to create a shield for %d turns blocking several instances of damage of the following types:%s]]) -- color me
+				:format(t.getDur(self, t), str)
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
@@ -789,7 +797,7 @@ newInscription{
 	image = "talents/phase_shift.png",  -- re-used icon
 	points = 1,
 	is_spell = true,
-	no_npc_use, -- You can't taunt players
+	tactical = { DEFEND = 3,},
 	getDur = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		return data.dur

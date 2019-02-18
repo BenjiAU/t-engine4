@@ -36,6 +36,7 @@ newEntity{ base = "BASE_CLOTH_ARMOR",
 	level_range = {1, 10},
 	cost = 0.5,
 	material_level = 1,
+	combat_def = 5,
 }
 
 newEntity{ base = "BASE_CLOTH_ARMOR",
@@ -43,6 +44,7 @@ newEntity{ base = "BASE_CLOTH_ARMOR",
 	level_range = {10, 20},
 	cost = 1.5,
 	material_level = 2,
+	combat_def = 10,
 }
 
 newEntity{ base = "BASE_CLOTH_ARMOR",
@@ -51,7 +53,7 @@ newEntity{ base = "BASE_CLOTH_ARMOR",
 	cost = 2.5,
 	material_level = 3,
 	wielder = {
-		combat_def = 2,
+		combat_def = 15,
 	},
 }
 
@@ -61,7 +63,7 @@ newEntity{ base = "BASE_CLOTH_ARMOR",
 	cost = 3.5,
 	material_level = 4,
 	wielder = {
-		combat_def = 3,
+		combat_def = 20,
 	},
 }
 
@@ -71,6 +73,6 @@ newEntity{ base = "BASE_CLOTH_ARMOR",
 	cost = 5.5,
 	material_level = 5,
 	wielder = {
-		combat_def = 5,
+		combat_def = 25,
 	},
 }

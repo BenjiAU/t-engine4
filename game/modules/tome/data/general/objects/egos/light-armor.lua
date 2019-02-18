@@ -32,7 +32,7 @@ newEntity{
 	rarity = 20,
 	cost = 14,
 	wielder = {
-		healing_factor = resolvers.mbonus_material(20, 10, function(e, v) v=v/100 return 0, v end), -- copied from robe.lua
+		healing_factor = resolvers.mbonus_material(10, 10, function(e, v) v=v/100 return 0, v end), -- copied from robe.lua
 		life_regen = resolvers.mbonus_material(120, 30, function(e, v) v=v/10 return 0, v end),
 		max_life=resolvers.mbonus_material(40, 30),
 	},
@@ -48,9 +48,8 @@ newEntity{
 	cost = 35,
 	wielder = {
 		combat_def = resolvers.mbonus_material(14, 2),
-		combat_def_ranged = resolvers.mbonus_material(14, 2),
 		movement_speed = 0.2,
-		inc_stats = { [Stats.STAT_DEX] = resolvers.mbonus_material(3, 2), },
+		inc_stats = { [Stats.STAT_DEX] = resolvers.mbonus_material(8, 2), },
 	},
 }
 

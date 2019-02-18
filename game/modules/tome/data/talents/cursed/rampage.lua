@@ -34,6 +34,7 @@ newTalent{
 	end,
 	getMovementSpeedChange = function(self, t) return self:combatTalentScale(t, 1.4, 3.13, 0.75) end, --Nerf this?
 	getCombatPhysSpeedChange = function(self, t) return self:combatTalentScale(t, 0.224, 0.5, 0.75) end,
+	getCombatMindSpeedChange = function(self, t) return self:combatTalentScale(t, 0.224, 0.5, 0.75) end,
 	on_pre_use = function(self, t, silent)
 		if self:hasEffect(self.EFF_RAMPAGE) then 
 			if not silent then game.logPlayer(self, "You are already rampaging!") end
@@ -48,6 +49,7 @@ newTalent{
 			maxDuration = t.getMaxDuration(self, t),
 			movementSpeedChange = t.getMovementSpeedChange(self, t),
 			combatPhysSpeedChange = t.getCombatPhysSpeedChange(self, t),
+			combatMindSpeedChange = t.getCombatMindSpeedChange(self, t),
 			physicalDamageChange = 0,
 			combatPhysResistChange = 0,
 			combatMentalResistChange = 0,
@@ -85,10 +87,12 @@ newTalent{
 		local maxDuration = t.getMaxDuration(self, t)
 		local movementSpeedChange = t.getMovementSpeedChange(self, t)
 		local combatPhysSpeedChange = t.getCombatPhysSpeedChange(self, t)
+		local combatMindSpeedChange = t.getCombatMindSpeedChange(self, t)
 		return ([[You enter a terrible rampage for %d turns (up to a maximum of %d turns), destroying everything in your path. Starting a rampage is instantaneous. You may also enter a rampage (50%% chance) when you are hit for more than 8%% of your max life. 
 		Any talent, rune or infusion you use while rampaging becomes a distraction, and reduces the duration of the rampage by 1. Your first movement while rampaging increases the rampage duration by 1.
 		Rampage Bonus: +%d%% movement speed.
-		Rampage Bonus: +%d%% attack speed]]):format(duration, maxDuration, movementSpeedChange * 100, combatPhysSpeedChange * 100)
+		Rampage Bonus: +%d%% attack speed.
+		Rampage Bonus: +%d%% mind speed.]]):format(duration, maxDuration, movementSpeedChange * 100, combatPhysSpeedChange * 100, combatMindSpeedChange *100)
 	end,
 }
 

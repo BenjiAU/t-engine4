@@ -161,7 +161,7 @@ newEntity{
 		inc_stats = {
 			[Stats.STAT_CON] = resolvers.mbonus_material(5, 1),
 		},
-		life_regen = resolvers.mbonus_material(54, 11, function(e, v) v=v/10 return 0, v end),
+		life_regen = resolvers.mbonus_material(15, 1, function(e, v) return 0, v end),
 		resists={
 			[DamageType.BLIGHT] = resolvers.mbonus_material(10, 5),
 	},	

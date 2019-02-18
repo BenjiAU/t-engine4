@@ -31,13 +31,13 @@ newEntity{
 	level_range = {1, 50},
 	rarity = 8,
 
-	charm_power_def = {add=50, max=500, floor=true},
+	charm_power_def = {add=100, max=700, floor=true},
 	resolvers.charm(
 		function(self, who) 
 			local heal = self.use_power.heal(self, who)
 			return ("heals yourself and all friendly characters within 10 spaces for %d"):
 				format(heal) end,
-		20,
+		15,
 		function(self, who)
 			local tg = self.use_power.target(self, who)
 			local heal = who:mindCrit(self.use_power.heal(self, who))
@@ -73,7 +73,7 @@ newEntity{
 			local dam = self.use_power.damage(self, who)
 			return ("instantly sting an enemy dealing %d nature damage over 7 turns and reducing their healing by 50%%%%"):format(dam, 50)
 		end,
-		12,
+		15,
 		function(self, who)
 			local tg = self.use_power.target(self, who)
 			local x, y = who:getTarget(tg)

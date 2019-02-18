@@ -197,8 +197,8 @@ newEntity{
 	rarity = 18,
 	cost = 60,
 	wielder = {
-		healing_factor = resolvers.mbonus_material(20, 10, function(e, v) v=v/100 return 0, v end),
-		life_regen = resolvers.mbonus_material(20, 10, function(e, v) v=v/10 return 0, v end),
+		healing_factor = resolvers.mbonus_material(10, 10, function(e, v) v=v/100 return 0, v end),
+		life_regen = resolvers.mbonus_material(10, 1, function(e, v) return 0, v end),
 		resists={
 			[DamageType.NATURE] = resolvers.mbonus_material(10, 10),
 			[DamageType.BLIGHT] = resolvers.mbonus_material(10, 10),

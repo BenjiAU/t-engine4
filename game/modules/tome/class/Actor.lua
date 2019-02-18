@@ -738,7 +738,7 @@ function _M:act()
 
 	if self:attr("never_act") then return false end
 
-	if not game.zone.wilderness and not self:attr("confused") and not self:attr("terrified") then self:automaticTalents() end
+	if not game.zone.wilderness and not self:attr("confused") --[[and not self:attr("terrified")]] then self:automaticTalents() end --terrified check for prosperity
 
 	-- Compute bonuses based on actors in FOV
 	if self:knowTalent(self.T_MILITANT_MIND) then
@@ -1689,6 +1689,7 @@ function _M:tooltip(x, y, seen_by)
 			local tst = ("#LIGHT_BLUE#Main:#LAST#"..o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
 			tst = tst:splitLines(game.tooltip.max-1, game.tooltip.font, 2)
 			tst = tst:extractLines(true)[1]
+			tst:add(" ("..math.floor(self:combatDamage(o.combat))..")")
 			table.append(ts, tst)
 			ts:add(true)
 		end
@@ -1698,6 +1699,7 @@ function _M:tooltip(x, y, seen_by)
 			local tst = ("#LIGHT_BLUE#Off :#LAST#"..o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
 			tst = tst:splitLines(game.tooltip.max-1, game.tooltip.font, 2)
 			tst = tst:extractLines(true)[1]
+			tst:add(" ("..math.floor(self:combatDamage(o.combat))..")")
 			table.append(ts, tst)
 			ts:add(true)
 		end
@@ -1707,6 +1709,7 @@ function _M:tooltip(x, y, seen_by)
 			local tst = ("#LIGHT_BLUE#Psi :#LAST#"..o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
 			tst = tst:splitLines(game.tooltip.max-1, game.tooltip.font, 2)
 			tst = tst:extractLines(true)[1]
+			tst:add(" ("..math.floor(self:combatDamage(o.combat))..")")
 			table.append(ts, tst)
 			ts:add(true)
 		end
@@ -1716,6 +1719,7 @@ function _M:tooltip(x, y, seen_by)
 			local tst = ("#LIGHT_BLUE#Ammo:#LAST#"..o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
 			tst = tst:splitLines(game.tooltip.max-1, game.tooltip.font, 2)
 			tst = tst:extractLines(true)[1]
+			tst:add(" ("..math.floor(self:combatDamage(o.combat))..")")
 			table.append(ts, tst)
 			ts:add(true)
 		end
@@ -2124,35 +2128,6 @@ function _M:onTakeHit(value, src, death_note)
 			game:delayedLogDamage(src, self, 0, ("#PINK#(%d linked)#LAST#"):format(displaced), false)
 			game:delayedLogDamage(src, shadow, displaced, ("#PINK#%d linked#LAST#"):format(displaced), false)
 			value = value - displaced
-		end
-	end
-
-	if value > 0 and self:isTalentActive(self.T_DISRUPTION_SHIELD) then
-		local mana = math.max(0, self:getMaxMana() - self:getMana())
-		local mana_val = value * self:attr("disruption_shield")
-		local converted = math.min(value, mana / self:attr("disruption_shield"))
-		game:delayedLogMessage(self, nil,  "disruption_shield", "#LIGHT_BLUE##Source# converts damage to mana!")
-		game:delayedLogDamage(src, self, 0, ("#LIGHT_BLUE#(%d converted)#LAST#"):format(converted), false)
-
-		-- We have enough to absorb the full hit
-		if mana_val <= mana then
-			self:incMana(mana_val)
-			self.disruption_shield_absorb = self.disruption_shield_absorb + value
-			return 0
-		-- Or the shield collapses in a deadly arcane explosion
-		else
-			self:incMana(mana)
-			self.disruption_shield_absorb = self.disruption_shield_absorb + mana / self:attr("disruption_shield")
-			value = value - mana / self:attr("disruption_shield")
-
-			local dam = self.disruption_shield_absorb
-
-			-- Deactivate without loosing energy
-			self:forceUseTalent(self.T_DISRUPTION_SHIELD, {ignore_energy=true})
-
-			-- Explode!
-			local t = self:getTalentFromId(self.T_DISRUPTION_SHIELD)
-			t.explode(self, t, dam)
 		end
 	end
 
@@ -2975,9 +2950,7 @@ function _M:die(src, death_note)
 	if src and src.hasEffect and src:hasEffect(src.EFF_CURSE_OF_CORPSES) then
 		local eff = src:hasEffect(src.EFF_CURSE_OF_CORPSES)
 		local def = src.tempeffect_def[src.EFF_CURSE_OF_CORPSES]
-		if not def.doReprieveFromDeath(src, eff, self) then
-			def.doCorpselight(src, eff, self)
-		end
+		def.doReprieveFromDeath(src, eff, self)
 	end
 
 	-- Curse of Shrouds: Shroud of Death
@@ -3450,10 +3423,7 @@ function _M:resetToFull()
 		if res_def.short_name == "paradox" then
 			self.paradox = self.preferred_paradox or 300
 		elseif res_def.short_name == "mana" then
-			-- Special handling of Disruption Shield to avoid penalizing Archmages on levelup
-			if not (self.isTalentActive and self:isTalentActive(self.T_DISRUPTION_SHIELD)) then
-				self.mana = self:getMaxMana()
-			end
+			self.mana = self:getMaxMana()
 		else
 			if res_def.invert_values or res_def.switch_direction then
 				self[res_def.short_name] = self:check(res_def.getMinFunction) or self[res_def.short_name] or res_def.min
@@ -3505,8 +3475,8 @@ function _M:levelup()
 	engine.interface.ActorLevel.levelup(self)
 	self:resolveLevelTalents()
 
-	-- Restock shops at level 5 and every 10 levels
-	if self == game.player and game.state.birth.stores_restock_by_level and ( (self.level % 10 == 0) or (self.level == 5) ) then
+	-- Restock shops at every 10 levels
+	if self == game.player and game.state.birth.stores_restock_by_level and ( (self.level % 10 == 0) ) then
 		if not (game.state.stores_restocks and game.state.stores_restocks[self.level]) then
 			game.state:storesRestock()
 			game.state.stores_restocks = game.state.stores_restocks or {}
@@ -4069,11 +4039,26 @@ function _M:onWear(o, inven_id, bypass_set, silent)
 							object_inven, conditions[1], conditions[2])
 					end
 				else
-					object, index, object_inven_id =
-						self:findInAllInventoriesBy(conditions[1], conditions[2])
+					-- Can't use Actor:findInAllInventories() here;
+					-- if a matching item is worn but there's also a
+					-- matching item in the pack,
+					-- findInAllInventories() may return the one that
+					-- is in the pack instead of the worn one
+					--
+					-- So manually search only the worn inventories
+					-- instead
+					for inven_id, inven in pairs(self.inven) do
+						if self:getInven(inven_id).worn then
+							object, index = self:findInInventoryBy(inven, conditions[1], conditions[2])
+							if object then
+								object_inven_id = inven_id
+								break
+							end
+						end
+					end
 				end
 				-- If we're wearing it, add it to the list.
-				if object and self:getInven(object_inven_id).worn and
+				if object and
 					(not object.set_complete or not object.set_complete[set_id])
 				then
 					table.insert(set_objects, {
@@ -4223,19 +4208,30 @@ function _M:onTakeoff(o, inven_id, bypass_set, silent)
 				if type(broken) == "table" then broken = broken[set_id] end
 				if broken then broken(d.object, self, d.inven_id, set_objects) end
 				if d.object._special_set then
-					for k, id in pairs(d.object._special_set) do
-						d.object:removeTemporaryValue(k, id)
+					if d.object._special_set[set_id] then
+						for k, id in pairs(d.object._special_set[set_id]) do
+							d.object:removeTemporaryValue(k, id)
+						end
+						d.object._special_set[set_id] = nil
+						-- Remove if empty.
+						if not next(d.object._special_set) then
+							d.object._special_set = nil
+						end
+					else -- Object only has one set (old behaviour)
+						for k, id in pairs(d.object._special_set) do
+							d.object:removeTemporaryValue(k, id)
+						end
+						d.object._special_set = nil
 					end
-					d.object._special_set = nil
 				end
 				if d.object ~= o then self:onWear(d.object, d.inven_id, true) end
 				self:useObjectDisable(d.object)
 				self:useObjectEnable(d.object)
 				d.object.set_complete[set_id] = nil
 				-- Remove if empty.
-				local empty = true
-				for k, v in pairs(d.object.set_complete) do empty = false break end
-				if empty then d.object.set_complete = nil end
+				if not next(d.object.set_complete) then
+					d.object.set_complete = nil
+				end
 			end
 		end
 	end
@@ -4542,7 +4538,8 @@ end
 local oldGetTalentTypeMastery = _M.getTalentTypeMastery
 function _M:getTalentTypeMastery(tt)
 	local mastery = oldGetTalentTypeMastery(self, tt)
-	local bonus1 = self.talents_mastery_bonus and self.talents_mastery_bonus[tt.category] or 0
+	local def = self:getTalentTypeFrom(tt)
+	local bonus1 = self.talents_mastery_bonus and self.talents_mastery_bonus[def.category] or 0
 	local bonus2 = self.talents_mastery_bonus and self.talents_mastery_bonus.all or 0
 	return mastery + bonus1 + bonus2
 end
@@ -5291,7 +5288,8 @@ function _M:preUseTalent(ab, silent, fake)
 			end
 		end
 
-		-- terrified effect
+		-- old terrified effect, for prosperity
+		--[[
 		if self:attr("terrified") and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) and util.getval(ab.no_energy, self, ab) ~= true and not fake and not self:attr("force_talent_ignore_ressources") then
 			local eff = self:hasEffect(self.EFF_TERRIFIED)
 			if rng.percent(self:attr("terrified")) then
@@ -5300,6 +5298,7 @@ function _M:preUseTalent(ab, silent, fake)
 				return false
 			end
 		end
+		]]
 		
 		-- Fumble
 		if self:attr("scoundrel_failure") and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) and util.getval(ab.no_energy, self, ab) ~= true and not fake and not self:attr("force_talent_ignore_ressources") then
@@ -5863,7 +5862,7 @@ function _M:postUseTalent(ab, ret, silent)
 
 	if self.turn_procs.anomalies_checked then self.turn_procs.anomalies_checked = nil end  -- clears out anomaly checks
 
-	if config.settings.tome.talents_flyers and not self:attr("save_cleanup") and self.x and self.y and game.level.map.seens(self.x, self.y) then
+	if config.settings.tome.talents_flyers and not self:attr("save_cleanup") and self.x and self.y and game.level.map.seens(self.x, self.y) and ab.id ~= "T_ATTACK" then
 		local name = (ab.display_entity and ab.display_entity:getDisplayString() or "")..ab.name
 		local sx, sy = game.level.map:getTileToScreen(self.x, self.y, true)
 		game.flyers:add(sx, sy - game.level.map.tile_h / 2, 20, rng.float(-0.1, 0.1), rng.float(-0.5,-0.8), name, colors.simple(colors.OLIVE_DRAB))
@@ -6167,6 +6166,12 @@ function _M:getTalentCooldown(t, base)
 	local eff = self:hasEffect(self.EFF_BURNING_HEX)
 	if eff and not self:attr("talent_reuse") then
 		cd = 1 + cd * eff.power
+	end
+
+	--terrified cooldown increase effect
+	local eff = self:hasEffect(self.EFF_TERRIFIED)
+	if eff and not self:attr("talent_reuse") and not (t.fixed_cooldown or base) then
+		cd = math.ceil(cd * (1 + eff.cooldownPower))
 	end
 
 	local p = self:isTalentActive(self.T_MATRIX)
@@ -6848,10 +6853,6 @@ function _M:on_set_temporary_effect(eff_id, e, p)
 		local t = self:getTalentFromId(self.T_VITALITY)
 		p.dur = math.ceil(p.dur * (1 - util.bound(t.getWoundReduction(self, t), 0, 1)))
 	end
-	if self:hasEffect(self.EFF_HAUNTED) and e.subtype and e.subtype.fear then
-		local e = self.tempeffect_def[self.EFF_HAUNTED]
-		e.on_setFearEffect(self, e)
-	end
 	if e.status == "detrimental" and e.type ~= "other" and self:attr("negative_status_effect_immune") then
 		p.dur = 0
 	end
@@ -7485,4 +7486,32 @@ function _M:projectSource(t, x, y, damtype, dam, particles, source)
 	self.__project_source = source
 	self:project(t, x, y, damtype, dam, particles)
 	self.__project_source = old_source
+end
+
+-- Superload from ActorPoject to handle player_selffire
+function _M:projectDoAct(typ, tg, damtype, dam, particles, px, py, tmp)
+	-- Now project on each grid, one type
+	-- Call the projected method of the target grid if possible
+	if not game.level.map:checkAllEntities(px, py, "projected", self, typ, px, py, damtype, dam, particles) then
+		-- Check self- and friendly-fire, and if the projection "misses"
+		local act = game.level.map(px, py, engine.Map.ACTOR)
+		if act and act == self and not (
+			((type(typ.selffire) == "number" and rng.percent(typ.selffire)) 
+			or 
+			(type(typ.selffire) ~= "number" and typ.selffire))
+			and (act == game.player and typ.player_selffire)  -- Disable friendlyfire for player projectiles unless explicitly overriden
+			)
+			then
+		elseif act and self.reactionToward and (self:reactionToward(act) >= 0) and not ((type(typ.friendlyfire) == "number" and rng.percent(typ.friendlyfire)) or (type(typ.friendlyfire) ~= "number" and typ.friendlyfire)) then
+		-- Otherwise hit
+		else
+			DamageType:projectingFor(self, {project_type=tg})
+			if type(damtype) == "function" then if damtype(px, py, tg, self, tmp) then return true end
+			else DamageType:get(damtype).projector(self, px, py, damtype, dam, tmp, nil, tg) end
+			if particles and type(particles) == "table" then
+				game.level.map:particleEmitter(px, py, 1, particles.type, particles.args)
+			end
+			DamageType:projectingFor(self, nil)
+		end
+	end
 end

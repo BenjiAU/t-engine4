@@ -80,7 +80,7 @@ newEntity{
 	rarity = 4,
 	cost = 5,
 	wielder = {
-		life_regen = resolvers.mbonus_material(40, 8, function(e, v) v=v/10 return 0, v end),
+		life_regen = resolvers.mbonus_material(8, 1, function(e, v) return 0, v end),
 		stun_immune = resolvers.mbonus_material(30, 20, function(e, v) v=v/100 return 0, v end),
 	},
 }
@@ -513,8 +513,8 @@ newEntity{
 	cost = 50,
 	wielder = {
 		max_life=resolvers.mbonus_material(60, 40),
-		life_regen = resolvers.mbonus_material(15, 5, function(e, v) v=v/10 return 0, v end),
-		healing_factor = resolvers.mbonus_material(20, 10, function(e, v) v=v/100 return 0, v end),
+		life_regen = resolvers.mbonus_material(15, 5, function(e, v) return 0, v end),
+		healing_factor = resolvers.mbonus_material(10, 10, function(e, v) v=v/100 return 0, v end),
 	},
 }
 
@@ -547,7 +547,7 @@ newEntity{
 	wielder = {
 		resists={
 			[DamageType.NATURE] = resolvers.mbonus_material(10, 5),
-		   [DamageType.BLIGHT] = resolvers.mbonus_material(10, 5),
+			[DamageType.BLIGHT] = resolvers.mbonus_material(10, 5),
 		},
 		poison_immune = resolvers.mbonus_material(20, 10, function(e, v) v=v/100 return 0, v end),
 		disease_immune = resolvers.mbonus_material(20, 10, function(e, v) v=v/100 return 0, v end),
@@ -565,12 +565,12 @@ newEntity{
 	resolvers.charmt(Talents.T_BLEEDING_EDGE, {2,3,4}, 20),
 	wielder = {
 		melee_project = {
-			[DamageType.BLEED] = resolvers.mbonus_material(20, 5),
-			[DamageType.ITEM_MIND_GLOOM] = resolvers.mbonus_material(10, 10),
+			[DamageType.PHYSICAL] = resolvers.mbonus_material(30, 5),
+			[DamageType.ITEM_MIND_EXPOSE] = resolvers.mbonus_material(10, 10),
 		},
 		ranged_project = {
-			[DamageType.BLEED] = resolvers.mbonus_material(20, 5),
-			[DamageType.ITEM_MIND_GLOOM] = resolvers.mbonus_material(10, 10),
+			[DamageType.PHYSICAL] = resolvers.mbonus_material(30, 5),
+			[DamageType.ITEM_MIND_EXPOSE] = resolvers.mbonus_material(10, 10),
 		},
 		inc_stats = {
 			[Stats.STAT_CUN] = resolvers.mbonus_material(9, 1),
@@ -598,7 +598,6 @@ newEntity{
 	},
 }
 
--- Instant so it isn't strictly worse than Psychoport/etc
 newEntity{
 	power_source = {technique=true},
 	name = " of pilfering", suffix=true, instant_resolve=true,
@@ -635,20 +634,22 @@ newEntity{
 -- Multihit synergy and early anti-armor 
 newEntity{
 	power_source = {arcane=true},
-	name = " of blinding strikes", suffix=true, instant_resolve=true,
-	keywords = {strikes=true},
+	name = " of luminosity", suffix=true, instant_resolve=true,
+	keywords = {luminosity=true},
 	level_range = {10, 50},
 	greater_ego = 1,
 	rarity = 30,
 	cost = 60,
 	wielder = {
 		melee_project = {
-			[DamageType.LIGHT] = resolvers.mbonus_material(30, 20),
-			[DamageType.ITEM_LIGHT_BLIND] = resolvers.mbonus_material(25, 10),
+			[DamageType.LIGHT] = resolvers.mbonus_material(30, 10),
 		},
 		ranged_project = {
-			[DamageType.LIGHT] = resolvers.mbonus_material(30, 20),
-			[DamageType.ITEM_LIGHT_BLIND] = resolvers.mbonus_material(25, 10),
+			[DamageType.LIGHT] = resolvers.mbonus_material(30, 10),
 		},
+		inc_stats = {
+			[Stats.STAT_MAG] = resolvers.mbonus_material(9, 1),
+		},
+		inc_damage = { [DamageType.LIGHT] = resolvers.mbonus_material(10, 10) },
 	},
 }
