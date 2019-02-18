@@ -378,5 +378,9 @@ function _M:makeKeyChar(i)
 	end
 end
 
+function _M:getLastPosition()
+	return self.do_container:getTranslate(true)
+end
+
 function _M:display(x, y, nb_keyframes, screen_x, screen_y, offset_x, offset_y, local_x, local_y)
 end

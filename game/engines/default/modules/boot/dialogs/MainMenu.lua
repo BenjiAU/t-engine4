@@ -137,7 +137,8 @@ function _M:setupDLCButtons()
 	self.c_dlc_embers = ButtonImage.new{no_decoration=true, alpha_unfocus=1, file="dlcs-icons/"..(has_embers and "" or "no-").."embers.png", fct=function() util.browserOpenUrl("https://te4.org/dlc/orcs") end}
 	self.c_dlc_cults = ButtonImage.new{no_decoration=true, alpha_unfocus=1, file="dlcs-icons/"..(has_cults and "" or "no-").."cults.png", fct=function() util.browserOpenUrl("https://te4.org/dlc/cults") end}
 	self.c_dlc_ashes.on_focus_change = function(self, v)
-		if v then game:floatingTooltip(self.last_display_x, self.last_display_y, "top", {
+		local posx, posy = self:getLastPosition()
+		if v then game:floatingTooltip(posx, posy, "top", {
 			Image.new{file="dlcs-icons/ashes-banner.png", width=467, height=181},
 [[#{bold}##GOLD#Ashes of Urh'Rok - Expansion#LAST##{normal}#
 #{italic}##ANTIQUE_WHITE#Many in Maj'Eyal have heard of "demons", sadistic creatures who appear seemingly from nowhere, leaving a trail of suffering and destruction whereever they go.#{normal}##LAST#
@@ -153,7 +154,8 @@ function _M:setupDLCButtons()
 		end
 	end
 	self.c_dlc_embers.on_focus_change = function(self, v)
-		if v then game:floatingTooltip(self.last_display_x, self.last_display_y, "top", {
+		local posx, posy = self:getLastPosition()
+		if v then game:floatingTooltip(posx, posy, "top", {
 			Image.new{file="dlcs-icons/embers-banner.png", width=467, height=181},
 [[#{bold}##GOLD#Embers of Rage - Expansion#LAST##{normal}#
 #{italic}##ANTIQUE_WHITE#One year has passed since the one the Orcs call the "Scourge from the West" came and single-handedly crushed the Orc Prides of Grushnak, Vor, Gorbat, and Rak'Shor.  The Allied Kingdoms, now linked by farportal to their distant, long-lost Sunwall allies, have helped them conquer most of Var'Eyal.  The few remnants of the ravaged Prides are caged...  but one Pride remains.#{normal}##LAST#
@@ -171,7 +173,8 @@ function _M:setupDLCButtons()
 		end
 	end
 	self.c_dlc_cults.on_focus_change = function(self, v)
-		if v then game:floatingTooltip(self.last_display_x, self.last_display_y, "top", {
+		local posx, posy = self:getLastPosition()
+		if v then game:floatingTooltip(posx, posy, "top", {
 			Image.new{file="dlcs-icons/cults-banner.png", width=467, height=181},
 [[#{bold}##GOLD#Forgotten Cults - Expansion#LAST##{normal}#
 #{italic}##ANTIQUE_WHITE#Not all adventurers seek fortune, not all that defend the world have good deeds in mind. Lately the number of sightings of horrors have grown tremendously. People wander off the beaten paths only to be found years later, horribly mutated and partly insane, if they are found at all. It is becoming evident something is stirring deep below Maj'Eyal. That something is you.#{normal}##LAST#

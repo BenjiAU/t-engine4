@@ -149,27 +149,38 @@ function table.findValue(t, fv)
 	end
 end
 
-function table.print_shallow(src, offset, ret)
-	if type(src) ~= "table" then print("table.print has no table:", src) return end
+function table.print_shallow(src, offset, line_feed)
+	if type(src) ~= "table" then io.stdout:write("table.print has no table:", src) io.stdout:write(line_feed) return end
 	offset = offset or ""
 	for k, e in pairs(src) do
-		print(("%s[%s] = %s"):format(offset, tostring(k), tostring(e)))
+		io.stdout:write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) io.stdout:write(line_feed)
 	end
 end
 
-function table.print(src, offset, ret)
-	if type(src) ~= "table" then print("table.print has no table:", src) return end
+function table.print(src, offset, line_feed)
+	if not line_feed then line_feed = '\n' end
+	if type(src) ~= "table" then io.stdout:write("table.print has no table:", src) io.stdout:write(line_feed) return end
 	offset = offset or ""
 	for k, e in pairs(src) do
 		-- Deep copy subtables, but not objects!
 		if type(e) == "table" and not e.__ATOMIC and not e.__CLASSNAME then
-			print(("%s[%s] = {"):format(offset, tostring(k)))
-			table.print(e, offset.."  ")
-			print(("%s}"):format(offset))
+			io.stdout:write(("%s[%s] = {"):format(offset, tostring(k))) io.stdout:write(line_feed)
+			table.print(e, offset.."  ", line_feed)
+			io.stdout:write(("%s}"):format(offset)) io.stdout:write(line_feed)
 		else
-			print(("%s[%s] = %s"):format(offset, tostring(k), tostring(e)))
+			io.stdout:write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) io.stdout:write(line_feed)
 		end
 	end
+end
+
+function tprint(...)
+	local args = {...}
+	for i, str in ipairs(args) do
+		if type(str) == "table" then io.stdout:write('{ ') table.print(str, nil, ', ') io.stdout:write(' }')
+		else io.stdout:write(tostring(str)) end
+		if i < #args then io.stdout:write('\t') end
+	end
+	io.stdout:write('\n')
 end
 
 function table.iprint(src, offset)

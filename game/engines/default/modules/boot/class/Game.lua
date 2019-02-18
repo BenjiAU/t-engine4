@@ -504,7 +504,6 @@ function _M:display(nb_keyframes)
 		self.logdisplay:toScreen()
 		engine.GameEnergyBased.display(self, nb_keyframes)
 		if self.floating_tooltip_pos and (#self.dialogs == 0 or self.dialogs[#self.dialogs].__main_menu) then
-			print("---")
 			self.floating_tooltip:toScreen(self.floating_tooltip_pos.x, self.floating_tooltip_pos.y)
 		end
 		self.full_fbo:use(false)
