@@ -84,7 +84,7 @@ function _M:init()
 	-- if config.settings.cheat then l[#l+1] = {name="foo", fct=function() Dialog:simpleWaiter("Test", "Test", 500, nil, 500) end} end
 	-- if config.settings.cheat then l[#l+1] = {name="foo", fct=function() if core.game.CProfiler then core.game.CProfiler("luastarted.profiler.prof") end end} end
 
-	self.c_background = Checkbox.new{title="Disable animated background", checked=game.stopped and true or false, on_change=function() self:switchBackground() end}
+	self.c_background = Checkbox.new{title="Disable animated background", default=config.settings.boot_menu_background and true or false, on_change=function() self:switchBackground() end}
 	-- self.c_background = Button.new{text=game.stopped and "Enable background" or "Disable background", fct=function() self:switchBackground() end}
 	self.c_version = Textzone.new{font={FontPackage:getFont("default"), 10}, auto_width=true, auto_height=true, text=("#{bold}##B9E100#T-Engine4 version: %d.%d.%d"):format(engine.version[1], engine.version[2], engine.version[3])}
 
@@ -336,8 +336,6 @@ end
 function _M:switchBackground()
 	game.stopped = not game.stopped
 	game:saveSettings("boot_menu_background", ("boot_menu_background = %s\n"):format(tostring(game.stopped)))
-	self.c_background.text = game.stopped and "Enable background" or "Disable background"
-	self.c_background:generate()
 
 	if game.stopped then
 		core.game.setRealtime(0)
