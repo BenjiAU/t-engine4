@@ -150,6 +150,7 @@ function table.findValue(t, fv)
 end
 
 function table.print_shallow(src, offset, line_feed)
+	if not line_feed then line_feed = '\n' end
 	if type(src) ~= "table" then io.stdout:write("table.print has no table:", src) io.stdout:write(line_feed) return end
 	offset = offset or ""
 	for k, e in pairs(src) do
@@ -173,6 +174,22 @@ function table.print(src, offset, line_feed)
 	end
 end
 
+function table.iprint(src, offset, line_feed)
+	if not line_feed then line_feed = '\n' end
+	if type(src) ~= "table" then io.stdout:write("table.iprint has no table:", src) io.stdout:write(line_feed) return end
+	offset = offset or ""
+	for k, e in ipairs(src) do
+		-- Deep copy subtables, but not objects!
+		if type(e) == "table" and not e.__ATOMIC and not e.__CLASSNAME then
+			io.stdout:write(("%s[%s] = {"):format(offset, tostring(k))) io.stdout:write(line_feed)
+			table.print(e, offset.."  ")
+			io.stdout:write(("%s}"):format(offset)) io.stdout:write(line_feed)
+		else
+			io.stdout:write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) io.stdout:write(line_feed)
+		end
+	end
+end
+
 function tprint(...)
 	local args = {...}
 	for i, str in ipairs(args) do
@@ -181,21 +198,6 @@ function tprint(...)
 		if i < #args then io.stdout:write('\t') end
 	end
 	io.stdout:write('\n')
-end
-
-function table.iprint(src, offset)
-	if type(src) ~= "table" then print("table.iprint has no table:", src) return end
-	offset = offset or ""
-	for k, e in ipairs(src) do
-		-- Deep copy subtables, but not objects!
-		if type(e) == "table" and not e.__ATOMIC and not e.__CLASSNAME then
-			print(("%s[%s] = {"):format(offset, tostring(k)))
-			table.print(e, offset.."  ")
-			print(("%s}"):format(offset))
-		else
-			print(("%s[%s] = %s"):format(offset, tostring(k), tostring(e)))
-		end
-	end
 end
 
 --- Generate a containing indexes between a and b and set to value v
