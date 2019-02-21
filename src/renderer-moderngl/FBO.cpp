@@ -48,6 +48,7 @@ DORTarget::DORTarget(int w, int h, int nbt, bool hdr, bool depth) {
 	this->nbt = nbt;
 	this->w = w;
 	this->h = h;
+	this->hdr = hdr;
 
 	view = NULL;
 
@@ -78,6 +79,30 @@ DORTarget::~DORTarget() {
 	if (picking_fbo) glDeleteFramebuffers(1, &picking_fbo);
 }
 
+void DORTarget::setupFramebufferTexture(GLuint tex, int w, int h, bool hdr) {
+	tfglBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, hdr ? GL_RGBA16F : GL_RGBA8,  w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+GLuint DORTarget::extractFramebufferTexture(int w, int h, int i, bool hdr, Fbo *fbo) {
+	GLuint res = fbo->textures[i].texture;
+
+	GLuint nt;
+	glGenTextures(1, &nt);
+
+	fbo->textures[i].texture = nt;
+	fbo->textures[i].gc = true;
+	setupFramebufferTexture(fbo->textures[i].texture, w, h, hdr);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, fbo->textures[i].texture, 0);
+	fbo->buffers[i] = GL_COLOR_ATTACHMENT0 + i;
+
+	return res;
+}
+
 void DORTarget::makeFramebuffer(int w, int h, int nbt, bool hdr, bool depth, Fbo *fbo) {
 	glGenFramebuffers(1, &fbo->fbo);
 	tglBindFramebuffer(GL_FRAMEBUFFER, fbo->fbo);
@@ -105,12 +130,7 @@ void DORTarget::makeFramebuffer(int w, int h, int nbt, bool hdr, bool depth, Fbo
 	for (i = 0; i < nbt; i++) {
 		fbo->textures[i].texture = td[i];
 		fbo->textures[i].gc = true;
-		tfglBindTexture(GL_TEXTURE_2D, fbo->textures[i].texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, hdr ? GL_RGBA16F : GL_RGBA8,  w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		setupFramebufferTexture(fbo->textures[i].texture, w, h, hdr);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, fbo->textures[i].texture, 0);
 		fbo->buffers[i] = GL_COLOR_ATTACHMENT0 + i;
 	}
@@ -206,6 +226,22 @@ void DORTarget::use(bool activate) {
 			tglBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 	}
+}
+
+GLuint DORTarget::extractTexture(int idx) {
+	if (idx < 0 || idx >= nbt) idx = 0;
+
+	// We do not use "use()" because we only need binding, we do NOT want to clear&reset it
+	tglBindFramebuffer(GL_FRAMEBUFFER, fbo.fbo);
+
+	GLuint res = extractFramebufferTexture(w, h, idx, hdr, &fbo);
+
+	if (!fbo_stack.empty()) {
+		tglBindFramebuffer(GL_FRAMEBUFFER, fbo_stack.top());
+	} else {
+		tglBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+	return res;
 }
 
 void DORTarget::setAutoRender(SubRenderer *o, int ref) {

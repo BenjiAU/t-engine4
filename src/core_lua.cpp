@@ -942,7 +942,7 @@ static int sdl_surface_to_texture(lua_State *L)
 	copy_surface_to_texture(*s);
 	t->w = (*s)->w;
 	t->h = (*s)->h;
-	t->no_free = FALSE;
+	t->no_free = false;
 
 	lua_pushnumber(L, fw);
 	lua_pushnumber(L, fh);

@@ -225,73 +225,6 @@ static int sdl_font_style(lua_State *L) {
 	return 0;
 }
 
-static int sdl_new_tile(lua_State *L) {
-	int w = luaL_checknumber(L, 1);
-	int h = luaL_checknumber(L, 2);
-	FontInstance *f = *(FontInstance**)auxiliar_checkclass(L, "sdl{font}", 3);
-	size_t lenstr;
-	const char *str = luaL_checklstring(L, 4, &lenstr);
-	int x = luaL_checknumber(L, 5);
-	int y = luaL_checknumber(L, 6);
-	Uint8 r = luaL_checknumber(L, 7);
-	Uint8 g = luaL_checknumber(L, 8);
-	Uint8 b = luaL_checknumber(L, 9);
-	Uint8 br = luaL_checknumber(L, 10);
-	Uint8 bg = luaL_checknumber(L, 11);
-	Uint8 bb = luaL_checknumber(L, 12);
-	Uint8 alpha = luaL_checknumber(L, 13);
-
-	SDL_Color color = {r,g,b};
-	// SDL_Surface *txt = TTF_RenderUTF8_Blended(f->font, str, color);
-	int32_t c;
-	utf8proc_iterate((const uint8_t*)str, lenstr, &c);
-	// texture_glyph_t *d = ftgl::texture_font_get_glyph(f->font, c);
-
-	SDL_Surface **s = (SDL_Surface**)lua_newuserdata(L, sizeof(SDL_Surface*));
-	auxiliar_setclass(L, "sdl{surface}", -1);
-
-	Uint32 rmask, gmask, bmask, amask;
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	rmask = 0xff000000;
-	gmask = 0x00ff0000;
-	bmask = 0x0000ff00;
-	amask = 0x000000ff;
-#else
-	rmask = 0x000000ff;
-	gmask = 0x0000ff00;
-	bmask = 0x00ff0000;
-	amask = 0xff000000;
-#endif
-
-	*s = SDL_CreateRGBSurface(
-		SDL_SWSURFACE,
-		w,
-		h,
-		32,
-		rmask, gmask, bmask, amask
-		);
-
-	SDL_FillRect(*s, NULL, SDL_MapRGBA((*s)->format, br, bg, bb, alpha));
-
-	// DGDGDGDG -- make newTile work again
-	// if (txt)
-	// {
-		// if (!alpha) SDL_SetAlpha(txt, 0, 0);
-		// sdlDrawImage(*s, txt, x, y);
-
-		// SDL_Rect r;
-		// r.w=image->w;
-		// r.h=image->h;
-		// r.x=x;
-		// r.y=y;
-		// int errcode = SDL_BlitSurface(image, NULL, *s, &r);
-
-		// SDL_FreeSurface(txt);
-	// }
-
-	return 1;
-}
-
 static int sdl_font_total(lua_State *L) {
 	lua_pushnumber(L, nb_fonts);
 	return 1;
@@ -310,7 +243,6 @@ static const struct luaL_Reg sdl_font_reg[] = {
 
 const luaL_Reg fontlib[] = {
 	{"newFont", sdl_new_font},
-	{"newTile", sdl_new_tile},
 	{"totalOpenFonts", sdl_font_total},
 	{NULL, NULL}
 };

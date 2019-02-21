@@ -50,8 +50,11 @@ function _M:loadTileset(file)
 end
 
 function _M:init(w, h, fontname, fontsize, texture, allow_backcolor)
+	if not texture then
+		error("[Tiles] ERROR: Tiles.new does not support non-texture anymore")
+	end
+
 	self.allow_backcolor = allow_backcolor
-	self.texture = texture
 	self.w, self.h = w, h
 	self.font = core.display.newFont(fontname or "/data/font/DroidSansMono.ttf", fontsize or 14)
 	self.repo = {}
@@ -128,7 +131,7 @@ function _M:get(char, fr, fg, fb, br, bg, bb, image, alpha, do_outline, allow_ti
 		local s, sw, sh, w, h
 		local is_image = false
 		if (self.use_images or not dochar) and image and #image > 4 then
-			if allow_tileset and self.texture then
+			if allow_tileset then
 				local ts, fx, fy, tsx, tsy, tw, th = self:checkTileset(image)
 				if ts then
 					self.repo[char] = self.repo[char] or {}
@@ -140,27 +143,23 @@ function _M:get(char, fr, fg, fb, br, bg, bb, image, alpha, do_outline, allow_ti
 			end
 			print("Loading tile", image, " even though tileset was", allow_tileset)
 
-			if self.texture then
-				local t, w, h  = core.loader.png(concatPrefix(self.prefix, image), self.sharp_scaling, not force_texture_repeat)
-				if not t then t, w, h = core.loader.png(baseImageFile(image), self.sharp_scaling, not force_texture_repeat) end
-				local ts, fx, fy, tsx, tsy, tw, th = t, 1, 1, 0, 0, w, h
-				if ts then
-					self.repo[char] = self.repo[char] or {}
-					self.repo[char][fgidx] = self.repo[char][fgidx] or {}
-					self.repo[char][fgidx][bgidx] = {ts, fx, fy, tw, th, tsx, tsy}
-					-- print(("------- TILE[%s] = texture (tile/%s: %fx%f %dx%d)"):format(char, ts:getValue(), fx, fy, tw, th))
-					return ts, fx, fy, tw, th, tsx, tsy
-				end
-			else
-				s = core.display.loadImage(concatPrefix(self.prefix, image))
-				if not s then s = core.display.loadImage(baseImageFile(image)) end
-				if s then is_image = true end
+			local t, w, h  = core.loader.png(concatPrefix(self.prefix, image), self.sharp_scaling, not force_texture_repeat)
+			if not t then t, w, h = core.loader.png(baseImageFile(image), self.sharp_scaling, not force_texture_repeat) end
+			local ts, fx, fy, tsx, tsy, tw, th = t, 1, 1, 0, 0, w, h
+			if ts then
+				self.repo[char] = self.repo[char] or {}
+				self.repo[char][fgidx] = self.repo[char][fgidx] or {}
+				self.repo[char][fgidx][bgidx] = {ts, fx, fy, tw, th, tsx, tsy}
+				-- print(("------- TILE[%s] = texture (tile/%s: %fx%f %dx%d)"):format(char, ts:getValue(), fx, fy, tw, th))
+				return ts, fx, fy, tw, th, tsx, tsy
 			end
 		end
 
 		local pot_width = math.pow(2, math.ceil(math.log(self.w-0.1) / math.log(2.0)))
 		local pot_height = math.pow(2, math.ceil(math.log(self.h-0.1) / math.log(2.0)))
 
+		-- We have no image yet, let's jsut try to make an ASCII tile
+		local offx, offy = 0, 0
 		if not s then
 			local w, h = self.font:size(dochar)
 			if not self.allow_backcolor or br < 0 then br = nil end
@@ -168,14 +167,8 @@ function _M:get(char, fr, fg, fb, br, bg, bb, image, alpha, do_outline, allow_ti
 			if not self.allow_backcolor or bb < 0 then bb = nil end
 			if not self.allow_backcolor then alpha = 0 end
 
-			-- DGDGDGDG: idea! to replace newtile, instead use a font atlas and grab glyph coords inside and make a MO from that
-			-- so this uses the same
-			-- DGDGDGDG: better idea, now that MO can have back & front DOs make a text DO and a plain color DO (for background if needed)
-			-- and set them on an MO
-			s = core.display.newTile(pot_width, pot_height, self.font, dochar, (pot_width - w) / 2, (pot_height - h) / 2, fr, fg, fb, br or 0, bg or 0, bb or 0, alpha)
-		end
-
-		if self.texture then
+			s, w, h, sw, sh = self:makeTextTile(pot_width, pot_height, dochar, fr, fg, fb, br or 0, bg or 0, bb or 0, alpha)
+		else
 			w, h = s:getSize()
 			s, sw, sh = s:glTexture(self.sharp_scaling, not force_texture_repeat)
 			sw, sh = w / sw, h / sh
@@ -186,21 +179,40 @@ function _M:get(char, fr, fg, fb, br, bg, bb, image, alpha, do_outline, allow_ti
 					s = s:makeOutline(do_outline.x*pot_width/self.w, do_outline.y*pot_height/self.h, pot_width, pot_height, do_outline.r, do_outline.g, do_outline.b, do_outline.a) or s
 				end
 			end
-		else
-			sw, sh = s:getSize()
-			w, h = sw, sh
 		end
 
 		self.repo[char] = self.repo[char] or {}
 		self.repo[char][fgidx] = self.repo[char][fgidx] or {}
-		self.repo[char][fgidx][bgidx] = {s, sw, sh, w, h, 0, 0}
+		self.repo[char][fgidx][bgidx] = {s, sw, sh, w, h, offx, offy}
 		-- print(("------- TILE[%s] = texture (%s: %fx%f %dx%d)"):format(char, s:getValue(), sw, sh, w, h))
 		return s, sw, sh, w, h
 	end
 end
 
+function _M:makeTextTile(w, h, char, fr, fg, fb, br, bg, bb, alpha)
+	if not self.ascii_maker then
+		self.ascii_maker_text = core.renderer.text(self.font):translate(self.w / 2, self.h / 2)
+		self.ascii_maker_rdr = core.renderer.renderer("static"):setRendererName("Tiles:ASCIIMaker")
+		self.ascii_maker_bg = core.renderer.colorQuad(0, 0, self.w, self.h, 1, 1, 1, 1):shown(false)
+		self.ascii_maker_rdr:add(self.ascii_maker_bg):add(self.ascii_maker_text)
+		self.ascii_maker_view = core.renderer.view():ortho(self.w, self.h, false)
+		self.ascii_maker = core.renderer.target(self.w, self.h, 1, false):view(self.ascii_maker_view):setAutoRender(self.ascii_maker_rdr)
+	end
+	if br > 0 or bg > 0 or bb > 0 then
+		self.ascii_maker_bg:shown(true):color(br / 255, bg / 255, bb / 255, alpha / 255)
+	else
+		self.ascii_maker_bg:shown(false)
+	end
+	self.ascii_maker_text:text(char, true):color(fr / 255, fg / 255, fb / 255, 1):center()
+	local tex = self.ascii_maker:compute():extractTexture(0)
+	return tex, self.w, self.h, 1, 1
+end
+
 function _M:clean()
 	self.repo = {}
 	self.texture_store = {}
+	self.ascii_maker_text = nil
+	self.ascii_maker_rdr = nil
+	self.ascii_maker = nil
 	collectgarbage("collect")
 end

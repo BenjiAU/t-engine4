@@ -800,6 +800,25 @@ static int gl_target_target_texture(lua_State *L)
 	return 1;
 }
 
+static int gl_target_extract_texture(lua_State *L)
+{
+	DORTarget *v = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
+	int idx = luaL_checknumber(L, 2);
+
+	texture_type *t = (texture_type*)lua_newuserdata(L, sizeof(texture_type));
+	auxiliar_setclass(L, "gl{texture}", -1);
+
+	int w, h;
+	v->getDisplaySize(&w, &h);
+	t->tex = v->extractTexture(idx);
+	// printf("[DOTarget] ExtractTexture(%d) => %d\n", idx, t->tex);
+	t->w = w;
+	t->h = h;
+	t->no_free = false;
+	
+	return 1;
+}
+
 static int gl_target_mode_none(lua_State *L)
 {
 	DORTarget *v = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
@@ -2037,6 +2056,7 @@ static const struct luaL_Reg gl_target_reg[] =
 	{"view", gl_target_view},
 	{"texture", gl_target_texture},
 	{"textureTarget", gl_target_target_texture},
+	{"extractTexture", gl_target_extract_texture},
 	{"removeMode", gl_target_mode_none},
 	{"blurMode", gl_target_mode_blur},
 	{"blurModeDownsampling", gl_target_mode_blur_downsampling},

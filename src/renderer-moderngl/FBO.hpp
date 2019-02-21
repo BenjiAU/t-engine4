@@ -134,6 +134,7 @@ protected:
 	int w, h;
 	Fbo fbo;
 	int nbt = 0;
+	bool hdr = false;
 	float clear_r = 0, clear_g = 0, clear_b = 0, clear_a = 1; 
 	SubRenderer *subrender = NULL;
 	int subrender_lua_ref = LUA_NOREF;
@@ -174,7 +175,11 @@ public:
 	void toScreen(int x, int y);
 
 	void setSpecialMode(TargetSpecialMode *mode);
+	
+	GLuint extractTexture(int idx);
 
+	void setupFramebufferTexture(GLuint tex, int w, int h, bool hdr);
+	GLuint extractFramebufferTexture(int w, int h, int i, bool hdr, Fbo *fbo);
 	void makeFramebuffer(int w, int h, int nbt, bool hdr, bool depth, Fbo *fbo);
 	void deleteFramebuffer(Fbo *fbo);
 	void useFramebuffer(Fbo *fbo);

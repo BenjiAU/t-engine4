@@ -378,13 +378,10 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	long int start_time;
 	int nb_draws_start;
 	if (count_time) start_time = SDL_GetTicks();
-	if (count_draws) {
-		nb_draws_start = nb_draws;
-	}
+	if (count_draws) nb_draws_start = nb_draws;
 	nb_rgl++;
 
 	cur_model = cur_model * model; // This is .. undeeded ..??
-	// View *use_view = view ? view : View::getCurrent();
 	if (view) view->use(true);
 	View *use_view = View::getCurrent();
 	mat4 mvp = use_view->get() * cur_model;
