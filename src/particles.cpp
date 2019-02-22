@@ -799,6 +799,9 @@ static int particles_emit(lua_State *L)
 				p->velv = 0;
 				p->vela = 0;
 
+				p->u1 = p->v1 = 0;
+				p->u2 = p->v2 = 1;
+
 				p->r = rng(ps->r_min, ps->r_max) / 255.0f;
 				p->g = rng(ps->g_min, ps->g_max) / 255.0f;
 				p->b = rng(ps->b_min, ps->b_max) / 255.0f;
