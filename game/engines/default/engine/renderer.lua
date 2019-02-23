@@ -340,6 +340,7 @@ function core.renderer.line(t, x1, y1, x2, y2, width)
 	return v
 end
 
+core.renderer.DEPTH_TEXTURE = -1
 function core.renderer.targetDisplay(target, tid, did, w, h)
 	local v = core.renderer.vertexes()
 	if not w or not h then w, h = target:displaySize() end
