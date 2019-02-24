@@ -46,7 +46,11 @@ function _M:setupProfiler()
 		end
 	end)
 	self:addCommand(self._c, {"ctrl","alt","shift"}, function()
-		if core.game.CProfiler then core.game.CProfiler("luastarted.profiler.prof") end
+		if core.game.CProfiler then
+			if self.cprofiler_started and self.cprofiler_started >= core.game.getTime() - 1000 then return end
+			core.game.CProfiler("luastarted.profiler.prof")
+			self.cprofiler_started = core.game.getTime()
+		end
 	end)
 end
 

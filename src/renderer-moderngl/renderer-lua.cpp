@@ -1037,6 +1037,7 @@ static int gl_vertexes_quad(lua_State *L)
 		float vk[4];
 		vertex_map_info vm[4];
 		vertex_picking_info picking[4];
+		vertex_normal_info vn[4];
 		for (int i = 0; i < 4; i++) {
 			vs[i].pos.w = 1;
 			lua_pushliteral(L, "x"); lua_rawget(L, i + 2); vs[i].pos.x = lua_tonumber(L, -1); lua_pop(L, 1);
@@ -1063,6 +1064,10 @@ static int gl_vertexes_quad(lua_State *L)
 			lua_pushliteral(L, "tw"); lua_rawget(L, i + 2); vm[i].texcoords.z = lua_tonumber(L, -1); lua_pop(L, 1);
 			lua_pushliteral(L, "th"); lua_rawget(L, i + 2); vm[i].texcoords.w = lua_tonumber(L, -1); lua_pop(L, 1);
 
+			lua_pushliteral(L, "nx"); lua_rawget(L, i + 2); if (lua_isnumber(L, -1)) data_kinds |= VERTEX_NORMAL_INFO; vn[i].normal.x = lua_tonumber(L, -1); lua_pop(L, 1);
+			lua_pushliteral(L, "ny"); lua_rawget(L, i + 2); vn[i].normal.y = lua_tonumber(L, -1); lua_pop(L, 1);
+			lua_pushliteral(L, "nz"); lua_rawget(L, i + 2); vn[i].normal.z = lua_tonumber(L, -1); lua_pop(L, 1);
+
 			lua_pushliteral(L, "picking"); lua_rawget(L, i + 2); if (lua_isnumber(L, -1)) {
 				data_kinds |= VERTEX_PICKING_INFO;
 				uint32_t id = lua_tonumber(L, -1);
@@ -1073,6 +1078,7 @@ static int gl_vertexes_quad(lua_State *L)
 		if (data_kinds & VERTEX_KIND_INFO) v->addQuadKindInfo(vk[0], vk[1], vk[2], vk[3]);
 		if (data_kinds & VERTEX_MAP_INFO) v->addQuadMapInfo(vm[0], vm[1], vm[2], vm[3]);
 		if (data_kinds & VERTEX_PICKING_INFO) v->addQuadPickingInfo(picking[0], picking[1], picking[2], picking[3]);
+		if (data_kinds & VERTEX_NORMAL_INFO) v->addQuadNormalInfo(vn[0], vn[1], vn[2], vn[3]);
 		v->setDataKinds(data_kinds);
 	}
 	lua_pushvalue(L, 1);

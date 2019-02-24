@@ -83,7 +83,7 @@ void DisplayObject::setParent(DisplayObject *parent) {
 void DisplayObject::setChanged(bool force) {
 	DisplayObject *p = this;
 	while (p) {
-		if (p->stop_parent_recursing) {
+		if (p->stop_parent_recursing && p != this) {
 			p->changed_children = true;
 			if (force) p->changed = true;
 			break;
@@ -508,6 +508,9 @@ void DisplayObject::cloneInto(DisplayObject *into) {
 	into->scale_x = scale_x;
 	into->scale_y = scale_y;
 	into->scale_z = scale_z;
+	into->sort_center = sort_center;
+	into->sort_center_set = sort_center_set;
+	into->sort_axis = sort_axis;
 
 	into->changed = true;
 }
@@ -547,6 +550,9 @@ void DORVertexes::clear() {
 	vertices.clear();
 	vertices_kind_info.clear();
 	vertices_map_info.clear();
+	vertices_model_info.clear();
+	vertices_picking_info.clear();
+	vertices_normal_info.clear();
 	setChanged();
 }
 
@@ -554,7 +560,13 @@ void DORVertexes::cloneInto(DisplayObject *_into) {
 	DisplayObject::cloneInto(_into);
 	DORVertexes *into = dynamic_cast<DORVertexes*>(_into);
 	into->vertices.insert(into->vertices.begin(), vertices.begin(), vertices.end());
+	into->vertices_kind_info.insert(into->vertices_kind_info.begin(), vertices_kind_info.begin(), vertices_kind_info.end());
+	into->vertices_map_info.insert(into->vertices_map_info.begin(), vertices_map_info.begin(), vertices_map_info.end());
+	into->vertices_model_info.insert(into->vertices_model_info.begin(), vertices_model_info.begin(), vertices_model_info.end());
+	into->vertices_picking_info.insert(into->vertices_picking_info.begin(), vertices_picking_info.begin(), vertices_picking_info.end());
+	into->vertices_normal_info.insert(into->vertices_normal_info.begin(), vertices_normal_info.begin(), vertices_normal_info.end());
 	into->tex_max = tex_max;
+	into->data_kind = data_kind;
 	into->tex = tex;
 	into->shader = shader;
 	into->render_kind = render_kind;
@@ -659,6 +671,19 @@ int DORVertexes::addQuadPickingInfo(vertex_picking_info v1, vertex_picking_info 
 	vertices_picking_info.push_back(v2);
 	vertices_picking_info.push_back(v3);
 	vertices_picking_info.push_back(v4);
+
+	setChanged();
+	return 0;
+}
+
+int DORVertexes::addQuadNormalInfo(vertex_normal_info n1, vertex_normal_info n2, vertex_normal_info n3, vertex_normal_info n4) {
+	int size = vertices_normal_info.size();
+	if (size + 4 >= vertices_normal_info.capacity()) {vertices_normal_info.reserve(vertices_normal_info.capacity() * 2);}
+
+	vertices_normal_info.push_back(n1);
+	vertices_normal_info.push_back(n2);
+	vertices_normal_info.push_back(n3);
+	vertices_normal_info.push_back(n4);
 
 	setChanged();
 	return 0;
@@ -875,12 +900,20 @@ void DORVertexes::loadObj(const string &filename) {
 				vec4 pos(attrib.vertices[3 * idx.vertex_index + 0], attrib.vertices[3 * idx.vertex_index + 1], attrib.vertices[3 * idx.vertex_index + 2], 1);
 				vec2 texcoords(0, 1);
 				vec4 color(1, 1, 1, 1);
+				vec3 normal(0, 0, 0);
 
 				if (idx.texcoord_index >= 0) {
 					texcoords.x = attrib.texcoords[2 * idx.texcoord_index + 0];
 					texcoords.y = attrib.texcoords[2 * idx.texcoord_index + 1];
 					// tex[0] = materials_diffuses[mat_id];
-					printf("SHAPE %d tex : %d : %fx%f\n", s, texcoords.x, texcoords.y);
+					// printf("SHAPE %d tex : %d : %fx%f\n", s, texcoords.x, texcoords.y);
+				}
+
+				if (idx.normal_index >= 0) {
+					normal.x = attrib.normals[3 * idx.normal_index + 0];
+					normal.y = attrib.normals[3 * idx.normal_index + 1];
+					normal.z = attrib.normals[3 * idx.normal_index + 2];
+					// printf("SHAPE %d normal : %d : %fx%fx%f\n", s, normal.x, normal.y, normal.z);
 				}
 
 				if (mat_id >= 0) {
@@ -891,6 +924,8 @@ void DORVertexes::loadObj(const string &filename) {
 
 				// printf("POS %f x %f x %f\n", pos.x, pos.y, pos.z);
 				vertices.push_back({pos, texcoords, color});
+				vertices_normal_info.push_back({normal});
+				data_kind |= VERTEX_NORMAL_INFO;
 			}
 			index_offset += fnum;
 		}
@@ -1053,6 +1088,14 @@ void DORVertexes::render(RendererGL *container, mat4& cur_model, vec4& cur_color
 		int startat = dl->list_picking_info.size();
 		dl->list_picking_info.reserve(startat + nb);
 		dl->list_picking_info.insert(std::end(dl->list_picking_info), std::begin(this->vertices_picking_info), std::end(this->vertices_picking_info));
+	}
+
+	if (data_kind & VERTEX_NORMAL_INFO) {
+		// Make sure we do not have to reallocate each step
+		int nb = vertices_normal_info.size();
+		int startat = dl->list_normal_info.size();
+		dl->list_normal_info.reserve(startat + nb);
+		dl->list_normal_info.insert(std::end(dl->list_normal_info), std::begin(this->vertices_normal_info), std::end(this->vertices_normal_info));
 	}
 
 	resetChanged();

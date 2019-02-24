@@ -93,14 +93,14 @@ void releaseDisplayList(DisplayList *dl) {
 }
 
 DisplayList::DisplayList() {
-	glGenBuffers(5, vbo);
+	glGenBuffers(6, vbo);
 	list.reserve(4096);
 	// printf("Making new DL! %x with vbo %d\n", this, vbo);
 }
 // This really should never be actually used
 DisplayList::~DisplayList() {
 	// printf("Deleteing DL! %x with vbo %d\n", this, vbo);
-	glDeleteBuffers(5, vbo);
+	glDeleteBuffers(6, vbo);
 }
 
 /***************************************************************************
@@ -231,7 +231,7 @@ void RendererGL::resetDisplayLists() {
 
 // DGDGDGDG: make that (optionally?) process in a second thread; making it nearly costless
 void RendererGL::update() {
-	// printf("Renderer %s needs updating\n", getRendererName());
+	printf("Renderer %s needs updating\n", getRendererName());
 
 	if (!manual_dl_management) {
 		resetDisplayLists();
@@ -329,6 +329,11 @@ void RendererGL::update() {
 				glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_picking_info) * (*dl)->list_picking_info.size(), NULL, (GLuint)mode);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_picking_info) * (*dl)->list_picking_info.size(), (*dl)->list_picking_info.data());
 			}
+			if ((*dl)->data_kind & VERTEX_NORMAL_INFO) {
+				glBindBuffer(GL_ARRAY_BUFFER, (*dl)->vbo[5]);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_normal_info) * (*dl)->list_normal_info.size(), NULL, (GLuint)mode);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_normal_info) * (*dl)->list_normal_info.size(), (*dl)->list_normal_info.data());
+			}
 		}
 	}
 
@@ -354,6 +359,7 @@ void RendererGL::update() {
 			printf("Upping vbo_elements to %d in renderer %s\n", nb_quads, getRendererName());
 		}
 	}
+	printf(" => %d\n", nb_quads);
 }
 
 void RendererGL::activateCutting(mat4 cur_model, bool v) {
@@ -504,6 +510,14 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 				if (shader->picking_attrib != -1) {
 					glEnableVertexAttribArray(shader->picking_attrib);
 					glVertexAttribPointer(shader->picking_attrib, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_picking_info), (void*)offsetof(vertex_picking_info, id));
+				}
+			}
+
+			if ((*dl)->data_kind & VERTEX_NORMAL_INFO) {
+				glBindBuffer(GL_ARRAY_BUFFER, (*dl)->vbo[5]);
+				if (shader->normal_attrib != -1) {
+					glEnableVertexAttribArray(shader->normal_attrib);
+					glVertexAttribPointer(shader->normal_attrib, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_normal_info), (void*)offsetof(vertex_normal_info, normal));
 				}
 			}
 

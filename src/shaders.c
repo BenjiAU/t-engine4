@@ -547,7 +547,7 @@ static int program_set_uniform_number3_fast(lua_State *L)
 	GLint pos = lua_tonumber(L, lua_upvalueindex(1));
 
 	if (change) tglUseProgramObject(p->shader);
-	glUniform2fv(pos, 1, i);
+	glUniform3fv(pos, 1, i);
 	if (change) useNoShader();
 	return 0;
 }
@@ -566,7 +566,7 @@ static int program_set_uniform_number4_fast(lua_State *L)
 	GLint pos = lua_tonumber(L, lua_upvalueindex(1));
 
 	if (change) tglUseProgramObject(p->shader);
-	glUniform2fv(pos, 1, i);
+	glUniform4fv(pos, 1, i);
 	if (change) useNoShader();
 	return 0;
 }
@@ -728,6 +728,7 @@ static int program_compile(lua_State *L)
 	p->kind_attrib = glGetAttribLocation(p->shader, "te4_kind");
 	p->model_attrib = glGetAttribLocation(p->shader, "te4_model");
 	p->picking_attrib = glGetAttribLocation(p->shader, "te4_picking");
+	p->normal_attrib = glGetAttribLocation(p->shader, "te4_normal");
 	// printf("Attri locations %d %d %d\n", p->vertex_attrib, p->texcoord_attrib, p->color_attrib);
 
 	lua_pushboolean(L, TRUE);
