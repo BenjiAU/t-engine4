@@ -547,6 +547,14 @@ static int gl_renderer_premultiplied_alpha(lua_State *L)
 	return 1;
 }
 
+static int gl_renderer_disable_depth_writing(lua_State *L)
+{
+	RendererGL *r = userdata_to_DO<RendererGL>(L, 1, "gl{renderer}");
+	r->disableDepthWriting(lua_toboolean(L, 2));
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
 static int gl_renderer_shader(lua_State *L)
 {
 	RendererGL *r = userdata_to_DO<RendererGL>(L, 1, "gl{renderer}");
@@ -1005,12 +1013,62 @@ static int gl_vertexes_reserve(lua_State *L)
 static int gl_vertexes_point(lua_State *L)
 {
 	DORVertexes *v = userdata_to_DO<DORVertexes>(L, 1, "gl{vertexes}");
-	float x1 = lua_tonumber(L, 2);  float y1 = lua_tonumber(L, 3);  float u1 = lua_tonumber(L, 4);  float v1 = lua_tonumber(L, 5); 
-	float r = lua_tonumber(L, 6); float g = lua_tonumber(L, 7); float b = lua_tonumber(L, 8); float a = lua_tonumber(L, 9);
-	v->addPoint(
-		x1, y1, 0, u1, v1, 
-		r, g, b, a
-	);
+	if (lua_isnumber(L, 2)) {
+		float x1 = lua_tonumber(L, 2);  float y1 = lua_tonumber(L, 3);  float u1 = lua_tonumber(L, 4);  float v1 = lua_tonumber(L, 5); 
+		float r = lua_tonumber(L, 6); float g = lua_tonumber(L, 7); float b = lua_tonumber(L, 8); float a = lua_tonumber(L, 9);
+		v->addPoint(
+			x1, y1, 0, u1, v1, 
+			r, g, b, a
+		);
+	} else {
+		uint8_t data_kinds = VERTEX_BASE;
+		vertex vs;
+		float vk;
+		vertex_map_info vm;
+		vertex_picking_info picking;
+		vertex_normal_info vn;
+		vs.pos.w = 1;
+		lua_pushliteral(L, "x"); lua_rawget(L, 2); vs.pos.x = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "y"); lua_rawget(L, 2); vs.pos.y = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "z"); lua_rawget(L, 2); vs.pos.z = lua_tonumber(L, -1); lua_pop(L, 1);
+		
+		lua_pushliteral(L, "r"); lua_rawget(L, 2); vs.color.r = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "g"); lua_rawget(L, 2); vs.color.g = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "b"); lua_rawget(L, 2); vs.color.b = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "a"); lua_rawget(L, 2); vs.color.a = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "u"); lua_rawget(L, 2); vs.tex.x = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "v"); lua_rawget(L, 2); vs.tex.y = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "kind"); lua_rawget(L, 2); if (lua_isnumber(L, -1)) data_kinds |= VERTEX_KIND_INFO; vk = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "mx"); lua_rawget(L, 2); if (lua_isnumber(L, -1)) data_kinds |= VERTEX_MAP_INFO; vm.mapcoords.x = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "my"); lua_rawget(L, 2); vm.mapcoords.y = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "mw"); lua_rawget(L, 2); vm.mapcoords.z = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "mh"); lua_rawget(L, 2); vm.mapcoords.w = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "tx"); lua_rawget(L, 2); if (lua_isnumber(L, -1)) data_kinds |= VERTEX_MAP_INFO; vm.texcoords.x = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "ty"); lua_rawget(L, 2); vm.texcoords.y = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "tw"); lua_rawget(L, 2); vm.texcoords.z = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "th"); lua_rawget(L, 2); vm.texcoords.w = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "nx"); lua_rawget(L, 2); if (lua_isnumber(L, -1)) data_kinds |= VERTEX_NORMAL_INFO; vn.normal.x = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "ny"); lua_rawget(L, 2); vn.normal.y = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "nz"); lua_rawget(L, 2); vn.normal.z = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "picking"); lua_rawget(L, 2); if (lua_isnumber(L, -1)) {
+			data_kinds |= VERTEX_PICKING_INFO;
+			uint32_t id = lua_tonumber(L, -1);
+			pickingConvertTo(id, picking);
+		} lua_pop(L, 1);
+
+		v->addPoint(vs);
+		if (data_kinds & VERTEX_KIND_INFO) v->addPointKindInfo(vk);
+		if (data_kinds & VERTEX_MAP_INFO) v->addPointMapInfo(vm);
+		if (data_kinds & VERTEX_PICKING_INFO) v->addPointPickingInfo(picking);
+		if (data_kinds & VERTEX_NORMAL_INFO) v->addPointNormalInfo(vn);
+		v->setDataKinds(data_kinds);
+	}
 	lua_pushvalue(L, 1);
 	return 1;
 }
@@ -1125,7 +1183,7 @@ static int gl_vertexes_texture(lua_State *L)
 	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 2);
 	int id = lua_tonumber(L, 3);
 	lua_pushvalue(L, 2);
-	v->setTexture(t->tex, luaL_ref(L, LUA_REGISTRYINDEX), id);
+	v->setTexture(t->tex, t->kind, luaL_ref(L, LUA_REGISTRYINDEX), id);
 
 	lua_pushvalue(L, 1);
 	return 1;
@@ -1141,7 +1199,7 @@ static int gl_vertexes_target_texture(lua_State *L)
 	int tex;
 	if (tex_id == -1) tex = t->getDepthTexture();
 	else tex = t->getTexture(tex_id);
-	v->setTexture(tex, luaL_ref(L, LUA_REGISTRYINDEX), id);
+	v->setTexture(tex, GL_TEXTURE_2D, luaL_ref(L, LUA_REGISTRYINDEX), id);
 
 	lua_pushvalue(L, 1);
 	return 1;
@@ -1152,7 +1210,7 @@ static int gl_vertexes_font_atlas_texture(lua_State *L)
 	DORVertexes *v = userdata_to_DO<DORVertexes>(L, 1, "gl{vertexes}");
 	FontInstance *f = *(FontInstance**)auxiliar_checkclass(L, "sdl{font}", 2);
 	lua_pushvalue(L, 2);
-	v->setTexture(f->kind->getAtlasTexture(), luaL_ref(L, LUA_REGISTRYINDEX));
+	v->setTexture(f->kind->getAtlasTexture(), GL_TEXTURE_2D, luaL_ref(L, LUA_REGISTRYINDEX));
 
 	lua_pushvalue(L, 1);
 	return 1;
@@ -2032,6 +2090,7 @@ static const struct luaL_Reg gl_renderer_reg[] =
 	{"shader", gl_renderer_shader},
 	{"enableBlending", gl_renderer_blend},
 	{"premultipliedAlpha", gl_renderer_premultiplied_alpha},
+	{"disableDepthWriting", gl_renderer_disable_depth_writing},
 	{"setRendererName", gl_renderer_set_name},
 	{"countTime", gl_renderer_count_time},
 	{"countDraws", gl_renderer_count_draws},

@@ -55,6 +55,7 @@ struct points_list {
 };
 
 extern bool loader_png(const char *filename, texture_type *t, bool nearest, bool norepeat, bool exact_size);
+extern bool loader_png_skybox(const char *filename, texture_type *t, bool nearest, bool norepeat, bool exact_size);
 extern bool loader_noise(const char *filename, noise_data *noise);
 extern bool loader_points_list(const char *filename, points_list *list);
 

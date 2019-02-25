@@ -56,7 +56,22 @@ function _M:init(name, args, unique, gl_specific)
 	self.gl_specific = gl_specific
 	if type(name) == "table" then
 		self.name = name[1]
-		self.shader_def = name[2]
+		if type(name[2]) == "table" then
+			-- Dynamic shader conf
+			self.shader_def = name[2]
+		else
+			-- Default shader conf
+			self.shader_def = {
+				vert = name[1],
+				frag = name[2],
+				args = {
+					tex = { texture = 0 },
+				},
+				clone = true,
+				permanent = true,
+			}
+
+		end
 	else
 		self.name = name
 	end

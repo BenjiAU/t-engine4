@@ -150,6 +150,7 @@ static int lua_web_get_texture(lua_State *L) {
 
 	texture_type *t = (texture_type*)lua_newuserdata(L, sizeof(texture_type));
 	auxiliar_setclass(L, "gl{texture}", -1);
+	t->kind = GL_TEXTURE_2D;
 	t->no_free = TRUE;
 	t->tex = *tex;
 	t->w = w;

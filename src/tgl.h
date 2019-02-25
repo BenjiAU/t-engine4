@@ -40,6 +40,7 @@
 
 typedef struct {
 	GLuint tex;
+	GLenum kind;
 	int w, h;
 	bool no_free;
 } texture_type;

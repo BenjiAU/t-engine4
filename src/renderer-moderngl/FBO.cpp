@@ -55,7 +55,7 @@ DORTarget::DORTarget(int w, int h, int nbt, bool hdr, bool depth) {
 	makeFramebuffer(w, h, nbt, hdr, depth, &fbo);
 
 	// For display as a DO
-	for (int i = 0; i < (nbt > 3 ? 3 : nbt); i++) tex[i] = fbo.textures[i].texture;
+	for (int i = 0; i < (nbt > 3 ? 3 : nbt); i++) tex[i] = {fbo.textures[i].texture, GL_TEXTURE_2D};
 
 	// Default display quad, can be removed and altered if needed with clear & addQuad
 	addQuad(

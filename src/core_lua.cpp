@@ -757,6 +757,7 @@ static int gl_texture_alter_sdm(lua_State *L) {
 	auxiliar_setclass(L, "gl{texture}", -1);
 
 	st->w = w; st->h = dh; st->no_free = FALSE;
+	st->kind = GL_TEXTURE_2D;
 	glGenTextures(1, &st->tex);
 	tfglBindTexture(GL_TEXTURE_2D, st->tex);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
@@ -940,6 +941,7 @@ static int sdl_surface_to_texture(lua_State *L)
 	make_texture_for_surface(*s, &fw, &fh, norepeat, exact_size);
 	if (nearest) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	copy_surface_to_texture(*s);
+	t->kind = GL_TEXTURE_2D;
 	t->w = (*s)->w;
 	t->h = (*s)->h;
 	t->no_free = false;
@@ -1021,20 +1023,19 @@ static int sdl_texture_bind(lua_State *L)
 {
 	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 1);
 	int i = luaL_checknumber(L, 2);
-	bool is3d = lua_toboolean(L, 3);
 
 	if (i > 0)
 	{
 		if (multitexture_active && shaders_active)
 		{
 			tglActiveTexture(GL_TEXTURE0+i);
-			tglBindTexture(is3d ? GL_TEXTURE_3D : GL_TEXTURE_2D, t->tex);
+			tglBindTexture(t->kind, t->tex);
 			tglActiveTexture(GL_TEXTURE0);
 		}
 	}
 	else
 	{
-		tglBindTexture(is3d ? GL_TEXTURE_3D : GL_TEXTURE_2D, t->tex);
+		tglBindTexture(t->kind, t->tex);
 	}
 
 	return 0;

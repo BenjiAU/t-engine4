@@ -45,7 +45,7 @@ class DisplayList {
 public:
 	int used = 0;
 	GLuint vbo[6] = {0,0,0,0,0,0};
-	array<GLuint, DO_MAX_TEX> tex{{0,0,0}};
+	array<texture_do, DO_MAX_TEX> tex{{{0,GL_TEXTURE_2D}, {0,GL_TEXTURE_2D}, {0,GL_TEXTURE_2D}}};
 	shader_type *shader = NULL;
 	uint8_t data_kind = VERTEX_BASE;
 	RenderKind render_kind = RenderKind::QUADS;
@@ -63,7 +63,7 @@ public:
 };
 
 extern void stopDisplayList();
-extern DisplayList* getDisplayList(RendererGL *container, array<GLuint, DO_MAX_TEX> tex, shader_type *shader, uint8_t data_kind, RenderKind render_kind);
+extern DisplayList* getDisplayList(RendererGL *container, array<texture_do, DO_MAX_TEX> tex, shader_type *shader, uint8_t data_kind, RenderKind render_kind);
 extern DisplayList* getDisplayList(RendererGL *container);
 
 /****************************************************************************
@@ -98,6 +98,7 @@ protected:
 
 	bool allow_blending = true;
 	bool premultiplied_alpha = false;
+	bool disable_depth_writing = false;
 
 	bool cutting = false;
 	vec4 cutpos1;
@@ -134,6 +135,7 @@ public:
 	void enableSorting(bool sort) { enableSorting(sort ? SortMode::FAST : SortMode::NO_SORT); };
 	void enableSorting(SortMode mode, SortAxis axis = SortAxis::Z);
 	void enableBlending(bool v) { allow_blending = v; };
+	void disableDepthWriting(bool v) { disable_depth_writing = v; };
 	void premultipliedAlpha(bool v) { premultiplied_alpha = v; };
 	void setLineMode(float size, bool smooth) { line_width = size; line_smooth = smooth; }
 	void sortedToDL();

@@ -58,6 +58,17 @@ enum {
 	VERTEX_NORMAL_INFO = 16,
 };
 
+struct texture_do {
+	GLuint tex;
+	GLenum kind;
+};
+inline bool operator==(const texture_do &a, const texture_do &b) { return a.tex == b.tex; }
+inline bool operator!=(const texture_do &a, const texture_do &b) { return a.tex != b.tex; }
+inline bool operator<(const texture_do &a, const texture_do &b) { return a.tex < b.tex; }
+inline bool operator>(const texture_do &a, const texture_do &b) { return a.tex > b.tex; }
+inline bool operator<=(const texture_do &a, const texture_do &b) { return a.tex <= b.tex; }
+inline bool operator>=(const texture_do &a, const texture_do &b) { return a.tex >= b.tex; }
+
 struct vertex {
 	vec4 pos;
 	vec2 tex;
@@ -137,7 +148,7 @@ enum class SortAxis { NONE, X, Y, Z, GFX };
 class DORFlatSortable {
 public:
 	shader_type *sort_shader;
-	array<GLuint, DO_MAX_TEX> sort_tex;
+	array<texture_do, DO_MAX_TEX> sort_tex;
 	vec4 sort_coords;
 };
 
@@ -243,7 +254,7 @@ protected:
 	vector<vertex_picking_info> vertices_picking_info;
 	vector<vertex_normal_info> vertices_normal_info;
 	array<int, DO_MAX_TEX> tex_lua_ref{{ LUA_NOREF, LUA_NOREF, LUA_NOREF}};
-	array<GLuint, DO_MAX_TEX> tex{{0, 0, 0}};
+	array<texture_do, DO_MAX_TEX> tex{{{0,GL_TEXTURE_2D}, {0,GL_TEXTURE_2D}, {0,GL_TEXTURE_2D}}};
 	int tex_max = 1;
 
 	array<GLint, 3> tween_uni{{0, 0, 0}};
@@ -299,11 +310,16 @@ public:
 		float x1, float y1, float z1, float u1, float v1, 
 		float r, float g, float b, float a
 	);
+	int addPoint(vertex v);
+	int addPointKindInfo(float v);
+	int addPointMapInfo(vertex_map_info v);
+	int addPointPickingInfo(vertex_picking_info v);
+	int addPointNormalInfo(vertex_normal_info n);
 
 	void loadObj(const string &filename);
-	GLuint getTexture(int id) { return tex[id]; };
-	virtual void setTexture(GLuint tex, int lua_ref, int id);
-	virtual void setTexture(GLuint tex, int lua_ref) { setTexture(tex, lua_ref, 0); };
+	GLuint getTexture(int id) { return tex[id].tex; };
+	virtual void setTexture(GLuint tex, GLenum kind, int lua_ref, int id);
+	virtual void setTexture(GLuint tex, GLenum kind, int lua_ref) { setTexture(tex, kind, lua_ref, 0); };
 	void setShader(shader_type *s);
 	void getShaderUniformTween(const char *uniform, uint8_t pos, float default_val);
 

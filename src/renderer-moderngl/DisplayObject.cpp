@@ -524,14 +524,14 @@ DORVertexes::~DORVertexes() {
 	}
 };
 
-void DORVertexes::setTexture(GLuint tex, int lua_ref, int id) {
+void DORVertexes::setTexture(GLuint tex, GLenum kind, int lua_ref, int id) {
 	if (id >= DO_MAX_TEX) id = DO_MAX_TEX - 1;
 	if (tex_lua_ref[id] != LUA_NOREF && L) refcleaner(&tex_lua_ref[id]);
-	this->tex[id] = tex;
+	this->tex[id] = {tex, kind};
 	tex_lua_ref[id] = lua_ref;
 
 	for (int i = 0; i < DO_MAX_TEX; i++) {
-		if (this->tex[i]) tex_max = i + 1;
+		if (this->tex[i].tex) tex_max = i + 1;
 	}
 }
 
@@ -826,6 +826,47 @@ int DORVertexes::addPoint(
 	setChanged();
 	return 0;
 }
+
+int DORVertexes::addPoint(vertex v) {
+	int size = vertices.size();
+	if (size + 1 >= vertices.capacity()) {vertices.reserve(vertices.capacity() * 2);}
+
+	vertices.push_back(v);
+	return 0;
+}
+
+int DORVertexes::addPointKindInfo(float v) {
+	int size = vertices_kind_info.size();
+	if (size + 1 >= vertices_kind_info.capacity()) {vertices_kind_info.reserve(vertices_kind_info.capacity() * 2);}
+
+	vertices_kind_info.push_back({v});
+	return 0;
+}
+
+int DORVertexes::addPointMapInfo(vertex_map_info v) {
+	int size = vertices_map_info.size();
+	if (size + 1 >= vertices_map_info.capacity()) {vertices_map_info.reserve(vertices_map_info.capacity() * 2);}
+
+	vertices_map_info.push_back(v);
+	return 0;
+}
+
+int DORVertexes::addPointPickingInfo(vertex_picking_info v) {
+	int size = vertices_picking_info.size();
+	if (size + 1 >= vertices_picking_info.capacity()) {vertices_picking_info.reserve(vertices_picking_info.capacity() * 2);}
+
+	vertices_picking_info.push_back(v);
+	return 0;
+}
+
+int DORVertexes::addPointNormalInfo(vertex_normal_info v) {
+	int size = vertices_normal_info.size();
+	if (size + 1 >= vertices_normal_info.capacity()) {vertices_normal_info.reserve(vertices_normal_info.capacity() * 2);}
+
+	vertices_normal_info.push_back(v);
+	return 0;
+}
+
 
 
 void CalcNormal(float N[3], float v0[3], float v1[3], float v2[3]) {

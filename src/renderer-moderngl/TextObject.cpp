@@ -196,7 +196,7 @@ void DORText::parseText() {
 	int max_width = line_max_width;
 	int bx = 0, by = 0;
 
-	setTexture(font->kind->getAtlasTexture(), LUA_NOREF);
+	setTexture(font->kind->getAtlasTexture(), GL_TEXTURE_2D, LUA_NOREF);
 
 	// Update VO size once, we are allocating a few more than neede in case of utf8 or control sequences, but we dont care
 	vertices.reserve(len * 4);
@@ -415,7 +415,7 @@ void DORText::parseTextSimple() {
 	const char *str = text;
 	float r = font_color.r, g = font_color.g, b = font_color.b, a = font_color.a;
 
-	setTexture(font->kind->getAtlasTexture(), LUA_NOREF);
+	setTexture(font->kind->getAtlasTexture(), GL_TEXTURE_2D, LUA_NOREF);
 
 	// Update VO size once, we are allocating a few more than neede in case of utf8 or control sequences, but we dont care
 	vertices.reserve(len * 4);
