@@ -151,41 +151,41 @@ end
 
 function table.print_shallow(src, offset, line_feed)
 	if not line_feed then line_feed = '\n' end
-	if type(src) ~= "table" then io.stdout:write("table.print has no table:", src) io.stdout:write(line_feed) return end
+	if type(src) ~= "table" then core.game.stdout_write("table.print has no table:", src) core.game.stdout_write(line_feed) return end
 	offset = offset or ""
 	for k, e in pairs(src) do
-		io.stdout:write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) io.stdout:write(line_feed)
+		core.game.stdout_write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) core.game.stdout_write(line_feed)
 	end
 end
 
 function table.print(src, offset, line_feed)
 	if not line_feed then line_feed = '\n' end
-	if type(src) ~= "table" then io.stdout:write("table.print has no table:", src) io.stdout:write(line_feed) return end
+	if type(src) ~= "table" then core.game.stdout_write("table.print has no table:", src) core.game.stdout_write(line_feed) return end
 	offset = offset or ""
 	for k, e in pairs(src) do
 		-- Deep copy subtables, but not objects!
 		if type(e) == "table" and not e.__ATOMIC and not e.__CLASSNAME then
-			io.stdout:write(("%s[%s] = {"):format(offset, tostring(k))) io.stdout:write(line_feed)
+			core.game.stdout_write(("%s[%s] = {"):format(offset, tostring(k))) core.game.stdout_write(line_feed)
 			table.print(e, offset.."  ", line_feed)
-			io.stdout:write(("%s}"):format(offset)) io.stdout:write(line_feed)
+			core.game.stdout_write(("%s}"):format(offset)) core.game.stdout_write(line_feed)
 		else
-			io.stdout:write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) io.stdout:write(line_feed)
+			core.game.stdout_write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) core.game.stdout_write(line_feed)
 		end
 	end
 end
 
 function table.iprint(src, offset, line_feed)
 	if not line_feed then line_feed = '\n' end
-	if type(src) ~= "table" then io.stdout:write("table.iprint has no table:", src) io.stdout:write(line_feed) return end
+	if type(src) ~= "table" then core.game.stdout_write("table.iprint has no table:", src) core.game.stdout_write(line_feed) return end
 	offset = offset or ""
 	for k, e in ipairs(src) do
 		-- Deep copy subtables, but not objects!
 		if type(e) == "table" and not e.__ATOMIC and not e.__CLASSNAME then
-			io.stdout:write(("%s[%s] = {"):format(offset, tostring(k))) io.stdout:write(line_feed)
+			core.game.stdout_write(("%s[%s] = {"):format(offset, tostring(k))) core.game.stdout_write(line_feed)
 			table.print(e, offset.."  ")
-			io.stdout:write(("%s}"):format(offset)) io.stdout:write(line_feed)
+			core.game.stdout_write(("%s}"):format(offset)) core.game.stdout_write(line_feed)
 		else
-			io.stdout:write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) io.stdout:write(line_feed)
+			core.game.stdout_write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) core.game.stdout_write(line_feed)
 		end
 	end
 end
@@ -193,11 +193,11 @@ end
 function tprint(...)
 	local args = {...}
 	for i, str in ipairs(args) do
-		if type(str) == "table" then io.stdout:write('{ ') table.print(str, nil, ', ') io.stdout:write(' }')
-		else io.stdout:write(tostring(str)) end
-		if i < #args then io.stdout:write('\t') end
+		if type(str) == "table" then core.game.stdout_write('{ ') table.print(str, nil, ', ') core.game.stdout_write(' }')
+		else core.game.stdout_write(tostring(str)) end
+		if i < #args then core.game.stdout_write('\t') end
 	end
-	io.stdout:write('\n')
+	core.game.stdout_write('\n')
 end
 
 --- Generate a containing indexes between a and b and set to value v

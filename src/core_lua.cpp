@@ -546,6 +546,17 @@ static int lua_disable_connectivity(lua_State *L)
 	return 0;
 }
 
+static int lua_stdout_write(lua_State *L)
+{
+	int i = 1;
+	while (i <= lua_gettop(L)) {
+		const char *s = lua_tostring(L, i);
+		printf("%s", s);
+		i++;
+	}
+	return 0;
+}
+
 static int lua_getclasstable(lua_State *L) {
 	const char *classname = luaL_checkstring(L, 1);
 	bool raw = lua_toboolean(L, 2);
@@ -642,6 +653,7 @@ static const struct luaL_Reg gamelib[] =
 	{"checkError", lua_check_error},
 	{"resetLocale", lua_reset_locale},
 	{"openBrowser", lua_open_browser},
+	{"stdout_write", lua_stdout_write},	
 	{"disableConnectivity", lua_disable_connectivity},
 #ifdef TE4_PROFILING
 	{"CProfiler", lua_cprofiler},
