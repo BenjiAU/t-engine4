@@ -231,7 +231,7 @@ void RendererGL::resetDisplayLists() {
 
 // DGDGDGDG: make that (optionally?) process in a second thread; making it nearly costless
 void RendererGL::update() {
-	printf("Renderer %s needs updating\n", getRendererName());
+	// printf("Renderer %s needs updating\n", getRendererName());
 
 	if (!manual_dl_management) {
 		resetDisplayLists();
@@ -359,7 +359,7 @@ void RendererGL::update() {
 			printf("Upping vbo_elements to %d in renderer %s\n", nb_quads, getRendererName());
 		}
 	}
-	printf(" => %d\n", nb_quads);
+	// printf(" => %d\n", nb_quads);
 }
 
 void RendererGL::activateCutting(mat4 cur_model, bool v) {

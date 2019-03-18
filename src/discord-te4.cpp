@@ -20,21 +20,26 @@
 */
 #ifdef DISCORD_TE4
 
+#include "display.hpp"
+extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
 #include "auxiliar.h"
 #include "types.h"
-#include "display.h"
 #include "physfs.h"
-// #include "core_lua.h"
 #include "main.h"
 #include "getself.h"
 #include "te4web.h"
 #include "web-external.h"
+#include "lua_externs.h"
 #include "discord-rpc/include/discord-rpc-dynlib.h"
+}
 
 #include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 /*
  * Grab stuff from the dynlib
@@ -49,21 +54,21 @@ static void discord_load() {
 #if defined(SELFEXE_LINUX) || defined(SELFEXE_BSD)
 #if defined(TE4_RELPATH64)
 	const char *name = "lib64/libdiscord-rpc.so";
-	char *lib = malloc(strlen(self) + strlen(name) + 1);
+	char *lib = (char*)malloc(strlen(self) + strlen(name) + 1);
 	strcpy(lib, self);
 	strcpy(strrchr(lib, '/') + 1, name);
 	libname = lib;
 	void *dynlib = SDL_LoadObject(lib);
 #elif defined(TE4_RELPATH32)
 	const char *name = "lib/libdiscord-rpc.so";
-	char *lib = malloc(strlen(self) + strlen(name) + 1);
+	char *lib = (char*)malloc(strlen(self) + strlen(name) + 1);
 	strcpy(lib, self);
 	strcpy(strrchr(lib, '/') + 1, name);
 	libname = lib;
 	void *dynlib = SDL_LoadObject(lib);
 #else
 	const char *name = "libdiscord-rpc.so";
-	char *lib = malloc(strlen(self) + strlen(name) + 1);
+	char *lib = (char*)malloc(strlen(self) + strlen(name) + 1);
 	strcpy(lib, self);
 	strcpy(strrchr(lib, '/') + 1, name);
 	libname = lib;
@@ -71,14 +76,14 @@ static void discord_load() {
 #endif
 #elif defined(SELFEXE_WINDOWS)
 	const char *name = "discord-rpc.dll";
-	char *lib = malloc(strlen(self) + strlen(name) + 1);
+	char *lib = (char*)malloc(strlen(self) + strlen(name) + 1);
 	strcpy(lib, self);
 	strcpy(strrchr(lib, '\\') + 1, name);
 	libname = lib;
 	void *dynlib = SDL_LoadObject(lib);
 #elif defined(SELFEXE_MACOSX)
 	const char *name = "libdiscord-rpc.dylib";
-	char *lib = malloc(strlen(self) + strlen(name) + 1);
+	char *lib = (char*)malloc(strlen(self) + strlen(name) + 1);
 	strcpy(lib, self);
 	strcpy(lib+strlen(self), name);
 	libname = lib;

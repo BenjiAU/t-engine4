@@ -21,10 +21,8 @@
 #ifndef _LUACOLORS_H_
 #define _LUACOLORS_H_
 
-extern "C" {
-#include "display.h"
-#include "tgl.h"
-}
+#include "tgl.hpp"
+#include "display.hpp"
 #include <string>
 #include <unordered_map>
 #include "glm/glm.hpp"

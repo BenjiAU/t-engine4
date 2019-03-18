@@ -18,9 +18,10 @@
     Nicolas Casalini "DarkGod"
     darkgod@te4.org
 */
+#include "display.hpp"
+extern "C" {
 #include "lua.h"
 #include "types.h"
-#include "display.h"
 #include "lauxlib.h"
 #include "lualib.h"
 #include "auxiliar.h"
@@ -29,6 +30,7 @@
 #include "main.h"
 #include "shaders.h"
 #include "libtcod.h"
+}
 
 bool shaders_active = TRUE;
 int default_shader_ref = LUA_NOREF;
@@ -80,16 +82,16 @@ void useShader(shader_type *p, int x, int y, int w, int h, float tx, float ty, f
 	shader_reset_uniform *ru = p->reset_uniforms;
 	while (ru) {
 		switch (ru->kind) {
-			case UNIFORM_NUMBER:
+			case s_shader_reset_uniform::UNIFORM_NUMBER:
 				glUniform1fv(ru->p, 1, &ru->data.number);
 				break;
-			case UNIFORM_VEC2:
+			case s_shader_reset_uniform::UNIFORM_VEC2:
 				glUniform2fv(ru->p, 1, ru->data.vec2);
 				break;
-			case UNIFORM_VEC3:
+			case s_shader_reset_uniform::UNIFORM_VEC3:
 				glUniform3fv(ru->p, 1, ru->data.vec3);
 				break;
-			case UNIFORM_VEC4:
+			case s_shader_reset_uniform::UNIFORM_VEC4:
 				glUniform4fv(ru->p, 1, ru->data.vec4);
 				break;
 		}
@@ -110,16 +112,16 @@ void useShaderSimple(shader_type *p)
 	shader_reset_uniform *ru = p->reset_uniforms;
 	while (ru) {
 		switch (ru->kind) {
-			case UNIFORM_NUMBER:
+			case s_shader_reset_uniform::UNIFORM_NUMBER:
 				glUniform1fv(ru->p, 1, &ru->data.number);
 				break;
-			case UNIFORM_VEC2:
+			case s_shader_reset_uniform::UNIFORM_VEC2:
 				glUniform2fv(ru->p, 1, ru->data.vec2);
 				break;
-			case UNIFORM_VEC3:
+			case s_shader_reset_uniform::UNIFORM_VEC3:
 				glUniform3fv(ru->p, 1, ru->data.vec3);
 				break;
-			case UNIFORM_VEC4:
+			case s_shader_reset_uniform::UNIFORM_VEC4:
 				glUniform4fv(ru->p, 1, ru->data.vec4);
 				break;
 		}
@@ -432,11 +434,11 @@ static int program_reset_uniform_number(lua_State *L)
 	shader_type *p = (shader_type*)lua_touserdata(L, 1);
 	const char *var = luaL_checkstring(L, 2);
 	
-	shader_reset_uniform *ru = malloc(sizeof(shader_reset_uniform));
+	shader_reset_uniform *ru = (shader_reset_uniform*)malloc(sizeof(shader_reset_uniform));
 	ru->next = p->reset_uniforms;
 	p->reset_uniforms = ru;
 	ru->p = glGetUniformLocation(p->shader, var);
-	ru->kind = UNIFORM_NUMBER;
+	ru->kind = s_shader_reset_uniform::UNIFORM_NUMBER;
 	ru->data.number = luaL_checknumber(L, 3);
 	return 0;
 }
@@ -446,11 +448,11 @@ static int program_reset_uniform_number2(lua_State *L)
 	shader_type *p = (shader_type*)lua_touserdata(L, 1);
 	const char *var = luaL_checkstring(L, 2);
 
-	shader_reset_uniform *ru = malloc(sizeof(shader_reset_uniform));
+	shader_reset_uniform *ru = (shader_reset_uniform*)malloc(sizeof(shader_reset_uniform));
 	ru->next = p->reset_uniforms;
 	p->reset_uniforms = ru;
 	ru->p = glGetUniformLocation(p->shader, var);
-	ru->kind = UNIFORM_VEC2;
+	ru->kind = s_shader_reset_uniform::UNIFORM_VEC2;
 	ru->data.vec2[0] = luaL_checknumber(L, 3);
 	ru->data.vec2[1] = luaL_checknumber(L, 4);
 	return 0;
@@ -461,11 +463,11 @@ static int program_reset_uniform_number3(lua_State *L)
 	shader_type *p = (shader_type*)lua_touserdata(L, 1);
 	const char *var = luaL_checkstring(L, 2);
 
-	shader_reset_uniform *ru = malloc(sizeof(shader_reset_uniform));
+	shader_reset_uniform *ru = (shader_reset_uniform*)malloc(sizeof(shader_reset_uniform));
 	ru->next = p->reset_uniforms;
 	p->reset_uniforms = ru;
 	ru->p = glGetUniformLocation(p->shader, var);
-	ru->kind = UNIFORM_VEC3;
+	ru->kind = s_shader_reset_uniform::UNIFORM_VEC3;
 	ru->data.vec3[0] = luaL_checknumber(L, 3);
 	ru->data.vec3[1] = luaL_checknumber(L, 4);
 	ru->data.vec3[2] = luaL_checknumber(L, 5);
@@ -477,11 +479,11 @@ static int program_reset_uniform_number4(lua_State *L)
 	shader_type *p = (shader_type*)lua_touserdata(L, 1);
 	const char *var = luaL_checkstring(L, 2);
 
-	shader_reset_uniform *ru = malloc(sizeof(shader_reset_uniform));
+	shader_reset_uniform *ru = (shader_reset_uniform*)malloc(sizeof(shader_reset_uniform));
 	ru->next = p->reset_uniforms;
 	p->reset_uniforms = ru;
 	ru->p = glGetUniformLocation(p->shader, var);
-	ru->kind = UNIFORM_VEC4;
+	ru->kind = s_shader_reset_uniform::UNIFORM_VEC4;
 	ru->data.vec4[0] = luaL_checknumber(L, 3);
 	ru->data.vec4[1] = luaL_checknumber(L, 4);
 	ru->data.vec4[2] = luaL_checknumber(L, 5);
@@ -759,7 +761,7 @@ static int program_use(lua_State *L)
 static int program_set_name(lua_State *L)
 {
 	shader_type *p = (shader_type*)lua_touserdata(L, 1);
-	char *name = luaL_checkstring(L, 2);
+	const char *name = luaL_checkstring(L, 2);
 	if (p->name) free(p->name);
 	p->name = strdup(name);
 	printf("Shader created with name %s : %lx\n", name, p);

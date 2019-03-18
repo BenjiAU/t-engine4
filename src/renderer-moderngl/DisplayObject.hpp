@@ -21,8 +21,8 @@
 #ifndef DISPLAYOBJECTS_H
 #define DISPLAYOBJECTS_H
 
+#include "tgl.hpp"
 extern "C" {
-#include "tgl.h"
 #include "useshader.h"
 extern lua_State *L;
 }

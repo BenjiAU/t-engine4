@@ -21,8 +21,8 @@
 #ifndef VBO_HPP
 #define VBO_HPP
 
+#include "tgl.hpp"
 extern "C" {
-#include "tgl.h"
 #include "useshader.h"
 }
 

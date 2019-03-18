@@ -38,12 +38,14 @@
 
 #define KEYFRAMES_PER_SEC 30
 
-typedef struct {
-	GLuint tex;
-	GLenum kind;
-	int w, h;
-	bool no_free;
-} texture_type;
+#include <stdio.h>
+struct texture_type {
+	texture_type() { printf("NEW TEXTURE!\n"); }
+	GLuint tex = 0;
+	GLenum kind = GL_TEXTURE_2D;
+	int w = 0, h = 0;
+	bool no_free = false;
+};
 
 extern GLint max_texture_size;
 

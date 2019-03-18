@@ -22,7 +22,6 @@
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
-#include "display.h"
 #include "types.h"
 #include "physfs.h"
 #include "physfsrwops.h"

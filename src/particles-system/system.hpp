@@ -21,8 +21,8 @@
 #ifndef _PARTICLES_SYSTEM_HPP
 #define _PARTICLES_SYSTEM_HPP
 
+#include "tgl.hpp"
 extern "C" {
-#include "tgl.h"
 #include "lua.h"
 #include "auxiliar.h"
 #include "useshader.h"

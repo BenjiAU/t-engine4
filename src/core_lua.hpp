@@ -21,8 +21,8 @@
 #ifndef _CORELUA_H_
 #define _CORELUA_H_
 
+#include "tgl.hpp"
 extern "C" {
-#include "tgl.h"
 #include "tSDL.h"
 }
 

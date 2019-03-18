@@ -21,7 +21,7 @@
 #ifndef _PARTICLES_HPP
 #define _PARTICLES_HPP
 
-#include "tgl.h"
+#include "tgl.hpp"
 #include "useshader.h"
 extern "C" {
 #include <setjmp.h>

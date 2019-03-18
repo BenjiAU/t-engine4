@@ -19,9 +19,9 @@
     darkgod@te4.org
 */
 extern "C" {
-#include "display_sdl.h"
 #include "physfs.h"
 }
+#include "display_sdl.hpp"
 #include "particles-system/system.hpp"
 #include "core_loader.hpp"
 #include <condition_variable>

@@ -18,9 +18,10 @@
     Nicolas Casalini "DarkGod"
     darkgod@te4.org
 */
+#include "display.hpp"
+extern "C" {
 #include "lua.h"
 #include "types.h"
-#include "display.h"
 #include "lauxlib.h"
 #include "lualib.h"
 #include "auxiliar.h"
@@ -29,6 +30,8 @@
 #include <stdlib.h>
 #include "libtcod.h"
 #include "noise.h"
+#include "lua_externs.h"
+}
 
 extern bool shaders_active;
 
@@ -259,7 +262,7 @@ static int noise_texture3d(lua_State *L)
 	int w = luaL_checknumber(L, 2);
 	int h = luaL_checknumber(L, 3);
 	int d = luaL_checknumber(L, 4);
-	GLubyte *map = malloc(w * h * d * 3 * sizeof(GLubyte));
+	GLubyte *map = (GLubyte *)malloc(w * h * d * 3 * sizeof(GLubyte));
 
 	int i, j, k;
 	for (i = 0; i < w; i++)
@@ -300,7 +303,7 @@ static int noise_texture2d(lua_State *L)
 	noise_t *n = (noise_t*)auxiliar_checkclass(L, "noise{core}", 1);
 	int w = luaL_checknumber(L, 2);
 	int h = luaL_checknumber(L, 3);
-	GLubyte *map = malloc(w * h * 3 * sizeof(GLubyte));
+	GLubyte *map = (GLubyte *)malloc(w * h * 3 * sizeof(GLubyte));
 
 	int i, j;
 	for (i = 0; i < w; i++)
@@ -338,7 +341,7 @@ static int noise_texture2dstack(lua_State *L)
 	int w = luaL_checknumber(L, 2);
 	int h = luaL_checknumber(L, 3);
 	int d = luaL_checknumber(L, 4);
-	GLubyte *map = malloc(w * h * 3 * sizeof(GLubyte));
+	GLubyte *map = (GLubyte *)malloc(w * h * 3 * sizeof(GLubyte));
 
 	int k;
 	lua_newtable(L);

@@ -20,19 +20,17 @@
 */
 #include "lua.h"
 #include "types.h"
-#include "display.h"
 #include "fov/fov.h"
 #include "lauxlib.h"
 #include "lualib.h"
 #include "auxiliar.h"
 #include "script.h"
-#include "display.h"
 #include "physfs.h"
 #include "physfsrwops.h"
 #include "SFMT.h"
 #include "mzip.h"
 #include "main.h"
-#include "useshader.h"
+//#include "useshader.h"
 #include <math.h>
 #include <time.h>
 

@@ -19,16 +19,16 @@
     darkgod@te4.org
 */
 
+#include "display.hpp"
 extern "C" {
 #include "lua.h"
 #include "types.h"
-#include "display.h"
 #include "fov/fov.h"
 #include "lauxlib.h"
 #include "lualib.h"
 #include "auxiliar.h"
 #include "script.h"
-#include "display.h"
+#include "display.hpp"
 #include "physfs.h"
 #include "physfsrwops.h"
 #include "main.h"

@@ -21,7 +21,7 @@
 #ifndef _CORELOADER_H_
 #define _CORELOADER_H_
 
-#include "tgl.h"
+#include "tgl.hpp"
 #include "tSDL.h"
 #include <atomic>
 #include <vector>

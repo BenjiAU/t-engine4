@@ -21,9 +21,9 @@
 #ifndef _LUAFONT_H_
 #define _LUAFONT_H_
 
+#include "display.hpp"
+#include "tgl.hpp"
 extern "C" {
-#include "display.h"
-#include "tgl.h"
 #include "freetype-gl/texture-atlas.h"
 #include "freetype-gl/texture-font.h"
 }

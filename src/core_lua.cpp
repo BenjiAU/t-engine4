@@ -18,16 +18,16 @@
     Nicolas Casalini "DarkGod"
     darkgod@te4.org
 */
+#include "display.hpp"
 extern "C" {
 #include "lua.h"
 #include "types.h"
-#include "display.h"
 #include "fov/fov.h"
 #include "lauxlib.h"
 #include "lualib.h"
 #include "auxiliar.h"
 #include "script.h"
-#include "display.h"
+#include "display.hpp"
 #include "physfs.h"
 #include "physfsrwops.h"
 #include "SFMT.h"
@@ -864,21 +864,6 @@ static int sdl_free_surface(lua_State *L)
 	return 1;
 }
 
-static int lua_display_char(lua_State *L)
-{
-	SDL_Surface **s = (SDL_Surface**)auxiliar_checkclass(L, "sdl{surface}", 1);
-	const char *c = luaL_checkstring(L, 2);
-	int x = luaL_checknumber(L, 3);
-	int y = luaL_checknumber(L, 4);
-	int r = luaL_checknumber(L, 5);
-	int g = luaL_checknumber(L, 6);
-	int b = luaL_checknumber(L, 7);
-
-	display_put_char(*s, c[0], x, y, r, g, b);
-
-	return 0;
-}
-
 static int sdl_surface_erase(lua_State *L)
 {
 	SDL_Surface **s = (SDL_Surface**)auxiliar_checkclass(L, "sdl{surface}", 1);
@@ -967,6 +952,19 @@ static int sdl_surface_to_texture(lua_State *L)
 
 	return 7;
 }
+
+static void sdlDrawImage(SDL_Surface *dest, SDL_Surface *image, int x, int y)
+{
+	SDL_Rect r;
+	r.w=image->w;
+	r.h=image->h;
+	r.x=x;
+	r.y=y;
+	int errcode = SDL_BlitSurface(image, NULL, dest, &r);
+        if (errcode)
+        	printf("ERROR! SDL_BlitSurface failed! (%d,%s)\n",errcode,SDL_GetError());
+}
+
 
 static int sdl_surface_merge(lua_State *L)
 {
@@ -1660,7 +1658,6 @@ static const struct luaL_Reg sdl_surface_reg[] =
 	{"erase", sdl_surface_erase},
 	{"getSize", sdl_surface_get_size},
 	{"merge", sdl_surface_merge},
-	{"putChar", lua_display_char},
 	{"alpha", sdl_surface_alpha},
 	{"glTexture", sdl_surface_to_texture},
 	{"updateTexture", sdl_surface_update_texture},

@@ -21,8 +21,8 @@
 #ifndef DO_INTERFACES_H
 #define DO_INTERFACES_H
 
+#include "tgl.hpp"
 extern "C" {
-#include "tgl.h"
 #include "useshader.h"
 }
 

@@ -21,10 +21,10 @@
 
 extern "C" {
 #include "tSDL.h"
-#include "tgl.h"
 #include "web-external.h"
 #include <stdio.h>
 }
+#include "tgl.hpp"
 
 #include "web.h"
 #include "web-internal.h"

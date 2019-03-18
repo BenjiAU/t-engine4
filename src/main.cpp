@@ -18,10 +18,10 @@
     Nicolas Casalini "DarkGod"
     darkgod@te4.org
 */
+#include "display.hpp"
 extern "C" {
 #include "lua.h"
 #include "types.h"
-#include "display.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -770,7 +770,6 @@ static void call_draw(float nb_keyframes)
 	interface_realtime(nb_keyframes);
 }
 
-extern "C" void te4_discord_update();
 void on_redraw()
 {
 	static int last_ticks = 0;
@@ -1130,7 +1129,6 @@ static void close_state() {
 	font_cleanup();
 }
 
-extern "C" int luaopen_discord(lua_State *L);
 void boot_lua(int state, bool rebooting, int argc, char *argv[])
 {
 	core_def->corenum = 0;

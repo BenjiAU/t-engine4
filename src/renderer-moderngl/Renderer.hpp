@@ -26,12 +26,12 @@ extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
 #include "auxiliar.h"
-#include "display.h"
 #include "types.h"
 #include "physfs.h"
 #include "physfsrwops.h"
 #include "main.h"
 }
+#include "display.hpp"
 
 #define GLM_FORCE_INLINE
 #include "glm/glm.hpp"

@@ -19,8 +19,8 @@
     darkgod@te4.org
 */
 
+#include "display.hpp"
 extern "C" {
-#include "display.h"
 #include "lua.h"
 #include "types.h"
 #include "lauxlib.h"

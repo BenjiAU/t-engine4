@@ -19,9 +19,10 @@
     darkgod@te4.org
 */
 
+#include "display.hpp"
+extern "C" {
 #include "lua.h"
 #include "types.h"
-#include "display.h"
 #include "lauxlib.h"
 #include "lualib.h"
 #include "auxiliar.h"
@@ -32,6 +33,8 @@
 #include "te4web.h"
 #include "web-external.h"
 #include "lua_externs.h"
+}
+#include <unistd.h>
 
 /*
  * Grab web browser methods -- availabe only here
@@ -244,7 +247,7 @@ static int lua_web_local_reply_file(lua_State *L) {
 	}
 
 	size_t len = PHYSFS_fileLength(f);
-	char *data = malloc(len * sizeof(char));
+	char *data = (char*)malloc(len * sizeof(char));
 	size_t read = 0;
 	while (read < len) {
 		size_t rl = PHYSFS_read(f, data + read, sizeof(char), len - read);
@@ -454,7 +457,7 @@ static void web_mutex_unlock(void *mutex) {
 }
 
 static void *web_make_texture(int w, int h) {
-	GLuint *tex = malloc(sizeof(GLuint));
+	GLuint *tex = (GLuint*)malloc(sizeof(GLuint));
 	glGenTextures(1, tex);
 	glBindTexture(GL_TEXTURE_2D, *tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -464,7 +467,7 @@ static void *web_make_texture(int w, int h) {
 	GLfloat largest_supported_anisotropy;
 	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, largest_supported_anisotropy);
-	unsigned char *buffer = calloc(w * h * 4, sizeof(unsigned char));
+	unsigned char *buffer = (unsigned char *)calloc(w * h * 4, sizeof(unsigned char));
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer);
 	free(buffer);
 
@@ -543,33 +546,33 @@ void te4_web_load() {
 #if defined(SELFEXE_LINUX) || defined(SELFEXE_BSD)
 #if defined(TE4_RELPATH64)
 	const char *spawnbname = "cef3spawn64";
-	spawnname = malloc(strlen(self) + strlen(spawnbname) + 1);
+	spawnname = (char*)malloc(strlen(self) + strlen(spawnbname) + 1);
 	strcpy(spawnname, self);
 	strcpy(strrchr(spawnname, '/') + 1, spawnbname);
 	const char *name = "lib64/libte4-web.so";
-	char *lib = malloc(strlen(self) + strlen(name) + 1);
+	char *lib = (char*)malloc(strlen(self) + strlen(name) + 1);
 	strcpy(lib, self);
 	strcpy(strrchr(lib, '/') + 1, name);
 	libname = lib;
 	void *web = SDL_LoadObject(lib);
 #elif defined(TE4_RELPATH32)
 	const char *spawnbname = "cef3spawn32";
-	spawnname = malloc(strlen(self) + strlen(spawnbname) + 1);
+	spawnname = (char*)malloc(strlen(self) + strlen(spawnbname) + 1);
 	strcpy(spawnname, self);
 	strcpy(strrchr(spawnname, '/') + 1, spawnbname);
 	const char *name = "lib/libte4-web.so";
-	char *lib = malloc(strlen(self) + strlen(name) + 1);
+	char *lib = (char*)malloc(strlen(self) + strlen(name) + 1);
 	strcpy(lib, self);
 	strcpy(strrchr(lib, '/') + 1, name);
 	libname = lib;
 	void *web = SDL_LoadObject(lib);
 #else
 	const char *spawnbname = "cef3spawn";
-	spawnname = malloc(strlen(self) + strlen(spawnbname) + 1);
+	spawnname = (char*)malloc(strlen(self) + strlen(spawnbname) + 1);
 	strcpy(spawnname, self);
 	strcpy(strrchr(spawnname, '/') + 1, spawnbname);
 	const char *name = "libte4-web.so";
-	char *lib = malloc(strlen(self) + strlen(name) + 1);
+	char *lib = (char*)malloc(strlen(self) + strlen(name) + 1);
 	strcpy(lib, self);
 	strcpy(strrchr(lib, '/') + 1, name);
 	libname = lib;
@@ -577,11 +580,11 @@ void te4_web_load() {
 #endif
 #elif defined(SELFEXE_WINDOWS)
 	const char *spawnbname = "cef3spawn.exe";
-	spawnname = malloc(strlen(self) + strlen(spawnbname) + 1);
+	spawnname = (char*)malloc(strlen(self) + strlen(spawnbname) + 1);
 	strcpy(spawnname, self);
 	strcpy(strrchr(spawnname, '\\') + 1, spawnbname);
 	const char *name = "te4-web.dll";
-	char *lib = malloc(strlen(self) + strlen(name) + 1);
+	char *lib = (char*)malloc(strlen(self) + strlen(name) + 1);
 	strcpy(lib, self);
 	strcpy(strrchr(lib, '\\') + 1, name);
 	libname = lib;
@@ -589,7 +592,7 @@ void te4_web_load() {
 #elif defined(SELFEXE_MACOSX)
 	spawnname = NULL;
 	const char *name = "libte4-web.dylib";
-	char *lib = malloc(strlen(self) + strlen(name) + 1);
+	char *lib = (char*)malloc(strlen(self) + strlen(name) + 1);
 	strcpy(lib, self);
 	strcpy(lib+strlen(self), name);
 	libname = lib;
@@ -603,7 +606,7 @@ void te4_web_load() {
 #if defined(SELFEXE_LINUX) || defined(SELFEXE_BSD)
 	// Hack to fix a strange bug when it fails to load the library on some linux version it core dumps. So we restart a new process and tell it to not even try
 	if (!web) {
-		char **newargs = calloc(g_argc + 2, sizeof(char*));
+		char **newargs = (char **)calloc(g_argc + 2, sizeof(char*));
 		int i;
 		for (i = 0; i < g_argc; i++) newargs[i] = g_argv[i];
 		newargs[g_argc] = strdup("--no-web");

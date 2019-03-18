@@ -823,6 +823,7 @@ static int gl_target_extract_texture(lua_State *L)
 	t->w = w;
 	t->h = h;
 	t->no_free = false;
+	t->kind = GL_TEXTURE_2D;
 	
 	return 1;
 }

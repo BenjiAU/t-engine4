@@ -18,7 +18,23 @@
     Nicolas Casalini "DarkGod"
     darkgod@te4.org
 */
-#ifndef MAIN2
-#define MAIN2
-#include "display_sdl.h"
+#ifndef DISPLAY_SDL_H
+#define DISPLAY_SDL_H
+
+extern "C" {
+#include "tSDL.h"
+#include "glew.h"
+}
+#include "tgl.hpp"
+
+#define sdlLock(surface) do {\
+	if (SDL_MUSTLOCK(surface)) SDL_LockSurface(surface);\
+	} while (0)
+
+#define sdlUnlock(surface) do {\
+		if (SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface);\
+	} while (0)
+
+extern SDL_Surface *screen;
+
 #endif
