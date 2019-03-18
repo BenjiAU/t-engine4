@@ -112,16 +112,44 @@ newBirthDescriptor
 	},
 	experience = 1.5,
 
-	cosmetic_unlock = {
-		cosmetic_bikini =  {
-			{name="Bikini [donator only]", donator=true, on_actor=function(actor, birther, last)
-				if not last then local o = birther.obj_list_by_name.Bikini if not o then print("No bikini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull()
-				else actor:registerOnBirthForceWear("FUN_BIKINI") end
-			end, check=function(birth) return birth.descriptors_by_type.sex == "Female" end},
-			{name="Mankini [donator only]", donator=true, on_actor=function(actor, birther, last)
-				if not last then local o = birther.obj_list_by_name.Mankini if not o then print("No mankini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull()
-				else actor:registerOnBirthForceWear("FUN_MANKINI") end
-			end, check=function(birth) return birth.descriptors_by_type.sex == "Male" end},
+	cosmetic_options = {
+		skin = {
+			{name="Skin Color 1", file="base_01"},
+			{name="Skin Color 2", file="base_02"},
+			{name="Skin Color 3", file="base_03"},
+			{name="Skin Color 4", file="base_04"},
+			{name="Skin Color 5", file="base_05"},
+		},
+		hairs = {
+			{name="Face 1", file="face_01"},
+			{name="Face 2", file="face_02"},
+			{name="Face 3", file="face_03"},
+		},
+		facial_features = {
+			{name="Mustache 1", file="face_mustache_01"},
+			{name="Mustache 2", file="face_mustache_02"},
+			{name="Mustache 3", file="face_mustache_03"},
+			{name="Mustache 4", file="face_mustache_04"},
+			{name="Mustache 5", file="face_mustache_05"},
+			{name="Mustache 6", file="face_mustache_06"},
+			{name="Mustache 7", file="face_mustache_07"},
+			{name="Mustache 8", file="face_mustache_08"},
+			{name="Mustache 9", file="face_mustache_09"},
+		},
+		tatoos = {
+			{name="Tatoos 1", file="tattoo_runes_01"},
+			{name="Tatoos 2", file="tattoo_runes_02"},
+			{name="Tatoos 3", file="tattoo_runes_03"},
+			{name="Tatoos 4", file="tattoo_runes_04"},
+			{name="Tatoos 5", file="tattoo_runes_05"},
+			{name="Tatoos 6", file="tattoo_runes_06"},
+			{name="Tatoos 7", file="tattoo_runes_07"},
+		},
+		special = {
+			{name="Bikini / Mankini", birth_only=true, on_actor=function(actor, birther, last)
+				if not last then local o = birther.obj_list_by_name[birther.descriptors_by_type.sex == 'Female' and 'Bikini' or 'Mankini'] if not o then print("No bikini/mankini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull() actor.moddable_tile_nude = 1
+				else actor:registerOnBirthForceWear(birther.descriptors_by_type.sex == 'Female' and "FUN_BIKINI" or "FUN_MANKINI") end
+			end},
 		},
 	},
 }

@@ -90,19 +90,71 @@ to start, look where halflings once tinkered with portals...]],
 	experience = 1.3,
 	random_escort_possibilities = { {"tier1.1", 1, 2}, {"tier1.2", 1, 2}, {"daikara", 1, 2}, {"old-forest", 1, 4}, {"dreadfell", 1, 8}, {"reknor", 1, 2}, },
 
-	cosmetic_unlock = {
-		cosmetic_race_human_redhead = {
-			{name="Redhead [donator only]", donator=true, on_actor=function(actor) if actor.moddable_tile then actor.moddable_tile_base = "base_redhead_01.png" end end},
+	default_cosmetics = { {"hairs", "Dark Hair 1"} },
+	cosmetic_options = {
+		skin = {
+			{name="Skin Color 1", file="base_01"},
+			{name="Skin Color 2", file="base_02"},
+			{name="Skin Color 3", file="base_03"},
+			{name="Skin Color 4", file="base_04"},
+			{name="Skin Color 5", file="base_05"},
+			{name="Skin Color 6", file="base_06"},
+			{name="Skin Color 7", file="base_07"},
+			{name="Skin Color 8", file="base_08"},
+			{name="Skin Color 9", file="base_09"},
 		},
-		cosmetic_bikini =  {
-			{name="Bikini [donator only]", donator=true, on_actor=function(actor, birther, last)
-				if not last then local o = birther.obj_list_by_name.Bikini if not o then print("No bikini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull()
-				else actor:registerOnBirthForceWear("FUN_BIKINI") end
-			end, check=function(birth) return birth.descriptors_by_type.sex == "Female" end},
-			{name="Mankini [donator only]", donator=true, on_actor=function(actor, birther, last)
-				if not last then local o = birther.obj_list_by_name.Mankini if not o then print("No mankini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull()
-				else actor:registerOnBirthForceWear("FUN_MANKINI") end
-			end, check=function(birth) return birth.descriptors_by_type.sex == "Male" end},
+		hairs = {
+			{name="Dark Hair 1", file="hair_01"},
+			{name="Dark Hair 2", file="hair_02"},
+			{name="Dark Hair 3", file="hair_03"},
+			{name="Dark Hair 4", file="hair_04", only_for={sex="Female"}},
+			{name="Dark Hair 5", file="hair_05", only_for={sex="Female"}},
+			{name="Dark Hair 6", file="hair_06", only_for={sex="Female"}},
+			{name="Dark Hair 7", file="hair_07", only_for={sex="Female"}},
+			{name="Dark Hair 8", file="hair_08", only_for={sex="Female"}},
+			{name="Dark Hair 9", file="hair_09", only_for={sex="Female"}},
+			{name="Blond Hair 1", file="hair_blond_01"},
+			{name="Blond Hair 2", file="hair_blond_02"},
+			{name="Blond Hair 3", file="hair_blond_03"},
+			{name="Blond Hair 4", file="hair_blond_04", only_for={sex="Female"}},
+			{name="Blond Hair 5", file="hair_blond_05", only_for={sex="Female"}},
+			{name="Blond Hair 6", file="hair_blond_06", only_for={sex="Female"}},
+			{name="Blond Hair 7", file="hair_blond_07", only_for={sex="Female"}},
+			{name="Blond Hair 8", file="hair_blond_08", only_for={sex="Female"}},
+			{name="Blond Hair 9", file="hair_blond_09", only_for={sex="Female"}},
+			{name="Redhead Hair 1", file="hair_redhead_01", unlock="cosmetic_race_human_redhead"},
+			{name="Redhead Hair 2", file="hair_redhead_02", unlock="cosmetic_race_human_redhead"},
+			{name="Redhead Hair 3", file="hair_redhead_03", unlock="cosmetic_race_human_redhead"},
+			{name="Redhead Hair 4", file="hair_redhead_04", unlock="cosmetic_race_human_redhead", only_for={sex="Female"}},
+			{name="Redhead Hair 5", file="hair_redhead_05", unlock="cosmetic_race_human_redhead", only_for={sex="Female"}},
+			{name="Redhead Hair 6", file="hair_redhead_06", unlock="cosmetic_race_human_redhead", only_for={sex="Female"}},
+			{name="Redhead Hair 7", file="hair_redhead_07", unlock="cosmetic_race_human_redhead", only_for={sex="Female"}},
+			{name="Redhead Hair 8", file="hair_redhead_08", unlock="cosmetic_race_human_redhead", only_for={sex="Female"}},
+			{name="Redhead Hair 9", file="hair_redhead_09", unlock="cosmetic_race_human_redhead", only_for={sex="Female"}},
+		},
+		facial_features = {
+			{name="Facial Infusions 1", file="face_infusion_01"},
+			{name="Facial Infusions 2", file="face_infusion_02"},
+			{name="Facial Runes 1", file="face_rune_01"},
+			{name="Facial Runes 2", file="face_rune_02"},
+			{name="Facial Runes 3", file="face_rune_03"},
+			{name="Facial Runes 4", file="face_rune_04"},
+		},
+		tatoos = {
+			{name="Body Tatoos 1", file="tattoo_runes_01"},
+			{name="Body Tatoos 2", file="tattoo_runes_02"},
+			{name="Body Tatoos 3", file="tattoo_runes_03"},
+			{name="Body Tatoos 4", file="tattoo_runes_04"},
+			{name="Body Tatoos 5", file="tattoo_runes_05"},
+			{name="Body Tatoos 6", file="tattoo_runes_06"},
+			{name="Body Tatoos 7", file="tattoo_runes_07"},
+			{name="Body Tatoos 8", file="tattoo_runes_08"},
+		},
+		special = {
+			{name="Bikini / Mankini", birth_only=true, on_actor=function(actor, birther, last)
+				if not last then local o = birther.obj_list_by_name[birther.descriptors_by_type.sex == 'Female' and 'Bikini' or 'Mankini'] if not o then print("No bikini/mankini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull() actor.moddable_tile_nude = 1
+				else actor:registerOnBirthForceWear(birther.descriptors_by_type.sex == 'Female' and "FUN_BIKINI" or "FUN_MANKINI") end
+			end},
 		},
 	},
 }

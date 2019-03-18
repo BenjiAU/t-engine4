@@ -180,6 +180,10 @@ newTalent{
 			self.moddable_tile_nude = 1
 			self.moddable_tile_base = "base_lich_01.png"
 			self.moddable_tile_ornament = nil
+			self.moddable_tile_hair = nil
+			self.moddable_tile_facial_features = nil
+			self.moddable_tile_tatoo = nil
+			self.moddable_tile_horn = nil
 			self.attachement_spots = "race_skeleton"
 		end
 		self.blood_color = colors.GREY
@@ -243,7 +247,15 @@ newTalent{
 			game.log("#GREY#As you turn into a powerful undead you feel your body violently rejecting the Blood of Life.")
 		end
 
-		require("engine.ui.Dialog"):simplePopup("Lichform", "#GREY#You feel your life slip away, only to be replaced by pure arcane forces! Your flesh starts to rot on your bones, and your eyes fall apart as you are reborn into a Lich!")
+		if not self.has_custom_tile then
+			self:removeAllMOs()
+			self:updateModdableTile()
+			require("engine.ui.Dialog"):yesnoLongPopup("Lichform", "#GREY#You feel your life slip away, only to be replaced by pure arcane forces! Your flesh starts to rot on your bones, and your eyes fall apart as you are reborn into a Lich!\n\n#{italic}#You may now choose to customize the appearance of your Lich, this can not be changed afterwards.", 600, function(ret) if ret then
+				require("mod.dialogs.Birther"):showCosmeticCustomizer(self, "Lich Cosmetic Options")
+			end end, "Customize Appearance", "Use Default", true)
+		else
+			require("engine.ui.Dialog"):simplePopup("Lichform", "#GREY#You feel your life slip away, only to be replaced by pure arcane forces! Your flesh starts to rot on your bones, and your eyes fall apart as you are reborn into a Lich!")
+		end
 
 		game.level.map:particleEmitter(self.x, self.y, 1, "demon_teleport")
 	end,

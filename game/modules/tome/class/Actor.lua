@@ -2623,6 +2623,13 @@ function _M:takeHit(value, src, death_note)
 	return dead, val
 end
 
+-- Superloaded
+function _M:cloneActor(post_copy, alt_nodes)
+	local a, post_copy = engine.Actor.cloneActor(self, post_copy, alt_nodes)
+	a.immune_possession = 1
+	return a, post_copy
+end
+
 --- Remove certain effects when cloned
 function _M:removeTimedEffectsOnClone()
 	local todel = {}
@@ -3847,6 +3854,8 @@ function _M:updateModdableTile()
 	if self.moddable_tile_base_alter then basebody = self:moddable_tile_base_alter(basebody) end
 	add[#add+1] = {image = base..basebody, auto_tall=1}
 
+	if self.moddable_tile_tatoo then add[#add+1] = {image = base..self.moddable_tile_tatoo..".png", auto_tall=1} end
+
 	if not self:attr("disarmed") then
 		i = self:getObjectModdableTile(self.INVEN_MAINHAND); if i and i.moddable_tile_back then
 			add[#add+1] = {image = base..(i.moddable_tile_back):format("right")..".png", auto_tall=1}
@@ -3864,9 +3873,16 @@ function _M:updateModdableTile()
 	i = self:getObjectModdableTile(self.INVEN_CLOAK); if i and i.moddable_tile then add[#add+1] = {image = base..(i.moddable_tile):format("shoulder")..".png", auto_tall=1} end
 	local done_head = false
 	i = self:getObjectModdableTile(self.INVEN_CLOAK); if config.settings.tome.show_cloak_hoods and i and i.moddable_tile_hood then add[#add+1] = {image = base..(i.moddable_tile):format("hood")..".png", auto_tall=1} done_head = true end
+
+	if self.moddable_tile_hair then add[#add+1] = {image = base..self.moddable_tile_hair..".png", auto_tall=1} end
+	if self.moddable_tile_facial_features then for _, f in ipairs(self.moddable_tile_facial_features) do add[#add+1] = {image = base..f..".png", auto_tall=1} end end
+
 	i = self:getObjectModdableTile(self.INVEN_HEAD); if not done_head and i and i.moddable_tile then add[#add+1] = {image = base..(i.moddable_tile)..".png", auto_tall=1} done_head = true end
 	if not done_head and self:attr("moddable_tile_head_underwear") then add[#add+1] = {image = base..self:attr("moddable_tile_head_underwear"), auto_tall=1} end
 	self:triggerHook{"Actor:updateModdableTile:middle", base=base, add=add}
+
+	if self.moddable_tile_horn then add[#add+1] = {image = base..self.moddable_tile_horn..".png", auto_tall=1} end
+
 	i = self:getObjectModdableTile(self.INVEN_HANDS); if i and i.moddable_tile then add[#add+1] = {image = base..(i.moddable_tile)..".png", auto_tall=1} end
 	i = self:getObjectModdableTile(self.INVEN_QUIVER); if i and i.moddable_tile then add[#add+1] = {image = base..(i.moddable_tile)..".png", auto_tall=1} end
 	if not self:attr("disarmed") then
@@ -3886,8 +3902,8 @@ function _M:updateModdableTile()
 
 	self:triggerHook{"Actor:updateModdableTile:front", base=base, add=add}
 
-	if self.moddable_tile_ornament and self.moddable_tile_ornament[self.female and "female" or "male"] then add[#add+1] = {image = base..self.moddable_tile_ornament[self.female and "female" or "male"]..".png", auto_tall=1, shader=self.moddable_tile_ornament_shader} end
-	if self.moddable_tile_ornament2 and self.moddable_tile_ornament2[self.female and "female" or "male"] then add[#add+1] = {image = base..self.moddable_tile_ornament2[self.female and "female" or "male"]..".png", auto_tall=1, shader=self.moddable_tile_ornament_shader2} end
+	-- if self.moddable_tile_ornament and self.moddable_tile_ornament[self.female and "female" or "male"] then add[#add+1] = {image = base..self.moddable_tile_ornament[self.female and "female" or "male"]..".png", auto_tall=1, shader=self.moddable_tile_ornament_shader} end
+	-- if self.moddable_tile_ornament2 and self.moddable_tile_ornament2[self.female and "female" or "male"] then add[#add+1] = {image = base..self.moddable_tile_ornament2[self.female and "female" or "male"]..".png", auto_tall=1, shader=self.moddable_tile_ornament_shader2} end
 
 	if self.x and game.level then game.level.map:updateMap(self.x, self.y) end
 end

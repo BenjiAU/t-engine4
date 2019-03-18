@@ -35,102 +35,51 @@ newEntity{
 	open_door = true,
 }
 
-newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS",
+newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS", define_as = "NPC_HUMANOID_HUMAN",
 	name = "human", subtype = "human", color=colors.LIGHT_UMBER,
-	resolvers.generic(function(e)
-		if rng.percent(50) then
-			e.female = true
-			image = "player/cornac_female.png"
-		else
-			image = "player/cornac_male.png"
-		end
-		e.moddable_tile = "human_#sex#"
-		e.moddable_tile_base = "base_cornac_01.png"
-	end),
 	random_name_def = "cornac_#sex#",
 	humanoid_random_boss = 1, zigur_random_boss = 1,
+	resolvers.racial_visual(nil, "Human", {"Cornac", "Higher"}),
 	resolvers.racial(),
 }
 
-newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS",
+newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS", define_as = "NPC_HUMANOID_THALORE",
 	name = "thalore", subtype = "thalore", color=colors.LIGHT_GREEN,
-	resolvers.generic(function(e)
-		if rng.percent(50) then
-			e.female = true
-			image = "player/thalore_female.png"
-		else
-			image = "player/thalore_male.png"
-		end
-		e.moddable_tile = "elf_#sex#"
-		e.moddable_tile_base = "base_thalore_01.png"
-		e.moddable_tile_ornament = {female="braid_01"}
-	end),
 	random_name_def = "thalore_#sex#",
 	humanoid_random_boss = 1, zigur_random_boss = 1,
+	resolvers.racial_visual(nil, "Elf", "Thalore"),
 	resolvers.racial(),
 }
 
-newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS",
+newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS", define_as = "NPC_HUMANOID_SHALORE",
 	name = "shalore", subtype = "shalore", color=colors.LIGHT_BLUE,
-	resolvers.generic(function(e)
-		if rng.percent(50) then
-			e.female = true
-			image = "player/shalore_female.png"
-		else
-			image = "player/shalore_male.png"
-		end
-		e.moddable_tile = "elf_#sex#"
-		e.moddable_tile_base = "base_shalore_01.png"
-		e.moddable_tile_ornament = {female="braid_02"}
-	end),
 	random_name_def = "shalore_#sex#", random_name_max_syllables = 4,
 	humanoid_random_boss = 1,
+	resolvers.racial_visual(nil, "Elf", "Shalore"),
 	resolvers.racial(),
 }
 
-newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS",
+newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS", define_as = "NPC_HUMANOID_HALFLING",
 	name = "halfling", subtype = "halfling", color=colors.BLUE,
-	resolvers.generic(function(e)
-		if rng.percent(50) then
-			e.female = true
-			image = "player/halfling_female.png"
-		else
-			image = "player/halfling_male.png"
-		end
-		e.moddable_tile = "halfling_#sex#"
-	end),
 	random_name_def = "halfling_#sex#",
 	humanoid_random_boss = 1, zigur_random_boss = 1,
+	resolvers.racial_visual(nil, "Halfling", "Halfling"),
 	resolvers.racial(),
 }
 
-newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS",
+newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS", define_as = "NPC_HUMANOID_DWARF",
 	name = "dwarf", subtype = "dwarf", color=colors.UMBER,
-	resolvers.generic(function(e)
-		if rng.percent(50) then
-			e.female = true
-			image = "player/dwarf_female.png"
-		else
-			image = "player/dwarf_male.png"
-		end
-		e.moddable_tile = "dwarf_#sex#"
-	end),
 	random_name_def = "dwarf_#sex#",
 	humanoid_random_boss = 2, zigur_random_boss = 2,
+	resolvers.racial_visual(nil, "Dwarf", "Dwarf"),
 	resolvers.racial(),
 }
 
-newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS",
+newEntity{ base = "BASE_NPC_HUMANOID_RANDOM_BOSS", define_as = "NPC_HUMANOID_OGRE",
 	display = 'P',
 	name = "giant", subtype = "ogre", color=colors.BLUE,
-	resolvers.generic(function(e)
-		if rng.percent(50) then
-			e.female = true
-		else
-		end
-		e.moddable_tile = "ogre_#sex#"
-	end),
 	random_name_def = "shalore_#sex#",
 	humanoid_random_boss = 2,
+	resolvers.racial_visual(nil, "Giant", "Ogre"),
 	resolvers.racial(),
 }

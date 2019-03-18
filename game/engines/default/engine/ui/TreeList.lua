@@ -305,8 +305,10 @@ function _M:drawItem(item)
 
 			if not item.cols[i] then
 				local offset = 0
+				item.offset_x = 0
 				if i == 1 then
 					offset = level * self.level_offset
+					item.offset_x = level * self.level_offset
 					if item.nodes then offset = offset + self.plus.w end
 				end
 

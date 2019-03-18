@@ -1174,6 +1174,109 @@ function resolvers.calc.racial(t, e)
 end
 
 
+--- Racial Visuals resolver
+local racials_visuals = {
+	Human = {
+		Cornac = {
+			{kind="skin", filter={"oneof", {"Skin Color 1", "Skin Color 2", "Skin Color 3", "Skin Color 4", "Skin Color 5"}}},
+			{kind="skin", percent=5, filter={"oneof", {"Skin Color 6", "Skin Color 7", "Skin Color 8"}}},
+			{kind="hairs", filter={"findname", "Dark Hair"}},
+			{kind="hairs", percent=10, filter={"findname", "Redhead "}},
+			{kind="facial_features", percent=20, filter={"findname", "Dark Beard "}},
+			{kind="facial_features", percent=20, filter={"findname", "Dark Mustache "}},
+		},
+		Higher = {
+			{kind="skin", filter={"oneof", {"Skin Color 1", "Skin Color 2", "Skin Color 3", "Skin Color 4", "Skin Color 5"}}},
+			{kind="skin", percent=5, filter={"oneof", {"Skin Color 6", "Skin Color 7", "Skin Color 8"}}},
+			{kind="hairs", filter={"findname", "Blond Hair"}},
+			{kind="hairs", percent=10, filter={"findname", "Redhead "}},
+			{kind="facial_features", percent=20, filter={"findname", "Blonde Beard "}},
+			{kind="facial_features", percent=20, filter={"findname", "Blonde Mustache "}},
+		},
+	},
+	Elf = {
+		Shalore = {
+			{kind="skin", filter={"oneof", {"Skin Color 1", "Skin Color 2", "Skin Color 3", "Skin Color 4", "Skin Color 5"}}},
+			{kind="skin", percent=15, filter={"oneof", {"Skin Color 6", "Skin Color 7", "Skin Color 8", "Skin Color 9"}}},
+			{kind="hairs", filter={"findname", "Blond Hair"}},
+			{kind="hairs", percent=15, filter={"findname", "Redhead "}},
+		},
+		Thalore = {
+			{kind="skin", filter={"oneof", {"Skin Color 1", "Skin Color 2", "Skin Color 3", "Skin Color 4", "Skin Color 5"}}},
+			{kind="hairs", filter={"findname", "Dark Hair"}},
+			{kind="hairs", percent=15, filter={"findname", "Redhead "}},
+		},
+	},
+	Halfling = {
+		Halfling = {
+			{kind="skin", filter={"oneof", {"Skin Color 1", "Skin Color 2", "Skin Color 3", "Skin Color 4"}}},
+			{kind="skin", percent=5, filter={"oneof", {"Skin Color 5", "Skin Color 6"}}},
+			{kind="hairs", filter={"all"}},
+		},
+	},
+	Dwarf = {
+		Dwarf = {
+			{kind="skin", filter={"oneof", {"Skin Color 1", "Skin Color 2", "Skin Color 3", "Skin Color 4", "Skin Color 5"}}},
+			{kind="hairs", filter={"all"}},
+			{kind="facial_features", percent=25, filter={"findname", "Beard"}},
+			{kind="facial_features", percent=25, filter={"findname", "Mustache"}},
+		},
+	},
+	Giant = {
+		Ogre = {
+			{kind="skin", filter={"oneof", {"Skin Color 1", "Skin Color 2", "Skin Color 3", "Skin Color 4", "Skin Color 5"}}},
+			{kind="skin", percent=15, filter={"oneof", {"Skin Color 6", "Skin Color 7", "Skin Color 8", "Skin Color 9"}}},
+			{kind="hairs", filter={"all"}},
+			{kind="facial_features", percent=20, filter={"all"}},
+			{kind="tatoos", percent=35, filter={"all"}},
+		},
+	},
+}
+resolvers.racials_visuals_defs = racials_visuals
+
+local racials_visuals_birther = nil
+
+function resolvers.racial_visual(sex, race, subrace)
+	return {__resolver="racial_visual", sex, race, subrace}
+end
+function resolvers.calc.racial_visual(t, e)
+	local sex = t[1]
+	local race = t[2]
+	local subrace = t[3]
+
+	if not sex then sex = rng.table{"Male", "Female"} end
+	if type(race) == "table" then race = rng.table(race) end
+	if type(subrace) == "table" then subrace = rng.table(subrace) end
+
+	if not racials_visuals[race] or not racials_visuals[race][subrace] then return end
+
+	if sex == "Female" then e.female = true end
+
+	e.descriptor = e.descriptor or {}
+	e.descriptor.sex = sex
+	e.descriptor.race = race
+	e.descriptor.subrace = subrace
+
+	if not racials_visuals_birther then
+		local Birther = require "mod.dialogs.Birther"
+		racials_visuals_birther = Birther.new("", e, {}, function() end, nil, nil, nil)
+		racials_visuals_birther.not_birthing = true
+	end
+
+	racials_visuals_birther.actor = e -- Bypass clone
+
+	racials_visuals_birther:setDescriptor("sex", e.descriptor.sex)
+	racials_visuals_birther:setDescriptor("race", e.descriptor.race)
+	racials_visuals_birther:setDescriptor("subrace", e.descriptor.subrace)
+
+	racials_visuals_birther:selectRandomCosmetics(racials_visuals[race][subrace])
+
+	racials_visuals_birther:setTile(nil, nil, nil, true)
+
+	return nil
+end
+
+
 function resolvers.emote_random(def)
 	return {__resolver="emote_random", def}
 end
