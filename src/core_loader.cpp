@@ -427,7 +427,7 @@ static int lua_loader_cubemap_png(lua_State *L) {
 	texture_lua *t = new(L) texture_lua();
 	glGenTextures(1, &t->texture_id);
 	tfglBindTexture(GL_TEXTURE_CUBE_MAP, t->texture_id);
-	// t->kind = GL_TEXTURE_CUBE_MAP;
+	t->kind = TextureKind::CUBEMAP;
 	t->w = sw;
 	t->h = sh;
 	t->no_free = false;

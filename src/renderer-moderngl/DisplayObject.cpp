@@ -82,6 +82,13 @@ void DisplayObject::setParent(DisplayObject *parent) {
 
 void DisplayObject::setChanged(bool force) {
 	DisplayObject *p = this;
+
+	// Independent renderers dont need to process children if they only changed themselves
+	if (p->stop_parent_recursing) {
+		p->changed = true;
+		return;
+	}
+
 	while (p) {
 		if (p->stop_parent_recursing) {
 			p->changed_children = true;
