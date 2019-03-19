@@ -58,20 +58,65 @@ newBirthDescriptor{
 	random_escort_possibilities = { {"tier1.1", 1, 2}, {"tier1.2", 1, 2}, {"daikara", 1, 2}, {"old-forest", 1, 4}, {"dreadfell", 1, 8}, {"reknor", 1, 2}, },
 
 	moddable_attachement_spots = "race_human",
-	cosmetic_unlock = {
-		cosmetic_race_human_redhead = {
-			{name="Redhead [donator only]", donator=true, on_actor=function(actor) if actor.moddable_tile then actor.moddable_tile_base = "base_redhead_01.png" end end},
-			{name="Red braids [donator only]", donator=true, on_actor=function(actor) if actor.moddable_tile then actor.moddable_tile_ornament = {female="braid_redhead_01"} end end, check=function(birth) return birth.descriptors_by_type.sex == "Female" end},
+	cosmetic_options = {
+		skin = {
+			{name="Skin Color 1", file="base_01"},
+			{name="Skin Color 2", file="base_02"},
+			{name="Skin Color 3", file="base_03"},
+			{name="Skin Color 4", file="base_04"},
+			{name="Skin Color 5", file="base_05"},
+			{name="Skin Color 6", file="base_06"},
+			{name="Skin Color 7", file="base_07"},
+			{name="Skin Color 8", file="base_08"},
 		},
-		cosmetic_bikini =  {
-			{name="Bikini [donator only]", donator=true, on_actor=function(actor, birther, last)
-				if not last then local o = birther.obj_list_by_name.Bikini if not o then print("No bikini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull()
-				else actor:registerOnBirthForceWear("FUN_BIKINI") end
-			end, check=function(birth) return birth.descriptors_by_type.sex == "Female" end},
-			{name="Mankini [donator only]", donator=true, on_actor=function(actor, birther, last)
-				if not last then local o = birther.obj_list_by_name.Mankini if not o then print("No mankini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull()
-				else actor:registerOnBirthForceWear("FUN_MANKINI") end
-			end, check=function(birth) return birth.descriptors_by_type.sex == "Male" end},
+		hairs = {
+			{name="Dark Hair 1", file="hair_cornac_01"},
+			{name="Dark Hair 2", file="hair_cornac_02"},
+			{name="Dark Hair 3", file="hair_cornac_03"},
+			{name="Dark Hair 4", file="hair_cornac_04", only_for={sex="Female"}},
+			{name="Dark Hair 5", file="hair_cornac_05", only_for={sex="Female"}},
+			{name="Dark Hair 6", file="hair_cornac_06", only_for={sex="Female"}},
+			{name="Blond Hair 1", file="hair_higher_01"},
+			{name="Blond Hair 2", file="hair_higher_02"},
+			{name="Blond Hair 3", file="hair_higher_03"},
+			{name="Blond Hair 4", file="hair_higher_04", only_for={sex="Female"}},
+			{name="Blond Hair 5", file="hair_higher_05", only_for={sex="Female"}},
+			{name="Blond Hair 6", file="hair_higher_06", only_for={sex="Female"}},
+			{name="Redhead 1", file="hair_redhead_01", unlock="cosmetic_race_human_redhead"},
+			{name="Redhead 2", file="hair_redhead_02", unlock="cosmetic_race_human_redhead"},
+			{name="Redhead 3", file="hair_redhead_03", unlock="cosmetic_race_human_redhead"},
+			{name="Redhead 4", file="hair_redhead_04", unlock="cosmetic_race_human_redhead", only_for={sex="Female"}},
+			{name="Redhead 5", file="hair_redhead_05", unlock="cosmetic_race_human_redhead", only_for={sex="Female"}},
+			{name="Redhead 6", file="hair_redhead_06", unlock="cosmetic_race_human_redhead", only_for={sex="Female"}},
+		},
+		facial_features = {
+			{name="Dark Beard 1", file="beard_cornac_01", only_for={sex="Male"}},
+			{name="Dark Beard 2", file="beard_cornac_02", only_for={sex="Male"}},
+			{name="Dark Beard 3", file="beard_cornac_03", only_for={sex="Male"}},
+			{name="Dark Beard 4", file="beard_cornac_04", only_for={sex="Male"}},
+			{name="Dark Beard 5", file="beard_cornac_05", only_for={sex="Male"}},
+			{name="Blonde Beard 1", file="beard_higher_01", only_for={sex="Male"}},
+			{name="Blonde Beard 2", file="beard_higher_02", only_for={sex="Male"}},
+			{name="Blonde Beard 3", file="beard_higher_03", only_for={sex="Male"}},
+			{name="Blonde Beard 4", file="beard_higher_04", only_for={sex="Male"}},
+			{name="Blonde Beard 5", file="beard_higher_05", only_for={sex="Male"}},
+			{name="Redhead Beard 1", file="beard_redhead_01", unlock="cosmetic_race_human_redhead", only_for={sex="Male"}},
+			{name="Redhead Beard 2", file="beard_redhead_02", unlock="cosmetic_race_human_redhead", only_for={sex="Male"}},
+			{name="Redhead Beard 3", file="beard_redhead_03", unlock="cosmetic_race_human_redhead", only_for={sex="Male"}},
+			{name="Redhead Beard 4", file="beard_redhead_04", unlock="cosmetic_race_human_redhead", only_for={sex="Male"}},
+			{name="Redhead Beard 5", file="beard_redhead_05", unlock="cosmetic_race_human_redhead", only_for={sex="Male"}},
+			{name="Dark Mustache 1", file="face_mustache_cornac_01", only_for={sex="Male"}},
+			{name="Dark Mustache 2", file="face_mustache_cornac_02", only_for={sex="Male"}},
+			{name="Blond Mustache 1", file="face_mustache_higher_01", only_for={sex="Male"}},
+			{name="Blond Mustache 2", file="face_mustache_higher_02", only_for={sex="Male"}},
+			{name="Redhead Mustache 1", file="face_mustache_redhead_01", unlock="cosmetic_race_human_redhead", only_for={sex="Male"}},
+			{name="Redhead Mustache 2", file="face_mustache_redhead_02", unlock="cosmetic_race_human_redhead", only_for={sex="Male"}},
+		},
+		special = {
+			{name="Bikini / Mankini", birth_only=true, on_actor=function(actor, birther, last)
+				if not last then local o = birther.obj_list_by_name[birther.descriptors_by_type.sex == 'Female' and 'Bikini' or 'Mankini'] if not o then print("No bikini/mankini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull() actor.moddable_tile_nude = 1
+				else actor:registerOnBirthForceWear(birther.descriptors_by_type.sex == 'Female' and "FUN_BIKINI" or "FUN_MANKINI") end
+			end},
 		},
 	},
 }
@@ -98,9 +143,10 @@ newBirthDescriptor
 	talents = {
 		[ActorTalents.T_HIGHER_HEAL]=1,
 	},
+	default_cosmetics = { {"hairs", "Blond Hair 1"} },
 	copy = {
 		moddable_tile = "human_#sex#",
-		moddable_tile_base = "base_higher_01.png",
+		moddable_tile_base = "base_01.png",
 		random_name_def = "higher_#sex#",
 		life_rating = 11,
 		default_wilderness = {"playerpop", "allied"},
@@ -129,9 +175,10 @@ newBirthDescriptor
 		unused_talents = 1,
 		unused_generics = 1,
 	},
+	default_cosmetics = { {"hairs", "Dark Hair 1"} },
 	copy = {
 		moddable_tile = "human_#sex#",
-		moddable_tile_base = "base_cornac_01.png",
+		moddable_tile_base = "base_01.png",
 		random_name_def = "cornac_#sex#",
 		life_rating = 10,
 		default_wilderness = {"playerpop", "allied"},

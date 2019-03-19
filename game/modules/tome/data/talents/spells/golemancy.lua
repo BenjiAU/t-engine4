@@ -32,6 +32,7 @@ function makeAlchemistGolem(self)
 		type = "construct", subtype = "golem",
 		name = "golem",
 		display = 'g', color=colors.WHITE, image = "npc/alchemist_golem.png",
+		descriptor = {sex="Male", race="Construct", subrace="Runic Golem"},
 		moddable_tile = "runic_golem",
 		moddable_tile_nude = 1,
 		moddable_tile_base = resolvers.generic(function() return "base_0"..rng.range(1, 5)..".png" end),

@@ -601,6 +601,17 @@ static int lua_cprofiler(lua_State *L) {
 }
 #endif
 
+static int lua_stdout_write(lua_State *L)
+{
+	int i = 1;
+	while (i <= lua_gettop(L)) {
+		const char *s = lua_tostring(L, i);
+		printf("%s", s);
+		i++;
+	}
+	return 0;
+}
+
 static int lua_open_browser(lua_State *L)
 {
 #if defined(SELFEXE_LINUX) || defined(SELFEXE_BSD)
@@ -641,6 +652,7 @@ static const struct luaL_Reg gamelib[] =
 	{"requestNextTick", lua_force_next_tick},
 	{"checkError", lua_check_error},
 	{"resetLocale", lua_reset_locale},
+	{"stdout_write", lua_stdout_write},	
 	{"openBrowser", lua_open_browser},
 	{"disableConnectivity", lua_disable_connectivity},
 #ifdef TE4_PROFILING
