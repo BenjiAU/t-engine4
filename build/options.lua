@@ -42,6 +42,10 @@ newoption {
 	description = "Enables sanitizer and such",
 }
 newoption {
+	trigger     = "debuggl",
+	description = "Enables GL debug callback log",
+}
+newoption {
 	trigger     = "profiling",
 	description = "Enables gprof profiling data",
 }

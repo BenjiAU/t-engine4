@@ -32,7 +32,7 @@ end
 function enableSanitizer()
 	if _OPTIONS.debugdeep then
 		buildoptions { "-ggdb", "-fsanitize=address", "-fno-omit-frame-pointer" }
-		linkoptions { "-fsanitize=address", "-fuse-ld=gold" }
+		linkoptions { "-static-libasan", "-fsanitize=address", "-fuse-ld=gold" }
 		-- buildoptions { "-ggdb", "-fsanitize=thread", "-fno-omit-frame-pointer" }
 		-- linkoptions { "-fsanitize=thread", "-fuse-ld=gold" }
 	end
@@ -56,6 +56,9 @@ project "TEngine"
 		buildoptions { "-fno-omit-frame-pointer" }
 		linkoptions{ "-fno-omit-frame-pointer" }
 		links{"profiler"}
+	end
+	if _OPTIONS.debuggl then
+		defines { "TE4_DEBUG_GL_CALLBACK" }
 	end
 	enableSanitizer()
 

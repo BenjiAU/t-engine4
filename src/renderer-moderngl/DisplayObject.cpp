@@ -83,7 +83,7 @@ void DisplayObject::setParent(DisplayObject *parent) {
 void DisplayObject::setChanged(bool force) {
 	DisplayObject *p = this;
 	while (p) {
-		if (p->stop_parent_recursing && p != this) {
+		if (p->stop_parent_recursing) {
 			p->changed_children = true;
 			if (force) p->changed = true;
 			break;

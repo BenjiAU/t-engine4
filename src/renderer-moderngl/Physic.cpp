@@ -58,7 +58,7 @@ public:
 			float p1x = p1->x * PhysicSimulator::unit_scale; float p1y = -p1->y * PhysicSimulator::unit_scale;
 			float p2x = p2->x * PhysicSimulator::unit_scale; float p2y = -p2->y * PhysicSimulator::unit_scale;
 
-			auto dl = getDisplayList(this, {(GLuint)gl_tex_white, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
+			auto dl = getDisplayList(this, {(texture_do){(GLuint)gl_tex_white, GL_TEXTURE_2D}, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
 			dl->list.push_back({{p1x, p1y, 0, 1}, {0, 0}, {color.r, color.g, color.b, color.a}});
 			dl->list.push_back({{p2x, p2y, 0, 1}, {0, 0}, {color.r, color.g, color.b, color.a}});
 		}
@@ -72,7 +72,7 @@ public:
 			float p2x = vertices[i  ].x * PhysicSimulator::unit_scale; float p2y = -vertices[i  ].y * PhysicSimulator::unit_scale;
 			float p3x = vertices[i+1].x * PhysicSimulator::unit_scale; float p3y = -vertices[i+1].y * PhysicSimulator::unit_scale;
 
-			auto dl = getDisplayList(this, {(GLuint)gl_tex_white, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::TRIANGLES);
+			auto dl = getDisplayList(this, {(texture_do){(GLuint)gl_tex_white, GL_TEXTURE_2D}, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::TRIANGLES);
 			dl->list.push_back({{p1x, p1y, 0, 1}, {0, 0}, {color.r, color.g, color.b, color.a * 0.7}});
 			dl->list.push_back({{p2x, p2y, 0, 1}, {0, 0}, {color.r, color.g, color.b, color.a * 0.7}});
 			dl->list.push_back({{p3x, p3y, 0, 1}, {0, 0}, {color.r, color.g, color.b, color.a * 0.7}});
@@ -85,7 +85,7 @@ public:
 			float p1x = p1->x * PhysicSimulator::unit_scale; float p1y = -p1->y * PhysicSimulator::unit_scale;
 			float p2x = p2->x * PhysicSimulator::unit_scale; float p2y = -p2->y * PhysicSimulator::unit_scale;
 
-			auto dl = getDisplayList(this, {(GLuint)gl_tex_white, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
+			auto dl = getDisplayList(this, {(texture_do){(GLuint)gl_tex_white, GL_TEXTURE_2D}, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
 			dl->list.push_back({{p1x, p1y, 0, 1}, {0, 0}, {color.r, color.g, color.b, color.a}});
 			dl->list.push_back({{p2x, p2y, 0, 1}, {0, 0}, {color.r, color.g, color.b, color.a}});
 		}
@@ -101,7 +101,7 @@ public:
 		float32 cosInc = cosf(k_increment);
 		b2Vec2 r1(1.0f, 0.0f);
 		b2Vec2 v1 = center + radius * r1;
-		auto dl = getDisplayList(this, {(GLuint)gl_tex_white, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
+		auto dl = getDisplayList(this, {(texture_do){(GLuint)gl_tex_white, GL_TEXTURE_2D}, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
 		for (int32 i = 0; i < k_segments; ++i)
 		{
 			// Perform rotation to avoid additional trigonometry.
@@ -128,7 +128,7 @@ public:
 		b2Vec2 v1 = center + radius * r1;
 		b2Vec2 v0 = center;
 
-		auto dl = getDisplayList(this, {(GLuint)gl_tex_white, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::TRIANGLES);
+		auto dl = getDisplayList(this, {(texture_do){(GLuint)gl_tex_white, GL_TEXTURE_2D}, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::TRIANGLES);
 		for (int32 i = 0; i < k_segments; ++i)
 		{
 			// Perform rotation to avoid additional trigonometry.
@@ -145,7 +145,7 @@ public:
 
 		r1.Set(1.0f, 0.0f);
 		v1 = center + radius * r1;
-		dl = getDisplayList(this, {(GLuint)gl_tex_white, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
+		dl = getDisplayList(this, {(texture_do){(GLuint)gl_tex_white, GL_TEXTURE_2D}, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
 		for (int32 i = 0; i < k_segments; ++i)
 		{
 			// Perform rotation to avoid additional trigonometry.
@@ -165,7 +165,7 @@ public:
 		float p1x = p1.x * PhysicSimulator::unit_scale; float p1y = -p1.y * PhysicSimulator::unit_scale;
 		float p2x = p2.x * PhysicSimulator::unit_scale; float p2y = -p2.y * PhysicSimulator::unit_scale;
 
-		auto dl = getDisplayList(this, {(GLuint)gl_tex_white, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
+		auto dl = getDisplayList(this, {(texture_do){(GLuint)gl_tex_white, GL_TEXTURE_2D}, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
 		dl->list.push_back({{p1x, p1y, 0, 1}, {0, 0}, {color.r, color.g, color.b, color.a}});
 		dl->list.push_back({{p2x, p2y, 0, 1}, {0, 0}, {color.r, color.g, color.b, color.a}});
 	}
@@ -179,7 +179,7 @@ public:
 		b2Vec2 p1(xf.p.x * PhysicSimulator::unit_scale, -xf.p.y * PhysicSimulator::unit_scale);
 		b2Vec2 p2;
 
-		auto dl = getDisplayList(this, {(GLuint)gl_tex_white, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
+		auto dl = getDisplayList(this, {(texture_do){(GLuint)gl_tex_white, GL_TEXTURE_2D}, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
 		dl->list.push_back({{p1.x, p1.y, 0, 1}, {0, 0}, {red.r, red.g, red.b, 1.0}});
 		p2 = p1 + k_axisScale * xf.q.GetXAxis();
 		dl->list.push_back({{p2.x, p2.y, 0, 1}, {0, 0}, {red.r, red.g, red.b, 1.0}});
@@ -193,7 +193,7 @@ public:
 	virtual void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color) {
 		float px = p.x * PhysicSimulator::unit_scale, py = -p.y * PhysicSimulator::unit_scale;
 		size *= PhysicSimulator::unit_scale;
-		auto dl = getDisplayList(this, {(GLuint)gl_tex_white, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::POINTS);
+		auto dl = getDisplayList(this, {(texture_do){(GLuint)gl_tex_white, GL_TEXTURE_2D}, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::POINTS);
 		dl->list.push_back({{px, py, 0, 1}, {0, 0}, {color.r, color.g, color.b, color.a}});
 	}
 };

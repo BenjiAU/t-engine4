@@ -54,7 +54,6 @@ using namespace std;
 #include "renderer-moderngl/RendererGL.hpp"
 //#include "renderer-moderngl/TileMap.hpp"
 
-extern DisplayList* getDisplayList(RendererGL *container, GLuint tex, shader_type *shader);
 extern void releaseDisplayList(DisplayList *dl);
 
 template<class T=DisplayObject>T* userdata_to_DO(lua_State *L, int index, const char *auxclass=nullptr) {

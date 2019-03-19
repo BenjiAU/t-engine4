@@ -48,7 +48,7 @@ MapObject::MapObject(int64_t uid, uint8_t nb_textures, bool on_seen, bool on_rem
 {
 	for (int i = 0; i < MAX_TEXTURES; i++) {
 		textures_ref[i] = LUA_NOREF;
-		textures[i] = 0;
+		textures[i] = {0, GL_TEXTURE_2D};
 	}
 	root = this;
 }
@@ -85,7 +85,7 @@ void MapObject::chain(sMapObject n) {
 bool MapObject::setTexture(uint8_t slot, GLuint tex, int ref, vec4 coords) {
 	if (slot >= MAX_TEXTURES) return false;
 	refcleaner(&textures_ref[slot]);
-	textures[slot] = tex;
+	textures[slot] = {tex, GL_TEXTURE_2D};
 	textures_ref[slot] = ref;
 	tex_coords[slot] = coords;
 	notifyChangedMORs();
@@ -727,8 +727,8 @@ void Map2D::toScreen(mat4 cur_model, vec4 color) {
 	for (int32_t z = 0; z < zdepth; z++) {
 		if (renderers_changed[z]) {
 			renderers_changed[z] = false;
-			renderers[z]->resetDisplayLists();
-			renderers[z]->setChanged(true);
+			// renderers[z]->resetDisplayLists();
+			// renderers[z]->setChanged(true);
 
 			int32_t mini, maxi;
 			int32_t minj, maxj;

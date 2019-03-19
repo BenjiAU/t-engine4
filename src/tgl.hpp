@@ -40,9 +40,8 @@
 
 #include <stdio.h>
 struct texture_type {
-	texture_type() { printf("NEW TEXTURE!\n"); }
-	GLuint tex = 0;
 	GLenum kind = GL_TEXTURE_2D;
+	GLuint tex = 0;
 	int w = 0, h = 0;
 	bool no_free = false;
 };

@@ -119,7 +119,7 @@ protected:
 	const static uint8_t MAX_TEXTURES = 5;
 	uint8_t nb_textures = 0;
 	int textures_ref[MAX_TEXTURES];
-	GLuint textures[MAX_TEXTURES];
+	texture_do textures[MAX_TEXTURES];
 	vec4 tex_coords[MAX_TEXTURES];
 
 	shader_type *shader = nullptr;

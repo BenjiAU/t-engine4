@@ -219,5 +219,6 @@ function _M:display(nb_keyframes)
 end
 
 function _M:setupMouse(mouse)
+	self.no_ui=true
 	for _, container in ipairs(self.minicontainers) do container:setupMouse(true) end
 end
