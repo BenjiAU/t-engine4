@@ -63,6 +63,7 @@ extern "C" {
 
 int start_xpos = -1, start_ypos = -1;
 bool ignore_window_change_pos = false;
+bool enable_gl_debug_log = false;
 char *override_home = NULL;
 int g_argc = 0;
 char **g_argv;
@@ -986,6 +987,49 @@ void do_move(int w, int h) {
 
 }
 
+void GLAPIENTRY openglDebugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+	if (type == GL_DEBUG_TYPE_OTHER) return ;
+	printf("\x1b[33m---------------------opengl-callback-start------------\n");
+	printf("message: %s\n", message);
+	printf("type: ");
+	switch (type) {
+	case GL_DEBUG_TYPE_ERROR:
+		printf("ERROR");
+		break;
+	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+		printf("DEPRECATED_BEHAVIOR");
+		break;
+	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+		printf("UNDEFINED_BEHAVIOR");
+		break;
+	case GL_DEBUG_TYPE_PORTABILITY:
+		printf("PORTABILITY");
+		break;
+	case GL_DEBUG_TYPE_PERFORMANCE:
+		printf("PERFORMANCE");
+		break;
+	case GL_DEBUG_TYPE_OTHER:
+		printf("OTHER");
+		break;
+	}
+	printf("\n");
+ 
+	printf("id: %d\n", id);
+	printf("severity: ");
+	switch (severity){
+	case GL_DEBUG_SEVERITY_LOW:
+		printf("LOW");
+		break;
+	case GL_DEBUG_SEVERITY_MEDIUM:
+		printf("MEDIUM");
+		break;
+	case GL_DEBUG_SEVERITY_HIGH:
+		printf("HIGH");
+		break;
+	}
+	printf("\n---------------------opengl-callback-end--------------\x1b[0m\n");
+}
+
 extern void interface_resize(int w, int h); // From Interface.cpp
 
 /* @see main.h#do_resize */
@@ -1024,6 +1068,7 @@ void do_resize(int w, int h, bool fullscreen, bool borderless, float zoom)
 	/* If there is no current window, we have to make one and initialize */
 	if (!window) {
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+		if (enable_gl_debug_log) SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 		// if (SDL_GL_SetSwapInterval(-1)) SDL_GL_SetSwapInterval(1);
 		
 		window = SDL_CreateWindow("TE4",
@@ -1054,6 +1099,16 @@ void do_resize(int w, int h, bool fullscreen, bool borderless, float zoom)
 		SDL_SetWindowIcon(window, windowIconSurface);
 		if (offscreen_render) SDL_HideWindow(window);
 
+		if (enable_gl_debug_log) {
+			if (glDebugMessageCallback) {
+				printf("Register OpenGL debug callback\n");
+				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+				glDebugMessageCallback((GLDEBUGPROC)openglDebugCallbackFunction, nullptr);
+				GLuint unusedIds = 0;
+				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
+			}
+			else printf("glDebugMessageCallback not available\n");
+		}
 	} else {
 
 		/* SDL won't allow a fullscreen resolution change in one go.  Check. */
@@ -1538,6 +1593,7 @@ int main(int argc, char *argv[])
 		if (!strncmp(arg, "--logtofile", 11)) logtofile = true;
 		if (!strncmp(arg, "--no-web", 8)) no_web = true;
 		if (!strncmp(arg, "--offscreen", 11)) offscreen_render = true;
+		if (!strncmp(arg, "--debug-gl", 10)) enable_gl_debug_log = true;
 		if (!strncmp(arg, "--lock-size", 11)) {
 			char *arg = argv[++i];
 			char *next;
