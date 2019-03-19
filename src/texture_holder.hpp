@@ -27,9 +27,10 @@ extern "C" {
 
 const int DO_MAX_TEX = 3;
 
-enum class RenderKind { QUADS, TRIANGLES, POINTS, LINES }; 
+// All supported textures types
 enum class TextureKind { _2D = GL_TEXTURE_2D, _3D = GL_TEXTURE_3D, CUBEMAP = GL_TEXTURE_CUBE_MAP }; 
 
+// A single texture holder info, with various textings and convertions
 struct texture_info {
 	TextureKind kind;
 	GLuint texture_id;
@@ -49,6 +50,7 @@ inline bool operator>(const texture_info &a, const texture_info &b) { return a.t
 inline bool operator<=(const texture_info &a, const texture_info &b) { return a.texture_id <= b.texture_id; }
 inline bool operator>=(const texture_info &a, const texture_info &b) { return a.texture_id >= b.texture_id; }
 
+// An array of texture holder infos (of fixed array size), with various textings and convertions
 struct textures_array {
 	texture_info tex[DO_MAX_TEX];
 	textures_array() { tex[0] = 0; tex[1] = 0; tex[2] = 0; }

@@ -40,6 +40,8 @@ using namespace std;
 
 #include "texture_holder.hpp"
 
+enum class RenderKind { QUADS, TRIANGLES, POINTS, LINES }; 
+
 class View;
 class RendererGL;
 class DisplayObject;
