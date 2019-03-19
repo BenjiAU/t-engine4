@@ -34,7 +34,7 @@ class RendererGL;
 class DisplayList {
 public:
 	int used = 0;
-	GLuint vbo[5] = {0,0,0,0,0};
+	GLuint vbo[6] = {0,0,0,0,0,0};
 	textures_array tex;
 	shader_type *shader = NULL;
 	uint8_t data_kind = VERTEX_BASE;
@@ -44,6 +44,7 @@ public:
 	vector<vertex_map_info> list_map_info;
 	vector<vertex_model_info> list_model_info;
 	vector<vertex_picking_info> list_picking_info;
+	vector<vertex_normal_info> list_normal_info;
 	SubRenderer *sub = NULL;
 	DisplayObject *tick = NULL;
 

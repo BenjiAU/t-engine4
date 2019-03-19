@@ -28,7 +28,7 @@ extern "C" {
 const int DO_MAX_TEX = 3;
 
 // All supported textures types
-enum class TextureKind : GLenum { _2D = GL_TEXTURE_2D, _3D = GL_TEXTURE_3D, CUBEMAP = GL_TEXTURE_CUBE_MAP }; 
+enum class TextureKind : GLenum { _1D = GL_TEXTURE_1D, _2D = GL_TEXTURE_2D, _3D = GL_TEXTURE_3D, CUBEMAP = GL_TEXTURE_CUBE_MAP }; 
 
 // A single texture holder info, with various textings and convertions
 struct texture_info {

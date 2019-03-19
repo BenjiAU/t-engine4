@@ -55,6 +55,7 @@ enum {
 	VERTEX_KIND_INFO = 2,
 	VERTEX_MODEL_INFO = 4,
 	VERTEX_PICKING_INFO = 8,
+	VERTEX_NORMAL_INFO = 16,
 };
 
 struct vertex {
@@ -74,6 +75,9 @@ struct vertex_picking_info {
 };
 struct vertex_model_info {
 	mat4 model;
+};
+struct vertex_normal_info {
+	vec3 normal;
 };
 
 struct recomputematrix {
@@ -237,6 +241,7 @@ protected:
 	vector<vertex_kind_info> vertices_kind_info;
 	vector<vertex_model_info> vertices_model_info;
 	vector<vertex_picking_info> vertices_picking_info;
+	vector<vertex_normal_info> vertices_normal_info;
 	array<int, DO_MAX_TEX> tex_lua_ref{{ LUA_NOREF, LUA_NOREF, LUA_NOREF}};
 	textures_array tex;
 	int tex_max = 1;
@@ -288,16 +293,28 @@ public:
 	int addQuadKindInfo(float v1, float v2, float v3, float v4);
 	int addQuadMapInfo(vertex_map_info v1, vertex_map_info v2, vertex_map_info v3, vertex_map_info v4);
 	int addQuadPickingInfo(vertex_picking_info v1, vertex_picking_info v2, vertex_picking_info v3, vertex_picking_info v4);
+	int addQuadNormalInfo(vertex_normal_info n1, vertex_normal_info n2, vertex_normal_info n3, vertex_normal_info n4);
 
 	int addPoint(
 		float x1, float y1, float z1, float u1, float v1, 
 		float r, float g, float b, float a
 	);
+	int addPoint(vertex v);
+	int addPointKindInfo(float v);
+	int addPointMapInfo(vertex_map_info v);
+	int addPointPickingInfo(vertex_picking_info v);
+	int addPointNormalInfo(vertex_normal_info n);
 
 	void loadObj(const string &filename);
 	GLuint getTexture(int id) { return tex[id]; };
-	virtual void setTexture(GLuint tex, int lua_ref, int id);
-	virtual void setTexture(GLuint tex, int lua_ref) { setTexture(tex, lua_ref, 0); };
+	virtual void setTexture(GLuint tex, TextureKind kind, int lua_ref, int id);
+	virtual void setTexture(GLuint tex, TextureKind kind, int lua_ref) { setTexture(tex, kind, lua_ref, 0); };
+	virtual void setTexture(GLuint tex, int lua_ref, int id) { setTexture(tex, TextureKind::_2D, lua_ref, id); }
+	virtual void setTexture(GLuint tex, int lua_ref) { setTexture(tex, TextureKind::_2D, lua_ref, 0); };
+	virtual void setTexture(texture_lua *t, int lua_ref) { setTexture(t->texture_id, t->kind, lua_ref, 0); };
+	virtual void setTexture(texture_lua *t, int lua_ref, int id) { setTexture(t->texture_id, t->kind, lua_ref, id); };
+	virtual void setTexture(texture_lua &t, int lua_ref) { setTexture(t.texture_id, t.kind, lua_ref, 0); };
+	virtual void setTexture(texture_lua &t, int lua_ref, int id) { setTexture(t.texture_id, t.kind, lua_ref, id); };
 	void setShader(shader_type *s);
 	void getShaderUniformTween(const char *uniform, uint8_t pos, float default_val);
 

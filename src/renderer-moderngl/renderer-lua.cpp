@@ -1012,12 +1012,62 @@ static int gl_vertexes_reserve(lua_State *L)
 static int gl_vertexes_point(lua_State *L)
 {
 	DORVertexes *v = userdata_to_DO<DORVertexes>(L, 1, "gl{vertexes}");
-	float x1 = lua_tonumber(L, 2);  float y1 = lua_tonumber(L, 3);  float u1 = lua_tonumber(L, 4);  float v1 = lua_tonumber(L, 5); 
-	float r = lua_tonumber(L, 6); float g = lua_tonumber(L, 7); float b = lua_tonumber(L, 8); float a = lua_tonumber(L, 9);
-	v->addPoint(
-		x1, y1, 0, u1, v1, 
-		r, g, b, a
-	);
+	if (lua_isnumber(L, 2)) {
+		float x1 = lua_tonumber(L, 2);  float y1 = lua_tonumber(L, 3);  float u1 = lua_tonumber(L, 4);  float v1 = lua_tonumber(L, 5); 
+		float r = lua_tonumber(L, 6); float g = lua_tonumber(L, 7); float b = lua_tonumber(L, 8); float a = lua_tonumber(L, 9);
+		v->addPoint(
+			x1, y1, 0, u1, v1, 
+			r, g, b, a
+		);
+	} else {
+		uint8_t data_kinds = VERTEX_BASE;
+		vertex vs;
+		float vk;
+		vertex_map_info vm;
+		vertex_picking_info picking;
+		vertex_normal_info vn;
+		vs.pos.w = 1;
+		lua_pushliteral(L, "x"); lua_rawget(L, 2); vs.pos.x = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "y"); lua_rawget(L, 2); vs.pos.y = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "z"); lua_rawget(L, 2); vs.pos.z = lua_tonumber(L, -1); lua_pop(L, 1);
+		
+		lua_pushliteral(L, "r"); lua_rawget(L, 2); vs.color.r = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "g"); lua_rawget(L, 2); vs.color.g = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "b"); lua_rawget(L, 2); vs.color.b = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "a"); lua_rawget(L, 2); vs.color.a = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "u"); lua_rawget(L, 2); vs.tex.x = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "v"); lua_rawget(L, 2); vs.tex.y = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "kind"); lua_rawget(L, 2); if (lua_isnumber(L, -1)) data_kinds |= VERTEX_KIND_INFO; vk = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "mx"); lua_rawget(L, 2); if (lua_isnumber(L, -1)) data_kinds |= VERTEX_MAP_INFO; vm.mapcoords.x = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "my"); lua_rawget(L, 2); vm.mapcoords.y = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "mw"); lua_rawget(L, 2); vm.mapcoords.z = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "mh"); lua_rawget(L, 2); vm.mapcoords.w = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "tx"); lua_rawget(L, 2); if (lua_isnumber(L, -1)) data_kinds |= VERTEX_MAP_INFO; vm.texcoords.x = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "ty"); lua_rawget(L, 2); vm.texcoords.y = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "tw"); lua_rawget(L, 2); vm.texcoords.z = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "th"); lua_rawget(L, 2); vm.texcoords.w = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "nx"); lua_rawget(L, 2); if (lua_isnumber(L, -1)) data_kinds |= VERTEX_NORMAL_INFO; vn.normal.x = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "ny"); lua_rawget(L, 2); vn.normal.y = lua_tonumber(L, -1); lua_pop(L, 1);
+		lua_pushliteral(L, "nz"); lua_rawget(L, 2); vn.normal.z = lua_tonumber(L, -1); lua_pop(L, 1);
+
+		lua_pushliteral(L, "picking"); lua_rawget(L, 2); if (lua_isnumber(L, -1)) {
+			data_kinds |= VERTEX_PICKING_INFO;
+			uint32_t id = lua_tonumber(L, -1);
+			pickingConvertTo(id, picking);
+		} lua_pop(L, 1);
+
+		v->addPoint(vs);
+		if (data_kinds & VERTEX_KIND_INFO) v->addPointKindInfo(vk);
+		if (data_kinds & VERTEX_MAP_INFO) v->addPointMapInfo(vm);
+		if (data_kinds & VERTEX_PICKING_INFO) v->addPointPickingInfo(picking);
+		if (data_kinds & VERTEX_NORMAL_INFO) v->addPointNormalInfo(vn);
+		v->setDataKinds(data_kinds);
+	}
 	lua_pushvalue(L, 1);
 	return 1;
 }
@@ -1044,6 +1094,7 @@ static int gl_vertexes_quad(lua_State *L)
 		float vk[4];
 		vertex_map_info vm[4];
 		vertex_picking_info picking[4];
+		vertex_normal_info vn[4];
 		for (int i = 0; i < 4; i++) {
 			vs[i].pos.w = 1;
 			lua_pushliteral(L, "x"); lua_rawget(L, i + 2); vs[i].pos.x = lua_tonumber(L, -1); lua_pop(L, 1);
@@ -1070,6 +1121,10 @@ static int gl_vertexes_quad(lua_State *L)
 			lua_pushliteral(L, "tw"); lua_rawget(L, i + 2); vm[i].texcoords.z = lua_tonumber(L, -1); lua_pop(L, 1);
 			lua_pushliteral(L, "th"); lua_rawget(L, i + 2); vm[i].texcoords.w = lua_tonumber(L, -1); lua_pop(L, 1);
 
+			lua_pushliteral(L, "nx"); lua_rawget(L, i + 2); if (lua_isnumber(L, -1)) data_kinds |= VERTEX_NORMAL_INFO; vn[i].normal.x = lua_tonumber(L, -1); lua_pop(L, 1);
+			lua_pushliteral(L, "ny"); lua_rawget(L, i + 2); vn[i].normal.y = lua_tonumber(L, -1); lua_pop(L, 1);
+			lua_pushliteral(L, "nz"); lua_rawget(L, i + 2); vn[i].normal.z = lua_tonumber(L, -1); lua_pop(L, 1);
+
 			lua_pushliteral(L, "picking"); lua_rawget(L, i + 2); if (lua_isnumber(L, -1)) {
 				data_kinds |= VERTEX_PICKING_INFO;
 				uint32_t id = lua_tonumber(L, -1);
@@ -1080,6 +1135,7 @@ static int gl_vertexes_quad(lua_State *L)
 		if (data_kinds & VERTEX_KIND_INFO) v->addQuadKindInfo(vk[0], vk[1], vk[2], vk[3]);
 		if (data_kinds & VERTEX_MAP_INFO) v->addQuadMapInfo(vm[0], vm[1], vm[2], vm[3]);
 		if (data_kinds & VERTEX_PICKING_INFO) v->addQuadPickingInfo(picking[0], picking[1], picking[2], picking[3]);
+		if (data_kinds & VERTEX_NORMAL_INFO) v->addQuadNormalInfo(vn[0], vn[1], vn[2], vn[3]);
 		v->setDataKinds(data_kinds);
 	}
 	lua_pushvalue(L, 1);
@@ -1126,7 +1182,7 @@ static int gl_vertexes_texture(lua_State *L)
 	texture_lua *t = texture_lua::from_state(L, 2);
 	int id = lua_tonumber(L, 3);
 	lua_pushvalue(L, 2);
-	v->setTexture(t->texture_id, luaL_ref(L, LUA_REGISTRYINDEX), id);
+	v->setTexture(t, luaL_ref(L, LUA_REGISTRYINDEX), id);
 
 	lua_pushvalue(L, 1);
 	return 1;
@@ -1354,7 +1410,7 @@ static int gl_text_texture(lua_State *L)
 	texture_lua *t = texture_lua::from_state(L, 2);
 	int id = lua_tonumber(L, 3);
 	lua_pushvalue(L, 2);
-	v->setTexture(t->texture_id, luaL_ref(L, LUA_REGISTRYINDEX), id);
+	v->setTexture(t, luaL_ref(L, LUA_REGISTRYINDEX), id);
 
 	lua_pushvalue(L, 1);
 	return 1;
