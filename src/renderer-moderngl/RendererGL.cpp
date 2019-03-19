@@ -39,10 +39,7 @@ void stopDisplayList() {
 	current_used_dl = NULL;
 }
 
-DisplayList* getDisplayList(RendererGL *container) {
-	return getDisplayList(container, {0,0,0}, NULL, VERTEX_BASE, RenderKind::QUADS);
-}
-DisplayList* getDisplayList(RendererGL *container, array<GLuint, DO_MAX_TEX> tex, shader_type *shader, uint8_t data_kind, RenderKind render_kind) {
+DisplayList* getDisplayList(RendererGL *container, textures_array &tex, shader_type *shader, uint8_t data_kind, RenderKind render_kind) {
 	if (available_dls.empty()) {
 		available_dls.push(new DisplayList());
 	}
@@ -79,7 +76,7 @@ void releaseDisplayList(DisplayList *dl) {
 		dl->list_map_info.clear();
 		dl->list_model_info.clear();
 		dl->list_picking_info.clear();
-		dl->tex = {0,0,0};
+		dl->tex = 0;
 		dl->shader = NULL;
 		dl->sub = NULL;
 		dl->tick = NULL;
@@ -410,10 +407,10 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 			// Bind the vertices
 			glBindBuffer(GL_ARRAY_BUFFER, (*dl)->vbo[0]);
 	 		tglActiveTexture(GL_TEXTURE0);
-		 	tglBindTexture(GL_TEXTURE_2D, (*dl)->tex[0]);
+		 	tglBindTexture(static_cast<GLenum>((*dl)->tex[0].kind), (*dl)->tex[0].texture_id);
 		 	for (int i = 1; i < DO_MAX_TEX; i++) { if ((*dl)->tex[i]) {
 		 		tglActiveTexture(GL_TEXTURE0 + i);
-		 		tglBindTexture(GL_TEXTURE_2D, (*dl)->tex[i]);
+		 		tglBindTexture(static_cast<GLenum>((*dl)->tex[i].kind), (*dl)->tex[i].texture_id);
 		 	} }
 			// printf("=r= binding vbo %d\n", (*dl)->vbo);
 			// printf("=r= binding tex %d\n", (*dl)->tex);

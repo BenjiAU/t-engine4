@@ -37,8 +37,8 @@ extern "C" {
 
 
 Minimap2D::Minimap2D() {
-	glGenTextures(1, &tex[0]);
-	tglBindTexture(GL_TEXTURE_2D, tex[0]);
+	glGenTextures(1, &tex[0].texture_id);
+	tglBindTexture(GL_TEXTURE_2D, tex[0].texture_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -48,7 +48,8 @@ Minimap2D::Minimap2D() {
 }
 
 Minimap2D::~Minimap2D() {
-	glDeleteTextures(1, &tex[0]);
+	glDeleteTextures(1, &tex[0].texture_id);
+	tex[0] = 0;
 	if (map) map->removeMinimap(this);
 	refcleaner(&map_ref);
 }
@@ -146,7 +147,7 @@ void Minimap2D::redrawMiniMap() {
 		}
 	}
 
-	tglBindTexture(GL_TEXTURE_2D, tex[0]);
+	tglBindTexture(GL_TEXTURE_2D, tex[0].texture_id);
 	// Full texture update means we change size so we need a full call to glTexImage2D
 	if (next_update_full) glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, info.mdw, info.mdh, 0, GL_BGRA, GL_UNSIGNED_BYTE, mm_data);
 	else glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, info.mdw, info.mdh, GL_BGRA, GL_UNSIGNED_BYTE, mm_data);

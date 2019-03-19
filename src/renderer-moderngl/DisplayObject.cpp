@@ -480,7 +480,7 @@ void DisplayObject::sortCoords(RendererGL *container, mat4& cur_model) {
 
 	sort_coords = vmodel * sort_center;
 	sort_shader = nullptr;
-	sort_tex = {0, 0, 0};
+	sort_tex = 0;
 	container->sorted_dos.push_back(this);
 }
 
@@ -1247,7 +1247,7 @@ void SubRenderer::sortCoords(RendererGL *container, mat4& cur_model) {
 
 	sort_coords = vmodel * sort_center;
 	sort_shader = nullptr;
-	sort_tex = {0, 0, 0};
+	sort_tex = 0;
 	container->sorted_dos.push_back(this);
 }
 

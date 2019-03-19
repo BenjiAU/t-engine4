@@ -116,11 +116,9 @@ protected:
 	bool hide = false;
 	bool hide_base = false;
 
-	const static uint8_t MAX_TEXTURES = 5;
-	uint8_t nb_textures = 0;
-	int textures_ref[MAX_TEXTURES];
-	GLuint textures[MAX_TEXTURES];
-	vec4 tex_coords[MAX_TEXTURES];
+	int textures_ref[DO_MAX_TEX];
+	textures_array textures;
+	vec4 tex_coords[DO_MAX_TEX];
 
 	shader_type *shader = nullptr;
 	int shader_ref = LUA_NOREF;

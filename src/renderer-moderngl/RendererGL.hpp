@@ -27,16 +27,6 @@
 
 class RendererGL;
 
-// struct sortable_vertex {
-// 	vertex v;
-// 	array<GLuint, DO_MAX_TEX> tex;
-// 	shader_type *shader;
-// 	SubRenderer *sub;
-// 	DisplayObject *tick;
-	
-// 	bool operator<(const sortable_vertex &i) const;
-// };
-
 /****************************************************************************
  ** Display lists contain a VBO, texture, ... and a list of vertices to be
  ** drawn; those dont change and dont get recomputed until needed
@@ -45,7 +35,7 @@ class DisplayList {
 public:
 	int used = 0;
 	GLuint vbo[5] = {0,0,0,0,0};
-	array<GLuint, DO_MAX_TEX> tex{{0,0,0}};
+	textures_array tex;
 	shader_type *shader = NULL;
 	uint8_t data_kind = VERTEX_BASE;
 	RenderKind render_kind = RenderKind::QUADS;
@@ -62,8 +52,10 @@ public:
 };
 
 extern void stopDisplayList();
-extern DisplayList* getDisplayList(RendererGL *container, array<GLuint, DO_MAX_TEX> tex, shader_type *shader, uint8_t data_kind, RenderKind render_kind);
-extern DisplayList* getDisplayList(RendererGL *container);
+extern DisplayList* getDisplayList(RendererGL *container, textures_array &tex, shader_type *shader, uint8_t data_kind, RenderKind render_kind);
+inline DisplayList* getDisplayList(RendererGL *container, GLuint tex0, shader_type *shader, uint8_t data_kind, RenderKind render_kind) { textures_array tex = tex0; return getDisplayList(container, tex, shader, data_kind, render_kind); }
+inline DisplayList* getDisplayList(RendererGL *container, texture_info tex0, shader_type *shader, uint8_t data_kind, RenderKind render_kind) { textures_array tex = tex0; return getDisplayList(container, tex, shader, data_kind, render_kind); }
+inline DisplayList* getDisplayList(RendererGL *container) { return getDisplayList(container, (GLuint)0, NULL, VERTEX_BASE, RenderKind::QUADS); };
 
 /****************************************************************************
  ** Handling actual rendering to the screen & such

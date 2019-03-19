@@ -576,7 +576,7 @@ void Navmesh::drawDebug(float x, float y) {
 	renderer->resetDisplayLists();
 	renderer->setChanged(true);
 
-	auto dl = getDisplayList(renderer, {(GLuint)gl_tex_white, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::TRIANGLES);
+	auto dl = getDisplayList(renderer, (GLuint)gl_tex_white, NULL, VERTEX_MAP_INFO, RenderKind::TRIANGLES);
 	for (auto tri : mesh) {
 		vertex v1{{tri->p1.x, tri->p1.y, 0, 1}, {0, 0}, {0, 1, 0.5, 0.5}};
 		vertex v2{{tri->p2.x, tri->p2.y, 0, 1}, {0, 0}, {0, 1, 0.5, 0.5}};
@@ -586,7 +586,7 @@ void Navmesh::drawDebug(float x, float y) {
 		dl->list.push_back(v3);
 	}
 
-	dl = getDisplayList(renderer, {(GLuint)gl_tex_white, 0, 0}, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
+	dl = getDisplayList(renderer, (GLuint)gl_tex_white, NULL, VERTEX_MAP_INFO, RenderKind::LINES);
 	for (auto tri : mesh) {
 		vertex v1{{tri->p1.x, tri->p1.y, 0, 1}, {0, 0}, {0, 1, 1, 1}};
 		vertex v2{{tri->p2.x, tri->p2.y, 0, 1}, {0, 0}, {0, 1, 1, 1}};

@@ -44,11 +44,10 @@ static unordered_set<MapObject*> mos_particles_clean;
  ** Map objects
  *************************************************************************/
 MapObject::MapObject(int64_t uid, uint8_t nb_textures, bool on_seen, bool on_remember, bool on_unknown, vec2 pos, vec2 size, float scale)
-	: uid(uid), nb_textures(nb_textures), on_seen(on_seen), on_remember(on_remember), on_unknown(on_unknown), pos(pos), size(size), scale(scale)
+	: uid(uid), on_seen(on_seen), on_remember(on_remember), on_unknown(on_unknown), pos(pos), size(size), scale(scale)
 {
-	for (int i = 0; i < MAX_TEXTURES; i++) {
+	for (int i = 0; i < DO_MAX_TEX; i++) {
 		textures_ref[i] = LUA_NOREF;
-		textures[i] = 0;
 	}
 	root = this;
 }
@@ -56,7 +55,7 @@ MapObject::MapObject(int64_t uid, uint8_t nb_textures, bool on_seen, bool on_rem
 MapObject::~MapObject() {
 	mos_particles_clean.erase(this);
 	clearParticles();
-	for (int i = 0; i < nb_textures; i++) {
+	for (int i = 0; i < DO_MAX_TEX; i++) {
 		refcleaner(&textures_ref[i]);
 	}
 	refcleaner(&fdo_ref);
@@ -83,7 +82,7 @@ void MapObject::chain(sMapObject n) {
 }
 
 bool MapObject::setTexture(uint8_t slot, GLuint tex, int ref, vec4 coords) {
-	if (slot >= MAX_TEXTURES) return false;
+	if (slot >= DO_MAX_TEX) return false;
 	refcleaner(&textures_ref[slot]);
 	textures[slot] = tex;
 	textures_ref[slot] = ref;
@@ -247,7 +246,7 @@ inline void MapObjectProcessor::processMapObject(RendererGL *renderer, MapObject
 		else if (dm->root->shader) shader = dm->root->shader;
 		else shader = default_shader;
 
-		auto dl = getDisplayList(renderer, {dm->textures[0], dm->textures[1], dm->textures[2]}, shader, VERTEX_MAP_INFO, RenderKind::QUADS);
+		auto dl = getDisplayList(renderer, dm->textures, shader, VERTEX_MAP_INFO, RenderKind::QUADS);
 		// printf("[%ld]-- %d %d %d : %lx\n", dm->uid, dm->textures[0], dm->textures[1], dm->textures[2], shader);
 
 		// Make sure we do not have to reallocate each step

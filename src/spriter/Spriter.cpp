@@ -147,7 +147,7 @@ TE4SpriterImageFile::~TE4SpriterImageFile() {
 void TE4SpriterImageFile::renderSprite(UniversalObjectInterface *spriteInfo) {
 	DORSpriter *spriter = DORSpriter::currently_processing;
 
-	auto dl = getDisplayList(spriter->render_container, {texture->tex.tex, 0, 0}, spriter->shader, VERTEX_BASE + (spriter->billboarding ? VERTEX_MAP_INFO : 0) + (spriter->picking ? VERTEX_PICKING_INFO : 0), RenderKind::QUADS);
+	auto dl = getDisplayList(spriter->render_container, texture->tex.tex, spriter->shader, VERTEX_BASE + (spriter->billboarding ? VERTEX_MAP_INFO : 0) + (spriter->picking ? VERTEX_PICKING_INFO : 0), RenderKind::QUADS);
 
 	// Make the matrix corresponding to the shape
 	mat4 qm = mat4();
@@ -340,7 +340,7 @@ void DORSpriter::sortCoords(RendererGL *container, mat4& cur_model) {
 	sort_coords = vmodel * sort_center;
 	// printf(" * %f x %f!\n", sort_coords.x, sort_coords.y);
 	sort_shader = shader;
-	sort_tex = {99999,0,0}; // DGDGDGDG UGH we need a wayto find the actual texture
+	sort_tex = 99999; // DGDGDGDG UGH we need a wayto find the actual texture
 	container->sorted_dos.push_back(this);
 }
 

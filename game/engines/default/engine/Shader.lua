@@ -56,7 +56,22 @@ function _M:init(name, args, unique, gl_specific)
 	self.gl_specific = gl_specific
 	if type(name) == "table" then
 		self.name = name[1]
-		self.shader_def = name[2]
+		if type(name[2]) == "table" then
+			-- Dynamic shader conf
+			self.shader_def = name[2]
+		else
+			-- Default shader conf
+			self.shader_def = {
+				vert = name[1],
+				frag = name[2],
+				args = {
+					tex = { texture = 0 },
+				},
+				clone = true,
+				permanent = true,
+			}
+
+		end
 	else
 		self.name = name
 	end
@@ -138,13 +153,15 @@ function _M:getFragment(name, def)
 	if self.frags[name] then return self.frags[name] end
 	local code = self:loadFile("/data/gfx/shaders/"..name..".frag")
 	if not def.nopreprocess_frag then code = self:rewriteShaderFrag(code, def) end
-	-- print("====== FRAG")
-	-- local nb = 1 for line in code:gmatch("([^\n]*)\n") do print(nb, line) nb = nb + 1 end
-	-- print("======")
 	self.frags[name] = core.shader.newShader(code, 0)
 	if not self.frags[name]:check() then
 		print("[SHADER] FAILED to create fragment shader from /data/gfx/shaders/"..name..".frag")
-		if config.settings.cheat then os.crash() end
+		if config.settings.cheat then
+			print("====== FRAG")
+			local nb = 1 for line in code:gmatch("([^\n]*)\n") do print(nb, line) nb = nb + 1 end
+			print("======")
+			os.crash()
+		end
 	else
 		print("[SHADER] created fragment shader from /data/gfx/shaders/"..name..".frag")
 	end
@@ -157,13 +174,15 @@ function _M:getVertex(name, def)
 	if self.verts[name] then print("[SHADER] reusing vertex shader from /data/gfx/shaders/"..name..".vert") return self.verts[name] end
 	local code = self:loadFile("/data/gfx/shaders/"..name..".vert")
 	if not def.nopreprocess_vert then code = self:rewriteShaderVert(code, def) end
-	-- print("====== VERT")
-	-- local nb = 1 for line in code:gmatch("([^\n]*)\n") do print(nb, line) nb = nb + 1 end
-	-- print("======")
 	self.verts[name] = core.shader.newShader(code, 1)
 	if not self.verts[name]:check() then
 		print("[SHADER] FAILED to create vertex shader from /data/gfx/shaders/"..name..".vert")
-		if config.settings.cheat then os.crash() end
+		if config.settings.cheat then
+			print("====== VERT")
+			local nb = 1 for line in code:gmatch("([^\n]*)\n") do print(nb, line) nb = nb + 1 end
+			print("======")
+			os.crash()
+		end
 	else
 		print("[SHADER] created vertex shader from /data/gfx/shaders/"..name..".vert")
 	end
@@ -177,13 +196,15 @@ function _M:getGeometry(name, def)
 	if self.geoms[name] then print("[SHADER] reusing geometry shader from /data/gfx/shaders/"..name..".geom") return self.geoms[name] end
 	local code = self:loadFile("/data/gfx/shaders/"..name..".geom")
 	if not def.nopreprocess_geom then code = self:rewriteShaderGeom(code, def) end
-	-- print("====== GEOM")
-	-- local nb = 1 for line in code:gmatch("([^\n]*)\n") do print(nb, line) nb = nb + 1 end
-	-- print("======")
 	self.geoms[name] = core.shader.newShader(code, 2)
 	if not self.geoms[name]:check() then
 		print("[SHADER] FAILED to create vertex shader from /data/gfx/shaders/"..name..".geom")
-		if config.settings.cheat then os.crash() end
+		if config.settings.cheat then
+			print("====== GEOM")
+			local nb = 1 for line in code:gmatch("([^\n]*)\n") do print(nb, line) nb = nb + 1 end
+			print("======")
+			os.crash()
+		end
 	else
 		print("[SHADER] created vertex shader from /data/gfx/shaders/"..name..".geom")
 	end
@@ -233,7 +254,7 @@ function _M:loaded()
 	end
 
 	if def then
-		print("[SHADER] Loaded shader with totalname", self.totalname)
+		print("[SHADER] Loaded shader with totalname", self.totalname, "glsl version", def.glsl_version)
 		if def.data then self.data = def.data end
 
 		if not _M.progs[self.totalname] then
@@ -335,6 +356,10 @@ end
 ----------------------------------------------------------------------------
 
 function _M:preprocess(code, kind, def)
+	if def.glsl_version then
+		code = "#version "..def.glsl_version.."\n"..code
+	end
+
 	code = code:gsub("gl_TexCoord%[0%]", "te4_uv")
 	code = code:gsub("gl_Color", "te4_fragcolor")
 
