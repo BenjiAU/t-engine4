@@ -38,46 +38,7 @@ extern lua_State *L;
 using namespace glm;
 using namespace std;
 
-const int DO_MAX_TEX = 3;
-
-enum class RenderKind { QUADS, TRIANGLES, POINTS, LINES }; 
-enum class TextureKind { _2D = GL_TEXTURE_2D, _3D = GL_TEXTURE_3D, CUBEMAP = GL_TEXTURE_CUBE_MAP }; 
-
-struct texture_info {
-	TextureKind kind;
-	GLuint texture_id;
-	texture_info() : texture_id(0), kind(TextureKind::_2D) {};
-	texture_info(GLuint id) : texture_id(id), kind(TextureKind::_2D) {};
-	texture_info(GLuint id, TextureKind k) : texture_id(id), kind(k) {};
-	inline texture_info& operator=(GLuint id) { texture_id = id; kind = TextureKind::_2D; return *this; }
-	operator GLuint() const { return texture_id; }
-	operator int() const { return texture_id; }
-	operator bool() const { return texture_id != 0; }
-};
-inline bool operator==(const texture_info &a, const unsigned int b) { return a.texture_id == b; }
-inline bool operator==(const texture_info &a, const texture_info &b) { return a.texture_id == b.texture_id; }
-inline bool operator!=(const texture_info &a, const texture_info &b) { return a.texture_id != b.texture_id; }
-inline bool operator<(const texture_info &a, const texture_info &b) { return a.texture_id < b.texture_id; }
-inline bool operator>(const texture_info &a, const texture_info &b) { return a.texture_id > b.texture_id; }
-inline bool operator<=(const texture_info &a, const texture_info &b) { return a.texture_id <= b.texture_id; }
-inline bool operator>=(const texture_info &a, const texture_info &b) { return a.texture_id >= b.texture_id; }
-
-struct textures_array {
-	texture_info tex[DO_MAX_TEX];
-	textures_array() { tex[0] = 0; tex[1] = 0; tex[2] = 0; }
-	textures_array(GLuint id) { tex[0] = id; tex[1] = 0; tex[2] = 0; }
-	textures_array(texture_info t) { tex[0] = t; tex[1] = 0; tex[2] = 0; }
-	inline texture_info& operator[](int idx) { return tex[idx]; }
-	inline textures_array& operator=(GLuint id) { tex[0] = id; tex[1] = 0; tex[2] = 0; return *this; }
-	inline textures_array& operator=(texture_info t) { tex[0] = t; tex[1] = 0; tex[2] = 0; return *this; }
-	inline uint8_t count() { for (uint8_t idx = 0; idx < DO_MAX_TEX; idx++) { if (!tex[0]) return idx; } return DO_MAX_TEX; }
-};
-inline bool operator==(const textures_array &a, const textures_array &b) { return (a.tex[0].texture_id == b.tex[0].texture_id) && (a.tex[1].texture_id == b.tex[1].texture_id) && (a.tex[2].texture_id == b.tex[2].texture_id); }
-inline bool operator!=(const textures_array &a, const textures_array &b) { return (a.tex[0].texture_id != b.tex[0].texture_id) || (a.tex[1].texture_id != b.tex[1].texture_id) || (a.tex[2].texture_id != b.tex[2].texture_id); }
-inline bool operator<(const textures_array &a, const textures_array &b) { return a.tex[0].texture_id < b.tex[0].texture_id; }
-inline bool operator>(const textures_array &a, const textures_array &b) { return a.tex[0].texture_id > b.tex[0].texture_id; }
-inline bool operator<=(const textures_array &a, const textures_array &b) { return a.tex[0].texture_id <= b.tex[0].texture_id; }
-inline bool operator>=(const textures_array &a, const textures_array &b) { return a.tex[0].texture_id >= b.tex[0].texture_id; }
+#include "texture_holder.hpp"
 
 class View;
 class RendererGL;
