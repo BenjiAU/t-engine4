@@ -89,6 +89,7 @@ protected:
 
 	bool allow_blending = true;
 	bool premultiplied_alpha = false;
+	bool disable_depth_writing = false;
 
 	bool cutting = false;
 	vec4 cutpos1;
@@ -125,6 +126,7 @@ public:
 	void enableSorting(bool sort) { enableSorting(sort ? SortMode::FAST : SortMode::NO_SORT); };
 	void enableSorting(SortMode mode, SortAxis axis = SortAxis::Z);
 	void enableBlending(bool v) { allow_blending = v; };
+	void disableDepthWriting(bool v) { disable_depth_writing = v; };
 	void premultipliedAlpha(bool v) { premultiplied_alpha = v; };
 	void setLineMode(float size, bool smooth) { line_width = size; line_smooth = smooth; }
 	void sortedToDL();

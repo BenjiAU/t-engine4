@@ -269,7 +269,7 @@ spTextureHolder Ensemble::getTexture(const char *tex_str) {
 		return it->second;
 	}
 
-	texture_type *tex = new texture_type;
+	texture_info *tex = new texture_info;
 	loader_png(tex_str, tex, false, false, true);
 	spTextureHolder th = make_shared<TextureHolder>(tex);
 	stored_textures.insert({tex_str, th});

@@ -54,8 +54,9 @@ struct points_list {
 	void set(SDL_Surface *s);
 };
 
-extern bool loader_png(const char *filename, texture_type *t, bool nearest, bool norepeat, bool exact_size);
 extern bool loader_noise(const char *filename, noise_data *noise);
 extern bool loader_points_list(const char *filename, points_list *list);
+extern bool loader_png(const char *filename, texture_lua *t, bool nearest, bool norepeat, bool exact_size);
+inline bool loader_png(const char *filename, texture_info *t, bool nearest, bool norepeat, bool exact_size) { texture_lua tl; bool ret = loader_png(filename, &tl, nearest, norepeat, exact_size); return tl.to_info(); }
 
 #endif

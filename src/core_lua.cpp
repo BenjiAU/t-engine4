@@ -47,6 +47,7 @@ extern "C" {
 #endif
 }
 
+#include "texture_holder.hpp"
 #include "core_lua.hpp"
 extern SDL_Window *window;
 
@@ -726,13 +727,13 @@ static int sdl_new_surface(lua_State *L)
 
 static int gl_texture_to_sdl(lua_State *L)
 {
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 1);
+	texture_lua *t = texture_lua::from_state(L, 1);
 
 	SDL_Surface **s = (SDL_Surface**)lua_newuserdata(L, sizeof(SDL_Surface*));
 	auxiliar_setclass(L, "sdl{surface}", -1);
 
 	// Bind the texture to read
-	tglBindTexture(GL_TEXTURE_2D, t->tex);
+	tglBindTexture(GL_TEXTURE_2D, t->texture_id);
 
 	// Get texture size
 	GLint w = t->w, h = t->h;
@@ -750,11 +751,11 @@ static int gl_texture_to_sdl(lua_State *L)
 static int print_png(lua_State *L, GLubyte *image, int width, int height);
 
 static int gl_texture_alter_sdm(lua_State *L) {
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 1);
+	texture_lua *t = texture_lua::from_state(L, 1);
 	bool doubleheight = lua_toboolean(L, 2);
 
 	// Bind the texture to read
-	tglBindTexture(GL_TEXTURE_2D, t->tex);
+	tglBindTexture(GL_TEXTURE_2D, t->texture_id);
 
 	// Get texture size
 	GLint w = t->w, h = t->h, dh;
@@ -764,13 +765,12 @@ static int gl_texture_alter_sdm(lua_State *L) {
 
 	GLubyte *sdm = (GLubyte*)calloc(w*dh*4, sizeof(GLubyte));
 	build_sdm_ex(tmp, w, h, sdm, w, dh, 0, doubleheight ? h : 0);
-	printf("==SDM %dx%d :: %dx%d\n", w,h,w,dh);
-	texture_type *st = (texture_type*)lua_newuserdata(L, sizeof(texture_type));
-	auxiliar_setclass(L, "gl{texture}", -1);
+
+	texture_lua *st = new(L) texture_lua();
 
 	st->w = w; st->h = dh; st->no_free = FALSE;
-	glGenTextures(1, &st->tex);
-	tfglBindTexture(GL_TEXTURE_2D, st->tex);
+	glGenTextures(1, &st->texture_id);
+	tfglBindTexture(GL_TEXTURE_2D, st->texture_id);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, dh, 0, GL_RGBA, GL_UNSIGNED_BYTE, sdm);
@@ -910,9 +910,9 @@ static int sdl_surface_get_size(lua_State *L)
 static int sdl_surface_update_texture(lua_State *L)
 {
 	SDL_Surface **s = (SDL_Surface**)auxiliar_checkclass(L, "sdl{surface}", 1);
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 2);
+	texture_lua *t = texture_lua::from_state(L, 2);
 
-	tglBindTexture(GL_TEXTURE_2D, t->tex);
+	tglBindTexture(GL_TEXTURE_2D, t->texture_id);
 	copy_surface_to_texture(*s);
 
 	return 0;
@@ -942,11 +942,10 @@ static int sdl_surface_to_texture(lua_State *L)
 	bool norepeat = lua_toboolean(L, 3);
 	bool exact_size = lua_toboolean(L, 4);
 
-	texture_type *t = (texture_type*)lua_newuserdata(L, sizeof(texture_type));
-	auxiliar_setclass(L, "gl{texture}", -1);
+	texture_lua *t = new(L) texture_lua();
 
-	glGenTextures(1, &t->tex);
-	tfglBindTexture(GL_TEXTURE_2D, t->tex);
+	glGenTextures(1, &t->texture_id);
+	tfglBindTexture(GL_TEXTURE_2D, t->texture_id);
 
 	int fw, fh;
 	make_texture_for_surface(*s, &fw, &fh, norepeat, exact_size);
@@ -996,8 +995,8 @@ static int sdl_surface_alpha(lua_State *L)
 
 static int sdl_free_texture(lua_State *L)
 {
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 1);
-	if (!t->no_free) glDeleteTextures(1, &t->tex);
+	texture_lua *t = texture_lua::from_state(L, 1);
+	t->~texture_lua();
 	lua_pushnumber(L, 1);
 //	printf("freeing texture %d\n", *t);
 	return 1;
@@ -1005,8 +1004,8 @@ static int sdl_free_texture(lua_State *L)
 
 static int sdl_texture_set_wrap(lua_State *L)
 {
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 1);
-	tglBindTexture(GL_TEXTURE_2D, t->tex);
+	texture_lua *t = texture_lua::from_state(L, 1);
+	tglBindTexture(GL_TEXTURE_2D, t->texture_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, !lua_toboolean(L, 2) ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, !lua_toboolean(L, 3) ? GL_CLAMP_TO_EDGE : GL_REPEAT);	
 	lua_pushvalue(L, 1);
@@ -1015,8 +1014,8 @@ static int sdl_texture_set_wrap(lua_State *L)
 
 static int sdl_texture_set_filter(lua_State *L)
 {
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 1);
-	tglBindTexture(GL_TEXTURE_2D, t->tex);
+	texture_lua *t = texture_lua::from_state(L, 1);
+	tglBindTexture(GL_TEXTURE_2D, t->texture_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, !lua_toboolean(L, 2) ? GL_LINEAR : GL_NEAREST);
 	lua_pushvalue(L, 1);
 	return 1;
@@ -1031,149 +1030,37 @@ static int gl_depth_test(lua_State *L)
 
 static int sdl_texture_bind(lua_State *L)
 {
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 1);
+	texture_lua *t = texture_lua::from_state(L, 1);
 	int i = luaL_checknumber(L, 2);
-	bool is3d = lua_toboolean(L, 3);
 
 	if (i > 0)
 	{
 		if (multitexture_active && shaders_active)
 		{
 			tglActiveTexture(GL_TEXTURE0+i);
-			tglBindTexture(is3d ? GL_TEXTURE_3D : GL_TEXTURE_2D, t->tex);
+			tglBindTexture(t->native_kind(), t->texture_id);
 			tglActiveTexture(GL_TEXTURE0);
 		}
 	}
 	else
 	{
-		tglBindTexture(is3d ? GL_TEXTURE_3D : GL_TEXTURE_2D, t->tex);
+		tglBindTexture(t->native_kind(), t->texture_id);
 	}
 
 	return 0;
 }
 static int sdl_texture_get_size(lua_State *L)
 {
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 1);
+	texture_lua *t = texture_lua::from_state(L, 1);
 	lua_pushnumber(L, t->w);
 	lua_pushnumber(L, t->h);
 	return 2;
 }
 static int sdl_texture_get_value(lua_State *L)
 {
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 1);
-	lua_pushnumber(L, t->tex);
+	texture_lua *t = texture_lua::from_state(L, 1);
+	lua_pushnumber(L, t->texture_id);
 	return 1;
-}
-
-static int sdl_texture_outline(lua_State *L)
-{
-#if 0 /* DGDGDGDG */
-	if (!fbo_active) return 0;
-
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 1);
-	float x = luaL_checknumber(L, 2);
-	float y = luaL_checknumber(L, 3);
-	int w = luaL_checknumber(L, 4);
-	int h = luaL_checknumber(L, 5);
-	float r = luaL_checknumber(L, 6);
-	float g = luaL_checknumber(L, 7);
-	float b = luaL_checknumber(L, 8);
-	float a = luaL_checknumber(L, 9);
-	int i;
-
-	// Setup our FBO
-	// WARNING: this is a static, only one FBO is ever made, and never deleted, for some reasons
-	// deleting it makes the game crash when doing a chain lightning spell under luajit1 ... (yeah I know .. weird)
-	static GLuint fbo = 0;
-	if (!fbo) glGenFramebuffers(1, &fbo);
-	tglBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-	// Now setup a texture to render to
-	texture_type *img = (texture_type*)lua_newuserdata(L, sizeof(texture_type));
-	auxiliar_setclass(L, "gl{texture}", -1);
-	glGenTextures(1, &img->tex);
-	tfglBindTexture(GL_TEXTURE_2D, img->tex);
-	img->w = w; img->h = h;	img->no_free = FALSE;
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,  w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, img->tex, 0);
-
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if(status != GL_FRAMEBUFFER_COMPLETE) return 0;
-
-	// Set the viewport and save the old one
-	glPushAttrib(GL_VIEWPORT_BIT);
-
-	glViewport(0, 0, w, h);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, w, 0, h, -101, 101);
-	glMatrixMode( GL_MODELVIEW );
-
-	/* Reset The View */
-	glLoadIdentity( );
-
-	tglClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
-	glClear(GL_COLOR_BUFFER_BIT);
-	glLoadIdentity();
-
-	/* Render to buffer: shadow */
-	tglBindTexture(GL_TEXTURE_2D, t->tex);
-
-	GLfloat texcoords[2*4] = {
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1,
-	};
-	GLfloat vertices[2*4] = {
-		x,   y,
-		w+x, y,
-		w+x, h+y,
-		x,   h+y,
-	};
-	GLfloat colors[4*4] = {
-		r, g, b, a,
-		r, g, b, a,
-		r, g, b, a,
-		r, g, b, a,
-	};
-	glColorPointer(4, GL_FLOAT, 0, colors);
-	glVertexPointer(2, GL_FLOAT, 0, vertices);
-	glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
-
-	glDrawArrays(GL_QUADS, 0, 4);
-
-	/* Render to buffer: original */
-	for (i = 0; i < 4*4; i++) colors[i] = 1;
-	vertices[0] = 0; vertices[1] = 0;
-	vertices[2] = w; vertices[3] = 0;
-	vertices[4] = w; vertices[5] = h;
-	vertices[6] = 0; vertices[7] = h;
-	glDrawArrays(GL_QUADS, 0, 4);
-
-	// Unbind texture from FBO and then unbind FBO
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-	tglBindFramebuffer(GL_FRAMEBUFFER, gl_c_fbo);
-	// Restore viewport
-	glPopAttrib();
-
-	// Cleanup
-	// No, dot not it's a static, see upwards
-//	CHECKGL(glDeleteFramebuffers(1, &fbo));
-
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode( GL_MODELVIEW );
-
-	tglClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-
-	return 1;
-#endif
-	return 0;
 }
 
 static int sdl_set_window_title(lua_State *L)
@@ -1670,7 +1557,6 @@ static const struct luaL_Reg sdl_texture_reg[] =
 {
 	{"__gc", sdl_free_texture},
 	{"close", sdl_free_texture},
-	{"makeOutline", sdl_texture_outline},
 	{"toSurface", gl_texture_to_sdl},
 	{"generateSDM", gl_texture_alter_sdm},
 	{"bind", sdl_texture_bind},

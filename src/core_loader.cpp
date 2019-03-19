@@ -33,10 +33,12 @@ extern "C" {
 #include "main.h"
 #include "lua_externs.h"
 }
+#include "texture_holder.hpp"
 #include "core_lua.hpp"
 #include "core_loader.hpp"
 #include <queue>
 #include <string>
+#include <array>
 
 using namespace std;
 static int loader_running = 0;
@@ -69,11 +71,11 @@ public:
 class LoaderPNG : public Loader {
 private:
 	string filename;
-	texture_type *tex;
+	texture_lua *tex;
 	PHYSFS_file *file;
 	SDL_Surface *s;
 public:
-	LoaderPNG(const char *filename, PHYSFS_file *file, texture_type *tex) : file(file), tex(tex), filename(filename) {};
+	LoaderPNG(const char *filename, PHYSFS_file *file, texture_lua *tex) : file(file), tex(tex), filename(filename) {};
 	virtual ~LoaderPNG() { };
 	virtual bool load() {
 		s = IMG_Load_RW(PHYSFSRWOPS_makeRWops(file), TRUE);
@@ -83,12 +85,56 @@ public:
 	}
 	virtual bool finish() {
 		if (s) {
-			printf("[LOADER] done loading PNG %s in texture %d!\n", filename.c_str(), tex->tex);
-			tfglBindTexture(GL_TEXTURE_2D, tex->tex);
+			printf("[LOADER] done loading PNG %s in texture %d!\n", filename.c_str(), tex->texture_id);
+			tfglBindTexture(GL_TEXTURE_2D, tex->texture_id);
 			GLenum texture_format = sdl_gl_texture_format(s);
 			GLint nOfColors = s->format->BytesPerPixel;
 			glTexImage2D(GL_TEXTURE_2D, 0, nOfColors == 4 ? GL_RGBA : GL_RGB, s->w, s->h, 0, texture_format, GL_UNSIGNED_BYTE, s->pixels);
 			SDL_FreeSurface(s);
+		}
+	}
+};
+
+/************************************************************************************
+ ** PNG to cubemap texture
+ ************************************************************************************/
+class LoaderPNGCubemap : public Loader {
+private:
+	array<string, 6> filenames;
+	texture_lua *tex;
+	array<PHYSFS_file*, 6> files = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+	array<SDL_Surface*, 6> s = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+public:
+	LoaderPNGCubemap(array<string, 6> &filenames, array<PHYSFS_file*, 6> &files, texture_lua *tex) : tex(tex) {
+		for (int i = 0; i < 6; i++) {
+			this->filenames[i] = filenames[i];
+			this->files[i] = files[i];
+		}
+	};
+	virtual ~LoaderPNGCubemap() { };
+	virtual bool load() {
+		for (int i = 0; i < 6; i++) {
+			s[i] = IMG_Load_RW(PHYSFSRWOPS_makeRWops(files[i]), TRUE);
+			if (!s[i]) printf("ERROR : LoaderPNGCubemap : %s\n", SDL_GetError());
+			files[i] = NULL;
+		}
+		done();		
+	}
+	virtual bool finish() {
+		if (s[0] && s[1] && s[2] && s[3] && s[4] && s[5]) {
+			printf("[LOADER] done loading cubemap PNG %s / %s / %s / %s / %s / %s in texture %d!\n", filenames[0].c_str(), filenames[1].c_str(), filenames[2].c_str(), filenames[3].c_str(), filenames[4].c_str(), filenames[5].c_str(), tex->texture_id);
+			tfglBindTexture(GL_TEXTURE_CUBE_MAP, tex->texture_id);
+
+			GLenum texture_format = sdl_gl_texture_format(s[0]);
+			GLint nOfColors = s[0]->format->BytesPerPixel;
+			int w = s[0]->w;
+			int h = s[0]->h;
+
+			for (int i = 0; i < 6; i++) {
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, nOfColors == 4 ? GL_RGBA : GL_RGB, w, h, 0, texture_format, GL_UNSIGNED_BYTE, s[i]->pixels);
+				SDL_FreeSurface(s[i]);
+			}
+			// glTexImage2D(GL_TEXTURE_2D, 0, nOfColors == 4 ? GL_RGBA : GL_RGB, s->w, s->h, 0, texture_format, GL_UNSIGNED_BYTE, s->pixels);
 		}
 	}
 };
@@ -274,10 +320,9 @@ static int lua_loader_png(lua_State *L) {
 	int sw = MAKE_DWORD_PTR(buffer + 16);
 	int sh = MAKE_DWORD_PTR(buffer + 20);
 
-	texture_type *t = (texture_type*)lua_newuserdata(L, sizeof(texture_type));
-	auxiliar_setclass(L, "gl{texture}", -1);
-	glGenTextures(1, &t->tex);
-	tfglBindTexture(GL_TEXTURE_2D, t->tex);
+	texture_lua *t = new(L) texture_lua();
+	glGenTextures(1, &t->texture_id);
+	tfglBindTexture(GL_TEXTURE_2D, t->texture_id);
 	t->w = sw;
 	t->h = sh;
 	t->no_free = false;
@@ -309,7 +354,7 @@ static int lua_loader_png(lua_State *L) {
 	return 7;
 }
 
-bool loader_png(const char *filename, texture_type *t, bool nearest, bool norepeat, bool exact_size) {
+bool loader_png(const char *filename, texture_lua *t, bool nearest, bool norepeat, bool exact_size) {
 	if (!PHYSFS_exists(filename)) return false;
 
 	// This is a bit fugly, we go and peek inside the fiel to know the size of the png
@@ -320,8 +365,8 @@ bool loader_png(const char *filename, texture_type *t, bool nearest, bool norepe
 	int sw = MAKE_DWORD_PTR(buffer + 16);
 	int sh = MAKE_DWORD_PTR(buffer + 20);
 
-	glGenTextures(1, &t->tex);
-	tfglBindTexture(GL_TEXTURE_2D, t->tex);
+	glGenTextures(1, &t->texture_id);
+	tfglBindTexture(GL_TEXTURE_2D, t->texture_id);
 	t->w = sw;
 	t->h = sh;
 	t->no_free = false;
@@ -340,6 +385,68 @@ bool loader_png(const char *filename, texture_type *t, bool nearest, bool norepe
 	return true;
 }
 
+static int lua_loader_cubemap_png(lua_State *L) {
+	const char *filename = luaL_checkstring(L, 1);
+	int scheme = lua_tonumber(L, 2);
+	bool nearest = lua_toboolean(L, 3);
+	bool norepeat = lua_toboolean(L, 4);
+
+	string tmpname(filename);
+	size_t pos = tmpname.find("%s");
+	if (pos == string::npos) return 0;
+
+	string prefix = tmpname.substr(0, pos);
+	string postfix = tmpname.substr(pos + 2);
+
+
+	array<string, 6> adds;
+	if (scheme == 0) adds = {"right", "left", "up", "down", "back", "front"};
+	else if (scheme == 1) adds = {"px", "nx", "py", "ny", "pz", "nz"};;
+	array<string, 6> filenames;
+
+	for (int i = 0; i < 6; i++) {
+		filenames[i] = prefix + adds[i] + postfix;
+		if (!PHYSFS_exists(filenames[i].c_str())) {
+			printf("[LOADER] pngCubemap: %s does not exist!\n", filenames[i].c_str());
+			return 0;
+		}
+	}
+
+	array<PHYSFS_file*, 6> files;
+	for (int i = 0; i < 6; i++) {
+		files[i] = PHYSFS_openRead(filenames[i].c_str());
+	}
+
+	// This is a bit fugly, we go and peek inside the fiel to know the size of the png, we also assume their are all the same size
+	unsigned char buffer[29];
+	PHYSFS_read(files[0], buffer, 1, 29);
+	PHYSFS_seek(files[0], 0);
+	int sw = MAKE_DWORD_PTR(buffer + 16);
+	int sh = MAKE_DWORD_PTR(buffer + 20);
+
+	texture_lua *t = new(L) texture_lua();
+	glGenTextures(1, &t->texture_id);
+	tfglBindTexture(GL_TEXTURE_CUBE_MAP, t->texture_id);
+	// t->kind = GL_TEXTURE_CUBE_MAP;
+	t->w = sw;
+	t->h = sh;
+	t->no_free = false;
+
+	// Paramétrage de la texture.
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, norepeat ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, norepeat ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, norepeat ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	if (nearest) glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	SDL_mutexP(loader_mutex);
+	loader_queue.push(new LoaderPNGCubemap(filenames, files, t));
+	loader_running++;
+	SDL_mutexV(loader_mutex);
+	SDL_SemPost(loader_sem);
+
+	return 1;
+}
 
 bool loader_noise(const char *filename, noise_data *noise) {
 	if (!PHYSFS_exists(filename)) return false;
@@ -413,6 +520,7 @@ static int lua_loader_wait(lua_State *L) {
 
 static const struct luaL_Reg loaderlib[] = {
 	{"png", lua_loader_png},
+	{"pngCubemap", lua_loader_cubemap_png},
 	{"waitAll", lua_loader_wait},
 	{NULL, NULL},
 };

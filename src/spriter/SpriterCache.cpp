@@ -22,6 +22,7 @@
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
+#include "auxiliar.h"
 #include "display.h"
 #include "types.h"
 #include "physfs.h"
@@ -30,6 +31,7 @@ extern "C" {
 #include "math.h"
 }
 
+#include <texture_holder.hpp>
 #include "core_lua.hpp"
 #include "core_loader.hpp"
 #include "spriter/Spriter.hpp"
@@ -51,11 +53,11 @@ texture_cache* DORSpriterCache::getTexture(string name) {
 
 	if (!loader_png(name.c_str(), &tex->tex, false, false, true)) {
 		printf("[SPRITER] texture file not found %s\n", name.c_str());
-		tex->tex.tex = 0;
+		tex->tex.set(0);
 		return tex;
 	}
 
-	printf("[SPRITER] New texture %s = %d (%dx%d)\n", name.c_str(), tex->tex.tex, tex->tex.w, tex->tex.h);
+	printf("[SPRITER] New texture %s = %d (%dx%d)\n", name.c_str(), tex->tex.texture_id, tex->tex.w, tex->tex.h);
 	return tex;
 }
 
@@ -64,9 +66,8 @@ void DORSpriterCache::releaseTexture(texture_cache* tex) {
 		if (it->second == tex) {
 			tex->used--;
 			if (tex->used <= 0) {
-				printf("[SPRITER] Releasing texture %s = %d\n", it->first.c_str(), tex->tex);
+				printf("[SPRITER] Releasing texture %s = %d\n", it->first.c_str(), tex->tex.texture_id);
 				tex_cache.erase(it);
-				glDeleteTextures(1, &tex->tex.tex);
 				delete tex;
 			}
 			return;

@@ -51,6 +51,8 @@ extern "C" {
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/ext.hpp"
 
+#include "texture_holder.hpp"
+
 #include "renderer-moderngl/Interfaces.hpp"
 
 #include "core_loader.hpp"
@@ -147,13 +149,13 @@ public:
 
 class TextureHolder {
 public:
-	texture_type *tex;
-	TextureHolder(texture_type *tex) : tex(tex) {
-		printf("Creating particle texture %d\n", tex->tex);
+	texture_info *tex;
+	TextureHolder(texture_info *tex) : tex(tex) {
+		printf("Creating particle texture %d\n", tex->texture_id);
 	};
 	~TextureHolder() {
-		printf("Freeing particle texture %d\n", tex->tex);
-		glDeleteTextures(1, &tex->tex);
+		printf("Freeing particle texture %d\n", tex->texture_id);
+		glDeleteTextures(1, &tex->texture_id);
 		delete tex;
 	};
 };

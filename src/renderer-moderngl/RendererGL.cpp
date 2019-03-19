@@ -390,6 +390,7 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	if (zsort == SortMode::GL) glEnable(GL_DEPTH_TEST);
 	if (!allow_blending) glDisable(GL_BLEND);
 	if (premultiplied_alpha) glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	if (disable_depth_writing) glDepthMask(GL_FALSE);
 
 	// Draw all display lists
 	int nb_vert = 0;
@@ -407,10 +408,10 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 			// Bind the vertices
 			glBindBuffer(GL_ARRAY_BUFFER, (*dl)->vbo[0]);
 	 		tglActiveTexture(GL_TEXTURE0);
-		 	tglBindTexture(static_cast<GLenum>((*dl)->tex[0].kind), (*dl)->tex[0].texture_id);
+		 	tglBindTexture((*dl)->tex[0].native_kind(), (*dl)->tex[0].texture_id);
 		 	for (int i = 1; i < DO_MAX_TEX; i++) { if ((*dl)->tex[i]) {
 		 		tglActiveTexture(GL_TEXTURE0 + i);
-		 		tglBindTexture(static_cast<GLenum>((*dl)->tex[i].kind), (*dl)->tex[i].texture_id);
+		 		tglBindTexture((*dl)->tex[i].native_kind(), (*dl)->tex[i].texture_id);
 		 	} }
 			// printf("=r= binding vbo %d\n", (*dl)->vbo);
 			// printf("=r= binding tex %d\n", (*dl)->tex);
@@ -526,6 +527,7 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	if (zsort == SortMode::GL) glDisable(GL_DEPTH_TEST);
 	if (!allow_blending) glEnable(GL_BLEND);
 	if (premultiplied_alpha) glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	if (disable_depth_writing) glDepthMask(GL_TRUE);
 
 	if (view) view->use(false);
 

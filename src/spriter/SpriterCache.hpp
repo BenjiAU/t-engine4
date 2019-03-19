@@ -26,6 +26,7 @@
 #include <map>
 
 #include "renderer-moderngl/Renderer.hpp"
+#include "texture_holder.hpp"
 #include "spriterengine/spriterengine.h"
 
 using namespace std;
@@ -33,7 +34,7 @@ using namespace SpriterEngine;
 
 struct texture_cache
 {
-	texture_type tex;
+	texture_lua tex;
 	int used = 0;
 };
 

@@ -547,6 +547,14 @@ static int gl_renderer_premultiplied_alpha(lua_State *L)
 	return 1;
 }
 
+static int gl_renderer_disable_depth_writing(lua_State *L)
+{
+	RendererGL *r = userdata_to_DO<RendererGL>(L, 1, "gl{renderer}");
+	r->disableDepthWriting(lua_toboolean(L, 2));
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
 static int gl_renderer_shader(lua_State *L)
 {
 	RendererGL *r = userdata_to_DO<RendererGL>(L, 1, "gl{renderer}");
@@ -766,14 +774,14 @@ static int gl_target_view(lua_State *L)
 static int gl_target_texture(lua_State *L)
 {
 	DORTarget *v = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 2);
+	texture_lua *t = texture_lua::from_state(L, 2);
 	int id = lua_tonumber(L, 3);
 	if (!id) {
 		lua_pushstring(L, "Can not set textute 0 of a target object");
 		lua_error(L);
 	}
 	lua_pushvalue(L, 2);
-	v->setTexture(t->tex, luaL_ref(L, LUA_REGISTRYINDEX), id);
+	v->setTexture(t->texture_id, luaL_ref(L, LUA_REGISTRYINDEX), id);
 
 	lua_pushvalue(L, 1);
 	return 1;
@@ -805,12 +813,11 @@ static int gl_target_extract_texture(lua_State *L)
 	DORTarget *v = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
 	int idx = luaL_checknumber(L, 2);
 
-	texture_type *t = (texture_type*)lua_newuserdata(L, sizeof(texture_type));
-	auxiliar_setclass(L, "gl{texture}", -1);
+	texture_lua *t = new(L) texture_lua();
 
 	int w, h;
 	v->getDisplaySize(&w, &h);
-	t->tex = v->extractTexture(idx);
+	t->set(v->extractTexture(idx));
 	// printf("[DOTarget] ExtractTexture(%d) => %d\n", idx, t->tex);
 	t->w = w;
 	t->h = h;
@@ -1116,10 +1123,10 @@ static int gl_vertexes_load_obj(lua_State *L)
 static int gl_vertexes_texture(lua_State *L)
 {
 	DORVertexes *v = userdata_to_DO<DORVertexes>(L, 1, "gl{vertexes}");
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 2);
+	texture_lua *t = texture_lua::from_state(L, 2);
 	int id = lua_tonumber(L, 3);
 	lua_pushvalue(L, 2);
-	v->setTexture(t->tex, luaL_ref(L, LUA_REGISTRYINDEX), id);
+	v->setTexture(t->texture_id, luaL_ref(L, LUA_REGISTRYINDEX), id);
 
 	lua_pushvalue(L, 1);
 	return 1;
@@ -1344,10 +1351,10 @@ static int gl_text_stats(lua_State *L)
 static int gl_text_texture(lua_State *L)
 {
 	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 2);
+	texture_lua *t = texture_lua::from_state(L, 2);
 	int id = lua_tonumber(L, 3);
 	lua_pushvalue(L, 2);
-	v->setTexture(t->tex, luaL_ref(L, LUA_REGISTRYINDEX), id);
+	v->setTexture(t->texture_id, luaL_ref(L, LUA_REGISTRYINDEX), id);
 
 	lua_pushvalue(L, 1);
 	return 1;
@@ -1642,9 +1649,9 @@ static int gl_vbo_shader(lua_State *L)
 static int gl_vbo_texture(lua_State *L)
 {
 	VBO *v = *(VBO**)auxiliar_checkclass(L, "gl{vbo}", 1);
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 2);
+	texture_lua *t = texture_lua::from_state(L, 2);
 	int id = lua_tonumber(L, 3);
-	v->setTexture(t->tex, id);
+	v->setTexture(t->texture_id, id);
 
 	lua_pushvalue(L, 1);
 	return 1;
@@ -2026,6 +2033,7 @@ static const struct luaL_Reg gl_renderer_reg[] =
 	{"shader", gl_renderer_shader},
 	{"enableBlending", gl_renderer_blend},
 	{"premultipliedAlpha", gl_renderer_premultiplied_alpha},
+	{"disableDepthWriting", gl_renderer_disable_depth_writing},
 	{"setRendererName", gl_renderer_set_name},
 	{"countTime", gl_renderer_count_time},
 	{"countDraws", gl_renderer_count_draws},

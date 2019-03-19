@@ -28,16 +28,19 @@ extern "C" {
 const int DO_MAX_TEX = 3;
 
 // All supported textures types
-enum class TextureKind { _2D = GL_TEXTURE_2D, _3D = GL_TEXTURE_3D, CUBEMAP = GL_TEXTURE_CUBE_MAP }; 
+enum class TextureKind : GLenum { _2D = GL_TEXTURE_2D, _3D = GL_TEXTURE_3D, CUBEMAP = GL_TEXTURE_CUBE_MAP }; 
 
 // A single texture holder info, with various textings and convertions
 struct texture_info {
 	TextureKind kind;
 	GLuint texture_id;
-	texture_info() : texture_id(0), kind(TextureKind::_2D) {};
-	texture_info(GLuint id) : texture_id(id), kind(TextureKind::_2D) {};
-	texture_info(GLuint id, TextureKind k) : texture_id(id), kind(k) {};
+	texture_info() : texture_id(0), kind(TextureKind::_2D) {}
+	texture_info(GLuint id) : texture_id(id), kind(TextureKind::_2D) {}
+	texture_info(GLuint id, TextureKind k) : texture_id(id), kind(k) {}
+	inline GLenum native_kind() { return static_cast<GLenum>(kind); }
 	inline texture_info& operator=(GLuint id) { texture_id = id; kind = TextureKind::_2D; return *this; }
+	inline void set(GLuint id) { texture_id = id; kind = TextureKind::_2D; }
+	inline void set(GLuint id, TextureKind k) { texture_id = id; kind = k; }
 	operator GLuint() const { return texture_id; }
 	operator int() const { return texture_id; }
 	operator bool() const { return texture_id != 0; }
@@ -49,6 +52,26 @@ inline bool operator<(const texture_info &a, const texture_info &b) { return a.t
 inline bool operator>(const texture_info &a, const texture_info &b) { return a.texture_id > b.texture_id; }
 inline bool operator<=(const texture_info &a, const texture_info &b) { return a.texture_id <= b.texture_id; }
 inline bool operator>=(const texture_info &a, const texture_info &b) { return a.texture_id >= b.texture_id; }
+
+// A texture holder for lua & other such kinds
+struct texture_lua : texture_info {
+	uint32_t w = 0, h = 0;
+	bool no_free = false;
+
+	~texture_lua() {
+		if (!no_free) glDeleteTextures(1, &texture_id);
+	}
+	texture_info to_info() { return *this; }
+
+	void *operator new(size_t size, lua_State *L) {
+		void *ptr = lua_newuserdata(L, size);
+		auxiliar_setclass(L, "gl{texture}", -1);
+		return ptr;
+	}
+	static texture_lua* from_state(lua_State *L, int idx) {
+		return (texture_lua*)auxiliar_checkclass(L, "gl{texture}", idx);
+	}
+};
 
 // An array of texture holder infos (of fixed array size), with various textings and convertions
 struct textures_array {

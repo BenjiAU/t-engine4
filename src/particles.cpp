@@ -195,7 +195,7 @@ static int particles_new(lua_State *L)
 	const char *args = luaL_checkstring(L, 2);
 	// float zoom = luaL_checknumber(L, 3);
 	int density = luaL_checknumber(L, 4);
-	texture_type *texture = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 5);
+	texture_lua *texture = texture_lua::from_state(L, 5);
 	shader_type *s = NULL;
 	if (lua_isuserdata(L, 6)) s = lua_get_shader(L, 6);
 	bool fboalter = lua_toboolean(L, 7);
@@ -223,7 +223,7 @@ static int particles_new(lua_State *L)
 	ps->trigger = 0;
 	ps->trigger_pass = 0;
 	ps->trigger_cb = LUA_NOREF;
-	ps->texture = texture->tex;
+	ps->texture = texture->texture_id;
 	ps->shader = s;
 	ps->fboalter = fboalter;
 	ps->allow_bloom = allow_bloom;

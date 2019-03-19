@@ -112,7 +112,7 @@ static int map_object_on_seen(lua_State *L) {
 static int map_object_texture(lua_State *L) {
 	auto obj = lua_get_sobj_get<MapObject>(L, "core{mapobj2d}", 1);
 	int i = luaL_checknumber(L, 2);
-	texture_type *t = (texture_type*)auxiliar_checkclass(L, "gl{texture}", 3);
+	texture_lua *t = texture_lua::from_state(L, 3);
 
 	vec4 coords = {0, 0, lua_tonumber(L, 5), lua_tonumber(L, 6)};
 	if (lua_isnumber(L, 7)) {
@@ -121,7 +121,7 @@ static int map_object_texture(lua_State *L) {
 	}
 
 	lua_pushvalue(L, 3); // Get the texture
-	obj->setTexture(i, t->tex, luaL_ref(L, LUA_REGISTRYINDEX), coords);
+	obj->setTexture(i, t->texture_id, luaL_ref(L, LUA_REGISTRYINDEX), coords);
 	return 0;
 }
 

@@ -119,7 +119,7 @@ void RendererLine::draw(ParticlesData &p, mat4 &model) {
 
 	if (tex.get()) {
 		tglActiveTexture(GL_TEXTURE0);
-		tglBindTexture(GL_TEXTURE_2D, tex->tex->tex);
+		tglBindTexture(tex->tex->native_kind(), tex->tex->texture_id);
 	}
 
 	shader_type *shader = this->shader.get() ? this->shader->shader : default_particlescompose_shader->shader;
