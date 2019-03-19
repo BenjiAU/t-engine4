@@ -25,6 +25,8 @@ using namespace std;
 
 typedef uint32_t ExpressionID;
 
+extern float _psystem_expr_rng(float min, float max);
+
 class Expression {
 private:
 	unordered_map<string, float> vars;
@@ -38,6 +40,15 @@ public:
 		vars.emplace(name, (double)value);
 	}
 
+	float* getAddress(const string &name) {
+		auto it = vars.find(name);
+		if (it != vars.end()) {
+			return &it->second;
+		} else {
+			return nullptr;
+		}
+	}
+
 	void finish() {
 	}
 
@@ -48,18 +59,32 @@ public:
 		}
 	}
 
-	ExpressionID compile(const string &expr_def) {
-		exprs.emplace_back();
-		mu::Parser &expr = exprs.back();
+	void bindEnv(mu::Parser &expr, const string &expr_def) {
 		try {
 			for (auto &it : vars) {
 				expr.DefineVar(it.first, &it.second);
 			}
+			expr.DefineFun("rng", _psystem_expr_rng);
 			expr.SetExpr(expr_def);
 		} catch (mu::Parser::exception_type &e) {
 			printf("[Math Expression Parser] expression '%s' error : %s\n", expr_def.c_str(), e.GetMsg().c_str());
-		}
+		}		
+	}
+
+	ExpressionID compile(const string &expr_def) {
+		exprs.emplace_back();
+		mu::Parser &expr = exprs.back();
+		bindEnv(expr, expr_def);
 		return exprs.size() - 1;
+	}
+
+	float eval(mu::Parser &expr) {
+		try {
+			return expr.Eval();
+		} catch (mu::Parser::exception_type &e) {
+			printf("[Math Expression Parser] expression '%s' error : %s\n", expr.GetExpr().c_str(), e.GetMsg().c_str());
+			return 0;
+		}
 	}
 
 	float eval(ExpressionID id) {

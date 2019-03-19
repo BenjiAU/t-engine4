@@ -405,5 +405,18 @@ uint32_t JaggedLineBetweenGenerator::generateLimit(ParticlesData &p, uint32_t st
 	return end;
 }
 
+ParametrizerGenerator::ParametrizerGenerator(Ensemble *ee, System *s, const char *name, const char *expr_def) : ee(ee), system(s) {
+	val = ee->exprs.getAddress(name);
+	ee->exprs.bindEnv(expr, expr_def);
+}
+
+void ParametrizerGenerator::generate(ParticlesData &p, uint32_t start, uint32_t end) {
+	// We ignore start/end; this should run once per emit
+
+	if (val == nullptr) return;
+
+	*val = ee->exprs.eval(expr);
+	ee->computeParametrizedValues(system);
+}
 
 }

@@ -255,6 +255,8 @@ void System::draw(mat4 &model) {
  ** Ensemble
  ********************************************************************/
 MT::MersenneTwist Ensemble::rng;
+float _psystem_expr_rng(float min, float max) { return Ensemble::rng.genrand_real(min, max); }
+
 unordered_map<string, spTextureHolder> Ensemble::stored_textures;
 unordered_map<string, spNoiseHolder> Ensemble::stored_noises;
 unordered_map<string, spPointsListHolder> Ensemble::stored_points_lists;
@@ -269,7 +271,7 @@ spTextureHolder Ensemble::getTexture(const char *tex_str) {
 		return it->second;
 	}
 
-	texture_info *tex = new texture_info;
+	texture_lua *tex = new texture_lua;
 	loader_png(tex_str, tex, false, false, true);
 	spTextureHolder th = make_shared<TextureHolder>(tex);
 	stored_textures.insert({tex_str, th});
@@ -497,6 +499,21 @@ void Ensemble::update(float nb_keyframes) {
 void Ensemble::setEventsCallback(int ref) {
 	refcleaner(&event_cb_ref);
 	event_cb_ref = ref;
+}
+
+void Ensemble::computeParametrizedValues(System *exclude_lock) {
+	// Need to lock all, because we do not know which system owns the variable(s) being changed :/
+	for (auto &s : systems) {
+		if (s.get() != exclude_lock) s->mux.lock();
+	}
+
+	for (auto &it : parametrized_values) {
+		*get<0>(it) = exprs.eval(get<1>(it));
+	}
+
+	for (auto &s : systems) {
+		if (s.get() != exclude_lock) s->mux.unlock();
+	}
 }
 
 void Ensemble::updateParameters(lua_State *L, int table_id) {

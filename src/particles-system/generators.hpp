@@ -30,6 +30,7 @@ enum class GeneratorsList : uint8_t {
 	BasicRotationGenerator, RotationByVelGenerator, BasicRotationVelGenerator, SwapPosByVelGenerator,
 	StartStopColorGenerator, FixedColorGenerator,
 	CopyGenerator, JaggedLineBetweenGenerator,
+	ParametrizerGenerator,
 };
 
 class Generator {
@@ -133,7 +134,7 @@ class JaggedLinePosGenerator : public JaggedLineGeneratorBase {
 public:
 	vec2 p1, p2;
 	JaggedLinePosGenerator() { use_limiter = true; };
-	virtual uint32_t weight() const { return 0; };
+	virtual uint32_t weight() const { return 10; };
 	virtual void useSlots(ParticlesData &p) { p.initSlot4(POS); p.initSlot2(LINKS); };
 	virtual void generate(ParticlesData &p, uint32_t start, uint32_t end) {}
 	virtual uint32_t generateLimit(ParticlesData &p, uint32_t start, uint32_t end);
@@ -144,7 +145,7 @@ class ImagePosGenerator : public Generator {
 public:
 	spPointsListHolder lph;
 	ImagePosGenerator(spPointsListHolder lph);
-	virtual uint32_t weight() const { return 0; };
+	virtual uint32_t weight() const { return 10; };
 	virtual void useSlots(ParticlesData &p) { p.initSlot4(POS); p.initSlot4(COLOR); p.initSlot4(COLOR_START); p.initSlot4(COLOR_STOP); };
 	virtual void generate(ParticlesData &p, uint32_t start, uint32_t end) {}
 	virtual uint32_t generateLimit(ParticlesData &p, uint32_t start, uint32_t end);
@@ -265,7 +266,7 @@ class CopyGenerator : public Generator {
 	bool copy_color;
 public:
 	CopyGenerator(System *source_system, bool copy_pos, bool copy_color) : source_system(source_system), copy_pos(copy_pos), copy_color(copy_color) { use_limiter = true; };
-	virtual uint32_t weight() const { return 0; };
+	virtual uint32_t weight() const { return 1; };
 	virtual void useSlots(ParticlesData &p);
 	virtual void generate(ParticlesData &p, uint32_t start, uint32_t end) {};
 	virtual uint32_t generateLimit(ParticlesData &p, uint32_t start, uint32_t end);
@@ -281,9 +282,22 @@ public:
 	float close_tries;
 	float repeat_times;
 	JaggedLineBetweenGenerator(System *source_system1, System *source_system2, bool copy_pos, bool copy_color) : source_system1(source_system1), source_system2(source_system2), copy_pos(copy_pos), copy_color(copy_color) { use_limiter = true; };
-	virtual uint32_t weight() const { return 0; };
+	virtual uint32_t weight() const { return 1; };
 	virtual void useSlots(ParticlesData &p);
 	virtual void generate(ParticlesData &p, uint32_t start, uint32_t end) {};
 	virtual uint32_t generateLimit(ParticlesData &p, uint32_t start, uint32_t end);
 	virtual GeneratorsList getID() { return GeneratorsList::JaggedLineBetweenGenerator; }
+};
+
+class ParametrizerGenerator : public Generator {
+	float *val = nullptr;
+	mu::Parser expr;
+	Ensemble *ee = nullptr;
+	System *system = nullptr;
+public:
+	ParametrizerGenerator(Ensemble *ee, System *s, const char *name, const char *expr_def);
+	virtual uint32_t weight() const { return 0; };
+	virtual void useSlots(ParticlesData &p) {}
+	virtual void generate(ParticlesData &p, uint32_t start, uint32_t end);
+	virtual GeneratorsList getID() { return GeneratorsList::ParametrizerGenerator; }
 };

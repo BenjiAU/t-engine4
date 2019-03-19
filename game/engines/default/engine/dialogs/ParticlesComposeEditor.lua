@@ -100,7 +100,7 @@ local particle_speed = 1
 local particle_zoom = 1
 
 local pdef = {
--- [[
+--[[
 	parameters = { size=300.000000, },
 	{
 		max_particles = 2000, blend=PC.ShinyBlend,
@@ -356,6 +356,29 @@ local pdef = {
 		},
 	},
 --]]
+-- [[
+	parameters = { h=1020.000000, intensity=1.000000, w=1920.000000 },
+	{
+		max_particles = 800, blend=PC.ShinyBlend, type=PC.RendererPoint, compute_only=false,
+		texture = "/data/gfx/particles_textures/lens_flare.png",
+		emitters = {
+			{PC.LinearEmitter, {
+				{PC.BasicTextureGenerator},
+				{PC.BasicSizeGenerator, max_size=20.000000, min_size=3.000000},
+				{PC.LifeGenerator, min=20.000000, max=20.000000},
+				{PC.LinePosGenerator, base_point={"w/2", "-h/2"}, p1={0.000000, 0.000000}, p2={1.000000, "h"}},
+				{PC.DirectionVelGenerator, min_vel="-w/20", max_vel="-w/20-150", from={-10000.000000, 0.000000}, min_rot=0.000000, max_rot=0.000000},
+				{PC.FixedColorGenerator, color_stop={0.968783, 0.984375, 0.968783, 1.000000}, color_start={0.984375, 0.980723, 0.961092, 1.000000}},
+				{PC.ParametrizerGenerator, name="intensity", expr="rng(1,10)"},
+			}, startat=0.000000, duration=-1.000000, rate=0.100000, nb=3.000000, dormant=false },
+		},
+		updaters = {
+			{PC.BasicTimeUpdater},
+			{PC.LinearColorUpdater, bilinear=false},
+			{PC.EulerPosUpdater, global_vel={0.000000, 0.000000}, global_acc={0.000000, 0.000000}},
+		},
+	},
+--]]
 }
 
 local typemodes = {
@@ -555,6 +578,10 @@ local specific_uis = {
 			{type="number", id="close_tries", text="Pick closer tries: ", min=0, max=200, default=0},
 			{type="number", id="repeat_times", text="Repeat: ", min=1, max=1000, default=1},
 		}},
+		[PC.ParametrizerGenerator] = {name="ParametrizerGenerator", category="special", fields={
+			{type="string", id="name", text="Parameter name: ", default="p1", line=true},
+			{type="string", id="expr", text="Expr: ", default="rng(1, 10)"},
+		}},
 	},
 	updaters = {
 		[PC.BasicTimeUpdater] = {name="BasicTimeUpdater", category="life", fields={}},
@@ -738,10 +765,10 @@ function _M:parametrizedBox(t)
 	local on_change = t.on_change
 	t.font = self.dfont
 	t.orig_title = t.title
-	t.text = tostring(t.number)
+	t.text = tostring(t.string or t.number)
 	t.on_change = function(v, box)
 		-- Number, bound it
-		if tonumber(v) then
+		if tonumber(v) and not t.string then
 			v = util.bound(tonumber(v), t.min, t.max)
 			t.is_parametrized = false
 		-- String parameter
@@ -750,7 +777,8 @@ function _M:parametrizedBox(t)
 		end
 		on_change(v)
 
-		if t.is_parametrized then box.title_do:color(colors_alphafs[getParametrizedColor(v)](1))
+		if t.string then box.title_do:color(colors_alphafs.GOLD)
+		elseif t.is_parametrized then box.title_do:color(colors_alphafs[getParametrizedColor(v)](1))
 		else box.title_do:color(1, 1, 1, 1)
 		end
 	end
@@ -774,6 +802,9 @@ function _M:processSpecificUI(ui, add, kind, spe, delete)
 		if field.type == "number" then
 			if not spe[field.id] then spe[field.id] = field.default end
 			adds[#adds+1] = self:parametrizedBox{title=field.text, number=field.to(spe[field.id]), min=field.to(field.min), max=field.to(field.max), chars=6, on_change=function(p) spe[field.id] = field.from(p) self:regenParticle() end, fct=function()end}
+		elseif field.type == "string" then
+			if not spe[field.id] then spe[field.id] = field.default end
+			adds[#adds+1] = self:parametrizedBox{title=field.text, string=spe[field.id], chars=6, on_change=function(p) spe[field.id] = p self:regenParticle() end, fct=function()end}
 		elseif field.type == "bool" then
 			if not spe[field.id] then spe[field.id] = field.default end
 			adds[#adds+1] = Checkbox.new{font=self.dfont, title=field.text, default=field.to(spe[field.id]), on_change=function(p) spe[field.id] = field.from(p) self:regenParticle() end, fct=function()end}
@@ -1206,7 +1237,7 @@ end
 
 function _M:toggleBloom()
 	if not self.blooming then
-		self.fbobloom:blurMode(14, self.downsampling, self.blur_shader)
+		self.fbobloom:blurMode(40, self.downsampling, self.blur_shader)
 		self.blooming = true
 	else
 		self.fbobloom:removeMode()

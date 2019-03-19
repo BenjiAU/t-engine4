@@ -63,6 +63,9 @@ struct texture_lua : texture_info {
 	}
 	texture_info to_info() { return *this; }
 
+	void *operator new(size_t size) {
+		return ::new texture_lua;
+	}
 	void *operator new(size_t size, lua_State *L) {
 		void *ptr = lua_newuserdata(L, size);
 		auxiliar_setclass(L, "gl{texture}", -1);

@@ -493,6 +493,7 @@ void TargetBlur::renderMode() {
 	// Draw all passes
 	view.use(true);
 	vbo.setShader(blur);
+	useShaderSimple(blur); // For the first pass
 	Fbo *use_fbo_prev = &target->fbo;
 	Fbo *use_fbo = &fbo_blur;
 	for (int i = 0; i < blur_passes; i++) {

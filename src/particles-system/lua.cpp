@@ -430,7 +430,7 @@ static int p_new(lua_State *L) {
 			for (int gi = 1; gi <= nb_generators; gi++) {
 				lua_rawgeti(L, -1, gi);
 				GeneratorsList g_id = (GeneratorsList)((uint8_t)lua_float(L, -1, 1, 0));
-				Generator *gg;
+				Generator *gg = nullptr;
 
 				switch (g_id) {
 					case GeneratorsList::LifeGenerator: {
@@ -531,13 +531,21 @@ static int p_new(lua_State *L) {
 						lua_float(L, &g->close_tries, -1, "close_tries", 1);
 						lua_float(L, &g->sway, -1, "sway", 80);
 						break;}
+					case GeneratorsList::ParametrizerGenerator: {
+						const char *name_str = lua_string(L, -1, "name", NULL);
+						const char *expr_str = lua_string(L, -1, "expr", NULL);
+						if (name_str && expr_str) {
+							auto g = new ParametrizerGenerator(e, sys, name_str, expr_str); gg = g;
+						}
+						break;}
 					default: 
 						lua_pushliteral(L, "Unknown particles Generator"); lua_error(L);
 						break;
 				}
-				gg->finish();
-				em->addGenerator(sys, gg);
-				// if (parametrizing) e->parametrizeGenerator(g_id, g);
+				if (gg) {
+					gg->finish();
+					em->addGenerator(sys, gg);
+				}
 				lua_pop(L, 1);
 			}
 			lua_pop(L, 1);
@@ -761,6 +769,7 @@ extern "C" int luaopen_particles_system(lua_State *L) {
 	lua_pushliteral(L, "FixedColorGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::FixedColorGenerator)); lua_rawset(L, -3);
 	lua_pushliteral(L, "CopyGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::CopyGenerator)); lua_rawset(L, -3);
 	lua_pushliteral(L, "JaggedLineBetweenGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::JaggedLineBetweenGenerator)); lua_rawset(L, -3);
+	lua_pushliteral(L, "ParametrizerGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::ParametrizerGenerator)); lua_rawset(L, -3);
 
 	lua_pushliteral(L, "TriggerDELETE"); lua_pushnumber(L, static_cast<uint8_t>(TriggerableKind::DESTROY)); lua_rawset(L, -3);
 	lua_pushliteral(L, "TriggerWAKEUP"); lua_pushnumber(L, static_cast<uint8_t>(TriggerableKind::WAKEUP)); lua_rawset(L, -3);

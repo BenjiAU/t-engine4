@@ -226,10 +226,10 @@ end
 function _M:loaded()
 	local def = nil
 	if _M.progsperm[self.totalname] then
-		print("[SHADER] using permcached shader "..self.totalname)
+		-- print("[SHADER] using permcached shader "..self.totalname)
 		self.shad = _M.progsperm[self.totalname]
 	elseif _M.progs[self.totalname] then
-		print("[SHADER] using cached shader "..self.totalname)
+		-- print("[SHADER] using cached shader "..self.totalname)
 		self.shad = _M.progs[self.totalname].shad
 		_M.progs[self.totalname].dieat = os.time() + 60*4
 		if _M.progsreset[self.totalname] and self.shad then

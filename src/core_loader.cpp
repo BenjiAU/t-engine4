@@ -71,11 +71,11 @@ public:
 class LoaderPNG : public Loader {
 private:
 	string filename;
-	texture_lua *tex;
+	GLuint tex;
 	PHYSFS_file *file;
 	SDL_Surface *s;
 public:
-	LoaderPNG(const char *filename, PHYSFS_file *file, texture_lua *tex) : file(file), tex(tex), filename(filename) {};
+	LoaderPNG(const char *filename, PHYSFS_file *file, GLuint tex) : file(file), tex(tex), filename(filename) {};
 	virtual ~LoaderPNG() { };
 	virtual bool load() {
 		s = IMG_Load_RW(PHYSFSRWOPS_makeRWops(file), TRUE);
@@ -85,8 +85,8 @@ public:
 	}
 	virtual bool finish() {
 		if (s) {
-			printf("[LOADER] done loading PNG %s in texture %d!\n", filename.c_str(), tex->texture_id);
-			tfglBindTexture(GL_TEXTURE_2D, tex->texture_id);
+			printf("[LOADER] done loading PNG %s in texture %d!\n", filename.c_str(), tex);
+			tfglBindTexture(GL_TEXTURE_2D, tex);
 			GLenum texture_format = sdl_gl_texture_format(s);
 			GLint nOfColors = s->format->BytesPerPixel;
 			glTexImage2D(GL_TEXTURE_2D, 0, nOfColors == 4 ? GL_RGBA : GL_RGB, s->w, s->h, 0, texture_format, GL_UNSIGNED_BYTE, s->pixels);
@@ -101,11 +101,11 @@ public:
 class LoaderPNGCubemap : public Loader {
 private:
 	array<string, 6> filenames;
-	texture_lua *tex;
+	GLuint tex;
 	array<PHYSFS_file*, 6> files = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 	array<SDL_Surface*, 6> s = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 public:
-	LoaderPNGCubemap(array<string, 6> &filenames, array<PHYSFS_file*, 6> &files, texture_lua *tex) : tex(tex) {
+	LoaderPNGCubemap(array<string, 6> &filenames, array<PHYSFS_file*, 6> &files, GLuint tex) : tex(tex) {
 		for (int i = 0; i < 6; i++) {
 			this->filenames[i] = filenames[i];
 			this->files[i] = files[i];
@@ -122,8 +122,8 @@ public:
 	}
 	virtual bool finish() {
 		if (s[0] && s[1] && s[2] && s[3] && s[4] && s[5]) {
-			printf("[LOADER] done loading cubemap PNG %s / %s / %s / %s / %s / %s in texture %d!\n", filenames[0].c_str(), filenames[1].c_str(), filenames[2].c_str(), filenames[3].c_str(), filenames[4].c_str(), filenames[5].c_str(), tex->texture_id);
-			tfglBindTexture(GL_TEXTURE_CUBE_MAP, tex->texture_id);
+			printf("[LOADER] done loading cubemap PNG %s / %s / %s / %s / %s / %s in texture %d!\n", filenames[0].c_str(), filenames[1].c_str(), filenames[2].c_str(), filenames[3].c_str(), filenames[4].c_str(), filenames[5].c_str(), tex);
+			tfglBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 
 			GLenum texture_format = sdl_gl_texture_format(s[0]);
 			GLint nOfColors = s[0]->format->BytesPerPixel;
@@ -334,7 +334,7 @@ static int lua_loader_png(lua_State *L) {
 	if (nearest) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	SDL_mutexP(loader_mutex);
-	loader_queue.push(new LoaderPNG(filename, file, t));
+	loader_queue.push(new LoaderPNG(filename, file, t->texture_id));
 	loader_running++;
 	SDL_mutexV(loader_mutex);
 	SDL_SemPost(loader_sem);
@@ -366,6 +366,7 @@ bool loader_png(const char *filename, texture_lua *t, bool nearest, bool norepea
 	int sh = MAKE_DWORD_PTR(buffer + 20);
 
 	glGenTextures(1, &t->texture_id);
+	printf("[LOADER] preparing texture %s => %d\n", filename, t->texture_id);
 	tfglBindTexture(GL_TEXTURE_2D, t->texture_id);
 	t->w = sw;
 	t->h = sh;
@@ -378,7 +379,7 @@ bool loader_png(const char *filename, texture_lua *t, bool nearest, bool norepea
 	if (nearest) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	SDL_mutexP(loader_mutex);
-	loader_queue.push(new LoaderPNG(filename, file, t));
+	loader_queue.push(new LoaderPNG(filename, file, t->texture_id));
 	loader_running++;
 	SDL_mutexV(loader_mutex);
 	SDL_SemPost(loader_sem);
@@ -440,7 +441,7 @@ static int lua_loader_cubemap_png(lua_State *L) {
 	if (nearest) glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	SDL_mutexP(loader_mutex);
-	loader_queue.push(new LoaderPNGCubemap(filenames, files, t));
+	loader_queue.push(new LoaderPNGCubemap(filenames, files, t->texture_id));
 	loader_running++;
 	SDL_mutexV(loader_mutex);
 	SDL_SemPost(loader_sem);

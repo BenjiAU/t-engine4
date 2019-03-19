@@ -149,13 +149,12 @@ public:
 
 class TextureHolder {
 public:
-	texture_info *tex;
-	TextureHolder(texture_info *tex) : tex(tex) {
+	texture_lua *tex;
+	TextureHolder(texture_lua *tex) : tex(tex) {
 		printf("Creating particle texture %d\n", tex->texture_id);
 	};
 	~TextureHolder() {
 		printf("Freeing particle texture %d\n", tex->texture_id);
-		glDeleteTextures(1, &tex->texture_id);
 		delete tex;
 	};
 };
@@ -328,6 +327,7 @@ public:
 	void add(System *system);
 	void storeParametersTable(int ref) { parameters_ref = ref; }
 	void updateParameters(lua_State *L, int table_id);
+	void computeParametrizedValues(System *exclude_lock);
 
 	void shift(float x, float y, bool absolute);
 	void displace(float x, float y);
