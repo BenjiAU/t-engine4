@@ -502,7 +502,7 @@ void TargetBlur::renderMode() {
 		float radius = blur_passes + 1 - i;
 		GLfloat uni[2] = {radius, 0};
 		if (i % 2 == 1) { uni[0] = 0; uni[1] = radius; }
-		glUniform2fv(blur_horizontal_uniform, 1, uni);
+		glUniform2f(blur_horizontal_uniform, uni[0], uni[1]);
 		vbo.toScreen(model);
 
 		swap(use_fbo_prev, use_fbo);

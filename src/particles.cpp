@@ -570,12 +570,18 @@ static void particles_draw(particles_type *ps, mat4 model)
 		c[1] = h;
 		glUniform2fv(shader->p_texsize, 1, c);
 	}
-	glEnableVertexAttribArray(shader->vertex_attrib);
-	glVertexAttribPointer(shader->vertex_attrib, 4, GL_FLOAT, GL_FALSE, sizeof(particles_vertex), (void*)0);
-	glEnableVertexAttribArray(shader->texcoord_attrib);
-	glVertexAttribPointer(shader->texcoord_attrib, 2, GL_FLOAT, GL_FALSE, sizeof(particles_vertex), (void*)offsetof(particles_vertex, tex));
-	glEnableVertexAttribArray(shader->color_attrib);
-	glVertexAttribPointer(shader->color_attrib, 4, GL_FLOAT, GL_FALSE, sizeof(particles_vertex), (void*)offsetof(particles_vertex, color));
+	if (shader->vertex_attrib != -1) {
+		glEnableVertexAttribArray(shader->vertex_attrib);
+		glVertexAttribPointer(shader->vertex_attrib, 4, GL_FLOAT, GL_FALSE, sizeof(particles_vertex), (void*)0);
+	}
+	if (shader->texcoord_attrib != -1) {
+		glEnableVertexAttribArray(shader->texcoord_attrib);
+		glVertexAttribPointer(shader->texcoord_attrib, 2, GL_FLOAT, GL_FALSE, sizeof(particles_vertex), (void*)offsetof(particles_vertex, tex));
+	}
+	if (shader->color_attrib != -1) {
+		glEnableVertexAttribArray(shader->color_attrib);
+		glVertexAttribPointer(shader->color_attrib, 4, GL_FLOAT, GL_FALSE, sizeof(particles_vertex), (void*)offsetof(particles_vertex, color));
+	}
 
 	// glDrawArrays(GL_TRIANGLES, 0, ps->batch_nb);
 	glDrawElements(GL_TRIANGLES, ps->batch_nb * 6, GL_UNSIGNED_INT, (void*)0);

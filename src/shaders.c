@@ -271,9 +271,20 @@ static int program_clone(lua_State *L)
 	np->p_texsize = p->p_texsize;
 	np->p_texcoord = p->p_texcoord;
 	np->p_tex = p->p_tex;
+	np->p_mvp = p->p_mvp;
+	np->p_model = p->p_model;
+	np->p_view = p->p_view;
+	np->p_projection = p->p_projection;
 	np->vertex_attrib = p->vertex_attrib;
+	np->shape_vertex_attrib = p->shape_vertex_attrib;
 	np->texcoord_attrib = p->texcoord_attrib;
 	np->color_attrib = p->color_attrib;
+	np->texcoorddata_attrib = p->texcoorddata_attrib;
+	np->mapcoord_attrib = p->mapcoord_attrib;
+	np->kind_attrib = p->kind_attrib;
+	np->model_attrib = p->model_attrib;
+	np->picking_attrib = p->picking_attrib;
+	np->normal_attrib = p->normal_attrib;
 	np->reset_uniforms = NULL;
 
 	lua_getmetatable(L, 1); // 3
@@ -717,7 +728,7 @@ static int program_compile(lua_State *L)
 	p->p_view = glGetUniformLocation(p->shader, "view");
 	p->p_model = glGetUniformLocation(p->shader, "model");
 	p->p_projection = glGetUniformLocation(p->shader, "projection");
-	// printf("Uniform locations %d %d %d %d %d %d %d\n", p->p_tick, p->p_color, p->p_mapcoord, p->p_texsize, p->p_texcoord, p->p_tex, p->p_mvp);
+	printf("Uniform locations %d %d %d %d %d %d %d\n", p->p_tick, p->p_color, p->p_mapcoord, p->p_texsize, p->p_texcoord, p->p_tex, p->p_mvp);
 
 	p->vertex_attrib = glGetAttribLocation(p->shader, "te4_position");
 	p->texcoord_attrib = glGetAttribLocation(p->shader, "te4_texcoord");
