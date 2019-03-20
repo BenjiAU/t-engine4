@@ -141,13 +141,30 @@ newAI("move_astar", function(self, add_check)
 			if config.settings.log_detail_ai > 0 then print("[move_astar] no Astar path, using move_simple") end
 			return self:runAI("move_simple")
 		else
-			local moved = self:move(path[1].x, path[1].y)
+			local moved = self:moveDirection(path[1].x, path[1].y)
 			if moved then return moved
 			else
 				if config.settings.log_detail_ai > 0 then print("[move_astar] invalid Astar node, using move_simple", path[1].x, path[1].y, "using move_simple") end
-				return self:runAI("move_simple") 
+				return self:runAI("move_simple")
 			end
 		end
+	end
+end)
+
+-- Always use Astar pathing and exclude grids that are blocked by actors *if* you would be unable to shove/swap with the actor
+-- This is autoassigned to most rares/randbosses
+newAI("move_astar_advanced", function(self)
+	if self.ai_target.actor then
+		local check_all_block_move = function(nx, ny)
+			local actor = game.level.map(nx, ny, engine.Map.ACTOR)
+			if actor and actor == self.ai_target.actor then
+				return true
+			else
+				local check = game.level.map:checkAllEntities(nx, ny, "aiPathingBlockCheck", self)
+				return not check
+			end
+		end
+		return self:runAI("move_astar", check_all_block_move)
 	end
 end)
 

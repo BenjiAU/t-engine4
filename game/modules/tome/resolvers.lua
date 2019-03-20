@@ -1353,3 +1353,14 @@ end
 function resolvers.calc.command_staff(t, e)
 	e:commandStaff()
 end
+
+function resolvers.birth_extra_tier1_zone(data)
+	return {__resolver = "birth_extra_tier1_zone", data}
+end
+function resolvers.calc.birth_extra_tier1_zone(t, e)
+	if not game.creating_player then return end
+	-- Add bonus starting zones to the tier1 list only if the zone they actually started in matches the race/classes
+	-- This is a hacky way to figure out which class/race start got prioritized
+	game.state.birth.bonus_zone_tiers = game.state.birth.bonus_zone_tiers or {}
+	game.state.birth.bonus_zone_tiers[#game.state.birth.bonus_zone_tiers+1] = e[1]
+end

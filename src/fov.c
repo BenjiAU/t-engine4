@@ -31,7 +31,7 @@
 #include "physfsrwops.h"
 #include "SFMT.h"
 #include "mzip.h"
-#include "main.h"
+// #include "main.h"
 #include "useshader.h"
 #include <math.h>
 #include <time.h>

@@ -55,7 +55,6 @@ static int draw_last_frame(lua_State *L)
 }
 
 extern int requested_fps;
-extern void on_redraw();
 static void hook_wait_display(lua_State *L, lua_Debug *ar)
 {
 	if (!manual_ticks_enabled) waited_count++;
@@ -65,7 +64,7 @@ static void hook_wait_display(lua_State *L, lua_Debug *ar)
 	int now = SDL_GetTicks();
 	if (now - last_tick < (3000 / (requested_fps ? requested_fps : NORMALIZED_FPS))) return;
 	last_tick = now;
-	on_redraw();
+	redraw_now(redraw_type_normal);
 }
 
 extern long draw_tick_skip;
@@ -126,7 +125,7 @@ static int enable(lua_State *L)
 			1, 1, 1, 1
 		);
 
-		on_redraw();
+		redraw_now(redraw_type_normal);
 	}
 
 	lua_pushboolean(L, waiting == 1);

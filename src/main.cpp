@@ -771,7 +771,7 @@ static void call_draw(float nb_keyframes)
 	interface_realtime(nb_keyframes);
 }
 
-extern "C" void te4_discord_update();
+redraw_type_t current_redraw_type = redraw_type_normal;
 void on_redraw()
 {
 	static int last_ticks = 0;
@@ -796,7 +796,17 @@ void on_redraw()
 	keyframes_done += nb_keyframes;
 	frames_done++;
 
-	SDL_GL_SwapWindow(window);
+	switch (current_redraw_type)
+	{
+	case redraw_type_user_screenshot:
+	case redraw_type_savefile_screenshot:
+		// glReadPixels reads from the back buffer, so skip swap when we're doing a screenshot.
+		break;
+	default:
+		//SDL_GL_SwapBuffers();
+		SDL_GL_SwapWindow(window);
+		break;
+	}
 
 	// ticks_per_frame = /;
 	last_ticks = ticks;
@@ -825,6 +835,44 @@ void on_redraw()
 		lua_gc(L, LUA_GCSTEP, 5);
 		ticks_count_gc = 0;
 	}
+}
+
+void redraw_now(redraw_type_t rtype) {
+	bool changed_gamma = FALSE;
+	if (rtype == redraw_type_savefile_screenshot)
+	{
+		if (current_game != LUA_NOREF)
+		{
+			// current_game:setFullscreenShaderGamma(1)
+			lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
+			lua_pushstring(L, "setFullscreenShaderGamma");
+			lua_gettable(L, -2);
+			lua_remove(L, -2);
+			lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
+			lua_pushnumber(L, 1);
+			docall(L, 2, 0);
+			changed_gamma = TRUE;
+		}
+	}
+
+	current_redraw_type = rtype;
+	on_redraw();
+
+	if (changed_gamma)
+	{
+		// current_game:setFullscreenShaderGamma(gamma_correction)
+		lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
+		lua_pushstring(L, "setFullscreenShaderGamma");
+		lua_gettable(L, -2);
+		lua_remove(L, -2);
+		lua_rawgeti(L, LUA_REGISTRYINDEX, current_game);
+		lua_pushnumber(L, gamma_correction);
+		docall(L, 2, 0);
+	}
+}
+
+redraw_type_t get_current_redraw_type() {
+	return current_redraw_type;
 }
 
 void pass_command_args(int argc, char *argv[])
@@ -1185,7 +1233,6 @@ static void close_state() {
 	font_cleanup();
 }
 
-extern "C" int luaopen_discord(lua_State *L);
 void boot_lua(int state, bool rebooting, int argc, char *argv[])
 {
 	core_def->corenum = 0;
@@ -1732,6 +1779,8 @@ int main(int argc, char *argv[])
 	printf("Terminating!\n");
 	te4_web_terminate();
 	printf("Webcore shutdown complete\n");
+	// Restore default gamma on exit.
+	SDL_SetWindowBrightness(window, 1.0);
 //	SDL_Quit();
 	printf("SDL shutdown complete\n");
 //	deinit_openal();

@@ -89,6 +89,10 @@ newBirthDescriptor{
 			local x, y = mod.class.Encounter:findSpot(where)
 			return x, y
 		end,
+		zone_tiers = {
+			{name="tier1", "trollmire", "norgos-lair", "scintillating-caves", "rhaloren-camp", "heart-gloom", "ruins-kor-pul"},
+			{name="tier2", "sandworm-lair", "maze", "daikara", "halfling-ruins"}
+		}		
 	},
 }
 

@@ -1856,9 +1856,14 @@ function _M:display(nb_keyframes)
 	-- If switching resolution, blank everything but the dialog
 	if self.change_res_dialog then engine.GameTurnBased.display(self, nb_keyframes) return end
 
-	-- Reset gamma setting, something somewhere is disrupting it, this is a stop gap solution
-	if self.support_shader_gamma and self.full_fbo_shader and self.full_fbo_shader.shad then self.full_fbo_shader.shad:uniGamma(config.settings.gamma_correction / 100) end
+	if not core.display.redrawingForSavefileScreenshot() then
+		-- Don't change gamma here during redrawing for savefile screenshot.
+		-- I suspect that the following code is actually unnecessary, but I'm not changing it.
 
+		-- Reset gamma setting, something somewhere is disrupting it, this is a stop gap solution
+		if self.support_shader_gamma and self.full_fbo_shader and self.full_fbo_shader.shad then self.full_fbo_shader.shad:uniGamma(config.settings.gamma_correction / 100) end
+	end
+ 
 	if self.full_fbo then self.full_fbo:use(true) end
 
 	-- Now the ui
@@ -2677,22 +2682,15 @@ end
 --- Take a screenshot of the game
 -- @param for_savefile The screenshot will be used for savefile display
 function _M:takeScreenshot(for_savefile)
+	core.display.forceRedrawForScreenshot(for_savefile)
 	if for_savefile then
-		self.suppressDialogs = true
-		core.display.forceRedraw()
-
 		local x, y = self.w / 4, self.h / 4
 		if self.level then
-			x, y = self.level.map:getTileToScreen(self.player.x, self.player.y)
+			x, y = self.level.map:getTileToScreen(self.player.x, self.player.y, true)
 			x, y = x - self.w / 4, y - self.h / 4
 			x, y = util.bound(x, 0, self.w / 2), util.bound(y, 0, self.h / 2)
 		end
-		local sc = core.display.getScreenshot(x, y, self.w / 2, self.h / 2)
-
-		self.suppressDialogs = nil
-		core.display.forceRedraw()
-
-		return sc
+		return core.display.getScreenshot(x, y, self.w / 2, self.h / 2)
 	else
 		return core.display.getScreenshot(0, 0, self.w, self.h)
 	end

@@ -47,9 +47,7 @@ function _M:bumpInto(target, x, y)
 			local chat = Chat.new(self.can_talk, self, target, {npc=self, player=target})
 			chat:invoke()
 			if target.can_talk_only_once then target.can_talk = nil end
-		elseif self.move_others and not target.cant_be_moved then
-			if target.move_others and self ~= game.player then return end
-
+		elseif self.player or (self ~= game.player and self.canBumpDisplace and self:canBumpDisplace(target)) then  -- canBumpDisplace is only on NPCs
 			-- Check we can both walk in the tile we will end up in
 			local blocks = game.level.map:checkAllEntitiesLayersNoStop(target.x, target.y, "block_move", self)
 			for kind, v in pairs(blocks) do if kind[1] ~= Map.ACTOR and v then return end end

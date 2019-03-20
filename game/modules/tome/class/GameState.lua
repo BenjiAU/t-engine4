@@ -2320,6 +2320,9 @@ function _M:createRandomBoss(base, data)
 	-- Randbosses resemble players so they should use the same resist cap rules
 	-- This is particularly important because at high levels boss ranks get a lot of free resist all
 	b.resists_cap = { all = 70 }
+
+	b.move_others = true
+	b.open_door = true
 	
 	-- Update default equipment, if any, to "boss" levels
 	for k, resolver in ipairs(b) do
@@ -2400,7 +2403,11 @@ function _M:createRandomBoss(base, data)
 	if data.ai then b.ai = data.ai
 	else b.ai = (b.rank > 3) and "tactical" or b.ai
 	end
-	b.ai_state = { talent_in=1, ai_move=data.ai_move or "move_astar" }
+	b.ai_state = { talent_in=1 }
+	if not b.no_overwrite_ai_move then 
+		b.ai_state.ai_move = "move_astar_advanced" 
+	end
+
 	if data.ai_tactic then
 		b.ai_tactic = data.ai_tactic
 	else
@@ -2636,6 +2643,8 @@ function _M:createRandomBossNew(base, data)
 	b.rank = data.rank or (rng.percent(30) and 4 or 3.5)
 	b.level_range[1] = data.level
 	b.fixed_rating = true
+	b.move_others = true
+	b.open_door = true
 	if data.life_rating then
 		b.life_rating = data.life_rating(b.life_rating)
 	else
@@ -2749,7 +2758,10 @@ function _M:createRandomBossNew(base, data)
 	if data.ai then b.ai = data.ai
 	else b.ai = (b.rank > 3) and "tactical" or b.ai
 	end
-	b.ai_state = { talent_in=1, ai_move=data.ai_move or "move_astar" }
+	b.ai_state = { talent_in=1}
+	if not b.no_overwrite_ai_move then 
+		b.ai_state.ai_move = "move_astar_advanced" 
+	end
 	if data.ai_tactic then
 		b.ai_tactic = data.ai_tactic
 	else

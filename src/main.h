@@ -56,6 +56,15 @@ void do_move(int w, int h);
  */
 extern void do_resize(int w, int h, bool fullscreen, bool borderless, float zoom);
 
+typedef enum {
+	redraw_type_normal,
+	redraw_type_user_screenshot,
+	redraw_type_savefile_screenshot
+} redraw_type_t;
+
+extern void redraw_now(redraw_type_t rtype);
+extern redraw_type_t get_current_redraw_type(void);
+
 extern void setupRealtime(float freq);
 extern void setupDisplayTimer(int fps);
 extern int docall (lua_State *L, int narg, int nret);

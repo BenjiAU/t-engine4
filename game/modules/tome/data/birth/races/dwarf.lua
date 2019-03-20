@@ -82,6 +82,7 @@ newBirthDescriptor
 		resolvers.inscription("INFUSION:_REGENERATION", {cooldown=10, dur=5, heal=100}, 1),
 		resolvers.inscription("INFUSION:_WILD", {cooldown=14, what={physical=true}, dur=4, power=14}, 2),
 		resolvers.inscription("INFUSION:_HEALING", {cooldown=12, heal=50}, 3),
+		resolvers.birth_extra_tier1_zone{name="tier1", condition=function(e) return e.starting_zone == "reknor-escape" end, "reknor-escape", "deep-bellow"},
 	},
 	default_cosmetics = { {"hairs", "Dark Hair 1"}, {"facial_features", "Dark Beard 2", {sex="Male"}} },
 	cosmetic_options = {

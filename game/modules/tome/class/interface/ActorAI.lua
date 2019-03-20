@@ -311,9 +311,18 @@ _M.aiSubstDamtypes = {
 	end
 }
 
--- compute the "shove weight" for an actor, determining who has priority when fighting for space
-local shove_algorithm = function(self)
-	return 3 * self.rank + self.size_category * self.size_category
+-- Still count grids we can potentially shove or swap our way into
+function _M:aiPathingBlockCheck(x, y, actor_checking)
+	return not self:block_move(x, y, actor_checking) or not actor_checking:canBumpDisplace(self)
+end
+
+-- Can an NPC shove or swap positions with a space occupied by another NPC?
+function _M:canBumpDisplace(target)
+	if target.rank >= self.rank then return false end
+	if not target.x then return end
+	if self.never_move or target.never_move or target.cant_be_moved then return false end
+	if not self.move_others then return false end
+	return true
 end
 
 --- Move one step towards the given coordinates if possible
@@ -333,10 +342,10 @@ function _M:moveDirection(x, y, force)
 	
 		-- if blocked, evaluate other possible directions
 		local l = {}
-		local shove_wt = shove_algorithm(self)
+
 		-- Find all possible directions to move, including towards friendly targets
 		local target = game.level.map(lx, ly, engine.Map.ACTOR)
-		if target and target ~= game.player then l[#l+1] = {lx,ly, core.fov.distance(x,y,lx,ly)/2+rng.float(0, .1), target} end -- straight ahead
+		if target and self:reactionToward(target) > 0 and self:canBumpDisplace(target) then l[#l+1] = {lx,ly, core.fov.distance(x,y,lx,ly)/2+rng.float(0, .1), target} end -- Add straight ahead if shoveable
 		local dir = util.getDir(lx, ly, self.x, self.y)
 		local sides = util.dirSides(dir, self.x, self.y)
 		for _, dir in pairs(sides) do -- sides
@@ -346,57 +355,51 @@ function _M:moveDirection(x, y, force)
 				l[#l+1] = {dx,dy, core.fov.distance(x,y,dx,dy)}
 			else
 				target = game.level.map(dx, dy, engine.Map.ACTOR)
-				if target and target ~= game.player and target.x and self:reactionToward(target) > 0 and not target:attr("never_move") and self:canMove(dx, dy, true) then
+				if target and self:reactionToward(target) > 0 and self:canBumpDisplace(target) then
 					l[#l+1] = {dx,dy, core.fov.distance(x,y,dx,dy)/2+rng.float(0, .1), target}
 				end
 			end
 		end
+
 		-- Find the best (most direct) direction
 		if #l > 0 then
 			table.sort(l, function(a,b) return a[3]<b[3] end)
 			local target = l[1][4]
-			if target then -- apply shove pressure to the friendly target and move it (maybe)
-				target.shove_pressure = (target.shove_pressure or 0) + shove_wt + (self.shove_pressure or 0)
-				if log_detail > 3 then print("[moveDirection]", self.uid, self.name, "applying", target.shove_pressure, "shove pressure to", target.name, l[1][1], l[1][2]) end
-				if force or target.shove_pressure > shove_algorithm(target) * 1.7 then
-					local dir = util.getDir(target.x, target.y, self.x, self.y)
-					local sides = util.dirSides(dir, target.x, target.y)
-					local check_order = {}
-					if rng.percent(50) then
-						table.insert(check_order, "left")
-						table.insert(check_order, "right")
-					else
-						table.insert(check_order, "right")
-						table.insert(check_order, "left")
-					end
-					if rng.percent(50) then
-						table.insert(check_order, "hard_left")
-						table.insert(check_order, "hard_right")
-					else
-						table.insert(check_order, "hard_right")
-						table.insert(check_order, "hard_left")
-					end
-					for _, side in ipairs(check_order) do
-						local check_dir = sides[side]
-						local sx, sy = util.coordAddDir(target.x, target.y, check_dir)
---	print("[moveDirection] checking shove target pos", check_dir, sx, sy)
-						-- move the friendly target if possible and it has energy
-						if target.energy.value > 0 and target:canMove(sx, sy) and target:move(sx, sy, true) then
-							local energy = game.energy_to_act * target:combatMovementSpeed(sx, sy)
---	print("move energy required:", energy)
-							print("[moveDirection]", self.uid, self.name, "moved (shove_pressure)", target.uid, target.name, "to", sx, sy)
-							self:logCombat(target, "#Source# shoves #Target# aside.")
-							target.shove_pressure = nil
-							target._last_shove_pressure = nil
-							-- use energy from the target (first) then the shover (if needed)
-							if not force then self:useEnergy(util.bound(energy - target.energy.value, 0, energy)) end
-							target:useEnergy(math.min(energy, target.energy.value))
---	print("attempting to move", self.name, "to", l[1][1], l[1][2])
-							return self:move(l[1][1], l[1][2], force)
-						end
-					end
-					return false -- can't move target
+			if target then -- Try to shove the blocker aside before trying to swap, this way we favor the NPCs "spreading out"
+				if log_detail > 3 then print("[moveDirection]", self.uid, self.name, "attempting to shove", target.name, l[1][1], l[1][2]) end
+				local dir = util.getDir(target.x, target.y, self.x, self.y)
+				local sides = util.dirSides(dir, target.x, target.y)
+				local check_order = {}
+				if rng.percent(50) then
+					table.insert(check_order, "left")
+					table.insert(check_order, "right")
+				else
+					table.insert(check_order, "right")
+					table.insert(check_order, "left")
 				end
+				if rng.percent(50) then
+					table.insert(check_order, "hard_left")
+					table.insert(check_order, "hard_right")
+				else
+					table.insert(check_order, "hard_right")
+					table.insert(check_order, "hard_left")
+				end
+				for _, side in ipairs(check_order) do
+					local check_dir = sides[side]
+					local sx, sy = util.coordAddDir(target.x, target.y, check_dir)
+--	print("[moveDirection] checking shove target pos", check_dir, sx, sy)
+					-- move the friendly target if possible
+					if target:canMove(sx, sy) and target:move(sx, sy, true) then
+						print("[moveDirection]", self.uid, self.name, "moved (shove)", target.uid, target.name, "to", sx, sy)
+						self:logCombat(target, "#Source# shoves #Target# aside.")
+						return self:move(l[1][1], l[1][2], force)
+--	print("attempting to move", self.name, "to", l[1][1], l[1][2])
+					end
+				end
+
+				-- We failed to shove the blocker, so swap positions with them instead via the default bumpInto behavior
+				-- Since swapping only happens with a rank advantage we don't need to worry about swapping back and forth
+				return self:move(l[1][1], l[1][2], force)
 			else
 				return self:move(l[1][1], l[1][2], force)
 			end
