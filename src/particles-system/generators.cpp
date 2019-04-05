@@ -60,6 +60,14 @@ void OriginPosGenerator::generate(ParticlesData &p, uint32_t start, uint32_t end
 	}
 }
 
+void SquarePosGenerator::generate(ParticlesData &p, uint32_t start, uint32_t end) {
+	vec4* pos = p.getSlot4(POS);
+	for (uint32_t i = start; i < end; i++) {
+		pos[i].x = final_pos.x + Ensemble::rng.genrand_real(min_x, max_x);
+		pos[i].y = final_pos.y + Ensemble::rng.genrand_real(min_y, max_y);
+	}
+}
+
 void DiskPosGenerator::generate(ParticlesData &p, uint32_t start, uint32_t end) {
 	vec4* pos = p.getSlot4(POS);
 	for (uint32_t i = start; i < end; i++) {

@@ -443,6 +443,12 @@ static int p_new(lua_State *L) {
 					case GeneratorsList::OriginPosGenerator: {
 						auto g = new OriginPosGenerator(); gg = g;
 						break;}
+					case GeneratorsList::SquarePosGenerator: {
+						auto g = new SquarePosGenerator(); gg = g;
+						lua_float(L, &g->min_x, -1, "min_x", -100); lua_float(L, &g->max_x, -1, "max_x", 100);
+						lua_float(L, &g->min_y, -1, "min_y", -100); lua_float(L, &g->max_y, -1, "max_y", 100);
+						lua_vec2(L, &g->base_pos, -1, "base_point", {0, 0});
+						break;}
 					case GeneratorsList::DiskPosGenerator: {
 						auto g = new DiskPosGenerator(); gg = g;
 						lua_float(L, &g->min_angle, -1, "min_angle", 0); lua_float(L, &g->max_angle, -1, "max_angle", M_PI*2); lua_float(L, &g->radius, -1, "radius", 100);
@@ -751,6 +757,7 @@ extern "C" int luaopen_particles_system(lua_State *L) {
 	lua_pushliteral(L, "LifeGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::LifeGenerator)); lua_rawset(L, -3);
 	lua_pushliteral(L, "BasicTextureGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::BasicTextureGenerator)); lua_rawset(L, -3);
 	lua_pushliteral(L, "OriginPosGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::OriginPosGenerator)); lua_rawset(L, -3);
+	lua_pushliteral(L, "SquarePosGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::SquarePosGenerator)); lua_rawset(L, -3);
 	lua_pushliteral(L, "DiskPosGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::DiskPosGenerator)); lua_rawset(L, -3);
 	lua_pushliteral(L, "CirclePosGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::CirclePosGenerator)); lua_rawset(L, -3);
 	lua_pushliteral(L, "TrianglePosGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::TrianglePosGenerator)); lua_rawset(L, -3);

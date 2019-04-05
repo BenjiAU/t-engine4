@@ -483,6 +483,13 @@ local specific_uis = {
 		}},
 		[PC.BasicTextureGenerator] = {name="BasicTextureGenerator", category="texture", fields={}},
 		[PC.OriginPosGenerator] = {name="OriginPosGenerator", category="position", fields={}},
+		[PC.SquarePosGenerator] = {name="SquarePosGenerator", category="position", fields={
+			{type="point", id="base_point", text="Origin: ", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="number", id="min_x", text="MinX: ", min=-10000, max=10000, default=-100},
+			{type="number", id="max_x", text="MaxX: ", min=-10000, max=10000, default=-100, line=true},
+			{type="number", id="min_y", text="MinY: ", min=-10000, max=10000, default=-100},
+			{type="number", id="max_y", text="MaxY: ", min=-10000, max=10000, default=-100, line=true},
+		}},
 		[PC.DiskPosGenerator] = {name="DiskPosGenerator", category="position", fields={
 			{type="point", id="base_point", text="Origin: ", min=-10000, max=10000, default={0, 0}, line=true},
 			{type="number", id="radius", text="Radius: ", min=0, max=10000, default=150, line=true},

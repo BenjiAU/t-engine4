@@ -24,7 +24,7 @@ using namespace glm;
 enum class GeneratorsList : uint8_t {
 	LifeGenerator,
 	BasicTextureGenerator,
-	OriginPosGenerator, DiskPosGenerator, CirclePosGenerator, TrianglePosGenerator, LinePosGenerator, JaggedLinePosGenerator, ImagePosGenerator,
+	OriginPosGenerator, DiskPosGenerator, SquarePosGenerator, CirclePosGenerator, TrianglePosGenerator, LinePosGenerator, JaggedLinePosGenerator, ImagePosGenerator,
 	DiskVelGenerator, DirectionVelGenerator,
 	BasicSizeGenerator, StartStopSizeGenerator,
 	BasicRotationGenerator, RotationByVelGenerator, BasicRotationVelGenerator, SwapPosByVelGenerator,
@@ -91,6 +91,14 @@ public:
 	virtual void useSlots(ParticlesData &p) { p.initSlot4(POS); p.initSlot2(ORIGIN_POS); };
 	virtual void generate(ParticlesData &p, uint32_t start, uint32_t end);
 	virtual GeneratorsList getID() { return GeneratorsList::OriginPosGenerator; }
+};
+
+class SquarePosGenerator : public Generator {
+public:
+	float min_x, max_x, min_y, max_y;
+	virtual void useSlots(ParticlesData &p) { p.initSlot4(POS); };
+	virtual void generate(ParticlesData &p, uint32_t start, uint32_t end);
+	virtual GeneratorsList getID() { return GeneratorsList::SquarePosGenerator; }
 };
 
 class DiskPosGenerator : public Generator {
