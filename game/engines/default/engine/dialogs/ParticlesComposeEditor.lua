@@ -609,7 +609,7 @@ local specific_uis = {
 		}},
 		[PC.ParametrizerGenerator] = {name="ParametrizerGenerator", category="special", fields={
 			{type="string", id="name", text="Parameter name: ", default="p1", line=true},
-			{type="string", id="expr", text="Expr: ", default="rng(1, 10)"},
+			{type="string", id="expr", chars=40, text="Expr: ", default="rng(1, 10)"},
 		}},
 	},
 	updaters = {
@@ -622,8 +622,8 @@ local specific_uis = {
 			{type="number", id="repeat_over_life", text="Repeat over lifetime: ", min=0, max=10000, default=1},
 		}},
 		[PC.MathPosUpdater] = {name="MathPosUpdater", category="position & movement", fields={
-			{type="string", id="expr_x", text="Expr X: ", default="t*dx", line=true},
-			{type="string", id="expr_y", text="Expr Y: ", default="t*dy"},
+			{type="string", chars=40, id="expr_x", text="Expr X: ", default="t*dx", line=true},
+			{type="string", chars=40, id="expr_y", text="Expr Y: ", default="t*dy"},
 		}},
 		[PC.EulerPosUpdater] = {name="EulerPosUpdater", category="position & movement", fields={
 			{type="point", id="global_vel", text="X Expr: ", min=-10000, max=10000, default={0, 0}},
@@ -815,7 +815,7 @@ function _M:parametrizedBox(t)
 		else box.title_do:color(1, 1, 1, 1)
 		end
 	end
-	t.chars = 12
+	t.chars = t.chars or 12
 	if not tonumber(t.number) then
 		t.is_parametrized = true
 	end
@@ -837,7 +837,7 @@ function _M:processSpecificUI(ui, add, kind, spe, delete)
 			adds[#adds+1] = self:parametrizedBox{title=field.text, number=field.to(spe[field.id]), min=field.to(field.min), max=field.to(field.max), chars=6, on_change=function(p) spe[field.id] = field.from(p) self:regenParticle() end, fct=function()end}
 		elseif field.type == "string" then
 			if not spe[field.id] then spe[field.id] = field.default end
-			adds[#adds+1] = self:parametrizedBox{title=field.text, string=spe[field.id], chars=6, on_change=function(p) spe[field.id] = p self:regenParticle() end, fct=function()end}
+			adds[#adds+1] = self:parametrizedBox{title=field.text, string=spe[field.id], chars=field.chars, on_change=function(p) spe[field.id] = p self:regenParticle() end, fct=function()end}
 		elseif field.type == "bool" then
 			if not spe[field.id] then spe[field.id] = field.default end
 			adds[#adds+1] = Checkbox.new{font=self.dfont, title=field.text, default=field.to(spe[field.id]), on_change=function(p) spe[field.id] = field.from(p) self:regenParticle() end, fct=function()end}
