@@ -609,6 +609,11 @@ static int p_new(lua_State *L) {
 				case UpdatersList::EulerPosUpdater:
 					u = new EulerPosUpdater(lua_vec2(L, -1, "global_vel", vec2(0, 0)), lua_vec2(L, -1, "global_acc", vec2(0, 0)));
 					break;
+				case UpdatersList::MathPosUpdater: {
+					const char *expr_x_str = lua_string(L, -1, "expr_x", NULL);
+					const char *expr_y_str = lua_string(L, -1, "expr_y", NULL);
+					if (expr_x_str && expr_y_str) u = new MathPosUpdater(e, expr_x_str, expr_y_str);
+					break; }
 				case UpdatersList::EasingPosUpdater: {
 					easing_ptr easing = easing::linear;
 					const char *easing_str = lua_string(L, -1, "easing", NULL);
@@ -643,7 +648,7 @@ static int p_new(lua_State *L) {
 					lua_pushliteral(L, "Unknown particles updater"); lua_error(L);
 					break;
 			}
-			sys->addUpdater(u);
+			if (u) sys->addUpdater(u);
 			lua_pop(L, 1);
 		}
 		lua_pop(L, 1);
@@ -749,6 +754,7 @@ extern "C" int luaopen_particles_system(lua_State *L) {
 	lua_pushliteral(L, "BasicTimeUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::BasicTimeUpdater)); lua_rawset(L, -3);
 	lua_pushliteral(L, "AnimatedTextureUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::AnimatedTextureUpdater)); lua_rawset(L, -3);
 	lua_pushliteral(L, "EulerPosUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::EulerPosUpdater)); lua_rawset(L, -3);
+	lua_pushliteral(L, "MathPosUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::MathPosUpdater)); lua_rawset(L, -3);
 	lua_pushliteral(L, "EasingPosUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::EasingPosUpdater)); lua_rawset(L, -3);
 	lua_pushliteral(L, "NoisePosUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::NoisePosUpdater)); lua_rawset(L, -3);
 	lua_pushliteral(L, "LinearRotationUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::LinearRotationUpdater)); lua_rawset(L, -3);

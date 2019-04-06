@@ -100,7 +100,7 @@ local particle_speed = 1
 local particle_zoom = 1
 
 local pdef = {
---[[
+-- [[
 	parameters = { size=300.000000, },
 	{
 		max_particles = 2000, blend=PC.ShinyBlend,
@@ -356,7 +356,7 @@ local pdef = {
 		},
 	},
 --]]
--- [[
+--[[
 	parameters = { h=1020.000000, intensity=1.000000, w=1920.000000 },
 	{
 		max_particles = 800, blend=PC.ShinyBlend, type=PC.RendererPoint, compute_only=false,
@@ -376,6 +376,28 @@ local pdef = {
 			{PC.BasicTimeUpdater},
 			{PC.LinearColorUpdater, bilinear=false},
 			{PC.EulerPosUpdater, global_vel={0.000000, 0.000000}, global_acc={0.000000, 0.000000}},
+		},
+	},
+--]]
+--[[
+	{
+		max_particles = 100, blend=PC.DefaultBlend, type=PC.RendererPoint, compute_only=false,
+		texture = "/data/gfx/particle.png",
+		emitters = {
+			{PC.LinearEmitter, {
+				{PC.BasicTextureGenerator},
+				{PC.FixedColorGenerator, color_stop={1.000000, 1.000000, 1.000000, 0.000000}, color_start={1.000000, 1.000000, 1.000000, 1.000000}},
+				{PC.DiskPosGenerator, base_point={0.000000, 0.000000}, max_angle=6.283185, radius=5.000000, min_angle=0.000000},
+				{PC.BasicSizeGenerator, max_size=30.000000, min_size=10.000000},
+				{PC.LifeGenerator, min=1.000000, max=1.000000},
+				{PC.DirectionVelGenerator, min_vel=200.000000, max_vel=200.000000, from={-10000.000000, 0.000000}, min_rot=0.000000, max_rot=0.000000},
+				{PC.OriginPosGenerator},
+			}, startat=0.000000, duration=-1.000000, rate=0.030000, nb=1.000000, dormant=false },
+		},
+		updaters = {
+			{PC.BasicTimeUpdater},
+			{PC.LinearColorUpdater, bilinear=false},
+			{PC.MathPosUpdater, expr_x="t*dx", expr_y="t*dy"},
 		},
 	},
 --]]
@@ -599,9 +621,13 @@ local specific_uis = {
 			{type="number", id="lastframe", text="Last frame: ", min=0, max=10000, default=0, line=true},
 			{type="number", id="repeat_over_life", text="Repeat over lifetime: ", min=0, max=10000, default=1},
 		}},
+		[PC.MathPosUpdater] = {name="MathPosUpdater", category="position & movement", fields={
+			{type="string", id="expr_x", text="Expr X: ", default="t*dx", line=true},
+			{type="string", id="expr_y", text="Expr Y: ", default="t*dy"},
+		}},
 		[PC.EulerPosUpdater] = {name="EulerPosUpdater", category="position & movement", fields={
-			{type="point", id="global_vel", text="Global Velocity: ", min=-10000, max=10000, default={0, 0}},
-			{type="point", id="global_acc", text="Global Acceleration: ", min=-10000, max=10000, default={0, 0}},
+			{type="point", id="global_vel", text="X Expr: ", min=-10000, max=10000, default={0, 0}},
+			{type="point", id="global_acc", text="Y Expr: ", min=-10000, max=10000, default={0, 0}},
 		}},
 		[PC.EasingPosUpdater] = {name="EasingPosUpdater", category="position & movement", fields={
 			{type="select", id="easing", text="Easing method: ", list=easings, default="outQuad"},

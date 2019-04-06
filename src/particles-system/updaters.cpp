@@ -141,6 +141,33 @@ void EasingPosUpdater::update(ParticlesData &p, float dt) {
 	}
 }
 
+MathPosUpdater::MathPosUpdater(Ensemble *ee, const char *expr_x_def, const char *expr_y_def) {
+	this->ee = ee;
+	expr_x.DefineVar("t", &tmp_t);
+	expr_x.DefineVar("dx", &tmp_dx);
+	expr_x.DefineVar("dy", &tmp_dy);
+	expr_y.DefineVar("t", &tmp_t);
+	expr_y.DefineVar("dx", &tmp_dx);
+	expr_y.DefineVar("dy", &tmp_dy);
+	ee->exprs.bindEnv(expr_x, expr_x_def);
+	ee->exprs.bindEnv(expr_y, expr_y_def);
+}
+
+void MathPosUpdater::update(ParticlesData &p, float dt) {
+	vec4* pos = p.getSlot4(POS);
+	vec2* vel = p.getSlot2(VEL);
+	vec2* origin = p.getSlot2(ORIGIN_POS);
+	vec4* life = p.getSlot4(LIFE);
+	for (uint32_t i = 0; i < p.count; i++) {
+		vec2 dist = vel[i] * life[i].y;
+		tmp_t = life[i].z;
+		tmp_dx = dist.x;
+		tmp_dy = dist.y;
+		pos[i].x = origin[i].x + ee->exprs.eval(expr_x);
+		pos[i].y = origin[i].y + ee->exprs.eval(expr_y);
+	}
+}
+
 void NoisePosUpdater::update(ParticlesData &p, float dt) {
 	vec4* pos = p.getSlot4(POS);
 	vec4* life = p.getSlot4(LIFE);
