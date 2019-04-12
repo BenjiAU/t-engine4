@@ -131,7 +131,7 @@ newTalent{
 	no_energy = true,
 	tactical = { DEFEND = 2 },
 	getShield = function(self, t) return 40 + self:combatTalentSpellDamage(t, 5, 500) / 10 end,
-	getDisruption = function(self, t) return self:combatTalentSpellDamage(t, 10, 20) end,
+	getDisruption = function(self, t) return 20 + self:combatTalentSpellDamage(t, 1, 10) end,
 	getNumEffects = function(self, t) return math.max(1,math.floor(self:combatTalentScale(t, 3, 7, "log"))) end,
 	on_pre_use = function(self, t)
 		for eff_id, p in pairs(self.tmp) do

@@ -103,7 +103,7 @@ newTalent{
 	points = 5,
 	getChance = function(self, t) return self:getTalentLevelRaw(t) * 10 end,
 	info = function(self, t)
-		return ([[When your Burning Wake talent is active, your Inferno and Burning Wake effects have a %d%% chance, each turn, to remove a status effect (physical, magical, curse or hex) from the targets.
+		return ([[When your Burning Wake talent is active, your Inferno and Burning Wake effects have a %d%% chance, each turn, to remove a status effect (physical or magical) from the targets.
 		If the target is hostile, it will remove a beneficial effect.
 		If the target is friendly, it will remove a detrimental effect (but still burn).]]):format(t.getChance(self, t))
 	end,

@@ -98,7 +98,7 @@ newTalent{
 		local speed = t.getPassiveSpeed(self, t)
 		return ([[Unleash raw, chaotic elemental damage upon your enemy.
 		You strike your enemy for %d%% weapon damage in one of blinding sand, disarming acid, freezing and slowing ice, dazing lightning or stunning flames, with equal odds.
-		Additionally, you will cause a burst that deals %0.2f of that damage to enemies in radius %d, regardless of if you hit with the blow.
+		Additionally, you will cause a burst that deals %0.2f of that damage to creatures in radius %d, regardless of if you hit with the blow.
 		Levels in Prismatic Slash increase your Physical and Mental attack speeds by %d%%.
 
 		This talent will also attack with your shield, if you have one equipped.]]):format(100 * self:combatTalentWeaponDamage(t, 1.2, 2.0), burstdamage, radius, 100*speed)

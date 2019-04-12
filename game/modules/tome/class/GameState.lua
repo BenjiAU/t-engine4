@@ -2088,6 +2088,10 @@ function _M:applyRandomClass(b, data, instant)
 						end
 						b[#b+1] = resolver
 					end
+				elseif resolver.__resolver == "auto_equip_filters" then
+					if not data.forbid_equip then
+						b[#b+1] = resolver
+					end
 				elseif resolver._allow_random_boss then -- explicitly allowed resolver
 					b[#b+1] = resolver
 				end

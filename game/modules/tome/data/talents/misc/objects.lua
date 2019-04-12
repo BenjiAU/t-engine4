@@ -236,7 +236,7 @@ newTalent{
 		return p
 	end,
 	callbackOnAct = function(self, eff)
-		if not self:knowTalent(self.T_ETERNAL_GUARD) and self:hasEffect(self.EFF_BLOCKING) and self:hasEffect(self.EFF_BLOCKING).from_block then self:removeEffect(self.EFF_BLOCKING) end
+		if not self:knowTalent(self.T_ETERNAL_GUARD) and self:hasEffect(self.EFF_BLOCKING) and self:hasEffect(self.EFF_BLOCKING).from_block and self:hasEffect(self.EFF_BLOCKING).did_block then self:removeEffect(self.EFF_BLOCKING) end
 	end,
 	getBlockValue = function(self, t) return self:combatShieldBlock() or 0 end,
 	getBlockedTypes = function(self, t)
@@ -301,9 +301,9 @@ newTalent{
 			br_text = " All blocked damage heals the wielder."
 		end
 		local bt, bt_string = t.getBlockedTypes(self, t)
-		return ([[Raise your shield into blocking position for 2 turns or until the start of your next turn, reducing all non-Mind damage by %d. If you block all of an attack's damage, the attacker will be vulnerable to a deadly counterstrike (the next weapon attack will instead deal 200%% damage) for one turn.
+		return ([[Raise your shield into blocking position for 2 turns reducing all non-Mind damage by %d. If you block all of an attack's damage, the attacker will be vulnerable to a deadly counterstrike (the next weapon attack will instead deal 200%% damage) for one turn.
 			Counterstrike can normally only effect one enemy per block.
-			
+			If any damage was successfully blocked this effect will be removed at the start of your turn.
 			If the shield has damage resistance to the blocked damage type the block value is increased by 50%%.
 			
 			Current Bonuses:  %s%s%s%s]]):

@@ -49,7 +49,7 @@ newTalent{
 	range = 7,
 	getSpeed = function(self, t) return self:combatTalentScale(t, 100, 200, "log")/(1 + 2*self:combatFatigue()/100) end,
 	getNb = function(self, t) return math.floor(self:combatTalentScale(t, 1, 3)) end,
-	tactical = { ESCAPE = 2, AMMO = 0.5 },
+	tactical = { ESCAPE = 2},
 	requires_target = true,
 	on_pre_use = function(self, t, silent, fake)
 		if self:attr("never_move") or self:attr("encased_in_ice") then

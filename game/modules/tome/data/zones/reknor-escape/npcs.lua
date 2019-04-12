@@ -78,7 +78,13 @@ newEntity{ define_as = "BROTOQ",
 
 	-- Remove free melee; poor brotoq
 	forbid_corrupted_strength_blow = 0,
-
+	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
+	on_added_to_level = function(self)
+		if self.level <= 16 then
+			self.ai_tactic.escape = 0
+		end
+	end,
+	
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("start-dwarf", engine.Quest.COMPLETED, "brotoq")
 	end,

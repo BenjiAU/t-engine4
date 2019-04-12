@@ -78,7 +78,7 @@ newEntity{
 			local tg = self.use_power.target(self, who)
 			local x, y = who:getTarget(tg)
 			if not x or not y then return nil end
-			local dam = {dam = who:mindCrit(self.use_power.damage(self, who)), heal_factor = 0.5, dur = 7}
+			local dam = {dam = who:mindCrit(self.use_power.damage(self, who)), heal_factor = 50, dur = 7}
 			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
 			who:project(tg, x, y, engine.DamageType.INSIDIOUS_POISON, dam, {type="slime"})
 			return {id=true, used=true}

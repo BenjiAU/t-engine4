@@ -146,7 +146,7 @@ end
 countHounds = function(self)
 	local hounds = 0
 	for _, e in pairs(game.level.entities) do
-		if e and e.summoner and e.summoner == self and e.name == "temporal hound" and game.party:hasMember(e) then 
+		if e and e.summoner and e.summoner == self and e.name == "temporal hound" then 
 			hounds = hounds + 1 
 		end
 	end

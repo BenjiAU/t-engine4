@@ -1470,18 +1470,23 @@ newEffect{
 	desc = "Crushing Hold",
 	long_desc = function(self, eff) return ("The target is being crushed and suffers %d damage each turn"):format(eff.power) end,
 	type = "physical",
-	subtype = { grapple=true },
+	subtype = { grapple=true, pin=true },
 	status = "detrimental",
 	parameters = { power=1 },
 	on_gain = function(self, err) return "#Target# is being crushed.", "+Crushing Hold" end,
 	on_lose = function(self, err) return "#Target# has escaped the crushing hold.", "-Crushing Hold" end,
 	on_timeout = function(self, eff)
-		local p = self:hasEffect(self.EFF_GRAPPLED)
-		if core.fov.distance(self.x, self.y, eff.src.x, eff.src.y) > 1 or eff.src.dead or not game.level:hasEntity(eff.src) or not (p and p.src == eff.src) then
+		if core.fov.distance(self.x, self.y, eff.src.x, eff.src.y) > 1 or eff.src.dead or not game.level:hasEntity(eff.src) then
 			self:removeEffect(self.EFF_CRUSHING_HOLD)
+		elseif eff.damtype then
+			local type = eff.damtype
+			DamageType:get(DamageType[type]).projector(eff.src or self, self.x, self.y, DamageType[type], eff.power)
 		else
 			DamageType:get(DamageType.PHYSICAL).projector(eff.src or self, self.x, self.y, DamageType.PHYSICAL, eff.power)
 		end
+	end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "never_move", 1)
 	end,
 }
 
@@ -1490,14 +1495,13 @@ newEffect{
 	desc = "Strangle Hold",
 	long_desc = function(self, eff) return ("The target is being strangled and may not cast spells and suffers %d damage each turn."):format(eff.power) end,
 	type = "physical",
-	subtype = { grapple=true, silence=true },
+	subtype = { grapple=true, pin=true, silence=true },
 	status = "detrimental",
 	parameters = { power=1 },
 	on_gain = function(self, err) return "#Target# is being strangled.", "+Strangle Hold" end,
 	on_lose = function(self, err) return "#Target# has escaped the strangle hold.", "-Strangle Hold" end,
 	on_timeout = function(self, eff)
-		local p = self:hasEffect(self.EFF_GRAPPLED)
-		if core.fov.distance(self.x, self.y, eff.src.x, eff.src.y) > 1 or eff.src.dead or not game.level:hasEntity(eff.src) or not (p and p.src == eff.src) then
+		if core.fov.distance(self.x, self.y, eff.src.x, eff.src.y) > 1 or eff.src.dead or not game.level:hasEntity(eff.src) then
 			self:removeEffect(self.EFF_STRANGLE_HOLD)
 		elseif eff.damtype then
 			local type = eff.damtype
@@ -1507,10 +1511,10 @@ newEffect{
 		end
 	end,
 	activate = function(self, eff)
-		eff.tmpid = self:addTemporaryValue("silence", 1)
+		self:effectTemporaryValue(eff, "silence", 1)
+		self:effectTemporaryValue(eff, "never_move", 1)
 	end,
 	deactivate = function(self, eff)
-		self:removeTemporaryValue("silence", eff.tmpid)
 	end,
 }
 
@@ -2331,21 +2335,17 @@ newEffect{
 				eff.properties.on_cs(self, eff, dam, type, src)
 			end
 		end
-
+		eff.did_block = true
 		self:fireTalentCheck("callbackOnBlock", eff, dam, type, src)
 
 		return amt
 	end,
 	activate = function(self, eff)
 		eff.tmpid = self:addTemporaryValue("block", eff.power)
-		eff.def = self:addTemporaryValue("combat_def", -eff.power)
-		eff.ctdef = self:addTemporaryValue("combat_def_ct", eff.power)
 		if eff.properties.sp then eff.spell = self:addTemporaryValue("combat_spellresist", eff.power) end
 	end,
 	deactivate = function(self, eff)
 		self:removeTemporaryValue("block", eff.tmpid)
-		self:removeTemporaryValue("combat_def", eff.def)
-		self:removeTemporaryValue("combat_def_ct", eff.ctdef)
 		if eff.properties.sp then self:removeTemporaryValue("combat_spellresist", eff.spell) end
 	end,
 }
@@ -3295,7 +3295,7 @@ newEffect{
 			end
 			if dam > 0 and eff.leeching > 0 then
 				local src = eff.src.resolveSource and eff.src:resolveSource()
-				if src then src:heal(dam*eff.leeching/100, self) end
+				if src then src:heal(dam*eff.leeching/100, eff) end
 			end
 		end
 	end,
@@ -3909,7 +3909,7 @@ newEffect{
 	-- Damage each turn
 	on_timeout = function(self, eff)
 		if self:attr("purify_poison") then 
-			self:heal(eff.power, eff.src)
+			self:heal(eff.power, eff)
 		else 
 			local dam = DamageType:get(DamageType.NATURE).projector(eff.src, self.x, self.y, DamageType.NATURE, eff.power)
 			local src = eff.src.resolveSource and eff.src:resolveSource()

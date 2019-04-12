@@ -130,8 +130,7 @@ newTalent{
 	type = {"spell/fire",3},
 	require = spells_req3,
 	points = 5,
-	random_ego = "attack",
-	mana = 40,
+	mana = 20,
 	cooldown = 8,
 	tactical = { ATTACKAREA = { FIRE = 2 } },
 	range = 7,
@@ -142,7 +141,7 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=self:spellFriendlyFire(), talent=t, display={particle="bolt_fire", particle_args={size_factor=1.5}, trail="firetrail"}, sound_stop="talents/fireflash"}
 	end,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 28, 280) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 28, 330) end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
@@ -177,7 +176,6 @@ newTalent{
 	type = {"spell/fire",4},
 	require = spells_req4,
 	points = 5,
-	random_ego = "attack",
 	mana = 100,
 	cooldown = 30,
 	tactical = { ATTACKAREA = { FIRE = 3 } },

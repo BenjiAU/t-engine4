@@ -25,7 +25,7 @@ newTalent{
 	points = 5,
 	cooldown = 15,
 	getHealValues = function(self, t)
-		return 5+self:combatTalentStatDamage(t, "con", 1, 200)
+		return self:combatTalentStatDamage(t, "con", 1, 200)
 	end,
 	getWoundReduction = function(self, t) return self:combatTalentLimit(t, 0.6, 0.17, 0.5) end, -- Limit <60%%
 	getDuration = function(self, t) return 8 end,

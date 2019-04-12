@@ -177,6 +177,7 @@ function _M:generateList()
 	list[#list+1] = {name="Weakdamage", action="weakdamage"}
 	list[#list+1] = {name="Spawn Event", dialog="SpawnEvent"}
 	list[#list+1] = {name="Endgamify", class="Endgamify"}
+	list[#list+1] = {name="Reload/regenerate Zone and level", class="ReloadZone"}
 	list[#list+1] = {name="Automatically Clear Zones", class="AdvanceZones"}
 	list[#list+1] = {name="Particles Editor", action="particles-editor"}
 	self:triggerHook{"DebugMain:generate", menu=list}

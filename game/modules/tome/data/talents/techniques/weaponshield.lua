@@ -194,13 +194,8 @@ newTalent{
 	sustain_stamina = 30,
 	tactical = { DEFEND = 2 },
 	on_pre_use = function(self, t, silent) if not self:hasShield() then if not silent then game.logPlayer(self, "You require a weapon and a shield to use this talent.") end return false end return true end,
-	getDefense = function(self, t)
-		return t.getDexArmor(self, t) + t.getExpertiseArmor(self,t)
-	end,
-	getExpertiseArmor = function(self, t) return self:combatTalentScale(self:getTalentLevel(self.T_SHIELD_EXPERTISE), 1, 5, 0.5) end,
-	getDexArmor = function(self, t) return self:combatTalentStatDamage(t, "dex", 6, 20) end,
-	getArmor = function(self,t) return t.getDexArmor(self, t) + t.getExpertiseArmor(self,t) end, -- Scale separately with talent level and talent level of Shield Expertise
-	getBlock = function(self, t) return self:combatTalentStatDamage(t, "str", 40, 150) end,
+	getArmor = function(self,t) return self:combatTalentStatDamage(t, "str", 6, 40) + self:combatTalentStatDamage(t, "dex", 6, 40) end,
+	getBlock = function(self, t) return self:combatTalentStatDamage(t, "str", 20, 75) + self:combatTalentStatDamage(t, "dex", 20, 75) end,
 	stunKBresist = function(self, t) return self:combatTalentLimit(t, 1, 0.15, 0.50) end, -- Limit <100%
 	activate = function(self, t)
 		local shield = self:hasShield()
@@ -211,10 +206,9 @@ newTalent{
 		local ret = {
 			stun = self:addTemporaryValue("stun_immune", t.stunKBresist(self, t)),
 			knock = self:addTemporaryValue("knockback_immune", t.stunKBresist(self, t)),
-			def = self:addTemporaryValue("combat_def", t.getDefense(self, t)),
 			armor = self:addTemporaryValue("combat_armor", t.getArmor(self,t)),
 			block = self:addTemporaryValue("block_bonus", t.getBlock(self,t)),
-
+			block_cd = self:addTemporaryValue("talent_cd_reduction", {[self.T_BLOCK] = 2}),
 		}
 		if core.shader.active(4) then
 			self:talentParticles(ret, {type="shader_shield", args={toback=true,  size_factor=1, img="rotating_shield"}, shader={type="rotatingshield", noup=2.0, appearTime=0.2}})
@@ -223,17 +217,19 @@ newTalent{
 		return ret
 	end,
 	deactivate = function(self, t, p)
-		self:removeTemporaryValue("combat_def", p.def)
 		self:removeTemporaryValue("combat_armor", p.armor)
 		self:removeTemporaryValue("stun_immune", p.stun)
 		self:removeTemporaryValue("knockback_immune", p.knock)
 		self:removeTemporaryValue("block_bonus", p.block)
+		self:removeTemporaryValue("talent_cd_reduction", p.block_cd)
 		return true
 	end,
 	info = function(self, t)
-		return ([[Enter a protective battle stance, increasing Defense by %d, Armour by %d, and Block value by %d. The Defense and Armor increase is based on your Dexterity, the Block on your Strength.
-		It also grants %d%% resistance to stunning and knockback.]]):
-		format(t.getDefense(self, t), t.getArmor(self, t), t.getBlock(self, t), 100*t.stunKBresist(self, t))
+		return ([[Enter a protective battle stance allowing you to defend yourself more proficiently while using a shield.
+		Increases Armour by %d, Block value by %d, and reduces Block cooldown by 2.
+		Increases stun and knockback resistance by %d%%.
+		The Armor and Block bonuses increase equally with your Dexterity and Strength.]]):
+		format(t.getArmor(self, t), t.getBlock(self, t), 100*t.stunKBresist(self, t))
 	end,
 }
 
@@ -302,7 +298,7 @@ newTalent{
 		self:talentTemporaryValue(p, "combat_spellresist", t.getSpell(self, t))
 	end,
 	info = function(self, t)
-		return ([[Improves your damage and defense with shield-based skills, and increases your Spell (+%d) and Physical (+%d) Saves.]]):format(t.getSpell(self, t), t.getPhysical(self, t))
+		return ([[Improves your damage with shield-based skills, and increases your Spell (+%d) and Physical (+%d) Saves.]]):format(t.getSpell(self, t), t.getPhysical(self, t))
 	end,
 }
 

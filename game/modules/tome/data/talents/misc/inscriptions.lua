@@ -128,7 +128,7 @@ newInscription{
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[heal %d; %d cd]]):format(data.heal + data.inc_stat, data.cooldown)
+		return ([[heal %d; cd %d]]):format(data.heal + data.inc_stat, data.cooldown)
 	end,
 }
 
@@ -173,7 +173,7 @@ Also removes cross-tier effects of the affected types for free.]]):format(what, 
 	short_info = function(self, t)	
 		local data = self:getInscriptionData(t.short_name)
 		local what = table.concat(table.keys(data.what), ", ")
-		return ([[resist %d%%; cure %s; cd %d; dur %d]]):format(data.power + data.inc_stat, what, data.cooldown, data.dur)
+		return ([[res %d%%; %s; dur %d; cd %d]]):format(data.power + data.inc_stat, what, data.dur, data.cooldown)
 	end,
 }
 
@@ -195,7 +195,7 @@ newInscription{
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[affinity %d%%; reduction %d]]):format(data.power + data.inc_stat*10, data.reduce + data.inc_stat)
+		return ([[affinity %d%%; reduction %d; dur %d; cd %d]]):format(data.power + data.inc_stat*10, data.reduce + data.inc_stat, data.dur, data.cooldown )
 	end,
 }
 
@@ -220,7 +220,7 @@ newInscription{
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[%d%% speed; %d cd]]):format(data.speed + data.inc_stat, data.cooldown)
+		return ([[speed %d; cd %d]]):format(data.speed + data.inc_stat, data.cooldown)
 	end,
 }
 
@@ -248,7 +248,7 @@ newInscription{
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[%d turns; die at -%d; %d cd]]):format(data.dur, data.die_at + data.inc_stat * 30, data.cooldown)
+		return ([[die at -%d; dur %d; cd %d]]):format(data.die_at + data.inc_stat * 30, data.dur, data.cooldown)
 	end,
 }
 
@@ -285,7 +285,7 @@ newInscription{
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[Rad %d for %d turns]]):format(self:getTalentRadius(t), data.dur)
+		return ([[rad %d; dur %d;]]):format(self:getTalentRadius(t), data.dur)
 	end,
 }
 
@@ -321,7 +321,7 @@ newInscription{
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[range %d]]):format(data.range + data.inc_stat)
+		return ([[range %d; cd %d]]):format(data.range + data.inc_stat, data.cooldown)
 	end,
 }
 
@@ -343,11 +343,11 @@ newInscription{
 	end,
 	info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[Activate the rune to create a protective shield absorbing at most %d damage for %d turns.]]):format(data.power + data.inc_stat, data.dur)
+		return ([[Activate the rune to create a protective shield absorbing at most %d damage for %d turns.]]):format((data.power + data.inc_stat) * (100 + (self:attr("shield_factor") or 0)) / 100, data.dur)
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[absorb %d; %d turns; %d cd]]):format(data.power + data.inc_stat, data.dur, data.cooldown)
+		return ([[absorb %d; dur %d; cd %d]]):format((data.power + data.inc_stat) * (100 + (self:attr("shield_factor") or 0)) / 100, data.dur, data.cooldown)
 	end,
 }
 
@@ -379,7 +379,7 @@ newInscription{
 		local data = self:getInscriptionData(t.short_name)
 		local power = 100+5*self:getMag()
 		if data.power and data.inc_stat then power = data.power + data.inc_stat end
-		return ([[absorb and reflect %d; %d turns]]):format(power, data.dur or 5)
+		return ([[absorb and reflect %d; dur %d; cd %d]]):format(power, data.dur or 5, data.cd)
 	end,
 }
 
@@ -427,7 +427,7 @@ newInscription{
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[%d damage; %d turns]]):format(damDesc(self, DamageType.COLD, data.power + data.inc_stat), data.dur)
+		return ([[damage %d; dur %d; cd %d]]):format(damDesc(self, DamageType.COLD, data.power + data.inc_stat), data.dur, data.cooldown)
 	end,
 }
 
@@ -480,11 +480,12 @@ newInscription{
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		local pow = data.power
-		return ([[%d damage; %d turns]]):format(damDesc(self, DamageType.ACID, data.power + data.inc_stat), data.dur or 3)
+		return ([[damage %d; dur %d; cd %d]]):format(damDesc(self, DamageType.ACID, data.power + data.inc_stat), data.dur or 3, data.cooldown)
 	end,
 }
 
 -- Incredibly specific to one resource top, a generalization applying to the other arcane resources is worth considering
+-- This serves as one of the primary counters to mana drain effects since it lets you recover from hitting 0
 newInscription{
 	name = "Rune: Manasurge",
 	type = {"inscriptions/runes", 1},
@@ -521,7 +522,7 @@ newInscription{
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[%d%% regen over %d turns; %d instant mana]]):format(data.mana + data.inc_stat, data.dur, (data.mana + data.inc_stat) / 20)
+		return ([[regen %d%% over %d turns; mana %d; cd %d]]):format(data.mana + data.inc_stat, data.dur, (data.mana + data.inc_stat) / 20, data.cooldown)
 	end,
 }
 
@@ -672,7 +673,7 @@ newInscription{
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		local power = data.power + data.inc_stat * 3
-		return ([[range %d; power %d; cd %d]]):format(self:getTalentRange(t), power, data.cooldown )
+		return ([[range %d; phase %d; cd %d]]):format(self:getTalentRange(t), power, data.cooldown )
 	end,
 }
 
@@ -714,7 +715,8 @@ newInscription{
 			format(t.getDur(self, t),t.getReduction(self, t) * 100, t.getResistance(self, t), t.getMove(self, t), t.getPower(self, t))
 	end,
 	short_info = function(self, t)
-		return ([[power %d; resist %d%%; move %d%%; %d turns]]):format(t.getPower(self, t), t.getResistance(self, t), t.getMove(self, t), t.getDur(self, t))
+		local data = self:getInscriptionData(t.short_name)
+		return ([[power %d; resist %d%%; move %d%%; dur %d; cd %d]]):format(t.getPower(self, t), t.getResistance(self, t), t.getMove(self, t), t.getDur(self, t), data.cooldown)
 	end,
 }
 
@@ -752,7 +754,8 @@ newInscription{
 				:format(t.getDur(self, t), t.getThreshold(self, t), t.getBlocks(self, t) )
 	end,
 	short_info = function(self, t)
-		return ([[threshold %d; blocks %d; %d turns]]):format(t.getThreshold(self, t), t.getBlocks(self, t), t.getDur(self, t) )
+		local data = self:getInscriptionData(t.short_name)
+		return ([[threshold %d; blocks %d; dur %d; cd %d]]):format(t.getThreshold(self, t), t.getBlocks(self, t), t.getDur(self, t), data.cooldown  )
 	end,
 }
 
@@ -891,7 +894,8 @@ newInscription{
 				:format(t.getInheritance(self, t)*100 )
 	end,
 	short_info = function(self, t)
-		return ([[%d turns]]):format(t.getDur(self, t))
+		local data = self:getInscriptionData(t.short_name)
+		return ([[dur %d; cd %d]]):format(t.getDur(self, t), data.cooldown)
 	end
 }
 
@@ -931,11 +935,11 @@ newInscription{
 	end,
 	info = function(self, t)
 		return ([[Activate the rune to instantly dissipate the energy of your ailments, cleansing all cross tier effects and 1 physical, mental, and magical effect.
-				You use the dissipated energy to create a shield lasting 3 turns and blocking %d damage per debuff cleansed.]]):format(t.getShield(self, t))
+				You use the dissipated energy to create a shield lasting 3 turns and blocking %d damage per debuff cleansed.]]):format(t.getShield(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100)
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[cooldown %d; absorb %d ]]):format(data.cooldown, data.shield + data.inc_stat)
+		return ([[absorb %d; cd %d]]):format(t.getShield(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100, data.cooldown)
 	end,
 }
 
@@ -954,14 +958,14 @@ newInscription{
 		if not (x and y) or not target or not self:canProject(tg, x, y) then return nil end
 
 		if self:reactionToward(target) < 0 then
-			target:removeEffectsSustainsFilter(function(o)
+			target:removeSustainsFilter(function(o)
 				if o.type == "magical" or o.is_spell then
 					if o.status and o.status == "detrimental" then return false end
 					return true
 				end
 				return false
 			end,
-			999)
+			4)
 		else
 			target:removeEffectsFilter({type="magical", status="detrimental"}, 999)
 		end
@@ -971,7 +975,7 @@ newInscription{
 	end,
 	info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[Activate the rune to remove all beneficial magical effects and sustains from an enemy target or all magical debuffs from you.]]):
+		return ([[Activate the rune to remove 4 beneficial magical sustains from an enemy target or all magical debuffs from you.]]):
 		format()
 	end,
 	short_info = function(self, t)

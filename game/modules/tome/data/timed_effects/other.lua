@@ -2672,7 +2672,7 @@ newEffect{
 	parameters = { },
 	activate = function(self, eff)
 		if not self.ai_state then return end
-		self:effectTemporaryValue(eff, {"ai_state","ai_move"}, "move_astar")
+		if self.ai_state and self.ai_state.ai_move and self.ai_state.ai_move ~= "move_astar_advanced" then self:effectTemporaryValue(eff, {"ai_state","ai_move"}, "move_astar") end  -- Not sure if theres a performance issue with giving everything astar_advanced so just make sure we don't overwrite it
 		self:setTarget(eff.src)
 	end,
 }
@@ -3498,7 +3498,7 @@ newEffect{
 	type = "other", --extending this would be very bad
 	subtype = {  },
 	status = "detrimental",
-	parameters = { dur=4, dam=10, power=20, radius=1, combo=1 },
+	parameters = { dur=4, dam=10, radius=1, combo=1 },
 	on_gain = function(self, err) return "#Target# is mortally wounded!", "+Touch of Death!" end,
 	on_lose = function(self, err) return "#Target# overcomes the touch of death.", "-Touch of Death" end,
 	activate = function(self, eff)
@@ -3514,8 +3514,8 @@ newEffect{
 		eff.src:buildCombo()
 		eff.src:buildCombo()
 		eff.src:buildCombo()
-		local tg = {type="ball", radius=eff.radius, selffire=false, x=self.x, y=self.y}
-		local dam = self.max_life * eff.power / self.rank
+		local tg = {type="ball", radius=eff.radius, selffire=false, friendlyfire=false, x=self.x, y=self.y}
+		local dam = eff.dam
 		eff.src:project(tg, self.x, self.y, DamageType.PHYSICAL, dam, {type="bones"})
 		game.logSeen(eff.src, "#LIGHT_RED#%s explodes into a shower of gore!", self.name:capitalize())
 		self:removeEffect(self.EFF_TOUCH_OF_DEATH)

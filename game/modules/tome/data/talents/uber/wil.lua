@@ -140,8 +140,7 @@ uberTalent{
 		Lava is created in radius 3 around the impact dealing %0.2f fire damage per turn for 8 turns.  This will overwrite tiles that already have modified terrain.
 		You and your allies take no damage from either effect.
 
-		Additionally, your fire damage and penetration will now use your highest type if that value would be greater.
-		
+		Additionally, your fire damage bonus and resistance penetration is set to your current highest damage bonus and resistance penetration. This applies to all fire damage you deal.
 		The damage scales with your Spellpower or Mindpower.]])
 		:format(damDesc(self, DamageType.FIRE, dam), damDesc(self, DamageType.PHYSICAL, dam), damDesc(self, DamageType.FIRE, t.getLava(self, t)))
 	end,

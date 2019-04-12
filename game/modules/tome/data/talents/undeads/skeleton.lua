@@ -52,7 +52,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Creates a shield of bones, absorbing %d damage. Lasts for 10 turns.
 		The total damage the shield can absorb increases with your Dexterity.]]):
-		format(t.getShield(self, t))
+		format(t.getShield(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100)
 	end,
 }
 

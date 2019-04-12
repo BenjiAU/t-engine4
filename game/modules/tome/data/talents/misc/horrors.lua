@@ -528,7 +528,7 @@ newTalent{
 	requires_target = true,
 	target = function(self, t) return {type="bolt", range=self:getTalentRange(t), talent=t} end,
 	getDamage = function(self, t) return self:combatTalentMindDamage(t, 5, 70) end,
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 3, 7)) end,
+	getDuration = function(self, t) return 5 end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
@@ -537,7 +537,6 @@ newTalent{
 		local crit = self:mindCrit(1)
 
 		if target:canBe("pin") and self:checkHit(self:combatMindpower(), target:combatPhysicalResist()) then
-			target:setEffect(target.EFF_GRAPPLED, t.getDuration(self, t), {src=self, power=t.getDamage(self, t)/2 * crit})
 			self:project(tg, x, y, function(px, py)
 
 				target:pull(self.x, self.y, tg.range)
@@ -558,7 +557,7 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local duration = t.getDuration(self, t)
-		return ([[Grab a target and drag it to your side, holding it down and strangling it for %d turns.
+		return ([[Grab a target and drag it to your side, holding it in place and silencing non-undead and creatures that need to breathe for %d turns.
 		The grab will also deal %0.2f slime damage per turn.
 		The damage will increase with your Mindpower.]]):
 		format(duration, damDesc(self, DamageType.SLIME, damage))

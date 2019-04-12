@@ -144,7 +144,6 @@ newEntity{ base = "BASE_NPC_THIEF", define_as = "THIEF_ASSASSIN",
 	combat_armor = 3, combat_def = 10,
 	resolvers.talents{
 		[Talents.T_STEALTH]={base=3, every=6, max=7},
-		[Talents.T_EXPOSE_WEAKNESS]={base=3, every=6, max=7},
 		[Talents.T_DUAL_WEAPON_MASTERY]={base=2, every=6, max=6},
 		[Talents.T_TEMPO]={base=2, every=6, max=6},
 		[Talents.T_DUAL_STRIKE]={base=1, every=6, max=6},

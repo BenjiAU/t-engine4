@@ -84,14 +84,17 @@ newBirthDescriptor{
 	},
 	copy = {
 		resolvers.auto_equip_filters{
-			MAINHAND = {type="weapon", special=function(e, filter) -- allow any weapon that doesn't forbid OFFHAND
-				if e.slot_forbid == "OFFHAND" then
-					local who = filter._equipping_entity
-					return who and not who:slotForbidCheck(e, who.INVEN_MAINHAND)
-				end
-				return true
+			MAINHAND = {type="weapon", not_properties={"twohanded"}, special=function(e, filter) -- Allow standard 1H strength weapons and 1H staves, not currently working with ogre
+				local who = filter._equipping_entity
+				if who and e.subtype and (e.subtype == "staff" or e.subtype == "waraxe" or e.subtype == "longsword" or e.subtype == "mace") then return true end
 			end},
-			OFFHAND = {type="weapon", not_properties={"twohanded"}}
+			OFFHAND = {type="weapon", not_properties={"twohanded"}, special=function(e, filter)
+				local who = filter._equipping_entity
+				if who then
+					local mh = who:getInven(who.INVEN_MAINHAND) mh = mh and mh[1]
+					if mh and (not mh.slot_forbid or not who:slotForbidCheck(e, who.INVEN_MAINHAND)) and e.subtype and (e.subtype == "staff" or e.subtype == "waraxe" or e.subtype == "longsword" or e.subtype == "mace") then return true end
+				end
+			end},
 		},
 		resolvers.equipbirth{ id=true,
 			{type="weapon", subtype="waraxe", name="iron waraxe", autoreq=true, ego_chance=-1000},

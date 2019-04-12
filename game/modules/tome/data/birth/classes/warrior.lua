@@ -312,12 +312,22 @@ newBirthDescriptor{
 	},
 	copy = {
 		max_life = 100,
---		talent_cd_reduction={[ActorTalents.T_FLAME]=-3, [ActorTalents.T_LIGHTNING]=-3, [ActorTalents.T_EARTHEN_MISSILES]=-3, },
+		resolvers.auto_equip_filters{
+			MAINHAND = {type="weapon", properties={"twohanded"}},
+			OFFHAND = {special=function(e, filter) -- only allow if there is already a weapon in MAINHAND
+				local who = filter._equipping_entity
+				if who then
+					local mh = who:getInven(who.INVEN_MAINHAND) mh = mh and mh[1]
+					if mh and (not mh.slot_forbid or not who:slotForbidCheck(e, who.INVEN_MAINHAND)) then return true end
+				end
+				return false
+			end},
+		},		
 		resolvers.equipbirth{ id=true,
 			{type="weapon", subtype="greatsword", name="iron greatsword", autoreq=true, ego_chance=-1000, ego_chance=-1000},
 			{type="armor", subtype="light", name="rough leather armour", autoreq=true, ego_chance=-1000, ego_chance=-1000},
 		},
-		resolvers.inscription("RUNE:_MANASURGE", {cooldown=25, dur=10, mana=620}),
+		resolvers.inscription("RUNE:_MANASURGE", {cooldown=25, dur=10, mana=620}, 3),
 	},
 	copy_add = {
 		life_rating = 2,

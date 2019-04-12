@@ -164,7 +164,7 @@ newTalent{
 	require = spells_req4,
 	mode = "sustained",
 	cooldown = 40,
-	sustain_mana = 250,
+	sustain_mana = 150,
 	points = 5,
 	proj_speed = 2.4,
 	range = 6,
@@ -186,7 +186,6 @@ newTalent{
 	getFireDamageOnHit = function(self, t) return self:combatTalentSpellDamage(t, 5, 25) end,
 	getResistance = function(self, t) return self:combatTalentSpellDamage(t, 5, 45) end,
 	getFireDamageInSight = function(self, t) return self:combatTalentSpellDamage(t, 15, 70) end,
-	drain_mana = function(self, t) return self:combatTalentScale(t, 0.15, 0.5) end,
 	target = function(self, t) return {type="ball", radius=self:getTalentRange(t), range=0, talent=t, friendlyblock=false, friendlyfire=false} end, -- for AI (gets all targets)
 	oneTarget = function(self, t) return {type="bolt", range=self:getTalentRange(t), talent=t, display={particle="bolt_fire"}, friendlyblock=false, friendlyfire=false} end, -- only hits one target
 	getNumber = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5, "log")) end,
@@ -236,11 +235,9 @@ newTalent{
 		local onhitdam = t.getFireDamageOnHit(self, t)
 		local insightdam = t.getFireDamageInSight(self, t)
 		local res = t.getResistance(self, t)
-		local manadrain = t.drain_mana(self, t)
 		return ([[Turn your body into pure flame, increasing your fire resistance by %d%%, burning any creatures striking you in melee for %0.2f fire damage, and randomly launching up to %d slow-moving fire bolt(s) per turn at targets in sight, each dealing %0.2f fire damage.
 		The projectiles safely go through your friends without harming them.
-		This powerful spell drains %0.2f mana per turn while active.
 		The damage and resistance will increase with your Spellpower.]]):
-		format(res,onhitdam, t.getNumber(self, t), insightdam, manadrain)
+		format(res,onhitdam, t.getNumber(self, t), insightdam)
 	end,
 }

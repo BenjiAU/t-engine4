@@ -108,9 +108,9 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		local absorb = t.getAbsorb(self, t)
+		local absorb = t.getAbsorb(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100
 		return ([[A protective shield forms around you that lasts for up to 10 turns and negates %d damage.
-		The total damage the barrier can absorb will increase with your Spellpower.]]):
+ 		The total damage the barrier can absorb will increase with your Spellpower and can crit.]]):
 		format(absorb)
 	end,
 }

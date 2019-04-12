@@ -284,7 +284,7 @@ newTalent{
 		end
 
 		if #diseases == 0 then return end
-		self:project({type="ball", radius=self:getTalentRadius(t)}, carrier.x, carrier.y, function(px, py)
+		self:project({type="ball", radius=self:getTalentRadius(t), friendlyfire=false}, carrier.x, carrier.y, function(px, py)
 			local target = game.level.map(px, py, engine.Map.ACTOR)
 			if not target or target == carrier or target == self then return end
 

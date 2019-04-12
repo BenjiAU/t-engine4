@@ -22,7 +22,6 @@ newTalent{
 	type = {"spell/water",1},
 	require = spells_req1,
 	points = 5,
-	random_ego = "attack",
 	mana = 12,
 	cooldown = 8,
 	tactical = { DISABLE = {stun = 0.5}, ATTACKAREA = { COLD = 1 } },
@@ -34,7 +33,7 @@ newTalent{
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 4, 50) end,
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 3, 7)) end,
+	getDuration = function(self, t) return 8 end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
@@ -43,7 +42,7 @@ newTalent{
 		-- Add a lasting map effect
 		game.level.map:addEffect(self,
 			x, y, t.getDuration(self, t),
-			DamageType.GLACIAL_VAPOUR, t.getDamage(self, t),
+			DamageType.GLACIAL_VAPOUR, self:spellCrit(t.getDamage(self, t)),
 			self:getTalentRadius(t),
 			5, nil,
 			{type="ice_vapour"},
@@ -113,8 +112,7 @@ newTalent{
 	type = {"spell/water",3},
 	require = spells_req3,
 	points = 5,
-	random_ego = "attack",
-	mana = 25,
+	mana = 10,
 	cooldown = 10,
 	tactical = { ESCAPE = { knockback = 2 }, ATTACKAREA = { COLD = 0.5, PHYSICAL = 0.5 }, DISABLE = { knockback = 1 } },
 	direct_hit = true,

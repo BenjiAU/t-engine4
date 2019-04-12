@@ -34,7 +34,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Turn into a wraith, allowing you to walk through walls (but not preventing suffocation) for %d turns.
+		return ([[Turn into a wraith, allowing you to walk through walls and removing the need to breath for %d turns.
 		Also increases your defense and armour by %d and %d, respectively.
 		If you are still in a wall when the effect ends you will randomly teleport.
 		]]):

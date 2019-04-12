@@ -100,6 +100,20 @@ newBirthDescriptor{
 	},
 	copy = {
 		max_life = 110,
+		resolvers.auto_equip_filters{
+			MAINHAND = {type="weapon", special=function(e, filter) -- Allow standard 2H strength weapons
+				local who = filter._equipping_entity
+				if who and e.subtype and (e.subtype == "battleaxe" or e.subtype == "greatsword" or e.subtype == "greatmaul") then return true end
+			end},
+			OFFHAND = {special=function(e, filter) -- only allow if there is already a weapon in MAINHAND
+				local who = filter._equipping_entity
+				if who then
+					local mh = who:getInven(who.INVEN_MAINHAND) mh = mh and mh[1]
+					if mh and (not mh.slot_forbid or not who:slotForbidCheck(e, who.INVEN_MAINHAND)) then return true end
+				end
+				return false
+			end},
+		},
 		resolvers.equipbirth{ id=true,
 			{type="armor", subtype="cloth", name="linen robe", autoreq=true, ego_chance=-1000},
 			{type="weapon", subtype="greatsword", name="iron greatsword", autoreq=true, ego_chance=-1000},
@@ -132,7 +146,6 @@ newBirthDescriptor{
 		"#GOLD#Life per level:#LIGHT_BLUE# -4 (*special*)",
 	},
 	power_source = {psionic=true},
---	not_on_random_boss = true,
 	random_rarity = 3,
 	stats = { str=0, wil=5, cun=4, },
 	birth_example_particles = {
@@ -171,6 +184,10 @@ newBirthDescriptor{
 	},
 	copy = {
 		max_life = 90,
+		resolvers.auto_equip_filters{
+			MAINHAND = {type="weapon", subtype="mindstar"},
+			OFFHAND = {type="weapon", subtype="mindstar"},
+		},
 		resolvers.equipbirth{ id=true,
 			{type="armor", subtype="cloth", name="linen robe", autoreq=true, ego_chance=-1000},
 			{type="weapon", subtype="mindstar", name="mossy mindstar", autoreq=true, ego_chance=-1000},

@@ -137,7 +137,7 @@ newEntity{
 	charm_power_def = {add=100, max=800, floor=true},
 	resolvers.charm(
 		function(self, who) 
-			local shield = self.use_power.shield(self, who)
+			local shield = self.use_power.shield(self, who) * (100 + (who:attr("shield_factor") or 0)) / 100
 			return ("create a shield absorbing up to %d damage on yourself and all friendly characters within 10 spaces for %d turns"):
 				format(shield, 4) end,
 		20,

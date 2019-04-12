@@ -76,7 +76,7 @@ newBirthDescriptor{
 		-- ["cursed/unyielding"]={true, 0.0},
 		["technique/combat-training"]={true, 0.3},
 		["cunning/survival"]={false, 0.0},
-		["cursed/rampage"]={false, 0.0},
+		["cursed/rampage"]={false, 0.3},
 		["cursed/predator"]={true, 0.0},
 		["cursed/fears"]={false, 0.0},
 	},
@@ -90,6 +90,17 @@ newBirthDescriptor{
 	},
 	copy = {
 		max_life = 110,
+		resolvers.auto_equip_filters{
+			MAINHAND = {type="weapon", properties={"twohanded"}},
+			OFFHAND = {special=function(e, filter) -- only allow if there is already a weapon in MAINHAND
+				local who = filter._equipping_entity
+				if who then
+					local mh = who:getInven(who.INVEN_MAINHAND) mh = mh and mh[1]
+					if mh and (not mh.slot_forbid or not who:slotForbidCheck(e, who.INVEN_MAINHAND)) then return true end
+				end
+				return false
+			end},
+		},
 		resolvers.equipbirth{ id=true,
 			{type="weapon", subtype="battleaxe", name="iron battleaxe", autoreq=true, ego_chance=-1000},
 			{type="armor", subtype="heavy", name="iron mail armour", autoreq=true, ego_chance=-1000, ego_chance=-1000}

@@ -295,10 +295,10 @@ newEntity{ base = "BASE_RUNE",
 
 	inscription_kind = "utility",
 	inscription_data = {
-		cooldown = resolvers.rngrange(20, 30),
+		cooldown = resolvers.rngrange(15, 20),
 		dur = 10,
 		mana = resolvers.mbonus_level(1200, 600, function(e, v) return v * 0.003 end),
-		use_stat_mod = 4,
+		use_stat_mod = 6,
 	},
 	inscription_talent = "RUNE:_MANASURGE",
 }

@@ -1139,7 +1139,7 @@ newEntity{ base = "BASE_GAUNTLETS",
 			physspeed = 0.2,
 			dammod = {dex=0.4, str=-0.6, cun=0.4 },
 			melee_project={[DamageType.ARCANE] = 20},
-			talent_on_hit = { T_GREATER_WEAPON_FOCUS = {level=1, chance=10}, T_DISPLACEMENT_SHIELD = {level=1, chance=10} },
+			talent_on_hit = { T_DISPLACEMENT_SHIELD = {level=4, chance=10} },
 			damrange = 0.3,
 		},
 	},
@@ -3608,7 +3608,7 @@ newEntity{ base = "BASE_GAUNTLETS",
 	name = "Spellhunt Remnants", color = colors.GREY, image = "object/artifact/spellhunt_remnants.png",
 	unided_name = "heavily corroded voratun gauntlets",
 	desc = [[These once brilliant voratun gauntlets have fallen into a deep decay. Originally used in the spellhunt, they were often used to destroy arcane artifacts, curing the world of their influence.]],
-	special_desc = function(self) return "Drains arcane resources while worn." end,
+	special_desc = function(self) return "Can't be worn by those with arcane powers." end,
 --	material_level = 1, --Special: this artifact can appear anywhere and adjusts its material level to the zone
 	level_range = {1, nil}, 
 	rarity = 550, -- Extra rare to make it not ALWAYS appear.
@@ -3620,31 +3620,25 @@ newEntity{ base = "BASE_GAUNTLETS",
 			self.power_up(self, nil, mat_level)
 		end
 	end,
-	on_wear = function(self, who)
+	on_canwear = function(self, who)
 		if who:attr("has_arcane_knowledge") then
-			game.logPlayer(who, "#ORCHID#The %s begin draining your arcane resources as they are worn!", self:getName({do_color=true}))
+			game.logPlayer(who, "#ORCHID#Your arcane equipment or powers conflict with the gauntlets!#LAST#", self:getName({do_color=true}))
+			return true
 		end
 	end,
 	on_preaddobject = function(self, who, inven) -- generated in an actor's inventory
 		if not self.material_level then self.addedToLevel(self, game.level) end
 	end,
-	cost = 1000,
-	callbackOnAct = function(self, who) -- Burn the wearer's arcane resources while worn
-		if who:attr("has_arcane_knowledge") then
-			local burn = who:burnArcaneResources(self.material_level*2)
-			if burn > 0 then
-				game.logSeen(who, "#ORCHID#%s's %s drain %s magic!", who.name:capitalize(), self:getName({do_color=true}), who:his_her())
-				who:restStop("Antimagic Drain")
-				who:runStop("Antimagic Drain")
-			end
-		end
-	end,
 	wielder = {
 		combat_mindpower=4,
-		combat_mindcrit=1,
+		combat_mindcrit=3,
 		combat_spellresist=4,
 		combat_def=1,
 		combat_armor=2,
+		inc_stats = { [Stats.STAT_CUN] = 2, [Stats.STAT_WIL] = 2, },
+		inc_damage = { [DamageType.NATURE] = 5 },
+		resists_pen = { [DamageType.NATURE] = 5 },
+		max_life = 20,
 		combat = {
 			dam = 12,
 			apr = 4,
@@ -3653,7 +3647,7 @@ newEntity{ base = "BASE_GAUNTLETS",
 			dammod = {dex=0.4, str=-0.6, cun=0.4,},
 			damrange = 0.3,
 			melee_project={[DamageType.RANDOM_SILENCE] = 10},
-			talent_on_hit = { [Talents.T_DESTROY_MAGIC] = {level=1, chance=100} },
+			talent_on_hit = {  },
 		},
 	},
 	power_up= function(self, who, level)
@@ -3670,10 +3664,14 @@ newEntity{ base = "BASE_GAUNTLETS",
 		self.desc = [[These once brilliant voratun gauntlets appear heavily decayed. Originally used in the spellhunt, they were often used to destroy arcane artifacts, ridding the world of their influence.]]
 		self.wielder={
 			combat_mindpower=6,
-			combat_mindcrit=2,
+			combat_mindcrit=6,
 			combat_spellresist=6,
 			combat_def=2,
 			combat_armor=3,
+			inc_stats = { [Stats.STAT_CUN] = 4, [Stats.STAT_WIL] = 4, },
+			inc_damage = { [DamageType.NATURE] = 10 },
+			resists_pen = { [DamageType.NATURE] = 10 },
+			max_life = 40,
 			combat = {
 				dam = 17,
 				apr = 8,
@@ -3682,7 +3680,7 @@ newEntity{ base = "BASE_GAUNTLETS",
 				dammod = {dex=0.4, str=-0.6, cun=0.4,},
 				damrange = 0.3,
 				melee_project={[DamageType.RANDOM_SILENCE] = 12},
-				talent_on_hit = { [Talents.T_DESTROY_MAGIC] = {level=2, chance=100} },
+				talent_on_hit = { },
 			},
 		}
 		elseif level == 3 then -- LEVEL 3
@@ -3690,10 +3688,14 @@ newEntity{ base = "BASE_GAUNTLETS",
 		self.desc = [[These voratun gauntlets appear to have suffered considerable damage. Originally used in the spellhunt, they were often used to destroy arcane artifacts, ridding the world of their influence.]]
 		self.wielder={
 			combat_mindpower=8,
-			combat_mindcrit=3,
+			combat_mindcrit=9,
 			combat_spellresist=8,
 			combat_def=3,
 			combat_armor=4,
+			inc_stats = { [Stats.STAT_CUN] = 6, [Stats.STAT_WIL] = 6, },
+			inc_damage = { [DamageType.NATURE] = 15 },
+			resists_pen = { [DamageType.NATURE] = 15 },
+			max_life = 60,
 			combat = {
 				dam = 22,
 				apr = 12,
@@ -3702,7 +3704,7 @@ newEntity{ base = "BASE_GAUNTLETS",
 				dammod = {dex=0.4, str=-0.6, cun=0.4,},
 				damrange = 0.3,
 				melee_project={[DamageType.RANDOM_SILENCE] = 15, [DamageType.ITEM_ANTIMAGIC_MANABURN] = 20,},
-				talent_on_hit = { [Talents.T_DESTROY_MAGIC] = {level=3, chance=100}, [Talents.T_MANA_CLASH] = {level=1, chance=5} },
+				talent_on_hit = { [Talents.T_MANA_CLASH] = {level=1, chance=5} },
 			},
 		}
 		elseif level == 4 then -- LEVEL 4
@@ -3710,10 +3712,14 @@ newEntity{ base = "BASE_GAUNTLETS",
 		self.desc = [[These voratun gauntlets shine brightly beneath a thin layer of wear. Originally used in the spellhunt, they were often used to destroy arcane artifacts, ridding the world of their influence.]]
 		self.wielder={
 			combat_mindpower=10,
-			combat_mindcrit=4,
+			combat_mindcrit=12,
 			combat_spellresist=10,
 			combat_def=4,
 			combat_armor=5,
+			inc_stats = { [Stats.STAT_CUN] = 8, [Stats.STAT_WIL] = 8, },
+			inc_damage = { [DamageType.NATURE] = 20 },
+			resists_pen = { [DamageType.NATURE] = 20 },
+			max_life = 80,
 			combat = {
 				dam = 27,
 				apr = 15,
@@ -3722,7 +3728,7 @@ newEntity{ base = "BASE_GAUNTLETS",
 				dammod = {dex=0.4, str=-0.6, cun=0.4,},
 				damrange = 0.3,
 				melee_project={[DamageType.RANDOM_SILENCE] = 17, [DamageType.ITEM_ANTIMAGIC_MANABURN] = 35,},
-				talent_on_hit = { [Talents.T_DESTROY_MAGIC] = {level=4, chance=100}, [Talents.T_MANA_CLASH] = {level=2, chance=10} },
+				talent_on_hit = { [Talents.T_MANA_CLASH] = {level=2, chance=10} },
 			},
 		}
 		elseif level >= 5 then -- LEVEL 5
@@ -3730,10 +3736,14 @@ newEntity{ base = "BASE_GAUNTLETS",
 		self.desc = [[These brilliant voratun gauntlets shine with an almost otherworldly glow. Originally used in the spellhunt, they were often used to destroy arcane artifacts, ridding the world of their influence. Pride in the fulfillment of this ancient duty practically radiates from them.]]
 		self.wielder={
 			combat_mindpower=12,
-			combat_mindcrit=5,
+			combat_mindcrit=15,
 			combat_spellresist=15,
 			combat_def=6,
 			combat_armor=8,
+			inc_stats = { [Stats.STAT_CUN] = 10, [Stats.STAT_WIL] = 10, },
+			inc_damage = { [DamageType.NATURE] = 25 },
+			resists_pen = { [DamageType.NATURE] = 25 },
+			max_life = 100,
 			lite=1,
 			combat = {
 				dam = 33,
@@ -3743,7 +3753,7 @@ newEntity{ base = "BASE_GAUNTLETS",
 				dammod = {dex=0.4, str=-0.6, cun=0.4,},
 				damrange = 0.3,
 				melee_project={[DamageType.RANDOM_SILENCE] = 20, [DamageType.ITEM_ANTIMAGIC_MANABURN] = 50,},
-				talent_on_hit = { [Talents.T_DESTROY_MAGIC] = {level=5, chance=100}, [Talents.T_MANA_CLASH] = {level=3, chance=15}, [Talents.T_AURA_OF_SILENCE] = {level=1, chance=10} },
+				talent_on_hit = { [Talents.T_MANA_CLASH] = {level=3, chance=15}, [Talents.T_AURA_OF_SILENCE] = {level=3, chance=15} },
 			},
 		}
 		self.use_power = {
@@ -4109,24 +4119,24 @@ newEntity{ base = "BASE_LEATHER_BOOT", --Thanks Grayswandir!
 	rarity = 200,
 	cost = 100,
 	material_level = 4,
-	callbackOnTeleport = function(self, who, teleported, ox, oy, x, y) game.level.map:particleEmitter(who.x, who.y, 2, "generic_sploom", {rm=150, rM=180, gm=20, gM=60, bm=180, bM=200, am=80, aM=150, radius=2, basenb=120})
-	local damage =  who:combatStatScale("mag", 50, 250) -- Generous because scaling Arcane is hard and its not exactly easy to proc this .. I think
-	who:project({type="ball", range=0, radius=3, friendlyfire=false}, who.x, who.y, engine.DamageType.ARCANE, who:spellCrit(damage))
+	callbackOnTeleport = function(self, who, teleported, ox, oy, x, y) game.level.map:particleEmitter(who.x, who.y, 3, "generic_sploom", {rm=150, rM=180, gm=20, gM=60, bm=180, bM=200, am=80, aM=150, radius=3, basenb=120})
+		local damage = who:combatStatScale("mag", 50, 250) -- Generous because scaling Arcane is hard and its not exactly easy to proc this .. I think
+		who:project({type="ball", range=0, radius=3, friendlyfire=false}, who.x, who.y, engine.DamageType.ARCANE, who:spellCrit(damage))
 	end,
 	special_desc = function(self, who) return ("Creates an arcane explosion dealing %d arcane damage based on magic in a radius of 3 around the user after any teleport."):format(who:combatStatScale("mag", 50, 250)) end,
 	wielder = {
 		combat_def = 6,
 		fatigue = 1,
-		combat_spellpower=5,
+		combat_spellpower=15,
 		resist_all_on_teleport = 20,
 		defense_on_teleport = 20,
 		effect_reduction_on_teleport = 20,
 		inc_stats = { [Stats.STAT_MAG] = 8, [Stats.STAT_CUN] = 8,},
 		resists={
-			[DamageType.ARCANE] = 12,
+			[DamageType.ARCANE] = 25,
 		},
-		resists_cap={
-			[DamageType.ARCANE] = 5,
+		inc_damage={
+			[DamageType.ARCANE] = 25,
 		},
 	},
 	max_power = 24, power_regen = 1,
@@ -4224,12 +4234,12 @@ newEntity{ base = "BASE_ARROW", --Thanks Grayswandir!
 	combat = {
 		capacity = 0,
 		dam = 45,
-		apr = 30, --No armor can stop the void
+		apr = 120, --No armor can stop the void
 		physcrit = 6,
-		dammod = {dex=0.7, str=0.5, mag=0.1,},
+		dammod = {dex=0.7, str=0.5, mag=0.4,},
 		damtype = DamageType.VOID,
 		-- Redo these when void talents are added
-		talent_on_hit = { [Talents.T_SPATIAL_TETHER] = {level=1, chance=10}, [Talents.T_DIMENSIONAL_ANCHOR] = {level=1, chance=5} },
+		talent_on_hit = { [Talents.T_SPATIAL_TETHER] = {level=1, chance=15}, [Talents.T_DIMENSIONAL_ANCHOR] = {level=1, chance=15} },
 	},
 }
 
@@ -4473,16 +4483,20 @@ newEntity{ base = "BASE_TOOL_MISC",
 	material_level = 5,
 	wielder = {
 		resists={[DamageType.BLIGHT] = 20, [DamageType.ARCANE] = 20},
-		on_melee_hit={[DamageType.SLIME] = 18},
+		on_melee_hit={[DamageType.ITEM_NATURE_SLOW] = 18},
 		combat_spellresist = 20,
 		talents_types_mastery = { ["wild-gift/antimagic"] = 0.1, ["wild-gift/fungus"] = 0.1},
 		inc_stats = {[Stats.STAT_WIL] = 10,},
 		combat_mindpower=8,
 	},
-	max_power = 35, power_regen = 1,
+	on_takeoff = function(self)
+		if self.summoned_totem then self.summoned_totem:die() end
+		self.summoned_totem = nil
+	end,
+	max_power = 50, power_regen = 1,
 	use_power = {
-		name = "call forth an immobile antimagic pillar for 15 turns.  (It spits slime, pulls in, stuns, and burns the arcane resources of your foes, while emitting an aura of silence against them within range 5, and will silence you for 5 turns when first summoned.)",
-		power = 35,
+		name = "call forth an immobile antimagic pillar for 10 turns.  (It spits slime, pulls in, stuns, and burns the arcane resources of your foes, while emitting an aura of silence against them within range 5, and will silence you for 5 turns when first summoned.)",
+		power = 50,
 		tactical = {ATTACK = {NATURE = 2},
 			CLOSEIN = 1.5,
 			DISABLE = function(self, t, aitarget)
@@ -4516,7 +4530,7 @@ newEntity{ base = "BASE_TOOL_MISC",
 					dammod={wil=1.2}, physcrit = 10,
 					damtype=engine.DamageType.SLIME,
 				},
-				level_range = {25, nil}, exp_worth = 0,
+				level_range = {1, who.level}, exp_worth = 0,
 				silent_levelup = true,
 				combat_armor=50,
 				combat_armor_hardiness=70,
@@ -4524,6 +4538,7 @@ newEntity{ base = "BASE_TOOL_MISC",
 				ai = "summoned", ai_real = "dumb_talented_simple", ai_state = { talent_in=1, },
 				never_move=1,
 				stats = { str=14, dex=18, mag=10, con=12, wil=20, cun=20, },
+				combat_mindpower = resolvers.levelup(1, 1, 3),  -- ~87 mindpower at L50 including stats
 				size_category = 5,
 				blind=1,
 				esp_all=1,
@@ -4554,20 +4569,24 @@ newEntity{ base = "BASE_TOOL_MISC",
 				
 				faction = who.faction,
 				summoner = who, summoner_gain_exp=true,
-				summon_time=15,
+				summon_time=10,
 			}
 
 			m:resolve()
 			who:logCombat(m, "#Source# uses %s to summon a natural guardian!", self:getName({do_color=true, no_add_name=true}))
+			m:forceLevelup(who.level)
+
 			game.zone:addEntity(game.level, m, "actor", x, y)
 			m.remove_from_party_on_death = true,
 			game.party:addMember(m, {
 				control=false,
 				type="summon",
 				title="Summon",
+				temporary_level = true,
 				orders = {target=true, leash=true, anchor=true, talents=true},
 			})
 			who:setEffect(who.EFF_SILENCED, 5, {})
+			self.summoned_totem = m
 			return {id=true, used=true}
 		end
 	},
@@ -4714,9 +4733,8 @@ newEntity{ base = "BASE_AMULET", --Thanks Grayswandir!
 		melee_project={[DamageType.RANDOM_CONFUSION] = 5},
 	},
 	max_power = 30, power_regen = 1,
-	use_talent = { id = Talents.T_INNER_DEMONS, level = 4, power = 30 },
+	talent_on_mind = { {chance=8, talent=Talents.T_SUNDER_MIND, level=1} },
 }
-
 
 newEntity{ base = "BASE_SHOT", --Thanks Grayswandir!
 	power_source = {psionic=true},
@@ -4940,7 +4958,7 @@ newEntity{ base = "BASE_GLOVES", --Thanks SageAcrin /AND/ Edge2054!
 			physcrit = 6,
 			dammod = {dex=0.4, str=-0.6, cun=0.4, mag=0.2 },
 			convert_damage = {[DamageType.VOID] = 100,},
-			talent_on_hit = { [Talents.T_SHADOW_SIMULACRUM] = {level=1, chance=15}, [Talents.T_MIND_BLAST] = {level=1, chance=10}, [Talents.T_TURN_BACK_THE_CLOCK] = {level=1, chance=10} },
+			talent_on_hit = { [Talents.T_DUST_TO_DUST] = {level=1, chance=15}, [Talents.T_MIND_BLAST] = {level=1, chance=10}, [Talents.T_TURN_BACK_THE_CLOCK] = {level=1, chance=10} },
 		},
 	},
 	-- Change when void talents are done
@@ -6623,8 +6641,9 @@ newEntity{ base = "BASE_LONGSWORD", --For whatever artists draws this: it's a ra
 	},
 	wielder = {
 		evasion=10,
-		combat_physcrit = 10,
-		combat_physspeed = 0.1,
+		combat_def = 40,
+		combat_physcrit = 20,
+		combat_physspeed = 0.2,
 	},
 }
 
@@ -6782,10 +6801,6 @@ newEntity{ base = "BASE_SHIELD",
 	end,}
 }
 
--- No longer hits your own projectiles
--- Hopefully fixed LUA errors with DamageType require
--- Significant rescaling.  Base damage cut by 50%, crit by 5%.  The reason these hilariously bad numbers happened was derping and not accounting for the awesomeness of the 100% dex scaling.  APR is still extremely high.
--- Proc chance is now 100% up from 25%.  No matter how I test this--even at 100% and 500% global action speed--it is often a pain in the ass to get procs just to test.  This is supposed to be one of the main features of the item. 
 newEntity{ base = "BASE_KNIFE", --Shibari's #1
 	power_source = {nature=true},
 	unique = true,
@@ -6811,7 +6826,7 @@ newEntity{ base = "BASE_KNIFE", --Shibari's #1
 				local i = 0
 				local p = game.level.map(x, y, engine.Map.PROJECTILE+i)
 				while p do
-					local DamageType = require "engine.DamageType" -- I don't entirely follow why this is necessary
+					local DamageType = require "engine.DamageType"
 					if p.src and p.src:reactionToward(who) >= 0 then return end -- Let's not destroy friendly projectiles
 					if p.name then 
 						game.logPlayer(who, "#GREEN#Lightning strikes the " .. p.name .. "!")
@@ -6825,7 +6840,7 @@ newEntity{ base = "BASE_KNIFE", --Shibari's #1
 					game.level.map:particleEmitter(x, y, 5, "ball_lightning_beam", {radius=5, tx=x, ty=y})
 				   
 					local tg = {type="ball", radius=5, friendlyfire=false} -- Let's not kill pets or escorts with uncontrolled AoE
-					local dam = 4*who:getDex() -- no more crit or base damage.  no real reason, just like it better.
+					local dam = 3*who:getDex()
 
 					who:project(tg, x, y, DamageType.LIGHTNING, dam)
 				   

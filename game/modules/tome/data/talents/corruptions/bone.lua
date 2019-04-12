@@ -87,21 +87,23 @@ newTalent{
 				if target:canBe("pin") then
 					target:setEffect(target.EFF_BONE_GRAB, t.getDuration(self, t), {apply_power=self:combatSpellpower()})
 				else
-					game.logSeen(target, "%s resists the bone!", target.name:capitalize())
+					game.logSeen(target, "%s resists the pin!", target.name:capitalize())
 				end
 			else
-				local tg = {type="cone", cone_angle=25, range=0, radius=8, friendlyfire=false}
+				local tg = {type="cone", cone_angle=90, range=0, radius=6, friendlyfire=false}
 				
 				local grids = {}
 				self:project(tg, x, y, function(px, py)
-					if core.fov.distance(target.x, target.y, px, py) > 2 then grids[#grids+1] = {px, py} end
+					if game.level.map(tx, ty, engine.Map.ACTOR) then return end
+					grids[#grids+1] = {px, py, core.fov.distance(self.x, self.y, px, py)}
 				end)
+				table.sort(grids, function(a, b) return a[3] > b[3] end )
 
 				DamageType:get(DamageType.PHYSICAL).projector(self, target.x, target.y, DamageType.PHYSICAL, dam)
 				if target:canBe("pin") then
 					target:setEffect(target.EFF_BONE_GRAB, t.getDuration(self, t), {apply_power=self:combatSpellpower()})
 				else
-					game.logSeen(target, "%s resists the bone!", target.name:capitalize())
+					game.logSeen(target, "%s resists the pin!", target.name:capitalize())
 				end
 
 				local hit = self:checkHit(self:combatSpellpower(), target:combatSpellResist() + (target:attr("continuum_destabilization") or 0))
@@ -109,16 +111,16 @@ newTalent{
 					game.logSeen(target, "%s resists being teleported by Bone Grab!", target.name:capitalize())
 					return true
 				end
-				local spot = rng.table(grids)
-				if not spot then return end
-				target:teleportRandom(spot[1], spot[2], 0)
+				
+				if #grids <= 0 then return end
+				target:teleportRandom(grids[1][1], grids[1][2], 0)
 			end
 		end)
 			game:playSoundNear(self, "talents/arcane")
 		return true
 	end,
 	info = function(self, t)
-		return ([[Grab a target and teleport it to your side or if adjacent to a random location at least 3 spaces away from you, pinning it there with a bone rising from the ground for %d turns.
+		return ([[Grab a target and teleport it to your side or if adjacent up to 6 spaces away from you, pinning it there with a bone rising from the ground for %d turns.
 		The bone will also deal %0.2f physical damage.
 		The damage will increase with your Spellpower.]]):
 		format(t.getDuration(self, t), damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)))
@@ -141,26 +143,25 @@ newTalent{
 		if ab.no_energy then return end
 		if self.turn_procs.bone_spike then return end
 		self.turn_procs.bone_spike = true
-		game:onTickEnd(function()
-			local tg = self:getTalentTarget(t)
-			local dam = t.getDamage(self, t)
-			local did_crit = false
-			self:project(tg, self.x, self.y, function(px, py)
-				local target = game.level.map(px, py, engine.Map.ACTOR)
-				if not target then return end
-				local nb = #target:effectsFilter({status="detrimental", type="magical"})
-				if nb and nb < 3 then return end
+		
+		local tg = self:getTalentTarget(t)
+		local dam = t.getDamage(self, t)
+		local did_crit = false
+		self:project(tg, self.x, self.y, function(px, py)
+			local target = game.level.map(px, py, engine.Map.ACTOR)
+			if not target then return end
+			local nb = #target:effectsFilter({status="detrimental", type="magical"})
+			if nb and nb < 3 then return end
 
-				-- Make sure crit is only calculated once, but do it here so we don't trigger a crit if there are no targets
-				if did_crit == false then
-					dam = self:spellCrit(dam)
-					did_crit = true
-				end
+			-- Make sure crit is only calculated once, but do it here so we don't trigger a crit if there are no targets
+			if did_crit == false then
+				dam = self:spellCrit(dam)
+				did_crit = true 
+			end
 
-				self:project({type="beam", range=10, selffire=false, friendlyfire=false, talent=t}, target.x, target.y, DamageType.PHYSICAL, dam)
-				local _ _, _, _, x, y = self:canProject(tg, x, y)
-				game.level.map:particleEmitter(self.x, self.y, 10, "bone_spear", {speed=0.2, tx=target.x - self.x, ty=target.y - self.y})
-			end)
+			self:projectSource({type="beam", range=10, selffire=false, friendlyfire=false, talent=t}, target.x, target.y, DamageType.PHYSICAL, dam, nil, t)
+			local _ _, _, _, x, y = self:canProject(tg, x, y)
+			game.level.map:particleEmitter(self.x, self.y, 10, "bone_spear", {speed=0.2, tx=target.x - self.x, ty=target.y - self.y})
 		end)
 	end,
 	info = function(self, t)
@@ -264,7 +265,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Bone shields start circling around you. They will each fully absorb one attack.
+		return ([[Bone shields start circling around you. They will each fully absorb one instance of damage.
 		%d shield(s) will be generated when first activated.
 		Then every %d turns a new one will be created if not full.
 		This will only trigger on hits over %d damage based on Spellpower.]]):

@@ -28,7 +28,7 @@ newTalent{
 	mode = "passive",
 	points = 5,
 	getRegen = function(self, t) return 0.5 end,
-	getResist = function(self, t) return 5 + combatTalentPhysicalMindDamage(self, t, 15, 35) end,  -- This can crit
+	getResist = function(self, t) return 5 + combatTalentPhysicalMindDamage(self, t, 15, 30) end,  -- This can crit
 	on_absorb = function(self, t, damtype)
 		if not DamageType:get(damtype).antimagic_resolve then return end
 		local max = self:getTalentLevel(t) >= 3 and 3 or 1
@@ -65,11 +65,11 @@ newTalent{
 	require = gifts_req2,
 	points = 5,
 	equilibrium = 20,
-	cooldown = 10,
+	cooldown = 12,
 	tactical = { DISABLE = { silence = 4 } },
 	range = 6,
 	radius = function(self, t) return 3 end,
-	getduration = function(self, t) return math.floor(self:combatTalentLimit(t, 10, 3.5, 5.6)) end,  -- Limit <10
+	getduration = function(self, t) return 3 end,
 	getFloorDuration = function(self, t) return 6 end,
 	getDamage = function(self, t) return combatTalentPhysicalMindDamage(self, t, 1, 110) end,
 	getEquiRegen = function(self, t) return math.floor(self:combatTalentScale(t, 5, 20)) end,
@@ -175,7 +175,7 @@ newTalent{
 	require = gifts_req4,
 	points = 5,
 	equilibrium = -15,
-	cooldown = 10,
+	cooldown = 15,
 	range = 10,
 	tactical = { ATTACK = { ARCANE = 3 } },
 	direct_hit = true,
@@ -199,7 +199,7 @@ newTalent{
 			if self:knowTalent(self.T_ANTIMAGIC_ADEPT) then
 				target:removeSustainsFilter(function(o)
 					if o.is_spell then return true else return false end
-				end, 999)
+				end, 4)
 			end
 		end, nil, {type="slime"})
 		game:playSoundNear(self, "talents/heal")
@@ -211,7 +211,7 @@ newTalent{
 		local vim = base / 2
 		local positive = base / 4
 		local negative = base / 4
-		local is_adept = self:knowTalent(self.T_ANTIMAGIC_ADEPT) and "\n#GREEN#Antimagic Adept:  #LAST#All magical sustains from the target will be removed." or ""
+		local is_adept = self:knowTalent(self.T_ANTIMAGIC_ADEPT) and "\n#GREEN#Antimagic Adept:  #LAST#4 magical sustains from the target will be removed." or ""
 		return ([[Drain %d mana, %d vim, %d positive and negative energies from your target, triggering a chain reaction that explodes in a burst of arcane damage.
 		The damage done is equal to 100%% of the mana drained, 200%% of the vim drained, or 400%% of the positive or negative energy drained, whichever is higher. This effect is called a manaburn.
 		The effect will increase with your Mindpower or Physical power (whichever is greater).
@@ -227,7 +227,7 @@ newTalent{
 	mode = "passive",
 	points = 1,
 	info = function(self, t)
-		return ([[Your Mana Clash talent also removes all magical sustains from the target.]]):
+		return ([[Your Mana Clash talent also removes 4 magical sustains from the target.]]):
 		format()
 	end,
 }

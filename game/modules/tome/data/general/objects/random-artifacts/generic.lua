@@ -136,15 +136,7 @@ newEntity{ theme={physical=true}, name="stamina regeneration", points = 1, rarit
 newEntity{ theme={physical=true}, name="increased stamina", points = 1, rarity = 14, level_range = {1, 50},
 	wielder = { max_stamina = resolvers.randartmax(5, 50), },
 }
-newEntity{ theme={physical=true, defense=true}, name="life regeneration", points = 1, rarity = 11, level_range = {1, 50},
-	wielder = { life_regen = resolvers.randartmax(2, 4), },
-}
-newEntity{ theme={physical=true, defense=true}, name="increased life", points = 1, rarity = 11, level_range = {1, 50},
-	wielder = { max_life = resolvers.randartmax(20, 100), },
-}
-newEntity{ theme={physical=true, defense=true}, name="improve heal", points = 1, rarity = 15, level_range = {1, 50},
-	wielder = { healing_factor = resolvers.randartmax(0.05, .2), },
-}
+
 ----------------------------------------------------------------
 -- Misc
 ----------------------------------------------------------------
@@ -164,6 +156,15 @@ newEntity{ theme={defense=true, physical=true}, name="def", points = 1, rarity =
 newEntity{ theme={defense=true, physical=true}, name="armor", points = 1, rarity = 10, level_range = {1, 50},
 	wielder = { combat_armor = resolvers.randartmax(2, 8), },
 }
+newEntity{ theme={defense=true}, name="life regeneration", points = 1, rarity = 11, level_range = {1, 50},
+	wielder = { life_regen = resolvers.randartmax(2, 4), },
+}
+newEntity{ theme={defense=true}, name="increased life", points = 1, rarity = 11, level_range = {1, 50},
+	wielder = { max_life = resolvers.randartmax(20, 100), },
+}
+newEntity{ theme={defense=true}, name="improve heal", points = 1, rarity = 15, level_range = {1, 50},
+	wielder = { healing_factor = resolvers.randartmax(0.05, .2), },
+}
 ----------------------------------------------------------------
 -- Saves
 ----------------------------------------------------------------
@@ -178,7 +179,7 @@ newEntity{ theme={defense=true, mental=true}, name="save mental", points = 1, ra
 }
 --------------------------------------------------------------
 -- Immunities
---------------------------------------------------------------
+-------------------------	-------------------------------------
 newEntity{ theme={defense=true}, name="immune stun", points = 2, rarity = 25, level_range = {1, 50},
 	wielder = { stun_immune = resolvers.randartmax(0.1, 0.2), },
 }

@@ -569,7 +569,7 @@ Finally The Scorpion was defeated by the alchemist Nessylia, who went to face th
 			physspeed = 0.15,
 			dammod = {dex=0.4, str=-0.6, cun=0.4,},
 			damrange = 0.3,
-			talent_on_hit = { T_BITE_POISON = {level=3, chance=20}, T_PERFECT_CONTROL = {level=1, chance=5}, T_QUICK_AS_THOUGHT = {level=3, chance=5}, T_IMPLODE = {level=1, chance=5} },
+			talent_on_hit = { T_BITE_POISON = {level=3, chance=20}, T_QUICK_AS_THOUGHT = {level=3, chance=10}, T_IMPLODE = {level=1, chance=5} },
 		},
 	},
 	max_power = 24, power_regen = 1,
@@ -862,7 +862,7 @@ newEntity{ base = "BASE_LEATHER_BELT",
 	use_power = {
 		name = function(self, who) return ("surround yourself with a magical shield (strength %d, based on Magic) for 10 turns"):format(self.use_power.shield(self, who)) end,
 		power = 20,
-		shield = function(self, who) return 100 + who:getMag(250) end,
+		shield = function(self, who) return 100 + who:getMag(250) * (100 + (who:attr("shield_factor") or 0)) / 100 end,
 		use = function(self, who)
 			game.logSeen(who, "%s invokes the memory of Neira!", who.name:capitalize())
 			who:setEffect(who.EFF_DAMAGE_SHIELD, 10, {power=self.use_power.shield(self, who)})
@@ -1103,7 +1103,7 @@ newEntity{ base = "BASE_AMULET", --Thanks Grayswandir!
 	},
 	max_power = 24, power_regen = 1,
 	use_power = {
-		name = function(self, who) return ("create a reflective shield (50%% reflection rate, %d strength, based on Magic) for 5 turns"):format(self.use_power.shield(self, who)) end,
+		name = function(self, who) return ("create a reflective shield (50%% reflection rate, %d strength, based on Magic) for 5 turns"):format(self.use_power.shield(self, who) * (100 + (who:attr("shield_factor") or 0)) / 100) end,
 		power = 24,
 		shield = function(self, who) return 150 + 2*who:getMag(100) end,
 		use = function(self, who)
@@ -1170,7 +1170,6 @@ newEntity{ base = "BASE_KNIFE", -- Thanks Grayswandir!
 	},
 }
 
--- Fix me
 newEntity{ base = "BASE_KNIFE", --Razakai's idea, slightly modified
 	power_source = {psionic=true},
 	unique = true,
@@ -1189,9 +1188,10 @@ newEntity{ base = "BASE_KNIFE", --Razakai's idea, slightly modified
 		apr = 9,
 		physcrit = 15,
 		dammod = {str=0.45, dex=0.55},
-		special_on_hit = {desc="deals physical damage equal to 3% of the target's missing health", fct=function(combat, who, target)
+		special_on_hit = {desc="deals 60 physical damage increased by 1% for each 1% life the target has lost", fct=function(combat, who, target)
 			local tg = {type="ball", range=10, radius=0, selffire=false}
-			who:project(tg, target.x, target.y, engine.DamageType.PHYSICAL, (target.max_life - target.life)*0.03)
+			local bonus = 1 + (1 - target.life / target.max_life)
+			who:project(tg, target.x, target.y, engine.DamageType.PHYSICAL, 60*bonus)
 		end},
 	},
 	wielder = {

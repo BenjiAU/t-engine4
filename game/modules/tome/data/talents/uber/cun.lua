@@ -195,9 +195,7 @@ uberTalent{
 		#YELLOW#Mind:#LAST#  Confuses (power %d%%) for 5 turns.
 
 		Each effect can only happen once per 12 player turns.  This does not count as a typical cooldown.
-
 		The damage and effect power increase with your Cunning, the threshold with your level, and the apply power is the highest of your mind or spell power.
-
 		%s]])
 		:format(t.getThreshold(self, t), t.getDamage(self, t), self:getTalentRadius(t), t.getAcid(self, t), blight_dam, blight_disease, t.getDarkness(self, t), t.getTemporal(self, t), t.getMind(self, t), str)
 	end,
@@ -265,7 +263,7 @@ uberTalent{
 	range = 10,
 	radius = 3,
 	getThreshold = function(self, t) return 16*self.level end,
-	getDamage = function(self, t) return self:combatStatScale("cun", 10, 250) end,
+	getDamage = function(self, t) return self:combatStatScale("cun", 10, 350) end,
 	doProject = function(self, t, damtype, part)
 		local tgts = {}
 		-- Find everything nearby and pick one at random
@@ -282,11 +280,6 @@ uberTalent{
 		local tg = {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=false, friendlyfire=false, talent=t}
 		game.level.map:particleEmitter(target.x, target.y, tg.radius, part, {radius=tg.radius})
 		self:projectSource(tg, target.x, target.y, damtype, t.getDamage(self, t), nil, t)
-		--self:projectSource(tg, target.x, target.y, function(tx, ty)
-		--	local target = game.level.map(tx, ty, Map.ACTOR)
-		--	if not target or target == self then return end
-		--	DamageType:get(damtype).projector(self, tx, ty, damtype, t.getDamage(self, t))
-		--end)
 	end,
 	callbackOnRest = function(self, t) self.elemental_surge = nil end, -- No storing damage out of combat
 	callbackOnRun = function(self, t) self.elemental_surge = nil end,
@@ -354,16 +347,15 @@ uberTalent{
 		return ([[Surround yourself with an elemental aura that stores damage you deal.
 		Whenever you have stored %d damage of one type you unleash a powerful blast at a random enemy dealing %d damage of that type in radius %d and granting you one of the following effects:
 
-		Physical:		Cleanse 1 physical debuff and grant immunity to physical debuffs for 2 turns.
+		Physical:		Cleanses 1 physical debuff and grant immunity to physical debuffs for 2 turns.
 		#PURPLE#Arcane:#LAST#		Increases your mind and spell action speeds by 30%% for 3 turns.
 		#LIGHT_RED#Fire:#LAST#		Increases all damage dealt by %d%% for 3 turns.
-		#1133F3#Cold:#LAST#		Turn your skin into ice for 3 turns increasing armor by %d and dealing %d ice damage to attackers.
+		#1133F3#Cold:#LAST#		Turns your skin into ice for 3 turns increasing armor by %d and dealing %d ice damage to attackers.
 		#ROYAL_BLUE#Lightning:#LAST#	Increases your movement speed by %d%% for 3 turns.
-		#YELLOW#Light:#LAST#		Reduce all cooldowns by 20%% for 3 turns.
-		#LIGHT_GREEN#Nature:#LAST#		Cleanse 1 magical debuff and grant immunity to magical debuffs for 2 turns.
+		#YELLOW#Light:#LAST#		Reduces all cooldowns by 20%% for 3 turns.
+		#LIGHT_GREEN#Nature:#LAST#		Cleanses 1 magical debuff and grant immunity to magical debuffs for 2 turns.
 
 		Each effect can only happen once per 12 player turns.  This does not count as a typical cooldown.
-
 		The damage and some effect powers increase with your Cunning and the threshold with your level.
 		%s]])
 		:format(t.getThreshold(self, t), t.getDamage(self, t), self:getTalentRadius(t), t.getFire(self, t), cold.armor, cold.dam, t.getLightning(self, t), str)
@@ -438,23 +430,29 @@ uberTalent{
 		local chat = Chat.new("worldly-knowledge", {name="Worldly Knowledge"}, self)
 		chat:invoke()
 	end,
+	passives = function(self, t, tmptable)
+		self:talentTemporaryValue(tmptable, "unused_generics", 5)
+	end,
 	info = function(self, t)
-		return ([[Learn a new talent category from one of the below at 0.9 mastery, unlocked. Group 1 categories are available to anyone; Group 2 are available only to people without any spells or runes, and Group 3 are not available to followers of Zigur.
+		return ([[Gain 5 generic talent points and learn a new talent category from one of the below at 1.0 mastery, unlocked. Group 1 categories are available to anyone; Group 2 are available only to people without any spells or runes, and Group 3 are not available to followers of Zigur.
 		GROUP 1:
 		- Technique / Conditioning
 		- Cunning / Survival
+		- Wild Gift / Harmony
 		GROUP 2:
-		- Technique / Mobility
-		- Technique / Field Control
 		- Wild Gift / Call of the Wild
 		- Wild Gift / Mindstar Mastery
 		- Psionic / Dreaming
+		- Psionic / Augmented Mobility
+		- Psionic / Feedback
 		GROUP 3:
 		- Spell / Divination
 		- Spell / Staff Combat
 		- Spell / Stone Alchemy
+		- Corruption / Vile Life
+		- Corruption / Hexes
+		- Corruption / Curses
 		- Celestial / Chants
-		- Celestial / Light
 		- Chronomancy / Chronomancy]])
 		:format()
 	end,
