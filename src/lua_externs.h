@@ -46,6 +46,7 @@ extern int luaopen_navmesh(lua_State *L);
 extern int luaopen_particles_system(lua_State *L);
 extern int luaopen_clipper(lua_State *L);
 extern int luaopen_map2d(lua_State *L);
+extern int luaopen_binpack(lua_State *L);
 
 extern int luaopen_discord(lua_State *L);
 extern void te4_discord_update();
@@ -61,6 +62,7 @@ extern void create_particles_thread();
 extern void free_particles_thread();
 extern void free_profile_thread();
 extern void lua_particles_system_clean();
+extern void threaded_runner_start();
 extern void threaded_runner_keyframe(float nb_keyframes);
 
 // extern void copy_surface_to_texture(SDL_Surface *s);

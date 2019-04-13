@@ -507,7 +507,7 @@ void loader_tick() {
 	// printf("LOADER LEFT: %d\n", loader_running);
 }
 
-extern "C" void core_loader_waitall() {
+void core_loader_waitall() {
 	while (loader_running) {
 		loader_tick();
 		if (loader_running) SDL_Delay(10);

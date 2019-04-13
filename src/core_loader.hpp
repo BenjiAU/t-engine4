@@ -57,5 +57,6 @@ struct points_list {
 extern bool loader_noise(const char *filename, noise_data *noise);
 extern bool loader_points_list(const char *filename, points_list *list);
 extern bool loader_png(const char *filename, texture_lua *t, bool nearest, bool norepeat, bool exact_size);
+extern void core_loader_waitall();
 
 #endif

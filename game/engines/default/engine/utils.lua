@@ -1129,9 +1129,11 @@ end
 -- end
 core.display.getFontCache = function() return font_cache end
 
+local fontoldsize
+if not __reduce_utils then
 local tmps = core.display.newFont("/data/font/Vera.ttf", 12)
 local word_size_cache = {}
-local fontoldsize = getmetatable(tmps).__index.size
+fontoldsize = getmetatable(tmps).__index.size
 getmetatable(tmps).__index.simplesize = fontoldsize
 local fontcachewordsize = function(font, fstyle, v)
 	local cache = table.getTable(word_size_cache, font, fstyle)
@@ -1172,6 +1174,7 @@ getmetatable(tmps).__index.size = function(font, str)
 	end
 	return mw, mh
 end
+end
 
 local virtualimages = {}
 function core.display.virtualImage(path, data)
@@ -1186,6 +1189,7 @@ function core.display.loadImage(path)
 	return oldloadimage(path)
 end
 
+if not __reduce_utils then
 local pngcache = setmetatable({}, {__mode='v'})
 _G.pngcache = pngcache
 local oldloaderpng = core.loader.png
@@ -1198,6 +1202,7 @@ function core.loader.png(file)
 	local d, w, h = oldloaderpng(file)
 	pngcache[file] = d
 	return d, w, h, 1, 1, w, h
+end
 end
 
 function fs.iterate(path, filter)
@@ -2080,6 +2085,7 @@ local function deltaRealToCoords(dx, dy, source_x, source_y)
 	return source_x + dx, source_y + dy
 end
 
+if not __reduce_utils then
 function core.fov.calc_wall(x, y, w, h, halflength, halfmax_spots, source_x, source_y, delta_x, delta_y, block, apply)
 	apply(_, x, y)
 	delta_x, delta_y = deltaCoordsToReal(delta_x, delta_y, source_x, source_y)
@@ -2344,6 +2350,7 @@ function core.fov.set_vision_shape(val)
 	end
 	core.fov.set_vision_shape_base(val)
 	return val
+end
 end
 
 --- create a basic bresenham line (or hex equivalent)

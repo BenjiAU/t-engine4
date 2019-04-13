@@ -55,6 +55,7 @@ extern "C" {
 #include "core_lua.hpp"
 #include "profile.hpp"
 #include "renderer-moderngl/Interfaces.hpp"
+#include "utilities.hpp"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -1233,14 +1234,69 @@ static void close_state() {
 	font_cleanup();
 }
 
-void boot_lua(int state, bool rebooting, int argc, char *argv[])
-{
+void bootstrap_lua_state(lua_State *L, int argc, char **argv) {
+	const char *selfexe;
+
+	/***************** Physfs Init *****************/
+	PHYSFS_init(argv[0]);
+
+	bool bootstrap_mounted = false;
+	selfexe = get_self_executable(argc, argv);
+	if (selfexe && PHYSFS_mount(selfexe, "/", 1)) {
+	}
+	else {
+		printf("NO SELFEXE: bootstrapping from CWD\n");
+		PHYSFS_mount("bootstrap", "/bootstrap", 1);
+		bootstrap_mounted = true;
+	}
+
+	// Tell the boostrapping code the selfexe path
+	if (selfexe)
+		lua_pushstring(L, selfexe);
+	else
+		lua_pushnil(L);
+	lua_setglobal(L, "__SELFEXE");
+
+	// Will be useful
+#ifdef __APPLE__
+	lua_pushboolean(L, true);
+	lua_setglobal(L, "__APPLE__");
+#endif
+
+	// Run bootstrapping
+	if (!luaL_loadfile(L, "/bootstrap/boot.lua")) {
+		docall(L, 0, 0);
+	}
+	// Could not load bootstrap! Try to mount the engine from working directory as last resort
+	else {
+		lua_pop(L, 1);
+		printf("WARNING: No bootstrap code found, defaulting to working directory for engine code!\n");
+		PHYSFS_mount("game/thirdparty", "/", 1);
+		PHYSFS_mount("game/", "/", 1);
+		luaL_loadstring(L,
+			"fs.setPathAllowed(fs.getRealPath('/addons/', true)) " \
+			"if fs.getRealPath('/dlcs/') then fs.setPathAllowed(fs.getRealPath('/dlcs/', true)) end " \
+			"fs.setPathAllowed(fs.getRealPath('/modules/', true)) "
+		);
+		lua_pcall(L, 0, 0, 0);
+	}
+
+	if (bootstrap_mounted) {
+		PHYSFS_removeFromSearchPath("bootstrap");
+	}
+
+	// And run the lua engine pre init scripts
+	if (!luaL_loadfile(L, "/loader/pre-init.lua"))
+		docall(L, 0, 0);
+	else
+		lua_pop(L, 1);
+}
+
+void boot_lua(int state, bool rebooting, int argc, char *argv[]) {
 	core_def->corenum = 0;
 
 	if (state == 1)
 	{
-		const char *selfexe;
-
 		/* When rebooting we destroy the lua state to free memory and we reset physfs */
 		if (rebooting)
 		{
@@ -1249,21 +1305,6 @@ void boot_lua(int state, bool rebooting, int argc, char *argv[])
 			current_game = LUA_NOREF;
 
 			close_state();			
-		}
-
-		/***************** Physfs Init *****************/
-		PHYSFS_init(argv[0]);
-
-		bool bootstrap_mounted = false;
-		selfexe = get_self_executable(argc, argv);
-		if (selfexe && PHYSFS_mount(selfexe, "/", 1))
-		{
-		}
-		else
-		{
-			printf("NO SELFEXE: bootstrapping from CWD\n");
-			PHYSFS_mount("bootstrap", "/bootstrap", 1);
-			bootstrap_mounted = true;
 		}
 
 		/***************** Lua Init *****************/
@@ -1301,6 +1342,7 @@ void boot_lua(int state, bool rebooting, int argc, char *argv[])
 		luaopen_clipper(L);
 		luaopen_navmesh(L);
 		luaopen_wfc(L);
+		luaopen_binpack(L);
 
 		// Disable automatic GC, we'l do it when we want
 		lua_gc(L, LUA_GCSTOP, 0);
@@ -1327,50 +1369,9 @@ void boot_lua(int state, bool rebooting, int argc, char *argv[])
 		lua_newtable(L);
 		lua_setglobal(L, "__uids");
 
-		// Tell the boostrapping code the selfexe path
-		if (selfexe)
-			lua_pushstring(L, selfexe);
-		else
-			lua_pushnil(L);
-		lua_setglobal(L, "__SELFEXE");
-
-		// Will be useful
-#ifdef __APPLE__
-		lua_pushboolean(L, true);
-		lua_setglobal(L, "__APPLE__");
-#endif
-
-		// Run bootstrapping
-		if (!luaL_loadfile(L, "/bootstrap/boot.lua"))
-		{
-			docall(L, 0, 0);
-		}
-		// Could not load bootstrap! Try to mount the engine from working directory as last resort
-		else
-		{
-			lua_pop(L, 1);
-			printf("WARNING: No bootstrap code found, defaulting to working directory for engine code!\n");
-			PHYSFS_mount("game/thirdparty", "/", 1);
-			PHYSFS_mount("game/", "/", 1);
-			luaL_loadstring(L,
-				"fs.setPathAllowed(fs.getRealPath('/addons/', true)) " \
-				"if fs.getRealPath('/dlcs/') then fs.setPathAllowed(fs.getRealPath('/dlcs/', true)) end " \
-				"fs.setPathAllowed(fs.getRealPath('/modules/', true)) "
-			);
-			lua_pcall(L, 0, 0, 0);
-		}
-
-		if (bootstrap_mounted) {
-			PHYSFS_removeFromSearchPath("bootstrap");
-		}
+		bootstrap_lua_state(L, argc, argv);
 
 		if (te4_web_init) te4_web_init(L);
-
-		// And run the lua engine pre init scripts
-		if (!luaL_loadfile(L, "/loader/pre-init.lua"))
-			docall(L, 0, 0);
-		else
-			lua_pop(L, 1);
 
 		create_particles_thread();
 	}
@@ -1613,6 +1614,13 @@ int main(int argc, char *argv[])
 	bool no_web = false;
 	FILE *logfile = NULL;
 
+	// Handle "utilities"
+	if ((argc > 2) && !strncmp(argv[1], "--utility", 9)) {
+		if (!strncmp(argv[2], "spritesheet-generator", 21)) utility_spritesheet_generator(argc, argv);
+		exit(0);
+		return 0;
+	}
+
 	// Parse arguments
 	int i;
 	for (i = 1; i < argc; i++)
@@ -1747,6 +1755,8 @@ int main(int argc, char *argv[])
 
 	pass_command_args(argc, argv);
 
+	threaded_runner_start();
+
 	while (!exit_engine)
 	{
 		event_loop();
@@ -1796,4 +1806,5 @@ int main(int argc, char *argv[])
 #ifdef SELFEXE_MACOSX
 	fclose(stdout);
 #endif
+	return 0;
 }

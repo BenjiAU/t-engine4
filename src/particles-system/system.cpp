@@ -44,7 +44,7 @@ public:
 	condition_variable cv;
 	float keyframes_accumulator = 0;
 
-	ThreadedRunner();
+	void start();
 	void onKeyframe(float nb_keyframes);
 };
 
@@ -65,7 +65,8 @@ static void threaded_runner_thread() {
 	}
 }
 
-ThreadedRunner::ThreadedRunner() : th(threaded_runner_thread) {
+void ThreadedRunner::start() {
+	th = thread(threaded_runner_thread);
 	printf("[ParticlesCompose] started updater thread\n");
 }
 
@@ -73,6 +74,10 @@ void ThreadedRunner::onKeyframe(float nb_keyframes) {
 	lock_guard<mutex> guard(mux);
 	keyframes_accumulator += nb_keyframes;
 	cv.notify_all();
+}
+
+extern "C" void threaded_runner_start() {
+	th_runner_singleton.start();
 }
 
 extern "C" void threaded_runner_keyframe(float nb_keyframes) {
