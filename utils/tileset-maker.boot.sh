@@ -1,7 +1,8 @@
 #!/bin/bash
 
-base=`pwd -P`
-cd game/engines/default/modules/boot/data/gfx/
-rm -f ts-gfx-*
-lua "$base"/utils/tileset-maker.lua 1024 1024 ts-gfx-terrain /data/gfx/ invis.png `find terrain/ -name '*png'`
-lua "$base"/utils/tileset-maker.lua 512 256 ts-gfx-npc /data/gfx/ `find npc/ -name '*png'`
+./t-engine --utility spritesheet-generator --write-to game/engines/default/modules/boot/data/gfx/ \
+	--name ts-gfx-all --max-w 4096 --max-h 4096 \
+	--mount game/engines/default/modules/boot/ \
+	--add-dir-recurs /data/gfx/player \
+	--add-dir-recurs /data/gfx/npc \
+	--add-dir-recurs /data/gfx/terrain

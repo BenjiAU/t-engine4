@@ -1130,12 +1130,13 @@ end
 core.display.getFontCache = function() return font_cache end
 
 local fontoldsize
+local fontcachewordsize
 if not __reduce_utils then
 local tmps = core.display.newFont("/data/font/Vera.ttf", 12)
 local word_size_cache = {}
 fontoldsize = getmetatable(tmps).__index.size
 getmetatable(tmps).__index.simplesize = fontoldsize
-local fontcachewordsize = function(font, fstyle, v)
+fontcachewordsize = function(font, fstyle, v)
 	local cache = table.getTable(word_size_cache, font, fstyle)
 	if not cache[v] then
 		cache[v] = {fontoldsize(font, v)}

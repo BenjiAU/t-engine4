@@ -79,8 +79,7 @@ ActorAI:loadDefinition("/mod/ai/")
 Birther:loadDefinition("/data/birth/descriptors.lua")
 
 -- Load tilesets, to speed up image loads
-Tiles:loadTileset("/data/gfx/ts-gfx-npc.lua")
-Tiles:loadTileset("/data/gfx/ts-gfx-terrain.lua")
+Tiles:loadTileset("/data/gfx/ts-gfx-all.lua")
 
 -- Switch to realtime, with 8 ticks per second
 core.game.setRealtime(8)

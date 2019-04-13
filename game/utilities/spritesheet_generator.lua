@@ -26,6 +26,7 @@ fs.reset()
 
 local dirs_to_parse = {}
 local files_to_parse = {}
+local excludes = {}
 local write_to = nil
 local sheetname = "ts-unnamed-sheet"
 local max_w = 4096
@@ -43,6 +44,9 @@ while i <= #args do
 		i = i + 1
 	elseif arg == "--add-dir-norecurs" then
 		dirs_to_parse[args[i+1]] = false
+		i = i + 1
+	elseif arg == "--exclude" then
+		excludes[args[i+1]] = true
 		i = i + 1
 	elseif arg == "--add-file" then
 		files_to_parse[args[i+1]] = true
@@ -74,13 +78,21 @@ table.print(fs.getSearchPath(true))
 
 local list = {}
 
+local function is_allowed(fpath)
+	for echeck, _ in pairs(excludes) do
+		if fpath:find(echeck) then return false end
+	end
+	return true
+end
+
 local function findfiles(path, allow_recurs)
+	if not path:suffix("/") then path = path.."/" end
 	for f in fs.iterate(path) do
 		local fpath = path..f
 		if fs.isdir(fpath) and allow_recurs then
 			findfiles(fpath.."/", true)
 		elseif fpath:find("%.png$") then
-			list[#list+1] = fpath
+			if is_allowed(fpath) then list[#list+1] = fpath end
 		end
 	end
 end
