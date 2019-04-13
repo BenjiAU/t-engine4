@@ -130,7 +130,7 @@ function _M:onKeyBindAltered()
 end
 
 -- Displays the hotkeys, keybinds & cooldowns
-function _M:display()
+function _M:display(nb_keyframes)
 	local a = self.actor
 	-- if not a or not a.changed then return end
 
@@ -164,7 +164,7 @@ function _M:display()
 			self.dragclics[j] = {x,y,w,h}
 			self.clics[j] = {x,y,w,h,fake=not has_hk}
 		end
-		self.hk_cache[j]:update(self, a)
+		self.hk_cache[j]:update(self, a, nb_keyframes)
 
 		if orient == "down" or orient == "up" then
 			col = col + 1
@@ -185,8 +185,8 @@ function _M:display()
 end
 
 --- Our toScreen override
-function _M:toScreen()
-	self:display()
+function _M:toScreen(nb_keyframes)
+	self:display(nb_keyframes)
 	self.renderer:toScreen()
 end
 

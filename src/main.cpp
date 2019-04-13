@@ -1457,6 +1457,7 @@ void cleanupTimerLock(SDL_mutex *lock, SDL_TimerID *timer
 void handleIdleTransition(int goIdle)
 {
 	if (forbid_idle_mode) return;
+	if (!requested_fps) return;
 
 	if (goIdle) {
 		/* Make sure this isn't an idle->idle transition */

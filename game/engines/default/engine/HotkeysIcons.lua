@@ -65,8 +65,8 @@ function _M:isInvalid(def, x, y)
 	return false
 end
 
-function _M:displayData(actor)
-	return kinds_def[self.kind].display_data(self, actor)
+function _M:displayData(actor, nb_keyframes)
+	return kinds_def[self.kind].display_data(self, actor, nb_keyframes)
 end
 
 function _M:getDragDO(actor)
@@ -74,7 +74,9 @@ function _M:getDragDO(actor)
 end
 
 function _M:addTo(hks, actor, page, bi, i, x, y)
-	local display_entity, pie_color, pie_angle, frame, txt = self:displayData(actor)
+	if kinds_def[self.kind].setup then kinds_def[self.kind].setup(self, actor, page, bi, i, x, y) end
+
+	local display_entity, pie_color, pie_angle, frame, txt = self:displayData(actor, 30)
 	self.x, self.y, self.i = x, y, i
 
 	self.keybound = "HOTKEY_"..hks.page_to_hotkey[page]..bi
@@ -123,8 +125,8 @@ function _M:removeFrom(hks, actor)
 	if self.display_entity then self.display_entity:removeFromParent() end
 end
 
-function _M:update(hks, actor)
-	local display_entity, pie_color, pie_angle, frame, txt = self:displayData(actor)
+function _M:update(hks, actor, nb_keyframes)
+	local display_entity, pie_color, pie_angle, frame, txt = self:displayData(actor, nb_keyframes)
 
 	if frame ~= self.oldframe then
 		self.frame.container

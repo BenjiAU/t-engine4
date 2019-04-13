@@ -205,7 +205,7 @@ function _M:display(nb_keyframes)
 	game:displayMap(nb_keyframes, game.full_fbo)
 
 	if game.creating_player then return end
-	if self.no_ui then return end
+	-- if self.no_ui then return end
 
 	Map.viewport_padding_4 = 0
 	Map.viewport_padding_6 = 0

@@ -54,6 +54,7 @@ end
 
 function _M:toggleUI()
 	self.no_ui = not self.no_ui
+	game.log("UI %s", self.no_ui and "#LIGHT_RED#disabled" or "#LIGHT_GREEN#enabled")
 end
 
 function _M:checkGameOption(name)

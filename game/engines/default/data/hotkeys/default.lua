@@ -19,13 +19,27 @@
 
 newKind{
 	kind = "talent",
-	display_data = function(self, actor) local t = actor:getTalentFromId(self.data) if t then
+	setup = function(self, actor, page, bi, i, x, y)
+		self.last_pre_use_check = 10
+		self.checkPreUseTalent = function(self, actor, t, nb_keyframes)
+			self.last_pre_use_check = self.last_pre_use_check + nb_keyframes
+			if self.last_pre_use_check >= 10 then
+				self.last_pre_use_check = 0
+				local ret = actor:preUseTalent(t, true, true)
+				self.last_pre_use_ret = ret
+				return ret
+			else
+				return self.last_pre_use_ret
+			end
+		end
+	end,
+	display_data = function(self, actor, nb_keyframes) local t = actor:getTalentFromId(self.data) if t then
 		local display_entity = t.display_entity
 		local pie_color, pie_angle = {1, 1, 1, 0}, 360
 		local frame = "ok"
 		local txt = nil
 		if actor:isTalentCoolingDown(t) then
-			if not actor:preUseTalent(t, true, true) then
+			if not self:checkPreUseTalent(actor, t, nb_keyframes) then
 				pie_color = {0.745,0.745,0.745,0.4}
 				frame = "disabled"
 			else
@@ -38,7 +52,7 @@ newKind{
 			pie_color = {1,1,0,0.4}
 			pie_angle = 0
 			frame = "sustain"
-		elseif not actor:preUseTalent(t, true, true) then
+		elseif not self:checkPreUseTalent(actor, t, nb_keyframes) then
 			pie_color = {0.745,0.745,0.745,0.4}
 			pie_angle = 0
 			frame = "disabled"
@@ -56,13 +70,27 @@ newKind{
 
 newKind{
 	kind = "inventory",
-	display_data = function(self, actor)
+	setup = function(self, actor, page, bi, i, x, y)
+		self.last_pre_use_check = 10
+		self.getMyObject = function(self, actor, nb_keyframes)
+			self.last_pre_use_check = self.last_pre_use_check + nb_keyframes
+			if self.last_pre_use_check >= 10 then
+				self.last_pre_use_check = 0
+				local o = actor:findInAllInventories(self.data, {no_add_name=true, force_id=true, no_count=true})
+				self.last_pre_use_ret = o
+				return o
+			else
+				return self.last_pre_use_ret
+			end
+		end
+	end,
+	display_data = function(self, actor, nb_keyframes)
 		local display_entity
 		local pie_color, pie_angle = {1, 1, 1, 0}, 360
 		local frame = "ok"
 		local txt = nil
 
-		local o = actor:findInAllInventories(self.data, {no_add_name=true, force_id=true, no_count=true})
+		local o = self:getMyObject(actor, nb_keyframes)
 		local cnt = 0
 		if o then cnt = o:getNumber() end
 		if cnt == 0 then
