@@ -161,7 +161,10 @@ function _M:activate()
 	for _, class in ipairs(self.allcontainers) do
 		local c = require(class).new(self)
 		self.minicontainers[#self.minicontainers+1] = c
-		self.renderer:add(c:getDO())
+		-- DGDGDGDG TEST ONLY
+		if class ~= "mod.class.uiset.minimalist.Log" then
+			self.renderer:add(c:getDO())
+		end
 	end
 
 	game.log = function(style, ...) if type(style) == "number" then game.uiset.logdisplay(...) else game.uiset.logdisplay(style, ...) end end
@@ -205,7 +208,7 @@ function _M:display(nb_keyframes)
 	game:displayMap(nb_keyframes, game.full_fbo)
 
 	if game.creating_player then return end
-	-- if self.no_ui then return end
+	if self.no_ui then return end
 
 	Map.viewport_padding_4 = 0
 	Map.viewport_padding_6 = 0

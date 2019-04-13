@@ -194,6 +194,8 @@ public:
 	void addMOR(MapObjectRenderer *mor);
 	void removeMOR(MapObjectRenderer *mor);
 	void notifyChangedMORs();
+
+	vector<texture_info> getTextures();
 };
 
 class MapObjectProcessor {

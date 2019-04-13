@@ -227,6 +227,18 @@ function _M:tooltip(x, y)
 	if config.settings.cheat then
 		tstr:add(true, tostring(rawget(self, "type")), " / ", tostring(rawget(self, "subtype")))
 		tstr:add(true, "UID: ", tostring(self.uid), true, "Coords: ", tostring(x), "x", tostring(y))
+
+		-- textures
+		tstr:add(true, "Textures: ", {"color", "LIGHT_UMBER"})
+		local mos = {}
+		self:getMapObjects(Map.tiles, mos, 1)
+		for i = 1, Map.zdepth do
+			if mos[i] then
+				local tids = table.concat({mos[i]:getTexturesIds()}, ',')
+				tstr:add(("%s[%d] "):format(tids, i))
+			end
+		end
+		tstr:add({"color", "LAST"})
 	
 		-- debugging info
 		if game.level.map.room_map then

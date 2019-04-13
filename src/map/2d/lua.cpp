@@ -109,6 +109,14 @@ static int map_object_on_seen(lua_State *L) {
 	return 1;
 }
 
+static int map_object_get_textures_ids(lua_State *L) {
+	auto obj = lua_get_sobj_get<MapObject>(L, "core{mapobj2d}", 1);
+	vector<texture_info> list = obj->getTextures();
+	int cnt = list.size();
+	for (int i = 0; i < cnt; i++) lua_pushnumber(L, (int)list[i]);
+	return cnt;
+}
+
 static int map_object_texture(lua_State *L) {
 	auto obj = lua_get_sobj_get<MapObject>(L, "core{mapobj2d}", 1);
 	int i = luaL_checknumber(L, 2);
@@ -649,6 +657,7 @@ static const struct luaL_Reg map_object_reg[] = {
 	{"print", map_object_print},
 	{"invalidate", map_object_invalid},
 	{"isValid", map_object_is_valid},
+	{"getTexturesIds", map_object_get_textures_ids},
 	{"onSeen", map_object_on_seen},
 	{"hide", map_object_hide},
 	{"hideBase", map_object_hide_base},

@@ -121,7 +121,6 @@ function _M:resize(w, h)
 end
 
 function _M:update(nb_keyframes)
-	if game.uiset.no_ui then return end
 	self.hotkeys_display_icons:display(nb_keyframes)
 end
 

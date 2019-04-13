@@ -225,7 +225,8 @@ Tiles:loadTileset("/data/gfx/ts-gfx-object.lua")
 Tiles:loadTileset("/data/gfx/ts-gfx-trap.lua")
 Tiles:loadTileset("/data/gfx/ts-gfx-terrain.lua")
 Tiles:loadTileset("/data/gfx/ts-gfx-talents-effects.lua")
-UIBase:loadTileset("/data/gfx/ts-tome-ui.lua")
+UIBase:loadTileset("/data/gfx/ts-ui-tome.lua")
+UIBase:loadTileset("/data/gfx/ts-ui-darktome.lua")
 
 core.particlescompose.defaultShader("particles/normal")
 

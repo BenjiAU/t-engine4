@@ -148,6 +148,25 @@ void MapObject::clearParticles() {
 	notifyChangedMORs();
 }
 
+vector<texture_info> MapObject::getTextures() {
+	vector<texture_info> v;
+
+	MapObject *cur = this;
+	while (cur) {
+		bool first = true;
+		for (int i = 0; i < DO_MAX_TEX; i++) {
+			if ((int)textures[i] != 0) {
+				if (first && cur != this) v.push_back(-1);
+				v.push_back(textures[i]);
+				first = false;
+			}
+		}
+		cur = cur->next.get();
+	}
+
+	return v;
+}
+
 void MapObject::setShader(shader_type *s, int ref) {
 	shader = s;
 	refcleaner(&shader_ref);

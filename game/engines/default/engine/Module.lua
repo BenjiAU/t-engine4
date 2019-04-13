@@ -1001,6 +1001,8 @@ function _M:instanciate(mod, name, new_game, no_reboot, extra_module_info)
 	if __module_extra_info.compute_md5_only then os.crash() end
 
 	UIBase:loadTileset("/data/gfx/ts-ui-engine.lua")
+	UIBase:loadTileset("/data/gfx/ts-ui-metal.lua")
+	UIBase:loadTileset("/data/gfx/ts-ui-dark.lua")
 
 	-- Now that addons are loaded we can load UI definitions
 	for _, file in ipairs(fs.list("/data/gfx/ui/definitions")) do

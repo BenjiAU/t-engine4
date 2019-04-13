@@ -30,12 +30,12 @@ function _M:imageLoader(file, rw, rh)
 	local sfile = UI.ui.."-ui/minimalist/"..file
 	if fs.exists("/data/gfx/"..sfile) then
 		local ts, fx, fy, tsx, tsy, tw, th = UI:checkTileset(sfile)
-		if ts then return core.renderer.fromTextureTable({t=ts, tw=fx, th=fy, w=tw, h=th, tx=tsx, ty=tsy}, 0, 0, rw, rh)
-		else return core.renderer.surface(core.display.loadImage("/data/gfx/"..sfile), 0, 0, rw, rh) end
+		if ts then print("Loading tile from tileset", sfile) return core.renderer.fromTextureTable({t=ts, tw=fx, th=fy, w=tw, h=th, tx=tsx, ty=tsy}, 0, 0, rw, rh)
+		else print("Loading tile from image", sfile) return core.renderer.surface(core.display.loadImage("/data/gfx/"..sfile), 0, 0, rw, rh) end
 	else
 		local ts, fx, fy, tsx, tsy, tw, th = UI:checkTileset("ui/"..file)
-		if ts then return core.renderer.fromTextureTable({t=ts, tw=fx, th=fy, w=tw, h=th, tx=tsx, ty=tsy}, 0, 0, rw, rh)
-		else return core.renderer.surface(core.display.loadImage("/data/gfx/ui/"..file), 0, 0, rw, rh) end
+		if ts then print("Loading tile from tileset", file) return core.renderer.fromTextureTable({t=ts, tw=fx, th=fy, w=tw, h=th, tx=tsx, ty=tsy}, 0, 0, rw, rh)
+		else print("Loading tile from image", file) return core.renderer.surface(core.display.loadImage("/data/gfx/ui/"..file), 0, 0, rw, rh) end
 	end
 end
 
