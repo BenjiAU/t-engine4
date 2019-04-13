@@ -1492,7 +1492,8 @@ local standard_rnd_boss_adjust = function(b)
 		change = (max - flat)
 		if flat > max then
 			b.flat_damage_armor.all = b.flat_damage_armor.all - (flat - max)
-			print("[standard_rnd_boss_adjust]:  Adjusting flat armor", flat, "Max", max, "Change", change)
+			-- Do NOT activate this log for production, it may trigger undefined upvalue if print is redefined
+			-- print("[standard_rnd_boss_adjust]:  Adjusting flat armor", flat, "Max", max, "Change", change)
 		end
 
 		if b.level <= 20 then
@@ -1501,7 +1502,8 @@ local standard_rnd_boss_adjust = function(b)
 			change = (max - armor)
 			if armor > max then
 				b.combat_armor = b.combat_armor - (armor - max)
-				print("[standard_rnd_boss_adjust]:  Adjusting armor", armor, "Max", max, "Change", change)
+				-- Do NOT activate this log for production, it may trigger undefined upvalue if print is redefined
+				-- print("[standard_rnd_boss_adjust]:  Adjusting armor", armor, "Max", max, "Change", change)
 			end
 
 			local defense = b:combatDefense()
@@ -1509,7 +1511,8 @@ local standard_rnd_boss_adjust = function(b)
 			change = (max - defense)
 			if defense > max then
 				b.combat_def = b.combat_def - (defense - max)
-				print("[standard_rnd_boss_adjust]:  Adjusting defense", defense, "Max", max, "Change", change)
+				-- Do NOT activate this log for production, it may trigger undefined upvalue if print is redefined
+				-- print("[standard_rnd_boss_adjust]:  Adjusting defense", defense, "Max", max, "Change", change)
 			end
 
 			-- Temporarily just hard removing this early game pending this stat not being spammed everywhere causing tons of damage most people don't even notice is happening
