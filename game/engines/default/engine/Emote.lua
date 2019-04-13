@@ -61,7 +61,7 @@ end
 function _M:generate()
 	self.renderer = core.renderer.renderer("static"):setRendererName("emote")
 
-	local text = core.renderer.text(self.font):outline(0.7):text(self.text):center()
+	local text = core.renderer.text(self.font):text(self.text):center():color(colors.unpack1(self.color))
 	local w, h = text:getStats()
 	self.rw, self.rh = w, h
 

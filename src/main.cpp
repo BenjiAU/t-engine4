@@ -1576,7 +1576,8 @@ void setupDisplayTimer(int fps)
 		printf("[ENGINE] Setting requested FPS to %d (%d ms)\n", fps, 1000 / fps);
 	} else {
 		max_ms_per_frame = 0;
-		printf("[ENGINE] Setting requested FPS to unbound\n");
+		event_loop = event_loop_realtime;
+		printf("[ENGINE] Setting requested FPS to unbound, forcing to realtime\n");
 	}
 
 	// We only use the display timer in tickbased event loop

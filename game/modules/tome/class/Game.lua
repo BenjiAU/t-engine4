@@ -1988,6 +1988,9 @@ function _M:setupCommands()
 			print("===============")
 		end end,
 		[{"_g","ctrl"}] = function() if config.settings.cheat then
+			package.loaded["engine.Emote"] = nil
+			self.player:setEmote(require("engine.Emote").new("Plop!!!! Plop!!!! Plop!!!! ", 120))
+do return end
 			if self.zone.short_name ~= "test" then
 				self:changeLevel(1, "test")
 			else
