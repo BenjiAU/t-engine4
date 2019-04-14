@@ -97,7 +97,7 @@ Right click or press '~' to configure talent confirmation and automatic use.
 	self:setupUI()
 
 	self.key:addCommands{
-		__TEXTINPUT = function(c)
+		__TEXTINPUT = function(c, isup)
 			if c == '~' then
 				self:use(self.cur_item, "right")
 			end

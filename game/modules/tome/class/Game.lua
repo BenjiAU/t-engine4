@@ -2045,8 +2045,8 @@ do return end
 		end
 	end
 	self.key:unicodeInput(true)
-	self.key:addBinds
-	{
+
+	self.key:addBinds{
 		-- Movements
 		MOVE_LEFT = function() if self.scroll_lock_enabled and self.level then self.level.map:scrollDir(4) else self.player:moveDir(4) end end,
 		MOVE_RIGHT = function() if self.scroll_lock_enabled and self.level then self.level.map:scrollDir(6) else self.player:moveDir(6) end end,
@@ -2217,7 +2217,9 @@ do return end
 		end,
 
 		USE_TALENTS = not_wild(function()
-			self:registerDialog(require("mod.dialogs.UseTalents").new(self.player))
+			self:onTickEnd(function()
+				self:registerDialog(require("mod.dialogs.UseTalents").new(self.player))
+			end)
 		end),
 
 		LEVELUP = function()
@@ -2394,6 +2396,9 @@ do return end
 			end
 		end
 	}
+
+	self:setupWASD()
+
 	-- add key bindings for targeting mode
 	self.targetmode_key:addBinds{
 		SHOW_CHARACTER_SHEET_CURSOR = function()
@@ -2413,6 +2418,36 @@ do return end
 
 	self.key:setCurrent()
 	self.gamepad:setCurrent()
+end
+
+function _M:setupWASD()
+	self.wasd_state = {}
+	local function handle_wasd()
+		local ws = self.wasd_state
+		if     ws.left  and ws.up   then self.key:triggerVirtual("MOVE_LEFT_UP")
+		elseif ws.right and ws.up   then self.key:triggerVirtual("MOVE_RIGHT_UP")
+		elseif ws.left  and ws.down then self.key:triggerVirtual("MOVE_LEFT_DOWN")
+		elseif ws.right and ws.down then self.key:triggerVirtual("MOVE_RIGHT_DOWN")
+		elseif ws.right             then self.key:triggerVirtual("MOVE_RIGHT")
+		elseif ws.left              then self.key:triggerVirtual("MOVE_LEFT")
+		elseif ws.up                then self.key:triggerVirtual("MOVE_UP")
+		elseif ws.down              then self.key:triggerVirtual("MOVE_DOWN")
+		end
+	end
+
+	if config.settings.tome.use_wasd then
+		self.key:addBinds{
+			MOVE_WASD_UP    = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.up = not isup and true or false end,
+			MOVE_WASD_DOWN  = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.down = not isup and true or false end,
+			MOVE_WASD_LEFT  = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.left = not isup and true or false end,
+			MOVE_WASD_RIGHT = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.right = not isup and true or false end,
+		}
+	else
+		self.key:removeBind("MOVE_WASD_UP")
+		self.key:removeBind("MOVE_WASD_DOWN")
+		self.key:removeBind("MOVE_WASD_LEFT")
+		self.key:removeBind("MOVE_WASD_RIGHT")
+	end
 end
 
 function _M:setupMouse(reset)

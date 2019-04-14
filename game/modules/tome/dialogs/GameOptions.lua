@@ -440,6 +440,16 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Enable the WASD movement keys. Can be used to move diagonaly by pressing two directions at once.#WHITE#"}
+	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Enable WASD movement keys#WHITE##{normal}#", status=function(item)
+		return tostring(config.settings.tome.use_wasd and "enabled" or "disabled")
+	end, fct=function(item)
+		config.settings.tome.use_wasd = not config.settings.tome.use_wasd
+		game:saveSettings("tome.use_wasd", ("tome.use_wasd = %s\n"):format(tostring(config.settings.tome.use_wasd)))
+		self.c_list:drawItem(item)
+		if self:isTome() then game:setupWASD() end
+	end,}
+
 	self.list = list
 end
 
