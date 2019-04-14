@@ -161,10 +161,7 @@ function _M:activate()
 	for _, class in ipairs(self.allcontainers) do
 		local c = require(class).new(self)
 		self.minicontainers[#self.minicontainers+1] = c
-		-- DGDGDGDG TEST ONLY
-		if class ~= "mod.class.uiset.minimalist.Log" then
-			self.renderer:add(c:getDO())
-		end
+		self.renderer:add(c:getDO())
 	end
 
 	game.log = function(style, ...) if type(style) == "number" then game.uiset.logdisplay(...) else game.uiset.logdisplay(style, ...) end end
