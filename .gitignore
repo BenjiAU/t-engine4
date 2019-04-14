@@ -7,8 +7,10 @@ divx2pass.log
 game/addons/**
 game/dlcs/**
 obj/**
-out.avi
-out.ogv
+out*.avi
+out*.ogv
+*recompile.sh
+*.so
 te4_log_web.txt
 t-engine
 tengine_doc
@@ -21,4 +23,6 @@ game/modules/particles_editor/
 steam_appid.txt
 oprofile_data/
 game/modules/tome/data/gfx/ts-gfx*
+game/modules/tome/data/gfx/ts-ui*
 game/engines/default/modules/boot/data/gfx/ts-gfx*
+game/engines/default/data/gfx/ts-ui*
