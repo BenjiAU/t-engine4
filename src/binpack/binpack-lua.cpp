@@ -33,9 +33,16 @@ extern "C" {
 #include <memory>
 #include <vector>
 #include <algorithm>
+#include "glm/glm.hpp"
 
 using namespace std;
 using namespace rbp;
+
+enum class Padding : uint8_t {
+	NONE = 0,
+	ALPHA0 = 1,
+	IMAGE = 2,
+};
 
 struct sprite_holder {
 	string filename;
@@ -62,10 +69,12 @@ struct spritesheet {
 	bool last_grow_dir = true;
 	MaxRectsBinPack bin;
 	vector<sp_sprite_holder> sprites;
+	Padding padding_mode = Padding::NONE;
+	uint8_t padding_size = 0;
 
-	spritesheet(uint32_t id, uint32_t max_w, uint32_t max_h, bool verbose) : id(id), max_w(max_w), max_h(max_h), verbose(verbose) {
+	spritesheet(uint32_t id, uint32_t max_w, uint32_t max_h, Padding mode, uint8_t size, bool verbose) : id(id), max_w(max_w), max_h(max_h), padding_mode(mode), padding_size(size), verbose(verbose) {
 		bin.Init(w, h, false);
-		if (verbose) printf("Initializing bin[%d] to size %dx%d.\n", id, w, h);
+		if (verbose) printf("Initializing bin[%d] to size %dx%d with padding %s : %d.\n", id, w, h, (mode == Padding::NONE) ? "none" : (mode == Padding::ALPHA0) ? "alpha0" : (mode == Padding::IMAGE) ? "image" : "???", padding_size);
 	}
 
 	bool grow() {
@@ -90,8 +99,14 @@ struct spritesheet {
 
 	bool insert(sp_sprite_holder sprite, bool no_add=false) {
 		// Read next rectangle to pack.
-		int rectWidth = sprite->w + 2;
-		int rectHeight = sprite->h + 2;
+		int rectWidth = sprite->w;
+		int rectHeight = sprite->h;
+
+		if (padding_mode != Padding::NONE) {
+			rectWidth += padding_size * 2;
+			rectHeight += padding_size * 2;
+		}
+
 		if (verbose) printf("Bin[%d] Packing rectangle %s of size %dx%d:\n", id, sprite->filename.c_str(), rectWidth, rectHeight);
 
 		// Perform the packing.
@@ -101,8 +116,12 @@ struct spritesheet {
 		// Test success or failure.
 		if (packedRect.height > 0) {
 			if (verbose) printf("  + Bin[%d] Packed to (x,y)=(%d,%d), (w,h)=(%d,%d). Free space left: %.2f%%\n", id, packedRect.x, packedRect.y, packedRect.width, packedRect.height, 100.f - bin.Occupancy()*100.f);
-			sprite->x = packedRect.x + 1;
-			sprite->y = packedRect.y + 1;
+			sprite->x = packedRect.x + padding_size;
+			sprite->y = packedRect.y + padding_size;
+			if (padding_mode != Padding::NONE) {
+				sprite->x += padding_size;
+				sprite->y += padding_size;
+			}
 			if (!no_add) sprites.push_back(sprite);
 			return true;
 		} else {
@@ -116,14 +135,43 @@ struct spritesheet {
 	}
 };
 
+static void blit_surface(SDL_Surface *from, glm::ivec4 from_coords, SDL_Surface *to, glm::ivec4 to_coords) {
+	SDL_Rect srcrect;
+	srcrect.x = from_coords.x;
+	srcrect.y = from_coords.y;
+	srcrect.w = from_coords.z;
+	srcrect.h = from_coords.w;
+
+	SDL_Rect dstrect;
+	dstrect.x = to_coords.x;
+	dstrect.y = to_coords.y;
+	dstrect.w = to_coords.z;
+	dstrect.h = to_coords.w;
+
+	if (from_coords.x == -1) {
+		SDL_BlitSurface(from, NULL, to, &dstrect);
+	} else {
+		SDL_BlitSurface(from, &srcrect, to, &dstrect);
+	}
+}
+
 static int generate_spritesheet(lua_State *L) {
 	const char *spritesheet_name = luaL_checkstring(L, 1);
 	uint32_t max_w = lua_tonumber(L, 2);
 	uint32_t max_h = lua_tonumber(L, 3);
-	bool verbose = lua_toboolean(L, 5);
+	bool verbose = lua_toboolean(L, 6);
 	if (!max_w) max_w = 512;
 	if (!max_h) max_h = 512;
 
+	uint32_t padding_size = 0;
+	Padding padding_mode = Padding::NONE;
+
+	if (lua_istable(L, 5)) {
+		lua_rawgeti(L, 5, 1);
+		padding_mode = static_cast<Padding>((uint8_t)lua_tonumber(L, -1)); lua_pop(L, 1);
+		lua_rawgeti(L, 5, 2);
+		padding_size = lua_tonumber(L, -1); lua_pop(L, 1);
+	}
 
 	Uint32 rmask, gmask, bmask, amask;
 	/* SDL interprets each pixel as a 32-bit number, so our masks must depend on the endianness (byte order) of the machine */
@@ -158,14 +206,14 @@ static int generate_spritesheet(lua_State *L) {
 	std::sort(sprites.begin(), sprites.end(), sort_sprites);
 
 	vector<spritesheet> sheets;
-	sheets.emplace_back(1, max_w, max_h, verbose);
+	sheets.emplace_back(1, max_w, max_h, padding_mode, padding_size, verbose);
 
 	for (auto sprite : sprites) {
 		int sheet_id = 0;
 		while (true) {
 			if (sheets[sheet_id].insert(sprite)) break;
 			sheet_id++;
-			if (sheets.size() <= sheet_id) sheets.emplace_back(sheet_id + 1, max_w, max_h, verbose);
+			if (sheets.size() <= sheet_id) sheets.emplace_back(sheet_id + 1, max_w, max_h, padding_mode, padding_size, verbose);
 		}
 	}
 	if (verbose) printf("Done. All rectangles packed.\n");
@@ -199,12 +247,24 @@ static int generate_spritesheet(lua_State *L) {
 
 			lua_setfield(L, -3, sprite->filename.c_str());
 
-			SDL_Rect dstrect;
-			dstrect.x = sprite->x;
-			dstrect.y = sprite->y;
-			dstrect.w = sprite->w;
-			dstrect.h = sprite->h;
-			SDL_BlitSurface(sprite->s, NULL, sheet_s, &dstrect);
+			blit_surface(sprite->s, {-1,-1,-1,-1}, sheet_s, {sprite->x, sprite->y, sprite->w, sprite->h});
+
+			if (padding_mode == Padding::IMAGE) {
+				for (int i = 1; i <= padding_size; i++) {
+					blit_surface(sprite->s, {0, 0, 1, sprite->h}, sheet_s, {sprite->x - i, sprite->y, 1, sprite->h});
+					blit_surface(sprite->s, {sprite->w-2, 0, 1, sprite->h}, sheet_s, {sprite->x + sprite->w-1 + i, sprite->y, 1, sprite->h});
+
+					blit_surface(sprite->s, {0, 0, sprite->w, 1}, sheet_s, {sprite->x, sprite->y - i, sprite->w, 1});
+					blit_surface(sprite->s, {0, sprite->h-2, sprite->w, 1}, sheet_s, {sprite->x, sprite->y + sprite->h-1 + i, sprite->w, 1});
+
+					for (int j = 1; j <= padding_size; j++) {
+						blit_surface(sprite->s, {0, 0, 1, 1}, sheet_s, {sprite->x - i, sprite->y - j, 1, 1});
+						blit_surface(sprite->s, {sprite->w-1, 0, 1, 1}, sheet_s, {sprite->x + sprite->w-1 + i, sprite->y - j, 1, 1});
+						blit_surface(sprite->s, {0, sprite->h-1, 1, 1}, sheet_s, {sprite->x - i, sprite->y + sprite->h-1 + j, 1, 1});
+						blit_surface(sprite->s, {sprite->w-1, sprite->h-1, 1, 1}, sheet_s, {sprite->x + sprite->w-1 + i, sprite->y + sprite->h-1 + j, 1, 1});
+					}
+				}
+			}
 
 			// Cleanup
 			SDL_FreeSurface(sprite->s);
@@ -227,6 +287,9 @@ static const struct luaL_Reg plib[] = {
 
 extern "C" int luaopen_binpack(lua_State *L) {
 	luaL_openlib(L, "core.binpack", plib, 0);
+	lua_pushliteral(L, "PADDING_NONE"); lua_pushnumber(L, static_cast<uint8_t>(Padding::NONE)); lua_rawset(L, -3);
+	lua_pushliteral(L, "PADDING_ALPHA0"); lua_pushnumber(L, static_cast<uint8_t>(Padding::ALPHA0)); lua_rawset(L, -3);
+	lua_pushliteral(L, "PADDING_IMAGE"); lua_pushnumber(L, static_cast<uint8_t>(Padding::IMAGE)); lua_rawset(L, -3);
 
 	lua_settop(L, 0);
 	return 1;

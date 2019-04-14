@@ -31,6 +31,8 @@ local write_to = nil
 local sheetname = "ts-unnamed-sheet"
 local max_w = 4096
 local max_h = 4096
+local padding_mode = core.binpack.PADDING_NONE
+local padding_size = 0
 
 local i = 1
 while i <= #args do
@@ -62,6 +64,13 @@ while i <= #args do
 		i = i + 1
 	elseif arg == "--max-h" then
 		max_h = tonumber(args[i+1])
+		i = i + 1
+	elseif arg == "--padding" then
+		local pdata = args[i+1]
+		if pdata:prefix("NONE") then padding_mode = core.binpack.PADDING_NONE; padding_size = 0
+		elseif pdata:prefix("ALPHA0") then padding_mode = core.binpack.PADDING_ALPHA0; padding_size = tonumber(pdata:sub(8)) or 1
+		elseif pdata:prefix("IMAGE") then padding_mode = core.binpack.PADDING_IMAGE; padding_size = tonumber(pdata:sub(7)) or 1
+		end
 		i = i + 1
 	end
 
@@ -107,11 +116,11 @@ end
 table.sort(list)
 table.print(list)
 
-local sheet, images = core.binpack.generateSpritesheet(sheetname, max_w, max_h, list, true)
+local sheet, images = core.binpack.generateSpritesheet(sheetname, max_w, max_h, list, {padding_mode, padding_size}, true)
 
-table.print(sheet)
-print("---")
-table.print(images)
+-- table.print(sheet)
+-- print("---")
+-- table.print(images)
 
 for file in fs.iterate("/data/gfx/", function(f) return f:find("%.png") and f:prefix(sheetname) end) do
 	fs.delete("/"..file)
