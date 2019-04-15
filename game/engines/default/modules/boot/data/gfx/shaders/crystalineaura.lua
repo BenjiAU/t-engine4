@@ -35,7 +35,7 @@ return {
 		color = color or {0.624, 0.820, 0.933},
 	},
 	resetargs = {
-		tick_start = function() return core.game.getTime() end,
+		tick_start = function() return core.game.getFrameTime() end,
 	},		
 	clone = false,
 }

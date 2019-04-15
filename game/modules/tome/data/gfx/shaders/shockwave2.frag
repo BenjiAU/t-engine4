@@ -194,7 +194,6 @@ void main(void)
 	//c.a *= min(1.0, max(0.0, 20.0 * (1.0 - (radiusLen - (ringRadius - ringWidth)) / ringWidth)));
 	c.a *= 1.0 - pow(phase, 3.0);
 	c.a *= gl_Color.a;
-	
 		
 	gl_FragColor = c;
 }

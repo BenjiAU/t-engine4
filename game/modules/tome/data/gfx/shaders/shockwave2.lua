@@ -35,7 +35,7 @@ return {
 		antialiasingRadius = antialiasingRadius or 0.98, --1.0 is no antialiasing, 0.0 - fully smoothed(looks worse)
 	},
 	resetargs = {
-		tick_start = function() return core.game.getTime() end,
+		tick_start = function() return core.game.getFrameTime() end,
 	},	
 	clone = false,
 }
