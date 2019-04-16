@@ -478,11 +478,11 @@ function _M:generate()
 	self.do_container:translate(self.display_x, self.display_y, -100)
 	self.full_container:add(self.do_container)
 
-	if self.__showup or self.force_fbo then
+	if self.__showup then
 		self.renderer_outer = core.renderer.renderer("static"):setRendererName(self:getClassName()..":FBO"):countDraws(false)
-		self.fbo = core.renderer.target()
-		self.fbo:setAutoRender(self.renderer)
-		self.renderer_outer:add(self.fbo)
+		self.renderer_inner = core.renderer.renderer("static")
+		self.renderer_inner:add(self.renderer)
+		self.renderer_outer:add(self.renderer_inner)
 	else
 		self.renderer_outer = self.renderer
 	end
@@ -803,14 +803,12 @@ function _M:setupUI(resizex, resizey, on_resize, addmw, addmh)
 	if self.__showup then
 		local mw, mh = self.display_x + math.floor(self.w / 2), self.display_y + math.floor(self.h / 2)
 		self.renderer_outer:translate(mw, mh)
-		self.fbo:translate(-mw, -mh)
+		self.renderer_inner:translate(-mw, -mh)
 
 		self.renderer_outer:scale(0.01, 0.01, 1):tween(7, "scale_x", nil, 1, self.__showup):tween(7, "scale_y", nil, 1, self.__showup, function()
-			if not self.force_fbo then
-				self.renderer_outer:clear()
-				self.fbo = nil
-				self.renderer_outer = self.renderer
-			end
+			self.renderer_outer:clear()
+			self.renderer_inner = nil
+			self.renderer_outer = self.renderer
 		end)
 	end
 

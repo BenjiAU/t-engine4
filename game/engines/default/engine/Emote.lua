@@ -71,7 +71,9 @@ function _M:generate()
 	self.renderer:add(frame.container:color(1, 1, 1, 0.7))
 	self.renderer:add(text:translate(self.w / 2, self.h / 2))
 
-	self.renderer:tween(self.dur, "wait", function(r) r:tween(10, "a", nil, 0, "inQuad", function() self.dead = true end) end)
+	self.renderer:tween(self.dur, "wait", function(r)
+		r:tween(10, "a", nil, 0, "inQuad"):tween(10, "scale_x", nil, 0, "inQuad", function() self.dead = true end)
+	end)
 
 	self.dead = false
 end

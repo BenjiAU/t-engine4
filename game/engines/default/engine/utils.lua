@@ -1194,13 +1194,13 @@ if not __reduce_utils then
 local pngcache = setmetatable({}, {__mode='v'})
 _G.pngcache = pngcache
 local oldloaderpng = core.loader.png
-function core.loader.png(file)
+function core.loader.png(file, ...)
 	if pngcache[file] then
 		local t = pngcache[file]
 		local w, h = t:getSize()
 		return t, w, h, 1, 1, w, h
 	end
-	local d, w, h = oldloaderpng(file)
+	local d, w, h = oldloaderpng(file, ...)
 	pngcache[file] = d
 	return d, w, h, 1, 1, w, h
 end

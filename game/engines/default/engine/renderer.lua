@@ -161,7 +161,7 @@ end
 function core.renderer.surface(s, x, y, w, h, r, g, b, a, v)
 	if not s then return v or core.renderer.container() end
 	r = r or 1 g = g or 1 b = b or 1 a = a or 1 
-	local tex, rw, rh, tw, th, iw, ih = s:glTexture()
+	local tex, rw, rh, tw, th, iw, ih = s:glTexture(false, true, false)
 	x = x or 0
 	y = y or 0
 	w = w or iw
@@ -228,7 +228,7 @@ function core.renderer.textureTable(s)
 	else
 		local t = {tx=0, ty=0}
 		t.w, t.h = s:getSize()
-		t.t, t.tw, t.th = s:glTexture()
+		t.t, t.tw, t.th = s:glTexture(false, true, false)
 		t.tw = t.w / t.tw
 		t.th = t.h / t.th
 		return t

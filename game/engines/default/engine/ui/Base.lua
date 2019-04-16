@@ -138,7 +138,7 @@ function _M:getUITexture(file)
 	local i, w, h = self:getImage(uifile, true)
 	if not i then i, w, h = self:getImage(self.defaultui.."-"..file) end
 	if not i then error("bad UI texture: "..uifile) return end
-	local t, tw, th = i:glTexture()
+	local t, tw, th = i:glTexture(false, true, false)
 	local r = {t=t, w=w, h=h, tw=w/tw, th=h/th, tx=0, ty=0}
 	tcache[uifile] = r
 	return r
