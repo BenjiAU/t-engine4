@@ -144,6 +144,13 @@ function _M:display(nb_keyframes)
 	self.items = {}
 	local w, h = self.frames.w, self.frames.h
 
+	if self.old_bpage ~= bpage or self.old_a ~= a then
+		for _, hk in pairs(self.hk_cache) do hk:removeFrom(self, a) end
+		self.hk_cache = {}
+	end
+	self.old_a = a
+	self.old_bpage = bpage
+
 	for page = bpage, #self.page_to_hotkey do for i = 1, 12 do
 		local bi = i
 		local j = i + (12 * (page - 1))
