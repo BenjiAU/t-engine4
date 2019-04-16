@@ -381,15 +381,16 @@ function _M:makeEntity(level, type, filter, force_level, prob_filter)
 	resolvers.current_level = self.base_level + level.level - 1
 	if force_level then resolvers.current_level = force_level end
 
-	if prob_filter == nil then prob_filter = util.getval(self.default_prob_filter, self, type) end
-	if filter == nil then filter = util.getval(self.default_filter, self, level, type) end
-	if filter and self.alter_filter then filter = util.getval(self.alter_filter, self, level, type, filter) end
-
 	local list
 	if _G.type(type) == "table" then -- use the provided list
 		list = type
 		type = type.__real_type or ""
 	end
+
+	if prob_filter == nil then prob_filter = util.getval(self.default_prob_filter, self, type) end
+	if filter == nil then filter = util.getval(self.default_filter, self, level, type) end
+	if filter and self.alter_filter then filter = util.getval(self.alter_filter, self, level, type, filter) end
+
 	local e
 	-- No probability list, use the default one and apply filter
 	if not prob_filter then
