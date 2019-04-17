@@ -1559,6 +1559,7 @@ void (*event_loop)() = event_loop_tickbased;
 void setupRealtime(float freq)
 {
 	if (!freq) {
+		// event_loop = event_loop_tickbased;
 		event_loop = event_loop_tickbased;
 		printf("[ENGINE] Switching to turn based\n");
 	} else {

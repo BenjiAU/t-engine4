@@ -106,7 +106,7 @@ function _M:checkTileset(image, base)
 		self.tilesets_texs[d.set] = tex
 		print("Loading tileset", d.set)
 	end
-	return tex, d.factorx, d.factory, d.x, d.y, d.w, d.h
+	return tex, d.factorx, d.factory, d.x, d.y, d.w, d.h, d.trim_x1, d.trim_y1, d.trim_x2, d.trim_y2, d.trim_ow, d.trim_oh
 end
 
 function _M:get(char, fr, fg, fb, br, bg, bb, image, alpha, do_outline, allow_tileset, force_texture_repeat)
@@ -126,19 +126,19 @@ function _M:get(char, fr, fg, fb, br, bg, bb, image, alpha, do_outline, allow_ti
 	if (self.use_images or not dochar) and image then char = image end
 	if self.repo[char] and self.repo[char][fgidx] and self.repo[char][fgidx][bgidx] then
 		local s = self.repo[char][fgidx][bgidx]
-		return s[1], s[2], s[3], s[4], s[5], s[6], s[7]
+		return s[1], s[2], s[3], s[4], s[5], s[6], s[7], s[8], s[9], s[10], s[11], s[12], s[13]
 	else
 		local s, sw, sh, w, h
 		local is_image = false
 		if (self.use_images or not dochar) and image and #image > 4 then
 			if allow_tileset then
-				local ts, fx, fy, tsx, tsy, tw, th = self:checkTileset(image)
+				local ts, fx, fy, tsx, tsy, tw, th, trim_x1, trim_y1, trim_x2, trim_y2, trim_ow, trim_oh = self:checkTileset(image)
 				if ts then
 					self.repo[char] = self.repo[char] or {}
 					self.repo[char][fgidx] = self.repo[char][fgidx] or {}
-					self.repo[char][fgidx][bgidx] = {ts, fx, fy, tw, th, tsx, tsy}
+					self.repo[char][fgidx][bgidx] = {ts, fx, fy, tw, th, tsx, tsy, trim_x1, trim_y1, trim_x2, trim_y2, trim_ow, trim_oh}
 					-- print(("------- TILE[%s] = texture (tileset/%s: %fx%f %dx%d)"):format(char, ts:getValue(), fx, fy, tw, th))
-					return ts, fx, fy, tw, th, tsx, tsy
+					return ts, fx, fy, tw, th, tsx, tsy, trim_x1, trim_y1, trim_x2, trim_y2, trim_ow, trim_oh
 				end
 			end
 			print("Loading tile", image, " even though tileset was", allow_tileset)

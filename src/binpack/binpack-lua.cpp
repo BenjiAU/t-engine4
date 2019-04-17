@@ -44,15 +44,134 @@ enum class Padding : uint8_t {
 	IMAGE = 2,
 };
 
+static void get_sdl_surface_masks(Uint32 &rmask, Uint32 &gmask, Uint32 &bmask, Uint32 &amask) {
+	/* SDL interprets each pixel as a 32-bit number, so our masks must depend on the endianness (byte order) of the machine */
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	rmask = 0xff000000;
+	gmask = 0x00ff0000;
+	bmask = 0x0000ff00;
+	amask = 0x000000ff;
+#else
+	rmask = 0x000000ff;
+	gmask = 0x0000ff00;
+	bmask = 0x00ff0000;
+	amask = 0xff000000;
+#endif
+}
+
+static void blit_surface(SDL_Surface *from, glm::ivec4 from_coords, SDL_Surface *to, glm::ivec4 to_coords) {
+	SDL_Rect srcrect;
+	srcrect.x = from_coords.x;
+	srcrect.y = from_coords.y;
+	srcrect.w = from_coords.z;
+	srcrect.h = from_coords.w;
+
+	SDL_Rect dstrect;
+	dstrect.x = to_coords.x;
+	dstrect.y = to_coords.y;
+	dstrect.w = to_coords.z;
+	dstrect.h = to_coords.w;
+
+	if (from_coords.x == -1) {
+		SDL_BlitSurface(from, NULL, to, &dstrect);
+	} else {
+		SDL_BlitSurface(from, &srcrect, to, &dstrect);
+	}
+}
+
 struct sprite_holder {
 	string filename;
-	SDL_Surface *s;
+	SDL_Surface *s, *s_original;
 	uint32_t x, y;
-	uint32_t w, h;
+	uint32_t w, h, w_original, h_original;
+	uint32_t tx1, tx2, ty1, ty2;
+	bool trimmed = false;
 
-	sprite_holder(const char *fn, SDL_Surface *s) : filename(fn), s(s) {
+	sprite_holder(const char *fn, SDL_Surface *s, bool do_trim) : filename(fn), s(s), s_original(s) {
 		w = s->w;
 		h = s->h;
+		w_original = s->w;
+		h_original = s->h;
+		tx1 = 0;
+		tx2 = s->w - 1;
+		ty1 = 0;
+		ty2 = s->h - 1;
+		if (do_trim) trim();
+	}
+	~sprite_holder() {
+		SDL_FreeSurface(s);
+		if (s != s_original) SDL_FreeSurface(s_original);
+	}
+
+	inline uint8_t getAlpha(uint32_t x, uint32_t y) {
+		return static_cast<uint8_t*>(s->pixels)[y * s->pitch + x * s->format->BytesPerPixel + 3];
+	}
+
+	void trim() {
+		if (s->format->format != SDL_PIXELFORMAT_RGBA32) {
+			printf("*********** ERROR WHILE TRIMMING %s: surface is not in RGBA32 format!\n", filename.c_str());
+			return;
+		}
+		printf("TRIMMING %s\n", filename.c_str());
+
+		// Left
+		for (uint32_t x = 0; x < s->w; x++) {
+			for (uint32_t y = 0; y < s->h; y++) {
+				uint8_t a = getAlpha(x, y);
+				if (a > 0) {
+					tx1 = x;
+					goto end_left;
+				}
+			}
+		}
+		end_left:
+
+		// Right
+		for (uint32_t x = s->w-1; x >= 0; x--) {
+			for (uint32_t y = 0; y < s->h; y++) {
+				uint8_t a = getAlpha(x, y);
+				if (a > 0) {
+					tx2 = x;
+					goto end_right;
+				}
+			}
+		}
+		end_right:
+
+		// Top
+		for (uint32_t y = 0; y < s->h; y++) {
+			for (uint32_t x = 0; x < s->w; x++) {
+				uint8_t a = getAlpha(x, y);
+				if (a > 0) {
+					ty1 = y;
+					goto end_top;
+				}
+			}
+		}
+		end_top:
+
+		// Bottom
+		for (uint32_t y = s->h-1; y >= 0; y--) {
+			for (uint32_t x = 0; x < s->w; x++) {
+				uint8_t a = getAlpha(x, y);
+				if (a > 0) {
+					ty2 = y;
+					goto end_bottom;
+				}
+			}
+		}
+		end_bottom:
+
+		printf(" => %dx%d : %dx%d\n", tx1, ty1, tx2, ty2);
+		w = tx2 - tx1 + 1;
+		h = ty2 - ty1 + 1;
+		trimmed = true;
+
+		// Trim the surface now
+		Uint32 rmask, gmask, bmask, amask;
+		get_sdl_surface_masks(rmask, gmask, bmask, amask);
+		s = SDL_CreateRGBSurface(0, w, h, 32, rmask, gmask, bmask, amask);
+		blit_surface(s_original, {tx1, ty1, w, h}, s, {0, 0, w, h});
 	}
 };
 typedef shared_ptr<sprite_holder> sp_sprite_holder;
@@ -135,71 +254,43 @@ struct spritesheet {
 	}
 };
 
-static void blit_surface(SDL_Surface *from, glm::ivec4 from_coords, SDL_Surface *to, glm::ivec4 to_coords) {
-	SDL_Rect srcrect;
-	srcrect.x = from_coords.x;
-	srcrect.y = from_coords.y;
-	srcrect.w = from_coords.z;
-	srcrect.h = from_coords.w;
-
-	SDL_Rect dstrect;
-	dstrect.x = to_coords.x;
-	dstrect.y = to_coords.y;
-	dstrect.w = to_coords.z;
-	dstrect.h = to_coords.w;
-
-	if (from_coords.x == -1) {
-		SDL_BlitSurface(from, NULL, to, &dstrect);
-	} else {
-		SDL_BlitSurface(from, &srcrect, to, &dstrect);
-	}
-}
-
 static int generate_spritesheet(lua_State *L) {
 	const char *spritesheet_name = luaL_checkstring(L, 1);
-	uint32_t max_w = lua_tonumber(L, 2);
-	uint32_t max_h = lua_tonumber(L, 3);
-	bool verbose = lua_toboolean(L, 6);
+	uint32_t min_w = lua_tonumber(L, 2);
+	uint32_t min_h = lua_tonumber(L, 3);
+	uint32_t max_w = lua_tonumber(L, 4);
+	uint32_t max_h = lua_tonumber(L, 5);
+	bool do_trim = lua_toboolean(L, 8);
+	bool verbose = lua_toboolean(L, 9);
 	if (!max_w) max_w = 512;
 	if (!max_h) max_h = 512;
 
 	uint32_t padding_size = 0;
 	Padding padding_mode = Padding::NONE;
 
-	if (lua_istable(L, 5)) {
-		lua_rawgeti(L, 5, 1);
+	if (lua_istable(L, 7)) {
+		lua_rawgeti(L, 7, 1);
 		padding_mode = static_cast<Padding>((uint8_t)lua_tonumber(L, -1)); lua_pop(L, 1);
-		lua_rawgeti(L, 5, 2);
+		lua_rawgeti(L, 7, 2);
 		padding_size = lua_tonumber(L, -1); lua_pop(L, 1);
 	}
 
 	Uint32 rmask, gmask, bmask, amask;
-	/* SDL interprets each pixel as a 32-bit number, so our masks must depend on the endianness (byte order) of the machine */
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	rmask = 0xff000000;
-	gmask = 0x00ff0000;
-	bmask = 0x0000ff00;
-	amask = 0x000000ff;
-#else
-	rmask = 0x000000ff;
-	gmask = 0x0000ff00;
-	bmask = 0x00ff0000;
-	amask = 0xff000000;
-#endif
+	get_sdl_surface_masks(rmask, gmask, bmask, amask);
 
 	MaxRectsBinPack bin;
 
 	vector<sp_sprite_holder> sprites;
 
 	lua_pushnil(L);
-	while (lua_next(L, 4) != 0) {
+	while (lua_next(L, 6) != 0) {
 		const char *filename = luaL_checkstring(L, -1);
 
 		if (verbose) printf("*** Loading file %s\n", filename);
 
 		PHYSFS_file *file = PHYSFS_openRead(filename);
 		SDL_Surface *s = IMG_Load_RW(PHYSFSRWOPS_makeRWops(file), TRUE);
-		sprites.emplace_back(new sprite_holder(filename, s));
+		sprites.emplace_back(new sprite_holder(filename, s, do_trim));
 
 		lua_pop(L, 1);
 	}
@@ -244,6 +335,14 @@ static int generate_spritesheet(lua_State *L) {
 			lua_pushnumber(L, sprite->w); lua_setfield(L, -2, "w");
 			lua_pushnumber(L, sprite->h); lua_setfield(L, -2, "h");
 			lua_pushstring(L, "/data/gfx/"); lua_pushstring(L, spritesheet_name); lua_pushnumber(L, sheet.id); lua_pushstring(L, ".png"); lua_concat(L, 4); lua_setfield(L, -2, "set");
+			if (sprite->trimmed) {
+				lua_pushnumber(L, (double)sprite->tx1 / (double)sprite->w_original); lua_setfield(L, -2, "trim_x1");
+				lua_pushnumber(L, (double)sprite->ty1 / (double)sprite->h_original); lua_setfield(L, -2, "trim_y1");
+				lua_pushnumber(L, (double)(sprite->w_original - sprite->tx2 - 1) / (double)sprite->w_original); lua_setfield(L, -2, "trim_x2");
+				lua_pushnumber(L, (double)(sprite->h_original - sprite->ty2 - 1) / (double)sprite->h_original); lua_setfield(L, -2, "trim_y2");
+				lua_pushnumber(L, sprite->w_original); lua_setfield(L, -2, "trim_ow");
+				lua_pushnumber(L, sprite->h_original); lua_setfield(L, -2, "trim_oh");
+			}
 
 			lua_setfield(L, -3, sprite->filename.c_str());
 
@@ -265,9 +364,6 @@ static int generate_spritesheet(lua_State *L) {
 					}
 				}
 			}
-
-			// Cleanup
-			SDL_FreeSurface(sprite->s);
 		}
 
 		lua_pushstring(L, "/data/gfx/"); lua_pushstring(L, spritesheet_name); lua_pushnumber(L, sheet.id); lua_pushstring(L, ".png"); lua_concat(L, 4);

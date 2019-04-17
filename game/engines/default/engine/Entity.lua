@@ -385,11 +385,17 @@ function _M:makeMapObject(tiles, idx)
 	-- Texture
 	-- DGDGDGDG: handle "invis.png" as a special "texture" that tells the engine to fully ignore it, no texture at all
 	-- This way this wont break sorting
-	local ok, btex, btexx, btexy, w, h, tex_x, tex_y
+	local ok, btex, btexx, btexy, w, h, tex_x, tex_y, trim_x1, trim_y1, trim_x2, trim_y2, trim_ow, trim_oh, trim_w, trim_h
 	if self.image == "invis.png" then ok = false
-	else ok, btex, btexx, btexy, w, h, tex_x, tex_y = pcall(tiles.get, tiles, self.display, self.color_r, self.color_g, self.color_b, self.color_br, self.color_bg, self.color_bb, self.image, self._noalpha and 255, self.ascii_outline, true)
+	else ok, btex, btexx, btexy, w, h, tex_x, tex_y, trim_x1, trim_y1, trim_x2, trim_y2, trim_ow, trim_oh = pcall(tiles.get, tiles, self.display, self.color_r, self.color_g, self.color_b, self.color_br, self.color_bg, self.color_bb, self.image, self._noalpha and 255, self.ascii_outline, true)
 	end
+
 	local dy, dh = 0, 0
+
+	-- If we are trimmed, get the original size
+	if ok and trim_x1 then w, h, trim_w, trim_h = trim_ow, trim_oh, w, h end
+
+	-- Adjust height if needed
 	if ok and self.auto_tall and h > w then dy = -1 dh = 1 end
 
 	-- Create the map object with 1 + additional textures
@@ -431,7 +437,7 @@ function _M:makeMapObject(tiles, idx)
 			self._mo:setAnim(0, self.anim.max, self.anim.speed or 1, self.anim.loop or -1)
 		else
 			-- print("=======", self.image, btexx, btexy, te)
-			self._mo:texture(0, btex, false, btexx, btexy, tex_x, tex_y)
+			self._mo:texture(0, btex, false, btexx, btexy, tex_x, tex_y, trim_x1, trim_y1, trim_x2, trim_y2)
 		end
 	else
 		-- print('=---= hiding mo', self.uid, self.image)
@@ -445,6 +451,7 @@ function _M:makeMapObject(tiles, idx)
 		for i = 1, #self.add_mos do
 			local amo = self.add_mos[i]
 			local dy, dh = amo.display_y or 0, amo.display_h or 1
+			local trim_x, trim_y, trim_ow, trim_oh, trim_w, trim_h
 			-- Create a simple additional chained MO
 			if amo.image_alter == "sdm" then
 				local _, bw, bh
@@ -460,11 +467,14 @@ function _M:makeMapObject(tiles, idx)
 				texx, texy = 1,1,nil,nil
 			elseif amo.image then
 				local w, h
-				tex, texx, texy, w, h, pos_x, pos_y = tiles:get("", 0, 0, 0, 0, 0, 0, amo.image, false, false, true)
+				tex, texx, texy, w, h, pos_x, pos_y, trim_x1, trim_y1, trim_x2, trim_y2, trim_ow, trim_oh = tiles:get("", 0, 0, 0, 0, 0, 0, amo.image, false, false, true)
+
+				if trim_x1 then w, h, trim_w, trim_h = trim_ow, trim_oh, w, h end
+
 				if amo.auto_tall and h > w then dy = -1 dh = 2 end
 			end
 			local mo = core.map2d.newObject(self.uid, 1 + (tiles.use_images and amo.textures and #amo.textures or 0), false, false, false, amo.display_x or 0, dy, amo.display_w or 1, dh, amo.display_scale or 1)
-			mo:texture(0, tex, false, texx, texy, pos_x, pos_y)
+			mo:texture(0, tex, false, texx, texy, pos_x, pos_y, trim_x1, trim_y1, trim_x2, trim_y2)
 			if amo.particle then
 				local args = amo.particle_args or {}
 				local e = engine.Particles.new(amo.particle, 1, args)

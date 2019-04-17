@@ -48,6 +48,7 @@ MapObject::MapObject(int64_t uid, uint8_t nb_textures, bool on_seen, bool on_rem
 {
 	for (int i = 0; i < DO_MAX_TEX; i++) {
 		textures_ref[i] = LUA_NOREF;
+		trimmed[i] = false;
 	}
 	root = this;
 }
@@ -88,6 +89,14 @@ bool MapObject::setTexture(uint8_t slot, GLuint tex, int ref, vec4 coords) {
 	textures_ref[slot] = ref;
 	tex_coords[slot] = coords;
 	notifyChangedMORs();
+	return true;
+}
+
+bool MapObject::setTextureTrimmed(uint8_t slot, vec4 info) {
+	if (slot >= DO_MAX_TEX) return false;
+	trimmed[slot] = true;
+	trim_pos1[slot] = vec2(info.x, info.y);
+	trim_pos2[slot] = vec2(info.z, info.w);
 	return true;
 }
 
@@ -245,10 +254,32 @@ inline void MapObjectProcessor::processMapObject(RendererGL *renderer, MapObject
 	float dw = dm->size.x, dh = dm->size.y;
 	float x1, x2, y1, y2;
 
-	if (dm->flip_x) { x2 = dx; x1 = tile_w * dw * dm->scale + dx; }
-	else { x1 = dx; x2 = tile_w * dw * dm->scale + dx; }
-	if (dm->flip_y) { y2 = dy; y1 = tile_h * dh * dm->scale + dy; }
-	else { y1 = dy; y2 = tile_h * dh * dm->scale + dy; }
+	if (dm->flip_x) {
+		x2 = dx; x1 = tile_w * dw * dm->scale + dx;
+		if (dm->trimmed[0]) {
+			x1 -= tile_w * dw * dm->scale * dm->trim_pos1[0].x;
+			x2 += tile_w * dw * dm->scale * dm->trim_pos2[0].x;
+		}
+	} else {
+		x1 = dx; x2 = tile_w * dw * dm->scale + dx;
+		if (dm->trimmed[0]) {
+			x1 += tile_w * dw * dm->scale * dm->trim_pos1[0].x;
+			x2 -= tile_w * dw * dm->scale * dm->trim_pos2[0].x;
+		}
+	}
+	if (dm->flip_y) {
+		y2 = dy; y1 = tile_h * dh * dm->scale + dy;
+		if (dm->trimmed[0]) {
+			y1 -= tile_h * dh * dm->scale * dm->trim_pos1[0].y;
+			y2 += tile_h * dh * dm->scale * dm->trim_pos2[0].y;
+		}
+	} else {
+		y1 = dy; y2 = tile_h * dh * dm->scale + dy;
+		if (dm->trimmed[0]) {
+			y1 += tile_h * dh * dm->scale * dm->trim_pos1[0].y;
+			y2 -= tile_h * dh * dm->scale * dm->trim_pos2[0].y;
+		}
+	}
 
 	if (allow_do && dm->bdisplayobject) {
 		mat4 base;

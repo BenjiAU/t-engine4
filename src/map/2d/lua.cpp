@@ -128,6 +128,15 @@ static int map_object_texture(lua_State *L) {
 		coords.y = lua_tonumber(L, 8);
 	}
 
+	if (lua_isnumber(L, 9)) {
+		obj->setTextureTrimmed(i, {
+			lua_tonumber(L, 9),
+			lua_tonumber(L, 10),
+			lua_tonumber(L, 11),
+			lua_tonumber(L, 12),
+		});
+	}
+
 	lua_pushvalue(L, 3); // Get the texture
 	obj->setTexture(i, t->texture_id, luaL_ref(L, LUA_REGISTRYINDEX), coords);
 	return 0;

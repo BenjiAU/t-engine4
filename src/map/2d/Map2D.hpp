@@ -120,6 +120,10 @@ protected:
 	textures_array textures;
 	vec4 tex_coords[DO_MAX_TEX];
 
+	vec2 trim_pos1[DO_MAX_TEX];
+	vec2 trim_pos2[DO_MAX_TEX];
+	bool trimmed[DO_MAX_TEX];
+
 	shader_type *shader = nullptr;
 	int shader_ref = LUA_NOREF;
 	
@@ -169,6 +173,7 @@ public:
 	void setHiddenBase(bool v) { hide_base = v; }
 	void setSeen(bool v) { on_seen = v; }
 	bool setTexture(uint8_t slot, GLuint tex, int ref, vec4 coords);
+	bool setTextureTrimmed(uint8_t slot, vec4 info);
 	void setDisplayObject(DisplayObject *d, int ref, bool front);
 	void addParticles(DORParticles *p, int ref);
 	void removeParticles(ParticlesVector::iterator *it);

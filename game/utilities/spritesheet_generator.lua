@@ -29,10 +29,13 @@ local files_to_parse = {}
 local excludes = {}
 local write_to = nil
 local sheetname = "ts-unnamed-sheet"
+local min_w = 4096
+local min_h = 4096
 local max_w = 4096
 local max_h = 4096
 local padding_mode = core.binpack.PADDING_NONE
 local padding_size = 0
+local trim = false
 
 local i = 1
 while i <= #args do
@@ -65,6 +68,14 @@ while i <= #args do
 	elseif arg == "--max-h" then
 		max_h = tonumber(args[i+1])
 		i = i + 1
+	elseif arg == "--min-w" then
+		min_w = tonumber(args[i+1])
+		i = i + 1
+	elseif arg == "--min-h" then
+		min_h = tonumber(args[i+1])
+		i = i + 1
+	elseif arg == "--trim" then
+		trim = true
 	elseif arg == "--padding" then
 		local pdata = args[i+1]
 		if pdata:prefix("NONE") then padding_mode = core.binpack.PADDING_NONE; padding_size = 0
@@ -116,7 +127,7 @@ end
 table.sort(list)
 table.print(list)
 
-local sheet, images = core.binpack.generateSpritesheet(sheetname, max_w, max_h, list, {padding_mode, padding_size}, true)
+local sheet, images = core.binpack.generateSpritesheet(sheetname, min_w, min_h, max_w, max_h, list, {padding_mode, padding_size}, trim, true)
 
 -- table.print(sheet)
 -- print("---")
@@ -132,7 +143,7 @@ end
 
 print("TOTAL", table.count(sheet))
 local f = fs.open("/"..sheetname..".lua", "w")
-f:write(table.serialize(sheet))
+f:write(table.serialize(sheet):gsub("_G", "\n_G"))
 f:close()
 
 end)
