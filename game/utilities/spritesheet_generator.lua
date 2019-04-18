@@ -22,6 +22,82 @@ require "engines.default.engine.utils"
 local args = {...}
 local ok, err = pcall(function()
 
+--- This is a really naive algorithm, it will not handle objects and such.
+-- Use only for small tables
+function table.serialize_smaller(src, sub)
+	local chunks = {}
+	if sub then
+		chunks[1] = "{"
+	end
+	for k, e in pairs(src) do
+		local nk = nil
+		local nkC = {}
+		local tk, te = type(k), type(e)
+		if not sub then
+			nkC[#nkC+1] = "_G"
+			nkC[#nkC+1] = "["
+			if tk == "table" then
+				nkC[#nkC+1] = table.serialize(k, true)
+			elseif tk == "string" then
+				-- escaped quotes matter
+				nkC[#nkC+1] = string.format("%q", k)
+			else
+				nkC[#nkC+1] = tostring(k)
+			end
+			nkC[#nkC+1] = "]"
+		else
+			if tk == "table" then
+				nkC[#nkC+1] = "["
+				nkC[#nkC+1] = table.serialize(k, true)
+				nkC[#nkC+1] = "]"
+			elseif tk == "string" then
+				if k:find("^[a-zA-Z0-9_]+$") then
+					nkC[#nkC+1] = k
+				else
+					-- escaped quotes matter
+					nkC[#nkC+1] = "["
+					nkC[#nkC+1] = string.format("%q", k)
+					nkC[#nkC+1] = "]"
+				end
+			else
+				nkC[#nkC+1] = "["
+				nkC[#nkC+1] = tostring(k)
+				nkC[#nkC+1] = "]"
+			end
+		end
+
+		nk = table.concat(nkC)
+
+		-- These are the types of data we are willing to serialize
+		if te == "table" or te == "string" or te == "number" or te == "boolean" then
+			chunks[#chunks+1] = nk
+			chunks[#chunks+1] = "="
+			if te == "table" then
+				chunks[#chunks+1] = table.serialize_smaller(e, true)
+			elseif te == "number" then
+				-- float output matters
+				chunks[#chunks+1] = string.format("%f", e)
+			elseif te == "string" then
+				-- escaped quotes matter
+				chunks[#chunks+1] = string.format("%q", e)
+			else -- te == "boolean"
+				chunks[#chunks+1] = tostring(e)
+			end
+			chunks[#chunks+1] = " "
+		end
+		
+		if sub then
+			chunks[#chunks+1] = ", "
+		end
+	end
+	if sub then
+		chunks[#chunks+1] = "}"
+	end
+			
+	return table.concat(chunks)
+end
+
+
 fs.reset()
 
 local dirs_to_parse = {}
@@ -29,8 +105,8 @@ local files_to_parse = {}
 local excludes = {}
 local write_to = nil
 local sheetname = "ts-unnamed-sheet"
-local min_w = 4096
-local min_h = 4096
+local min_w = 256
+local min_h = 256
 local max_w = 4096
 local max_h = 4096
 local padding_mode = core.binpack.PADDING_NONE
@@ -143,7 +219,7 @@ end
 
 print("TOTAL", table.count(sheet))
 local f = fs.open("/"..sheetname..".lua", "w")
-f:write(table.serialize(sheet):gsub("_G", "\n_G"))
+f:write(table.serialize_smaller(sheet):gsub("_G", "\n_G"))
 f:close()
 
 end)

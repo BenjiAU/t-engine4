@@ -115,7 +115,7 @@ struct sprite_holder {
 		printf("TRIMMING %s\n", filename.c_str());
 
 		// Left
-		for (uint32_t x = 0; x < s->w; x++) {
+		for (int32_t x = 0; x < s->w; x++) {
 			for (uint32_t y = 0; y < s->h; y++) {
 				uint8_t a = getAlpha(x, y);
 				if (a > 0) {
@@ -127,7 +127,7 @@ struct sprite_holder {
 		end_left:
 
 		// Right
-		for (uint32_t x = s->w-1; x >= 0; x--) {
+		for (int32_t x = s->w-1; x >= 0; x--) {
 			for (uint32_t y = 0; y < s->h; y++) {
 				uint8_t a = getAlpha(x, y);
 				if (a > 0) {
@@ -139,7 +139,7 @@ struct sprite_holder {
 		end_right:
 
 		// Top
-		for (uint32_t y = 0; y < s->h; y++) {
+		for (int32_t y = 0; y < s->h; y++) {
 			for (uint32_t x = 0; x < s->w; x++) {
 				uint8_t a = getAlpha(x, y);
 				if (a > 0) {
@@ -151,7 +151,7 @@ struct sprite_holder {
 		end_top:
 
 		// Bottom
-		for (uint32_t y = s->h-1; y >= 0; y--) {
+		for (int32_t y = s->h-1; y >= 0; y--) {
 			for (uint32_t x = 0; x < s->w; x++) {
 				uint8_t a = getAlpha(x, y);
 				if (a > 0) {
@@ -191,7 +191,7 @@ struct spritesheet {
 	Padding padding_mode = Padding::NONE;
 	uint8_t padding_size = 0;
 
-	spritesheet(uint32_t id, uint32_t max_w, uint32_t max_h, Padding mode, uint8_t size, bool verbose) : id(id), max_w(max_w), max_h(max_h), padding_mode(mode), padding_size(size), verbose(verbose) {
+	spritesheet(uint32_t id, uint32_t min_w, uint32_t min_h, uint32_t max_w, uint32_t max_h, Padding mode, uint8_t size, bool verbose) : id(id), w(min_w), h(min_h), max_w(max_w), max_h(max_h), padding_mode(mode), padding_size(size), verbose(verbose) {
 		bin.Init(w, h, false);
 		if (verbose) printf("Initializing bin[%d] to size %dx%d with padding %s : %d.\n", id, w, h, (mode == Padding::NONE) ? "none" : (mode == Padding::ALPHA0) ? "alpha0" : (mode == Padding::IMAGE) ? "image" : "???", padding_size);
 	}
@@ -297,14 +297,14 @@ static int generate_spritesheet(lua_State *L) {
 	std::sort(sprites.begin(), sprites.end(), sort_sprites);
 
 	vector<spritesheet> sheets;
-	sheets.emplace_back(1, max_w, max_h, padding_mode, padding_size, verbose);
+	sheets.emplace_back(1, min_w, min_h, max_w, max_h, padding_mode, padding_size, verbose);
 
 	for (auto sprite : sprites) {
 		int sheet_id = 0;
 		while (true) {
 			if (sheets[sheet_id].insert(sprite)) break;
 			sheet_id++;
-			if (sheets.size() <= sheet_id) sheets.emplace_back(sheet_id + 1, max_w, max_h, padding_mode, padding_size, verbose);
+			if (sheets.size() <= sheet_id) sheets.emplace_back(sheet_id + 1, min_w, min_h, max_w, max_h, padding_mode, padding_size, verbose);
 		}
 	}
 	if (verbose) printf("Done. All rectangles packed.\n");
@@ -351,10 +351,10 @@ static int generate_spritesheet(lua_State *L) {
 			if (padding_mode == Padding::IMAGE) {
 				for (int i = 1; i <= padding_size; i++) {
 					blit_surface(sprite->s, {0, 0, 1, sprite->h}, sheet_s, {sprite->x - i, sprite->y, 1, sprite->h});
-					blit_surface(sprite->s, {sprite->w-2, 0, 1, sprite->h}, sheet_s, {sprite->x + sprite->w-1 + i, sprite->y, 1, sprite->h});
+					blit_surface(sprite->s, {sprite->w-1, 0, 1, sprite->h}, sheet_s, {sprite->x + sprite->w-1 + i, sprite->y, 1, sprite->h});
 
 					blit_surface(sprite->s, {0, 0, sprite->w, 1}, sheet_s, {sprite->x, sprite->y - i, sprite->w, 1});
-					blit_surface(sprite->s, {0, sprite->h-2, sprite->w, 1}, sheet_s, {sprite->x, sprite->y + sprite->h-1 + i, sprite->w, 1});
+					blit_surface(sprite->s, {0, sprite->h-1, sprite->w, 1}, sheet_s, {sprite->x, sprite->y + sprite->h-1 + i, sprite->w, 1});
 
 					for (int j = 1; j <= padding_size; j++) {
 						blit_surface(sprite->s, {0, 0, 1, 1}, sheet_s, {sprite->x - i, sprite->y - j, 1, 1});
