@@ -108,7 +108,7 @@ function _M:unlockShimmer(o)
 	end
 
 	local moddables = {}
-	for _, p in ipairs{"moddable_tile", "moddable_tile2", "moddable_tile_back", "moddable_tile_hood", "moddable_tile_particle", "moddable_tile_ornament"} do
+	for _, p in ipairs{"moddable_tile", "moddable_tile2", "moddable_tile_back", "moddable_tile_hood", "moddable_tile_particle", "moddable_tile_ornament", "moddable_tile_projectile"} do
 		if o[p] then moddables[p] = o[p] end
 	end
 

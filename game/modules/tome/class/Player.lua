@@ -509,6 +509,12 @@ function _M:updateMainShader()
 		pf.timestop:uniTick_start(core.game.getTime())
 	end
 
+	-- Sharpen shader
+	if config.settings.tome.sharpen_display and config.settings.tome.sharpen_display > 1 then
+		effects[pf.sharpen.shad] = true
+		pf.sharpen.shad:uniSharpen_power(config.settings.tome.sharpen_display)
+	end
+
 	game.fbo_posteffects:disableAll()
 	game.fbo_posteffects:enable("main", true)
 	for name, _ in pairs(effects) do game.fbo_posteffects:enable(name, true) end

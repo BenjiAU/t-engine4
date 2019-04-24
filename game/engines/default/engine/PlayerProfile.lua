@@ -77,6 +77,7 @@ function _M:init()
 	self.chat = UserChat.new()
 	self.dlc_files = {classes={}, files={}}
 	self.saved_events = {}
+	self.temporary_event_handlers = {}
 	self.generic = {}
 	self.modules = {}
 	self.evt_cbs = {}
@@ -650,11 +651,20 @@ function _M:eventFunFacts(e)
 	end
 end
 
+function _M:registerTemporaryEventHandler(name, fct)
+	self.temporary_event_handlers[name] = self.temporary_event_handlers[name] or {}
+	table.insert(self.temporary_event_handlers[name], fct)
+end
+
 --- Got an event from the profile thread
 function _M:handleEvent(e)
 	if type(e) == "string" then e = e:unserialize() end
 	if not e then return end
-	if self["event"..e.e] then self["event"..e.e](self, e) end
+	if self["event"..e.e] then self["event"..e.e](self, e)
+	elseif self.temporary_event_handlers[e.e] then
+		for _, fct in ipairs(self.temporary_event_handlers[e.e]) do print("[PROFILE] temporary_event_handlers", e.e, pcall(fct, e)) end
+		self.temporary_event_handlers[e.e] = nil
+	end
 	return e
 end
 

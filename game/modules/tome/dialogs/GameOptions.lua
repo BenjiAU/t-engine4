@@ -24,6 +24,7 @@ local Textzone = require "engine.ui.Textzone"
 local TextzoneList = require "engine.ui.TextzoneList"
 local Separator = require "engine.ui.Separator"
 local GetQuantity = require "engine.dialogs.GetQuantity"
+local GetQuantitySlider = require "engine.dialogs.GetQuantitySlider"
 local Tabs = require "engine.ui.Tabs"
 local GraphicMode = require("mod.dialogs.GraphicMode")
 local FontPackage = require "engine.FontPackage"
@@ -448,6 +449,19 @@ function _M:generateListUi()
 		game:saveSettings("tome.use_wasd", ("tome.use_wasd = %s\n"):format(tostring(config.settings.tome.use_wasd)))
 		self.c_list:drawItem(item)
 		if self:isTome() then game:setupWASD() end
+	end,}
+
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Sharpen Visuals, set to 0 to disable.#WHITE#"}
+	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Sharpen Visuals#WHITE##{normal}#", status=function(item)
+		return tostring((config.settings.tome.sharpen_display or 0))
+	end, fct=function(item)
+		game:registerDialog(GetQuantitySlider.new("Enter Sharpen Power", "From 0(disable) to 10", math.floor(config.settings.tome.sharpen_display), 0, 10, 1, function(qty)
+			qty = util.bound(qty, 0, 10)
+			game:saveSettings("tome.sharpen_display", ("tome.sharpen_display = %f\n"):format(qty))
+			config.settings.tome.sharpen_display = qty
+			self.c_list:drawItem(item)
+			if self:isTome() and game.player then game.player:updateMainShader() end
+		end))
 	end,}
 
 	self.list = list

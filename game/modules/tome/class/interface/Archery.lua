@@ -801,7 +801,7 @@ end
 
 function _M:archeryDefaultProjectileVisual(weapon, ammo)
 	if (ammo and ammo.proj_image) or (weapon and weapon.proj_image) then
-		return {display=' ', particle="arrow", particle_args={tile="shockbolt/"..(ammo.proj_image or weapon.proj_image):gsub("%.png$", "")}}
+		return {display=' ', particle="arrow", particle_args={tile="shockbolt/"..((ammo.shimmer_moddable and ammo.shimmer_moddable.moddable_tile_projectile) or ammo.proj_image or weapon.proj_image):gsub("%.png$", "")}}
 		else
 		return {display='/'}
 		end

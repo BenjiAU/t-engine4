@@ -22,6 +22,7 @@ local Dialog = require "engine.ui.Dialog"
 local Separator = require "engine.ui.Separator"
 local List = require "engine.ui.List"
 local Button = require "engine.ui.Button"
+local ButtonImage = require "engine.ui.ButtonImage"
 local Numberbox = require "engine.ui.Numberbox"
 local Textzone = require "engine.ui.Textzone"
 local Checkbox = require "engine.ui.Checkbox"
@@ -32,12 +33,12 @@ module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init(source)
 	self.donation_source = source or "ingame"
-	Dialog.init(self, "Donations", 500, 300)
+	Dialog.init(self, "Donations", 600, 300)
 
 	local desc
 	local recur = false
 
-	if not profile.auth or not tonumber(profile.auth.donated) or tonumber(profile.auth.donated) <= 1 then
+	if not profile.auth or not tonumber(profile.auth.donated) or tonumber(profile.auth.donated) <= 1 or true then
 		local donation_features = { "#GOLD#Character cosmetic customization and special tiles#WHITE#", "#GOLD#Exploration mode (infinite lives)#WHITE#", "#GOLD#Item's appearance change (Shimmering)#WHITE#"}
 		self:triggerHook{"DonationDialog:features", list=donation_features}
 
@@ -58,18 +59,24 @@ Thank you for your kindness!]]}
 	end
 
 	self.c_donate = Numberbox.new{title="Donation amount: ", number=10, max=1000, min=5, chars=5, fct=function() end}
+	self.c_recur = Checkbox.new{title="Monthly donation", default=recur, fct=function() end}
 	local euro = Textzone.new{auto_width=true, auto_height=true, text=[[euro]]}
-	self.c_recur = Checkbox.new{title="Make it a recurring monthly donation", default=recur, fct=function() end}
-	local ok = require("engine.ui.Button").new{text="Accept", fct=function() self:ok() end}
-	local cancel = require("engine.ui.Button").new{text="Cancel", fct=function() self:cancel() end}
+	local patreon = ButtonImage.new{alpha_unfocus=1, file="ui/patreon.png", fct=function() self:patreon() end}
+	local paypal = ButtonImage.new{alpha_unfocus=1, file="ui/paypal.png", fct=function() self:paypal() end}
+	local cancel = Button.new{text="Cancel", fct=function() self:cancel() end}
+	local patreon_explain = Textzone.new{width=patreon.w, auto_height=true, text=[[You can also make a pledge on Patreon if you prefer.]]}
+	local hsep = Separator.new{dir="horizontal", size=self.c_donate.h+paypal.h+self.c_recur.h-cancel.h}
 
 	self:loadUI{
 		{left=0, top=0, ui=desc},
-		{left=5, bottom=5 + ok.h + self.c_recur.h, ui=self.c_donate},
-		{left=5+self.c_donate.w, bottom=10 + ok.h + self.c_recur.h, ui=euro},
-		{left=0, bottom=5 + ok.h, ui=self.c_recur},
-		{left=0, bottom=0, ui=ok},
-		{right=0, bottom=0, ui=cancel},
+		{left=5, bottom=5 + paypal.h + self.c_recur.h, ui=self.c_donate},
+		{left=5+self.c_donate.w, bottom=10 + paypal.h + self.c_recur.h, ui=euro},
+		{hcenter=0, bottom=cancel.h, ui=hsep},
+		{left=0, bottom=5 + paypal.h, ui=self.c_recur},
+		{right=0, bottom=5 + patreon.h, ui=patreon_explain},
+		{left=0, bottom=0, ui=paypal},
+		{right=0, bottom=0, ui=patreon},
+		{hcenter=0, bottom=0, ui=cancel},
 	}
 	self:setFocus(self.c_donate)
 	self:setupUI(false, true)
@@ -79,7 +86,7 @@ function _M:cancel()
 	game:unregisterDialog(self)
 end
 
-function _M:ok()
+function _M:paypal()
 	if not tonumber(self.c_donate.number) or tonumber(self.c_donate.number) < 5 then return end
 
 	game:unregisterDialog(self)
@@ -92,4 +99,11 @@ function _M:ok()
 
 	if inside then util.browserOpenUrl(url, {is_external=true})
 	else util.browserOpenUrl(url, {webview=true, is_external=true}) end
+end
+
+function _M:patreon()
+	game:unregisterDialog(self)
+
+	self:simplePopup("Thank you", "Thank you, a Patreon page should now open in your browser.")
+	util.browserOpenUrl("https://www.patreon.com/darkgodone", {is_external=true})
 end

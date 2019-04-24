@@ -64,7 +64,6 @@ function _M:targetOnTick()
 end
 
 --- Display the tooltip, if any
-
 function _M:targetDisplayTooltip(dx, dy, force, nb_keyframes)
 	-- Tooltip is displayed over all else
 	if self.level and self.level.map and self.level.map.finished then
@@ -96,6 +95,11 @@ function _M:tooltipDisplayAtMap(x, y, text, extra, force, nb_keyframes)
 		if extra.up then self.tooltip.last_display_y = self.tooltip.last_display_y - self.tooltip.h end
 	end
 	self.tooltip_x = {}
+end
+
+--- Forces to hide the tooltip
+function _M:tooltipHide()
+	self.tooltip_x = nil
 end
 
 --- Enter/leave targeting mode

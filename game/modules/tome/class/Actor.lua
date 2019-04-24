@@ -35,6 +35,7 @@ require "mod.class.interface.Combat"
 require "mod.class.interface.Archery"
 require "mod.class.interface.ActorInscriptions"
 require "mod.class.interface.ActorObjectUse"
+local Particles = require "engine.Particles"
 local Faction = require "engine.Faction"
 local Dialog = require "engine.ui.Dialog"
 local Map = require "engine.Map"
@@ -3794,8 +3795,7 @@ function _M:getObjectModdableTile(slot)
 	return o
 end
 
---- Update tile for races that can handle it
-function _M:updateModdableTile()
+function _M:updateModdableTilePrepare()
 	local selfbase = self.replace_display or self
 	if not selfbase.moddable_tile or Map.tiles.no_moddable_tiles then
 		local add = selfbase.add_mos or {}
@@ -3830,9 +3830,33 @@ function _M:updateModdableTile()
 			self:removeAllMOs()
 			if self.x and game.level then game.level.map:updateMap(self.x, self.y) end
 		end
-		return
+		return false
 	end
 	self:removeAllMOs()
+	return true
+end
+
+--- Update tile for races that can handle it
+function _M:updateModdableTile()
+	if not self:updateModdableTilePrepare() then return end
+
+	if self.shimmer_particles_active then
+		for _, p in ipairs(self.shimmer_particles_active) do self:removeParticles(p) end
+		self.shimmer_particles_active = nil
+	end
+
+	if self.moddable_tile_base_shimmer_particle then
+		self.shimmer_particles_active = self.shimmer_particles_active or {}
+		for _, def in ipairs(self.moddable_tile_base_shimmer_particle) do
+			local args = table.clone(def.args, true)
+			if def.spot then
+				args.x, args.y = self:attachementSpot(def.spot, true)
+				if args.x and args.y and def.spot_offset then args.x, args.y = args.x + def.spot_offset.x, args.y + def.spot_offset.y end
+			end
+			local p = self:addParticles(Particles.new(def.name, 1, args, def.shader))
+			table.insert(self.shimmer_particles_active, p)
+		end
+	end
 
 	local base = "player/"..self.moddable_tile:gsub("#sex#", self.female and "female" or "male").."/"
 
@@ -3850,19 +3874,28 @@ function _M:updateModdableTile()
 			add[#add+1] = {image_alter="sdm", sdm_double="dynamic", image=base..(self.moddable_tile_base or "base_01.png"), shader=def.shader, shader_args=def.shader_args, textures=def.textures, display_h=2, display_y=-1}
 		end
 	end
+	if self.moddable_tile_base_shimmer_aura then
+		for _, def in ipairs(self.moddable_tile_base_shimmer_aura) do
+			add[#add+1] = {image_alter="sdm", sdm_double="dynamic", image=base..(self.moddable_tile_base or "base_01.png"), shader=def.shader, shader_args=def.shader_args, textures=def.textures, display_h=2, display_y=-1}
+		end
+	end
 
-	local basebody = self.moddable_tile_base or "base_01.png"
+	local basebody = self.moddable_tile_base_shimmer or self.moddable_tile_base or "base_01.png"
 	if self.moddable_tile_base_alter then basebody = self:moddable_tile_base_alter(basebody) end
 	add[#add+1] = {image = base..basebody, auto_tall=1}
 
 	if self.moddable_tile_tatoo then add[#add+1] = {image = base..self.moddable_tile_tatoo..".png", auto_tall=1} end
 
 	if not self:attr("disarmed") then
-		i = self:getObjectModdableTile(self.INVEN_MAINHAND); if i and i.moddable_tile_back then
-			add[#add+1] = {image = base..(i.moddable_tile_back):format("right")..".png", auto_tall=1}
-		end
-		i = self:getObjectModdableTile(self.INVEN_OFFHAND); if i and i.moddable_tile_back then
-			add[#add+1] = {image = base..(i.moddable_tile_back):format("left")..".png", auto_tall=1}
+		local hd = {"Actor:updateModdableTile:weapon", base=base, add=add, back=true, replace=false}
+		self:triggerHook(hd)
+		if not hd.replace then
+			i = self:getObjectModdableTile(self.INVEN_MAINHAND); if i and i.moddable_tile_back then
+				add[#add+1] = {image = base..(i.moddable_tile_back):format("right")..".png", auto_tall=1}
+			end
+			i = self:getObjectModdableTile(self.INVEN_OFFHAND); if i and i.moddable_tile_back then
+				add[#add+1] = {image = base..(i.moddable_tile_back):format("left")..".png", auto_tall=1}
+			end
 		end
 	end
 
@@ -3886,18 +3919,23 @@ function _M:updateModdableTile()
 
 	i = self:getObjectModdableTile(self.INVEN_HANDS); if i and i.moddable_tile then add[#add+1] = {image = base..(i.moddable_tile)..".png", auto_tall=1} end
 	i = self:getObjectModdableTile(self.INVEN_QUIVER); if i and i.moddable_tile then add[#add+1] = {image = base..(i.moddable_tile)..".png", auto_tall=1} end
+
 	if not self:attr("disarmed") then
-		i = self:getObjectModdableTile(self.INVEN_MAINHAND); if i and i.moddable_tile then
-			add[#add+1] = {image = base..(i.moddable_tile):format("right")..".png", auto_tall=1}
-			if i.moddable_tile_particle then
-				add[#add].particle = i.moddable_tile_particle[1]
-				add[#add].particle_args = i.moddable_tile_particle[2]
+		local hd = {"Actor:updateModdableTile:weapon", base=base, add=add, front=true, replace=false}
+		self:triggerHook(hd)
+		if not hd.replace then
+			i = self:getObjectModdableTile(self.INVEN_MAINHAND); if i and i.moddable_tile then
+				add[#add+1] = {image = base..(i.moddable_tile):format("right")..".png", auto_tall=1}
+				if i.moddable_tile_particle then
+					add[#add].particle = i.moddable_tile_particle[1]
+					add[#add].particle_args = i.moddable_tile_particle[2]
+				end
+				if i.moddable_tile_ornament then add[#add+1] = {image = base..(i.moddable_tile_ornament):format("right")..".png", auto_tall=1} end
 			end
-			if i.moddable_tile_ornament then add[#add+1] = {image = base..(i.moddable_tile_ornament):format("right")..".png", auto_tall=1} end
-		end
-		i = self:getObjectModdableTile(self.INVEN_OFFHAND); if i and i.moddable_tile then
-			add[#add+1] = {image = base..(i.moddable_tile):format("left")..".png", auto_tall=1}
-			if i.moddable_tile_ornament then add[#add+1] = {image = base..(i.moddable_tile_ornament):format("left")..".png", auto_tall=1} end
+			i = self:getObjectModdableTile(self.INVEN_OFFHAND); if i and i.moddable_tile then
+				add[#add+1] = {image = base..(i.moddable_tile):format("left")..".png", auto_tall=1}
+				if i.moddable_tile_ornament then add[#add+1] = {image = base..(i.moddable_tile_ornament):format("left")..".png", auto_tall=1} end
+			end
 		end
 	end
 

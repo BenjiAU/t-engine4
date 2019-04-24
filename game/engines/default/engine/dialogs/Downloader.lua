@@ -49,7 +49,7 @@ function _M:init(t)
 	self.custom_calls = t.custom_calls or {}
 	if self.allow_login == nil then self.allow_login = true end
 
-	if self.allow_login and self.url:find("^http://te4%.org/") and profile.auth then
+	if self.allow_login and self.url:find("^https://te4%.org/") and profile.auth then
 		local param = "_te4ah="..profile.auth.hash.."&_te4ad="..profile.auth.drupid
 
 		local first = self.url:find("?", 1, 1)
@@ -57,7 +57,7 @@ function _M:init(t)
 		else self.url = self.url.."?"..param end
 	end
 
-	if self.url:find("^http://te4%.org/")  then
+	if self.url:find("^https://te4%.org/")  then
 		local param = "_te4"
 
 		local first = self.url:find("?", 1, 1)

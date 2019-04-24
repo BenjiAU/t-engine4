@@ -69,7 +69,7 @@ newEntity{
 		local MapEffect = require "engine.MapEffect"
 		who:project(tg, x, y, function(px, py)
 			game.level.map:addEffect(who, px, py, 5, DamageType.LIGHTNING_DAZE, dam, 0, 5, nil, 
-				MapEffect.new{color_br=30, color_bg=150, color_bb=160, effect_shader="shader_images/retch_effect.png"}, nil, true)
+				{zdepth=6, type="lightning_storm"}, nil, true)
 		end)
 		game:playSoundNear(who, "talents/lightning")
 		return {id=true, used=true}

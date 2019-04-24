@@ -466,7 +466,7 @@ function _M:loadHooksFile(file)
 	local f, err = loadfile(_current_hook_dir.."/"..file)
 	if not f and err then error(err) end
 	setfenv(f, setmetatable({}, {__index = _G}))
-	f()
+	return f()
 end
 
 function _M:bindHook(hook, fct)

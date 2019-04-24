@@ -1720,6 +1720,7 @@ function _M:createFBOs()
 		{ "motionblur", "main_fbo/motionblur" }, 
 		{ "blur", "main_fbo/blur" }, 
 		{ "timestop", "main_fbo/timestop" }, 
+		{ "sharpen", "main_fbo/sharpen" }, 
 		{ "main", "main_fbo" }, 
 		-- line_grids = "main_fbo/line_grids", 
 		-- gestures = "main_fbo/gestures",1
@@ -1970,6 +1971,9 @@ function _M:setupCommands()
 	-- Debug mode
 	self.key:addCommands{
 		[{"_d","ctrl"}] = function() if config.settings.cheat then
+			package.loaded["mod.dialogs.Donation"] = nil
+			self:registerDialog(require("mod.dialogs.Donation").new())
+do return end
 			local g = self.level.map(self.player.x, self.player.y, Map.TERRAIN)
 			print(g.define_as, g.image, g.z)
 			for i, a in ipairs(g.add_mos or {}) do print(" => ", a.image) end
@@ -2009,6 +2013,9 @@ do return end
 			print(pcall(f))
 		end end,
 		[{"_f","ctrl"}] = function() if config.settings.cheat then
+			package.loaded["engine.dialogs.microtxn.UsePurchased"] = nil
+			self:registerDialog(require("engine.dialogs.microtxn.UsePurchased").new())
+do return end
 			local m = game.zone:makeEntityByName(game.level, "actor", "NPC_HUMANOID_KROG")
 			local x, y = util.findFreeGrid(game.player.x, game.player.y, 20, true, {[Map.ACTOR]=true})
 			if m and x then

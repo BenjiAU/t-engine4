@@ -25,6 +25,14 @@ local function shimmer(player, slot)
 	end
 end
 
+local function shimmer_other(player, slot)
+	return function()
+		package.loaded['mod.dialogs.ShimmerOther'] = nil
+		local d = require("mod.dialogs.ShimmerOther").new(player, slot)
+		game:registerDialog(d)
+	end
+end
+
 local answers = {}
 
 for slot, inven in pairs(player.inven) do
@@ -35,6 +43,20 @@ for slot, inven in pairs(player.inven) do
 		end
 	end
 end
+if world.unlocked_shimmers and world.unlocked_shimmers.SHIMMER_DOLL then
+	answers[#answers+1] = {"[Alter the appearance of your body]", action=shimmer_other(player, "SHIMMER_DOLL"), jump="welcome"}
+end
+if world.unlocked_shimmers and world.unlocked_shimmers.SHIMMER_FACIAL then
+	answers[#answers+1] = {"[Alter the appearance of your facial features]", action=shimmer_other(player, "SHIMMER_FACIAL"), jump="welcome"}
+end
+if world.unlocked_shimmers and world.unlocked_shimmers.SHIMMER_HAIR then
+	answers[#answers+1] = {"[Alter the appearance of your hair]", action=shimmer_other(player, "SHIMMER_HAIR"), jump="welcome"}
+end
+if world.unlocked_shimmers and world.unlocked_shimmers.SHIMMER_AURA then
+	answers[#answers+1] = {"[Alter the appearance of your aura]", action=shimmer_other(player, "SHIMMER_AURA"), jump="welcome"}
+end
+
+
 answers[#answers+1] = {"[Leave the mirror alone]"}
 	
 newChat{ id="welcome",
