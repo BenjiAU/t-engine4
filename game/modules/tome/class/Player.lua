@@ -511,8 +511,8 @@ function _M:updateMainShader()
 
 	-- Sharpen shader
 	if config.settings.tome.sharpen_display and config.settings.tome.sharpen_display > 1 then
-		effects[pf.sharpen.shad] = true
-		pf.sharpen.shad:uniSharpen_power(config.settings.tome.sharpen_display)
+		effects.sharpen = true
+		pf.sharpen:uniSharpen_power(config.settings.tome.sharpen_display)
 	end
 
 	game.fbo_posteffects:disableAll()

@@ -1,10 +1,10 @@
 uniform float sharpen_power;
-uniform vec2 texSize;
+uniform vec2 screenSize;
 uniform sampler2D tex;
 
 void main(void) {
-	float step_w = 1.0 / texSize.x;
-	float step_h = 1.0 / texSize.y;
+	float step_w = 1.0 / screenSize.x;
+	float step_h = 1.0 / screenSize.y;
 
 	float kernel[9];
 	vec2 offset[9];
