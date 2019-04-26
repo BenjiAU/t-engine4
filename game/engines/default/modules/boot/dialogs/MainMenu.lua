@@ -221,24 +221,51 @@ function _M:updateUI()
 ----------------------------
 ----------------------------DGDGDGDG remove this
 ----------------------------
---[[
+-- [[
+	local LayoutContainer = require "engine.ui.LayoutContainer"
+
 	local tree = {}
-	for i = 1, 1000 do tree[#tree+1] = {name='this is azlkdj a long text '..i, plop="kjhekjghekg", plop3="kjhekjghekg"} end
-	local test = require("engine.ui.TreeList").new{scrollbar=true, width=self.iw * 2, height=self.ih * 3, columns={
+	for i = 1, 100 do tree[#tree+1] = {name='this is azlkdj a long text '..i, plop="kjhekjghekg", plop3="kjhekjghekg"} end
+	local tree2 = {}
+	for i = 1, 100 do tree2[#tree2+1] = {name='zekfjjkzf '..i, plop="kjhekjghekg", plop3="kjhekjghekg"} end
+	local test = require("engine.ui.TreeList").new{scrollbar=true, width=200, height=300, columns={
 		{name="Inventory", width=50, display_prop="name", sort="name"},
 		{name="2", width=25, display_prop="plop", sort="plop"},
 		{name="3", width=25, display_prop="plop3", sort="plop3"},
 	}, tree=tree, fct=function(t) core.game.CProfiler("luastarted.profiler.prof") end}
+	local test2 = require("engine.ui.TreeList").new{scrollbar=true, width=200, height=300, columns={
+		{name="Inventory", width=50, display_prop="name", sort="name"},
+		{name="2", width=25, display_prop="plop", sort="plop"},
+		{name="3", width=25, display_prop="plop3", sort="plop3"},
+	}, tree=tree2, fct=function(t) core.game.CProfiler("luastarted.profiler.prof") end}
+	-- local test2 = Textzone.new{width=200, auto_height=true, text="PLOPZOR!"}
+	local test3 = Button.new{text="Login", width=100, fct=function() print("PLOP") end}
+	local test4 = Textbox.new{title="Search: ", text="", chars=30, max_len=60, fct=function() end, on_change=function(text)end}
 	
-	uis = { {left=0, top=0, ui=test},  }
+	local lay = LayoutContainer.new{width=600, height=600, uis={
+		{left=0, top=0, ui=test},
+		{right=0, top=0, ui=test2},
+	}}
+	local lay2 = LayoutContainer.new{width=600, height=600, uis={
+		{left=0, top=0, ui=test3},
+		{right=0, top=0, ui=test4},
+	}}
+
+	uis = {
+		{left=0, top=0, ui=lay},
+		{right=0, top=0, ui=lay2},
+	}
+
+	self:loadUI(uis)
+	self:setupUI(true, true)
 --]]
 ----------------------------
 ----------------------------
 ----------------------------
 
 
-	self:loadUI(uis)
-	self:setupUI(false, true)
+	-- self:loadUI(uis)
+	-- self:setupUI(false, true)
 	self.key:addBind("LUA_CONSOLE", function()
 		if config.settings.cheat then
 			game:registerDialog(require("engine.DebugConsole").new())

@@ -578,10 +578,8 @@ function _M:generate()
 		self.key:addBind("LUA_CONSOLE", function()
 			local DebugConsole = require "engine.DebugConsole"
 			local d = DebugConsole.new()
-			if game and game.dialogs and game.dialogs[self] then
-				DebugConsole.line = "=game.dialogs["..game.dialogs[self].."]"
-				DebugConsole.line_pos = #DebugConsole.line
-				d.changed_input = true
+			if self.__stack_id then
+				d:setLineText("=game.dialogs["..self.__stack_id.."]")
 			end
 			game:registerDialog(d)
 		end)
@@ -897,6 +895,10 @@ function _M:toggleDisplay(ui, show)
 end
 
 function _M:moveFocus(v)
+	if self.focus_ui and self.focus_ui.ui.moveSubFocus then
+		if self.focus_ui.ui:moveSubFocus(v) then return end
+	end
+
 	local id = self.focus_ui_id
 	local start = id or 1
 	local cnt = 0

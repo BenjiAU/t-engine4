@@ -94,9 +94,7 @@ function _M:use(item)
 		local DebugConsole = require"engine.DebugConsole"
 		local d = DebugConsole.new()
 		game:registerDialog(d)
-		DebugConsole.line = "=__uids["..item.actor.uid.."]"
-		DebugConsole.line_pos = #DebugConsole.line
-		d.changed_input = true
+		d:setLineText("=__uids["..item.actor.uid.."]")
 	elseif act == "debug-inventory" then
 		local d
 		local actor = item.actor

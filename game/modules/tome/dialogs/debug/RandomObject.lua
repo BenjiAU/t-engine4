@@ -542,9 +542,7 @@ _M.newButton = function(t)
 				local DebugConsole = require"engine.DebugConsole"
 				local d = DebugConsole.new()
 				game:registerDialog(d)
-				DebugConsole.line = "=__uids["..obj.uid.."]"
-				DebugConsole.line_pos = #DebugConsole.line
-				d.changed_input = true
+				d:setLineText("=__uids["..obj.uid.."]")
 			else
 				game.log("#LIGHT_BLUE#Nothing to Lua inspect")
 			end

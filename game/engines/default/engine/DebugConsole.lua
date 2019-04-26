@@ -328,6 +328,13 @@ function _M:init()
 	self.changed = true
 end
 
+--- Define the current command line text
+function _M:setLineText(txt)
+	_M.line = txt
+	_M.line_pos = #_M.line
+	self.changed_input = true
+end
+
 --- Display function
 -- This is not super efficient as we rerender all text, but meh we don't really care either for a debug console
 function _M:display()
