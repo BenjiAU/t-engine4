@@ -221,7 +221,7 @@ function _M:updateUI()
 ----------------------------
 ----------------------------DGDGDGDG remove this
 ----------------------------
--- [[
+--[[
 	local LayoutContainer = require "engine.ui.LayoutContainer"
 
 	local tree = {}
@@ -264,8 +264,8 @@ function _M:updateUI()
 ----------------------------
 
 
-	-- self:loadUI(uis)
-	-- self:setupUI(false, true)
+	self:loadUI(uis)
+	self:setupUI(false, true)
 	self.key:addBind("LUA_CONSOLE", function()
 		if config.settings.cheat then
 			game:registerDialog(require("engine.DebugConsole").new())
