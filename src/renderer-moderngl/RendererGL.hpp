@@ -71,6 +71,8 @@ using SortMethod = bool(DORFlatSortable *i, DORFlatSortable *j);
 class RendererGL : public SubRenderer {
 	friend class DORVertexes;
 protected:
+	static stack<vec4> cutting_history;
+
 	VBOMode mode = VBOMode::DYNAMIC;
 
 	View *view = NULL;	
@@ -141,7 +143,7 @@ public:
 		this->view = view;
 	}
 
-	void activateCutting(mat4 cur_model, bool v);
+	bool activateCutting(mat4 &cur_model, bool v);
 };
 
 #endif

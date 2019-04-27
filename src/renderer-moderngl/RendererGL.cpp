@@ -104,6 +104,8 @@ DisplayList::~DisplayList() {
  ** RendererGL class
  ***************************************************************************/
 
+stack<vec4> RendererGL::cutting_history;
+
 RendererGL::RendererGL(VBOMode mode) {
 	this->mode = mode;
 	glGenBuffers(1, &vbo_elements);
@@ -358,16 +360,41 @@ void RendererGL::update() {
 	}
 }
 
-void RendererGL::activateCutting(mat4 cur_model, bool v) {
+bool RendererGL::activateCutting(mat4 &cur_model, bool v) {
 	if (v) {
-		glEnable(GL_SCISSOR_TEST);
 		vec4 cut1 = cur_model * cutpos1;
 		vec4 cut2 = cur_model * cutpos2;
 		cut2 -= cut1;
-		glScissor(cut1.x, screen->h / screen_zoom - cut1.y - cut2.y, cut2.x, cut2.y);
+		vec4 c = vec4(cut1.x, screen->h / screen_zoom - cut1.y - cut2.y, cut2.x, cut2.y);
+		
+		if (cutting_history.empty()) glEnable(GL_SCISSOR_TEST);
+		else {
+			vec4 pc = cutting_history.top();
+
+			float x = std::max(c.x, pc.x);
+			float num1 = std::min(c.x + c.z, pc.x + pc.z);
+			float y = std::max(c.y, pc.y);
+			float num2 = std::min(c.y + c.w, pc.y + pc.w);
+			if (num1 >= x && num2 >= y){
+				c = vec4(x, y, num1 - x, num2 - y);
+			} else {
+				return false;
+			}
+		}
+
+		glScissor(c.x, c.y, c.z, c.w);
+		cutting_history.push(c);
+		// printf("[CUTTING] %lx : %dx%d => %dx%d\n", this, (int)c.x, (int)c.y, (int)c.z, (int)c.w);
 	} else {
-		glDisable(GL_SCISSOR_TEST);
+		cutting_history.pop();
+		if (cutting_history.empty()) glDisable(GL_SCISSOR_TEST);
+		else {
+			vec4 c = cutting_history.top();
+			glScissor(c.x, c.y, c.z, c.w);
+			// printf("[CUTTING] resetting to %lx : %dx%d => %dx%d\n", this, (int)c.x, (int)c.y, (int)c.z, (int)c.w);
+		}
 	}
+	return true;
 }
 
 int nb_rgl = 0;
@@ -384,13 +411,15 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	nb_rgl++;
 
 	cur_model = cur_model * model; // This is .. undeeded ..??
+	if (cutting) {
+		if (!activateCutting(cur_model, true)) return;
+	}
+
 	if (view) view->use(true);
 	View *use_view = View::getCurrent();
 	mat4 mvp = use_view->get() * cur_model;
 	cur_color = cur_color * color;
 
-	if (cutting) activateCutting(cur_model, true);
-	// else glDisable(GL_SCISSOR_TEST);
 
 	if (zsort == SortMode::GL) glEnable(GL_DEPTH_TEST);
 	if (!allow_blending) glDisable(GL_BLEND);
@@ -402,10 +431,8 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	for (auto dl = displays.begin() ; dl != displays.end(); ++dl) {
 		if ((*dl)->sub) {
 			(*dl)->sub->toScreen(cur_model * (*dl)->sub->use_model, cur_color * (*dl)->sub->use_color);
-			if (cutting) activateCutting(cur_model, true);
 		} else if ((*dl)->tick) {
 			(*dl)->tick->tick();
-			if (cutting) activateCutting(cur_model, true);
 		} else {
 			// Bind the indices
 			if ((*dl)->render_kind == RenderKind::QUADS) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_elements);
@@ -545,7 +572,7 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 	if (view) view->use(false);
 
 	if (cutting) {
-		glDisable(GL_SCISSOR_TEST);
+		activateCutting(cur_model, false);
 	}
 
 	if (count_vertexes) {

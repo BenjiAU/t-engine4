@@ -226,7 +226,6 @@ end
 function _M:moveSubFocus(v)
 	local id = self.focus_ui_id
 	if id == #self.uis then return false end
-	print("!!!!!!!!!!! SUB CALL", v, "::", id, #self.uis)
 	local start = id or 1
 	local cnt = 0
 	id = util.boundWrap((id or 1) + v, 1, #self.uis)
