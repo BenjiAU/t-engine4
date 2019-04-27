@@ -28,8 +28,9 @@ module(..., package.seeall, class.inherit(Base, Focusable))
 
 function _M:init(t)
 	if not t.uis then error("LayoutContainer needs uis") end
-	self.w = assert(t.width, "no layout width")
-	self.h = assert(t.height, "no layout height")
+	self.w = t.width
+	self.h = t.height
+	self.frame_id = t.frame_id
 
 	self.uis = {}
 	self.ui_by_ui = {}
@@ -52,13 +53,15 @@ function _M:generate()
 	self.mouse:reset()
 	self.key:reset()
 	self.do_container:clear()
-	self.uis_container = core.renderer.container()
+	self.uis_container = core.renderer.renderer()
 
-	self:setupUI(true, true)
+	self:setupUI(self.w == nil, self.h == nil)
 
-	self.frame = self:makeFrameDO("ui/textbox", self.w, self.h, nil, nil, false, true)
+	self.frame = self:makeFrameDO(self.frame_id or "ui/textbox", self.w, self.h, nil, nil, false, true)
 	self.do_container:add(self.frame.container)
 	self.do_container:add(self.uis_container)
+
+	self.uis_container:cutoff(0, 0, self.iw, self.ih)
 
 	self.mouse:registerZone(0, 0, self.w, self.h, function(...) self:mouseEvent(...) end, nil, nil, true)
 	self.key.receiveKey = function(_, ...) self:keyEvent(...) end

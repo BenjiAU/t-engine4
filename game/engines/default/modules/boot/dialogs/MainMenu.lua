@@ -221,7 +221,7 @@ function _M:updateUI()
 ----------------------------
 ----------------------------DGDGDGDG remove this
 ----------------------------
---[[
+-- [[
 	local LayoutContainer = require "engine.ui.LayoutContainer"
 
 	local tree = {}
@@ -239,12 +239,15 @@ function _M:updateUI()
 		{name="3", width=25, display_prop="plop3", sort="plop3"},
 	}, tree=tree2, fct=function(t) core.game.CProfiler("luastarted.profiler.prof") end}
 	-- local test2 = Textzone.new{width=200, auto_height=true, text="PLOPZOR!"}
+	local txttest = {} for i = 1, 200 do txttest[#txttest+1] = "line nb "..i end
+	local test5 = Textzone.new{width=200, auto_height=true, text=table.concat(txttest,"\n")}
 	local test3 = Button.new{text="Login", width=100, fct=function() print("PLOP") end}
 	local test4 = Textbox.new{title="Search: ", text="", chars=30, max_len=60, fct=function() end, on_change=function(text)end}
 	
 	local lay = LayoutContainer.new{width=600, height=600, uis={
 		{left=0, top=0, ui=test},
 		{right=0, top=0, ui=test2},
+		{left=0, top=test, ui=test5},
 	}}
 	local lay2 = LayoutContainer.new{width=600, height=600, uis={
 		{left=0, top=0, ui=test3},
@@ -256,16 +259,17 @@ function _M:updateUI()
 		{right=0, top=0, ui=lay2},
 	}
 
+	self.allow_scroll = true
 	self:loadUI(uis)
-	self:setupUI(true, true)
+	self:setupUI(true, false)
 --]]
 ----------------------------
 ----------------------------
 ----------------------------
 
 
-	self:loadUI(uis)
-	self:setupUI(false, true)
+	-- self:loadUI(uis)
+	-- self:setupUI(false, true)
 	self.key:addBind("LUA_CONSOLE", function()
 		if config.settings.cheat then
 			game:registerDialog(require("engine.DebugConsole").new())
