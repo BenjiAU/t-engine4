@@ -62,7 +62,6 @@ function _M:generate()
 	if self.force_w then w = self.force_w end
 
 	text:translate(f.b4.w, f.b8.h, 10)
-	self.do_container:add(text)
 	self.do_text = text
 
 	self.frame_sel_do = self:makeFrameDO(self.use_frame or "ui/button_sel", f.w, f.h)
@@ -71,6 +70,7 @@ function _M:generate()
 	self.do_container:add(self.frame_do.container)
 	self.do_container:add(self.frame_sel_do.container)
 	self.do_container:shown(not self.hide)
+	self.do_container:add(text)
 
 	-- Add UI controls
 	self.mouse:registerZone(0, 0, self.w, self.h, function(button, x, y, xrel, yrel, bx, by, event)
