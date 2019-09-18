@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -36,9 +36,9 @@ defineTile('.', Floor)
 defineTile('X', "HARDWALL")
 defineTile('#', "DOOR_VAULT", nil, nil, nil, {room_map={special=false, room=false, can_open=true}})
 defineTile('s', Floor, nil , {random_filter={add_levels=5,type="spiderkin",subtype="spider"}})
-defineTile('S', Floor, {random_filter={add_levels=10, tome_mod=vault}}, {random_filter={add_levels=10, type="spiderkin",subtype="spider"}})
-defineTile('g', Floor, {random_filter={add_levels=15, tome_mod=gvault}}, {random_filter={add_levels=15, type="spiderkin",subtype="spider"}})
-defineTile('B', Floor, {random_filter={add_levels=20, tome_mod=gvault}}, {random_filter={add_levels=20, type="spiderkin",subtype="spider"}})
+defineTile('S', Floor, {random_filter={add_levels=10, tome_mod="vault"}}, {random_filter={add_levels=10, type="spiderkin",subtype="spider"}})
+defineTile('g', Floor, {random_filter={add_levels=15, tome_mod="gvault"}}, {random_filter={add_levels=15, type="spiderkin",subtype="spider"}})
+defineTile('B', Floor, {random_filter={add_levels=20, tome_mod="gvault"}}, {random_filter={add_levels=20, type="spiderkin",subtype="spider"}})
 
 defineTile('^', Floor, nil, nil, {random_filter = {name="poison blast trap", add_levels=20}})
 

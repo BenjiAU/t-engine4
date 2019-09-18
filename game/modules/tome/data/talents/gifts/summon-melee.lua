@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -17,6 +17,61 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
+newTalent{
+	name = "Jelly Spread", short_name = "JELLY_PBAOE",
+	type = {"wild-gift/other",1},
+	points = 5,
+	equilibrium = 10,
+	message = "@source@ oozes over the ground!!",
+	cooldown = 15,
+	tactical = { ATTACKAREA = { SLIME = 4} },
+	range = 0,
+	radius = 1,
+	target = function(self, t)
+		return {type="ball", range=0, radius=1, selffire=false}
+	end,
+	getDamage = function(self, t) return self:combatTalentStatDamage(t, "con", 40, 140) end,
+	getDuration = function(self, t) return 4 end,
+	action = function(self, t)
+		-- Add a lasting map effect
+		game.level.map:addEffect(self,
+			self.x, self.y, t.getDuration(self, t),
+			DamageType.NATURE, t.getDamage(self, t),
+			1,
+			5, nil,
+			MapEffect.new{color_br=25, color_bg=140, color_bb=40, effect_shader="shader_images/retch_effect.png"},
+				function(e, update_shape_only)
+					if not update_shape_only then e.radius = e.radius end
+					return true
+				end,
+			false,
+			false
+		)
+		game:playSoundNear(self, "talents/slime")
+		return true
+	end,
+	info = function(self, t)
+		local damage = t.getDamage(self, t)
+		local duration = t.getDuration(self, t)
+		return ([[Ooze over the floor, spreading caustic jelly in a radius of 1 lasting %d turns and dealing %d nature damage per turn to hostile creatures caught within.]]):format(duration, damDesc(self, DamageType.NATURE, damage))
+	end,
+}
+
+newTalent{
+	name = "Mitotic Split", short_name = "JELLY_MITOTIC_SPLIT",
+	type = {"wild-gift/other",1},
+	mode = "passive",
+	points = 5,
+	getDamage = function(self,t) return self:combatTalentLimit(t, 5, 20, 8) end,
+	getChance = function(self,t) return self:combatTalentLimit(t, 85, 50, 75) end,
+	passives = function(self, t, p)
+		self:talentTemporaryValue(p, "clone_on_hit", {min_dam_pct=t.getDamage(self,t), chance=t.getChance(self,t)})
+	end,
+	info = function(self, t)
+		return ([[%d%% chance to split upon taking a single hit dealing at least %d%% of your maximum life.]]):format(t.getChance(self, t), t.getDamage(self, t))
+	end,
+}
+	
 newTalent{
 	name = "War Hound",
 	type = {"wild-gift/summon-melee", 1},
@@ -42,21 +97,23 @@ newTalent{
 	on_pre_use_ai = aiSummonPreUse,
 	on_detonate = function(self, t, m)
 		local tg = {type="ball", range=self:getTalentRange(t), friendlyfire=false, radius=self:getTalentRadius(t), talent=t, x=m.x, y=m.y}
-		self:project(tg, m.x, m.y, DamageType.PHYSICAL, self:mindCrit(self:combatTalentMindDamage(t, 30, 250)), {type="flame"})
+		local explodeBleed = self:callTalent(self.T_DETONATE, "explodeBleed")
+		self:project(tg, m.x, m.y, DamageType.BLEED, self:mindCrit(explodeBleed), {type="flame"})
 	end,
 	on_arrival = function(self, t, m)
 		local tg = {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), talent=t, x=m.x, y=m.y}
 		local duration = self:callTalent(self.T_GRAND_ARRIVAL,"effectDuration")
-		self:project(tg, m.x, m.y, DamageType.TEMP_EFFECT, {foes=true, eff=self.EFF_LOWER_PHYSICAL_RESIST, dur=duration, p={power=self:combatTalentMindDamage(t, 15, 70)}})
+		local reduction = self:callTalent(self.T_GRAND_ARRIVAL,"resReduction")
+		self:project(tg, m.x, m.y, DamageType.TEMP_EFFECT, {foes=true, eff=self.EFF_LOWER_PHYSICAL_RESIST, dur=duration, p={power=reduction}})
 		game.level.map:particleEmitter(m.x, m.y, tg.radius, "shout", {size=4, distorion_factor=0.3, radius=tg.radius, life=30, nb_circles=8, rm=0.8, rM=1, gm=0.8, gM=1, bm=0.1, bM=0.2, am=0.6, aM=0.8})
 	end,
-	summonTime = function(self, t) return math.floor(self:combatScale(self:getTalentLevel(t) + self:getTalentLevel(self.T_RESILIENCE), 5, 0, 10, 5)) end,
+	summonTime = function(self, t) return math.floor(self:combatScale(self:getTalentLevel(t), 5, 0, 10, 5)) + self:callTalent(self.T_RESILIENCE, "incDur") end,
 	incStats = function(self, t,fake)
 		local mp = self:combatMindpower()
 		return{ 
 			str=15 + (fake and mp or self:mindCrit(mp)) * 2 * self:combatTalentScale(t, 0.2, 1, 0.75) + self:combatTalentScale(t, 2, 10, 0.75),
-			dex=15 + (fake and mp or self:mindCrit(mp)) * 2 * self:combatTalentScale(t, 0.2, 1, 0.75) + self:combatTalentScale(t, 2, 10, 0.75),
-			con=15 + self:callTalent(self.T_RESILIENCE, "incCon")
+			dex=15 + (fake and mp or self:mindCrit(mp)) * 1 * self:combatTalentScale(t, 0.2, 1, 0.75) + self:combatTalentScale(t, 2, 10, 0.75),
+			con=15 
 		}
 	end,
 	action = function(self, t)
@@ -104,6 +161,13 @@ newTalent{
 			m[#m+1] = resolvers.talents{ [self.T_TOTAL_THUGGERY]=self:getTalentLevelRaw(t) }
 		end
 		setupSummon(self, m, x, y)
+		
+		if self:knowTalent(self.T_RESILIENCE) then
+			local incLife = self:callTalent(self.T_RESILIENCE, "incLife") + 1
+			m.max_life = m.max_life * incLife
+			m.life = m.max_life
+		end
+		
 		game:playSoundNear(self, "talents/spell_generic")
 		return true
 	end,
@@ -141,18 +205,21 @@ newTalent{
 	on_pre_use_ai = aiSummonPreUse,
 	on_detonate = function(self, t, m)
 		local tg = {type="ball", range=self:getTalentRange(t), friendlyfire=false, radius=self:getTalentRadius(t), talent=t, x=m.x, y=m.y}
-		self:project(tg, m.x, m.y, DamageType.SLIME, self:mindCrit(self:combatTalentMindDamage(t, 30, 200)), {type="flame"})
+		local explodeDamage = self:callTalent(self.T_DETONATE, "explodeSecondary")
+		local jellySlow = self:callTalent(self.T_DETONATE, "jellySlow")
+		self:project(tg, m.x, m.y, DamageType.SLIME, {dam=self:mindCrit(explodeDamage), power=jellySlow}, {type="slime"})
 	end,
 	on_arrival = function(self, t, m)
 		local tg = {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), talent=t, x=m.x, y=m.y}
 		local duration = self:callTalent(self.T_GRAND_ARRIVAL,"effectDuration")
-		self:project(tg, m.x, m.y, DamageType.TEMP_EFFECT, {foes=true, eff=self.EFF_LOWER_NATURE_RESIST, dur=duration, p={power=self:combatTalentMindDamage(t, 15, 70)}}, {type="flame"})
+		local reduction = self:callTalent(self.T_GRAND_ARRIVAL,"resReduction")
+		self:project(tg, m.x, m.y, DamageType.TEMP_EFFECT, {foes=true, eff=self.EFF_LOWER_NATURE_RESIST, dur=duration, p={power=reduction}}, {type="flame"})
 	end,
-	summonTime = function(self, t) return math.floor(self:combatScale(self:getTalentLevel(t) + self:getTalentLevel(self.T_RESILIENCE), 5, 0, 10, 5)) end,
+	summonTime = function(self, t) return math.floor(self:combatScale(self:getTalentLevel(t), 5, 0, 10, 5)) + self:callTalent(self.T_RESILIENCE, "incDur") end,
 	incStats = function(self, t, fake)
 		local mp = self:combatMindpower()
 		return{ 
-			con=10 + (fake and mp or self:mindCrit(mp)) * 1.8 * self:combatTalentScale(t, 0.2, 1, 0.75) + self:combatTalentScale(self:getTalentLevel(self.T_RESILIENCE), 3, 15, 0.75),
+			con=10 + (fake and mp or self:mindCrit(mp)) * 1.6 * self:combatTalentScale(t, 0.2, 1, 0.75),
 			str=10 + self:combatTalentScale(t, 2, 10, 0.75)
 		}
 	end,
@@ -190,8 +257,9 @@ newTalent{
 
 			combat_armor = 1, combat_def = 1,
 			never_move = 1,
+			resolvers.talents{ [Talents.T_JELLY_PBAOE]=self:getTalentLevelRaw(t) },
 
-			combat = { dam=8, atk=15, apr=5, damtype=DamageType.ACID, dammod={str=0.7} },
+			combat = { dam=8, atk=15, apr=5, damtype=DamageType.NATURE, dammod={str=0.7} },
 
 			wild_gift_detonate = t.id,
 
@@ -210,9 +278,16 @@ newTalent{
 		}
 		if self:attr("wild_summon") and rng.percent(self:attr("wild_summon")) then
 			m.name = m.name.." (wild summon)"
-			m[#m+1] = resolvers.talents{ [self.T_SWALLOW]=self:getTalentLevelRaw(t) }
+			m[#m+1] = resolvers.talents{ [self.T_JELLY_MITOTIC_SPLIT]=self:getTalentLevelRaw(t) }
 		end
 		setupSummon(self, m, x, y)
+		
+		if self:knowTalent(self.T_RESILIENCE) then
+			local incLife = self:callTalent(self.T_RESILIENCE, "incLife") + 1
+			m.max_life = m.max_life * incLife
+			m.life = m.max_life
+		end
+		
 		game:playSoundNear(self, "talents/spell_generic")
 		return true
 	end,
@@ -250,21 +325,22 @@ newTalent{
 	on_pre_use_ai = aiSummonPreUse,
 	on_detonate = function(self, t, m)
 		local tg = {type="ball", range=self:getTalentRange(t), friendlyfire=false, radius=self:getTalentRadius(t), talent=t, x=m.x, y=m.y}
-		self:project(tg, m.x, m.y, DamageType.BLEED, self:mindCrit(self:combatTalentMindDamage(t, 30, 350)), {type="flame"})
+		local confusePower = self:callTalent(self.T_DETONATE,"minotaurConfuse")
+		self:project(tg, m.x, m.y, DamageType.TEMP_EFFECT, {foes=true, eff=self.EFF_CONFUSED, check_immune="confusion", dur=5, p={minotaurConfuse}}, {type="flame"})
 	end,
 	on_arrival = function(self, t, m)
 		local tg = {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), talent=t, x=m.x, y=m.y}
 		local duration = self:callTalent(self.T_GRAND_ARRIVAL,"effectDuration")
-		local slowdown = self:combatLimit(self:combatTalentMindDamage(t, 5, 500), 1, 0.1, 0, 0.47 , 369) -- Limit speed loss to <100%
+		local slowdown = self:callTalent(self.T_GRAND_ARRIVAL,"slowStrength") / 100 --divide by 100 to change percent to decimal
 		self:project(tg, m.x, m.y, DamageType.TEMP_EFFECT, {foes=true, eff=self.EFF_SLOW_MOVE, dur=duration, p={power=slowdown}}, {type="flame"})
 	end,
-	summonTime = function(self, t) return math.floor(self:combatScale(self:getTalentLevel(t) + self:getTalentLevel(self.T_RESILIENCE), 2, 0, 7, 5)) end,
+	summonTime = function(self, t) return math.floor(self:combatScale(self:getTalentLevel(t), 2, 0, 7, 5)) + self:callTalent(self.T_RESILIENCE, "incDur") end,
 	incStats = function(self, t,fake)
 		local mp = self:combatMindpower()
 		return{ 
 			str=25 + (fake and mp or self:mindCrit(mp)) * 2.1 * self:combatTalentScale(t, 0.2, 1, 0.75) + self:combatTalentScale(t, 2, 10, 0.75),
 			dex=10 + (fake and mp or self:mindCrit(mp)) * 1.8 * self:combatTalentScale(t, 0.2, 1, 0.75) + self:combatTalentScale(t, 2, 10, 0.75),
-			con=10 + self:combatTalentScale(t, 2, 10, 0.75) + self:callTalent(self.T_RESILIENCE, "incCon"),
+			con=10 + self:combatTalentScale(t, 2, 10, 0.75)
 		}
 	end,
 	action = function(self, t)
@@ -319,12 +395,19 @@ newTalent{
 			m[#m+1] = resolvers.talents{ [self.T_RUSH]=self:getTalentLevelRaw(t) }
 		end
 		setupSummon(self, m, x, y)
+		
+		if self:knowTalent(self.T_RESILIENCE) then
+			local incLife = self:callTalent(self.T_RESILIENCE, "incLife") + 1
+			m.max_life = m.max_life * incLife
+			m.life = m.max_life
+		end
+		
 		game:playSoundNear(self, "talents/spell_generic")
 		return true
 	end,
 	info = function(self, t)
 		local incStats = t.incStats(self, t, true)
-		return ([[Summon a Minotaur for %d turns to attack your foes. Minotaurs cannot stay summoned for long, but they deal a lot of damage.
+		return ([[Summon a Minotaur for %d turns to attack your foes. Minotaurs cannot stay summoned for long, but they deal high damage.
 		It will get %d Strength, %d Constitution and %d Dexterity.
 		Your summons inherit some of your stats: increased damage%%, stun/pin/confusion/blindness resistance, armour penetration.
 		The minotaur's Strength and Dexterity will increase with your Mindpower.]])
@@ -354,8 +437,14 @@ newTalent{
 	end,
 	on_pre_use_ai = aiSummonPreUse,
 	on_detonate = function(self, t, m)
-		local tg = {type="ball", range=self:getTalentRange(t), friendlyfire=false, radius=self:getTalentRadius(t), talent=t, x=m.x, y=m.y}
-		self:project(tg, m.x, m.y, DamageType.PHYSKNOCKBACK, {dam=self:mindCrit(self:combatTalentMindDamage(t, 30, 150)), dist=4}, {type="flame"})
+		local tg = {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), talent=t, x=m.x, y=m.y, ignore_nullify_all_friendlyfire=true}
+		local golemArmour = self:callTalent(self.T_DETONATE,"golemArmour")
+		local golemHardiness = self:callTalent(self.T_DETONATE,"golemHardiness")
+		self:project(tg, m.x, m.y, function(px, py)
+			local target = game.level.map(px, py, Map.ACTOR)
+			if not target or self:reactionToward(target) < 0 then return end
+			target:setEffect(target.EFF_THORNY_SKIN, 5, {ac=golemArmour, hard=golemHardiness})
+		end, nil, {type="flame"})
 	end,
 	on_arrival = function(self, t, m)
 		local tg = {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), talent=t, x=m.x, y=m.y}
@@ -363,13 +452,13 @@ newTalent{
 		self:project(tg, m.x, m.y, DamageType.TEMP_EFFECT, {foes=true, eff=self.EFF_DAZED, check_immune="stun", dur=duration, p={}}, {type="flame"})
 	end,
 	requires_target = true,
-	summonTime = function(self, t) return math.floor(self:combatScale(self:getTalentLevel(t) + self:getTalentLevel(self.T_RESILIENCE), 5, 0, 10, 5)) end,
+	summonTime = function(self, t) return math.floor(self:combatScale(self:getTalentLevel(t), 5, 0, 10, 5)) + self:callTalent(self.T_RESILIENCE, "incDur") end,
 	incStats = function(self, t,fake)
 		local mp = self:combatMindpower()
 		return{ 
 			str=15 + (fake and mp or self:mindCrit(mp)) * 2 * self:combatTalentScale(t, 0.2, 1, 0.75) + self:combatTalentScale(t, 2, 10, 0.75),
 			dex=15 + (fake and mp or self:mindCrit(mp)) * 1.9 * self:combatTalentScale(t, 0.2, 1, 0.75) + self:combatTalentScale(t, 2, 10, 0.75),
-			con=10 + self:combatTalentScale(t, 2, 10, 0.75) + self:callTalent(self.T_RESILIENCE, "incCon"),
+			con=10 + self:combatTalentScale(t, 2, 10, 0.75)
 		}
 	end,
 	action = function(self, t)
@@ -423,9 +512,16 @@ newTalent{
 		}
 		if self:attr("wild_summon") and rng.percent(self:attr("wild_summon")) then
 			m.name = m.name.." (wild summon)"
-			m[#m+1] = resolvers.talents{ [self.T_SHATTERING_IMPACT]=self:getTalentLevelRaw(t) }
+			m[#m+1] = resolvers.talents{ [self.T_DISARM]=self:getTalentLevelRaw(t) }
 		end
 		setupSummon(self, m, x, y)
+		
+		if self:knowTalent(self.T_RESILIENCE) then
+			local incLife = self:callTalent(self.T_RESILIENCE, "incLife") + 1
+			m.max_life = m.max_life * incLife
+			m.life = m.max_life
+		end
+		
 		game:playSoundNear(self, "talents/spell_generic")
 		return true
 	end,

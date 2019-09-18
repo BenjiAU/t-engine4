@@ -1,5 +1,5 @@
 -- ToME - Tales of Middle-Earth
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -78,6 +78,8 @@ function _M:init()
 	if not profile.connected then core.webview, core.webview_inactive = nil, core.webview end
 	if not core.webview then self.tooltip = Tooltip.new(nil, 14, nil, colors.DARK_GREY, 380) end
 
+	self.floating_tooltip = Tooltip.new(nil, 14, nil, colors.DARK_GREY, 467)
+
 --	self.refuse_threads = true
 	self.normal_key = self.key
 	self.stopped = config.settings.boot_menu_background
@@ -91,6 +93,7 @@ function _M:init()
 
 	self:loaded()
 	profile:currentCharacter("Main Menu", "Main Menu")
+	if core.discord then core.discord.updatePresence{state="Main Menu", details="Thinking about which character to die with!", large_image="default", large_image_text="Pondering..."} end
 end
 
 function _M:loaded()
@@ -153,7 +156,7 @@ function _M:run()
 	if not self.news then
 		self.news = {
 			title = "Welcome to T-Engine and the Tales of Maj'Eyal",
-			text = [[#GOLD#"Tales of Maj'Eyal"#WHITE# is the main game, you can also install more addons or modules by by going to https://te4.org/
+			text = [[#GOLD#"Tales of Maj'Eyal"#WHITE# is the main game, you can also install more addons or modules by going to https://te4.org/
 
 When inside a module remember you can press Escape to bring up a menu to change keybindings, resolution and other module specific options.
 
@@ -220,6 +223,18 @@ A usual problem is shaders and thus should be your first target to disable.]], 7
 	local reboot_message = core.game.getRebootMessage()
 	if reboot_message then
 		Dialog:simpleLongPopup("Message", reboot_message, 700)
+	end
+
+	self:checkBootLoginRegister()
+end
+
+function _M:floatingTooltip(x, y, pos, txt)
+	if not x then
+		game.floating_tooltip_pos = nil
+	else
+		game.floating_tooltip:set(txt)
+		if pos == "top" then y = y - game.floating_tooltip.h end
+		game.floating_tooltip_pos = {x=x, y=y}
 	end
 end
 
@@ -479,6 +494,10 @@ function _M:display(nb_keyframes)
 		end
 		self.logdisplay:toScreen()
 		engine.GameEnergyBased.display(self, nb_keyframes)
+		if self.floating_tooltip_pos and (#self.dialogs == 0 or self.dialogs[#self.dialogs].__main_menu) then
+			self.floating_tooltip:display()
+			self.floating_tooltip:toScreen(self.floating_tooltip_pos.x, self.floating_tooltip_pos.y)
+		end
 		if self.full_fbo then self.full_fbo:use(false) self.full_fbo:toScreen(0, 0, self.w, self.h, self.full_fbo_shader.shad) end
 		return
 	end
@@ -527,6 +546,11 @@ function _M:display(nb_keyframes)
 	engine.GameEnergyBased.display(self, nb_keyframes)
 	self.flyers = old
 
+	if self.floating_tooltip_pos and (#self.dialogs == 0 or self.dialogs[#self.dialogs].__main_menu) then
+		self.floating_tooltip:display()
+		self.floating_tooltip:toScreen(self.floating_tooltip_pos.x, self.floating_tooltip_pos.y)
+	end
+
 	if self.full_fbo then self.full_fbo:use(false) self.full_fbo:toScreen(0, 0, self.w, self.h, self.full_fbo_shader.shad) end
 end
 
@@ -539,39 +563,46 @@ function _M:onQuit()
 	end, "Quit", "Continue")
 end
 
-profile_help_text = [[#LIGHT_GREEN#T-Engine4#LAST# allows you to sync your player profile with the website #LIGHT_BLUE#https://te4.org/#LAST#
+profile_help_text = [[Welcome to #LIGHT_GREEN#Tales of Maj'Eyal#LAST#!
 
-This allows you to:
+Before you can start dying in many innovative ways we need to ask you about online play.
+
+This is a #{bold}#single player game#{normal}# but it also features many online features to enhance your gameplay and connect you to the community:
 * Play from several computers without having to copy unlocks and achievements.
-* Keep track of your modules progression, kill count, ...
-* Talk ingame to other fellow players
-* Cool statistics for each module to help sharpen your gameplay style
+* Talk ingame to other fellow players, ask for advice, share your most memorable moments...
+* Keep track of your kill count, deaths, most played classes...
+* Cool statistics for to help sharpen your gameplay style
+* Install official expansions and third-party addons directly from the game, hassle-free
+* Access your purchaser / donator bonuses if you have bought the game or donated on https://te4.org/
 * Help the game developers balance and refine the game
 
-You will also have a user page on https://te4.org/ where you can show off your achievements to your friends.
-This is all optional, you are not forced to use this feature at all, but the developers would thank you if you did as it will make balancing easier.
-Online profile requires an internet connection, if not available it will wait and sync when it finds one.]]
+You will also have a user page on #LIGHT_BLUE#https://te4.org/#LAST# to show off to your friends.
+This is all optional, you are not forced to use this feature at all, but the developer would thank you if you did as it will make balancing easier.]]
 
 function _M:checkFirstTime()
-	if not profile.generic.firstrun and not core.steam then
-		profile:checkFirstRun()
-		local text = "Thanks for downloading T-Engine/ToME.\n\n"..profile_help_text
-		Dialog:yesnocancelLongPopup("Welcome to T-Engine", text, 600, function(ret, cancel)
-			if cancel then return end
-			if not ret then
-				local dialogdef = {}
-				dialogdef.fct = function(login) self:setPlayerLogin(login) end
-				dialogdef.name = "login"
-				dialogdef.justlogin = true
-				game:registerDialog(require('mod.dialogs.ProfileLogin').new(dialogdef, game.profile_help_text))
-			else
-				local dialogdef = {}
-				dialogdef.fct = function(login) self:setPlayerLogin(login) end
-				dialogdef.name = "creation"
-				dialogdef.justlogin = false
-				game:registerDialog(require('mod.dialogs.ProfileLogin').new(dialogdef, game.profile_help_text))
+	if not profile.generic.firstrun then
+		local d = require("mod.dialogs.FirstRun").new(profile_help_text)
+		local mm = self.dialogs[#self.dialogs]
+		self:unregisterDialog(mm)
+		self.tooltip = nil
+		self:registerDialog(d)
+	end
+end
+
+function _M:checkBootLoginRegister()
+	if __module_extra_info.boot_and_register then
+		if core.steam then
+			local mm = self.dialogs[#self.dialogs]
+			if mm and mm:isClassName("mod.dialogs.MainMenu") then
+				mm:loginSteam()
 			end
-		end, "Register new account", "Log in existing account", "Maybe later")
+		else
+			local dialogdef = {}
+			dialogdef.fct = function(login) self:setPlayerLogin(login) end
+			dialogdef.name = "creation"
+			dialogdef.justlogin = false
+			game:registerDialog(require('mod.dialogs.ProfileLogin').new(dialogdef, game.profile_help_text))
+		end
 	end
 end
 

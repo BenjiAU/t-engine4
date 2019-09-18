@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ local TreeList = require "engine.ui.TreeList"
 local Textzone = require "engine.ui.Textzone"
 local Separator = require "engine.ui.Separator"
 local GetQuantity = require "engine.dialogs.GetQuantity"
+local GetQuantitySlider = require "engine.dialogs.GetQuantitySlider"
 local Tabs = require "engine.ui.Tabs"
 local GraphicMode = require("mod.dialogs.GraphicMode")
 local FontPackage = require "engine.FontPackage"
@@ -68,7 +69,7 @@ end
 
 function _M:select(item)
 	if item and self.uis[3] then
-		self.uis[3].ui = item.zone
+		self:replaceUI(self.uis[3].ui, item.zone)
 	end
 end
 
@@ -85,9 +86,7 @@ function _M:switchTo(kind)
 		{width=40, display_prop="status"},
 	}, tree=self.list, fct=function(item) end, select=function(item, sel) self:select(item) end}
 	if self.uis and self.uis[2] then
-		self.c_list.mouse.delegate_offset_x = self.uis[2].ui.mouse.delegate_offset_x
-		self.c_list.mouse.delegate_offset_y = self.uis[2].ui.mouse.delegate_offset_y
-		self.uis[2].ui = self.c_list
+		self:replaceUI(self.uis[2].ui, self.c_list)
 	end
 end
 
@@ -414,6 +413,24 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Always display the combat properties of gloves even if you don't know unarmed attack talents.#WHITE#"}
+	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Always show glove combat properties#WHITE##{normal}#", status=function(item)
+		return tostring(config.settings.tome.display_glove_stats and "enabled" or "disabled")
+	end, fct=function(item)
+		config.settings.tome.display_glove_stats = not config.settings.tome.display_glove_stats
+		game:saveSettings("tome.display_glove_stats", ("tome.display_glove_stats = %s\n"):format(tostring(config.settings.tome.display_glove_stats)))
+		self.c_list:drawItem(item)
+	end,}
+
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Always display combat properties of shields even if you don't know shield attack talents.#WHITE#"}
+	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Always show shield combat properties#WHITE##{normal}#", status=function(item)
+		return tostring(config.settings.tome.display_shield_stats and "enabled" or "disabled")
+	end, fct=function(item)
+		config.settings.tome.display_shield_stats = not config.settings.tome.display_shield_stats
+		game:saveSettings("tome.display_shield_stats", ("tome.display_shield_stats = %s\n"):format(tostring(config.settings.tome.display_shield_stats)))
+		self.c_list:drawItem(item)
+	end,}
+
 	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"When you do a mouse gesture (right click + drag) a color coded trail is displayed.#WHITE#"}
 	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Display mouse gesture trails#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.hide_gestures and "disabled" or "enabled")
@@ -430,6 +447,19 @@ function _M:generateListUi()
 		config.settings.tome.quest_popup = not config.settings.tome.quest_popup
 		game:saveSettings("tome.quest_popup", ("tome.quest_popup = %s\n"):format(tostring(config.settings.tome.quest_popup)))
 		self.c_list:drawItem(item)
+	end,}
+
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Sharpen Visuals, set to 0 to disable.#WHITE#"}
+	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Sharpen Visuals#WHITE##{normal}#", status=function(item)
+		return tostring((config.settings.tome.sharpen_display or 0))
+	end, fct=function(item)
+		game:registerDialog(GetQuantitySlider.new("Enter Sharpen Power", "From 0(disable) to 10", math.floor(config.settings.tome.sharpen_display), 0, 10, 1, function(qty)
+			qty = util.bound(qty, 0, 10)
+			game:saveSettings("tome.sharpen_display", ("tome.sharpen_display = %f\n"):format(qty))
+			config.settings.tome.sharpen_display = qty
+			self.c_list:drawItem(item)
+			if self:isTome() and game.player then game.player:updateMainShader() end
+		end))
 	end,}
 
 	self.list = list
@@ -570,21 +600,67 @@ function _M:generateListOnline()
 		return "select to configure"
 	end, fct=function(item)	game:registerDialog(require("engine.dialogs.ChatChannels").new()) end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Allow various events that are pushed by the server when playing online\nDisabling this will make you miss cool and fun zones.#WHITE#"}
-	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Allow online events#WHITE##{normal}#", status=function(item)
-		return tostring(config.settings.tome.allow_online_events and "enabled" or "disabled")
-	end, fct=function(item)
-		config.settings.tome.allow_online_events = not config.settings.tome.allow_online_events
-		game:saveSettings("tome.allow_online_events", ("tome.allow_online_events = %s\n"):format(tostring(config.settings.tome.allow_online_events)))
-		self.c_list:drawItem(item)
-	end,}
-
 	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Open links in external browser instead of the embedded one.\nThis does not affect addons browse and installation which always stays ingame."}
 	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Open links in external browser#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.open_links_external and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.open_links_external = not config.settings.open_links_external
 		game:saveSettings("open_links_external", ("open_links_external = %s\n"):format(tostring(config.settings.open_links_external)))
+		self.c_list:drawItem(item)
+	end,}
+
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Enable Discord's Rich Presence integration to show your current character on your currently playing profile on Discord (restart the game to apply).\n#ANTIQUE_WHITE#If you do not use Discord this option doesn't do anything in either state."}
+	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Discord's Rich Presence#WHITE##{normal}#", status=function(item)
+		return tostring(not config.settings.disable_discord and "enabled" or "disabled")
+	end, fct=function(item)
+		config.settings.disable_discord = not config.settings.disable_discord
+		game:saveSettings("disable_discord", ("disable_discord = %s\n"):format(tostring(config.settings.disable_discord)))
+		self.c_list:drawItem(item)
+	end,}
+
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Keep a copy of your character sheets (not the whole savefile) on the online vault at te4.org.\nFor each character you will be given a link to this online character sheet so that you can brag about your heroic deeds or sad deaths to your friends or the whole community.#WHITE#"}
+	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Upload characters sheets to the online vault#WHITE##{normal}#", status=function(item)
+		return tostring(config.settings.upload_charsheet and "enabled" or "disabled")
+	end, fct=function(item)
+		config.settings.upload_charsheet = not config.settings.upload_charsheet
+		game:saveSettings("tome.upload_charsheet", ("tome.upload_charsheet = %s\n"):format(tostring(config.settings.upload_charsheet)))
+		self.c_list:drawItem(item)
+
+	end,}
+
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Allow various events that are pushed by the server when playing online\n#{bold}#All#{normal}#: Allow all server events (bonus zones, random events, ...)\n#{bold}#Technical help only#{normal}#: Allow administrator to help in case of bugs or weirdness and allows website services (data reset, steam achievements push, ...) to work.\n#{bold}#Disabled#{normal}#: Disallow all.\n#WHITE#"}
+	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Allow online events#WHITE##{normal}#", status=function(item)
+		return tostring(config.settings.allow_online_events == true and "all" or (config.settings.allow_online_events == "limited" and "technical help only" or "disabled"))
+	end, fct=function(item)
+		if config.settings.allow_online_events == true then config.settings.allow_online_events = "limited"
+		elseif config.settings.allow_online_events == "limited" then config.settings.allow_online_events = false
+		else config.settings.allow_online_events = true end
+		game:saveSettings("allow_online_events", ("allow_online_events = %s\n"):format(config.settings.allow_online_events == "limited" and "'limited'" or tostring(config.settings.allow_online_events)))
+		self.c_list:drawItem(item)
+	end,}
+
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, scrollbar=true, text=string.toTString[[Disables all connectivity to the network.
+This includes, but is not limited to:
+- Player profiles: You will not be able to login, register
+- Characters vault: You will not be able to upload any character to the online vault to show your glory
+- Item's Vault: You will not be able to access the online item's vault, this includes both storing and retrieving items.
+- Ingame chat: The ingame chat requires to connect to the server to talk to other players, this will not be possible.
+- Purchaser / Donator benefits: The base game being free, the only way to give donators their bonuses fairly is to check their online profile. This will thus be disabled.
+- Easy addons downloading & installation: You will not be able to see ingame the list of available addons, nor to one-click install them. You may still do so manually.
+- Version checks: Addons will not be checked for new versions.
+- Discord: If you use Discord Rich Presence integration this will also be disabled by this setting.
+- Ingame game news: The main menu will stop showing you info about new updates to the game.
+
+Note that this setting only affects the game itself. If you use the game launcher, whose sole purpose is to make sure the game is up to date, it will still do so.
+If you do not want that, simply run the game directly: the #{bold}#only#{normal}# use of the launcher is to update the game.
+
+#{bold}##CRIMSON#This is an extremely restrictive setting. It is recommended you only activate it if you have no other choice as it will remove many fun and acclaimed features.
+A full exit and restart of the game is neccessary to apply this setting.#{normal}#]]}
+	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Disable all connectivity#WHITE##{normal}#", status=function(item)
+		return tostring(config.settings.disable_all_connectivity and "yes" or "no")
+	end, fct=function(item)
+		config.settings.disable_all_connectivity = not config.settings.disable_all_connectivity
+		game:saveSettings("disable_all_connectivity", ("disable_all_connectivity = %s\n"):format(tostring(config.settings.disable_all_connectivity)))
 		self.c_list:drawItem(item)
 	end,}
 

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ newEntity{ base = "BASE_NPC_HORROR", define_as="WEIRDLING_BEAST",
 	killer_message = "and slowly consumed",
 	level_range = {19, nil}, exp_worth = 3,
 	rank = 3.5,
-	autolevel = "warriormage",
+	autolevel = "caster",
 	max_life = 300, life_rating = 16,
 	combat_armor = 10, combat_def = 0,
 
@@ -72,6 +72,15 @@ newEntity{ base = "BASE_NPC_HORROR", define_as="WEIRDLING_BEAST",
 	resolvers.inscription("RUNE:_SHIELDING", {cooldown=10, dur=5, power=500}),
 	resolvers.inscription("TAINT:_DEVOURER", {cooldown=10, effects=4, heal=75}),
 	resolvers.inscriptions(1, {"manasurge rune"}),
+
+	
+	-- The theme of this boss confuses me, I assume its supposed to just feel very random and weird, so, ADHD classes it is
+	auto_classes={
+		{class="Anorithil", start_level=19, level_rate=25},
+		{class="Doomed", start_level=19, level_rate=25},
+		{class="Corruptor", start_level=19, level_rate=25},
+		{class="Archmage", start_level=19, level_rate=25},
+	},
 
 	resolvers.sustains_at_birth(),
 
@@ -126,6 +135,7 @@ newEntity{ base = "BASE_NPC_HORROR", define_as="BUTLER",
 	invulnerable = 1, never_move = 1,
 	faction = "neutral",
 	never_anger = 1,
+	immune_possession = 1,
 	can_talk = "shertul-fortress-butler",
 }
 
@@ -137,6 +147,7 @@ newEntity{ define_as="TRAINING_DUMMY",
 	rank = 3,
 	max_life = 300000, life_rating = 0,
 	life_regen = 300000,
+	immune_possession = 1,
 	never_move = 1,
 	knockback_immune = 1,
 	training_dummy = 1,
@@ -168,6 +179,7 @@ newEntity{ base = "BASE_NPC_CAT", define_as = "KITTY",
 	desc = [[An orange kitty with a white star blaze on his chest. Has a strange affinity for licking your face whenever possible.]],
 	level_range = {1, nil}, exp_worth = 1,
 	rarity = 4,
+	immune_possession = 1,
 	self_resurrect = 9,
 	max_life = 50,
 	invulnerable = 1,

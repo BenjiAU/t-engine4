@@ -10,7 +10,7 @@ void main(void)
 	gl_FragColor = texture2D(tex, gl_TexCoord[0].xy);
 
 	int blursize = int(motionblur);
-	vec2 offset = 0.8/texSize;
+	vec2 offset = 0.4/texSize;
 
 	float fTime0_X = tick / 20000.0;
 	float coord = gl_TexCoord[0].x + gl_TexCoord[0].y * texSize[0];
@@ -21,7 +21,8 @@ void main(void)
 
 	// Center Pixel
 	vec4 sample = vec4(0.0,0.0,0.0,0.0);
-	float factor = ((float(blursize)*2.0)+1.0);
+	//float factor = ((float(blursize)*2.0)+1.0);
+	float factor = (float(blursize)+1.0)*(float(blursize)+1.0);	factor = factor*factor;
 	factor = factor*factor;
 
 	if (noisy < 0.25)

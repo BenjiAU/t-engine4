@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ newTalent{
 	points = 5,
 	mode = "sustained",
 	cooldown = 15,
-	sustain_stamina = 40,
+	sustain_stamina = 10,
 	callbackOnRest = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
 	callbackOnRun = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
 	tactical = { DEFEND = 2 }, -- AI for this could be better
@@ -113,13 +113,36 @@ newTalent{
 	getCapApproach = function(self, t) return self:combatTalentLimit(t, 1, 0.15, 0.5) end,
 	getResist = function(self, t) return (1 - self.life / self.max_life)*t.resistCoeff(self, t) end,
 	getResistCap = function(self, t) return util.bound((100-(self.resists_cap.all or 100))*t.getCapApproach(self, t), 0, 100) end,
-	callbackOnActBase = function(self, t) --called by mod.class.Actor:actBase
+	remove_on_zero = true,
+	drain_stamina = function(self, t, turn)
 		local p = self:isTalentActive(t.id)
-		if p.resid then self:removeTemporaryValue("resists", p.resid) end
-		if p.cresid then self:removeTemporaryValue("resists_cap", p.cresid) end
+		return 1 + (turn or (p and p.turns) or 0)*0.3
+	end,
+	iconOverlay = function(self, t, p)
+		local p = self.sustain_talents[t.id]
+		if not p then return end
+		return tostring("#RED##{bold}#"..math.floor(t.getResist(self, t))).."#LAST##{normal}#", "buff_font_small"
+	end,
+	callbackOnActBase = function(self, t)
+		local p = self:isTalentActive(t.id)
+		if not p then return end
 		if p.stamina then self:removeTemporaryValue("stamina_regen", p.stamina) end
 		if p.turns then p.turns = p.turns + 1 end
-		p.stamina = self:addTemporaryValue("stamina_regen", t.getStaminaDrain(self, t) + -0.3 * p.turns)
+		p.stamina = self:addTemporaryValue("stamina_regen", -(t.drain_stamina(self, t, p.turns) - t.drain_stamina(self, t, 0)))
+
+		-- This should be redundant but there are cases the value won't properly update, ie direct life reductions
+		if p.resid then self:removeTemporaryValue("resists", p.resid) end
+		if p.cresid then self:removeTemporaryValue("resists_cap", p.cresid) end
+		local resistbonus = t.getResist(self, t)
+		p.resid = self:addTemporaryValue("resists", {all=resistbonus})
+		local capbonus = t.getResistCap(self, t)
+		p.cresid = self:addTemporaryValue("resists_cap", {all=capbonus})	
+	end,
+	callbackOnTakeDamage = function(self, t)
+		local p = self:isTalentActive(t.id)
+		if not p then return end
+		if p.resid then self:removeTemporaryValue("resists", p.resid) end
+		if p.cresid then self:removeTemporaryValue("resists_cap", p.cresid) end
 
 		--This makes it impossible to get 100% resist all cap from this talent, and most npc's will get no cap increase
 		local resistbonus = t.getResist(self, t)
@@ -127,13 +150,9 @@ newTalent{
 		local capbonus = t.getResistCap(self, t)
 		p.cresid = self:addTemporaryValue("resists_cap", {all=capbonus})
 	end,
-	getStaminaDrain = function(self, t)
-		return -1
-	end,
 	activate = function(self, t)
 		return {
 			turns = 0,
-			stamina = self:addTemporaryValue("stamina_regen", t.getStaminaDrain(self, t)),
 			resid = self:addTemporaryValue("resists", {all = t.getResist(self, t)}),
 			cresid = self:addTemporaryValue("resists_cap", {all = t.getResistCap(self, t)})
 		}
@@ -141,18 +160,18 @@ newTalent{
 	deactivate = function(self, t, p)
 		if p.resid then self:removeTemporaryValue("resists", p.resid) end
 		if p.cresid then self:removeTemporaryValue("resists_cap", p.cresid) end
-		self:removeTemporaryValue("stamina_regen", p.stamina)
+		if p.stamina then self:removeTemporaryValue("stamina_regen", p.stamina) end
 		return true
 	end,
 	info = function(self, t)
-		local drain = t.getStaminaDrain(self, t)
+		local drain = t.drain_stamina(self, t)
 		local resistC = t.resistCoeff(self, t)
 		return ([[Take a defensive stance to resist the onslaught of your foes.
 		While wounded, you gain all damage resistance equal to %d%% of your missing health.
 		(So if you have lost 70%% of your life, you gain %d%% all resistance.)
 		In addition, your all damage resistance cap increases %0.1f%% closer to 100%%.
-		This consumes stamina rapidly the longer it is sustained (%d stamina increasing by -0.3/turn).
-		The effects are refreshed at the start of each turn.]]):
+		This consumes stamina rapidly the longer it is sustained (%0.1f stamina/turn, increasing by 0.3/turn).
+		The resist is recalculated each time you take damage.]]):
 		format(resistC, resistC*0.7, t.getCapApproach(self, t)*100, drain)
 	end,
 }

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ newEntity{
 	rarity = 7,
 	cost = 7,
 	wielder = {
-		resists_pen={ [DamageType.PHYSICAL] = resolvers.mbonus_material(15, 10), },
+		resists_pen={ [DamageType.PHYSICAL] = resolvers.mbonus_material(5, 5), },
 		inc_stats = { [Stats.STAT_CUN] = resolvers.mbonus_material(6, 2) },
 	},
 }

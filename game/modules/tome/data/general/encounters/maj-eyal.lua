@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ newEntity{
 	type = "hostile", subtype = "special", unique = true,
 	level_range = {10, 20},
 	rarity = 7,
-	min_level = 6,
+	min_level = 10,
 	on_world_encounter = "merchant-quest",
 	on_encounter = function(self, who)
 		who.energy.value = game.energy_to_act

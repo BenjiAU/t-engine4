@@ -1,7 +1,7 @@
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
-#include <OpenGL/glext.h>
+// #include <OpenGL/glext.h>
 #else
 #ifdef _WIN32
 #include <windows.h>
@@ -9,7 +9,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #ifndef _WIN32
-#include <GL/glext.h>
+// #include <GL/glext.h>
 #endif
 #endif
 

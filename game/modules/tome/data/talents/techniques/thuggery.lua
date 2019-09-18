@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ newTalent{
 		return ([[You smack your forehead against your enemy's head (or whatever sensitive part you can find), causing %0.1f Physical damage.
 		If the attack hits, the target is confused (%d%% effect) for %d turns.
 		Damage done increases with the quality of your headgear, your Strength, and your physical damage bonuses.
-		Confusion power and chance increase with your Dexterity and Accuracy.]]):
+		Confusion power increases with your Dexerity, and chance increases Accuracy.]]):
 		format(dam, t.getConfusion(self, t), duration)
 	end,
 }
@@ -122,6 +122,7 @@ newTalent{
 	cooldown = 30,
 	sustain_stamina = 40,
 	drain_stamina = 6,
+	remove_on_zero = true,
 	no_energy = true,
 	require = techs_req4,
 	range = 1,

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -118,7 +118,9 @@ function _M:onBirth(birther)
 	-- Make a list of random escort levels
 	local race_def = birther.birth_descriptor_def.race[self.descriptor.race]
 	local subrace_def = birther.birth_descriptor_def.subrace[self.descriptor.subrace]
+	local world = birther.birth_descriptor_def.world[self.descriptor.world]
 	local def = subrace_def.random_escort_possibilities or race_def.random_escort_possibilities
+	if world.random_escort_possibilities then def = world.random_escort_possibilities end -- World overrides
 	if def then
 		local zones = {}
 		for i, zd in ipairs(def) do for j = zd[2], zd[3] do zones[#zones+1] = {zd[1], j} end end
@@ -180,7 +182,7 @@ function _M:onEnterLevel(zone, level)
 
 	-- Clear existing player created effects on the map
 	for i, eff in ipairs(level.map.effects) do
-		if eff.src and eff.src.player then
+		if (eff.src and (eff.src.player or (eff.src.summoner and eff.src:resolveSource().player))) then
 			eff.duration = 0
 			eff.grids = {}
 			print("[onEnterLevel] Cancelling player created effect ", tostring(eff.name))
@@ -205,6 +207,8 @@ function _M:onEnterLevel(zone, level)
 	end
 
 	self:fireTalentCheck("callbackOnChangeLevel", "enter", zone, level)
+
+	game:updateCurrentChar()
 end
 
 function _M:onEnterLevelEnd(zone, level)
@@ -410,6 +414,14 @@ function _M:act()
 	end
 end
 
+function _M:useEnergy(val)
+	mod.class.Actor.useEnergy(self, val)
+	if self.player and self.energy.value < game.energy_to_act then
+		game.paused = false
+		self:fireTalentCheck("callbackOnActEnd")
+	end
+end
+
 function _M:tooltip(x, y, seen_by)
 	local str = mod.class.Actor.tooltip(self, x, y, seen_by)
 	if not str then return end
@@ -456,8 +468,8 @@ function _M:updateMainShader()
 		end
 
 		-- Colorize shader
-		if self:attr("stealth") and self:attr("stealth") > 0 then game.fbo_shader:setUniform("colorize", {0.9,0.9,0.9,0.6})
-		elseif self:attr("invisible") and self:attr("invisible") > 0 then game.fbo_shader:setUniform("colorize", {0.3,0.4,0.9,0.8})
+		if self:attr("stealth") and self:attr("stealth") > 0 then game.fbo_shader:setUniform("colorize", {0.9,0.9,0.9,0.4})
+		elseif self:attr("invisible") and self:attr("invisible") > 0 then game.fbo_shader:setUniform("colorize", {0.3,0.4,0.9,0.3})
 		elseif self:attr("unstoppable") then game.fbo_shader:setUniform("colorize", {1,0.2,0,1})
 		elseif self:attr("lightning_speed") then game.fbo_shader:setUniform("colorize", {0.2,0.3,1,1})
 		elseif game.level and game.level.data.is_eidolon_plane then game.fbo_shader:setUniform("colorize", {1,1,1,1})
@@ -495,6 +507,12 @@ function _M:updateMainShader()
 		if self:attr("timestopping") and pf.timestop and pf.timestop.shad then
 			effects[pf.timestop.shad] = true
 			pf.timestop.shad:paramNumber("tick_start", core.game.getTime())
+		end
+
+		-- Sharpen shader
+		if config.settings.tome.sharpen_display and config.settings.tome.sharpen_display > 1 then
+			effects[pf.sharpen.shad] = true
+			pf.sharpen.shad:paramNumber("sharpen_power", config.settings.tome.sharpen_display)
 		end
 
 		game.posteffects_use = table.keys(effects)
@@ -647,7 +665,12 @@ function _M:playerFOV()
 		local lradius = self.lite
 		if self.radiance_aura and lradius < self.radiance_aura then lradius = self.radiance_aura end
 		if self.lite <= 0 then game.level.map:applyLite(self.x, self.y)
-		else self:computeFOV(lradius, "block_sight", function(x, y, dx, dy, sqdist) game.level.map:applyLite(x, y) end, true, true, true) end
+		else
+			self:computeFOV(lradius, "block_sight", function(x, y, dx, dy, sqdist)
+				game.level.map:applyExtraLite(x, y) 
+			end, 
+			true, true, true)
+		end
 
 		-- For each entity, generate lite
 		local uid, e = next(game.level.entities)
@@ -664,6 +687,7 @@ function _M:playerFOV()
 			self:computeFOV(self:attr("blind_sight"), "block_sight", function(x, y, dx, dy, sqdist) game.level.map:applyLite(x, y, 0.6) end, true, true, true)
 		end
 	end
+	self:postFOVCombatCheck()
 end
 
 function _M:doFOV()
@@ -899,7 +923,7 @@ function _M:automaticTalents()
 		if cd <= turns_used and t.mode ~= "sustained" then
 			game.logPlayer(self, "Automatic use of talent %s #DARK_RED#skipped#LAST#: cooldown too low (%d).", self:getTalentDisplayName(t), cd)
 		elseif (t.mode ~= "sustained" or not self.sustain_talents[tid]) and not self.talents_cd[tid] and self:preUseTalent(t, true, true) and (not t.auto_use_check or t.auto_use_check(self, t)) then
-			if (c == 1) or (c == 2 and #spotted <= 0) or (c == 3 and #spotted > 0) then
+			if (c == 1) or (c == 2 and #spotted <= 0) or (c == 3 and #spotted > 0) or (c == 5 and not self.in_combat) then
 				if c ~= 2 then
 					uses[#uses+1] = {name=t.name, turns_used=turns_used, cd=cd, fct=function() self:useTalent(tid) end}
 				else
@@ -977,7 +1001,12 @@ function _M:restCheck()
 
 	-- Resting improves regen
 	for act, def in pairs(game.party.members) do if game.level:hasEntity(act) and not act.dead then
-		local perc = math.min(self.resting.cnt / 10, 8)
+		-- Drastically improve regen while resting as this is one of the most common areas lag causes frustration
+		-- To avoid interactions with life regen buffs and minimize any other non-QOL impacts we wait 15 turns before doing any enhancement
+		local perc = 0
+		if self.resting.cnt >= 15 then
+			perc = math.min(self.resting.cnt, 16)
+		end
 		local old_shield = act.arcane_shield
 		act.arcane_shield = nil
 		act:heal(act.life_regen * perc)

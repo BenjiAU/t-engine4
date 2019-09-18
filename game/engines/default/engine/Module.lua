@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -446,12 +446,72 @@ function _M:addonMD5(add, base)
 	print("[MODULE LOADER] addon ", add.short_name, " MD5", fmd5, "computed in ", core.game.getTime() - t, vbase)
 
 	if __module_extra_info.compute_md5_only then
-		local f = io.open(__module_extra_info.compute_md5_only, "a")
+		local f = fs.open(__module_extra_info.compute_md5_only, "a")
 		f:write(("%s : addon[%s] md5\n"):format(fmd5, add.version_name))
 		f:close()
 	end
 
 	return fmd5
+end
+
+function _M:loadAddon(mod, add, hashlist, hooks_list)
+	add.version_name = ("%s-%s-%d.%d.%d"):format(mod.short_name, add.short_name, add.version[1], add.version[2], add.version[3])
+
+	print("Binding addon", add.long_name, add.teaa, add.version_name)
+	local base
+	if add.teaa then
+		base = fs.getRealPath(add.teaa)
+	else
+		base = fs.getRealPath(add.dir)
+	end
+
+	if add.data then
+		print(" * with data")
+		if add.teaac then fs.mount("subdir:/"..add.teaac.."/data/|"..fs.getRealPath(add.teaa), "/data-"..add.short_name, true)
+		elseif add.teaa then fs.mount("subdir:/data/|"..fs.getRealPath(add.teaa), "/data-"..add.short_name, true)
+		else fs.mount(base.."/data", "/data-"..add.short_name, true)
+		end
+	end
+	if add.superload then 
+		print(" * with superload")
+		if add.teaac then fs.mount("subdir:/"..add.teaac.."/superload/|"..fs.getRealPath(add.teaa), "/mod/addons/"..add.short_name.."/superload", true)
+		elseif add.teaa then fs.mount("subdir:/superload/|"..fs.getRealPath(add.teaa), "/mod/addons/"..add.short_name.."/superload", true)
+		else fs.mount(base.."/superload", "/mod/addons/"..add.short_name.."/superload", true)
+		end
+		
+		table.insert(_G.__addons_superload_order, add.short_name)
+	end
+	if add.overload then
+		print(" * with overload")
+		if add.teaac then fs.mount("subdir:/"..add.teaac.."/overload/|"..fs.getRealPath(add.teaa), "/", false)
+		elseif add.teaa then fs.mount("subdir:/overload/|"..fs.getRealPath(add.teaa), "/", false)
+		else fs.mount(base.."/overload", "/", false)
+		end
+	end
+	if add.hooks then
+		if add.teaac then fs.mount("subdir:/"..add.teaac.."/hooks/|"..fs.getRealPath(add.teaa), "/hooks/"..add.short_name, true)
+		elseif add.teaa then fs.mount("subdir:/hooks/|"..fs.getRealPath(add.teaa), "/hooks/"..add.short_name, true)
+		else fs.mount(base.."/hooks", "/hooks/"..add.short_name, true)
+		end
+
+ 		hooks_list[#hooks_list+1] = "/hooks/"..add.short_name
+		print(" * with hooks")
+	end
+
+	-- Compute addon md5
+	local hash_valid, hash_err
+	if config.settings.cheat and not __module_extra_info.compute_md5_only then
+		hash_valid, hash_err = false, "cheat mode skipping addon validation"
+	else
+		local fmd5 = self:addonMD5(add)
+		hashlist[#hashlist+1] = {module=mod.short_name, addon=add.version_name, md5=fmd5}
+--		hash_valid, hash_err = profile:checkAddonHash(mod.short_name, add.version_name, fmd5)
+	end
+
+--	if hash_err then hash_err = hash_err .. " [addon: "..add.short_name.."]" end
+--	add.hash_valid, add.hash_err = hash_valid, hash_err
+
+	mod.addons[add.short_name] = add
 end
 
 function _M:loadAddons(mod, saveuse)
@@ -572,63 +632,7 @@ You may try to force loading if you are sure the savefile does not use that addo
 	mod.addons = {}
 	_G.__addons_superload_order = {}
 	for i, add in ipairs(adds) do
-		add.version_name = ("%s-%s-%d.%d.%d"):format(mod.short_name, add.short_name, add.version[1], add.version[2], add.version[3])
-
-		print("Binding addon", add.long_name, add.teaa, add.version_name)
-		local base
-		if add.teaa then
-			base = fs.getRealPath(add.teaa)
-		else
-			base = fs.getRealPath(add.dir)
-		end
-
-		if add.data then
-			print(" * with data")
-			if add.teaac then fs.mount("subdir:/"..add.teaac.."/data/|"..fs.getRealPath(add.teaa), "/data-"..add.short_name, true)
-			elseif add.teaa then fs.mount("subdir:/data/|"..fs.getRealPath(add.teaa), "/data-"..add.short_name, true)
-			else fs.mount(base.."/data", "/data-"..add.short_name, true)
-			end
-		end
-		if add.superload then 
-			print(" * with superload")
-			if add.teaac then fs.mount("subdir:/"..add.teaac.."/superload/|"..fs.getRealPath(add.teaa), "/mod/addons/"..add.short_name.."/superload", true)
-			elseif add.teaa then fs.mount("subdir:/superload/|"..fs.getRealPath(add.teaa), "/mod/addons/"..add.short_name.."/superload", true)
-			else fs.mount(base.."/superload", "/mod/addons/"..add.short_name.."/superload", true)
-			end
-			
-			table.insert(_G.__addons_superload_order, add.short_name)
-		end
-		if add.overload then
-			print(" * with overload")
-			if add.teaac then fs.mount("subdir:/"..add.teaac.."/overload/|"..fs.getRealPath(add.teaa), "/", false)
-			elseif add.teaa then fs.mount("subdir:/overload/|"..fs.getRealPath(add.teaa), "/", false)
-			else fs.mount(base.."/overload", "/", false)
-			end
-		end
-		if add.hooks then
-			if add.teaac then fs.mount("subdir:/"..add.teaac.."/hooks/|"..fs.getRealPath(add.teaa), "/hooks/"..add.short_name, true)
-			elseif add.teaa then fs.mount("subdir:/hooks/|"..fs.getRealPath(add.teaa), "/hooks/"..add.short_name, true)
-			else fs.mount(base.."/hooks", "/hooks/"..add.short_name, true)
-			end
-
-         		hooks_list[#hooks_list+1] = "/hooks/"..add.short_name
-			print(" * with hooks")
-		end
-
-		-- Compute addon md5
-		local hash_valid, hash_err
-		if config.settings.cheat and not __module_extra_info.compute_md5_only then
-			hash_valid, hash_err = false, "cheat mode skipping addon validation"
-		else
-			local fmd5 = self:addonMD5(add)
-			hashlist[#hashlist+1] = {module=mod.short_name, addon=add.version_name, md5=fmd5}
---			hash_valid, hash_err = profile:checkAddonHash(mod.short_name, add.version_name, fmd5)
-		end
-
---		if hash_err then hash_err = hash_err .. " [addon: "..add.short_name.."]" end
---		add.hash_valid, add.hash_err = hash_valid, hash_err
-
-		mod.addons[add.short_name] = add
+		self:loadAddon(mod, add, hashlist, hooks_list)
 	end
 
 	-- We load hooks at the end of all superloads and overloads
@@ -953,7 +957,7 @@ function _M:instanciate(mod, name, new_game, no_reboot, extra_module_info)
 			print("[MODULE LOADER] module MD5", module_md5, "computed in ", core.game.getTime() - t)
 
 			if __module_extra_info.compute_md5_only then
-				local f = io.open(__module_extra_info.compute_md5_only, "w")
+				local f = fs.open(__module_extra_info.compute_md5_only, "w")
 				f:write(("%s : module[%s] md5\n"):format(module_md5, mod.version_string))
 				f:close()
 			end
@@ -990,6 +994,7 @@ function _M:instanciate(mod, name, new_game, no_reboot, extra_module_info)
 	profile:incrLoadProfile(mod)
 	profile:currentCharacter(mod.full_version_string, "game did not tell us")
 
+
 	UIBase:clearCache()
 
 	-- Some requires cleanup, to correctly let modules apply settings	
@@ -1013,6 +1018,9 @@ function _M:instanciate(mod, name, new_game, no_reboot, extra_module_info)
 		end
 		_G.world:run()
 	end
+
+	-- TODO: Replace this with loading quickhotkeys from the profile.
+	if engine.interface.PlayerHotkeys then engine.interface.PlayerHotkeys:loadQuickHotkeys(mod.short_name, Savefile.hotkeys_file) end
 
 	-- Load the savefile if it exists, or create a new one if not (or if requested)
 	local save = engine.Savefile.new(_G.game.save_name)
@@ -1076,9 +1084,6 @@ function _M:instanciate(mod, name, new_game, no_reboot, extra_module_info)
 
 	profile:saveGenericProfile("modules_loaded", {name=mod.short_name, nb={"inc", 1}})
 	profile:setConfigsBatch(false)
-
-	-- TODO: Replace this with loading quickhotkeys from the profile.
-	if engine.interface.PlayerHotkeys then engine.interface.PlayerHotkeys:loadQuickHotkeys(mod.short_name, Savefile.hotkeys_file) end
 
 	core.wait.disable()
 	profile.waiting_auth_no_redraw = false

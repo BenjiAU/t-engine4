@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -71,6 +71,7 @@ newTalent{
 			combatSpellpower = function(self) return self.summoner:combatSpellpower() end,
 			rad = 3,
 			energy = {value=0, mod=16},
+			all_know = true,
 			detect_power = self:combatSpellpower() / 2,
 			disarm_power = self:combatSpellpower() / 2,
 			on_added = function(self, level, x, y)
@@ -101,8 +102,17 @@ newTalent{
 
 				local tg = {type="beam", x=self.x, y=self.y, range=self.rad, selffire=self.summoner:spellFriendlyFire()}
 				self.summoner.__project_source = self
-				self.summoner:project(tg, x, y, engine.DamageType.ARCANE_SILENCE, {dam=self.dam, chance=25}, nil)
 				self.summoner:project(tg, self.x, self.y, engine.DamageType.ARCANE, self.dam/10, nil)
+				self:project(tg, x, y, function(tx, ty)
+					-- In rare circumstances this can hit the same target 4-7 times so we need to sanity check it
+					local target = game.level.map(tx, ty, engine.Map.ACTOR)
+					if not target then return end
+					if target.turn_procs.aether_beam and target.turn_procs.aether_beam > 2 then return end
+					target.turn_procs.aether_beam = target.turn_procs.aether_beam or 0
+					target.turn_procs.aether_beam = target.turn_procs.aether_beam + 1
+					engine.DamageType:get(engine.DamageType.ARCANE_SILENCE).projector(self, tx, ty, engine.DamageType.ARCANE_SILENCE, {dam=self.dam, chance=25})
+				end)
+
 				self.summoner.__project_source = nil
 				local _ _, x, y = self:canProject(tg, x, y)
 				game.level.map:particleEmitter(self.x, self.y, math.max(math.abs(x-self.x), math.abs(y-self.y)), "mana_beam", {tx=x-self.x, ty=y-self.y})
@@ -122,7 +132,7 @@ newTalent{
 		local dam = t.getDamage(self, t)
 		return ([[You focus the aether into a spinning beam of arcane energies, doing %0.2f arcane damage and having 25%% chance to silence the creatures it pierces.
 		The beam will also damage its epicenter each turn for 10%% of the damage (but it will not silence).
-		The beam spins with incredible speed (1600%%).
+		The beam spins with incredible speed (1600%%) and can only hit the same target up to 3 times inbetween their turns.
 		The damage will increase with your Spellpower.]]):
 		format(damDesc(self, DamageType.ARCANE, dam))
 	end,
@@ -148,7 +158,7 @@ newTalent{
 		return tg
 	end,
 	getNb = function(self, t) return math.floor(self:combatTalentScale(t, 3.3, 4.7)) end,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 180) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 180) end,  -- 100, 900 at 6.5 assuming all hit.  Not bad.
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
@@ -189,14 +199,26 @@ newTalent{
 	no_energy = true,
 	tactical = { BUFF = 2 },
 	getNb = function(self, t) return math.floor(self:combatTalentLimit(t, 15, 5, 9)) end, -- Limit duration < 15	
+	callbackOnTalentPost = function(self, t, ab)
+		if not self:hasEffect(self.EFF_AETHER_AVATAR) then return end
+		if ab.mode == "sustained" then return end
+		if ab.use_only_arcane then return end
+		if ab.type[1] == "spell/aegis" and self:hasEffect(self.EFF_AETHER_AVATAR).aegis then return end
+		if self.turn_procs.aether_avatar_penalty then return end
+		self:incMana(-50)
+		game.logSeen(self, "#VIOLET#%s loses 50 mana from using a non-Arcane talent!#LAST#", self.name:capitalize())
+
+		self.turn_procs.aether_avatar_penalty = true
+	end,
 	action = function(self, t)
-		self:setEffect(self.EFF_AETHER_AVATAR, t.getNb(self, t), {})
+		local aegis
+		self:setEffect(self.EFF_AETHER_AVATAR, t.getNb(self, t), {aegis = (self:getTalentLevel(t) > 4 )})
 		game:playSoundNear(self, "talents/arcane")
 		return true
 	end,
 	info = function(self, t)
 		return ([[Fill yourself with aether forces, completely surrounding your body for %d turns.
-		While active, you can only cast arcane or aether spells, your cooldown for them is divided by 3, your arcane damage is increased by 25%%, your Disruption Shield can be used at any time, and your maximum mana is increased by 33%%.]]):
+		While active, you lose 50 mana the first time you use a non-sustain, non-Arcane or Aether talent each turn, your cooldown for them is divided by 3, your arcane damage and penetration is increased by 25%%, your Disruption Shield radius is increased to 10, and your maximum mana is increased by 33%%.]]):
 		format(t.getNb(self, t))
 	end,
 }
@@ -239,7 +261,7 @@ newTalent{
 		local damageinc = t.getDamageIncrease(self, t)
 		local ressistpen = t.getResistPenalty(self, t)
 		return ([[Surround yourself with Pure Aether, increasing all your arcane damage by %0.1f%% and ignoring %d%% arcane resistance of your targets.
-		At level 5 it allows Aegis spells to be used while in Aether Avatar form.]])
+		At level 4 it allows Aegis spells to be used while in Aether Avatar form without penalty.]])
 		:format(damageinc, ressistpen)
 	end,
 }

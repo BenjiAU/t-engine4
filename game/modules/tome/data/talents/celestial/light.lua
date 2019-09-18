@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -108,9 +108,9 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		local absorb = t.getAbsorb(self, t)
+		local absorb = t.getAbsorb(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100
 		return ([[A protective shield forms around you that lasts for up to 10 turns and negates %d damage.
-		The total damage the barrier can absorb will increase with your Spellpower.]]):
+ 		The total damage the barrier can absorb will increase with your Spellpower and can crit.]]):
 		format(absorb)
 	end,
 }

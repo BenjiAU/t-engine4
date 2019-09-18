@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -75,6 +75,10 @@ newEntity{ base="BASE_NPC_ORC_GRUSHNAK", define_as = "GNARG",
 		[Talents.T_SHATTERING_SHOUT]={base=5, every=7, max=7},
 		[Talents.T_SECOND_WIND]={base=5, every=7, max=7},
 	},
+
+	resolvers.auto_equip_filters("Berserker"),
+	auto_classes={{class="Berserker", start_level=35, level_rate=75}},
+	
 	resolvers.sustains_at_birth(),
 }
 

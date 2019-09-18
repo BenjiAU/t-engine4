@@ -1,6 +1,6 @@
 /*
     TE4 - T-Engine 4
-    Copyright (C) 2009 - 2017 Nicolas Casalini
+    Copyright (C) 2009 - 2018 Nicolas Casalini
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -91,7 +91,6 @@ bool is_waiting()
 }
 
 extern int requested_fps;
-extern void on_redraw();
 static void hook_wait_display(lua_State *L, lua_Debug *ar)
 {
 	if (!manual_ticks_enabled) waited_count++;
@@ -101,7 +100,7 @@ static void hook_wait_display(lua_State *L, lua_Debug *ar)
 	int now = SDL_GetTicks();
 	if (now - last_tick < (3000 / requested_fps)) return;
 	last_tick = now;
-	on_redraw();
+	redraw_now(redraw_type_normal);
 }
 
 extern long draw_tick_skip;
@@ -155,7 +154,7 @@ static int enable(lua_State *L)
 			wait_draw_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 		}
 
-		on_redraw();
+		redraw_now(redraw_type_normal);
 	}
 
 	lua_pushboolean(L, waiting == 1);

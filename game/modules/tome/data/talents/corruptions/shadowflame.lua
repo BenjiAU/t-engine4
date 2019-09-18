@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Turn into a wraith, allowing you to walk through walls (but not preventing suffocation) for %d turns.
+		return ([[Turn into a wraith, allowing you to walk through walls and removing the need to breath for %d turns.
 		Also increases your defense and armour by %d and %d, respectively.
 		If you are still in a wall when the effect ends you will randomly teleport.
 		]]):

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -48,9 +48,11 @@ newBirthDescriptor{
 		starting_quest = "start-yeek",
 		starting_intro = "yeek",
 		blood_color = colors.BLUE,
-		resolvers.inscription("INFUSION:_REGENERATION", {cooldown=10, dur=5, heal=60}),
-		resolvers.inscription("INFUSION:_WILD", {cooldown=12, what={physical=true}, dur=4, power=14}),
-		resolvers.inventory({id=true, transmo=false, alter=function(o) o.inscription_data.cooldown=12 o.inscription_data.heal=50 end, {type="scroll", subtype="infusion", name="healing infusion", ego_chance=-1000, ego_chance=-1000}}),
+
+		resolvers.inscription("INFUSION:_REGENERATION", {cooldown=10, dur=5, heal=100}, 1),
+		resolvers.inscription("INFUSION:_WILD", {cooldown=14, what={physical=true}, dur=4, power=14}, 2),
+		resolvers.inscription("INFUSION:_HEALING", {cooldown=12, heal=50}, 3),
+		resolvers.birth_extra_tier1_zone{name="tier1", condition=function(e) return e.starting_zone == "town-irkkk" end, "murgol-lair", "ritch-tunnels"},
 	},
 	game_state = {
 		start_tier1_skip = 4,
@@ -58,16 +60,70 @@ newBirthDescriptor{
 	random_escort_possibilities = { {"tier1.1", 1, 2}, {"tier1.2", 1, 2}, {"daikara", 1, 2}, {"old-forest", 1, 4}, {"dreadfell", 1, 8}, {"reknor", 1, 2}, },
 	moddable_attachement_spots = "race_yeek", moddable_attachement_spots_sexless=true,
 
-	cosmetic_unlock = {
-		cosmetic_bikini =  {
-			{name="Bikini [donator only]", donator=true, on_actor=function(actor, birther, last)
-				if not last then local o = birther.obj_list_by_name.Bikini if not o then print("No bikini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull()
-				else actor:registerOnBirthForceWear("FUN_BIKINI") end
-			end, check=function(birth) return birth.descriptors_by_type.sex == "Female" end},
-			{name="Mankini [donator only]", donator=true, on_actor=function(actor, birther, last)
-				if not last then local o = birther.obj_list_by_name.Mankini if not o then print("No mankini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull()
-				else actor:registerOnBirthForceWear("FUN_MANKINI") end
-			end, check=function(birth) return birth.descriptors_by_type.sex == "Male" end},
+	cosmetic_options = {
+		skin = {
+			{name="Skin Color 1", file="base_01"},
+			{name="Skin Color 2", file="base_02"},
+			{name="Skin Color 3", file="base_03"},
+			{name="Skin Color 4", file="base_04"},
+			{name="Skin Color 5", file="base_05"},
+			{name="Skin Color 6", file="base_06"},
+			{name="Skin Color 7", file="base_07"},
+			{name="Skin Color 8", file="base_08"},
+			{name="Skin Color 9", file="base_09"},
+			{name="Skin Color 10", file="base_10"},
+		},
+		hairs = {
+			{name="Hair 1", file="hair_01"},
+			{name="Hair 2", file="hair_02"},
+			{name="Hair 3", file="hair_03"},
+			{name="Hair 4", file="hair_04"},
+			{name="Hair 5", file="hair_05"},
+			{name="Redfur Hair 1", file="hair_redfur_01", unlock="cosmetic_race_human_redhead"},
+			{name="Redfur Hair 2", file="hair_redfur_02", unlock="cosmetic_race_human_redhead"},
+			{name="Redfur Hair 3", file="hair_redfur_03", unlock="cosmetic_race_human_redhead"},
+			{name="Redfur Hair 4", file="hair_redfur_04", unlock="cosmetic_race_human_redhead"},
+			{name="Redfur Hair 5", file="hair_redfur_05", unlock="cosmetic_race_human_redhead"},
+		},
+		facial_features = {
+			{name="Beard 1", file="beard_01"},
+			{name="Beard 2", file="beard_02"},
+			{name="Beard 3", file="beard_03"},
+			{name="Redfur Beard 1", file="beard_redfur_01", unlock="cosmetic_race_human_redhead"},
+			{name="Redfur Beard 2", file="beard_redfur_02", unlock="cosmetic_race_human_redhead"},
+			{name="Redfur Beard 3", file="beard_redfur_03", unlock="cosmetic_race_human_redhead"},
+			{name="Eyes 1", file="face_eyes_01"},
+			{name="Eyes 2", file="face_eyes_02"},
+			{name="Eyes 3", file="face_eyes_03"},
+			{name="Eyes 4", file="face_eyes_04"},
+			{name="Eyes 5", file="face_eyes_05"},
+			{name="Eyes 6", file="face_eyes_06"},
+			{name="Eyes 7", file="face_eyes_07"},
+			{name="Eyes 8", file="face_eyes_08"},
+			{name="Eyes 9", file="face_eyes_09"},
+			{name="Eyes 10", file="face_eyes_10"},
+			{name="Eyes 11", file="face_eyes_11"},
+			{name="Eyes 12", file="face_eyes_12"},
+			{name="Eyes 13", file="face_eyes_13"},
+			{name="Mustache 1", file="face_mustache_01"},
+			{name="Mustache 2", file="face_mustache_02"},
+			{name="Mustache 3", file="face_mustache_03"},
+			{name="Redfur Mustache 1", file="face_mustache_redfur_01", unlock="cosmetic_race_human_redhead"},
+			{name="Redfur Mustache 2", file="face_mustache_redfur_02", unlock="cosmetic_race_human_redhead"},
+			{name="Redfur Mustache 3", file="face_mustache_redfur_03", unlock="cosmetic_race_human_redhead"},
+		},
+		tatoos = {
+			{name="Bodypaint 1", file="tattoo_bodypaint_01"},
+			{name="Bodypaint 2", file="tattoo_bodypaint_02"},
+			{name="Tatoos 1", file="tattoo_pattern_01"},
+			{name="Tatoos 2", file="tattoo_pattern_02"},
+			{name="Redfur", file="tattoo_redfur", unlock="cosmetic_race_human_redhead"},
+		},
+		special = {
+			{name="Bikini / Mankini", birth_only=true, on_actor=function(actor, birther, last)
+				if not last then local o = birther.obj_list_by_name[birther.descriptors_by_type.sex == 'Female' and 'Bikini' or 'Mankini'] if not o then print("No bikini/mankini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull() actor.moddable_tile_nude = 1
+				else actor:registerOnBirthForceWear(birther.descriptors_by_type.sex == 'Female' and "FUN_BIKINI" or "FUN_MANKINI") end
+			end},
 		},
 	},
 }

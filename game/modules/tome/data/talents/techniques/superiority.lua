@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Take an offensive stance. As you walk through your foes, you knock them all back in an frontal arc (up to %d grids).
+		return ([[Take an offensive stance. As you attack your foes, you knock your target and foes adjacent to them in a frontal arc back (up to %d grids).
 		This consumes stamina rapidly (-1 stamina/turn).]]):
 		format(t.range(self, t))
 	end,

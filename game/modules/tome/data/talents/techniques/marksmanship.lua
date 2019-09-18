@@ -71,7 +71,7 @@ newTalent{
 	points = 5,
 	require = { stat = { dex=function(level) return 12 + level * 6 end }, },
 	mode = "passive",
-	getDamage = function(self, t) return 0 end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	getReload = function(self, t)
 		return math.floor(self:combatTalentScale(t, 0, 2.7, "log"))
@@ -88,10 +88,10 @@ newTalent{
 		local inc = t.getPercentInc(self, t)
 		local reload = t.getReload(self,t)
 		local chance = t.getChance(self,t)
-		return ([[Increases Physical Power by %d and increases weapon damage by %d%% when using bows or slings, as well as your reload rate by %d.
+		return ([[Increases weapon damage by %d%% and physical power by 30 when using bows or slings, as well as your reload rate by %d.
 		In addition, your Shoot has a %d%% chance to mark targets on hit.
 The mark lasts for 5 turns, grants you visibility of the target (even through walls and other concealment), and causes them to become vulnerable to Headshot, Volley and Called Shots.]]):
-format(damage, inc * 100, reload, chance)
+format(inc * 100, reload, chance)
 	end,
 }
 
@@ -138,7 +138,7 @@ newTalent{
 		if not x or not y then return nil end
 
 		local _ _, x, y = self:canProject(tg, x, y)
-		self:project({type="ball", x=x, y=y, radius=3, selffire=false}, x, y, DamageType.FLARE, t.getBlindDuration(self, t), {type="light"})
+		self:project({type="ball", x=x, y=y, radius=self:getTalentRadius(t), selffire=false}, x, y, DamageType.FLARE, t.getBlindDuration(self, t), {type="light"})
 		-- Add a lasting map effect
 		game.level.map:addEffect(self,
 			x, y, t.getDuration(self,t),
@@ -152,11 +152,12 @@ newTalent{
 	end,
 	info = function(self, t)
 		local blind = t.getBlindDuration(self,t)
+		local rad = self:getTalentRadius(t)
 		local dur = t.getDuration(self,t)
 		local def = t.getDefensePenalty(self,t)
-		return ([[Fire a shot at the target tile that blinds enemies for %d turns, marks them for 2 turns and illuminates the area within radius 2 for %d turns. Enemies within the illuminated area lose %d defence and stealth power and cannot benefit from concealment.
+		return ([[Fire a shot at the target tile that blinds enemies for %d turns, marks them for 2 turns and illuminates the area within radius %d for %d turns. Enemies within the illuminated area lose %d defence and stealth power and cannot benefit from concealment.
 		The status chance increases with your Accuracy, and the defense reduction with your Dexterity.]])
-		:format(blind, dur, def)
+		:format(blind, rad, dur, def)
 	end,
 }
 

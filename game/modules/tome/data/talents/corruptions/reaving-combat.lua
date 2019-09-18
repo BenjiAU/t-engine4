@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Allows you to dual wield any type of one handed weapons, and increases the damage of the off-hand weapon to %d%%.
 		Also, casting a spell (which uses a turn) will give a free melee attack at a random target in melee range for %d%% blight damage.]]):
-		format(100*t.getoffmult(self,t), 100 * self:combatTalentWeaponDamage(t, 0.5, 1.1))
+		format(100*t.getoffmult(self,t), 100 * self:combatTalentWeaponDamage(t, 0.2, 0.7))
 	end,
 }
 
@@ -48,17 +48,18 @@ newTalent{
 	mode = "passive",
 	require = str_corrs_req2,
 	points = 5,
-	-- _M:combatSpellpower references effect in mod\class\interface\Combat.lua
-	-- Effect is refreshed in function _M:onTakeHit(value, src) in mod\class\Actor.lua
-	-- getParams called in definition of EFF_BLOODLUST in data\timed_effects\magical.lua
-	getParams = function(self, t) -- returns maxSP per turn, max duration
-		return self:combatTalentScale(t, 1, 5, 0.75), math.floor(self:combatTalentScale(t, 2, 6))
+	getSpellpower = function(self, t) return self:combatTalentScale(t, 1, 5.5) end, -- 66 at TL5 total
+	callbackOnMeleeAttack = function(self, t, target, hitted)
+		if not hitted or not (self:reactionToward(target) < 0) then return end
+		self:setEffect(self.EFF_BLOODLUST, 3, {spellpower = t.getSpellpower(self, t), max_stacks = 10})
+		return true
 	end,
 	info = function(self, t)
-		local SPbonus, maxDur = t.getParams(self, t)
-		return ([[Each time you deal damage to one of your foes, you enter a bloodlust-infused frenzy, increasing your Spellpower by 1 (maximum %d Spellpower per turn, %d Spellpower overall), and extending any current frenzy for an additional turn.
-		The frenzy lasts up to %d turns, and the bonus decreases by %0.1f%% of its current value each turn you don't deal damage.]]):
-		format(SPbonus, SPbonus*6, maxDur, 100/maxDur)
+		local SPbonus = t.getSpellpower(self, t)
+		return ([[Each time you hit an enemy with a melee weapon you enter a bloodlust-infused frenzy, increasing your Spellpower by %0.1f.
+		This effect stacks up to 10 times for a total Spellpower gain of %d.
+		The frenzy lasts 3 turns.]]):
+		format(SPbonus, SPbonus*10)
 	end,
 }
 

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ I will not make you pay a fee for it since you helped me so much, but I am afrai
 newChat{ id="quest",
 	text = [[#LIGHT_GREEN#*He quickly looks at the tome and looks amazed.*#WHITE# This is an amazing find! Truly amazing!
 With this knowledge I could create potent amulets. However, it requires a special place of power to craft such items.
-There are rumours about a site of power in the southern mountains. Old legends tell about a place where a part of the Winterglow Moon melted when it got too close to the Sun and fell from the sky.
+There are rumours about a site of power in the southern mountains. Old legends tell about a place where a part of the Wintertide Moon melted when it got too close to the Sun and fell from the sky.
 A lake formed in the crater of the crash. The water of this lake, soaked in intense Moonlight for eons, should be sufficient to forge powerful artifacts!
 Go to the lake and then summon me with this scroll. I will retire to study the tome, awaiting your summon.]],
 	answers = {

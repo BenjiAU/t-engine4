@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -66,14 +66,12 @@ ActorResource:defineResource("Air", "air", nil, "air_regen", "Air capacity in yo
 ActorResource:defineResource("Stamina", "stamina", ActorTalents.T_STAMINA_POOL, "stamina_regen", "Stamina represents your physical fatigue.  Most physical abilities consume it.", nil, nil, {
 	color = "#ffcc80#",
 	cost_factor = function(self, t, check) return (check and self:hasEffect(self.EFF_ADRENALINE_SURGE)) and 0 or (100 + self:combatFatigue()) / 100 end,
-	depleted_unsustain = true,
 	wait_on_rest = true,
 	randomboss_enhanced = true,
 })
 ActorResource:defineResource("Mana", "mana", ActorTalents.T_MANA_POOL, "mana_regen", "Mana represents your reserve of magical energies. Most spells cast consume mana and each sustained spell reduces your maximum mana.", nil, nil, {
 	color = "#7fffd4#",
 	cost_factor = function(self, t) return (100 + 2 * self:combatFatigue()) / 100 end,
-	depleted_unsustain = true,
 	wait_on_rest = true,
 	randomboss_enhanced = true,
 })
@@ -98,7 +96,7 @@ ActorResource:defineResource("Equilibrium", "equilibrium", ActorTalents.T_EQUILI
 			end
 		},
 		-- find a talent to restore equilibrium (simple AIs)
-		aiResourceAction = function(act, res_def, t_filter, t_list) 
+		aiResourceAction = function(act, res_def, t_filter, t_list)
 			if act:getEquilibrium() > act:getMinEquilibrium() then
 				local tid = act:aiGetResourceTalent(res_def, t_filter, t_list)
 				if tid then
@@ -152,13 +150,13 @@ ActorResource:defineResource("Vim", "vim", ActorTalents.T_VIM_POOL, "vim_regen",
 ActorResource:defineResource("Positive energy", "positive", ActorTalents.T_POSITIVE_POOL, "positive_regen", "Positive energy represents your reserve of positive power. It slowly decreases.", nil, nil, {
 	color = "#ffd700#",
 	randomboss_enhanced = true,
-	cost_factor = function(self, t) return (100 + self:combatFatigue()) / 100 end,
+	--cost_factor = function(self, t) return (100 + self:combatFatigue()) / 100 end,
 	Minimalist = {highlight = function(player, vc, vn, vm, vr) return vc >=0.7*vm end},
 })
 ActorResource:defineResource("Negative energy", "negative", ActorTalents.T_NEGATIVE_POOL, "negative_regen", "Negative energy represents your reserve of negative power. It slowly decreases.", nil, nil, {
 	color = "#7f7f7f#",
 	randomboss_enhanced = true,
-	cost_factor = function(self, t) return (100 + self:combatFatigue()) / 100 end,
+	--cost_factor = function(self, t) return (100 + self:combatFatigue()) / 100 end,
 	Minimalist = {highlight = function(player, vc, vn, vm, vr) return vc >=0.7*vm end},
 })
 ActorResource:defineResource("Hate", "hate", ActorTalents.T_HATE_POOL, "hate_regen", "Hate represents your soul's primal antipathy towards others.  It generally decreases whenever you have no outlet for your rage, and increases when you are damaged or destroy others.", nil, nil, {

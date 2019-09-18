@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -49,27 +49,42 @@ newBirthDescriptor{
 		starting_quest = "start-allied",
 		starting_intro = "halfling",
 		size_category = 2,
-		resolvers.inscription("INFUSION:_REGENERATION", {cooldown=10, dur=5, heal=60}),
-		resolvers.inscription("INFUSION:_WILD", {cooldown=12, what={physical=true}, dur=4, power=14}),
-		resolvers.inventory({id=true, transmo=false, alter=function(o) o.inscription_data.cooldown=12 o.inscription_data.heal=50 end, {type="scroll", subtype="infusion", name="healing infusion", ego_chance=-1000, ego_chance=-1000}}),
+		resolvers.inscription("INFUSION:_REGENERATION", {cooldown=10, dur=5, heal=100}, 1),
+		resolvers.inscription("INFUSION:_WILD", {cooldown=14, what={physical=true}, dur=4, power=14}, 2),
+		resolvers.inscription("INFUSION:_HEALING", {cooldown=12, heal=50}, 3),
 		resolvers.inventory{ id=true, {defined="ORB_SCRYING"} },
 	},
 	random_escort_possibilities = { {"tier1.1", 1, 2}, {"tier1.2", 1, 2}, {"daikara", 1, 2}, {"old-forest", 1, 4}, {"dreadfell", 1, 8}, {"reknor", 1, 2}, },
 
 	moddable_attachement_spots = "race_halfling",
-	cosmetic_unlock = {
-		cosmetic_race_human_redhead = {
-			{name="Redhead [donator only]", donator=true, on_actor=function(actor) if actor.moddable_tile then actor.moddable_tile_base = "base_redhead_01.png" end end},
+	cosmetic_options = {
+		skin = {
+			{name="Skin Color 1", file="base_01"},
+			{name="Skin Color 2", file="base_02"},
+			{name="Skin Color 3", file="base_03"},
+			{name="Skin Color 4", file="base_04"},
+			{name="Skin Color 5", file="base_05"},
+			{name="Skin Color 6", file="base_06"},
 		},
-		cosmetic_bikini =  {
-			{name="Bikini [donator only]", donator=true, on_actor=function(actor, birther, last)
-				if not last then local o = birther.obj_list_by_name.Bikini if not o then print("No bikini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull()
-				else actor:registerOnBirthForceWear("FUN_BIKINI") end
-			end, check=function(birth) return birth.descriptors_by_type.sex == "Female" end},
-			{name="Mankini [donator only]", donator=true, on_actor=function(actor, birther, last)
-				if not last then local o = birther.obj_list_by_name.Mankini if not o then print("No mankini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull()
-				else actor:registerOnBirthForceWear("FUN_MANKINI") end
-			end, check=function(birth) return birth.descriptors_by_type.sex == "Male" end},
+		hairs = {
+			{name="Blond Hair 1", file="hair_blond_01"},
+			{name="Blond Hair 2", file="hair_blond_02"},
+			{name="Blond Hair 3", file="hair_blond_03"},
+			{name="Blond Hair 4", file="hair_blond_04"},
+			{name="Dark Hair 1", file="hair_black_01"},
+			{name="Dark Hair 2", file="hair_black_02"},
+			{name="Dark Hair 3", file="hair_black_03"},
+			{name="Dark Hair 4", file="hair_black_04"},
+			{name="Redhead 1", file="hair_redhead_01", unlock="cosmetic_race_human_redhead"},
+			{name="Redhead 2", file="hair_redhead_02", unlock="cosmetic_race_human_redhead"},
+			{name="Redhead 3", file="hair_redhead_03", unlock="cosmetic_race_human_redhead"},
+			{name="Redhead 4", file="hair_redhead_04", unlock="cosmetic_race_human_redhead"},
+		},
+		special = {
+			{name="Bikini / Mankini", birth_only=true, on_actor=function(actor, birther, last)
+				if not last then local o = birther.obj_list_by_name[birther.descriptors_by_type.sex == 'Female' and 'Bikini' or 'Mankini'] if not o then print("No bikini/mankini found!") return end actor:getInven(actor.INVEN_BODY)[1] = o:cloneFull() actor.moddable_tile_nude = 1
+				else actor:registerOnBirthForceWear(birther.descriptors_by_type.sex == 'Female' and "FUN_BIKINI" or "FUN_MANKINI") end
+			end},
 		},
 	},
 }
@@ -99,6 +114,7 @@ newBirthDescriptor
 	talents = {
 		[ActorTalents.T_HALFLING_LUCK]=1,
 	},
+	default_cosmetics = { {"hairs", "Dark Hair 1", only_for={sex="Male"}}, {"hairs", "Blond Hair 1", only_for={sex="Female"}} },
 	copy = {
 		moddable_tile = "halfling_#sex#",
 		random_name_def = "halfling_#sex#",

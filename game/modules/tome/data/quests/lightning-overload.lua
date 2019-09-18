@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ desc = function(self, who)
 		desc[#desc+1] = " * You have learned the real threat comes from a rogue Archmage, a Tempest. You have been shown a secret entrance to his stronghold."
 	end
 	if self:isCompleted("tempest-urkis-slain") then
-		desc[#desc+1] = " * You have slain Urkis.  Return to Angolwen for a reward."
+		desc[#desc+1] = " * You have slain Urkis.  Return to Angolwen or Zigur for a reward."
 	end
 	if self:isCompleted() then
 		desc[#desc+1] = " * Urkis has been dealt with. Permanently."

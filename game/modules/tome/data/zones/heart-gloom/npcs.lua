@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -80,14 +80,24 @@ newEntity{ base="BASE_NPC_CANINE", define_as = "WITHERING_THING",
 	resolvers.talents{
 		[Talents.T_BLINDSIDE]=2,
 		[Talents.T_CALL_SHADOWS]={base=3, every=4, max=6},
-		[Talents.T_SHADOW_MAGES]={base=1, every=4, max=6},
-		[Talents.T_SHADOW_WARRIORS]={base=1, every=4, max=6},
+		[Talents.T_SHADOW_MAGES]={base=1, every=6, max=6},
+		[Talents.T_SHADOW_WARRIORS]={base=1, every=6, max=6},
 	},
 	resolvers.sustains_at_birth(),
 
 	autolevel = "warriorwill",
 	ai = "tactical", ai_state = { talent_in=2 },
 	ai_tactic = resolvers.tactic"melee",
+	
+	resolvers.auto_equip_filters("Doomed"),
+	auto_classes={{class="Doomed", start_level=12, level_rate=35}},
+
+	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
+	on_added_to_level = function(self)
+		if self.level <= 16 then
+			self.ai_tactic.escape = 0
+		end
+	end,
 
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("start-thaloren", engine.Quest.COMPLETED, "heart-gloom")
@@ -129,6 +139,9 @@ newEntity{ define_as = "DREAMING_ONE",
 
 	autolevel = "wildcaster",
 	ai = "tactical", ai_state = { talent_in=1 },
+
+	resolvers.auto_equip_filters("Solipsist"),
+	auto_classes={{class="Solipsist", start_level=15, level_rate=50}},
 
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("start-thaloren", engine.Quest.COMPLETED, "heart-gloom")

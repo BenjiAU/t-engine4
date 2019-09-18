@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ function _M:newTalentType(t)
 	assert(t.name, "no talent type name")
 	assert(t.type, "no talent type type")
 	t.description = t.description or ""
+	t.category = t.category or t.type:gsub("/.*", "")
 	t.points = t.points or 1
 	t.talents = {}
 	table.insert(self.talents_types_def, t)
@@ -95,7 +96,8 @@ end
 function _M:init(t)
 	self.talents = t.talents or {}
 	self.talents_types = t.talents_types or {}
-	self.talents_types_mastery = self.talents_types_mastery  or {}
+	self.talents_types_mastery = self.talents_types_mastery or {}
+	self.talents_mastery_bonus = self.talents_mastery_bonus or {}
 	self.talents_cd = self.talents_cd or {}
 	self.sustain_talents = self.sustain_talents or {}
 	self.talents_auto = self.talents_auto or {}
@@ -188,6 +190,7 @@ function _M:useTalent(id, who, force_level, ignore_cd, force_target, silent, no_
 			
 			local ok, ret, special
 			if not self.sustain_talents[id] then -- activating
+				if self.deactivating_sustain_talent == ab.id then return end
 				ok, ret, special = xpcall(function() return ab.activate(who, ab) end, debug.traceback)
 				if not ok then self:onTalentLuaError(ab, ret) error(ret) end
 				if ret == true then ret = {} end -- fix for badly coded talents
@@ -831,7 +834,8 @@ function _M:getTalentLevel(id)
 	else
 		t = _M.talents_def[id]
 	end
-	return t and (self:getTalentLevelRaw(id)) * ((self.talents_types_mastery[t.type[1]] or 0) + 1) or 0
+	return t and (self:getTalentLevelRaw(id)) * (self:getTalentMastery(t) or 0) or 0
+
 end
 
 --- Talent type level, sum of all raw levels of talents inside
@@ -997,12 +1001,13 @@ function _M:getTalentDisplayName(t)
 	return t.display_name
 end
 
---- Cooldown all talents by one
+--- Cooldown all talents
 -- This should be called in your actors "act()" method
-function _M:cooldownTalents()
+-- @param turns the number of turns to cooldown the talents
+function _M:cooldownTalents(turns)
 	for tid, c in pairs(self.talents_cd) do
 		self.changed = true
-		self.talents_cd[tid] = self.talents_cd[tid] - 1
+		self.talents_cd[tid] = self.talents_cd[tid] - (turns or 1)
 		if self.talents_cd[tid] <= 0 then
 			self.talents_cd[tid] = nil
 			if self.onTalentCooledDown then self:onTalentCooledDown(tid) end
@@ -1031,7 +1036,7 @@ end
 function _M:automaticTalents()
 	for tid, c in pairs(self.talents_auto) do
 		local t = self.talents_def[tid]
-		if not t.np_npc_use and (t.mode ~= "sustained" or not self.sustain_talents[tid]) and not self.talents_cd[tid] and self:preUseTalent(t, true, true) and (not t.auto_use_check or t.auto_use_check(self, t)) then
+		if not t.no_npc_use and (t.mode ~= "sustained" or not self.sustain_talents[tid]) and not self.talents_cd[tid] and self:preUseTalent(t, true, true) and (not t.auto_use_check or t.auto_use_check(self, t)) then
 			self:useTalent(tid)
 		end
 	end
@@ -1079,14 +1084,24 @@ function _M:triggerTalent(tid, name, ...)
 
 	local t = _M.talents_def[tid]
 	name = name or "trigger"
-	if t[name] then return t[name](self, t, ...) end
+	if t[name] then
+		self.__talent_running = t
+		local ret = {t[name](self, t, ...)}
+		self.__talent_running = nil
+		return unpack(ret, 1, table.maxn(ret))
+	end
 end
 
 --- Trigger a talent method
 function _M:callTalent(tid, name, ...)
 	local t = _M.talents_def[tid]
 	name = name or "trigger"
-	if t[name] then return t[name](self, t, ...) end
+	if t[name] then
+		self.__talent_running = t
+		local ret = {t[name](self, t, ...)}
+		self.__talent_running = nil
+		return unpack(ret, 1, table.maxn(ret))
+	end
 end
 
 --- Trigger all talents matching

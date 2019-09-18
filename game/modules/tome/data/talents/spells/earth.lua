@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ newTalent{
 		local tg = {type="beam", range=self:getTalentRange(t), talent=t}
 		return tg
 	end,
-	allow_for_arcane_combat = true,
 	getDigs = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5, "log")) end,
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 30, 300) end,
 	action = function(self, t)
@@ -66,12 +65,13 @@ newTalent{
 	mode = "sustained",
 	require = spells_req2,
 	points = 5,
-	sustain_mana = 30,
+	sustain_mana = 15,
 	cooldown = 10,
 	tactical = { BUFF = 2 },
 	getArmor = function(self, t) return self:combatTalentSpellDamage(t, 10, 23) end,
 	getCDChance = function(self, t) return self:combatTalentLimit(t, 100, 30, 90) end,
 	callbackOnMeleeHit = function(self, t, src, dam)
+		if self == src then return end  -- This matters, Stone Wall gives you a lot of time to whack yourself
 		if not rng.percent(t.getCDChance(self, t)) then return end
 		if self.turn_procs.stone_skin_cd or dam <= 0 then return end
 		self.turn_procs.stone_skin_cd = true
@@ -114,11 +114,11 @@ newTalent{
 
 newTalent{
 	name = "Mudslide",
-        type = {"spell/earth",3},
+    type = {"spell/earth",3},
 	require = spells_req3,
 	points = 5,
 	random_ego = "attack",
-	mana = 40,
+	mana = 20,
 	cooldown = 12,
 	direct_hit = true,
 	tactical = { ATTACKAREA = { PHYSICAL = 2 }, DISABLE = { knockback = 2 }, ESCAPE = { knockback = 1 } },
@@ -131,7 +131,7 @@ newTalent{
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		self:project(tg, x, y, DamageType.SPELLKNOCKBACK, {dist=4, dam=self:spellCrit(t.getDamage(self, t))})
+		self:project(tg, x, y, DamageType.SPELLKNOCKBACK, {dist=8, dam=self:spellCrit(t.getDamage(self, t))})
 		game.level.map:particleEmitter(self.x, self.y, tg.radius, "mudflow", {radius=tg.radius, tx=x-self.x, ty=y-self.y})
 		game:playSoundNear(self, "talents/tidalwave")
 		return true
@@ -139,7 +139,7 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local radius = self:getTalentRadius(t)
-		return ([[Conjures a mudslide, dealing %0.2f physical damage in a radius of %d. Any creatures caught inside will be knocked back.
+		return ([[Conjures a mudslide, dealing %0.2f physical damage in a radius of %d. Any creatures caught inside will be knocked back 8 spaces.
 		The damage will increase with your Spellpower.]]):
 		format(damDesc(self, DamageType.PHYSICAL, damage), self:getTalentRadius(t))
 	end,
@@ -150,7 +150,7 @@ newTalent{
 	type = {"spell/earth",4},
 	require = spells_req4,
 	points = 5,
-	cooldown = 40,
+	cooldown = 60,
 	mana = 50,
 	range = function(self, t) return self:getTalentLevel(t) >= 4 and 7 or 0 end,
 	radius = 1,

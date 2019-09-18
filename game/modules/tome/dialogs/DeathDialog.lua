@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -217,6 +217,7 @@ function _M:use(item)
 		self:resurrectBasic(self.actor)
 		self:restoreResources(self.actor)
 		self.actor:check("on_resurrect", "cheat")
+		self.actor:triggerHook{"Actor:resurrect", reason="cheat"}
 	elseif act == "blood_life" then
 		self.actor.blood_life = false
 		game.logPlayer(self.actor, "#LIGHT_RED#The Blood of Life rushes through your dead body. You come back to life!")
@@ -226,6 +227,7 @@ function _M:use(item)
 		self:restoreResources(self.actor)
 		world:gainAchievement("UNSTOPPABLE", actor)
 		self.actor:check("on_resurrect", "blood_life")
+		self.actor:triggerHook{"Actor:resurrect", reason="blood_life"}
 		game:saveGame()
 	elseif act == "lichform" then
 		local t = self.actor:getTalentFromId(self.actor.T_LICHFORM)
@@ -237,6 +239,7 @@ function _M:use(item)
 		t.becomeLich(self.actor, t)
 		self.actor:updateModdableTile()
 		self.actor:check("on_resurrect", "lichform")
+		self.actor:triggerHook{"Actor:resurrect", reason="lichform"}
 		game:saveGame()
 	elseif act == "threads" then
 		game:chronoRestore("see_threads_base", true)
@@ -256,6 +259,7 @@ function _M:use(item)
 		self:restoreResources(self.actor)
 		world:gainAchievement("UNSTOPPABLE", actor)
 		self.actor:check("on_resurrect", "skeleton")
+		self.actor:triggerHook{"Actor:resurrect", reason="skeleton"}
 		game:saveGame()
 	elseif act:find("^consume") then
 		local inven, item, o = item.inven, item.item, item.object
@@ -267,6 +271,8 @@ function _M:use(item)
 		self:restoreResources(self.actor)
 		world:gainAchievement("UNSTOPPABLE", actor)
 		self.actor:check("on_resurrect", "consume", o)
+		o:check("on_resurrect", self.actor)
+		self.actor:triggerHook{"Actor:resurrect", reason="consume", object=o}
 		game:saveGame()
 	end
 end

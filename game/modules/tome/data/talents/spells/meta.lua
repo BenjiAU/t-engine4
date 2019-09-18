@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ newTalent{
 	points = 5,
 	random_ego = "utility",
 	mana = 40,
-	cooldown = 7,
+	cooldown = 25,
 	tactical = { CURE = function(self, t, aitarget)
 			local nb = 0
 			for eff_id, p in pairs(self.tmp) do

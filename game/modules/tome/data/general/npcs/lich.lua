@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -184,7 +184,6 @@ newEntity{ base = "BASE_NPC_LICH",
 	rarity = 30,
 	max_life = resolvers.rngavg(100,150),
 	combat_armor = 0, combat_def = 45,
-	on_melee_hit = {[DamageType.BLIGHT]=resolvers.mbonus(25, 30)},
 
 	vim_regen = 1,
 	ignore_direct_crits = 100,

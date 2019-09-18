@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -205,7 +205,7 @@ function _M:generateList(key_source, force_all)
 	local tree = {}
 	local groups = {}
 	for _, k in ipairs(l) do
-		if not k.only_on_cheat or config.settings.cheat then
+		if (not k.only_on_cheat or config.settings.cheat) and (not k.check or k.check()) then
 			local item = {
 				k = k,
 				name = tstring{{"font","italic"}, {"color","AQUAMARINE"}, k.name, {"font","normal"}},

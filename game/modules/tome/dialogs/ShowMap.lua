@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ function _M:init(mm_mode)
 
 	self.ui = "parchment"
 
-	self.bsize = 22
+	self.bsize = 10
 	local map = game.level.map
 	local mw, mh = map.w * self.bsize, map.h * self.bsize
 	local Mw, Mh = math.floor(game.w * 0.9), math.floor(game.h * 0.9)

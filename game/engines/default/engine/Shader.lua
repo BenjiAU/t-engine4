@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -177,7 +177,14 @@ function _M:loaded()
 	else
 		print("[SHADER] Loading from /data/gfx/shaders/"..self.name..".lua")
 		local f, err = loadfile("/data/gfx/shaders/"..self.name..".lua")
-		if not f and err then error(err) end
+		if not f and err then
+			if config.settings.cheat then
+				error(err)
+			else
+				print("[SHADER] "..self.name.." not found, using fallback")
+				f, err = loadfile("/data/gfx/shaders/fallback.lua")
+			end
+		end
 		setfenv(f, setmetatable(self.args or {}, {__index=_G}))
 		local def = f()
 

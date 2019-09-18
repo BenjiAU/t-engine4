@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -16,6 +16,23 @@
 --
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
+
+uberTalent{
+	name = "Flexible Combat",
+	mode = "passive",
+	on_learn = function(self, t)
+		self:attr("unharmed_attack_on_hit", 1)
+		self:attr("show_gloves_combat", 1)
+	end,
+	on_unlearn = function(self, t)
+		self:attr("unharmed_attack_on_hit", -1)
+		self:attr("show_gloves_combat", -1)
+	end,
+	info = function(self, t)
+		return ([[Each time that you make a melee attack you have a 30%% chance to execute an additional unarmed strike.]])
+		:format()
+	end,
+}
 
 uberTalent{
 	name = "Through The Crowd",
@@ -150,70 +167,10 @@ uberTalent{
 }
 
 uberTalent{
-	name = "Giant Leap",
-	mode = "activated",
-	require = { special={desc="Have dealt over 50000 damage with any weapon or unarmed", fct=function(self) return
-		self.damage_log and (
-			(self.damage_log.weapon.twohanded and self.damage_log.weapon.twohanded >= 50000) or
-			(self.damage_log.weapon.shield and self.damage_log.weapon.shield >= 50000) or
-			(self.damage_log.weapon.dualwield and self.damage_log.weapon.dualwield >= 50000) or
-			(self.damage_log.weapon.other and self.damage_log.weapon.other >= 50000)
-		)
-	end} },
-	cooldown = 12,
-	radius = 1,
-	range = 10,
-	is_melee = true,
-	requires_target = true,
-	tactical = { CLOSEIN = 2, ATTACKAREA = { weapon = 2 }, DISABLE = { stun = 1 } },
-	target = function(self, t)
-		return {type="ball", range=self:getTalentRange(t), selffire=false, radius=self:getTalentRadius(t)}
-	end,
-	action = function(self, t)
-		local tg = self:getTalentTarget(t)
-		local x, y, target = self:getTarget(tg)
-		if not x or not y then return nil end
-		local _ _, x, y = self:canProject(tg, x, y)
-
-		if game.level.map(x, y, Map.ACTOR) then
-			x, y = util.findFreeGrid(x, y, 1, true, {[Map.ACTOR]=true})
-			if not x then return end
-		end
-
-		if game.level.map:checkAllEntities(x, y, "block_move") then return end
-
-		local ox, oy = self.x, self.y
-		self:move(x, y, true)
-		if config.settings.tome.smooth_move > 0 then
-			self:resetMoveAnim()
-			self:setMoveAnim(ox, oy, 8, 5)
-		end
-
-		self:removeEffectsFilter({subtype={stun=true, daze=true, pin=true, pinned=true, pinning=true}}, 50)
-
-		self:project(tg, self.x, self.y, function(px, py, tg, self)
-			local target = game.level.map(px, py, Map.ACTOR)
-			if target and target ~= self then
-				local hit = self:attackTarget(target, nil, 2, true)
-				if hit and target:canBe("stun") then
-					target:setEffect(target.EFF_DAZED, 3, {})
-				end
-			end
-		end)
-
-		return true
-	end,
-	info = function(self, t)
-		return ([[You accurately jump to the target and deal 200%% weapon damage to all foes within radius 1 on impact as well as dazing them for 3 turns.
-		When you jump you free yourself from any stun, daze and pinning effects.]])
-		:format()
-	end,
-}
-
-uberTalent{
 	name = "Crafty Hands",
 	mode = "passive",
 	no_npc_use = true,
+	cant_steal = true,
 	require = { special={desc="Know Imbue Item to level 5", fct=function(self)
 		return self:getTalentLevelRaw(self.T_IMBUE_ITEM) >= 5
 	end} },

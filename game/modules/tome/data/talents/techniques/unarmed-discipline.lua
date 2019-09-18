@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ newTalent{
 	require = techs_dex_req1,
 	points = 5,
 	random_ego = "attack",
-	cooldown = 10,
+	cooldown = 20,
 	stamina = 40,
 	message = "@Source@ unleashes a flurry of disrupting kicks.",
 	tactical = { ATTACK = { weapon = 2 }, },
@@ -36,7 +36,7 @@ newTalent{
 	requires_target = true,
 	--on_pre_use = function(self, t, silent) if not self:hasEffect(self.EFF_COMBO) then if not silent then game.logPlayer(self, "You must have a combo going to use this ability.") end return false end return true end,
 	getStrikes = function(self, t) return self:getCombo() end,
-	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 0.1, 0.4) + getStrikingStyle(self, dam) end,
+	getDamage = function(self, t) return 0.1 + getStrikingStyle(self, dam) end,  -- Multihits already do plenty of damage and this has a ton of utility
 	checkType = function(self, t, talent)
 		if talent.is_spell and self:getTalentLevel(t) < 3 then
 			return false
@@ -155,6 +155,7 @@ newTalent{
 	end,
 }
 
+-- fix me
 newTalent{
 	name = "Touch of Death",
 	type = {"technique/unarmed-discipline", 4},
@@ -172,7 +173,6 @@ newTalent{
 	radius = function(self,t) return self:combatTalentScale(t, 1, 3) end,
 	getDamage = function(self, t) return 0.2 + getStrikingStyle(self, dam) end,
 	getMult = function(self, t) return self:combatTalentLimit(t, 100, 15, 40) end,
-	getLifePercent = function(self, t) return self:combatTalentLimit(t, 100, 25, 75) end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y, target = self:getTarget(tg)
@@ -183,6 +183,7 @@ newTalent{
 			self:breakGrapples()
 		end
 
+		-- This is really not a good way to calculate damage, consider changing to base off just the weapon damage dealt
 		self.turn_procs.auto_melee_hit = true
 		-- store old values to restore later
 		local evasion = target.evasion
@@ -198,7 +199,7 @@ newTalent{
 		local life_diff = oldlife - target.life
 		if life_diff > 0 then
 			game:onTickEnd(function()	
-				target:setEffect(target.EFF_TOUCH_OF_DEATH, 4, {dam=life_diff, power=t.getLifePercent(self,t)/100, mult=t.getMult(self,t)/100, radius=self:getTalentRadius(t), src=self})
+				target:setEffect(target.EFF_TOUCH_OF_DEATH, 4, {dam=life_diff, initial_dam=life_diff, mult=t.getMult(self,t)/100, radius=self:getTalentRadius(t), src=self})
 			end)
 		end
 
@@ -210,10 +211,9 @@ newTalent{
 		local mult = t.getMult(self,t)
 		local finaldam = damage+(damage*(((mult/100)+1)^2))+(damage*(((mult/100)+1)^3))+(damage*(((mult/100)+1)^4))
 		local radius = self:getTalentRadius(t)
-		local life = t.getLifePercent(self,t)
 		return ([[Using your deep knowledge of anatomy, you strike a target in a vital pressure point for %d%% weapon damage, bypassing their defense and evasion.
-		This strike inflicts terrible wounds inside the target's body, causing them to take physical damage equal to 100%% of the initial strike each turn for 4 turns, increasing by %d%% each turn (so after 4 turns, they would have taken a total of %d%% damage).
-		If the target dies while under or from this effect their body will explode in a radius %d shower of bone and gore, inflicting physical damage equal to %d%% of their maximum life (divided by rank) to all enemies and granting you 4 combo points.]])
+		This strike inflicts terrible wounds inside the target's body, causing them to take physical damage equal to 100%% of any damage dealt during the attack each turn for 4 turns, increasing by %d%% each turn (so after 4 turns, they would have taken a total of %d%% damage).
+		If the target dies while under or from this effect their body will explode in a radius %d shower of bone and gore, inflicting physical damage equal to the current tick to all enemies and granting you 4 combo points.]])
 		:format(damage, mult, finaldam, radius, life)
 	end,
 }

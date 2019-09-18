@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ newTalent{
 	require = gifts_req_high3,
 	points = 5,
 	equilibrium = 20,
-	cooldown = 25,
+	cooldown = 12,
 	range = 8,
 	radius = 4,
 	direct_hit = true,
@@ -96,8 +96,8 @@ newTalent{
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
 	tactical = { ATTACKAREA = { ACID = 2 },  DISABLE = {blind = 1} },
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 6, 10)) end,
-	getDamage = function(self, t) return self:combatTalentMindDamage(t, 10, 70) end,
+	getDuration = function(self, t) return 5 end,
+	getDamage = function(self, t) return self:combatTalentMindDamage(t, 10, 120) end,
 	getChance = function(self, t) return self:combatTalentLimit(t, 100, 20, 40) end, --Limit < 100%
 	removeEffect = function(target) -- remove one random beneficial magical effect or sustain
 	-- Go through all beneficial magical effects
@@ -133,7 +133,7 @@ newTalent{
 		-- Add a lasting map effect
 		local eff = game.level.map:addEffect(self,
 			x, y, t.getDuration(self, t), -- duration
-			engine.DamageType.ACID_BLIND, t.getDamage(self, t),
+			engine.DamageType.ACID_BLIND, self:mindCrit(t.getDamage(self, t)),
 			self:getTalentRadius(t), -- radius
 			5, nil,
 			{type="vapour"},
@@ -161,7 +161,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[You call upon the earth to create a blinding, corrosive cloud in an area of radius %d for %d turns.
-		Each turn, this cloud deals %0.1f acid damage to each foe with a 25%% chance to blind and a (%d%% chance) of burning away one beneficial magical effect.
+		Each turn, this cloud deals %0.1f acid damage to each foe with a 25%% chance to blind and a %d%% chance of burning away one magical sustain or beneficial magical effect.
 		The damage increases with your Mindpower.]]):
 		format(self:getTalentRadius(t), t.getDuration(self, t), damDesc(self, DamageType.ACID, t.getDamage(self, t)), t.getChance(self, t))
 	end,
@@ -196,7 +196,7 @@ newTalent{
 		-- Add a lasting map effect
 		local eff = game.level.map:addEffect(self,
 			self.x, self.y, 7,
-			DamageType.NATURE, t.getDamage(self, t),
+			DamageType.NATURE, self:mindCrit(t.getDamage(self, t)),
 			t.radius(self, t),
 			5, nil,
 			{type="generic_vortex", args = {radius = t.radius(self, t), rm = 5, rM=55, gm=250, gM=255, bm = 180, bM=255, am= 35, aM=90, density = 100}, only_one=true },

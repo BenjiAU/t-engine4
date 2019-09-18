@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ newEntity{ base = "BASE_NPC_YAECH", define_as = "MURGOL",
 	resolvers.equip{
 		{type="weapon", subtype="trident", autoreq=true, special_rarity="trident_rarity"},
 		{type="armor", subtype="light", defined="EEL_SKIN", random_art_replace={chance=65}, autoreq=true},
-		{type="charm", subtype="torque", autoreq=true}
+		--{type="charm", subtype="torque", autoreq=true}
 	},
 	resolvers.drops{chance=100, nb=3, {tome_drops="boss"} },
 
@@ -56,13 +56,21 @@ newEntity{ base = "BASE_NPC_YAECH", define_as = "MURGOL",
 		[Talents.T_PYROKINESIS]=2,
 		[Talents.T_MINDLASH]=2,
 		[Talents.T_MINDHOOK]=2,
-		[Talents.T_KINETIC_SHIELD]=3,
-		[Talents.T_THERMAL_SHIELD]=3,
 	},
 	resolvers.sustains_at_birth(),
 
 	autolevel = "wildcaster",
 	ai = "tactical", ai_state = { talent_in=2, },
+	
+	resolvers.auto_equip_filters("Mindslayer"),	
+	auto_classes={{class="Mindslayer", start_level=12, level_rate=75}},
+
+	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
+	on_added_to_level = function(self)
+		if self.level <= 16 then
+			self.ai_tactic.escape = 0
+		end
+	end,
 
 	on_die = function(self, who)
 		game.player:setQuestStatus("start-yeek", engine.Quest.COMPLETED, "murgol")
@@ -112,7 +120,7 @@ newEntity{ base = "BASE_NPC_NAGA", define_as = "NAGA_TIDEWARDEN",
 		{type="weapon", subtype="trident", autoreq=true, force_drop=true, special_rarity="trident_rarity"},
 	},
 	resolvers.talents{
-		[Talents.T_EXOTIC_WEAPONS_MASTERY]={base=1, every=8, max=6},
+		[Talents.T_EXOTIC_WEAPONS_MASTERY]={base=0, every=8, max=6},
 		[Talents.T_SPIT_POISON]={base=1, every=10, max=5},
 	},
 }
@@ -181,13 +189,23 @@ newEntity{ base="BASE_NPC_NAGA", define_as = "NASHVA",
 		[Talents.T_SPIT_POISON]={base=2, every=10, max=5},
 		[Talents.T_CHARGE_LEECH]={base=2, every=10, max=5},
 		[Talents.T_DISTORTION_BOLT]={base=2, every=10, max=5},
-		[Talents.T_EXOTIC_WEAPONS_MASTERY]={base=1, every=8, max=6},
+		[Talents.T_EXOTIC_WEAPONS_MASTERY]={base=0, every=8, max=6},
 	},
 	resolvers.inscriptions(1, {"movement infusion"}),
 
 	autolevel = "warriormage",
 	ai = "tactical", ai_state = { talent_in=2, ai_move="move_astar", },
 	ai_tactic = resolvers.tactic"melee",
+
+	resolvers.auto_equip_filters("Mindslayer"),
+	auto_classes={{class="Mindslayer", start_level=12, level_rate=75}},
+	
+	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
+	on_added_to_level = function(self)
+		if self.level <= 16 then
+			self.ai_tactic.escape = 0
+		end
+	end,
 
 	on_die = function(self, who)
 		game.player:setQuestStatus("start-yeek", engine.Quest.COMPLETED, "murgol")

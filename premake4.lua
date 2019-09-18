@@ -71,9 +71,29 @@ configuration "windows"
  	}
 end
 
-configuration "macosx"
-	buildoptions { "-isysroot /Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6" }
+cppconfig = function(what)
+	if os.get() == "macosx" then
+		if what == "web" then
+			buildoptions { "-stdlib=libstdc++" }
+			linkoptions { "-stdlib=libstdc++" }
+		else
+			buildoptions { "-stdlib=libc++" }
+			linkoptions { "-stdlib=libc++" }
+		end
+	end
+	-- links { "stdc++" }
+end
 
+configuration "macosx"
+	premake.gcc.cc  = 'clang'
+	premake.gcc.cxx = 'clang++'
+
+	buildoptions { "-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7" }
+	includedirs {
+                        "/Library/Frameworks/SDL2.framework/Headers",
+                        "/Library/Frameworks/SDL2_image.framework/Headers",
+                        "/Library/Frameworks/SDL2_ttf.framework/Headers",
+	}
 
 configuration "Debug"
 	defines { }

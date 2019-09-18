@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ newTalent{
 	cooldown = 20,
 	range = 10,
 	no_energy = true,
+	no_npc_use = true, -- It is almost never a good idea for resource cheating NPCs to use this but they often do with this tactical table does
 	tactical = {EQUILIBRIUM = 2, HEAL = 0.1, BUFF = -3,
 		SPECIAL = function(self, t) return self.ai_target.actor and -2 or 0 end -- offsets minimal equilibrium and healing tactics while in combat
 	},

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -107,7 +107,7 @@ newEntity{ base = "BASE_NPC_SKELETON",
 	max_life = resolvers.rngavg(90,100),
 	combat_armor = 5, combat_def = 1,
 	resolvers.equip{ {type="weapon", subtype="greatsword", forbid_power_source={antimagic=true}, autoreq=true} },
-	resolvers.talents{ [Talents.T_STUNNING_BLOW]={base=1, every=7, max=5}, [Talents.T_WEAPON_COMBAT]={base=1, every=10, max=5}, [Talents.T_WEAPONS_MASTERY]={base=1, every=10, max=5}, },
+	resolvers.talents{ [Talents.T_STUNNING_BLOW]={base=1, every=7, max=5}, [Talents.T_WEAPON_COMBAT]={base=1, every=10, max=5}, [Talents.T_WEAPONS_MASTERY]={base=0, every=10, max=5}, },
 	ai_state = { talent_in=2, },
 }
 
@@ -118,7 +118,7 @@ newEntity{ base = "BASE_NPC_SKELETON",
 	rarity = 3,
 	max_life = resolvers.rngavg(70,80),
 	combat_armor = 5, combat_def = 1,
-	resolvers.talents{ [Talents.T_BOW_MASTERY]={base=1, every=10, max=5}, [Talents.T_WEAPON_COMBAT]={base=1, every=10, max=5}, [Talents.T_SHOOT]=1, },
+	resolvers.talents{ [Talents.T_BOW_MASTERY]={base=0, every=10, max=5}, [Talents.T_WEAPON_COMBAT]={base=1, every=10, max=5}, [Talents.T_SHOOT]=1, },
 	ai_state = { talent_in=1, },
 
 	autolevel = "archer",
@@ -161,7 +161,7 @@ newEntity{ base = "BASE_NPC_SKELETON",
 	resolvers.inscriptions(1, "rune"),
 	resolvers.talents{
 		[Talents.T_WEAPON_COMBAT]={base=1, every=10, max=5},
-		[Talents.T_WEAPONS_MASTERY]={base=1, every=10, max=5},
+		[Talents.T_WEAPONS_MASTERY]={base=0, every=10, max=5},
 		[Talents.T_ARMOUR_TRAINING]={base=2, every=11, max=5},
 		[Talents.T_SHIELD_PUMMEL]={base=1, every=7, max=5},
 		[Talents.T_RIPOSTE]={base=3, every=7, max=7},
@@ -208,7 +208,6 @@ newEntity{ base = "BASE_NPC_SKELETON",
 		[Talents.T_DUAL_WEAPON_MASTERY]={base=1, every=10, max=7},
 		[Talents.T_TEMPO]={base=1, every=10, max=7},
 		[Talents.T_FLURRY]={base=1, every=10, max=7},
-		[Talents.T_EXPOSE_WEAKNESS]={base=1, every=10, max=7},
 		[Talents.T_LETHALITY]={base=1, every=10, max=7},
 		[Talents.T_WEAPON_COMBAT]={base=1, every=10, max=7},
 		[Talents.T_KNIFE_MASTERY]={base=1, every=10, max=7},

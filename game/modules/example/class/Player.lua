@@ -1,5 +1,5 @@
 -- ToME - Tales of Middle-Earth
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -77,6 +77,13 @@ function _M:act()
 	-- Resting ? Running ? Otherwise pause
 	if not self:restStep() and not self:runStep() and self.player then
 		game.paused = true
+	end
+end
+
+function _M:useEnergy(val)
+	mod.class.Actor.useEnergy(self, val)
+	if self.player and self.energy.value < game.energy_to_act then
+		game.paused = false
 	end
 end
 

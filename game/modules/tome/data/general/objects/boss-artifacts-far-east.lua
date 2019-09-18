@@ -1,5 +1,5 @@
 -- ToME - Tales of Middle-Earth
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -212,7 +212,6 @@ newEntity{ base = "BASE_CLOTH_ARMOR",
 	talent_on_spell = {
 		{chance=5, talent=Talents.T_SOUL_ROT, level=3},
 		{chance=5, talent=Talents.T_BLOOD_GRASP, level=3},
-		{chance=5, talent=Talents.T_BONE_SPEAR, level=3},
 	},
 }
 
@@ -227,12 +226,14 @@ newEntity{ base = "BASE_LEATHER_CAP",
 	cost = 500,
 	material_level = 5,
 	wielder = {
-		inc_stats = { [Stats.STAT_CON] = 5, [Stats.STAT_WIL] = 3, },
+		inc_stats = { [Stats.STAT_MAG] = 10, [Stats.STAT_WIL] = 10, },
+		combat_spellpower = 15,
+		combat_mindpower = 15,
 		resists={
-			[DamageType.FIRE] = 15,
-			[DamageType.COLD] = 15,
-			[DamageType.ACID] = 15,
-			[DamageType.LIGHTNING] = 15,
+			[DamageType.FIRE] = 25,
+			[DamageType.COLD] = 25,
+			[DamageType.ACID] = 25,
+			[DamageType.LIGHTNING] = 25,
 		},
 		melee_project={
 			[DamageType.FIRE] = 10,
@@ -241,13 +242,12 @@ newEntity{ base = "BASE_LEATHER_CAP",
 			[DamageType.LIGHTNING] = 10,
 		},
 		inc_damage = {
-			[DamageType.FIRE] = 8,
-			[DamageType.COLD] = 8,
-			[DamageType.ACID] = 8,
-			[DamageType.LIGHTNING] = 8,
+			[DamageType.FIRE] = 25,
+			[DamageType.COLD] = 25,
+			[DamageType.ACID] = 25,
+			[DamageType.LIGHTNING] = 25,
 		},
-		see_invisible = 15,
-		combat_armor = 5,
+		combat_armor = 10,
 		fatigue = 5,
 	},
 }
@@ -302,7 +302,7 @@ newEntity{ base = "BASE_WHIP",
 		apr = 0,
 		physcrit = 9,
 		dammod = {dex=1},
-		damtype = DamageType.FIREKNOCKBACK,
+		damtype = DamageType.FIRE_DRAIN,
 		talent_on_hit = { [Talents.T_BONE_NOVA] = {level=4, chance=20}, [Talents.T_BLOOD_BOIL] = {level=3, chance=15} },
 	},
 	wielder = {
@@ -321,7 +321,8 @@ newEntity{ base = "BASE_WHIP",
 	},
 }
 
---Storm fury, lightning infused bow that automatically attacks nearby enemies with bolts of lightning.
+--  Strange item, role is a bit unclear, perhaps best as a high tier AoE swap?
+--  Good for procing spell crit a lot
 newEntity{ base = "BASE_LONGBOW",
 	power_source = {arcane=true},
 	define_as = "STORM_FURY",
@@ -334,42 +335,44 @@ newEntity{ base = "BASE_LONGBOW",
 	cost = 300,
 	material_level = 5,
 	sentient = true,
-	special_desc = function(self) return "Automatically fires lightning bolts at nearby enemies, with a chance to inflict Daze." end,
+	special_desc = function(self, who)		
+		local dam = (40+ who:getMag())
+		local dam2 = (40+ who:getMag()) * 2
+		return ("Automatically fires lightning bolts every game turn at nearby enemies dealing %d to %d lightning damage based on Magic with a chance to inflict Daze."):
+			format(dam, dam2)
+	end,
 	combat = {
-		range=10,
-		physspeed = 0.9,
+		range = 10,
+		talent_on_hit = { T_CHAIN_LIGHTNING = {level=3, chance=12},},
 	},
 	wielder = {
-		combat_spellpower=20,
-		inc_stats = { [Stats.STAT_MAG] = 7, [Stats.STAT_DEX] = 5},
-		combat_def_ranged = 15,
+		combat_spellpower = 30,
+		combat_spellcrit = 10,
+		inc_stats = { [Stats.STAT_MAG] = 10, [Stats.STAT_DEX] = 10},
+		combat_def = 30,
 		ranged_project = {[DamageType.LIGHTNING] = 75},
 		talents_types_mastery = {
-			["spell/air"] = 0.2,
-			["spell/storm"] = 0.1,
+			["spell/air"] = 0.5,  -- High values because these stats are only relevant to casters, sort of the counterpart to the Chain Lightning on hit
+			["spell/storm"] = 0.5,
 		},
 		inc_damage={
-			[DamageType.LIGHTNING] = 20,
+			[DamageType.LIGHTNING] = 25,
 		},
 		resists={
 			[DamageType.LIGHTNING] = 20,
 		},
-		talent_on_hit = { T_CHAIN_LIGHTNING = {level=3, chance=12},},
-		movement_speed=0.1,
+		movement_speed = 0.3,
 	},
 	act = function(self)
 		self:useEnergy()
 		if not self.worn_by then return end
+		if game.zone.wilderness then return end
 		if game.level and not game.level:hasEntity(self.worn_by) then self.worn_by = nil return end
 		if self.worn_by:attr("dead") then return end
-		self.zap = self.zap + 5
-		if not rng.percent(self.zap)  then return end
 		local who = self.worn_by
 		local Map = require "engine.Map"
-		--local project = require "engine.DamageType"
 		local tgts = {}
 		local DamageType = require "engine.DamageType"
-		--local project = "engine.ActorProject"
 		local grids = core.fov.circle_grids(who.x, who.y, 5, true)
 		for x, yy in pairs(grids) do for y, _ in pairs(grids[x]) do
 			local a = game.level.map(x, y, Map.ACTOR)
@@ -378,14 +381,13 @@ newEntity{ base = "BASE_LONGBOW",
 			end
 		end end
 
-		local tg = {type="hit", range=5,}
+		local tg = {type="hit", range=5, friendlyfire=false}
 		for i = 1, 1 do
 			if #tgts <= 0 then break end
 			local a, id = rng.table(tgts)
 			table.remove(tgts, id)
 
-			self.zap = 0
-			who:project(tg, a.x, a.y, engine.DamageType.LIGHTNING_DAZE, {daze=40, dam = rng.avg(1,3) * (40+ who:getMag() * 1.5)} )
+			who:project(tg, a.x, a.y, engine.DamageType.LIGHTNING_DAZE, {daze=40, dam = who:spellCrit(rng.avg(1,2) * (40+ who:getMag()))} )
 			game.level.map:particleEmitter(who.x, who.y, math.max(math.abs(a.x-who.x), math.abs(a.y-who.y)), "lightning", {tx=a.x-who.x, ty=a.y-who.y})
 			game:playSoundNear(self, "talents/lightning")
 			who:logCombat(a, "#GOLD#A bolt of lightning fires from #Source#'s bow, striking #Target#!")
@@ -393,12 +395,12 @@ newEntity{ base = "BASE_LONGBOW",
 	end,
 	on_wear = function(self, who)
 		self.worn_by = who
-		self.zap = 0
 	end,
 	on_takeoff = function(self)
 		self.worn_by = nil
 	end,
 }
+
 --Ice Cloak that can release massive freezing AOE, dropped by Glacial Legion.
 newEntity{ base = "BASE_CLOAK", define_as="GLACIAL_CLOAK",
 	power_source = {arcane=true},
@@ -412,7 +414,8 @@ newEntity{ base = "BASE_CLOAK", define_as="GLACIAL_CLOAK",
 	material_level = 5,
 	wielder = {
 		resists= {[DamageType.FIRE] = -15,[DamageType.COLD] = 25, all=8},
-		inc_stats = { [Stats.STAT_MAG] = 7,},
+		inc_damage = {[DamageType.COLD] = 25},
+		inc_stats = { [Stats.STAT_MAG] = 12,},
 		combat_def = 12,
 		on_melee_hit = {[DamageType.ICE]=60},
 	},
@@ -507,7 +510,7 @@ newEntity{ base = "BASE_GREATMAUL", define_as="ROTTING_MAUL",
 	use_power = {
 		name = function(self, who)
 			local dam = who:damDesc(engine.DamageType.PHYSICAL, self.use_power.damage(self, who))
-			return ("knock away other craatures within radius %d), dealing %0.2f to %0.2f physical damage (based on Strength) to each"):format(self.use_power.radius, dam, dam*2)
+			return ("knock away other creatures within radius %d), dealing %0.2f to %0.2f physical damage (based on Strength) to each"):format(self.use_power.radius, dam, dam*2)
 		end,
 		power = 50,
 		damage = function(self, who) return 125 + 3*who:getStr() end,

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ newTalentType{ allow_random=true, type="cursed/endless-hunt", name = "endless hu
 newTalentType{ allow_random=true, type="cursed/strife", name = "strife", description = "The battlefield is your home; death and confusion, your comfort." }
 newTalentType{ allow_random=true, is_mind=true, type="cursed/gloom", name = "gloom", description = "All those in your sight must share your despair." }
 newTalentType{ allow_random=true, type="cursed/rampage", name = "rampage", description = "Let loose the hate that has grown within." }
-newTalentType{ allow_random=true, type="cursed/predator", name = "predator", description = "Track and kill your prey with single-minded focus." }
+newTalentType{ allow_random=false, type="cursed/predator", name = "predator", description = "Track and kill your prey with single-minded focus." }
 
 -- Doomed
 newTalentType{ allow_random=true, is_mind=true, type="cursed/dark-sustenance", name = "dark sustenance", generic = true, description = "Invoke the powerful force of your will." }
@@ -35,7 +35,7 @@ newTalentType{ allow_random=true, is_mind=true, type="cursed/one-with-shadows", 
 newTalentType{ allow_random=true, is_mind=true, type="cursed/advanced-shadowmancy", name = "advanced shadowmancy", min_lev = 10, description = "Gain more direct control over your shadows with physical damage talents." }
 
 -- Generic
-newTalentType{ allow_random=true, is_mind=true, type="cursed/gestures", name = "gestures", generic = true, description = "Enhance the power of you mind with gestures." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/gestures", name = "gestures", generic = true, description = "Enhance the power of your mind with gestures." }
 newTalentType{ allow_random=true, is_mind=true, type="cursed/cursed-form", name = "cursed form", generic = true, description = "You are wracked with the dark energies of the curse." }
 newTalentType{ allow_random=true, is_mind=true, type="cursed/cursed-aura", name = "cursed aura", generic = true, description = "The things you surround yourself with soon wither away." }
 newTalentType{ allow_random=false, is_mind=true, type="cursed/curses", name = "curses", hide = true, description = "The effects of cursed objects." }

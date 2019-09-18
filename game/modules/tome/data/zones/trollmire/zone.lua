@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -23,11 +23,12 @@ if layout == "FLOODED" then
 
 return {
 	name = "Trollmire",
-	level_range = {1, 5},
+	level_range = {1, 7},
 	level_scheme = "player",
 	max_level = 3,
+	debug_auto_clear_max_level = 4,
 	decay = {300, 800},
-	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(-1,2) end,
+	actor_adjust_level = function(zone, level, e) return zone.base_level + level.level-1 + e:getRankLevelAdjust() + 1 end,
 	width = 65, height = 40,
 --	all_remembered = true,
 	all_lited = true,
@@ -163,6 +164,7 @@ return {
 	day_night = true,
 	tier1 = true,
 	tier1_escort = 2,
+	debug_auto_clear_max_level = 4,
 	persistent = "zone",
 	ambient_music = "Rainy Day.ogg",
 	min_material_level = function() return game.state:isAdvanced() and 3 or 1 end,

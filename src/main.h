@@ -1,6 +1,6 @@
 /*
     TE4 - T-Engine 4
-    Copyright (C) 2009 - 2017 Nicolas Casalini
+    Copyright (C) 2009 - 2018 Nicolas Casalini
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,10 +54,20 @@ void do_move(int w, int h);
  */
 extern void do_resize(int w, int h, bool fullscreen, bool borderless, float zoom);
 
+typedef enum {
+	redraw_type_normal,
+	redraw_type_user_screenshot,
+	redraw_type_savefile_screenshot
+} redraw_type_t;
+
+extern void redraw_now(redraw_type_t rtype);
+extern redraw_type_t get_current_redraw_type(void);
+
 extern void setupRealtime(float freq);
 extern void setupDisplayTimer(int fps);
 extern int docall (lua_State *L, int narg, int nret);
 extern bool no_steam;
+extern bool no_connectivity;
 extern bool safe_mode;
 extern bool fbo_active;
 extern bool multitexture_active;
@@ -69,6 +79,7 @@ extern int g_argc;
 extern char **g_argv;
 extern char *override_home;
 extern float screen_zoom;
+extern bool forbid_idle_mode;
 
 /* Error handling */
 struct lua_err_type_s {
@@ -84,7 +95,8 @@ extern void del_lua_error();
 extern core_boot_type *core_def;
 
 extern void physfs_reset_dir_allowed(lua_State *L);
-extern bool physfs_check_allow_path(lua_State *L, const char *path);
+extern bool physfs_check_allow_path_read(lua_State *L, const char *path);
+extern bool physfs_check_allow_path_write(lua_State *L, const char *path);
 
 #ifdef STEAM_TE4
 #include "steam-te4.h"

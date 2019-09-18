@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -20,7 +20,15 @@
 load("/data/general/npcs/rodent.lua", rarity(0))
 load("/data/general/npcs/vermin.lua", rarity(2))
 load("/data/general/npcs/molds.lua", rarity(1))
-load("/data/general/npcs/orc.lua", function(e) if e.level_range and e.level_range[1] == 10 then e.level_range[1] = 1 e.start_level = 1 end end) -- Make orcs lower level, not a problem we have norgan to help!
+load("/data/general/npcs/orc.lua", function(e)
+	if e.level_range and e.level_range[1] == 10 then
+		e.level_range[1] = 1 
+		e.start_level = 1
+		e.on_added_to_level = function(self)  -- Avoid the frontloading of the new weapon mastery formula but don't impact Orcs later
+			self.talents.T_WEAPONS_MASTERY = nil
+			self.talents.T_BOW_MASTERY = nil
+		end
+	end end) -- Make orcs lower level, not a problem we have norgan to help!
 load("/data/general/npcs/snake.lua", rarity(2))
 
 load("/data/general/npcs/all.lua", rarity(4, 35))
@@ -62,7 +70,6 @@ newEntity{ define_as = "BROTOQ",
 		[Talents.T_CARRIER]=1,
 		[Talents.T_ACID_BLOOD]=1,
 		[Talents.T_REND]=2,
-		[Talents.T_WEAPONS_MASTERY]=1,
 	},
 	resolvers.inscriptions(1, {"wild infusion"}),
 
@@ -71,7 +78,13 @@ newEntity{ define_as = "BROTOQ",
 
 	-- Remove free melee; poor brotoq
 	forbid_corrupted_strength_blow = 0,
-
+	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
+	on_added_to_level = function(self)
+		if self.level <= 16 then
+			self.ai_tactic.escape = 0
+		end
+	end,
+	
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("start-dwarf", engine.Quest.COMPLETED, "brotoq")
 	end,

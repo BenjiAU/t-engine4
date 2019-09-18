@@ -472,7 +472,6 @@ static int determineUserDir(void)
         if (OpenProcessToken(processHandle, TOKEN_QUERY, &accessToken))
         {
             DWORD psize = 0;
-            WCHAR dummy = 0;
             LPWSTR wstr = NULL;
             BOOL rc = 0;
 
@@ -481,7 +480,7 @@ static int determineUserDir(void)
              *  psize. Also note that the second parameter can't be
              *  NULL or the function fails.
              */
-    		rc = pGetUserProfileDirectoryW(accessToken, &dummy, &psize);
+    		rc = pGetUserProfileDirectoryW(accessToken, NULL, &psize);
             assert(!rc);  /* !!! FIXME: handle this gracefully. */
             (void)rc;
 

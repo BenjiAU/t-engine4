@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local damagestat = t.getDamageStat(self, t)
-		return ([[Projects a bolt of temporal energy that deals %0.2f temporal damage, and reduces the targets three highest by %d for 3 turns.
+		return ([[Projects a bolt of temporal energy that deals %0.2f temporal damage, and reduces the targets three highest stats by %d for 3 turns.
 		The damage dealt will scale with your Spellpower.]]):format(damDesc(self, DamageType.TEMPORAL, damage), damagestat)
 	end,
 }

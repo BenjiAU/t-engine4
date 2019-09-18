@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -48,8 +48,14 @@ function _M:use(item)
 	game:unregisterDialog(self)
 
 	if item.dialog then
+		package.loaded["mod.dialogs.debug."..item.dialog] = nil
 		local d = require("mod.dialogs.debug."..item.dialog).new(item)
 		game:registerDialog(d)
+		return
+	elseif item.class then
+		package.loaded["mod.dialogs.debug."..item.class] = nil
+		local d = require("mod.dialogs.debug."..item.class).new(item)
+		d:run()
 		return
 	end
 
@@ -146,7 +152,7 @@ function _M:use(item)
 		self:triggerHook{"DebugMain:use", act=act}
 	end
 end
-
+		
 -- Ideas:
 -- force reload all shops
 function _M:generateList()
@@ -167,6 +173,10 @@ function _M:generateList()
 	list[#list+1] = {name="Give Sher'tul fortress energy", action="shertul-energy"}
 	list[#list+1] = {name="Give all ingredients", action="all-ingredients"}
 	list[#list+1] = {name="Weakdamage", action="weakdamage"}
+	list[#list+1] = {name="Spawn Event", dialog="SpawnEvent"}
+	list[#list+1] = {name="Endgamify", class="Endgamify"}
+	list[#list+1] = {name="Reload/regenerate Zone and level", class="ReloadZone"}
+	list[#list+1] = {name="Automatically Clear Zones", class="AdvanceZones"}
 	self:triggerHook{"DebugMain:generate", menu=list}
 
 	local chars = {}

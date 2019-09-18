@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ function _M:unlockShimmer(o)
 	end
 
 	local moddables = {}
-	for _, p in ipairs{"moddable_tile", "moddable_tile2", "moddable_tile_back", "moddable_tile_hood", "moddable_tile_particle", "moddable_tile_ornament"} do
+	for _, p in ipairs{"moddable_tile", "moddable_tile2", "moddable_tile_back", "moddable_tile_hood", "moddable_tile_particle", "moddable_tile_ornament", "moddable_tile_projectile"} do
 		if o[p] then moddables[p] = o[p] end
 	end
 

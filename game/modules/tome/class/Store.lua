@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -280,6 +280,11 @@ end
 --- Actor interacts with the store
 -- @param who the actor who interacts
 function _M:interact(who, name)
+	-- Lore-ize me?
+	if who.level < (self.store.minimum_level or 0) then 
+		game.logPlayer(who, "You must be level %d to access this shop.", self.store.minimum_level or 0) 
+		return
+	end
 	who:sortInven()
 	Store.interact(self, who, name)
 end

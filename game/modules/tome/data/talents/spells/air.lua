@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ newTalent{
 	type = {"spell/air", 1},
 	require = spells_req1,
 	points = 5,
-	random_ego = "attack",
 	mana = 10,
 	cooldown = 3,
 	tactical = { ATTACK = {LIGHTNING = 2} },
@@ -50,10 +49,12 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		return ([[Conjures up mana into a powerful beam of lightning, doing %0.2f to %0.2f damage
+		return ([[Conjures up mana into a powerful beam of lightning, doing %0.2f to %0.2f damage (%0.2f average)
 		The damage will increase with your Spellpower.]]):
 		format(damDesc(self, DamageType.LIGHTNING, damage / 3),
-		damDesc(self, DamageType.LIGHTNING, damage))
+		damDesc(self, DamageType.LIGHTNING, damage),
+		damDesc(self, DamageType.LIGHTNING, (damage + damage / 3) / 2))
+
 	end,
 }
 
@@ -62,8 +63,7 @@ newTalent{
 	type = {"spell/air", 2},
 	require = spells_req2,
 	points = 5,
-	random_ego = "attack",
-	mana = 30,
+	mana = 20,
 	cooldown = 8,
 	tactical = { ATTACKAREA = {LIGHTNING = 2} }, --note: only considers the primary target
 	range = 10,
@@ -71,7 +71,7 @@ newTalent{
 	reflectable = true,
 	requires_target = true,
 	target = function(self, t) return {type="bolt", range=self:getTalentRange(t), talent=t} end,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 10, 250) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 28, 330) end,
 	getTargetCount = function(self, t) return math.floor(self:combatTalentScale(t, 4, 8, "log")) end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
@@ -132,11 +132,12 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local targets = t.getTargetCount(self, t)
-		return ([[Invokes a forking beam of lightning doing %0.2f to %0.2f damage and forking to another target.
+		return ([[Invokes a forking beam of lightning doing %0.2f to %0.2f damage (%0.2f average) and forking to another target.
 		It can hit up to %d targets up to 10 grids apart, and will never hit the same one twice; nor will it hit the caster.
 		The damage will increase with your Spellpower.]]):
 		format(damDesc(self, DamageType.LIGHTNING, damage / 3),
 			damDesc(self, DamageType.LIGHTNING, damage),
+			damDesc(self, DamageType.LIGHTNING, (damage + damage / 3) / 2),
 			targets)
 	end,
 }
@@ -199,18 +200,14 @@ newTalent{
 	require = spells_req4,
 	points = 5,
 	mode = "sustained",
-	sustain_mana = 30,
+	sustain_mana = 50,
 	cooldown = 15,
 	tactical = { ATTACKAREA = {LIGHTNING = 2} },
 	range = 6,
 	direct_hit = true,
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 15, 80) end,
 	getTargetCount = function(self, t) return math.floor(self:getTalentLevel(t)) end,
-	getManaDrain = function(self, t) return -1.5 * self:getTalentLevelRaw(t) end,
 	callbackOnActBase = function(self, t)
-		local mana = t.getManaDrain(self, t)
-		if self:getMana() <= mana + 1 then return end
-
 		local tgts = {}
 		local grids = core.fov.circle_grids(self.x, self.y, 6, true)
 		for x, yy in pairs(grids) do for y, _ in pairs(grids[x]) do
@@ -231,7 +228,6 @@ newTalent{
 			if core.shader.active() then game.level.map:particleEmitter(a.x, a.y, tg.radius, "ball_lightning_beam", {radius=tg.radius, tx=x, ty=y}, {type="lightning"})
 			else game.level.map:particleEmitter(a.x, a.y, tg.radius, "ball_lightning_beam", {radius=tg.radius, tx=x, ty=y}) end
 			game:playSoundNear(self, "talents/lightning")
-			self:incMana(mana)
 		end
 	end,
 	activate = function(self, t)
@@ -247,11 +243,9 @@ newTalent{
 	info = function(self, t)
 		local targetcount = t.getTargetCount(self, t)
 		local damage = t.getDamage(self, t)
-		local manadrain = t.getManaDrain(self, t)
 		return ([[Conjures a furious, raging lightning storm with a radius of 6 that follows you as long as this spell is active.
-		Each turn, a random lightning bolt will hit up to %d of your foes for 1 to %0.2f damage in a radius of 1.
-		This powerful spell will drain %0.2f mana with each hit.
+		Each turn, a random lightning bolt will hit up to %d of your foes for 1 to %0.2f damage (%0.2f average) in a radius of 1.
 		The damage will increase with your Spellpower.]]):
-		format(targetcount, damDesc(self, DamageType.LIGHTNING, damage),-manadrain)
+		format(targetcount, damDesc(self, DamageType.LIGHTNING, damage), damDesc(self, DamageType.LIGHTNING, damage / 2))
 	end,
 }

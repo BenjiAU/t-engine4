@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -20,303 +20,437 @@
 local Trap = require "mod.class.Trap"
 
 newTalent{
-	name = "Glyph of Paralysis",
+	name = "Glyphs",
 	type = {"celestial/glyphs", 1},
 	require = divi_req_high1,
 	random_ego = "attack",
 	points = 5,
-	cooldown = 20,
-	positive = -10,
-	no_energy = true,
---	requires_target = true,
-	tactical = { DISABLE = {stun = 1.5} },
-	range = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5, "log")) end,
-	getDazeDuration = function(self, t) return math.floor(self:combatTalentScale(t, 4, 8)) end,
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 6, 10)) end, -- Duration of glyph
-	trapPower = function(self,t) return math.max(1,self:combatScale(self:getTalentLevel(t) * self:getMag(15, true), 0, 0, 75, 75)) end, -- Used to determine detection and disarm power, about 75 at level 50
-	target = function(self, t) return {type="hit", nowarning=true, range=self:getTalentRange(t), nolock=true, talent=t} end,
-	action = function(self, t)
-		local tg = self:getTalentTarget(t)
-		local tx, ty = self:trapGetGrid(t, tg)
-		if not (tx and ty) then return end
+	mode = "sustained",
+	sustain_positive = 5,
+	sustain_negative = 5,
+	range = function(self, t) return 10 end,
+	radius = function(self, t) return 1 end,
+	target = function(self, t) return {type="ball", radius=self:getTalentRadius(t), range=self:getTalentRange(t), talent=t} end,
+	iconOverlay = function(self, t, p)
+		local p = self.sustain_talents[t.id]
+		if not p or not p.glyphs_last_turn then return "" end
+		local cd = math.ceil(t.getGlyphCD(self, t) - ((game.turn - p.glyphs_last_turn) / 10))
+		cd = (cd > 0) and "#RED#"..tostring(cd).."#LAST#" or ""
+		return cd, "buff_font"
+	end,
+	getGlyphCD = function(self, t) return 4 end,
+	getDuration = function(self, t)
+		if self:knowTalent(self.T_GLYPHS_OF_FURY) then
+			local pg = self:getTalentFromId(self.T_GLYPHS_OF_FURY)
+			return self:combatTalentLimit(t, 6, 2, 5) + pg.getPersistentDuration(self, pg)
+		else
+			return self:combatTalentLimit(t, 6, 2, 5)
+		end
+	end,
+	getGlyphDam = function(self, t)
+		if self:knowTalent(self.T_GLYPHS_OF_FURY) then
+			local pg = self:getTalentFromId(self.T_GLYPHS_OF_FURY)
+			return pg.getTriggerDam(self, pg)
+		else
+			return 0
+		end
+	end,
+	getSunlightHeal = function(self, t) return self:combatTalentSpellDamage(t, 1, 100) end,  -- No crit
+	getMoonlightNumb = function(self, t) return math.min(100, self:combatTalentSpellDamage(t, 40, 80)) end,
+	getMoonlightNumbDur = function(self, t) return 2 end,
+	getTwilightKnockback = function(self, t) return 1 end,
+	callbackOnCrit = function(self, t, kind)
+		if kind ~= "spell" then return end
+		if self:getPositive() < 5 or self:getNegative() < 5 then return nil end
+		local p = self:isTalentActive(self.T_GLYPHS)
+		if not p then return end
+		if p.glyphs_last_turn and ((game.turn - p.glyphs_last_turn) / 10) < t.getGlyphCD(self, t) then return end
+		p.glyphs_last_turn = game.turn
+-- find a target
 		
-		local dam = self:spellCrit(t.getDazeDuration(self, t))
-		local trap = Trap.new{
-			name = "glyph of paralysis",
-			type = "elemental", id_by_type=true, unided_name = "trap",
-			display = '^', color=colors.GOLD, image = "trap/trap_glyph_paralysis_01_64.png",
-			faction = self.faction,
-			desc = function(self)
-				return ([[Dazes for %d turns.]]):format(self.dam)
-			end,
-			dam = dam,
-			canTrigger = function(self, x, y, who)
-				if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
-				return false
-			end,
-			triggered = function(self, x, y, who)
-				if who:canBe("stun") then
-					who:setEffect(who.EFF_DAZED, self.dam, {})
+		-- Invalidate any target with a glyph adjacent
+		local valid_for_glyph = function(target)
+			local grids = core.fov.circle_grids(target.x, target.y, 1, true)
+			local valid = false
+			for x, yy in pairs(grids) do for y, _ in pairs(grids[x]) do
+				local t = game.level.map(x, y, Map.TRAP)
+				if t and t.is_glyph then return false end
+			end end
+			return true
+		end
+
+		-- Prioritize self, else pick a random valid target
+		local target
+		if valid_for_glyph(self) then 
+			target = self
+		else
+			local tgts = {}
+			local grids = core.fov.circle_grids(self.x, self.y, self:getTalentRange(t), true)
+			for x, yy in pairs(grids) do for y, _ in pairs(grids[x]) do
+				local a = game.level.map(x, y, Map.ACTOR)
+				if a and self:reactionToward(a) < 0 and valid_for_glyph(a) then
+					tgts[#tgts+1] = a
 				end
-				return true
-			end,
-			temporary = t.getDuration(self, t),
-			x = tx, y = ty,
-			disarm_power = math.floor(t.trapPower(self,t)),
-			detect_power = math.floor(t.trapPower(self,t) * 0.8),
-			canAct = false,
-			energy = {value=0},
-			act = function(self)
-				self:useEnergy()
-				self.temporary = self.temporary - 1
-				if self.temporary <= 0 then
-					if game.level.map(self.x, self.y, engine.Map.TRAP) == self then game.level.map:remove(self.x, self.y, engine.Map.TRAP) end
-					game.level:removeEntity(self)
+			end end
+			if #tgts < 1 then return nil end
+			target = rng.tableRemove(tgts)
+		end
+
+--target glyphs
+		local tg = self:getTalentTarget(t)
+		local glyphgrids = {}
+		if not self:canProject(tg, target.x, target.y) then return end
+
+		-- Grab all adjacent coordinates that don't have an existing trap or something that blocks movement
+		self:project(tg, target.x, target.y, function(px, py)
+			local trap = game.level.map(px, py, Map.TRAP)
+			if not game.level.map:checkEntity(px, py, Map.TERRAIN, "block_move") and not (trap and trap.is_glyph) then glyphgrids[#glyphgrids+1] = {x=px, y=py} end		
+		end)
+
+		local dam = self:spellCrit(t.getGlyphDam(self, t))
+		local heal = t.getSunlightHeal(self, t)  -- It gets very weird to avoid double crits if this can crit, if thats needed define its value in relation to getGlyphDam
+		local numb = t.getMoonlightNumb(self, t)
+		local numbDur = t.getMoonlightNumbDur(self, t)
+		local dist = t.getTwilightKnockback(self, t)
+
+----------------------------------------------------------------
+-- START - Define Glyph Traps - START
+----------------------------------------------------------------
+local function makeSunGlyph()
+	local sun_glyph = Trap.new{
+		name = "glyph of sunlight",
+		is_glyph = true,
+		type = "elemental", id_by_type=true, unided_name = "trap",
+		display = '^', color=colors.GOLD, image = "trap/trap_glyph_explosion_02_64.png",
+		disarmable = false,
+		no_disarm_message = true,
+		message = false,
+		all_know = true,
+		always_remember = true,
+		faction = self.faction,
+		dam = dam,
+		heal = heal,
+		desc = function(self)
+			return ([[Deals %d light damage and heals the summoner for %d]]):format(engine.interface.ActorTalents.damDesc(self, engine.DamageType.LIGHT, self.dam), self.heal)
+		end,
+		canTrigger = function(self, x, y, who)
+			if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
+			return false
+		end,
+		triggered = function(self, x, y, who)
+			if self.dam then
+				self.summoner:project({type="hit", x=x,y=y}, x, y, engine.DamageType.LIGHT, self.dam, {type="light"})
+			end
+			game.level.map:particleEmitter(x, y, 0, "sunburst", {radius=0, x=x, y=y})
+			self.summoner:heal(self.heal, self)
+	--divine glyphs buff
+			if self.summoner:knowTalent(self.summoner.T_DIVINE_GLYPHS) then
+				self.summoner.turn_procs.divine_glyphs = self.summoner.turn_procs.divine_glyphs or 0
+				if self.summoner.turn_procs.divine_glyphs < 3 then
+					local dg = self.summoner:getTalentFromId(self.summoner.T_DIVINE_GLYPHS)
+					local maxStacks = dg.getMaxStacks(self.summoner, dg)
+					local dur = dg.getTurns(self.summoner, dg)
+					self.summoner:setEffect(self.summoner.EFF_DIVINE_GLYPHS, dur, {maxStacks=maxStacks})
+					self.summoner.turn_procs.divine_glyphs = self.summoner.turn_procs.divine_glyphs + 1
 				end
-			end,
-			summoner = self,
-			summoner_gain_exp = true,
-		}
-		game.level:addEntity(trap)
-		trap:identify(true)
-		trap:setKnown(self, true)
-		game.zone:addEntity(game.level, trap, "trap", tx, ty)
-		game:playSoundNear(self, "talents/heal")
+			end
+			return true, true
+		end,
+		temporary = t.getDuration(self, t),
+		x = tx, y = ty,
+		inc_damage = table.clone(self.inc_damage or {}, true),
+		resists_pen = table.clone(self.resists_pen or {}, true),
+		canAct = false,
+		energy = {value=0},
+		act = function(self)
+			self:useEnergy()
+			self.temporary = self.temporary - 1
+			if self.temporary <= 0 then
+				if game.level.map(self.x, self.y, engine.Map.TRAP) == self then game.level.map:remove(self.x, self.y, engine.Map.TRAP) end
+				game.level:removeEntity(self)
+			end
+		end,
+		summoner = self,
+		summoner_gain_exp = true,
+	}
+	return sun_glyph
+end
+
+local function makeMoonGlyph()
+	local star_glyph = Trap.new{
+		name = "glyph of moonlight",
+		is_glyph = true,
+		type = "elemental", id_by_type=true, unided_name = "trap",
+		display = '^', color=colors.GOLD, image = "trap/trap_glyph_fatigue_01_64.png",
+		disarmable = false,
+		no_disarm_message = true,
+		message = false,
+		all_know = true,
+		always_remember = true,
+		faction = self.faction,
+		dam = dam,
+		numb = numb,
+		numbDur = numbDur,
+		desc = function(self)
+			return ([[Deals %d darkness damage and saps the foes energy, reducing all damage dealt by %d%% for %d turns.]]):
+				format(engine.interface.ActorTalents.damDesc(self, engine.DamageType.DARKNESS, self.dam), self.numb, self.numbDur)
+		end,
+		canTrigger = function(self, x, y, who)
+			if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
+			return false
+		end,
+		triggered = function(self, x, y, who)
+			if self.dam then
+				self.summoner:project({type="hit", x=x,y=y}, x, y, engine.DamageType.DARKNESS, self.dam, {type="light"})
+			end
+			who:setEffect(who.EFF_GLYPH_OF_MOONLIGHT, self.numbDur, {reduce = self.numb})
+			game.level.map:particleEmitter(x, y, 0, "shadow_flash", {radius=0, x=x, y=y})
+	--divine glyphs buff
+			if self.summoner:knowTalent(self.summoner.T_DIVINE_GLYPHS) then
+				self.summoner.turn_procs.divine_glyphs = self.summoner.turn_procs.divine_glyphs or 0
+				if self.summoner.turn_procs.divine_glyphs < 3 then
+					local dg = self.summoner:getTalentFromId(self.summoner.T_DIVINE_GLYPHS)
+					local maxStacks = dg.getMaxStacks(self.summoner, dg)
+					local dur = dg.getTurns(self.summoner, dg)
+					self.summoner:setEffect(self.summoner.EFF_DIVINE_GLYPHS, dur, {maxStacks=maxStacks})
+					self.summoner.turn_procs.divine_glyphs = self.summoner.turn_procs.divine_glyphs + 1
+				end
+			end
+			return true, true
+		end,
+		temporary = t.getDuration(self, t),
+		x = tx, y = ty,
+		inc_damage = table.clone(self.inc_damage or {}, true),
+		resists_pen = table.clone(self.resists_pen or {}, true),
+		canAct = false,
+		energy = {value=0},
+		act = function(self)
+			self:useEnergy()
+			self.temporary = self.temporary - 1
+			if self.temporary <= 0 then
+				if game.level.map(self.x, self.y, engine.Map.TRAP) == self then game.level.map:remove(self.x, self.y, engine.Map.TRAP) end
+				game.level:removeEntity(self)
+			end
+		end,
+		summoner = self,
+		summoner_gain_exp = true,
+	}
+	return star_glyph
+end
+
+local function makeTwilightGlyph()
+	local twi_glyph = Trap.new{
+		name = "glyph of twilight",
+		type = "elemental", id_by_type=true, unided_name = "trap",
+		display = '^', color=colors.GOLD, image = "trap/trap_glyph_repulsion_01_64.png",
+		disarmable = false,
+		no_disarm_message = true,
+		message = false,
+		all_know = true,
+		always_remember = true,
+		faction = self.faction,
+		dam = dam,
+		dist=dist,
+		desc = function(self)
+			return ([[Explodes knocking the enemy 1 space in a random direction and dealing %d light and %d darkness damage.]]):format(engine.interface.ActorTalents.damDesc(self, engine.DamageType.LIGHT, self.dam/2), engine.interface.ActorTalents.damDesc(self, engine.DamageType.DARKNESS, self.dam/2))
+		end,
+		canTrigger = function(self, x, y, who)
+			if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
+			return false
+		end,
+		triggered = function(self, x, y, who)
+			if self.dam then
+				self.summoner:project({type="hit", x=x,y=y}, x, y, engine.DamageType.LIGHT, self.dam/2, {type="light"})
+				self.summoner:project({type="hit", x=x,y=y}, x, y, engine.DamageType.DARKNESS, self.dam/2, {type="light"})
+			end
+			if who:canBe("knockback") then
+				local ox, oy = self.x, self.y
+				local dir = util.getDir(who.x, who.y, who.old_x, who.old_y)
+				self.x, self.y = util.coordAddDir(self.x, self.y, dir)
+				who:knockback(self.x, self.y, self.dist)
+				self.x, self.y = ox, oy
+			end
+	--divine glyphs buff
+			if self.summoner:knowTalent(self.summoner.T_DIVINE_GLYPHS) then
+				self.summoner.turn_procs.divine_glyphs = self.summoner.turn_procs.divine_glyphs or 0
+				if self.summoner.turn_procs.divine_glyphs < 3 then
+					local dg = self.summoner:getTalentFromId(self.summoner.T_DIVINE_GLYPHS)
+					local maxStacks = dg.getMaxStacks(self.summoner, dg)
+					local dur = dg.getTurns(self.summoner, dg)
+					self.summoner:setEffect(self.summoner.EFF_DIVINE_GLYPHS, dur, {maxStacks=maxStacks})
+					self.summoner.turn_procs.divine_glyphs = self.summoner.turn_procs.divine_glyphs + 1
+				end
+			end
+			return true, true
+		end,
+		temporary = t.getDuration(self, t),
+		x = tx, y = ty,
+		inc_damage = table.clone(self.inc_damage or {}, true),
+		resists_pen = table.clone(self.resists_pen or {}, true),
+		canAct = false,
+		energy = {value=0},
+		act = function(self)
+			self:useEnergy()
+			self.temporary = self.temporary - 1
+			if self.temporary <= 0 then
+				if game.level.map(self.x, self.y, engine.Map.TRAP) == self then game.level.map:remove(self.x, self.y, engine.Map.TRAP) end
+				game.level:removeEntity(self)
+			end
+		end,
+		summoner = self,
+		summoner_gain_exp = true,
+	}
+	return twi_glyph
+end
+----------------------------------------------------------------
+-- END - Define Glyph Traps - END
+----------------------------------------------------------------		
+		for _, spot in pairs(glyphgrids) do
+			local trap2
+			local trap = rng.table{"sun", "star", "twilight"}
+			if trap == "sun" then trap2 = makeSunGlyph()
+			elseif trap == "star" then trap2 = makeMoonGlyph()
+			elseif trap == "twilight" then trap2 = makeTwilightGlyph()
+			end
+
+			trap2:identify(true)
+			trap2:resolve() trap2:resolve(nil, true)
+			trap2:setKnown(self, true)
+			game.level:addEntity(trap2)
+			game.zone:addEntity(game.level, trap2, "trap", spot.x, spot.y)
+			game.level.map:particleEmitter(spot.x, spot.y, 1, "summon")
+		end
+	end,
+	activate = function(self, t)
+		local ret = {}
+		if core.shader.active() then
+			ret.particle1 = self:addParticles(Particles.new("shader_ring_rotating", 1, {rotation=0, radius=0.8, img="runicshield_yellow"}, {type="lightningshield", time_factor=3000, noup=1.0}))
+			ret.particle1.toback = true
+			ret.particle2 = self:addParticles(Particles.new("shader_ring_rotating", 1, {rotation=0, radius=0.8, img="runicshield_dark"}, {type="lightningshield", time_factor=3000, noup=1.0}))
+		end
+		return ret
+	end,
+	deactivate = function(self, t, p)
+		if p.particle1 then self:removeParticles(p.particle1) end
+		if p.particle2 then self:removeParticles(p.particle2) end
 		return true
 	end,
 	info = function(self, t)
-		local dazeduration = t.getDazeDuration(self, t)
-		local duration = t.getDuration(self, t)
-		return ([[You bind light in a glyph on the floor. All enemies walking over the glyph will be dazed for %d turns.
-		The glyph is a hidden trap (%d detection and %d disarm power based on your Magic) and lasts for %d turns.]]):format(dazeduration, t.trapPower(self,t)*0.8, t.trapPower(self,t), duration)
+		local dam = t.getGlyphDam(self, t)
+		local heal = t.getSunlightHeal(self, t)
+		local numb = t.getMoonlightNumb(self, t)
+		local numbDur = t.getMoonlightNumbDur(self, t)
+		local dist = t.getTwilightKnockback(self, t)
+		return ([[When one of your spells goes critical, you bind glyphs in radius 1 centered on a random target in range %d at the cost of 5 positive and 5 negative energy.
+		Glyphs last for %d turns and cause various effects when an enemy enters their grid.
+		Glyphs will only spawn on enemies that aren't adjacent to an existing glyph and will prioritize your own position if it is valid.
+		This can only happen every %d game turns.
+		Glyph effects will scale with your Spellpower.
+
+		Avalable glyphs are:
+		Glyph of Sunlight - Bind sunlight into a glyph. When triggered it will release a brilliant light, dealing %0.2f light damage and healing you for %d.
+		Glyph of Moonlight - Bind moonlight into a glyph. When triggered it will release a fatiguing darkness,  dealing %0.2f darkness damage and reducing the foes damage dealt by %d%% for %d turns.
+		Glyph of Twilight - Bind twilight into a glyph. When triggered it will release a burst of twilight, dealing %0.2f light and %0.2f darkness damage and knocking the foe back %d tiles.
+		]]):format(self:getTalentRange(t), t.getDuration(self, t), t.getGlyphCD(self, t), 
+			damDesc(self, DamageType.LIGHT, dam), heal,
+			damDesc(self, DamageType.DARKNESS, dam), numb, numbDur,
+			damDesc(self, DamageType.LIGHT, dam/2), damDesc(self, DamageType.DARKNESS, dam/2), dist)
 	end,
 }
 
 newTalent{
-	name = "Glyph of Repulsion",
+	name = "Glyphs of Fury",
 	type = {"celestial/glyphs", 2},
 	require = divi_req_high2,
 	random_ego = "attack",
 	points = 5,
-	positive = -10,
-	cooldown = 20,
-	no_energy = true,
-	tactical = { ATTACK = {PHYSICAL = 1}, CLOSEIN = {knockback = 1.5}, ESCAPE = {knockback = 1.5} },
---	requires_target = true,
-	range = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5, "log")) end,
-	getDamage = function(self, t) return 15 + self:combatSpellpower(0.12) * self:combatTalentScale(t, 1.5, 5) end,
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 6, 10)) end, -- Duration of glyph
-	trapPower = function(self,t) return math.max(1,self:combatScale(self:getTalentLevel(t) * self:getMag(15, true), 0, 0, 75, 75)) end, -- Used to determine detection and disarm power, about 75 at level 50
-	target = function(self, t) return {type="hit", nowarning=true, range=self:getTalentRange(t), nolock=true, talent=t} end,
-	action = function(self, t)
-		local tg = self:getTalentTarget(t)
-		local tx, ty = self:trapGetGrid(t, tg)
-		if not (tx and ty) then return end
-
-		local dam = self:spellCrit(t.getDamage(self, t))
-		local sp = self:combatSpellpower()
-		local trap = Trap.new{
-			name = "glyph of repulsion",
-			type = "elemental", id_by_type=true, unided_name = "trap",
-			display = '^', color=colors.GOLD, image = "trap/trap_glyph_repulsion_01_64.png",
-			faction = self.faction,
-			dam = dam,
-			desc = function(self)
-				return ([[Deals %d physical damage, knocking the target back.]]):format(engine.interface.ActorTalents.damDesc(self, engine.DamageType.PHYSICAL, self.dam))
-			end,
-			canTrigger = function(self, x, y, who)
-				if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
-				return false
-			end,
-			triggered = function(self, x, y, who)
-				local ox, oy = self.x, self.y
-				local dir = util.getDir(who.x, who.y, who.old_x, who.old_y)
-				self.x, self.y = util.coordAddDir(self.x, self.y, dir)
-				self:project({type="hit",x=x,y=y}, x, y, engine.DamageType.SPELLKNOCKBACK, self.dam)
-				self.x, self.y = ox, oy
-				return true
-			end,
-			temporary = t.getDuration(self, t),
-			x = tx, y = ty,
-			disarm_power = math.floor(t.trapPower(self,t)),
-			detect_power = math.floor(t.trapPower(self,t) * 0.8),
-			inc_damage = table.clone(self.inc_damage or {}, true),
-			resists_pen = table.clone(self.resists_pen or {}, true),
-			canAct = false,
-			energy = {value=0},
-			combatSpellpower = function(self) return self.sp end, sp = sp,
-			act = function(self)
-				self:useEnergy()
-				self.temporary = self.temporary - 1
-				if self.temporary <= 0 then
-					if game.level.map(self.x, self.y, engine.Map.TRAP) == self then game.level.map:remove(self.x, self.y, engine.Map.TRAP) end
-					game.level:removeEntity(self)
-				end
-			end,
-			summoner = self,
-			summoner_gain_exp = true,
-		}
-		game.level:addEntity(trap)
-		trap:identify(true)
-		trap:setKnown(self, true)
-		game.zone:addEntity(game.level, trap, "trap", tx, ty)
-		game:playSoundNear(self, "talents/heal")
-		return true
-	end,
+	mode = "passive",
+	getPersistentDuration = function(self, t) return self:combatTalentLimit(t, 6, 2, 5) end,
+	getTriggerDam = function(self, t) return self:combatTalentSpellDamage(t, 1, 100) end,
 	info = function(self, t)
-		local damage = t.getDamage(self, t)
-		local duration = t.getDuration(self, t)
-		return ([[You bind light in a glyph on the floor. All enemies walking over the glyph will be hit by a blast that does %0.2f physical damage and knocks them back.
-		The glyph is a hidden trap (%d detection and %d disarm power based on your Magic) and lasts for %d turns.
-		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.PHYSICAL, damage), t.trapPower(self, t)*0.8, t.trapPower(self, t), duration)
+		local dam = t.getTriggerDam(self, t)
+		return ([[Your glyphs are imbued with celestial fury; they last %d turns longer and when triggered they will deal damage.
+		Glyph of Sunlight: Deals %0.2f light damage.
+		Glyph of Moonlight: Deals %0.2f darkness damage.
+		Glyph of Twilight: Deals %0.2f light and %0.2f darkness damage.]]):format(t.getPersistentDuration(self, t), damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.DARKNESS, dam), damDesc(self, DamageType.LIGHT, dam/2), damDesc(self, DamageType.DARKNESS, dam/2))
 	end,
 }
 
 newTalent{
-	name = "Glyph of Explosion",
+	name = "Divine Glyphs",
 	type = {"celestial/glyphs", 3},
 	require = divi_req_high3,
 	random_ego = "attack",
 	points = 5,
-	cooldown = 20,
-	positive = -10,
-	no_energy = true,
-	tactical = { ATTACKAREA = {LIGHT = 2} },
---	requires_target = true,
-	range = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5, "log")) end,
-	getDamage = function(self, t) return 15 + self:combatSpellpower(0.15) * self:combatTalentScale(t, 1.5, 5) end,
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 6, 10)) end, -- Duration of glyph
-	trapPower = function(self,t) return math.max(1,self:combatScale(self:getTalentLevel(t) * self:getMag(15, true), 0, 0, 75, 75)) end, -- Used to determine detection and disarm power, about 75 at level 50
-	target = function(self, t) return {type="ball", radius=1, nowarning=true, range=self:getTalentRange(t), nolock=true, talent=t} end,
-	action = function(self, t)
-		local tg = self:getTalentTarget(t)
-		local tx, ty = self:trapGetGrid(t, tg)
-		if not (tx and ty) then return end
-
-		local dam = self:spellCrit(t.getDamage(self, t))
-		local trap = Trap.new{
-			name = "glyph of explosion",
-			type = "elemental", id_by_type=true, unided_name = "trap",
-			display = '^', color=colors.GOLD, image = "trap/trap_glyph_explosion_02_64.png",
-			faction = self.faction,
-			dam = dam,
-			desc = function(self)
-				return ([[Explodes (radius 1) for %d light damage.]]):format(engine.interface.ActorTalents.damDesc(self, engine.DamageType.LIGHT, self.dam))
-			end,
-			canTrigger = function(self, x, y, who)
-				if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
-				return false
-			end,
-			triggered = function(self, x, y, who)
-				self:project({type="ball", x=x,y=y, radius=1}, x, y, engine.DamageType.LIGHT, self.dam, {type="light"})
-				game.level.map:particleEmitter(x, y, 1, "sunburst", {radius=1, tx=x, ty=y})
-				return true
-			end,
-			temporary = t.getDuration(self, t),
-			x = tx, y = ty,
-			disarm_power = math.floor(t.trapPower(self,t) * 0.8),
-			detect_power = math.floor(t.trapPower(self,t) * 0.8),
-			inc_damage = table.clone(self.inc_damage or {}, true),
-			resists_pen = table.clone(self.resists_pen or {}, true),
-			canAct = false,
-			energy = {value=0},
-			act = function(self)
-				self:useEnergy()
-				self.temporary = self.temporary - 1
-				if self.temporary <= 0 then
-					if game.level.map(self.x, self.y, engine.Map.TRAP) == self then game.level.map:remove(self.x, self.y, engine.Map.TRAP) end
-					game.level:removeEntity(self)
-				end
-			end,
-			summoner = self,
-			summoner_gain_exp = true,
-		}
-		game.level:addEntity(trap)
-		trap:identify(true)
-		trap:setKnown(self, true)
-		game.zone:addEntity(game.level, trap, "trap", tx, ty)
-		game:playSoundNear(self, "talents/heal")
-		return true
-	end,
+	mode = "passive",
+	getMaxStacks = function(self, t) return self:combatTalentLimit(t, 6, 2, 5) end,
+	getTurns = function(self, t) return self:combatTalentLimit(t, 10, 1, 7) end,
 	info = function(self, t)
-		local damage = t.getDamage(self, t)
-		local duration = t.getDuration(self, t)
-		return ([[You bind light in a glyph on the floor. All enemies walking over the glyph will trigger an explosion of light that does %0.2f damage to everyone within 1 tile.
-		The glyph is a hidden trap (%d detection and %d disarm power based on your Magic) and lasts for %d turns.
-		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHT, damage), t.trapPower(self, t)*0.8, t.trapPower(self, t)*0.8, duration)
+		return ([[Up to 3 times pers turn when one of your glyphs triggers you feel a surge of celestial power, increasing your darkness and light resistance and affinity by 5%% for %d turns, stacking up to %d times.]]):format(t.getTurns(self, t), t.getMaxStacks(self, t))
 	end,
 }
 
 newTalent{
-	name = "Glyph of Fatigue",
-	type = {"celestial/glyphs", 4},
+	name = "Twilight Glyph",
+	type = {"celestial/glyphs",4},
 	require = divi_req_high4,
-	random_ego = "attack",
 	points = 5,
-	cooldown = 20,
-	positive = -10,
-	no_energy = true,
-	tactical = { DISABLE = {slow = 1.5} },
---	requires_target = true,
-	range = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5, "log")) end,
-	getSlow = function(self, t) return self:combatTalentLimit(t, 1, 0.20, 0.35) end, -- Limit <100% slow
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 6, 10)) end, -- Duration of glyph
-	trapPower = function(self,t) return math.max(1,self:combatScale(self:getTalentLevel(t) * self:getMag(15, true), 0, 0, 75, 75)) end, -- Used to determine detection and disarm power, about 75 at level 50
-	target = function(self, t) return {type="hit", nowarning=true, range=self:getTalentRange(t), nolock=true, talent=t} end,
+	random_ego = "attack",
+	cooldown = function(self, t) return 6 + (self.consecutive_twilights or 0) * 2 end,
+	negative = 7,
+	positive = 7,
+	tactical = { ATTACKAREA = {LIGHT = 1, DARKNESS = 1} },
+	range = 7,
+	on_pre_use = function(self, t, silent)
+		return self:isTalentActive(self.T_GLYPHS)
+	end,
+	direct_hit = true,
+	getDamage =  function(self, t) return self:combatTalentSpellDamage(t, 10, 170) end,
+	getConsecutiveTurns = function(self, t) return self:combatTalentLimit(t, 15, 4, 10) end,
 	action = function(self, t)
-		local tg = self:getTalentTarget(t)
-		local tx, ty = self:trapGetGrid(t, tg)
-		if not (tx and ty) then return end
+		local tg = {type="hit", range=self:getTalentRange(t), talent=t}
+		local x, y = self:getTarget(tg)
+		if not x or not y then return nil end
+		--alternate between damage types
+		self.twilightdam = self.twilightdam or false
+		if self.twilightdam == false then
+			self:project(tg, x, y, DamageType.LIGHT, self:spellCrit(t.getDamage(self, t)))
+			self.twilightdam = true
 
-		local dam = t.getSlow(self, t)
-		local trap = Trap.new{
-			name = "glyph of fatigue",
-			type = "elemental", id_by_type=true, unided_name = "trap",
-			display = '^', color=colors.GOLD, image = "trap/trap_glyph_fatigue_01_64.png",
-			faction = self.faction,
-			dam = dam,
-			desc = function(self)
-				return ([[Slows (%d%%) for 5 turns.]]):format(self.dam*100)
-			end,
-			canTrigger = function(self, x, y, who)
-				if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
-				return false
-			end,
-			triggered = function(self, x, y, who)
-				who:setEffect(who.EFF_SLOW, 5, {power=self.dam})
-				return true
-			end,
-			temporary = t.getDuration(self, t),
-			x = tx, y = ty,
-			disarm_power = math.floor(t.trapPower(self,t)),
-			detect_power = math.floor(t.trapPower(self,t)),
-			canAct = false,
-			energy = {value=0},
-			act = function(self)
-				self:useEnergy()
-				self.temporary = self.temporary - 1
-				if self.temporary <= 0 then
-					if game.level.map(self.x, self.y, engine.Map.TRAP) == self then game.level.map:remove(self.x, self.y, engine.Map.TRAP) end
-					game.level:removeEntity(self)
-				end
-			end,
-			summoner = self,
-			summoner_gain_exp = true,
-		}
-		game.level:addEntity(trap)
-		trap:identify(true)
-		trap:setKnown(self, true)
-		game.zone:addEntity(game.level, trap, "trap", tx, ty)
-		game:playSoundNear(self, "talents/heal")
-		return true
+			game.level.map:particleEmitter(x, y, 1, "circle", {base_rot=0, oversize=0.8, a=130, limit_life=5, appear=5, speed=0, img="healcelestial", radius=0})
+
+		else
+			self:project(tg, x, y, DamageType.DARKNESS, self:spellCrit(t.getDamage(self, t)))
+			self.twilightdam = false
+
+			game.level.map:particleEmitter(x, y, 1, "circle", {base_rot=0, oversize=0.8, a=130, limit_life=5, appear=5, speed=0, img="healdark", radius=0})
+
+		end
+		--count casts and cd at limit
+		self.consecutive_twilights = (self.consecutive_twilights or 0) + 1
+		if self.consecutive_twilights < t.getConsecutiveTurns(self, t) then
+			self.twilightproc = 1
+		else
+			self:startTalentCooldown(t)
+			self.consecutive_twilights = 0
+		end
+		return true, {ignore_cd=true}
+	end,
+	--cd if not used consecutively
+	callbackOnAct = function(self, t)
+		self.consecutive_twilights = self.consecutive_twilights or 0
+		self.twilightproc = self.twilightproc or 0
+		if self.consecutive_twilights > 0 then
+			if self.twilightproc == 0 then
+				self:startTalentCooldown(t)
+				self.consecutive_twilights = 0
+			end
+		end
+		self.twilightproc = 0
 	end,
 	info = function(self, t)
-		local slow = t.getSlow(self, t)
-		local duration = t.getDuration(self, t)
-		return ([[You bind light in a glyph on the floor. All enemies walking over the glyph will be slowed by %d%% for 5 turns.
-		The glyph is a hidden trap (%d detection and %d disarm power based on your Magic) and lasts for %d turns.]]):
-		format(100 * slow, t.trapPower(self, t), t.trapPower(self, t), duration)
+		local dam = t.getDamage(self, t)
+		return ([[Bind the twilight into a transient glyph that will instantly deal damage alternating between %d light and %d darkness before dissipating.
+		This spell can be used for %d consecutive turns without going on cooldown, however each consecutive cast will increase the cooldown by 2. When the cast limit is reached or a turn is spent not casting this spell, it will go on cooldown.]]):format(damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.DARKNESS, dam), t.getConsecutiveTurns(self, t))
 	end,
 }

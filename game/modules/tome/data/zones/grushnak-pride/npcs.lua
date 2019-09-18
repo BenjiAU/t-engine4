@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -93,6 +93,10 @@ newEntity{ base="BASE_NPC_ORC_GRUSHNAK", define_as = "GRUSHNAK",
 		[Talents.T_ETERNAL_GUARD]=1,
 		[Talents.T_UNBREAKABLE_WILL]=1,
 		[Talents.T_GIANT_LEAP]=1,
+	},
+
+	auto_classes={
+		{class="Bulwark", start_level=45, level_rate=75},
 	},
 	resolvers.sustains_at_birth(),
 

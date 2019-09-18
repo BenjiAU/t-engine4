@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -155,7 +155,7 @@ newTalent{
 		-- Add a lasting map effect
 		game.level.map:addEffect(self,
 			x, y, t.getDuration(self, t),
-			DamageType.PHYSICAL_STUN, t.getDamage(self, t),
+			DamageType.PHYSICAL_STUN, self:spellCrit(t.getDamage(self, t)),
 			self:getTalentRadius(t),
 			5, nil,
 			{type="quake"},

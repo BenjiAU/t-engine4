@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ newTalent{
 	getPowermult = function(self,t,level) return 1.076 + 0.324*(level or self:getTalentLevel(t))^.5 end,
 	getStatmult = function(self,t,level) return 1.076 + 0.324*(level or self:getTalentLevel(t))^.5 end,
 	getAPRmult = function(self,t,level) return 0.65 + 0.51*(level or self:getTalentLevel(t))^.5 end,
-	getDamage = function(self, t) return 0 end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	activate = function(self, t)
 		local r = {
@@ -66,8 +66,8 @@ newTalent{
 		local inc = t.getPercentInc(self, t)
 		return ([[Channel your mental power through your wielded mindstars, generating psionic blades.
 		Mindstar psiblades have their damage modifiers (how much damage they gain from stats) multiplied by %0.2f, their armour penetration by %0.2f and mindpower, willpower and cunning by %0.2f.
-		Also increases Physical Power by %d and increases weapon damage by %d%% when using mindstars.]]):
-		format(t.getStatmult(self, t), t.getAPRmult(self, t), t.getPowermult(self, t), damage, 100 * inc) --I5
+		Also passively increases weapon damage by %d%% and physical power by 30 when using mindstars.]]):
+		format(t.getStatmult(self, t), t.getAPRmult(self, t), t.getPowermult(self, t), 100 * inc) --I5
 	end,
 }
 

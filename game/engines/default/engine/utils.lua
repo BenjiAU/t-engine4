@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -89,6 +89,15 @@ function ripairs(t)
 	end
 end
 
+function table.empty(t)
+	while next(t) do t[next(t)] = nil end
+end
+
+function table.replaceWith(t, nt)
+	table.empty(t)
+	for k, e in pairs(nt) do t[k] = e end
+end
+
 function table.count(t)
 	local i = 0
 	for k, v in pairs(t) do
@@ -117,41 +126,55 @@ function table.max(t)
 	return m
 end
 
-function table.print_shallow(src, offset, ret)
-	if type(src) ~= "table" then print("table.print has no table:", src) return end
+function table.print_shallow(src, offset, line_feed)
+	if not line_feed then line_feed = '\n' end
+	if type(src) ~= "table" then core.game.stdout_write("table.print has no table:", src) core.game.stdout_write(line_feed) return end
 	offset = offset or ""
 	for k, e in pairs(src) do
-		print(("%s[%s] = %s"):format(offset, tostring(k), tostring(e)))
+		core.game.stdout_write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) core.game.stdout_write(line_feed)
 	end
 end
 
-function table.print(src, offset, ret)
-	if type(src) ~= "table" then print("table.print has no table:", src) return end
+function table.print(src, offset, line_feed)
+	if not line_feed then line_feed = '\n' end
+	if type(src) ~= "table" then core.game.stdout_write("table.print has no table:", src) core.game.stdout_write(line_feed) return end
 	offset = offset or ""
 	for k, e in pairs(src) do
 		-- Deep copy subtables, but not objects!
 		if type(e) == "table" and not e.__ATOMIC and not e.__CLASSNAME then
-			print(("%s[%s] = {"):format(offset, tostring(k)))
-			table.print(e, offset.."  ")
-			print(("%s}"):format(offset))
+			core.game.stdout_write(("%s[%s] = {"):format(offset, tostring(k))) core.game.stdout_write(line_feed)
+			table.print(e, offset.."  ", line_feed)
+			core.game.stdout_write(("%s}"):format(offset)) core.game.stdout_write(line_feed)
 		else
-			print(("%s[%s] = %s"):format(offset, tostring(k), tostring(e)))
+			core.game.stdout_write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) core.game.stdout_write(line_feed)
 		end
 	end
 end
 
-function table.iprint(src, offset)
+function table.iprint(src, offset, line_feed)
+	if not line_feed then line_feed = '\n' end
+	if type(src) ~= "table" then core.game.stdout_write("table.iprint has no table:", src) core.game.stdout_write(line_feed) return end
 	offset = offset or ""
 	for k, e in ipairs(src) do
 		-- Deep copy subtables, but not objects!
 		if type(e) == "table" and not e.__ATOMIC and not e.__CLASSNAME then
-			print(("%s[%s] = {"):format(offset, tostring(k)))
+			core.game.stdout_write(("%s[%s] = {"):format(offset, tostring(k))) core.game.stdout_write(line_feed)
 			table.print(e, offset.."  ")
-			print(("%s}"):format(offset))
+			core.game.stdout_write(("%s}"):format(offset)) core.game.stdout_write(line_feed)
 		else
-			print(("%s[%s] = %s"):format(offset, tostring(k), tostring(e)))
+			core.game.stdout_write(("%s[%s] = %s"):format(offset, tostring(k), tostring(e))) core.game.stdout_write(line_feed)
 		end
 	end
+end
+
+function tprint(...)
+	local args = {...}
+	for i, str in ipairs(args) do
+		if type(str) == "table" then core.game.stdout_write('{ ') table.print(str, nil, ', ') core.game.stdout_write(' }')
+		else core.game.stdout_write(tostring(str)) end
+		if i < #args then core.game.stdout_write('\t') end
+	end
+	core.game.stdout_write('\n')
 end
 
 --- Generate a containing indexes between a and b and set to value v
@@ -370,6 +393,17 @@ function table.removeFromList(t, ...)
 	for _, v in ipairs{...} do
 		for i = #t, 1, -1 do if t[i] == v then table.remove(t, i) end end
 	end
+end
+
+function table.pairsRemove(t, check)
+	local todel = {}
+	for k, v in pairs(t) do
+		if check(k, v) then todel[#todel+1] = k end
+	end
+	for _, k in ipairs(todel) do
+		t[k] = nil
+	end
+	return #todel
 end
 
 function table.check(t, fct, do_recurse, path)
@@ -1021,8 +1055,11 @@ end
 function __get_uid_surface(uid, w, h)
 	uid = tonumber(uid)
 	local e = uid and __uids[uid]
-	if e and game.level then
-		return e:getEntityFinalSurface(game.level.map.tiles, w, h)
+	local tiles
+	if game.level then tiles = game.level.map.tiles
+	else tiles = require("engine.Map").tiles end
+	if e and tiles then
+		return e:getEntityFinalSurface(tiles, w, h)
 	end
 	return nil
 end
@@ -1030,7 +1067,7 @@ end
 function __get_uid_entity(uid)
 	uid = tonumber(uid)
 	local e = uid and __uids[uid]
-	if e and game.level then
+	if e then
 		return e
 	end
 	return nil
@@ -1098,7 +1135,10 @@ getmetatable(tmps).__index.size = function(font, str)
 				local uid = v[2]
 				local e = __uids[uid]
 				if e then
-					local surf = e:getEntityFinalSurface(game.level.map.tiles, font:lineSkip(), font:lineSkip())
+					local tiles
+					if game.level then tiles = game.level.map.tiles
+					else tiles = require("engine.Map").tiles end
+					local surf = e:getEntityFinalSurface(tiles, font:lineSkip(), font:lineSkip())
 					if surf then
 						local w, h = surf:getSize()
 						mw = mw + w
@@ -1131,6 +1171,7 @@ end
 function fs.iterate(path, filter)
 	local list = fs.list(path)
 	if filter then
+		if type(filter) == "string" then local fstr = filter filter = function(f) return f:find(fstr) end end
 		for i = #list, 1, -1 do if not filter(list[i]) then
 			table.remove(list, i)
 		end end
@@ -1158,7 +1199,7 @@ function fs.getRealPath(path)
 end
 
 function fs.readAll(file)
-	local f = fs:open(file, "r")
+	local f = fs.open(file, "r")
 	if not f then return nil, "file not found" end
 	local data = f:read(10485760)
 	f:close()
@@ -1925,6 +1966,34 @@ function util.adjacentCoords(x, y, no_diagonals, no_cardinals)
 	return coords
 end
 
+--- Return the closest adjacent coordinate to the source coordinate from the target coordinate (use for gap closer positioning, etc)
+-- @param x x-coordinate of the source tile.
+-- @param y y-coordinate of the source tile.
+-- @param tx x-coordinate of the target tile.
+-- @param ty y-coordinate of the target tile.
+-- @param check_block Boolean for whether to check for block_move
+-- @param extra_check(x,y) Function to run on each grid and return true if that grid is invalid
+-- @return Table containing the x,y coordinate of the closest grid.
+function util.closestAdjacentCoord(x, y, tx, ty, check_block, extra_check)
+	local check_block = check_block or true
+	local coords = util.adjacentCoords(x, y)
+	local valid = {}
+	for _, coord in pairs(coords) do
+		if not (check_block and game.level.map:checkEntity(coord[1], coord[2], engine.Map.TERRAIN, "block_move")) and not (extra_check and extra_check(coord[1], coord[2])) then 
+			valid[#valid+1] = coord
+		end
+	end
+
+	if #valid == 0 then return end
+	local closest = valid[1]
+	for _, coord in pairs(valid) do
+		if core.fov.distance(closest[1], closest[2], tx, ty, true) > core.fov.distance(coord[1], coord[2], tx, ty, true) then
+			closest = coord
+		end
+	end
+
+	return closest
+end
 function util.coordAddDir(x, y, dir)
 	local dx, dy = util.dirToCoord(dir, x, y)
 	return x + dx, y + dy

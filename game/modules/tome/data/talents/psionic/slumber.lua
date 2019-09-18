@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -122,6 +122,7 @@ newTalent{
 	cooldown = 24,
 	psi = 40,
 	not_on_random_boss = true,
+	no_npc_use = true,  -- Currently bugged and can spawn on stuff like player clones
 	tactical = { DISABLE = function(self, t, target) if target and target.game_ender and target:attr("sleep") then return 4 else return 0 end end},
 	direct_hit = true,
 	requires_target = true,

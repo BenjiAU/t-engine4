@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -89,6 +89,10 @@ newEntity{ base="BASE_NPC_ORC_VOR", define_as = "VOR",
 		[Talents.T_METEORIC_CRASH]=1,
 		[Talents.T_ELEMENTAL_SURGE]=1,
 	},
+
+	resolvers.auto_equip_filters("Archmage"),
+	auto_classes={{class="Archmage", start_level=40, level_rate=100}},
+
 	resolvers.sustains_at_birth(),
 
 	on_die = function(self, who)

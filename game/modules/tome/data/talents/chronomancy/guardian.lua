@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -25,15 +25,15 @@ newTalent{
 	points = 5,
 	require = { stat = { mag=function(level) return 12 + level * 6 end }, },
 	mode = "passive",
-	getDamage = function(self, t) return 0 end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
-		return ([[Increases Physical Power by %d, and increases weapon damage by %d%% when using swords, axes, maces, knives, or bows.
+		return ([[Increases weapon damage by %d%% and physical power by 30 when using swords, axes, maces, knives, or bows.
 		You now also use your Magic in place of Strength when equipping weapons and ammo as well as when calculating weapon damage.
 		These bonuses override rather than stack with weapon mastery, dagger mastery, and bow mastery.]]):
-		format(damage, 100*inc)
+		format(100*inc)
 	end,
 }
 

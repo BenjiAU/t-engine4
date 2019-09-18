@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Improves your ghoulish body, increasing Strength and Constitution by %d.
-		Your body also becomes incredibly resilient to damage, you can never take a blow that deals more than %d%% of your maximum life.]])
+		Your body also becomes incredibly resilient to damage; you can never take a blow that deals more than %d%% of your maximum life.]])
 		:format(t.statBonus(self, t), t.getMaxDamage(self, t))
 	end,
 }
@@ -122,7 +122,7 @@ newTalent{
 			tg.radius,
 			5, nil,
 			MapEffect.new{color_br=30, color_bg=180, color_bb=60, effect_shader="shader_images/retch_effect.png"},
-			nil, self:spellFriendlyFire()
+			nil
 		)
 		game.logSeen(self, "%s #YELLOW_GREEN#VOMITS#LAST# on the ground!", self.name:capitalize())
 		game:playSoundNear(self, "talents/cloud")
@@ -131,9 +131,9 @@ newTalent{
 	info = function(self, t)
 		local dam = 10 + self:combatTalentStatDamage(t, "con", 10, 60)
 		return ([[Vomit on the ground around you, healing any undead in the area and damaging anyone else.
-		Lasts %d turns, and deals %d blight damage or heals %d life.
-		Creatures standing in the retch also have %d%% chance to remove a physical effect each turn.
-		Undeads will be stripped from a detrimental effect while others will be stripped from a beneficial effect.]]):format(t.getduration(self, t), damDesc(self, DamageType.BLIGHT, dam), dam * 1.5, t.getPurgeChance(self, t))
+		Lasts %d turns and deals %d blight damage or heals %d life.
+		Creatures standing in the retch also have %d%% chance to remove a physical effect each turn; undeads will be stripped from a detrimental effect while others will be stripped from a beneficial effect.
+		When you stand in your own retch your racial -20%% global speed is cancelled.]]):format(t.getduration(self, t), damDesc(self, DamageType.BLIGHT, dam), dam * 1.5, t.getPurgeChance(self, t))
 	end,
 }
 
@@ -143,7 +143,7 @@ newTalent{
 	require = undeads_req4,
 	points = 5,
 	cooldown = 10,
-	tactical = { ATTACK = {BLIGHT = 5} },  -- Ghouls really like making more ghouls
+	tactical = { ATTACK = {BLIGHT = {disease = 6}} },  -- Ghouls really like making more ghouls
 	range = 1,
 	requires_target = true,
 	is_melee = true,
@@ -196,10 +196,6 @@ newTalent{
 				[Talents.T_STUN]={base=1, every=10, max=3},
 				[Talents.T_ROTTING_DISEASE]={base=1, max=1},  -- The scaling on this is completely insane, TL1 is plenty
 			},
-
-			--log_detail_ai = 2,
-
-			open_door = true,
 
 			blind_immune = 1,
 			see_invisible = 2,

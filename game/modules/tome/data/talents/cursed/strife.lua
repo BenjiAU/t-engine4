@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -61,7 +61,16 @@ newTalent{
 
 		-- attack if adjacent
 		if core.fov.distance(self.x, self.y, x, y) <= 1 then
-			self:attackTarget(target, nil, 1, true)
+			-- We need to alter behavior slightly to accomodate shields since they aren't used in attackTarget
+			local shield, shield_combat = self:hasShield()
+			local weapon = self:hasMHWeapon() and self:hasMHWeapon().combat or self.combat --can do unarmed attack
+			local hit = false
+			if not shield then
+				hit = self:attackTarget(target, nil, 1, true)
+			else
+				hit = self:attackTargetWith(target, weapon, nil, 1)
+				if self:attackTargetWith(target, shield_combat, nil, 1) or hit then hit = true end
+			end
 		end
 
 		return true
@@ -72,7 +81,9 @@ newTalent{
 		local defenseChange = t.getDefenseChange(self, t)
 		local resistPenetration = t.getResistPenetration(self, t)
 		return ([[Turn your attention to a nearby foe, and dominate them with your overwhelming presence. If the target fails to save versus your Mindpower, it will be unable to move for %d turns and vulnerable to attacks. They will lose %d Armour, %d Defense and your attacks will gain %d%% resistance penetration. If the target is adjacent to you, your domination will include a melee attack.
-		Effects will improve with your Willpower.]]):format(duration, -armorChange, -defenseChange, resistPenetration)
+		Effects will improve with your Willpower.
+
+		This talent will also attack with your shield, if you have one equipped.]]):format(duration, -armorChange, -defenseChange, resistPenetration)
 	end,
 }
 
@@ -357,18 +368,19 @@ newTalent{
 	-- end,
 -- }
 
+-- Using shields on a class without strikes to go with the is a notable disadvantage on attacks, so were generous with the bonus here
 newTalent{
 	name = "Repel",
 	type = {"cursed/strife", 4},
 	mode = "sustained",
 	require = cursed_str_req4,
 	points = 5,
-	cooldown = 10,
+	cooldown = 6,
 	no_energy = true,
 	getChance = function(self, t)
-		local chance = self:combatLimit(self:combatTalentStatDamage(t, "str", 12, 36), 50, 0, 0, 26.45, 26.45) -- Limit <50% (56% with shield)
+		local chance = self:combatLimit(self:combatTalentStatDamage(t, "str", 12, 36), 50, 0, 0, 26.45, 26.45) -- Limit <50% (70% with shield)
 		if self:hasShield() then
-			chance = chance + 6
+			chance = chance + 20
 		end
 		return chance
 	end,
@@ -407,6 +419,6 @@ newTalent{
 		local chance = t.getChance(self, t)
 		return ([[Rather than hide from the onslaught, you face down every threat. While active you have a %d%% chance of repelling a melee attack. The recklessness of your defense brings you bad luck (Luck -3).
 		Cleave, Repel and Surge cannot be active simultaneously, and activating one will place the others in cooldown.
-		Repel chance increases with your Strength, and when equipped with a shield.]]):format(chance)
+		Repel chance increases with your Strength and by 20%% when equipped with a shield.]]):format(chance)
 	end,
 }

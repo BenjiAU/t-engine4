@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -63,43 +63,47 @@ newBirthDescriptor{
 	stats = { str=4, mag=4, dex=1, },
 	talents_types = {
 		["technique/combat-training"]={true, 0.3},
-		["cunning/survival"]={false, 0.1},
-		["corruption/sanguisuge"]={true, 0.3},
+		["cunning/survival"]={false, 0.0},
+		["corruption/sanguisuge"]={true, 0.0},
 		["corruption/reaving-combat"]={true, 0.3},
 		["corruption/scourge"]={true, 0.3},
-		["corruption/plague"]={true, 0.3},
+		["corruption/plague"]={true, 0.0},
 		["corruption/hexes"]={false, 0.3},
 		["corruption/curses"]={false, 0.3},
 		["corruption/bone"]={true, 0.3},
 		["corruption/torment"]={true, 0.3},
-		["corruption/vim"]={true, 0.3},
+		["corruption/vim"]={true, 0.0},
 		["corruption/rot"]={false, 0.3},
 	},
 	talents = {
 		[ActorTalents.T_CORRUPTED_STRENGTH] = 1,
 		[ActorTalents.T_WEAPON_COMBAT] = 1,
+		[ActorTalents.T_WEAPONS_MASTERY] = 1,
 		[ActorTalents.T_DRAIN] = 1,
-		[ActorTalents.T_REND] = 1,
+		[ActorTalents.T_ARMOUR_TRAINING] = 1,
 	},
 	copy = {
 		resolvers.auto_equip_filters{
-			MAINHAND = {type="weapon", special=function(e, filter) -- allow any weapon that doesn't forbid OFFHAND
-				if e.slot_forbid == "OFFHAND" then
-					local who = filter._equipping_entity
-					return who and not who:slotForbidCheck(e, who.INVEN_MAINHAND)
-				end
-				return true
+			MAINHAND = {type="weapon", not_properties={"twohanded"}, special=function(e, filter) -- Allow standard 1H strength weapons and 1H staves, not currently working with ogre
+				local who = filter._equipping_entity
+				if who and e.subtype and (e.subtype == "staff" or e.subtype == "waraxe" or e.subtype == "longsword" or e.subtype == "mace") then return true end
 			end},
-			OFFHAND = {type="weapon", not_properties={"twohanded"}}
+			OFFHAND = {type="weapon", not_properties={"twohanded"}, special=function(e, filter)
+				local who = filter._equipping_entity
+				if who then
+					local mh = who:getInven(who.INVEN_MAINHAND) mh = mh and mh[1]
+					if mh and (not mh.slot_forbid or not who:slotForbidCheck(e, who.INVEN_MAINHAND)) and e.subtype and (e.subtype == "staff" or e.subtype == "waraxe" or e.subtype == "longsword" or e.subtype == "mace") then return true end
+				end
+			end},
 		},
 		resolvers.equipbirth{ id=true,
 			{type="weapon", subtype="waraxe", name="iron waraxe", autoreq=true, ego_chance=-1000},
 			{type="weapon", subtype="waraxe", name="iron waraxe", autoreq=true, ego_chance=-1000},
-			{type="armor", subtype="light", name="rough leather armour", autoreq=true, ego_chance=-1000}
+			{type="armor", subtype="heavy", name="iron mail armour", autoreq=true, ego_chance=-1000}
 		},
 	},
 	copy_add = {
-		life_rating = 2,
+		life_rating = 1,
 	},
 }
 
@@ -126,7 +130,7 @@ newBirthDescriptor{
 		end,
 	},
 	talents_types = {
-		["cunning/survival"]={false, 0},
+		["cunning/survival"]={false, 0.0},
 		["corruption/sanguisuge"]={true, 0.3},
 		["corruption/hexes"]={true, 0.3},
 		["corruption/curses"]={true, 0.3},
@@ -136,7 +140,7 @@ newBirthDescriptor{
 		["corruption/blood"]={true, 0.3},
 		["corruption/vim"]={true, 0.3},
 		["corruption/blight"]={true, 0.3},
-		["corruption/torment"]={false, 0.3},
+		["corruption/torment"]={true, 0.3},
 	},
 	talents = {
 		[ActorTalents.T_DRAIN] = 1,

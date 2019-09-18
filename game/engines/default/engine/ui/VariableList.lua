@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -32,7 +32,9 @@ function _M:init(t)
 	self.max_h = t.max_height
 	self.fct = t.fct
 	self.select = t.select
+	self.direct_draw = t.direct_draw
 	self.scrollbar = t.scrollbar
+	self.all_clicks = t.all_clicks
 	self.min_items_shown = t.min_items_shown or 3
 	self.display_prop = t.display_prop or "name"
 
@@ -58,22 +60,28 @@ function _M:generate()
 	local sh = 0
 	local minh = 0
 	for i, item in ipairs(self.list) do
-		local color = item.color or {255,255,255}
-		local width = fw - self.frame_sel.b4.w - self.frame_sel.b6.w
+		local ifh = 0
+		if not self.direct_draw then
+			local color = item.color or {255,255,255}
+			local width = fw - self.frame_sel.b4.w - self.frame_sel.b6.w
 
-		local text = self.font:draw(item[self.display_prop], width, color[1], color[2], color[3])
-		local fh = fh * #text + self.frame_sel.b8.w / 3 * 2
+			local text = self.font:draw(item[self.display_prop], width, color[1], color[2], color[3])
+			ifh = fh * #text + self.frame_sel.b8.w / 3 * 2
 
-		local texs = {}
-		for z, tex in ipairs(text) do
-			texs[z] = {t=tex._tex, tw=tex._tex_w, th = tex._tex_h, w=tex.w, h=tex.h, y = (z - 1) * self.font_h + self.frame_sel.b8.w / 3}
+			local texs = {}
+			for z, tex in ipairs(text) do
+				texs[z] = {t=tex._tex, tw=tex._tex_w, th = tex._tex_h, w=tex.w, h=tex.h, y = (z - 1) * self.font_h + self.frame_sel.b8.w / 3}
+			end
+			item.start_h = sh
+			item.fh = ifh
+			item._texs = texs
+		else
+			ifh = self.direct_draw(item, 0, sh, true)
+			item.start_h = sh
+			item.fh = ifh
 		end
 
-		item.start_h = sh
-		item.fh = fh
-		item._texs = texs
-
-		sh = sh + fh
+		sh = sh + ifh
 		if i <= self.min_items_shown then minh = sh end
 	end
 	self.h = math.max(minh, math.min(self.max_h or 1000000, sh))
@@ -81,7 +89,7 @@ function _M:generate()
 
 	self.scroll_inertia = 0
 	self.scroll = 0
-	if self.scrollbar then self.scrollbar = Slider.new{size=self.h, max=sh} end
+	if self.scrollbar then self.scrollbar = Slider.new{size=self.h, max=sh, ui=self.ui} end
 
 	self.mouse:registerZone(0, 0, self.w, self.h, function(button, x, y, xrel, yrel, bx, by, event)
 		self.last_input_was_keyboard = false
@@ -96,7 +104,7 @@ function _M:generate()
 				if self.sel and self.list[self.sel] then self.list[self.sel].focus_decay = self.focus_decay_max end
 				self.sel = i
 				self:onSelect()
-				if button == "left" and event == "button" then self:onUse() end
+				if (self.all_clicks or button == "left") and event == "button" then self:onUse(button, event) end
 				break
 			end
 		end
@@ -104,7 +112,7 @@ function _M:generate()
 
 	-- Add UI controls
 	self.key:addBinds{
-		ACCEPT = function() self:onUse() end,
+		ACCEPT = function() self:onUse("left", "key") end,
 		MOVE_UP = function()
 			if self.sel and self.list[self.sel] then self.list[self.sel].focus_decay = self.focus_decay_max end
 			self.sel = util.boundWrap(self.sel - 1, 1, self.max) self:onSelect()
@@ -116,12 +124,17 @@ function _M:generate()
 	}
 end
 
-function _M:onUse()
+function _M:setList(list)
+	self.list = list
+	self:generate()
+end
+
+function _M:onUse(button, event)
 	local item = self.list[self.sel]
 	if not item then return end
 	self:sound("button")
-	if item.fct then item:fct()
-	else self.fct(item, self.sel) end
+	if item.fct then item:fct(button, event)
+	else self.fct(item, self.sel, button, event) end
 end
 
 function _M:onSelect()
@@ -149,6 +162,7 @@ end
 
 function _M:display(x, y, nb_keyframes, screen_x, screen_y)
 	local by = y
+	local display_y = 0
 	core.display.glScissor(true, screen_x, screen_y, self.w, self.h)
 
 	if self.scrollbar then
@@ -183,11 +197,18 @@ function _M:display(x, y, nb_keyframes, screen_x, screen_y)
 				if item.focus_decay <= 0 then item.focus_decay = nil end
 			end
 		end
-		for z, tex in pairs(item._texs) do
-			if self.text_shadow then self:textureToScreen(tex, x+1 + self.frame_sel.b4.w, y+1 + tex.y, 0, 0, 0, self.text_shadow) end
-			self:textureToScreen(tex, x + self.frame_sel.b4.w, y + tex.y)
+		if not self.direct_draw then
+			for z, tex in pairs(item._texs) do
+				if self.text_shadow then self:textureToScreen(tex, x+1 + self.frame_sel.b4.w, y+1 + tex.y, 0, 0, 0, self.text_shadow) end
+				self:textureToScreen(tex, x + self.frame_sel.b4.w, y + tex.y)
+			end
+		else
+			self.direct_draw(item, x + self.frame_sel.b4.w, y)
 		end
+		item.last_display_x = screen_x
+		item.last_display_y = screen_y + display_y
 		y = y + item.fh
+		display_y = display_y + item.fh
 	end
 
 	core.display.glScissor(false)

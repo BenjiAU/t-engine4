@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -96,13 +96,13 @@ newTalent{
 	mode = "passive",
 	require = spells_req2,
 	points = 5,
-	getDamage = function(self, t) return 0 end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
-		return ([[Increases Physical Power by %d and increases weapon damage by %d%% when using staves.]]):
-		format(damage, 100 * inc)
+		return ([[Increases weapon damage by %d%% and physical power by 30 when using staves.]]):
+		format(100 * inc)
 	end,
 }
 

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ newEntity{
 	rarity = 9,
 	wielder={combat = {accuracy_effect = "axe", physspeed = 0},},
 	desc = [[Light gloves which do not seriously hinder finger movements, while still protecting the hands somewhat.]],
-	randart_able = "/data/general/objects/random-artifacts/gloves.lua",
+	randart_able = "/data/general/objects/random-artifacts/generic.lua",
 	egos = "/data/general/objects/egos/gloves.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 }
 

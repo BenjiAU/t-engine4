@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ return { blend_mode=core.particles.BLEND_SHINY, generator = function()
 		r = rng.float(0.8, 1),   rv = 0, ra = 0,
 		g = rng.float(0.4, 0.7),   gv = 0, ga = 0,
 		b = rng.float(0, 1),      bv = 0, ba = 0,
-		a = rng.float(0.2, 0.8),    av = 0, aa = 0,
+		a = rng.float(0.1, 0.3),    av = 0, aa = 0,
 	}
 end, },
 function(self)

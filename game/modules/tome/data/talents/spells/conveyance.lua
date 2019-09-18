@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -61,8 +61,8 @@ newTalent{
 	require = spells_req1,
 	points = 5,
 	random_ego = "utility",
-	mana = function(self, t) return game.zone and game.zone.force_controlled_teleport and 1 or 10 end,
-	cooldown = function(self, t) return game.zone and game.zone.force_controlled_teleport and 3 or 8 end,
+	mana = function(self, t) return game.zone and game.zone.force_controlled_teleport and 1 or 30 end,
+	cooldown = function(self, t) return game.zone and game.zone.force_controlled_teleport and 3 or 12 end,
 	tactical = teleport_tactical,
 	getRange = function(self, t) return self:combatLimit(self:combatTalentSpellDamage(t, 10, 15), 40, 4, 0, 13.4, 9.4) end, -- Limit to range 40
 	range = function(self, t) return self:getTalentLevel(t) >= 4 and 10 or 0 end, -- for targeting enemies
@@ -294,7 +294,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		local chance = t.getTransferChange(self, t)
-		local maxabsorb = t.getMaxAbsorb(self, t)
+		local maxabsorb = t.getMaxAbsorb(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100
 		local duration = t.getDuration(self, t)
 		return ([[This intricate spell erects a space distortion around the caster that is linked to another distortion, placed around a target.
 		Any time the caster should take damage, there is a %d%% chance that it will instead be warped by the shield and hit the designated target.

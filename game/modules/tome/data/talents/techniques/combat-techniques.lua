@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -45,8 +45,8 @@ newTalent{
 	end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
-		local x, y, target = self:getTarget(tg)
-		if not self:canProject(tg, x, y) then return nil end
+		local x, y, target = self:getTargetLimited(tg)
+		if not target then game.logPlayer(self, "You can only rush to a creature.") return nil end
 		local block_actor = function(_, bx, by) return game.level.map:checkEntity(bx, by, Map.TERRAIN, "block_move", self) end
 		local linestep = self:lineFOV(x, y, block_actor)
 
@@ -130,11 +130,11 @@ newTalent{
 	points = 5,
 	random_ego = "attack",
 	cooldown = 25,
-	stamina = 10,
+	stamina = 25,
 	require = techs_strdex_req3,
 	no_energy = true,
 	tactical = { BUFF = 2 },
-	getDuration = function(self, t) return math.floor(self:combatTalentLimit(t, 25, 2, 6)) end, -- Limit < 25
+	getDuration = function(self, t) return math.floor(self:combatTalentLimit(t, 7, 2, 5)) end, -- Limit < 25
 	getAtk = function(self, t) return self:combatTalentScale(t, 40, 100, 0.75) end,
 	action = function(self, t)
 		self:setEffect(self.EFF_ATTACK, t.getDuration(self, t), {power = t.getAtk(self, t)})

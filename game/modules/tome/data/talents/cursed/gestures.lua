@@ -1,5 +1,5 @@
 -- ToME - Tales of Middle-Earth
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -200,7 +200,7 @@ newTalent{
 		local bonusCritical = t.getBonusCritical(self, t)
 		return ([[Use a gesture of pain in place of a normal attack to assault the minds of your enemies, inflicting between %0.1f and %0.1f mind damage. If the attack succeeds, there is a %d%% chance to stun your opponent for 3 turns.
 		This strike replaces your melee physical and checks your Mindpower against your opponent's Mental Save, and is thus not affected by your Accuracy or the enemy's Defense. The base damage (doubled) and the critical chance of any Mindstars equipped are added in when this attack is performed.
-		This talent requires two free or mindstar-equipped hands and has a 25%% chance to inflict cross tier effects which can be critical hits. The damage will increase with your Mindpower.
+		This talent requires two free or mindstar-equipped hands and has a 25%% chance to inflict brainlock, which can critically hit. The damage will increase with your Mindpower.
 		If attacking with two mindstars the attack will trigger their proc effects, if any.
 		Mindstars bonuses from damage and physical criticals: (+%d damage, +%d critical chance)]])
 		:format(damDesc(self, DamageType.MIND, baseDamage * 0.5), damDesc(self, DamageType.MIND, baseDamage), stunChance, bonusDamage, bonusCritical)
@@ -258,7 +258,6 @@ newTalent{
 	type = {"cursed/gestures", 4},
 	require = cursed_cun_req4,
 	mode = "passive",
-	cooldown = 10,
 	points = 5,
 	getGuardPercent = function(self, t) return self:combatTalentLimit(t, 80, 20, 45) end,
 	-- Damage reduction handled in _M:attackTargetWith function in mod.class.interface.Combat.lua

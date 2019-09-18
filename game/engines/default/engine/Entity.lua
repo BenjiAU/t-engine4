@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -1192,6 +1192,7 @@ function _M:loadList(file, no_default, res, mod, loaded)
 
 			local e = newenv.class.new(t, no_default)
 			if type(mod) == "function" then mod(e) end
+			if _M.alter_entity_load then _M.alter_entity_load(e) end
 
 			res[#res+1] = e
 			if t.define_as then res[t.define_as] = e end
@@ -1200,10 +1201,15 @@ function _M:loadList(file, no_default, res, mod, loaded)
 		importEntity = function(t)
 			local e = t:cloneFull()
 			if mod then mod(e) end
+			if _M.alter_entity_load then _M.alter_entity_load(e) end
 			res[#res+1] = e
 			if t.define_as then res[t.define_as] = e end
 		end,
 		load = function(f, new_mod)
+			self:loadList(f, no_default, res, new_mod or mod, loaded)
+		end,
+		loadIfNot = function(f, new_mod)
+			if loaded[f] then return end
 			self:loadList(f, no_default, res, new_mod or mod, loaded)
 		end,
 		loadList = function(f, new_mod, list, loaded)

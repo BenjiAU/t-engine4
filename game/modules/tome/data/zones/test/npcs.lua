@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -17,5 +17,4 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
---load("/data/zones/town-angolwen/npcs.lua", rarity(0))
---load("/data/zones/golem-graveyard/npcs.lua", rarity(0))
+load("/data/general/npcs/all.lua")

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -63,8 +63,6 @@ newBirthDescriptor{
 	power_source = {technique=true},
 	stats = { str=5, con=3, dex=1, },
 	talents_types = {
-		["technique/archery-training"]={false, 0.1},
-		["technique/shield-defense"]={false, -0.1},
 		["technique/2hweapon-assault"]={true, 0.3},
 		["technique/strength-of-the-berserker"]={true, 0.3},
 		["technique/combat-techniques-active"]={true, 0.3},
@@ -73,14 +71,15 @@ newBirthDescriptor{
 		["technique/conditioning"]={true, 0.3},
 		["technique/superiority"]={false, 0.3},
 		["technique/warcries"]={false, 0.3},
-		["technique/bloodthirst"]={false, 0.2},
-		["cunning/survival"]={true, 0},
-		["cunning/dirty"]={false, 0},
+		["technique/bloodthirst"]={false, 0.3},
+		["cunning/survival"]={true, 0.0},
+		["cunning/dirty"]={false, 0.0},
 	},
 	talents = {
 		[ActorTalents.T_WARSHOUT_BERSERKER] = 1,
 		[ActorTalents.T_STUNNING_BLOW_ASSAULT] = 1,
 		[ActorTalents.T_WEAPON_COMBAT] = 1,
+		[ActorTalents.T_WEAPONS_MASTERY] = 1,
 		[ActorTalents.T_ARMOUR_TRAINING] = 1,
 	},
 	copy = {
@@ -131,10 +130,8 @@ newBirthDescriptor{
 	power_source = {technique=true},
 	stats = { str=5, con=2, dex=2, },
 	talents_types = {
-		["technique/archery-training"]={false, 0.1},
 		["technique/shield-offense"]={true, 0.3},
 		["technique/shield-defense"]={true, 0.3},
-		["technique/2hweapon-offense"]={false, -0.1},
 		["technique/combat-techniques-active"]={true, 0.3},
 		["technique/combat-techniques-passive"]={true, 0.3},
 		["technique/combat-training"]={true, 0.3},
@@ -142,8 +139,8 @@ newBirthDescriptor{
 		["technique/superiority"]={false, 0.3},
 		["technique/warcries"]={false, 0.3},
 		["technique/battle-tactics"]={false, 0.3},
-		["cunning/survival"]={true, 0},
-		["cunning/dirty"]={false, 0},
+		["cunning/survival"]={true, 0.0},
+		["cunning/dirty"]={false, 0.0},
 	},
 	talents = {
 		[ActorTalents.T_SHIELD_PUMMEL] = 1,
@@ -195,6 +192,9 @@ newBirthDescriptor{
 		"#LIGHT_BLUE# * +0 Magic, +0 Willpower, +2 Cunning",
 		"#GOLD#Life per level:#LIGHT_BLUE# +0",
 	},
+	unlockable_talents_types = {
+		["cunning/poisons"]={false, 0.0, "rogue_poisons"},
+	},
 	power_source = {technique=true, technique_ranged=true},
 	stats = { dex=5, str=2, cun=2, },
 	talents_types = {
@@ -202,16 +202,16 @@ newBirthDescriptor{
 		["technique/archery-utility"]={true, 0.3},
 		["technique/marksmanship"]={true, 0.3},
 		["technique/reflexes"]={true, 0.3},
-		["technique/combat-techniques-active"]={true, 0},
-		["technique/combat-techniques-passive"]={true, 0},
-		["technique/munitions"]={false, 0.3},
+		["technique/combat-techniques-active"]={true, 0.0},
+		["technique/combat-techniques-passive"]={true, 0.0},
+		--["technique/munitions"]={false, 0.3},  Disabled pending major revision
 		["technique/sniper"]={false, 0.3},
 		["technique/agility"]={false, 0.3},
 		["technique/combat-training"]={true, 0.3},
-		["cunning/trapping"]={false, 0.2},
-		["cunning/survival"]={true, 0},
-		["technique/mobility"]={true, 0.2},
-		["technique/conditioning"]={false, 0},
+		["cunning/trapping"]={false, 0.3},
+		["cunning/survival"]={true, 0.0},
+		["technique/mobility"]={true, 0.0},
+		["technique/conditioning"]={false, 0.0},
 	},
 	talents = {
 		[ActorTalents.T_MASTER_MARKSMAN] = 1,
@@ -271,26 +271,25 @@ newBirthDescriptor{
 	power_source = {technique=true, arcane=true},
 	stats = { mag=3, str=3, cun=3},
 	talents_types = {
-		["spell/fire"]={true, 0.2},
-		["spell/air"]={true, 0.2},
-		["spell/earth"]={true, 0.2},
-		["spell/conveyance"]={true, 0.2},
-		["spell/aegis"]={true, 0.1},
-		["spell/enhancement"]={true, 0.2},
-		--["technique/battle-tactics"]={false, 0.2},
-		["technique/superiority"]={false, 0.2},
-		["technique/combat-techniques-active"]={true, 0.1},
-		["technique/combat-techniques-passive"]={false, 0.1},
-		["technique/combat-training"]={true, 0.1},
+		["spell/fire"]={true, 0.3},
+		["spell/air"]={true, 0.3},
+		["spell/earth"]={true, 0.3},
+		["spell/conveyance"]={true, 0.0},
+		["spell/aegis"]={true, 0.0},
+		["spell/enhancement"]={true, 0.3},
+		["technique/superiority"]={false, 0.3},
+		["technique/combat-techniques-active"]={true, 0.0},
+		["technique/combat-techniques-passive"]={false, 0.0},
+		["technique/combat-training"]={true, 0.0},
 		["technique/magical-combat"]={true, 0.3},
-		["technique/shield-offense"]={false, 0},
-		["technique/2hweapon-assault"]={false, 0},
-		["technique/dualweapon-attack"]={false, 0},
-		["cunning/survival"]={true, 0.1},
-		["cunning/dirty"]={true, 0.2},
+		["technique/shield-offense"]={false, 0.0},
+		["technique/2hweapon-assault"]={false, 0.0},
+		["technique/dualweapon-attack"]={false, 0.0},
+		["cunning/survival"]={true, 0.0},
+		["cunning/dirty"]={true, 0.3},
 	},
 	unlockable_talents_types = {
-		["spell/stone"]={false, 0.1, "mage_geomancer"},
+		["spell/stone"]={false, 0.3, "mage_geomancer"},
 	},
 	birth_example_particles = {
 		function(actor) if core.shader.active(4) then
@@ -312,12 +311,22 @@ newBirthDescriptor{
 	},
 	copy = {
 		max_life = 100,
---		talent_cd_reduction={[ActorTalents.T_FLAME]=-3, [ActorTalents.T_LIGHTNING]=-3, [ActorTalents.T_EARTHEN_MISSILES]=-3, },
+		resolvers.auto_equip_filters{
+			MAINHAND = {type="weapon", properties={"twohanded"}},
+			OFFHAND = {special=function(e, filter) -- only allow if there is already a weapon in MAINHAND
+				local who = filter._equipping_entity
+				if who then
+					local mh = who:getInven(who.INVEN_MAINHAND) mh = mh and mh[1]
+					if mh and (not mh.slot_forbid or not who:slotForbidCheck(e, who.INVEN_MAINHAND)) then return true end
+				end
+				return false
+			end},
+		},		
 		resolvers.equipbirth{ id=true,
 			{type="weapon", subtype="greatsword", name="iron greatsword", autoreq=true, ego_chance=-1000, ego_chance=-1000},
 			{type="armor", subtype="light", name="rough leather armour", autoreq=true, ego_chance=-1000, ego_chance=-1000},
 		},
-		resolvers.inscription("RUNE:_MANASURGE", {cooldown=25, dur=10, mana=620}),
+		resolvers.inscription("RUNE:_MANASURGE", {cooldown=25, dur=10, mana=620}, 3),
 	},
 	copy_add = {
 		life_rating = 2,
@@ -344,26 +353,26 @@ newBirthDescriptor{
 	power_source = {technique=true},
 	stats = { str=3, dex=3, cun=3},
 	talents_types = {
-		["cunning/dirty"]={false, 0},
+		["cunning/dirty"]={false, 0.0},
 		["cunning/tactical"]={true, 0.3},
-		["cunning/survival"]={true, 0},
-		["technique/combat-training"]={true, 0.1},
-		["technique/combat-techniques-active"]={true, 0.1},
-		["technique/combat-techniques-passive"]={true, 0.1},
+		["cunning/survival"]={true, 0.0},
+		["technique/combat-training"]={true, 0.0},
+		["technique/combat-techniques-active"]={true, 0.3},
+		["technique/combat-techniques-passive"]={true, 0.0},
 		["technique/pugilism"]={true, 0.3},
 		["technique/finishing-moves"]={true, 0.3},
 		["technique/grappling"]={false, 0.3},
 		["technique/unarmed-discipline"]={false, 0.3},
 		["technique/unarmed-training"]={true, 0.3},
-		["technique/conditioning"]={true, 0.1},
-		["technique/mobility"]={true, 0.2},
+		["technique/conditioning"]={true, 0.3},
+		["technique/mobility"]={true, 0.3},
 	},
 	talents = {
 		[ActorTalents.T_UPPERCUT] = 1,
 		[ActorTalents.T_DOUBLE_STRIKE] = 1,
 		[ActorTalents.T_WEAPON_COMBAT] = 1,
 		[ActorTalents.T_ARMOUR_TRAINING] = 1,
-		[ActorTalents.T_UNARMED_MASTERY] = 1, -- early game is absolutely stupid without this
+		[ActorTalents.T_UNARMED_MASTERY] = 1,
 	},
 	copy = {
 		resolvers.auto_equip_filters{-- will not try to equip weapons

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ local function getShieldStrength(self, t)
 end
 
 local function getEfficiency(self, t)
-	return self:combatTalentLimit(t, 100, 20, 55)/100 -- Limit to <100%
+	return 0.4
 end
 
 local function maxPsiAbsorb(self, t) -- Max psi/turn to prevent runaway psi gains (solipsist randbosses)
@@ -137,6 +137,9 @@ newTalent{
 	name = "Kinetic Shield",
 	type = {"psionic/absorption", 1},
 	require = psi_cun_req1,
+	rnd_boss_restrict = function(self, t, data) -- Flat damage reduction can be obnoxious early game
+		return data.level < 15
+	end,
 	mode = "sustained", no_sustain_autoreset = true,
 	points = 5,
 	sustain_psi = 10,
@@ -197,6 +200,9 @@ newTalent{
 	name = "Thermal Shield",
 	type = {"psionic/absorption", 1},
 	require = psi_cun_req2,
+	rnd_boss_restrict = function(self, t, data) -- Flat damage reduction can be obnoxious early game
+		return data.level < 15
+	end,
 	mode = "sustained", no_sustain_autoreset = true,
 	points = 5,
 	sustain_psi = 10,
@@ -259,6 +265,9 @@ newTalent{
 	name = "Charged Shield",
 	type = {"psionic/absorption", 1},
 	require = psi_cun_req3,
+	rnd_boss_restrict = function(self, t, data) -- Flat damage reduction can be obnoxious early game
+		return data.level < 15
+	end,
 	mode = "sustained", no_sustain_autoreset = true,
 	points = 5,
 	sustain_psi = 10,
@@ -363,7 +372,7 @@ newTalent{
 	end,
 	callbackOnTakeDamage = function(self, t, src, x, y, damtype, dam, tmp)
 		local ff = self:isTalentActive(t.id)
-		if not ff then return dam end
+		if not ff then return {dam=dam} end
 		local total_dam = dam
 		local absorbable_dam = t.getResist(self,t) / 100 * total_dam
 		local guaranteed_dam = total_dam - absorbable_dam

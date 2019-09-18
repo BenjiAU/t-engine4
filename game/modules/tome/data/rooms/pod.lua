@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 return function(gen, id)
 	local w = rng.table{4,6,8,10}
-	local h = h
+	local h = w
 	local function make_pod(self, x, y, is_lit)
 		gen:makePod(x + w / 2, y + h / 2, w, id)
 	end

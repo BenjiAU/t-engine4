@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -17,45 +17,14 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
---[[
-Torques
-*psionic shield
-*psychoportation
-*clear mind
-*mind wave
-]]
-
--- This is too important to nerf, but it should be noted that all charm powers have to be balanced against its existence, same as the teleport amulet
--- In order for non-teleport charms to be worth wasting the charm CD on they need to be very good, because the opportunity cost is *not just the item slot*
 newEntity{
-	name = " of psychoportation", addon=true, instant_resolve=true,
-	keywords = {psyport=true},
-	level_range = {15, 50},
-	rarity = 10,
-
-	charm_power_def = {add=15, max=60, floor=true},
-	resolvers.charm("teleport randomly (rad %d)", 30,
-		function(self, who)
-			game.level.map:particleEmitter(who.x, who.y, 1, "teleport")
-			who:teleportRandom(who.x, who.y, self:getCharmPower(who))
-			game.level.map:particleEmitter(who.x, who.y, 1, "teleport")
-			game.logSeen(who, "%s uses %s!", who.name:capitalize(), self:getName{no_add_name=true, do_color=true})
-			return {id=true, used=true}
-		end,
-		"T_GLOBAL_CD",
-		{no_npc_use = true} -- This wouldn't be the least bit annoying.....
-	),
-}
-
-newEntity{
-	name = " of kinetic psionic shield", addon=true, instant_resolve=true,
-	keywords = {kinshield=true},
+	name = " of psionic shield", addon=true, instant_resolve=true,
+	keywords = {psionicshield=true},
 	level_range = {1, 50},
-	rarity = 7,
-
+	rarity = 15,
 	charm_power_def = {add=3, max=200, floor=true},
-	resolvers.charm("setup a psionic shield, reducing all physical, nature, temporal and acid damage by %d for 7 turns", 20, function(self, who)
-		who:setEffect(who.EFF_PSIONIC_SHIELD, 7, {kind="kinetic", power=self:getCharmPower(who)})
+	resolvers.charm("setup a psionic shield, reducing all damage taken %d for 5 turns", 25, function(self, who)
+		who:setEffect(who.EFF_PSIONIC_SHIELD, 5, {kind="all", power=self:getCharmPower(who)})
 		game.logSeen(who, "%s uses %s!", who.name:capitalize(), self:getName{no_add_name=true, do_color=true})
 		return {id=true, used=true}
 	end,
@@ -67,115 +36,115 @@ newEntity{
 	tactical = { DEFEND = 2 }}),
 }
 
-
-newEntity{
-	name = " of thermal psionic shield", addon=true, instant_resolve=true,
-	keywords = {thermshield=true},
-	level_range = {1, 50},
-	rarity = 7,
-
-	charm_power_def = {add=3, max=200, floor=true},
-	resolvers.charm("setup a psionic shield, reducing all fire, cold, light, and arcane damage by %d for 7 turns", 20, function(self, who)
-		who:setEffect(who.EFF_PSIONIC_SHIELD, 7, {kind="thermal", power=self:getCharmPower(who)})
-		game.logSeen(who, "%s uses %s!", who.name:capitalize(), self:getName{no_add_name=true, do_color=true})
-		return {id=true, used=true}
-	end,
-	"T_GLOBAL_CD",
-	{on_pre_use = function(self, who)
-		local shield = who:hasEffect(who.EFF_PSIONIC_SHIELD)
-		return not (shield and shield.kind == "thermal")
-	end,
-	tactical = { DEFEND = 2 }}),
-}
-
-newEntity{
-	name = " of charged psionic shield", addon=true, instant_resolve=true,
-	keywords = {chargedshield=true},
-	level_range = {10, 50},
-	rarity = 8,
-
-	charm_power_def = {add=3, max=200, floor=true},
-	resolvers.charm("setup a psionic shield, reducing all lightning, blight, mind, and darkness damage by %d for 7 turns", 20, function(self, who)
-		who:setEffect(who.EFF_PSIONIC_SHIELD, 7, {kind="charged", power=self:getCharmPower(who)})
-		game.logSeen(who, "%s uses %s!", who.name:capitalize(), self:getName{no_add_name=true, do_color=true})
-		return {id=true, used=true}
-	end,
-	"T_GLOBAL_CD",
-	{on_pre_use = function(self, who)
-		local shield = who:hasEffect(who.EFF_PSIONIC_SHIELD)
-		return not (shield and shield.kind == "charged")
-	end,
-	tactical = { DEFEND = 2 }}),
-}
-
+-- Scaling on this is pretty dumb
 newEntity{
 	name = " of clear mind", addon=true, instant_resolve=true,
 	keywords = {clearmind=true},
-	level_range = {15, 50},
-	rarity = 12,
-
+	level_range = {1, 50},
+	rarity = 20,
 	charm_power_def = {add=1, max=5, floor=true},
-	resolvers.charm("absorb and nullify at most %d detrimental mental status effects in the next 10 turns", 10, function(self, who)
-		who:setEffect(who.EFF_CLEAR_MIND, 10, {power=self:getCharmPower(who)})
+	resolvers.charm("remove 1 confusion or silence effect and prevent the application of %d detrimental mental effects for 5 turns", 40, function(self, who)
+		who:removeEffectsFilter(function(e) return (e.subtype.confusion or e.subtype.silence) end, 1)
+		who:setEffect(who.EFF_CLEAR_MIND, 5, {power=self:getCharmPower(who)})
 		game.logSeen(who, "%s uses %s!", who.name:capitalize(), self:getName{no_add_name=true, do_color=true})
 		return {id=true, used=true}
 	end,
 	"T_GLOBAL_CD",
-	{tactical = {CURE = function(who, t, aitarget) -- if we're debuffed, try to prevent more
-			if who:hasEffect(who.EFF_CLEAR_MIND) then return 0 end
+	{tactical = {CURE = function(who, t, aitarget)
 			local nb = 0
 			for eff_id, p in pairs(who.tmp) do
 				local e = who.tempeffect_def[eff_id]
-				if e.status == "detrimental" and e.type == "mental" then
+				if e.status == "detrimental" and (e.subtype.confusion or e.subtype.silence) then
 					nb = nb + 1
 				end
 			end
-			return math.ceil(nb/2)
+			return nb
 		end,
-		DEFEND = function(who, t, aitarget) -- if the target can debuff us with mental abilities, prepare
-			if not aitarget or who:hasEffect(who.EFF_CLEAR_MIND) then return 0 end
-			local count, nb = 0, 0
-			for t_id, p in pairs(aitarget.talents) do
-				count = count + 1
-				local tal = aitarget.talents_def[t_id]
-				if tal.is_mind then
-					if type(tal.tactical) == "table" and tal.tactical.disable then
-						nb = nb + 1
-					end
+	}}
+	),
+}
+
+newEntity{
+	name = " of gale force", addon=true, instant_resolve=true,
+	keywords = {galeforce=true},
+	level_range = {1, 50},
+	rarity = 10,
+	charm_power_def = {add=0, max=800, floor=true},
+	resolvers.charm(
+		function(self, who)
+			local dam = who:damDesc(engine.DamageType.Mind, self.use_power.damage(self, who))
+			return ("project a gust of wind in a cone knocking enemies back %d spaces and dealing %d damage"):format(self.use_power.knockback(self, who), dam)
+		end,
+		15,
+		function(self, who)
+			local tg = self.use_power.target(self, who)
+			local x, y = who:getTarget(tg)
+			if not x or not y then return nil end
+			local dam = who:mindCrit(self.use_power.damage(self, who))
+			local kb = self.use_power.knockback(self, who)
+
+			game.logSeen(who, "%s uses %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name=true, do_color=true})
+			local DamageType = require "engine.DamageType"
+			local state = {}
+			game.level.map:particleEmitter(who.x, who.y, tg.radius, "mudflow", {radius=tg.radius, tx=x-who.x, ty=y-who.y})
+			who:project(tg, x, y, function(tx, ty)
+				local target = game.level.map(tx, ty, engine.Map.ACTOR)
+				if not target or target == who or state[target] then return end
+				state[target] = true
+				local DamageType = require "engine.DamageType"
+				DamageType:get(DamageType.PHYSICAL).projector(who, tx, ty, DamageType.PHYSICAL, dam)
+				if target:canBe("knockback") then
+					target:knockback(who.x, who.y, kb)		
 				end
-			end
-			return math.min(5*(nb/count)^.5, 5)
-		end}}
+			end, dam)
+			return {id=true, used=true}
+		end,
+		"T_GLOBAL_CD",
+		{
+		damage = function(self, who) return self:getCharmPower(who) end,
+		knockback = function(self, who) return math.floor(self:getCharmPower(who) / 50) + 5 end,
+		target = function(self, who) return {type="cone", radius=4, range=0} end,
+		requires_target = true,
+		tactical = { attackarea = { physical = 2} }
+		}
 	),
 }
 
 newEntity{
 	name = " of mindblast", addon=true, instant_resolve=true,
 	keywords = {mindblast=true},
-	level_range = {15, 50},
-	rarity = 8,
-	charm_power_def = {add=45, max=400, floor=true},
-	resolvers.charm(
-		function(self, who)
-			local dam = who:damDesc(engine.DamageType.Mind, self.use_power.damage(self, who))
-			return ("fire a blast of psionic energies in a range %d beam dealing %0.2f to %0.2f mind damage"):format(self.use_power.range(self, who), dam/2, dam)
+	level_range = {1, 50},
+	rarity = 10,
+	charm_power_def = {add=0, max=800, floor=true},
+	resolvers.charm(function(self, who)
+			local dam = self.use_power.damage(self, who)
+			return ("blast the opponent's mind dealing %d mind damage and silencing them for 4 turns"):format(dam )
 		end,
-		6,
+		15,
 		function(self, who)
 			local tg = self.use_power.target(self, who)
 			local x, y = who:getTarget(tg)
 			if not x or not y then return nil end
-			local dam = self.use_power.damage(self, who)
-			game.logSeen(who, "%s uses %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name=true, do_color=true})
-			who:project(tg, x, y, engine.DamageType.MIND, rng.avg(dam / 2, dam, 3), {type="mind"})
+			local damage = who:mindCrit(self.use_power.damage(self, who))
+			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
+			if not x or not y then return nil end
+			who:project(tg, x, y, function(tx, ty)
+				local target = game.level.map(tx, ty, engine.Map.ACTOR)
+				if not target then return end
+				local DamageType = require "engine.DamageType"
+				DamageType:get(DamageType.MIND).projector(who, tx, ty, DamageType.MIND, damage)
+				if target:canBe("silence") then
+					target:setEffect(target.EFF_SILENCED, 4, {apply_power = who:combatMindpower()})
+				end
+			end, dam, {type="mind"})
+			game:playSoundNear(who, "talents/mind")
 			return {id=true, used=true}
 		end,
 		"T_GLOBAL_CD",
-		{range = function(self, who) return math.floor(who:combatStatScale("wil", 6, 10)) end,
-		damage = function(self, who) return self:getCharmPower(who) end,
-		target = function(self, who) return {type="beam", range=self.use_power.range(self, who)} end,
+		{ range = 10,
 		requires_target = true,
-		tactical = { attackarea = { mind = 2} }
-		}
+		target = function(self, who) return {type="hit", range=self.use_power.range} end,
+		damage = function(self, who) return self:getCharmPower(who) end,
+		tactical = {ATTACK = 1}}
 	),
 }

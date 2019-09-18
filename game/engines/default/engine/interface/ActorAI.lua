@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ end
 
 function _M:aiCanPass(x, y)
 	-- Nothing blocks, just go on
-	if not game.level.map:checkAllEntities(x, y, "block_move", self, true) then return true end
+	if not game.level.map:checkAllEntities(x, y, "block_move", self, nil, true) then return true end
 
 	-- If there is an other actor, check hostility, if hostile, we move to attack
 	local target = game.level.map(x, y, Map.ACTOR)
@@ -81,6 +81,10 @@ function _M:aiCanPass(x, y)
 	if target and self:attr("move_body") then return true end
 
 	return false
+end
+
+function _M:aiPathingBlockCheck(x, y, target)
+
 end
 
 --- Move one step to the given target if possible
@@ -238,30 +242,32 @@ function _M:aiSeeTargetPos(target)
 		LSeen.GCache_turn = game.turn
 	else
 		if target == self.ai_target.actor and (LSeen.GCache_turn or 0) + 10 <= game.turn and LSeen.x then
-			spread = spread + math.min(10, math.floor((game.turn - (LSeen.GCknown_turn or game.turn)) / (game.energy_to_act / game.energy_per_tick))) -- Limit spread to 10 tiles
+			if target.last_special_movement and LSeen.GCknown_turn and (target.last_special_movement > LSeen.GCknown_turn) then 
+				spread = 10  -- If the target has done a "special" movement, such as teleporting a long distance or out of LOS, max out our randomness so we don't cheat chasing them with teleports or whatever
+			else
+				spread = spread + math.min(10, math.floor((game.turn - (LSeen.GCknown_turn or game.turn)) / (game.energy_to_act / game.energy_per_tick))) -- Limit spread to 10 tiles
+			end
 			tx, ty = util.bound(tx + rng.range(-spread, spread), 0, game.level.map.w - 1), util.bound(ty + rng.range(-spread, spread), 0, game.level.map.h - 1)
+			
 			-- Inertial average with last guess: can specify another method here to make the targeting position less random
 			if LSeen.GCache_x then -- update guess with new random position
 				tx = math.floor(LSeen.GCache_x + (tx-LSeen.GCache_x)/2)
 				ty = math.floor(LSeen.GCache_y + (ty-LSeen.GCache_y)/2)
-	
---[[ simplified sanity check
-				if (target.canMove and not target:canMove(tx, ty, true)) or (tx == self.x and ty == self.y) then -- find a reasonable spot if target can't be at that position
-					local nx, ny = util.findFreeGrid(tx, ty, math.max(1, spread), false)
-					if nx then tx, ty = nx, ny end
+			end
+
+			-- try to find a reasonable spot if target can't be at estimated position
+			local act = game.level.map(tx, ty, Map.ACTOR)
+			if (act and act ~= target and self:canSee(act)) or (target.canMove and not target:canMove(tx, ty, true)) then
+				local nx, ny, grids = util.findFreeGrid(tx, ty, math.max(1, spread), false)
+				if not grids then  -- sometimes there is no free grid at low spreads, so try again a bit wider on failure
+					nx, ny, grids = util.findFreeGrid(tx, ty, 3, false) 
 				end
---]]
-				-- try to find a reasonable spot if target can't be at estimated position
-				local act = game.level.map(tx, ty, Map.ACTOR)
-				if act and act ~= target and self:canSee(act) or (target.canMove and not target:canMove(tx, ty, true)) then
-					local nx, ny, grids = util.findFreeGrid(tx, ty, math.max(1, spread), false)
-					if grids then
-						for i, grid in ipairs(grids) do
-							act = game.level.map(grid[1], grid[2], Map.ACTOR)
-							if not act or (act == target or act ~= self and not self:canSee(act)) then
-								tx, ty = grid[1], grid[2]
-								break
-							end
+				if grids then
+					for i, grid in ipairs(grids) do
+						act = game.level.map(grid[1], grid[2], Map.ACTOR)
+						if not act or (act == target or act ~= self and not self:canSee(act)) then
+							tx, ty = grid[1], grid[2]
+							break
 						end
 					end
 				end
@@ -316,13 +322,15 @@ function _M:aiTalentTargets(t, aitarget, tg, all_targets, ax, ay)
 			friendlyfire = typ.friendlyfire and (type(typ.friendlyfire) == "number" and typ.friendlyfire or 100) or 0
 			if all_targets then	typ.selffire, typ.friendlyfire = 100, 100 end
 			targets = {}
-			self:project(typ, ax, ay, function(px, py)
-				local tgt = game.level.map(px, py, typ.scan_on or Map.ACTOR)
-				if tgt and not tgt.dead then
-					if log_detail > 2 then print("[aiTalentTargets]", t.id, "may affect", px, py, "actor:", tgt.uid, tgt.name) end
-					targets[#targets+1] = tgt
-				end
-			end)
+			if ax and ay then
+				self:project(typ, ax, ay, function(px, py)
+					local tgt = game.level.map(px, py, typ.scan_on or Map.ACTOR)
+					if tgt and not tgt.dead then
+						if log_detail > 2 then print("[aiTalentTargets]", t.id, "may affect", px, py, "actor:", tgt.uid, tgt.name) end
+						targets[#targets+1] = tgt
+					end
+				end)
+			end
 		end
 	end
 	return targets, selffire, friendlyfire, tg

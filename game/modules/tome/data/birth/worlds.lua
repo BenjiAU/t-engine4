@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -89,6 +89,10 @@ newBirthDescriptor{
 			local x, y = mod.class.Encounter:findSpot(where)
 			return x, y
 		end,
+		zone_tiers = {
+			{name="tier1", "trollmire", "norgos-lair", "scintillating-caves", "rhaloren-camp", "heart-gloom", "ruins-kor-pul"},
+			{name="tier2", "sandworm-lair", "old-forest", "maze", "daikara", "halfling-ruins"}
+		}		
 	},
 }
 
@@ -108,6 +112,7 @@ newBirthDescriptor{
 		"Every 10 levels after level 50 the maximum points of each talent will increase by one.",
 	},
 	descriptor_choices = default_eyal_descriptors{ difficulty = { Tutorial = "never"} },
+	random_escort_possibilities = { {"infinite-dungeon", 5, 40} },
 	copy = {
 		-- Can levelup forever
 		resolvers.generic(function(e) e.max_level = nil end),

@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 
 colors = {}
 colors_simple = {}
+r_colors = {}
+r_colors_simple = {}
 
 --- Define Color
 -- @string name
@@ -35,6 +37,8 @@ colors_simple = {}
 function defineColor(name, r, g, b, br, bg, bb)
 	colors[name] = {r=r, g=g, b=b, br=br, bg=bg, bb=bb}
 	colors_simple[name] = {r, g, b}
+	r_colors[colors[name]] = name
+	r_colors_simple[colors_simple[name]] = name
 end
 
 --- color -> foreground table

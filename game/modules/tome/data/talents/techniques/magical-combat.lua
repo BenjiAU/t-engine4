@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ newTalent{
 		local talent = self:getTalentFromId(proc)
 		if not talent or not talent.allow_for_arcane_combat then return false end
 		if not self:knowTalent(talent) then return false end
-		if self:isTalentCoolingDown(talent) then return false end
 		if not self:attr("force_talent_ignore_ressources") then
 			-- Check all possible resource types and see if the talent has an associated cost
 			for _, res_def in ipairs(self.resources_def) do
@@ -63,13 +62,11 @@ newTalent{
 		if self.x == target.x and self.y == target.y then return nil end
 
 		local chance = t.getChance(self, t)
-		if self:hasShield() then chance = chance * 0.75
+		if self:hasShield() then chance = chance * 0.5
 		elseif self:hasDualWeapon() then chance = chance * 0.5
 		end
 		
 		if rng.percent(chance) then
-			local fatigue = (100 + 2 * self:combatFatigue()) / 100
-			local mana = self:getMana() - 1
 			local spells = {}
 			-- Load previously selected spell
 			local p = self:isTalentActive(t.id)
@@ -107,7 +104,7 @@ newTalent{
 				end
 				print("[ARCANE COMBAT] autocast ",self:getTalentFromId(tid).name)
 				local old_cd = self:isTalentCoolingDown(self:getTalentFromId(tid))
-				self:forceUseTalent(tid, {ignore_energy=true, force_target={x=target_x, y=target_y, __no_self=true}})
+				self:forceUseTalent(tid, {ignore_energy=true, ignore_cooldown=true, force_target={x=target_x, y=target_y, __no_self=true}})
 				-- Do not setup a cooldown
 				if not old_cd then
 					self.talents_cd[tid] = nil
@@ -156,10 +153,9 @@ newTalent{
 			end
 		end
 		return ([[Allows you to use melee weapons to focus your spells, granting a %d%% chance per melee attack to cast an offensive spell as a free action on the target.
-		Delivering the spell this way will not trigger a spell cooldown, but only works if the spell is not already cooling down.
+		Delivering the spell this way will not trigger a spell cooldown.
 		You may select an allowed spell to trigger this way, or choose to have one randomly selected for each attack.
-		While wielding a shield, the chance is reduced by one quarter.
-		While dual wielding, the chance is reduced by half for both weapons.
+		While dual wielding or using a shield, the chance is reduced to 50%% for both weapons.
 		The chance increases with your Cunning.
 
 		Allowed spells: %s %s]]):
@@ -176,8 +172,10 @@ newTalent{
 	-- called by _M:combatSpellpower in mod\class\interface\Combat.lua
 	getSpellpower = function(self, t) return self:combatTalentScale(t, 20, 40, 0.75) end,
 	info = function(self, t)
-		return ([[The user gains a bonus to Spellpower equal to %d%% of their Cunning.]]):
-		format(t.getSpellpower(self,t))
+		local spellpower = t.getSpellpower(self, t)
+		local bonus = self:getCun()*spellpower/100
+		return ([[The user gains a bonus to Spellpower equal to %d%% of your Cunning (Current bonus: %d).]]):
+		format(spellpower, bonus)
 	end,
 }
 
@@ -220,17 +218,16 @@ newTalent{
 	points = 5,
 	require = techs_req4,
 	radius = function(self, t) return self:getTalentLevel(t) < 5 and 1 or 2 end,
-	getDamMult = function(self, t) return self:combatTalentScale(t, 0.5, 1.1, 1) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 1, 100) end,
 	getSPMult = function(self, t) return self:combatTalentScale(t, 1/7, 5/7) end,
 	info = function(self, t)
-		return ([[Raw magical damage channels through the caster's weapon, increasing raw Physical Power by %0.2f of your Magic (current bonus: %d).
-		Each time you crit with a melee blow, you will unleash a radius %d ball of either fire, lightning or arcane damage, doing %0.2f.
+		return ([[Raw magical damage channels through the caster's weapon, increasing raw Physical Power by %d%% of your Magic (current bonus: %d).
+		Each time you crit with a melee blow, you will unleash a radius %d ball of arcane damage, doing %0.2f.
 		The bonus scales with your Spellpower and talent level.
-		If you are using a shield this will only occur 75%% of the time.
+		If you are using a shield this will only occur 50%% of the time.
 		If you are dual wielding this will only occur 50%% of the time.
 		At level 5 the ball becomes radius 2.
 		]]):
-		format(t.getSPMult(self, t), self:getMag() * t.getSPMult(self, t), self:getTalentRadius(t), self:combatSpellpower() * 2 * t.getDamMult(self, t))
+		format(t.getSPMult(self, t)*100, self:getMag() * t.getSPMult(self, t), self:getTalentRadius(t), damDesc(self, DamageType.ARCANE, t.getDamage(self, t)) )
 	end,
 }
-

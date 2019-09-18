@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ newEntity{
 	moddable_tile = resolvers.moddable_tile("heavy"),
 	add_name = " (#ARMOR#)",
 	display = "[", color=colors.SLATE,
-	require = { talent = { Talents.T_ARMOUR_TRAINING }, },
+	require = { flag = { "allow_wear_heavy" }, },
 	encumber = 14,
 	rarity = 5,
 	metallic = true,
@@ -57,7 +57,7 @@ newEntity{ base = "BASE_HEAVY_ARMOR",
 	wielder = {
 		combat_def = 2,
 		combat_armor = 6,
-		fatigue = 14,
+		fatigue = 12,
 	},
 }
 
@@ -70,7 +70,7 @@ newEntity{ base = "BASE_HEAVY_ARMOR",
 	wielder = {
 		combat_def = 3,
 		combat_armor = 8,
-		fatigue = 16,
+		fatigue = 12,
 	},
 }
 
@@ -83,7 +83,7 @@ newEntity{ base = "BASE_HEAVY_ARMOR",
 	wielder = {
 		combat_def = 4,
 		combat_armor = 8,
-		fatigue = 16,
+		fatigue = 12,
 	},
 }
 
@@ -96,6 +96,6 @@ newEntity{ base = "BASE_HEAVY_ARMOR",
 	wielder = {
 		combat_def = 5,
 		combat_armor = 10,
-		fatigue = 16,
+		fatigue = 12,
 	},
 }

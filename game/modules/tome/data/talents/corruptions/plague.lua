@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -38,56 +38,61 @@ local getTargetDiseases = function(self, target)
 	return diseases
 end
 
+-- Fix dead priority
+-- Add a clear display on where the disease went
 newTalent{
 	name = "Virulent Disease",
 	type = {"corruption/plague", 1},
 	require = corrs_req1,
 	points = 5,
-	vim = 8,
 	cooldown = 3,
-	random_ego = "attack",
-	tactical = { ATTACK = {BLIGHT = {disease=2}} },
-	requires_target = true,
-	no_energy = true,
-	range = function(self, t) return 5 end, -- Instant cast should not do thousands of damage at long range.  This is still too powerful, though
-	action = function(self, t)
-		local tg = {type="bolt", range=self:getTalentRange(t)}
-		local x, y = self:getTarget(tg)
-		if not x or not y then return nil end
+	mode = "passive",
+	do_disease = function(self, t, target, val)
+		if self:isTalentCoolingDown(t) then return end
 
+		-- Grab an enemy of radius 5 of the damaged target that has the most diseases else default to the actor damaged
+		local disease_target = {actor=target, count=0}
+		if dead then disease_target.actor = "none" end
+		self:project({type="ball", radius=5, friendlyfire=false, selffire=false, x=target.x, y=target.y}, target.x, target.y, function(px, py)
+			local target = game.level.map(px, py, engine.Map.ACTOR)
+			if not target then return end
+			local count = #target:effectsFilter(function(e) return e.subtype.disease end, 9)
+			if (count > 0 and disease_target.count < count) or disease_target.actor == "none" then  -- If the initial target was dead then we grab a semi-random one
+				disease_target.actor = target
+				disease_target.count = count
+			end
+		end)
+
+		if disease_target.actor == "none" then return end
+		target = disease_target.actor
 		local diseases = {{self.EFF_WEAKNESS_DISEASE, "str"}, {self.EFF_ROTTING_DISEASE, "con"}, {self.EFF_DECREPITUDE_DISEASE, "dex"}}
 		local disease = rng.table(diseases)
 
-		-- Try to rot !
-		self:project(tg, x, y, function(px, py)
-			local target = game.level.map(px, py, engine.Map.ACTOR)
-			if not target then return end
-			if target:canBe("disease") then
-				local str, dex, con = not target:hasEffect(self.EFF_WEAKNESS_DISEASE) and target:getStr() or 0, not target:hasEffect(self.EFF_DECREPITUDE_DISEASE) and target:getDex() or 0, not target:hasEffect(self.EFF_ROTTING_DISEASE) and target:getCon() or 0
+		if target:canBe("disease") then
+			local str, dex, con = not target:hasEffect(self.EFF_WEAKNESS_DISEASE) and target:getStr() or 0, not target:hasEffect(self.EFF_DECREPITUDE_DISEASE) and target:getDex() or 0, not target:hasEffect(self.EFF_ROTTING_DISEASE) and target:getCon() or 0
 
-				if str >= dex and str >= con then
-					disease = {self.EFF_WEAKNESS_DISEASE, "str"}
-				elseif dex >= str and dex >= con then
-					disease = {self.EFF_DECREPITUDE_DISEASE, "dex"}
-				elseif con > 0 then
-					disease = {self.EFF_ROTTING_DISEASE, "con"}
-				end
-
-				target:setEffect(disease[1], 6, {src=self, dam=self:spellCrit(7 + self:combatTalentSpellDamage(t, 6, 45)), [disease[2]]=self:combatTalentSpellDamage(t, 5, 35), apply_power=self:combatSpellpower()})
-			else
-				game.logSeen(target, "%s resists the disease!", target.name:capitalize())
+			if str >= dex and str >= con then
+				disease = {self.EFF_WEAKNESS_DISEASE, "str"}
+			elseif dex >= str and dex >= con then
+				disease = {self.EFF_DECREPITUDE_DISEASE, "dex"}
+			elseif con > 0 then
+				disease = {self.EFF_ROTTING_DISEASE, "con"}
 			end
-			game.level.map:particleEmitter(px, py, 1, "circle", {oversize=0.7, a=200, limit_life=8, appear=8, speed=-2, img="disease_circle", radius=0})
-		end)
-		game:playSoundNear(self, "talents/slime")
 
-		return true
+			target:setEffect(disease[1], 6, {src=self, dam=self:spellCrit(7 + self:combatTalentSpellDamage(t, 6, 45)), [disease[2]]=self:combatTalentSpellDamage(t, 5, 35), apply_power=self:combatSpellpower()})
+		else
+			game.logSeen(target, "%s resists the disease!", target.name:capitalize())
+		end
+		self:startTalentCooldown(t)
+		game.level.map:particleEmitter(target.x, target.y, 1, "circle", {oversize=0.7, a=200, limit_life=8, appear=8, speed=-2, img="disease_circle", radius=0})
+		game:playSoundNear(self, "talents/slime")
 	end,
 	info = function(self, t)
-		return ([[Fires a bolt of pure filth, diseasing your target with a disease doing %0.2f blight damage per turn for 6 turns, and reducing one of its physical stats (strength, constitution, dexterity) by %d. The three diseases can stack.
+		return ([[Whenever you dealt non-disease blight damage you apply a disease dealing %0.2f blight damage per turn for 6 turns and reducing one of its physical stats (strength, constitution, dexterity) by %d. The three diseases can stack.
 		Virulent Disease will always try to apply a disease the target does not currently have, and also one that will have the most debilitating effect for the target.
+		This disease will try to prioritize being applied to an enemy with a high disease count near the target.
 		The effect will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.BLIGHT, 7 + self:combatTalentSpellDamage(t, 6, 65)), self:combatTalentSpellDamage(t, 5, 35))
+		format(damDesc(self, DamageType.BLIGHT, 7 + self:combatTalentSpellDamage(t, 6, 45)), self:combatTalentSpellDamage(t, 5, 35))
 	end,
 }
 
@@ -97,8 +102,8 @@ newTalent{
 	require = corrs_req2,
 	points = 5,
 	vim = 18,
-	cooldown = 9,
-	range = 8,
+	cooldown = 4,
+	range = 10,
 	radius = function(self, t) return math.floor(self:combatTalentScale(t, 1.5, 3.5)) end,
 	getTargetDiseases = getTargetDiseases,
 	tactical = function(self, t, aitarget)
@@ -122,14 +127,14 @@ newTalent{
 	requires_target = true,
 	target = function(self, t)
 		-- Target trying to combine the bolt and the ball disease spread
-		return {type="ballbolt", radius=self:getTalentRadius(t), range=self:getTalentRange(t)}
+		return {type="ballbolt", radius=self:getTalentRadius(t), range=self:getTalentRange(t), friendlyfire=false, selffire=false, talent=t}
 	end,
 	action = function(self, t)
-		local tg = {type="bolt", range=self:getTalentRange(t)}
+		local tg = {type="hit", range=self:getTalentRange(t), talent=t}
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
 
-		local dam = self:spellCrit(self:combatTalentSpellDamage(t, 15, 85))
+		local dam = self:spellCrit(self:combatTalentSpellDamage(t, 15, 90))
 		local diseases
 		
 		-- Try to rot !
@@ -147,7 +152,7 @@ newTalent{
 		end)
 
 		if diseases and #diseases > 0 then -- burst in a radius
-			self:project({type="ball", radius=self:getTalentRadius(t), range=self:getTalentRange(t)}, x, y, function(px, py)
+			self:project({type="ball", radius=self:getTalentRadius(t), range=self:getTalentRange(t), talent=t}, x, y, function(px, py)
 				local target = game.level.map(px, py, engine.Map.ACTOR)
 				if not target or target == source or target == self or (self:reactionToward(target) >= 0) then return end
 
@@ -155,7 +160,14 @@ newTalent{
 					local parameters = table.clone(disease.params, true)
 					parameters.src = self
 					parameters.apply_power = self:combatSpellpower()
-					target:setEffect(disease.id, 6, parameters)
+					parameters.__tmpvals = nil
+
+					local dur = math.max(6, parameters.dur)
+					if target:canBe("disease") then
+						target:setEffect(disease.id, dur, parameters)
+					else
+						game.logSeen(target, "%s resists the disease!", target.name:capitalize())
+					end
 				end
 			end)
 			game.level.map:particleEmitter(x, y,self:getTalentRadius(t), "circle", {oversize=0.7, a=200, limit_life=8, appear=8, speed=-2, img="disease_circle", radius=self:getTalentRadius(t)})
@@ -166,9 +178,9 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Make your target's diseases burst, doing %0.2f blight damage for each disease it is infected with.
-		This will also spread any diseases to any nearby foes in a radius of %d.
+		This will also spread any diseases to any nearby foes in a radius of %d with a minimum duration of 6.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 15, 85)), self:getTalentRadius(t))
+		format(damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 15, 115)), self:getTalentRadius(t))
 	end,
 }
 
@@ -183,7 +195,7 @@ newTalent{
 	getTargetDiseases = getTargetDiseases,
 	tactical = { DISABLE = function(self, t, target)
 			local diseases = t.getTargetDiseases(self, target)
-			if diseases and diseases.num > 0 then return {stun=2} end
+			if diseases and diseases.num > 0 then return {stun=0.1} end  -- We want the disable to be a small part of this calculation, partially to emphasize delaying its use
 		end,
 		ATTACKAREA = function(self, t, target)
 			local diseases = t.getTargetDiseases(self, target)
@@ -198,7 +210,7 @@ newTalent{
 	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 2.5, 4.5)) end,
 	getRadius = function(self, t) return math.floor(self:combatTalentScale(t, 2.3, 3.7)) end,
 	target = function(self, t)
-		return {type="ball", range=self:getTalentRange(t), radius=t.getRadius(self, t), friendlyfire=false}
+		return {type="ball", range=self:getTalentRange(t), radius=t.getRadius(self, t), friendlyfire=false, talent=t}
 	end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
@@ -251,6 +263,7 @@ newTalent{
 	range = 8,
 	radius = 2,
 	tactical = { ATTACK = {BLIGHT = 2} },
+	target = function(self, t) return {type="hit", range=self:getTalentRange(t), talent=t} end,
 	requires_target = true,
 	healloss = function(self,t) return self:combatTalentLimit(t, 150, 44, 80) end, -- Limit < 150%
 	disfact = function(self,t) return self:combatTalentLimit(t, 100, 36, 60) end, -- Limit < 100%
@@ -271,15 +284,19 @@ newTalent{
 		end
 
 		if #diseases == 0 then return end
-		self:project({type="ball", radius=self:getTalentRadius(t)}, carrier.x, carrier.y, function(px, py)
+		self:project({type="ball", radius=self:getTalentRadius(t), friendlyfire=false}, carrier.x, carrier.y, function(px, py)
 			local target = game.level.map(px, py, engine.Map.ACTOR)
 			if not target or target == carrier or target == self then return end
 
 			local disease = rng.table(diseases)
 			local params = table.clone(disease.params, true)
+			params.__tmpvals = nil
 			params.src = self
+			params.apply_power = self:combatSpellpower()
+			local dur = math.max(6, params.dur)
+
 			if target:canBe("disease") then
-				target:setEffect(disease.id, 6, params)
+				target:setEffect(disease.id, dur, params)
 			else
 				game.logSeen(target, "%s resists the disease!", target.name:capitalize())
 			end
@@ -287,7 +304,7 @@ newTalent{
 		end)
 	end,
 	action = function(self, t)
-		local tg = {type="bolt", range=self:getTalentRange(t)}
+		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
 

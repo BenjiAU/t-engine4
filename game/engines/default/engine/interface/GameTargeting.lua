@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -36,6 +36,18 @@ function _M:init()
 
 	-- Allow scrolling when targetting
 	self.target.on_set_target = function(self, how)
+		if self.target and self.target_type and self.target.x and self.active and self.target_type.stop_before_target and how == "scan" then
+			local start_x = self.target_type.start_x or self.target_type.x or self.target_type.source_actor and self.target_type.source_actor.x or self.x
+			local start_y = self.target_type.start_y or self.target_type.y or self.target_type.source_actor and self.target_type.source_actor.y or self.y
+			local l = core.fov.line(self.target.x, self.target.y, start_x, start_y)
+			local lx, ly = l:step()
+			if lx and ly then
+				self.target.x = lx
+				self.target.y = ly
+				self.target.entity = game.level.map(self.target.x, self.target.y, engine.Map.ACTOR)
+			end
+		end
+
 		if self.key ~= self.targetmode_key then return end
 		local dx, dy = game.level.map:moveViewSurround(self.target.x, self.target.y, 1, 1, true)
 		if how == "mouse" and (dx ~= 0 or dy ~= 0) then
@@ -52,7 +64,6 @@ function _M:targetOnTick()
 end
 
 --- Display the tooltip, if any
-
 function _M:targetDisplayTooltip(dx, dy, force, nb_keyframes)
 	-- Tooltip is displayed over all else
 	if self.level and self.level.map and self.level.map.finished then
@@ -84,6 +95,11 @@ function _M:tooltipDisplayAtMap(x, y, text, extra, force, nb_keyframes)
 		if extra.up then self.tooltip.last_display_y = self.tooltip.last_display_y - self.tooltip.h end
 	end
 	self.tooltip_x = {}
+end
+
+--- Forces to hide the tooltip
+function _M:tooltipHide()
+	self.tooltip_x = nil
 end
 
 --- Enter/leave targeting mode

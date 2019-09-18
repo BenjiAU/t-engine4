@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -93,19 +93,96 @@ newTalent{
 }
 
 newTalent{
-	name = "Beckon",
+	name = "Harass Prey",
 	type = {"cursed/endless-hunt", 2},
 	require = cursed_wil_req2,
+	points = 5,
+	cooldown = 6,
+	hate = 5,
+	tactical = { ATTACK = { PHYSICAL = 3 } },
+	is_melee = true,
+	getCooldownDuration = function(self, t) return math.ceil(self:combatTalentLimit(t, 5, 0.75, 2.7)) end,
+	getDamageMultiplier = function(self, t, hate)
+		return getHateMultiplier(self, 0.35, 0.67, false, hate)
+	end,
+	getTargetDamageChange = function(self, t)
+		return -self:combatLimit(self:getTalentLevel(t), 100, 45.5, 1.3, 55, 6.5)
+	end,
+	getDuration = function(self, t)
+		return 2
+	end,
+	on_pre_use = function(self, t)
+		local eff = self:hasEffect(self.EFF_STALKER)
+		return eff and not eff.target.dead and core.fov.distance(self.x, self.y, eff.target.x, eff.target.y) <= 1
+	end,
+	
+	action = function(self, t)
+		local damageMultiplier = t.getDamageMultiplier(self, t)
+		local cooldownDuration = t.getCooldownDuration(self, t)
+		local targetDamageChange = t.getTargetDamageChange(self, t)
+		local duration = t.getDuration(self, t)
+		local effStalker = self:hasEffect(self.EFF_STALKER)
+		local target = effStalker.target
+		if not target or target.dead then return nil end
+
+		target:setEffect(target.EFF_HARASSED, duration, {src=self, damageChange=targetDamageChange })
+
+		for i = 1, 2 do
+			-- We need to alter behavior slightly to accomodate shields since they aren't used in attackTarget
+			local shield, shield_combat = self:hasShield()
+			local weapon = self:hasMHWeapon() and self:hasMHWeapon().combat or self.combat --can do unarmed attack
+			local hit = false
+			if not shield then
+				hit = self:attackTarget(target, nil, damageMultiplier, true)
+			else
+				hit = self:attackTargetWith(target, weapon, nil, damageMultiplier)
+				if self:attackTargetWith(target, shield_combat, nil, damageMultiplier) or hit then hit = true end
+			end
+
+			if not target.dead then
+				local tids = {}
+				for tid, lev in pairs(target.talents) do
+					local t = target:getTalentFromId(tid)
+					if not target.talents_cd[tid] and t.mode == "activated" and not t.innate then tids[#tids+1] = t end
+				end
+					
+				local t = rng.tableRemove(tids)
+				if t then
+					target.talents_cd[t.id] = getCooldownDuration
+					game.logSeen(target, "#F53CBE#%s's %s is disrupted!", target.name:capitalize(), t.name)
+				end
+			end
+		end
+
+		return true
+	end,
+	info = function(self, t)
+		local damageMultiplier = t.getDamageMultiplier(self, t)
+		local cooldownDuration = t.getCooldownDuration(self, t)
+		local targetDamageChange = t.getTargetDamageChange(self, t)
+		local duration = t.getDuration(self, t)
+		return ([[Harass your stalked victim with two quick attacks for %d%% (at 0 Hate) to %d%% (at 100+ Hate) damage each. Each attack that scores a hit disrupts one talent, rune or infusion for %d turns. Your opponent will be unnerved by the attacks, reducing the damage they deal by %d%% for %d turns.
+		Damage reduction increases with the Willpower stat.
+
+		This talent will also attack with your shield, if you have one equipped.]]):format(t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100, cooldownDuration, -targetDamageChange, duration)
+	end,
+}
+
+newTalent{
+	name = "Beckon",
+	type = {"cursed/endless-hunt", 3},
+	require = cursed_wil_req3,
 	points = 5,
 	cooldown = 10,
 	hate = 2,
 	tactical = { DISABLE = 2 },
+	is_mind = true,
 	range = 10,
 	getDuration = function(self, t)
-		return math.min(20, math.floor(5 + self:getTalentLevel(t) * 2))
+		return math.min(10, math.floor(5 + self:getTalentLevel(t) * 2))
 	end,
 	getChance = function(self, t)
-		return math.min(75, math.floor(25 + (math.sqrt(self:getTalentLevel(t)) - 1) * 20))
+		return math.min(55, math.floor(25 + (math.sqrt(self:getTalentLevel(t)) - 1) * 20))
 	end,
 	getSpellpowerChange = function(self, t)
 		return -self:combatTalentStatDamage(t, "wil", 8, 33)
@@ -139,68 +216,6 @@ newTalent{
 	end,
 }
 
-newTalent{
-	name = "Harass Prey",
-	type = {"cursed/endless-hunt", 3},
-	require = cursed_wil_req3,
-	points = 5,
-	random_ego = "attack",
-	cooldown = 6,
-	hate = 5,
-	tactical = { ATTACK = { PHYSICAL = 3 } },
-	getCooldownDuration = function(self, t) return math.floor(self:combatTalentScale(t, 3.75, 6.75, "log", 0, 1)) end,
-	getDamageMultiplier = function(self, t, hate)
-		return getHateMultiplier(self, 0.35, 0.67, false, hate)
-	end,
-	getTargetDamageChange = function(self, t)
-		return -self:combatLimit(self:combatTalentStatDamage(t, "wil", 0.7, 0.9), 1, 0, 0, 0.75, 0.87)*100 -- Limit < 100%
-	end,
-	getDuration = function(self, t)
-		return 2
-	end,
-	on_pre_use = function(self, t)
-		local eff = self:hasEffect(self.EFF_STALKER)
-		return eff and not eff.target.dead and core.fov.distance(self.x, self.y, eff.target.x, eff.target.y) <= 1
-	end,
-	action = function(self, t)
-		local damageMultipler = t.getDamageMultiplier(self, t)
-		local cooldownDuration = t.getCooldownDuration(self, t)
-		local targetDamageChange = t.getTargetDamageChange(self, t)
-		local duration = t.getDuration(self, t)
-		local effStalker = self:hasEffect(self.EFF_STALKER)
-		local target = effStalker.target
-		if not target or target.dead then return nil end
-
-		target:setEffect(target.EFF_HARASSED, duration, {src=self, damageChange=targetDamageChange })
-
-		for i = 1, 2 do
-			if not target.dead and self:attackTarget(target, nil, damageMultipler, true) then
-				-- remove effects
-				local tids = {}
-				for tid, lev in pairs(target.talents) do
-					local t = target:getTalentFromId(tid)
-					if not target.talents_cd[tid] and t.mode == "activated" and not t.innate then tids[#tids+1] = t end
-				end
-
-				local t = rng.tableRemove(tids)
-				if t then
-					target.talents_cd[t.id] = rng.range(3, 5)
-					game.logSeen(target, "#F53CBE#%s's %s is disrupted!", target.name:capitalize(), t.name)
-				end
-			end
-		end
-
-		return true
-	end,
-	info = function(self, t)
-		local damageMultipler = t.getDamageMultiplier(self, t)
-		local cooldownDuration = t.getCooldownDuration(self, t)
-		local targetDamageChange = t.getTargetDamageChange(self, t)
-		local duration = t.getDuration(self, t)
-		return ([[Harass your stalked victim with two quick attacks for %d%% (at 0 Hate) to %d%% (at 100+ Hate) damage each. Each attack that scores a hit disrupts one talent, rune or infusion for %d turns. Your opponent will be unnerved by the attacks, reducing the damage they deal by %d%% for %d turns.
-		Damage reduction increases with the Willpower stat.]]):format(t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100, cooldownDuration, -targetDamageChange, duration)
-	end,
-}
 
 newTalent{
 	name = "Surge",
@@ -208,7 +223,7 @@ newTalent{
 	mode = "sustained",
 	require = cursed_wil_req4,
 	points = 5,
-	cooldown = 10,
+	cooldown = 6,
 	no_energy = true,
 	getMovementSpeedChange = function(self, t)
 		return self:combatTalentStatDamage(t, "wil", 0.1, 1.1)
@@ -252,7 +267,7 @@ newTalent{
 		local defenseChange = t.getDefenseChange(self, t, true)
 		return ([[Let hate fuel your movements. While active, you gain %d%% movement speed. The recklessness of your movement brings you bad luck (Luck -3).
 		Cleave, Repel and Surge cannot be active simultaneously, and activating one will place the others in cooldown.
-		The speed of your movements, combined with the balance and utility of two weapons, gives you %d extra Defense while dual-wielding.
+		Sustaining Surge while Dual Wielding grants %d additional Defense.
 		Movement speed and dual-wielding Defense both increase with the Willpower stat.]]):format(movementSpeedChange * 100, defenseChange)
 	end,
 }

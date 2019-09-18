@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ newEntity{
 	encumber = 7,
 	metallic = true,
 	desc = [[Handheld deflection devices.]],
-	require = { talent = { {Talents.T_ARMOUR_TRAINING,2} }, },
+	require = { flag = { "allow_wear_shield" }, },
 	randart_able = "/data/general/objects/random-artifacts/shields.lua",
 	special_combat = { talented="shield", accuracy_effect="staff", damrange = 1.2, no_offhand_penalty=true },
 	egos = "/data/general/objects/egos/shield.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
@@ -53,9 +53,7 @@ newEntity{ base = "BASE_SHIELD",
 	},
 	wielder = {
 		combat_armor = 2,
-		combat_def = 4,
-		combat_def_ranged = 4,
-		fatigue = 6,
+		fatigue = 8,
 		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
@@ -73,11 +71,9 @@ newEntity{ base = "BASE_SHIELD",
 		dammod = {str=1},
 	},
 	wielder = {
-		combat_armor = 2,
-		combat_def = 6,
-		combat_def_ranged = 6,
+		combat_armor = 4,
 		fatigue = 8,
-		learn_talent = { [Talents.T_BLOCK] = 2, },
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
 
@@ -94,11 +90,9 @@ newEntity{ base = "BASE_SHIELD",
 		dammod = {str=1},
 	},
 	wielder = {
-		combat_armor = 2,
-		combat_def = 8,
-		combat_def_ranged = 8,
-		fatigue = 12,
-		learn_talent = { [Talents.T_BLOCK] = 3, },
+		combat_armor = 6,
+		fatigue = 8,
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
 
@@ -115,11 +109,9 @@ newEntity{ base = "BASE_SHIELD",
 		dammod = {str=1},
 	},
 	wielder = {
-		combat_armor = 2,
-		combat_def = 10,
-		combat_def_ranged = 10,
-		fatigue = 14,
-		learn_talent = { [Talents.T_BLOCK] = 4, },
+		combat_armor = 8,
+		fatigue = 8,
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
 
@@ -136,10 +128,8 @@ newEntity{ base = "BASE_SHIELD",
 		dammod = {str=1},
 	},
 	wielder = {
-		combat_armor = 3,
-		combat_def = 12,
-		combat_def_ranged = 12,
-		fatigue = 14,
-		learn_talent = { [Talents.T_BLOCK] = 5, },
+		combat_armor = 10,
+		fatigue = 8,
+		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }

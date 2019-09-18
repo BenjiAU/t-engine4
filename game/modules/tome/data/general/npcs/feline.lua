@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -101,6 +101,5 @@ newEntity{ base = "BASE_NPC_CAT",
 		[Talents.T_RUSH]={base=3, every=8, max=5},
 		[Talents.T_LETHALITY]={base=3, every=8, max=5},
 		[Talents.T_CRIPPLE]={base=3, every=8, max=5},
-		[Talents.T_EXPOSE_WEAKNESS]={base=3, every=8, max=5},
 	},
 }

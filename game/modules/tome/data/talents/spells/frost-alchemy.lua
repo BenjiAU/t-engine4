@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -116,14 +116,14 @@ newTalent{
 	range = 6,
 	tactical = { DEFEND = 2 },
 	critResist = function(self, t) return self:combatTalentScale(t, 10, 50) end,
-	getResistance = function(self, t) return self:combatTalentSpellDamage(t, 5, 45) end,
+	getResistance = function(self, t) return self:combatTalentSpellDamage(t, 5, 45) * 0.6 end,
 	getAffinity = function(self, t) return self:combatTalentLimit(t, 50, 5, 20) end, -- Limit <50%
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/ice")
 		local ret = {}
 		self:addShaderAura("body_of_ice", "crystalineaura", {}, "particles_images/spikes.png")
 		ret.particle = self:addParticles(Particles.new("snowfall", 1))
-		self:talentTemporaryValue(ret, "resists", {[DamageType.PHYSICAL] = t.getResistance(self, t) * 0.6})
+		self:talentTemporaryValue(ret, "resists", {[DamageType.PHYSICAL] = t.getResistance(self, t)})
 		self:talentTemporaryValue(ret, "damage_affinity", {[DamageType.COLD] = t.getAffinity(self, t)})
 		self:talentTemporaryValue(ret, "ignore_direct_crits", t.critResist(self, t))
 		return ret
@@ -137,7 +137,7 @@ newTalent{
 		local resist = t.getResistance(self, t)
 		local crit = t.critResist(self, t)
 		return ([[Turn your body into pure ice, increasing your Cold damage affinity by %d%% and your physical resistance by %d%%.
-		All direct critical hits (physical, mental, spells) against you have a %d%% lower Critical multiplier (but always do at least normal damage).
+		You have a %d%% chance to shrug off all direct critical hits (physical, mental, spell).
 		The effects increase with your Spellpower.]]):
 		format(t.getAffinity(self, t), resist, crit)
 	end,

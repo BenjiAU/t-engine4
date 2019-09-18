@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -268,7 +268,7 @@ newEntity{
 -- The four possible final rewards for the Brotherhood of Alchemists quest:
 
 newEntity{ base = "BASE_TAINT",
-	name = "Taint of Purging", unique = true, define_as = "TAINT_PURGING",
+	name = "Taint of Purging", unique = true, define_as = "TAINT_PURGING", image = "object/taint_of_telepathy.png",
 	level_range = {5, 50},
 	cost = 20,
 	material_level = 3,

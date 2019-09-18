@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ end
 -----------------------------------------------------------------
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*A slot in the door opens and a pair of wild eyes peers out.*#WHITE#
+	text = [[#LIGHT_GREEN#*A slot in the door opens and a pair of wild eyes peer out.*#WHITE#
 What do you want, @playerdescriptor.race@?]],
 	answers = {
 		{"Paladin Aeryn told me that you could help me. I need to get to Maj'Eyal.", jump="help", cond=function(npc, player) return game.state:isAdvanced() and not player:hasQuest("west-portal") end},

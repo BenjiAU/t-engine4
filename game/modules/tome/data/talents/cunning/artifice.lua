@@ -303,10 +303,10 @@ newTalent{
 	cooldown = 4,
 	getDollImage = function(self, t) return self:knowTalent(self.T_ASSASSINATE) and "artifices/mastery_hidden_blades" or "artifices/hidden_blades" end,
 	getDamage = function (self, t) return self:combatTalentWeaponDamage(t, 1.0, 1.8) end,
+	no_break_stealth = true,
 	callbackOnCrit = function(self, t, kind, dam, chance, target)
 		if not target then return end
 		if target.turn_procs.hb then return end
-		if core.fov.distance(self.x, self.y, target.x, target.y) > 1 then return end
 		if not self:isTalentCoolingDown(t) then
 			target.turn_procs.hb = true
 			local oldlife = target.life
@@ -333,7 +333,7 @@ newTalent{
 		for slot_id, tool_id in pairs(self.artifice_tools or {}) do
 			if tool_id == t.id then slot = self:getTalentFromId(slot_id).name break end
 		end
-		return ([[You conceal spring loaded blades within your equipment. On scoring a critical strike against an adjacent target, you follow up with your blades for %d%% damage (as an unarmed attack).
+		return ([[You conceal spring loaded blades within your equipment. On scoring a critical strike, you follow up with your blades for %d%% damage (as an unarmed attack).
 This talent has a cooldown.
 #YELLOW#Prepared with: %s#LAST#]]):format(dam*100, slot)
 	end,
@@ -408,6 +408,7 @@ newTalent{
 	points = 1,
 	cooldown = 20,
 	getDollImage = function(self, t) return self:knowTalent(self.T_ROGUE_S_BREW_MASTERY) and "artifices/mastery_rogues_brew" or "artifices/rogues_brew" end,
+	no_break_stealth = true,
 	tactical = { HEAL = 1.5, STAMINA = 1.5,
 		CURE = function(self, t, target)
 			local num, max = 0, t.getCure(self, t)
@@ -633,7 +634,7 @@ newTalent{
 		self:project(tg, x, y, function(px, py)
 			local target = game.level.map(px, py, engine.Map.ACTOR)
 			if not target then return nil end
-			self:project(tg, x, y, DamageType.PHYSICAL, t.getDamage(self,t))
+			self:project(tg, x, y, DamageType.PHYSICAL, self:physicalCrit(t.getDamage(self,t)))
 			if target:checkClassification("living") and (self:knowTalent(self.T_DART_LAUNCHER_MASTERY) or target:canBe("sleep") and target:canBe("poison")) then
 				target:setEffect(target.EFF_SEDATED, 4, {src=self, power=t.getSleepPower(self,t), slow=slow, insomnia=20, no_ct_effect=true, apply_power=self:combatAttack()})
 				game.level.map:particleEmitter(target.x, target.y, 1, "generic_charge", {rm=180, rM=200, gm=100, gM=120, bm=30, bM=50, am=70, aM=180})
@@ -688,7 +689,7 @@ newTalent{
 	stamina = 14,
 	requires_target = true,
 	getDollImage = function(self, t) return self:knowTalent(self.T_GRAPPLING_HOOK_MASTERY) and "artifices/mastery_grappling_hook" or "artifices/grappling_hook" end,
-	target = function(self, t) return {type="bolt", range=t.range(self,t), talent=t} end,
+	target = function(self, t) return {type="bolt", range=t.range(self,t), talent=t, nolock=true} end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y, target = self:getTarget(tg)

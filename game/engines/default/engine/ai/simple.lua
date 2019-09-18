@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -141,13 +141,30 @@ newAI("move_astar", function(self, add_check)
 			if config.settings.log_detail_ai > 0 then print("[move_astar] no Astar path, using move_simple") end
 			return self:runAI("move_simple")
 		else
-			local moved = self:move(path[1].x, path[1].y)
+			local moved = self:moveDirection(path[1].x, path[1].y)
 			if moved then return moved
 			else
 				if config.settings.log_detail_ai > 0 then print("[move_astar] invalid Astar node, using move_simple", path[1].x, path[1].y, "using move_simple") end
-				return self:runAI("move_simple") 
+				return self:runAI("move_simple")
 			end
 		end
+	end
+end)
+
+-- Always use Astar pathing and exclude grids that are blocked by actors *if* you would be unable to shove/swap with the actor
+-- This is autoassigned to most rares/randbosses
+newAI("move_astar_advanced", function(self)
+	if self.ai_target.actor then
+		local check_all_block_move = function(nx, ny)
+			local actor = game.level.map(nx, ny, engine.Map.ACTOR)
+			if actor and actor == self.ai_target.actor then
+				return true
+			else
+				local check = game.level.map:checkAllEntities(nx, ny, "aiPathingBlockCheck", self)
+				return not check
+			end
+		end
+		return self:runAI("move_astar", check_all_block_move)
 	end
 end)
 
@@ -250,7 +267,7 @@ end)
 -- this requires the ActorFOV interface, or an interface that provides self.fov.actors*
 newAI("target_simple", function(self)
 	-- keep same (hostile) target 90% of the time
-	if self.ai_target.actor and not self.ai_target.actor.dead and self:reactionToward(act) < 0 and rng.percent(90) then return true end
+	if self.ai_target.actor and not self.ai_target.actor.dead and self:reactionToward(self.ai_target.actor) < 0 and rng.percent(90) then return true end
 
 	-- Find closer enemy and target it
 	-- Get list of actors ordered by distance

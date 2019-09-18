@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -128,7 +128,8 @@ newTalent{
 		local darknessdamage = t.getDarknessDamage(self, t)
 		return ([[Each time one of your spells criticals, you project a bolt of light or shadow at up to %d targets within radius %d, doing %0.2f light damage or %0.2f darkness damage per bolt.
 		This effect costs 2 positive or 2 negative energy each time it's triggered, and will not activate if either your positive or negative energy is below 2.
-		The damage scales with your Spellpower.]]):
+		The damage scales with your Spellpower.
+		This spell cannot crit.]]):
 		format(targetcount, self:getTalentRange(t), damDesc(self, DamageType.LIGHT, lightdamage), damDesc(self, DamageType.DARKNESS, darknessdamage))
 	end,
 }
@@ -136,77 +137,38 @@ newTalent{
 newTalent{
 	name = "Darkest Light",
 	type = {"celestial/eclipse", 4},
-	mode = "sustained",
 	require = divi_req4,
 	points = 5,
-	cooldown = 30,
-	sustain_negative = 10,
-	no_npc_use = true,
-	tactical = { DEFEND = 2, ESCAPE = 2 },
-	getInvisibilityPower = function(self, t) return self:combatScale(self:getCun() * self:getTalentLevel(t), 5, 0, 38.33, 500) end,
-	getEnergyConvert = function(self, t) return math.max(0, 6 - self:getTalentLevelRaw(t)) end,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 10, 100) end,
-	getRadius = function(self, t) return math.floor(self:combatTalentScale(t, 2.5, 4.5)) end,
-	callbackOnActBase = function(self, t)
-		if self.positive > self.negative then
-			self:forceUseTalent(t.id, {ignore_energy=true})
-			game.logSeen(self, "%s's darkness can no longer hold back the light!", self.name:capitalize())
-		end
+	random_ego = "attack",
+	cooldown = 15,
+	positive = 15,
+	negative = 15,
+	tactical = { ATTACKAREA = {LIGHT = 2} },
+	range = 0,
+	radius = 10,
+	direct_hit = true,
+	target = function(self, t)
+		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), friendlyfire=false, talent=t}
 	end,
-	activate = function(self, t)
-		local timer = t.getEnergyConvert(self, t)
-		game:playSoundNear(self, "talents/heal")
-		local ret = {
-			invisible = self:addTemporaryValue("invisible", t.getInvisibilityPower(self, t)),
-			invisible_damage_penalty = self:addTemporaryValue("invisible_damage_penalty", 0.5),
-			fill = self:addTemporaryValue("positive_regen_ref", -timer),
-			drain = self:addTemporaryValue("negative_regen_ref", timer),
-			pstop = self:addTemporaryValue("positive_at_rest_disable", 1),
-			nstop = self:addTemporaryValue("negative_at_rest_disable", 1),
-		}
-		if not self.shader then
-			ret.set_shader = true
-			self.shader = "invis_edge"
-			self.shader_args = {color1={1,1,0,1}, color2={0,0,0,1}}
-			self:removeAllMOs()
-			game.level.map:updateMap(self.x, self.y)
-		end
-		ret.particle = self:addParticles(Particles.new("circle", 1, {shader=true, toback=true, oversize=1.7, a=155, appear=8, speed=0, img="darkest_light", radius=0}))
-		self:resetCanSeeCacheOf()
-		return ret
-	end,
-	deactivate = function(self, t, p)
-		if p.set_shader then
-			self.shader = nil
-			self:removeAllMOs()
-			game.level.map:updateMap(self.x, self.y)
-		end
-		self:removeTemporaryValue("invisible", p.invisible)
-		self:removeTemporaryValue("invisible_damage_penalty", p.invisible_damage_penalty)
-		self:removeTemporaryValue("positive_regen_ref", p.fill)
-		self:removeTemporaryValue("negative_regen_ref", p.drain)
-		self:removeTemporaryValue("positive_at_rest_disable", p.pstop)
-		self:removeTemporaryValue("negative_at_rest_disable", p.nstop)
-		self:removeParticles(p.particle)
-		local tg = {type="ball", range=0, selffire=true, radius= t.getRadius(self, t), talent=t}
-		self:project(tg, self.x, self.y, DamageType.LITE, 1)
-		tg.selffire = false
-		local grids = self:project(tg, self.x, self.y, DamageType.LIGHT, self:spellCrit(t.getDamage(self, t) + self.positive))
-		game.level.map:particleEmitter(self.x, self.y, tg.radius, "sunburst", {radius=tg.radius, grids=grids, tx=self.x, ty=self.y, max_alpha=80})
-		game:playSoundNear(self, "talents/flame")
-		self.positive = 0
-		self:resetCanSeeCacheOf()
+	getDotDamage = function(self, t) return self:combatTalentSpellDamage(t, 10, 50) end,
+	getConversion = function(self, t) return math.min(1, self:combatTalentScale(t, 0.1, 0.7)) end,
+	getDuration = function(self, t) return 6 end,
+	action = function(self, t)
+		local tg = self:getTalentTarget(t)
+		self:project(tg, self.x, self.y, function(px, py)
+			local target = game.level.map(px, py, Map.ACTOR)
+			if not target then return end
+			target:setEffect(target.EFF_DARKLIGHT, t.getDuration(self, t), {src=self, dotDam=self:spellCrit(t.getDotDamage(self, t)), conversion=t.getConversion(self, t)})
+		end)
+		game.level.map:particleEmitter(self.x, self.y, tg.radius, "shadow_flash", {radius=tg.radius, grids=grids, tx=self.x, ty=self.y})
+		game:playSoundNear(self, "talents/fireflash")
 		return true
 	end,
 	info = function(self, t)
-		local invisibilitypower = t.getInvisibilityPower(self, t)
-		local convert = t.getEnergyConvert(self, t)
-		local damage = t.getDamage(self, t)
-		local radius = t.getRadius(self, t)
-		return ([[This powerful spell grants you %d bonus invisibility, but converts %d negative energy into positive energy each turn.  Once your positive energy exceeds your negative energy, or you deactivate the talent, the effect ends in an explosion of light, converting all of your positive energy into damage and inflicting an additional %0.2f damage to everything in a radius of %d.
-		As you become invisible, you fade out of phase with reality; all your damage is reduced by 50%%.
-		You may not cast Twilight while this spell is active, and you should take off your light source; otherwise, others will spot you with ease.
-		The invisibility bonus will increase with your Cunning, and the explosion damage will increase with your Spellpower.]]):
-		format(invisibilitypower, convert, damDesc(self, DamageType.LIGHT, damage), radius)
+		local radius = self:getTalentRadius(t)
+		local dotDam = t.getDotDamage(self, t)
+		local conversion = t.getConversion(self, t)
+		local duration = t.getDuration(self, t)
+		return ([[Shroud foes within radius %d in darkest light, dealing %0.2f light and %0.2f darkness damage per turn and converting %d%% of the damage they deal between light and darkness for %d turns.]]):format(radius, damDesc(self, DamageType.LIGHT, dotDam), damDesc(self, DamageType.DARKNESS, dotDam), conversion*100, duration)
 	end,
 }

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -96,6 +96,11 @@ newEntity{ base="BASE_NPC_ORC_GORBAT", define_as = "GORBAT",
 		[Talents.T_SPINE_OF_THE_WORLD]=1,
 		[Talents.T_MASSIVE_BLOW]=1,
 		[Talents.T_BLIGHTED_SUMMONING]=1,
+	},
+
+	auto_classes={
+		{class="Wyrmic", start_level=40, level_rate=50},
+		{class="Summoner", start_level=40, level_rate=50},
 	},
 	resolvers.sustains_at_birth(),
 

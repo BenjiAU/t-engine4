@@ -116,7 +116,7 @@ newTalent{
 		local fat = t.fatigueBoost(self, t)
 		return ([[Manipulate forces on the molecular level to realign, rebalance, and synergize equipment you wear to your form and function.
 		Any weapon you wield will gain a boost of %d to both accuracy and power. (The power is treated like an increase to your stats.  Mindstars cannot be manipulated in this way because they are already in an ideal natural state.)
-		Your total armour will increase by %d and your fatigue rating by %d for each body armour and shield worn.
+		Your total armour will increase by %d and your fatigue will decrease by %d for each body armour and shield worn.
 		The effects increase with your Mindpower.]]):
 		format(weapon_boost, arm, fat)
 	end,
@@ -148,7 +148,7 @@ newTalent{
 	info = function(self, t)
 		local amt = t.energy_per_turn(self, t)
 		return ([[Matter is energy, as any good Mindslayer knows. Unfortunately, the various bonds and particles involved are just too numerous and complex to make the conversion feasible in most cases. The ordered, crystalline structure of a gem, however, make it possible to transform a small percentage of its matter into usable energy.
-		This talent consumes one gem and grants %d energy per turn for between 5 and 13 turns, depending on the quality of the gem used.
+		This talent consumes one gem and grants %d psi per turn for between 5 and 13 turns, depending on the quality of the gem used.
 		This process also creates a resonance field that provides the (imbued) effects of the gem to you while this effect lasts.]]):
 		format(amt)
 	end,

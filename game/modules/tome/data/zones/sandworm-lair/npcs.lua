@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2018 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -123,9 +123,12 @@ newEntity{ define_as = "SANDWORM_QUEEN",
 		{type="vermin", subtype="sandworm", number=4, hasxp=false},
 	},
 
-	autolevel = "warrior",
-	ai = "tactical", ai_state = { talent_in=2, ai_move="move_astar", },
-	ai_tactic = resolvers.tactic"melee",
+	autolevel = "warriorwill",
+	auto_classes={
+		{class="Summoner", start_level=15, level_rate=50},
+	},
+	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
+	ai_tactic = {attack=2, attackarea=2, disable=2, escape=0, heal=1},  -- No real preference for range or melee but don't run away through walls
 	resolvers.inscriptions(2, "infusion"),
 	
 	-- Failsafe for if a player can't find the boss
@@ -190,7 +193,8 @@ newEntity{ define_as = "CORRUPTED_SAND_WYRM",
 	combat = { dam=140, atk=130, apr=25, dammod={str=1.2} },
 
 	resists = { [DamageType.BLIGHT] = 25, [DamageType.NATURE] = 50 },
-
+	equilibrium_regen = -10,
+	vim_regen = 5,
 	body = { INVEN = 10, BODY=1 },
 
 	can_pass = {pass_wall=20},
@@ -213,6 +217,9 @@ newEntity{ define_as = "CORRUPTED_SAND_WYRM",
 	resolvers.sustains_at_birth(),
 
 	autolevel = "warriormage",
+	auto_classes={{class="Corruptor", start_level=48, level_rate=50},
+		{class="Wyrmic", start_level=48, level_rate=50},
+	},
 	ai = "tactical", ai_state = { ai_target="target_player_radius", ai_move="move_complex", sense_radius=400, talent_in=1, },
 	dont_pass_target = true,
 	resolvers.inscriptions(4, "infusion"),
