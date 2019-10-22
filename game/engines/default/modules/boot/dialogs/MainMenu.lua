@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -289,8 +289,8 @@ function _M:uiLogin(uis)
 	local str = Textzone.new{auto_width=true, auto_height=true, text="#GOLD#Online Profile"}
 	local bt = Button.new{text="Login", width=50, fct=function() self:login() end}
 	local btr = Button.new{text="Register", fct=function() self:register() end}
-	self.c_login = Textbox.new{title="Username: ", text="", chars=16, max_len=20, fct=function(text) self:login() end}
-	self.c_pass = Textbox.new{title="Password: ", size_title=self.c_login.title, text="", chars=16, max_len=20, hide=true, fct=function(text) self:login() end}
+	self.c_login = Textbox.new{title="Username: ", text="", chars=16, max_len=200, fct=function(text) self:login() end}
+	self.c_pass = Textbox.new{title="Password: ", size_title=self.c_login.title, text="", chars=16, max_len=200, hide=true, fct=function(text) self:login() end}
 
 	uis[#uis+1] = {left=10, bottom=bt.h + self.c_login.h + self.c_pass.h + str.h, ui=Separator.new{dir="vertical", size=self.iw - 20}}
 	uis[#uis+1] = {hcenter=0, bottom=bt.h + self.c_login.h + self.c_pass.h, ui=str}

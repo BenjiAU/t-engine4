@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -56,6 +56,8 @@ on_grant = function(self, who)
 	if not x or not y then return end
 
 	who:move(x, y, true)
+
+	if config.settings.cheat and __module_extra_info.no_birth_popup then return end
 
 	local Chat = require"engine.Chat"
 	local chat = Chat.new("tarelion-start-archmage", npc, who)

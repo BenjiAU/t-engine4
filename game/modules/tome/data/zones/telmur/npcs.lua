@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ newEntity{ define_as = "SHADE_OF_TELOS",
 	display = "G", color=colors.VIOLET,
 	desc = [[Everybody thought Telos dead and his spirit destroyed, but it seems he still lingers in his old place of power.]],
 	killer_message = "and was savagely mutilated, a show of his rage towards all living things",
+	not_power_source = {nature=true},
 	level_range = {38, nil}, exp_worth = 3,
 	max_life = 250, life_rating = 22, fixed_rating = true,
 	rank = 4,

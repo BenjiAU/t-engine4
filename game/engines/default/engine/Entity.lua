@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -956,11 +956,11 @@ function _M:addTemporaryValue(prop, v, noupdate)
 				table.sort(b, function(a, b) return a[1] > b[1] end)
 				base[prop] = b[1] and b[1][2]
 			else
-if type(base[prop] or 0) ~= "number" or type(v) ~= "number" then
-	print("ERROR: Attempting to add value", v, "property", prop, "to", base[prop]) table.print(base[prop]) table.print(v)
-	print("Entity:", self) -- table.print(self)
-	game.debug._debug_entity = self
-end
+-- if type(base[prop] or 0) ~= "number" or type(v) ~= "number" then
+-- 	print("ERROR: Attempting to add value", v, "property", prop, "to", base[prop]) table.print(base[prop]) table.print(v)
+-- 	print("Entity:", self) -- table.print(self)
+-- 	game.debug._debug_entity = self
+-- end
 				base[prop] = (base[prop] or 0) + v
 			end
 			self:onTemporaryValueChange(prop, v, base)
@@ -1249,6 +1249,7 @@ function _M:loadList(file, no_default, res, mod, loaded)
 
 			local e = newenv.class.new(t, no_default)
 			if type(mod) == "function" then mod(e) end
+			if _M.alter_entity_load then _M.alter_entity_load(e) end
 
 			res[#res+1] = e
 			if t.define_as then res[t.define_as] = e end
@@ -1257,6 +1258,7 @@ function _M:loadList(file, no_default, res, mod, loaded)
 		importEntity = function(t)
 			local e = t:cloneFull()
 			if mod then mod(e) end
+			if _M.alter_entity_load then _M.alter_entity_load(e) end
 			res[#res+1] = e
 			if t.define_as then res[t.define_as] = e end
 		end,

@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -150,7 +150,7 @@ function _M.AI_InitializeData()
 				want = "constant:"..tostring(swant)
 			end
 		end
-		print(("\t* %-15s\t%s\t\t%s"):format(tact, _M.AI_TACTICS[tact], want))
+		print(("\t* %-15s\t%s\t\t%s"):format(tact, tostring(_M.AI_TACTICS[tact]), want))
 	end
 end
 
@@ -313,11 +313,12 @@ _M.aiSubstDamtypes = {
 
 -- Still count grids we can potentially shove or swap our way into
 function _M:aiPathingBlockCheck(x, y, actor_checking)
-	return not self:block_move(x, y, actor_checking) or not actor_checking:canBumpDisplace(self)
+	return not self:block_move(x, y, actor_checking) or not actor_checking.canBumpDisplace or not actor_checking:canBumpDisplace(self)
 end
 
 -- Can an NPC shove or swap positions with a space occupied by another NPC?
 function _M:canBumpDisplace(target)
+	if target == game.player then return end
 	if target.rank >= self.rank then return false end
 	if not target.x then return end
 	if self.never_move or target.never_move or target.cant_be_moved then return false end
@@ -345,7 +346,7 @@ function _M:moveDirection(x, y, force)
 
 		-- Find all possible directions to move, including towards friendly targets
 		local target = game.level.map(lx, ly, engine.Map.ACTOR)
-		if target and self:reactionToward(target) > 0 and self:canBumpDisplace(target) then l[#l+1] = {lx,ly, core.fov.distance(x,y,lx,ly)/2+rng.float(0, .1), target} end -- Add straight ahead if shoveable
+		if target and self:reactionToward(target) > 0 and self.canBumpDisplace and self:canBumpDisplace(target) then l[#l+1] = {lx,ly, core.fov.distance(x,y,lx,ly)/2+rng.float(0, .1), target} end -- Add straight ahead if shoveable
 		local dir = util.getDir(lx, ly, self.x, self.y)
 		local sides = util.dirSides(dir, self.x, self.y)
 		for _, dir in pairs(sides) do -- sides
@@ -355,7 +356,7 @@ function _M:moveDirection(x, y, force)
 				l[#l+1] = {dx,dy, core.fov.distance(x,y,dx,dy)}
 			else
 				target = game.level.map(dx, dy, engine.Map.ACTOR)
-				if target and self:reactionToward(target) > 0 and self:canBumpDisplace(target) then
+				if target and self:reactionToward(target) > 0 and self.canBumpDisplace and self:canBumpDisplace(target) then
 					l[#l+1] = {dx,dy, core.fov.distance(x,y,dx,dy)/2+rng.float(0, .1), target}
 				end
 			end
@@ -673,6 +674,7 @@ function _M:aiGridDamage(gx, gy)
 	gx = gx or self.x
 	gy = gy or self.y
 	local g = game.level.map(gx, gy, engine.Map.TERRAIN)
+	if not g then return 0, 0 end
 	local dam, air = 0, 0
 	if not self:attr("no_breath") then -- check for suffocating terrain
 		local air_level, air_condition = g:check("air_level", gx, gy), g:check("air_condition", gx, gy)
@@ -685,7 +687,9 @@ function _M:aiGridDamage(gx, gy)
 
 	if g.DamageType and not self:attr("invulnerable") then -- check for damaging terrain
 		if not g.faction or self:reactionToward(g) < 0 then
-			dam = ((g.maxdam or 0) + (g.mindam or 0))/2 * (100 - self:combatGetResist(g.DamageType)-self:combatGetAffinity(g.DamageType))/100
+			if type(g.maxdam) == "table" or type(g.mindam) == "table" then dam = 0
+			else dam = ((g.maxdam or 0) + (g.mindam or 0))/2 * (100 - self:combatGetResist(g.DamageType)-self:combatGetAffinity(g.DamageType))/100
+			end
 		end
 	end
 	if config.settings.log_detail_ai > 3 then print(("[aiGridDamage] for %s (%d, %d) dam: %s, air: %s"):format(self.name, gx, gy, dam, air)) end
@@ -808,7 +812,7 @@ end
 -- returns true/false (grid found?), grid x, grid y
 function _M:aiCanFleeDmapKeepLos()
 	if self:attr("never_move") then return false end -- Dont move, dont flee
-	if self.ai_target.actor then
+	if self.ai_target.actor and self.ai_target.actor.distanceMap then
 		local act = self.ai_target.actor
 		local ax, ay = self:aiSeeTargetPos(act)
 		local dir, c
@@ -971,7 +975,7 @@ For each talent, the aiTalentTactics function caches a list of targets affected 
 		Updated by Actor:onTemporaryValueChange (when one of the properties in ActorAI.aiDHashProps changes).
 	
 	computed TACTIC values (for various actors, never for SELF):
-	SELF.ai_state._tact_wt_cache = {
+	SELF._ai_tact_wt_cache = {
 		_computed = game.turn of last full reset,
 		[TID] = {
 			_computed = game.turn of last reset for TID,
@@ -984,8 +988,7 @@ For each talent, the aiTalentTactics function caches a list of targets affected 
 		}
 		
 	final TACTIC WEIGHT results (for each talent evaluated in the current turn):
-	SELF.turn_procs{
-		_ai_tactical = {_new_tact_wt_cache = <boolean> actor weights cache has been reset,
+	SELF._turn_ai_tactical = {_new_tact_wt_cache = <boolean> actor weights cache has been reset,
 			[TID] = {base_tacs = {base tactics = computed explicit tactics for TID,
 				implicit_tacs = computed implicit tactics for TID},
 				selffire = computed selffire coefficient,
@@ -1269,10 +1272,10 @@ config.settings.tactical_cache_test = false
 function _M:aiTalentTactics(t, aitarget, target_list, tactic, tg, wt_mod)
 	-- set up caching for tactical values
 	local cache_turns = self.ai_state._tactical_cache_turns or self.AI_TACTICAL_CACHE_TURNS -- # game turns cached values are valid (all talents)
-	local cache_wt_values -- allow caching of tactical weights in self.ai_state._tact_wt_cache
-	local tp_cache_tactics -- allow caching of tactics results in self.turn_procs._ai_tactical
-	self.turn_procs._ai_tactical = self.turn_procs._ai_tactical or {_new_tact_wt_cache = false}
-	local tp_cache = self.turn_procs._ai_tactical -- turn_procs tactical cache
+	local cache_wt_values -- allow caching of tactical weights in self._ai_tact_wt_cache
+	local tp_cache_tactics -- allow caching of tactics results in self._turn_ai_tactical
+	self._turn_ai_tactical = self._turn_ai_tactical or {_new_tact_wt_cache = false}
+	local tp_cache = self._turn_ai_tactical -- turn_procs tactical cache
 	local tpid_cache = tp_cache[t.id] -- turn_procs tactical cache (this talent)
 	local log_detail = config.settings.log_detail_ai or 0
 	
@@ -1281,13 +1284,13 @@ function _M:aiTalentTactics(t, aitarget, target_list, tactic, tg, wt_mod)
 	if log_detail > 1 then print(("[aiTalentTactics] COMPUTING TACTICs [%d]%s(OHash:%s) (%s, wt_mod:%s, wt cache_turns:%d) for talent: %s targeted on %s[%s], tg=%s"):format(self.uid, self.name, self.aiOHash, tactic or "all", wt_mod, cache_turns, t.id, aitarget and aitarget.uid, aitarget and aitarget.name, tg)) end 
 
 	-- build/reset the master target tactical weight cache periodically
-	if not self.ai_state._tact_wt_cache or game.turn - self.ai_state._tact_wt_cache._computed >= cache_turns and not tp_cache._new_tact_wt_cache then
+	if not self._ai_tact_wt_cache or game.turn - self._ai_tact_wt_cache._computed >= cache_turns and not tp_cache._new_tact_wt_cache then
 		if log_detail > 2 then print("[aiTalentTactics] *** creating new TACTICAL WEIGHT CACHE, turn", game.turn) end
-		self.ai_state._tact_wt_cache = {_computed=game.turn}
+		self._ai_tact_wt_cache = {_computed=game.turn}
 		tp_cache._new_tact_wt_cache = true
 	end
 
-	local tac_cache = self.ai_state._tact_wt_cache -- master target tactical weight cache
+	local tac_cache = self._ai_tact_wt_cache -- master target tactical weight cache
 	local tid_cache -- target tactical weight cache (this talent)
 	local cache_tactic = type(tactic) ~= "string" and tactic or nil -- tactical data reference
 	local targets = target_list -- specified target list	
@@ -1595,7 +1598,7 @@ function _M:aiTalentTactics(t, aitarget, target_list, tactic, tg, wt_mod)
 									else -- calculate status immunity
 										_, status_chance = act:canBe(effect_type) --Status immunity
 										if log_detail > 2 then print("\t\t--- status_chance", effect_type, status_chance) end
-										res = 100 - status_chance
+										res = 100 - status_chance or 0
 									end
 									if type(effect_wt) == "table" then -- sum the list of statuses and weights that can affect the actor
 										local e_wt = 0

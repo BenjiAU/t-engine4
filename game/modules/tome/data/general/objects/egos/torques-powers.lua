@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -17,20 +17,13 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
---[[
-Torques
-*psionic shield
-*clear mind
-*mind wave
-]]
-
 newEntity{
 	name = " of psionic shield", addon=true, instant_resolve=true,
-	keywords = {psionicshield=true},
+	keywords = {['psionic shield']=true},
 	level_range = {1, 50},
 	rarity = 15,
 	charm_power_def = {add=3, max=200, floor=true},
-	resolvers.charm("setup a psionic shield, reducing all damage taken %d for 5 turns", 25, function(self, who)
+	resolvers.charm("setup a psionic shield, reducing all damage taken by %d for 5 turns", 25, function(self, who)
 		who:setEffect(who.EFF_PSIONIC_SHIELD, 5, {kind="all", power=self:getCharmPower(who)})
 		game.logSeen(who, "%s uses %s!", who.name:capitalize(), self:getName{no_add_name=true, do_color=true})
 		return {id=true, used=true}
@@ -43,43 +36,31 @@ newEntity{
 	tactical = { DEFEND = 2 }}),
 }
 
+-- Scaling on this is pretty dumb
 newEntity{
 	name = " of clear mind", addon=true, instant_resolve=true,
 	keywords = {clearmind=true},
-	level_range = {15, 50},
-	rarity = 15,
+	level_range = {1, 50},
+	rarity = 20,
 	charm_power_def = {add=1, max=5, floor=true},
-	resolvers.charm("absorb and nullify at most %d detrimental mental status effects in the next 10 turns", 10, function(self, who)
-		who:setEffect(who.EFF_CLEAR_MIND, 10, {power=self:getCharmPower(who)})
+	resolvers.charm("remove 1 confusion or silence effect and prevent the application of %d detrimental mental effects for 5 turns", 40, function(self, who)
+		who:removeEffectsFilter(function(e) return (e.subtype.confusion or e.subtype.silence) end, 1)
+		who:setEffect(who.EFF_CLEAR_MIND, 5, {power=self:getCharmPower(who)})
 		game.logSeen(who, "%s uses %s!", who.name:capitalize(), self:getName{no_add_name=true, do_color=true})
 		return {id=true, used=true}
 	end,
 	"T_GLOBAL_CD",
-	{tactical = {CURE = function(who, t, aitarget) -- if we're debuffed, try to prevent more
-			if who:hasEffect(who.EFF_CLEAR_MIND) then return 0 end
+	{tactical = {CURE = function(who, t, aitarget)
 			local nb = 0
 			for eff_id, p in pairs(who.tmp) do
 				local e = who.tempeffect_def[eff_id]
-				if e.status == "detrimental" and e.type == "mental" then
+				if e.status == "detrimental" and (e.subtype.confusion or e.subtype.silence) then
 					nb = nb + 1
 				end
 			end
-			return math.ceil(nb/2)
+			return nb
 		end,
-		DEFEND = function(who, t, aitarget) -- if the target can debuff us with mental abilities, prepare
-			if not aitarget or who:hasEffect(who.EFF_CLEAR_MIND) then return 0 end
-			local count, nb = 0, 0
-			for t_id, p in pairs(aitarget.talents) do
-				count = count + 1
-				local tal = aitarget.talents_def[t_id]
-				if tal.is_mind then
-					if type(tal.tactical) == "table" and tal.tactical.disable then
-						nb = nb + 1
-					end
-				end
-			end
-			return math.min(5*(nb/count)^.5, 5)
-		end}}
+	}}
 	),
 }
 
@@ -88,10 +69,10 @@ newEntity{
 	keywords = {galeforce=true},
 	level_range = {1, 50},
 	rarity = 10,
-	charm_power_def = {add=15, max=800, floor=true},
+	charm_power_def = {add=0, max=800, floor=true},
 	resolvers.charm(
 		function(self, who)
-			local dam = who:damDesc(engine.DamageType.Mind, self.use_power.damage(self, who))
+			local dam = who:damDesc(engine.DamageType.PHYSICAL, self.use_power.damage(self, who))
 			return ("project a gust of wind in a cone knocking enemies back %d spaces and dealing %d damage"):format(self.use_power.knockback(self, who), dam)
 		end,
 		15,
@@ -105,6 +86,7 @@ newEntity{
 			game.logSeen(who, "%s uses %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name=true, do_color=true})
 			local DamageType = require "engine.DamageType"
 			local state = {}
+			game.level.map:particleEmitter(who.x, who.y, tg.radius, "mudflow", {radius=tg.radius, tx=x-who.x, ty=y-who.y})
 			who:project(tg, x, y, function(tx, ty)
 				local target = game.level.map(tx, ty, engine.Map.ACTOR)
 				if not target or target == who or state[target] then return end
@@ -121,7 +103,7 @@ newEntity{
 		{
 		damage = function(self, who) return self:getCharmPower(who) end,
 		knockback = function(self, who) return math.floor(self:getCharmPower(who) / 50) + 5 end,
-		target = function(self, who) return {type="cone", radius=6, range=0} end,
+		target = function(self, who) return {type="cone", radius=4, range=0} end,
 		requires_target = true,
 		tactical = { attackarea = { physical = 2} }
 		}
@@ -133,7 +115,7 @@ newEntity{
 	keywords = {mindblast=true},
 	level_range = {1, 50},
 	rarity = 10,
-	charm_power_def = {add=25, max=600, floor=true},
+	charm_power_def = {add=0, max=800, floor=true},
 	resolvers.charm(function(self, who)
 			local dam = self.use_power.damage(self, who)
 			return ("blast the opponent's mind dealing %d mind damage and silencing them for 4 turns"):format(dam )

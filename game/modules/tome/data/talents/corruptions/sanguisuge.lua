@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ newTalent{
 	type = {"corruption/sanguisuge", 1},
 	require = corrs_req1,
 	points = 5,
-	vim = 0,
 	cooldown = 5,
 	reflectable = true,
 	proj_speed = 15,
@@ -47,7 +46,6 @@ newTalent{
 	end,
 }
 
--- Sustain?
 newTalent{
 	name = "Bloodcasting",
 	type = {"corruption/sanguisuge", 2},
@@ -55,13 +53,12 @@ newTalent{
 	points = 5,
 	mode = "passive",
 	no_npc_use = true,
-	getLifeCost = function(self, t) return math.floor(self:combatTalentScale(t, 250, 100)) end,
+	getLifeCost = function(self, t) return math.floor(self:combatTalentScale(t, 180, 100)) end,
 	passives = function(self, t, p)
 		self:talentTemporaryValue(p, "bloodcasting", t.getLifeCost(self, t))
 	end,
 	info = function(self, t)
-		return ([[Your corruption spells will consume health instead of vim if their cost is higher than your vim.
-			The health cost is equal to %d%% of the vim cost.]]):
+		return ([[The cost of using life instead of vim for talents is reduced to %d%%.]]):
 		format(t.getLifeCost(self,t))
 	end,
 }
@@ -108,7 +105,6 @@ newTalent{
 	points = 5,
 	vim = 40,
 	cooldown = 20,
-	range = 10,
 	no_energy = true,
 	tactical = { HEAL = 2 },
 	getMult = function(self,t) return self:combatTalentSpellDamage(t, 4, 30) end,

@@ -59,6 +59,7 @@ newTalent {
 		return self:combatTalentWeaponDamage(t, 0.4, 1.6)
 	end,
 	callbackOnMove = function(self, t, moved, force, ox, oy)
+		if (self.x == ox and self.y == oy) or force then return end
 		local cooldown = self.talents_cd[t.id] or 0
 		if cooldown > 0 then
 			self.talents_cd[t.id] = math.max(cooldown - 1, 0)
@@ -175,8 +176,6 @@ newTalent {
 	end,
 }
 
--- The cost on this is extreme because its a completely ridiculous talent
--- We don't have any other talents like this, really, that are incredibly hard to use for much of anything until late.  Should be interesting.
 newTalent {
 	short_name = "SKIRMISHER_BOMBARDMENT",
 	name = "Bombardment",
@@ -194,7 +193,7 @@ newTalent {
 		return 3
 	end,
 	shot_stamina = function(self, t)
-		return 25 * (1 + self:combatFatigue() * 0.01)
+		return 20
 	end,
 	damage_multiplier = function(self, t)
 		return self:combatTalentWeaponDamage(t, 0.1, 0.6)
@@ -202,7 +201,7 @@ newTalent {
 	activate = function(self, t) return {} end,
 	deactivate = function(self, t, p) return true end,
 	info = function(self, t)
-		return ([[While activated, your basic Shot talent now fires %d times, with each attack dealing %d%% Ranged damage, at a cost of %d Stamina per attack.]])
-		:format(t.bullet_count(self, t), t.damage_multiplier(self, t) * 100, t.shot_stamina(self, t))
+		return ([[Your Shoot talent now costs %d stamina but fires %d times for %d%% damage per shot.]])
+		:format(t.shot_stamina(self, t), t.bullet_count(self, t), t.damage_multiplier(self, t) * 100 )
 	end,
 }

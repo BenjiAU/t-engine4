@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ if log_detail > 1.4 and config.settings.cheat then game.log("__%s #GREY# (%d, %d
 	grid = self.ai_state.safe_grid
 	if grid then -- try to use previously calculated grid information
 		path = grid.path
-		if path and #path > 0 then -- try to use previously calculated path
+		if path and #path > 0 and path[1].x and path[1].y then -- try to use previously calculated path
 			if log_detail >= 2 then
 				print("[move_safe_grid AI]", self.uid, self.name, "Trying previous path to", path[1].x, path[1].y)
 	if log_detail > 1.4 and config.settings.cheat then game.log("#GREY#___Trying existing path to (%s, %s)", path[1].x, path[1].y) end -- debugging

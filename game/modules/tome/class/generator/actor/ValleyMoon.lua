@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ function _M:generateOne()
 			x = spot.x y = spot.y
 			if m.unique then -- make room for the boss
 				local a = self.level.map(x, y, Map.ACTOR)
-				if not a.unique then a:die() end
+				if a and not a.unique then a:die() end
 			end
 			tries = tries + 1
 		end

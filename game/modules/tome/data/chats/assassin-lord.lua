@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -39,6 +39,11 @@ local function evil(npc, player)
 	game.log("As you depart the assassin lord says: 'And do not forget, I own you now.'")
 end
 
+local function do_attack(npc, player)
+	engine.Faction:setFactionReaction(player.faction, npc.faction, -100, true)
+	if npc.on_takehit then npc:on_takehit() end
+end
+
 newChat{ id="welcome",
 	text = [[#LIGHT_GREEN#*Before you stands a menacing man clothed in black.*#WHITE#
 Ahh, the intruder at last... And what shall we do with you? Why did you kill my men?]],
@@ -52,7 +57,7 @@ Ahh, the intruder at last... And what shall we do with you? Why did you kill my 
 newChat{ id="hostile",
 	text = [[Oh, you are not going anywhere, I'm afraid! KILL!]],
 	answers = {
-		{"[attack]", action=function(npc, player) engine.Faction:setFactionReaction(player.faction, npc.faction, -100, true) end},
+		{"[attack]", action=do_attack},
 		{"Wait! Maybe we could work out some kind of arrangement; you seem to be a practical man.", jump="offer"},
 	}
 }
@@ -60,14 +65,14 @@ newChat{ id="hostile",
 newChat{ id="what",
 	text = [[Oh, so this is the part where I tell you my plan before you attack me? GET THIS INTRUDER!]],
 	answers = {
-		{"[attack]", action=function(npc, player) engine.Faction:setFactionReaction(player.faction, npc.faction, -100, true) end},
+		{"[attack]", action=do_attack},
 		{"Wait! Maybe we could work out some kind of arrangement; you seem to be a practical man.", jump="offer"},
 	}
 }
 newChat{ id="greed",
 	text = [[I am afraid this is not your lucky day then. The merchant is ours... and so are you! GET THIS INTRUDER!!]],
 	answers = {
-		{"[attack]", action=function(npc, player) engine.Faction:setFactionReaction(player.faction, npc.faction, -100, true) end},
+		{"[attack]", action=do_attack},
 		{"Wait! Maybe we could work out some kind of arrangement; you seem to be a practical man.", jump="offer"},
 	}
 }
@@ -79,7 +84,7 @@ And do not think of crossing me.  That would be... unwise.]],
 	answers = {
 		{"Well, I suppose it is better than dying.", action=evil},
 		{"Money? I'm in!", action=evil},
-		{"Just let me and the merchant get out of here and you may live!", action=function(npc, player) engine.Faction:setFactionReaction(player.faction, npc.faction, -100, true) end},
+		{"Just let me and the merchant get out of here and you may live!", action=do_attack},
 	}
 }
 

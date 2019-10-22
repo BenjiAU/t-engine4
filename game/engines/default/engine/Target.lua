@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -315,7 +315,7 @@ function _M:realDisplay(dispx, dispy, display_highlight)
 		or function(_, bx, by) return false end
 
 	d.l:set_corner_block(block_corner)
-	d.lx, d.ly, d.blocked_corner_x, d.blocked_corner_y = d.l:step()
+	d.lx, d.ly, d.blocked_corner_x, d.blocked_corner_y = d.l:step(self.target_type.force_max_range)
 
 	d.stop_x, d.stop_y = self.target_type.start_x, self.target_type.start_y
 	d.stop_radius_x, d.stop_radius_y = self.target_type.start_x, self.target_type.start_y
@@ -338,12 +338,35 @@ function _M:realDisplay(dispx, dispy, display_highlight)
 		if self.target_type.display_line_step then self.target_type.display_line_step(self, d) end
 
 		if d.block then self.target_type.display_on_block(self, d) end
+		if self.target_type.force_max_range and (d.stopped or core.fov.distance(self.target_type.start_x, self.target_type.start_y, d.lx, d.ly) > self.target_type.range) then break end
 
-		d.lx, d.ly, d.blocked_corner_x, d.blocked_corner_y = d.l:step()
+		d.lx, d.ly, d.blocked_corner_x, d.blocked_corner_y = d.l:step(self.target_type.force_max_range)
 
 		if d.blocked_corner_x and not d.stopped then
 			self.target_type.display_on_block_corner(self, d)
 		end
+	end
+
+	if self.target_type.widebeam and self.target_type.widebeam > 0 then
+		core.fov.calc_wide_beam(
+			d.stop_radius_x,
+			d.stop_radius_y,
+			game.level.map.w,
+			game.level.map.h,
+			self.target_type.start_x,
+			self.target_type.start_y,
+			self.target_type.widebeam,
+			function(_, px, py)
+				if self.target_type.block_radius and self.target_type:block_radius(px, py, true) then return true end
+			end,
+			function(_, px, py)
+				if not self.target_type.no_restrict and not game.level.map.remembers(px, py) and not game.level.map.seens(px, py) then
+					d.display_highlight(self.syg, px, py)
+				else
+					d.display_highlight(self.sg, px, py)
+				end
+			end,
+			nil)
 	end
 
 	if self.target_type.ball and self.target_type.ball > 0 then
@@ -353,6 +376,27 @@ function _M:realDisplay(dispx, dispy, display_highlight)
 			game.level.map.w,
 			game.level.map.h,
 			self.target_type.ball,
+			function(_, px, py)
+				if self.target_type.block_radius and self.target_type:block_radius(px, py, true) then return true end
+			end,
+			function(_, px, py)
+				if not self.target_type.no_restrict and not game.level.map.remembers(px, py) and not game.level.map.seens(px, py) then
+					d.display_highlight(self.syg, px, py)
+				else
+					d.display_highlight(self.sg, px, py)
+				end
+			end,
+			nil)
+	end
+
+	if self.target_type.triangle then
+		core.fov.calc_triangle(
+			d.stop_radius_x,
+			d.stop_radius_y,
+			game.level.map.w,
+			game.level.map.h,
+			self.target_type.triangle,
+			self.target_type.triangle_mode or "center",
 			function(_, px, py)
 				if self.target_type.block_radius and self.target_type:block_radius(px, py, true) then return true end
 			end,
@@ -596,7 +640,9 @@ _M.types_def = {
 		dest.wall = src.halflength
 		end,
 	bolt = function(dest, src) dest.stop_block = true end,
-	beam = function(dest, scr) dest.line = true end,
+	beam = function(dest, src) dest.line = true end,
+	widebeam = function(dest, src) dest.widebeam = src.radius end,
+	triangle = function(dest, src) dest.triangle = src.tri_points dest.triangle_mode = src.tri_src end,
 }
 
 --- Interpret a targeting table, applying default fields needed by ActorProject and realDisplay

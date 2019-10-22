@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ newEntity{
 	change_level_check = function()
 		game:onLevelLoad("town-point-zero-1", function(zone, level)
 			game:onTickEnd(function()
-				local npc = game.zone:makeEntityByName(level, "actor", "TEMPORAL_DEFILER")
+				local npc = game.zone:makeEntityByName(level, "actor", "TEMPORAL_DEFILER", true)
 				local spot = level:pickSpot{type="pop", subtype="defiler"}
 				game.zone:addEntity(level, npc, "actor", spot.x, spot.y)
 				npc:setTarget(game.player)

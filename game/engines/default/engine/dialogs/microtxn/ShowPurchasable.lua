@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -24,8 +24,10 @@ local Entity = require "engine.Entity"
 local Dialog = require "engine.ui.Dialog"
 local Image = require "engine.ui.Image"
 local Textzone = require "engine.ui.Textzone"
+local Separator = require "engine.ui.Separator"
 local TextzoneList = require "engine.ui.TextzoneList"
 local ListColumns = require "engine.ui.ListColumns"
+local VariableList = require "engine.ui.VariableList"
 local Button = require "engine.ui.Button"
 local WebView = require "engine.ui.WebView"
 
@@ -37,38 +39,58 @@ local bonus_vault_slots_tooltip = "For every purchase of #{italic}##GREY#%s#LAST
 local coins_balance_text = "#{italic}##UMBER#Voratun Coins available from your donations: #ROYAL_BLUE#%d#{normal}#"
 local coins_balance_tooltip = "For every donations you've ever made you have earned voratun coins. These can be spent purchasing expansions or options on the online store. This is the amount you have left, if your purchase total is below this number you'll instantly get your purchase validated, if not you'll need to donate some more first.\n#GOLD##{italic}#Thanks for your support, every little bit helps the game survive for years on!#{normal}#"
 
+_M.force_ui_inside = "microtxn"
+
 function _M:init(mode)
 	if not mode then mode = core.steam and "steam" or "te4" end
 	self.mode = mode
 
-	self.ui = "microtxn"
-
 	self.cart = {}
+
 
 	self.base_title_text = game.__mod_info.long_name.." #GOLD#Online Store#LAST#"
 	Dialog.init(self, self.base_title_text, game.w * 0.8, game.h * 0.8)
 
+	game.tooltip:generate()
+
 	self.categories_icons = {
-		pay2die = Entity.new{image="/data/gfx/mtx/ui/category_pay2die.png"},
-		community = Entity.new{image="/data/gfx/mtx/ui/category_community.png"},
-		cosmetic = Entity.new{image="/data/gfx/mtx/ui/category_cosmetic.png"},
-		misc = Entity.new{image="/data/gfx/mtx/ui/category_misc.png"},
+		pay2die = "/data/gfx/microtxn-ui/category_pay2die.png",
+		community = "/data/gfx/microtxn-ui/category_community.png",
+		cosmetic = "/data/gfx/microtxn-ui/category_cosmetic.png",
+		misc = "/data/gfx/microtxn-ui/category_misc.png",
 	}
-	local in_cart_icon = Entity.new{image="/data/gfx/mtx/ui/in_cart.png"}
+	local in_cart_icon = Entity.new{image="/data/gfx/microtxn-ui/in_cart.png"}
+	-- local icon_frame = Entity.new{image="/data/gfx/microtxn-ui/icon_frame.png"}
 
 	self.list = {}
 	self.purchasables = {}
 	self.recap = {}
 
+	local vsep = Separator.new{dir="horizontal", size=self.ih - 10}
+
 	self.c_waiter = Textzone.new{auto_width=1, auto_height=1, text="#YELLOW#-- connecting to server... --"}
-	self.c_list = ListColumns.new{width=self.iw - 350, height=self.ih, item_height=132, hide_columns=true, scrollbar=true, sortable=true, columns={
-		{name="", width=100, display_prop="", direct_draw=function(item, x, y)
+
+	self.c_list = VariableList.new{width=self.iw - 350 - vsep.w, max_height=self.ih, scrollbar=true, sortable=true,
+		direct_draw=function(item, x, y, get_size)
+			if get_size then return 132 end
 			item.img:toScreen(nil, x+2, y+2, 128, 128)
-			item.category_img:toScreen(nil, x+2+64+32, y+2+64+32, 32, 32)
-			if self.cart[item.id_purchasable] and item.nb_purchase > 0 then in_cart_icon:toScreen(nil, x+2, y+2, 128, 128) end
+			if self.cart[item.id_purchasable] and item.nb_purchase > 0 then
+				in_cart_icon:toScreen(nil, x+2, y+2, 128, 128)
+				if item.nb_purchase > 1 and item.p_txt then
+					item.p_txt._tex:toScreenFull(x + 106 - item.p_txt.w / 2 + 2, y + 106 - item.p_txt.h / 2 + 2, item.p_txt.w, item.p_txt.h, item.p_txt._tex_w, item.p_txt._tex_h, 0, 0, 0, 1)
+					item.p_txt._tex:toScreenFull(x + 106 - item.p_txt.w / 2, y + 106 - item.p_txt.h / 2, item.p_txt.w, item.p_txt.h, item.p_txt._tex_w, item.p_txt._tex_h)
+				end
+			end
 			item.txt:display(x+10+130, y+2 + (128 - item.txt.h) / 2, 0)
-		end},
-	}, list=self.list, all_clicks=true, fct=function(item, _, button) self:use(item, button) end, select=function(item, sel) self:onSelectItem(item) end}
+		end,
+	list=self.list, all_clicks=true, fct=function(item, _, button) self:use(item, button) end, select=function(item, sel) self:onSelectItem(item) end}
+	-- self.c_list = ListColumns.new{width=self.iw - 350 - vsep.w, height=self.ih, item_height=132, hide_columns=true, scrollbar=true, sortable=true, columns={
+	-- 	{name="", width=100, display_prop="", direct_draw=function(item, x, y)
+	-- 		item.img:toScreen(nil, x+2, y+2, 128, 128)
+	-- 		if self.cart[item.id_purchasable] and item.nb_purchase > 0 then in_cart_icon:toScreen(nil, x+2, y+2, 128, 128) end
+	-- 		item.txt:display(x+10+130, y+2 + (128 - item.txt.h) / 2, 0)
+	-- 	end},
+	-- }, list=self.list, all_clicks=true, fct=function(item, _, button) self:use(item, button) end, select=function(item, sel) self:onSelectItem(item) end}
 	self.c_list.on_focus_change = function(_, v) if not v then game:tooltipHide() end end
 
 	self.c_bonus_vault_slots = Textzone.new{has_box=true, width=340, auto_height=1, text=bonus_vault_slots_text:format(0), can_focus=true}
@@ -93,7 +115,7 @@ function _M:init(mode)
 
 	self.c_do_purchase = Button.new{text="Purchase", fct=function() self:doPurchase() end}
 
-	self.c_recap = ListColumns.new{width=350, height=self.ih - self.c_do_purchase.h - math.max(self.c_bonus_vault_slots.h, self.c_coins_available.h), scrollbar=true, columns={
+	self.c_recap = ListColumns.new{width=350, height=self.ih - self.c_do_purchase.h - 15 - math.max(self.c_bonus_vault_slots.h, self.c_coins_available.h), scrollbar=true, columns={
 		{name="Name", width=50, display_prop="recap_name"},
 		{name="Price", width=35, display_prop="recap_price"},
 		{name="Qty", width=15, display_prop="recap_qty"},
@@ -104,20 +126,21 @@ function _M:init(mode)
 		self:use(item.item, button)
 	end, select=function(item, sel) end}
 
---	local wv = WebView.new{width=500,height=500, url='https://i.giphy.com/media/uk9A7Mz8Jv4GI/giphy-downsized.gif'}
+	-- local wv = WebView.new{width=500,height=500, url='https://te4.org/images/tmp/mtx-short.gif'}
 
 	local uis = {
 		{vcenter=0, hcenter=0, ui=self.c_waiter},
 		{left=0, top=0, ui=self.c_list},
+		{left=self.c_list, top=0, ui=vsep},
 		{right=0, top=0, ui=self.c_recap},
 		{right=0, bottom=0, ui=self.c_do_purchase},
---		{left=0, top=0, ui=wv},
+		-- {left=0, top=0, ui=wv},
 	}
 	-- Only show those for steam as te4.org purchases require already having a donation up
 	if mode == "steam" then
-		uis[#uis+1] = {right=0, bottom=self.c_do_purchase, ui=self.c_bonus_vault_slots}
+		uis[#uis+1] = {right=0, bottom=self.c_do_purchase.h+15, ui=self.c_bonus_vault_slots}
 	elseif mode == "te4" then
-		uis[#uis+1] = {right=0, bottom=self.c_do_purchase, ui=self.c_coins_available}
+		uis[#uis+1] = {right=0, bottom=self.c_do_purchase.h+15, ui=self.c_coins_available}
 	end
 
 	self:loadUI(uis)
@@ -137,6 +160,13 @@ function _M:init(mode)
 
 	self:generateList()
 end
+
+function _M:unload()
+	game.tooltip:generate()
+end
+
+-- function _M:innerDisplay(x, y, nb_keyframes)
+-- end
 
 function _M:checks() game:onTickEnd(function()
 	if not profile.auth then
@@ -221,6 +251,14 @@ function _M:updateCart()
 			recap_qty = item.nb_purchase,
 			item = item,
 		}
+
+		if item.nb_purchase > 1 then
+			local str = tostring(item.nb_purchase)
+			local gen = self.font:draw(str, str:toTString():maxWidth(self.font), 255, 255, 255)
+			if gen and gen[1] then item.p_txt = gen[1] table.print(gen[1]) end
+		else
+			item.p_txt = nil
+		end
 	end end
 	table.sort(self.recap, "sort_name")
 	self.recap[#self.recap+1] = {
@@ -240,6 +278,8 @@ function _M:updateCart()
 end
 
 function _M:doPurchase()
+	if table.count(self.cart) == 0 then self:simplePopup("Cart", "Cart is empty!") return end
+
 	self.in_paying_ui = true
 	if core.steam then self:doPurchaseSteam()
 	else self:doPurchaseTE4()
@@ -459,8 +499,13 @@ function _M:generateList()
 		for _, res in ipairs(e.data.list) do
 			res.id_purchasable = res.id
 			res.nb_purchase = 0
-			res.img = Entity.new{image=res.image}
-			res.category_img = self.categories_icons[res.category or "misc"] or self.categories_icons.misc
+			res.img = Entity.new{
+				image=res.image,
+				add_mos={
+					{image="/data/gfx/microtxn-ui/icon_frame.png"},
+					{image=self.categories_icons[res.category or "misc"] or self.categories_icons.misc},
+				},
+			}
 			res.txt = TextzoneList.new{width=self.iw - 10 - 132 - 350, height=128, pingpong=20, scrollbar=true}
 			res.txt:switchItem(true, ("%s (%s)\n#SLATE##{italic}#%s#{normal}#"):format(res.name, self:currencyDisplay(res.price), res.desc))
 			res.txt.pingpong = nil

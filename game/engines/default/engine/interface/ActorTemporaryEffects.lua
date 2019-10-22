@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -74,18 +74,26 @@ end
 function _M:timedEffects(filter)
 	local todel = {}
 	local def
+	local effs = {}
 	for eff, p in pairs(self.tmp) do
+		effs[eff] = p
+	end
+	for eff, p in pairs(effs) do
 		def = _M.tempeffect_def[eff]
 		if not filter or filter(def, p) then
 			if p.dur <= 0 then
 				todel[#todel+1] = eff
 			else
 				if def.on_timeout then
-					if p.src then p.src.__project_source = p end -- intermediate projector source
+					local old_source
+					if p.src then
+						old_source = p.src.__project_source
+						p.src.__project_source = p 
+					end -- intermediate projector source
 					if def.on_timeout(self, p, def) then
 						todel[#todel+1] = eff
 					end
-					if p.src then p.src.__project_source = nil end
+					if p.src then p.src.__project_source = old_source end
 				end
 			end
 			p.dur = p.dur - def.decrease

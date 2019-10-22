@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ local Actor = require "mod.class.Actor"
 local Party = require "mod.class.Party"
 local Player = require "mod.class.Player"
 local NPC = require "mod.class.NPC"
+local Entity = require "engine.Entity"
 
 local DebugConsole = require "engine.DebugConsole"
 local FlyingText = require "engine.FlyingText"
@@ -412,6 +413,12 @@ function _M:loaded()
 	Zone.alter_filter = function(...) return self.state:entityFilterAlter(...) end
 	Zone.post_filter = function(...) return self.state:entityFilterPost(...) end
 	Zone.ego_filter = function(...) return self.state:egoFilter(...) end
+	Entity.alter_entity_load = function(e)
+		if e:getEntityKind() == "object" and e.unique and not e.randart and e.level_range and not e.force_max_level_range then
+			e.level_range = table.clone(e.level_range)
+			e.level_range[2] = nil
+		end
+	end
 
 	self.uiset = (require("mod.class.uiset."..(config.settings.tome.uiset_mode or "Minimalist"))).new()
 
@@ -664,7 +671,11 @@ end
 function _M:updateCurrentChar()
 	if not self.party then return end
 	local player = self.party:findMember{main=true}
-	profile:currentCharacter(self.__mod_info.full_version_string, ("%s the level %d %s %s"):format(player.name, player.level, player.descriptor.subrace, player.descriptor.subclass), player.__te4_uuid)
+
+	local class_evo = ""
+	if self.descriptor and self.descriptor.class_evolution then class_evo = " ("..self.descriptor.class_evolution..")" end
+	profile:currentCharacter(self.__mod_info.full_version_string, ("%s the level %d %s %s"):format(player.name, player.level, player.descriptor.subrace, (player.descriptor.subclass or "")..class_evo), player.__te4_uuid)
+
 	if core.discord and self.zone then
 		local all_kills_kind = player.all_kills_kind or {}
 
@@ -689,7 +700,7 @@ function _M:updateCurrentChar()
 
 		local info = {}
 		info.zone = self:getZoneName()
-		info.char = ("Lvl %d %s %s"):format(player.level, player.descriptor.subrace, player.descriptor.subclass)
+		info.char = ("Lvl %d %s %s"):format(player.level, player.descriptor.subrace, (player.descriptor.subclass or "")..class_evo)
 		info.splash = "default"
 		info.splash_text = ("%d elite/%d rare/%d boss kills; playtime %s"):format(all_kills_kind.elite or 0, all_kills_kind.rare or 0, all_kills_kind.boss or 0, playtime)
 		
@@ -1618,7 +1629,7 @@ function _M:displayDelayedLogDamage()
 		for src, tgts in pairs(psrcs) do
 			for target, dams in pairs(tgts) do
 				if #dams.descs > 1 then
-					game.uiset.logdisplay(self:logMessage(src, dams.srcSeen, target, dams.tgtSeen, "#Source# hits #Target# for %s (#RED#%0.0f#LAST# total damage)%s.", table.concat(dams.descs, ", "), dams.total, dams.healing<0 and (" #LIGHT_GREEN#[%0.0f healing]#LAST#"):format(-dams.healing) or ""))
+					game.uiset.logdisplay(self:logMessage(src, dams.srcSeen, target, dams.tgtSeen, "#Source# hits #Target# for %s (#RED##{bold}#%0.0f#LAST##{normal}# total damage)%s.", table.concat(dams.descs, ", "), dams.total, dams.healing<0 and (" #LIGHT_GREEN#[%0.0f healing]#LAST#"):format(-dams.healing) or ""))
 				else
 					if dams.healing >= 0 then
 						game.uiset.logdisplay(self:logMessage(src, dams.srcSeen, target, dams.tgtSeen, "#Source# hits #Target# for %s damage.", table.concat(dams.descs, ", ")))
@@ -1971,9 +1982,6 @@ function _M:setupCommands()
 	-- Debug mode
 	self.key:addCommands{
 		[{"_d","ctrl"}] = function() if config.settings.cheat then
-			package.loaded["mod.dialogs.Donation"] = nil
-			self:registerDialog(require("mod.dialogs.Donation").new())
-do return end
 			local g = self.level.map(self.player.x, self.player.y, Map.TERRAIN)
 			print(g.define_as, g.image, g.z)
 			for i, a in ipairs(g.add_mos or {}) do print(" => ", a.image) end
@@ -1992,8 +2000,7 @@ do return end
 			print("===============")
 		end end,
 		[{"_g","ctrl"}] = function() if config.settings.cheat then
-			package.loaded["engine.Emote"] = nil
-			self.player:setEmote(require("engine.Emote").new("Plop!!!! Plop!!!! Plop!!!! ", 60))
+			self:changeLevel(1, "tareyal+bamboo-forest")
 do return end
 			if self.zone.short_name ~= "test" then
 				self:changeLevel(1, "test")
@@ -2001,21 +2008,21 @@ do return end
 				self:changeLevel(game.level.level + 1)
 			end
 do return end
+			local f, err = loadfile("/data/general/events/weird-pedestals.lua")
+			print(f, err)
+			setfenv(f, setmetatable({level=self.level, zone=self.zone}, {__index=_G}))
+			print(pcall(f))
+do return end
+			package.loaded["mod.dialogs.Donation"] = nil
+			self:registerDialog(require("mod.dialogs.Donation").new())
+do return end
 			local m = game.zone:makeEntity(game.level, "actor", {name="elven mage"}, nil, true)
 			local x, y = util.findFreeGrid(game.player.x, game.player.y, 20, true, {[Map.ACTOR]=true})
 			if m and x then
 				game.zone:addEntity(game.level, m, "actor", x, y)
 			end
-do return end
-			local f, err = loadfile("/data/general/events/fearscape-portal.lua")
-			print(f, err)
-			setfenv(f, setmetatable({level=self.level, zone=self.zone}, {__index=_G}))
-			print(pcall(f))
 		end end,
 		[{"_f","ctrl"}] = function() if config.settings.cheat then
-			package.loaded["engine.dialogs.microtxn.UsePurchased"] = nil
-			self:registerDialog(require("engine.dialogs.microtxn.UsePurchased").new())
-do return end
 			local m = game.zone:makeEntityByName(game.level, "actor", "NPC_HUMANOID_KROG")
 			local x, y = util.findFreeGrid(game.player.x, game.player.y, 20, true, {[Map.ACTOR]=true})
 			if m and x then
@@ -2244,6 +2251,12 @@ do return end
 			game.log("#GOLD#Automatic talent usage: %s", not self.player.no_automatic_talents and "#LIGHT_GREEN#enabled" or "#LIGHT_RED#disabled")
 		end,
 
+		TOGGLE_AUTOACCEPT_TARGET = function()
+			config.settings.auto_accept_target = not config.settings.auto_accept_target
+			game:saveSettings("auto_accept_target", ("auto_accept_target = %s\n"):format(tostring(config.settings.auto_accept_target)))
+			game.log("#GOLD#Automatic accept target mode: %s", config.settings.auto_accept_target and "#LIGHT_GREEN#enabled" or "#LIGHT_RED#disabled")			
+		end,
+
 		SAVE_GAME = function()
 			self:saveGame()
 		end,
@@ -2401,7 +2414,19 @@ do return end
 				self.log("Movement Mode: #LIGHT_RED#Passive#LAST#.")
 				game_or_player.bump_attack_disabled = true
 			end
-		end
+		end,
+
+		MTXN_PURCHASE = function()
+			if not profile:canMTXN() then return end
+			package.loaded["engine.dialogs.microtxn.ShowPurchasable"] = nil
+			self:registerDialog(require("engine.dialogs.microtxn.ShowPurchasable").new())
+		end,
+
+		MTXN_USE = function()
+			if not profile:canMTXN() then return end
+			package.loaded["engine.dialogs.microtxn.UsePurchased"] = nil
+			self:registerDialog(require("engine.dialogs.microtxn.UsePurchased").new())
+		end,
 	}
 
 	self:setupWASD()

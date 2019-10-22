@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -95,8 +95,8 @@ newTalent{ short_name = "SKELETON_REASSEMBLE",
 		return true
 	end,
 	info = function(self, t)
-		return ([[Re-position some of your bones, healing yourself for %d.
-		At level 5, you will gain the ability to completely re-assemble your body should it be destroyed (can only be used once)]]):
+		return ([[Reposition some of your bones, healing yourself for %d.
+		At level 5, you will gain the ability to completely re-assemble your body should it be destroyed (can only be used once).]]):
 		format(t.getHeal(self, t))
 	end,
 }

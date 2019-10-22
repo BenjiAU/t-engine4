@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -66,11 +66,7 @@ newEntity{ define_as = "INQUISITOR",
 	auto_classes={{class="Corruptor", start_level=12, level_rate=75}},
 
 	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
-	on_added_to_level = function(self)
-		if self.level <= 16 then
-			self.ai_tactic.escape = 0
-		end
-	end,
+	low_level_tactics_override = {escape=0},
 	
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("start-shaloren", engine.Quest.COMPLETED, "rhaloren")

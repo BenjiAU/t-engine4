@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2014 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ newTalent{
 		if not target or not self:canProject(tg, x, y) then return nil end
 
 		-- Leap
-		local tg = {type="hit", range=t.getDist(self,t)}
+		local tg = {type="hit", nolock=true, range=t.getDist(self,t)}
 		local x, y  = self:getTarget(tg)
 		if not x or not y then return nil end
 		local _ _, x, y = self:canProject(tg, x, y)
@@ -225,6 +225,7 @@ newTalent{
 		return true
 	end,
 	callbackOnMove = function(self, t, moved, force, ox, oy)
+		if (self.x == ox and self.y == oy) or force then return end
 		local cooldown = self.talents_cd[t.id] or 0
 		if cooldown > 0 then
 			self.talents_cd[t.id] = math.max(cooldown - 1, 0)

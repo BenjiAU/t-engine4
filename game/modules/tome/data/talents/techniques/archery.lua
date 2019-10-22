@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -153,18 +153,12 @@ newTalent{
 		if not x or not y then return end
 		game.target.forced = {x, y, target}
 
-		-- Fire all shots, limited by stamina
+		-- Fire all shots
 		local count = 0
-		local stam = t.stamina(self, t)*self.resources_def[self.RS_STAMINA].cost_factor(self, t)
 		for i = 1, shots do
 			local targets = self:archeryAcquireTargets(nil, {no_energy=true, one_shot=true, type="sling"})
 			if not targets then break end
 			
-			if count > 0 then 
-				if self:getStamina() < stam*2 then break end
-				
-				self:incStamina(-stam)
-			end
 			count = i
 			self:archeryShoot(targets, t, nil, {mult=mult, type="sling"})
 		end

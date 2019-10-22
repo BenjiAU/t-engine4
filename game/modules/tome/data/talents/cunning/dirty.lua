@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ newTalent{
 		local tg = self:getTalentTarget(t)
 		local x, y, target = self:getTarget(tg)
 		if not target or not self:canProject(tg, x, y) then return nil end
-		local hitted = self:attackTarget(target, nil, t.getDamage(self, t), true)
+		local hitted = self:attackTarget(target, nil, t.getDamage(self, t), true, true)
 		if hitted then
 			target:setEffect(target.EFF_DIRTY_FIGHTING, t.getDuration(self, t), {power=t.getPower(self,t)})
 		end
@@ -52,7 +52,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local duration = t.getDuration(self, t)
 		local power = t.getPower(self,t)
-		return ([[You make a low blow against a sensitive point on the target, dealing %d%% weapon damage. If your attack hits, the target is left reeling and vulnerable, reducing their physical save by %d and their stun, blind, confusion and pin immunities to 50%% of normal for %d turns.
+		return ([[You make a low blow against a sensitive point on the target, dealing %d%% unarmed damage. If your attack hits, the target is left reeling and vulnerable, reducing their physical save by %d and their stun, blind, confusion and pin immunities to 50%% of normal for %d turns.
 This effect bypasses saves.]]):
 		format(100 * damage, power, duration)
 	end,

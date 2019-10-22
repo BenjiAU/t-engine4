@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 require "engine.class"
 local Mouse = require "engine.Mouse"
+local Dialog = require "engine.ui.Dialog"
 local Button = require "engine.ui.Button"
 local ActorResource = require "engine.interface.ActorResource"
 local TooltipsData = require "mod.class.interface.TooltipsData"
@@ -69,8 +70,8 @@ end
 function _M:mouseTooltip(text, w, h, x, y, click)
 	self.mouse:registerZone(x, y, w, h, function(button, mx, my, xrel, yrel, bx, by, event)
 		game.tooltip_x, game.tooltip_y = 1, 1; game:tooltipDisplayAtMap(game.w, game.h, text)
-		if click and event == "button" and button == "left" then
-			click()
+		if click and event == "button"then
+			click(button)
 		end
 	end)
 end
@@ -154,8 +155,8 @@ function _M:makePortrait(a, current, x, y)
 	self.items[#self.items+1] = {p, x=x, y=y}
 end
 
-function _M:makeEntityIcon(e, tiles, x, y, desc, gtxt, frame)
-	self:mouseTooltip(desc, 40, 40, x, y)
+function _M:makeEntityIcon(e, tiles, x, y, desc, gtxt, frame, click)
+	self:mouseTooltip(desc, 40, 40, x, y, click)
 
 	local item = function(dx, dy)
 		e:toScreen(tiles, dx+x+4, dy+y+4, 32, 32)
@@ -181,6 +182,14 @@ function _M:handleEffect(eff_id, e, p, ex, h)
 		desc = ("#{bold}##GOLD#%s\n(%s: %s)#WHITE##{normal}#\n"):format(name, e.type, eff_subtype)..e.long_desc(player, p)
 	end
 
+	local remove_fct = function(button) if button == "right" then
+		Dialog:yesnoPopup(name, "Really cancel "..name.."?", function(ret)
+			if ret then
+				player:removeEffect(eff_id)
+			end
+		end)
+	end end
+
 	if config.settings.tome.effects_icons and e.display_entity then
 		local txt = nil
 		if e.decrease > 0 then
@@ -188,16 +197,19 @@ function _M:handleEffect(eff_id, e, p, ex, h)
 			txt = self.fontbig:draw(dur, 40, colors.WHITE.r, colors.WHITE.g, colors.WHITE.b, true)[1]
 			txt.fw, txt.fh = self.fontbig:size(dur)
 		end
-		self:makeEntityIcon(e.display_entity, game.uiset.hotkeys_display_icons.tiles, ex, h, desc, txt, e.status ~= "detrimental" and self.icon_green or self.icon_red)
+		self:makeEntityIcon(e.display_entity, game.uiset.hotkeys_display_icons.tiles, ex, h, desc, txt, e.status ~= "detrimental" and self.icon_green or self.icon_red, ((e.status == "beneficial" and not e.no_player_remove) or config.settings.cheat) and remove_fct or nil)
 
 		ex = ex + 40
 		if ex + 40 >= self.w then ex = 0 h = h + 40 end
 	else
 		ex = 0
+
 		if e.status == "detrimental" then
-			self:mouseTooltip(desc, self:makeTexture((e.decrease > 0) and ("#LIGHT_RED#%s(%d)"):format(name, dur) or ("#LIGHT_RED#%s"):format(name), ex, h, 255, 255, 255)) h = h + self.font_h
+			local _w, _h, _x, _y = self:makeTexture((e.decrease > 0) and ("#LIGHT_RED#%s(%d)"):format(name, dur) or ("#LIGHT_RED#%s"):format(name), ex, h, 255, 255, 255)
+			self:mouseTooltip(desc, _w, _h, _x, _y, config.settings.cheat and remove_fct or nil) h = h + self.font_h
 		else
-			self:mouseTooltip(desc, self:makeTexture((e.decrease > 0) and ("#LIGHT_GREEN#%s(%d)"):format(name, dur) or ("#LIGHT_GREEN#%s"):format(name), ex, h, 255, 255, 255)) h = h + self.font_h
+			local _w, _h, _x, _y = self:makeTexture((e.decrease > 0) and ("#LIGHT_GREEN#%s(%d)"):format(name, dur) or ("#LIGHT_GREEN#%s"):format(name), ex, h, 255, 255, 255)
+			self:mouseTooltip(desc, _w, _h, _x, _y, ((e.status == "beneficial" and not e.no_player_remove) or config.settings.cheat) and remove_fct or nil) h = h + self.font_h
 		end
 	end
 	return ex, h
@@ -247,7 +259,7 @@ function _M:display()
 		self:makeTexture("LEVELUP!", self.w - fw, h, colors.VIOLET.r, colors.VIOLET.g, colors.VIOLET.b, fw)
 		self.items[#self.items].glow = true
 		self:mouseTooltip(("#GOLD##{bold}#%s\n#WHITE##{normal}#Unused stats: %d\nUnused class talents: %d\nUnused generic talents: %d\nUnused categories: %d"):format(player.name, player.unused_stats, player.unused_talents, player.unused_generics, player.unused_talents_types), self.w, self.font_h, 0, h, function()
-			player:playerLevelup()
+			game.key:triggerVirtual("LEVELUP")
 		end)
 		h = h + self.font_h
 	end

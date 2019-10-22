@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ local ListColumns = require "engine.ui.ListColumns"
 local Button = require "engine.ui.Button"
 
 module(..., package.seeall, class.inherit(Dialog))
+
+_M.force_ui_inside = "microtxn"
 
 function _M:init(mode)
 	if not mode then mode = core.steam and "steam" or "te4" end
@@ -63,7 +65,6 @@ function _M:init(mode)
 		ACCEPT = "EXIT",
 		EXIT = function()
 			game:unregisterDialog(self)
-			if on_exit then on_exit() end
 		end,
 	}
 end
@@ -89,6 +90,18 @@ Make sure you have #GOLD##{bold}#Allow online events#WHITE##{normal}# in the #GO
 		return
 	end
 
+	if item.is_shimmer then
+		game:unregisterDialog(self)
+		if item.is_installed then
+			Dialog:simplePopup(item.name, "This pack is already installed and in use for your character.")
+		else
+			local ShowPurchasable = require("engine.dialogs.microtxn.ShowPurchasable")
+			ShowPurchasable:installShimmer(item)
+		end
+		return
+	end
+
+	Dialog:forceNextDialogUI("microtxn")
 	Dialog:yesnoPopup(item.name, ("You are about to use a charge of this option. You currently have %d charges remaining."):format(item.nb_available), function(ret) if ret then
 		local popup = Dialog:simplePopup(item.name, "Please wait while contacting the server...", nil, true)
 		profile:registerTemporaryEventHandler("MicroTxnUseActionable", function(e)
@@ -116,12 +129,22 @@ function _M:generateList()
 		end
 		if not e.list then return end
 		e.list = e.list:unserialize()
-		-- table.print(e.list)
+		table.print(e.list)
 
 		local list = {}
 		for _, item in ipairs(e.list) do
 			item.img = Entity.new{image=item.image}
 			item.display_name = item.img:getDisplayString().." "..item.name
+			if item.is_shimmer then
+				local pack_name = "cosmetic-"..item.effect
+				if game.__mod_info.addons and game.__mod_info.addons[pack_name] then
+					item.nb_available = "#LIGHT_GREEN#Installed"
+					item.is_installed = true
+				else
+					item.nb_available = "#YELLOW#Installable"
+					item.can_install = pack_name
+				end
+			end
 			list[#list+1] = item
 		end
 		self.list = list

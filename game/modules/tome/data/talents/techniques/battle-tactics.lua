@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -113,6 +113,7 @@ newTalent{
 	getCapApproach = function(self, t) return self:combatTalentLimit(t, 1, 0.15, 0.5) end,
 	getResist = function(self, t) return (1 - self.life / self.max_life)*t.resistCoeff(self, t) end,
 	getResistCap = function(self, t) return util.bound((100-(self.resists_cap.all or 100))*t.getCapApproach(self, t), 0, 100) end,
+	remove_on_zero = true,
 	drain_stamina = function(self, t, turn)
 		local p = self:isTalentActive(t.id)
 		return 1 + (turn or (p and p.turns) or 0)*0.3

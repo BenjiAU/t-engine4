@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Improves your ghoulish body, increasing Strength and Constitution by %d.
-		Your body also becomes incredibly resilient to damage, you can never take a blow that deals more than %d%% of your maximum life.]])
+		Your body also becomes incredibly resilient to damage; you can never take a blow that deals more than %d%% of your maximum life.]])
 		:format(t.statBonus(self, t), t.getMaxDamage(self, t))
 	end,
 }
@@ -131,10 +131,9 @@ newTalent{
 	info = function(self, t)
 		local dam = 10 + self:combatTalentStatDamage(t, "con", 10, 60)
 		return ([[Vomit on the ground around you, healing any undead in the area and damaging anyone else.
-		Lasts %d turns, and deals %d blight damage or heals %d life.
-		Creatures standing in the retch also have %d%% chance to remove a physical effect each turn.
-		When you stand in your own retch your racial -20%% global speed is cancelled.
-		Undeads will be stripped from a detrimental effect while others will be stripped from a beneficial effect.]]):format(t.getduration(self, t), damDesc(self, DamageType.BLIGHT, dam), dam * 1.5, t.getPurgeChance(self, t))
+		Lasts %d turns and deals %d blight damage or heals %d life.
+		Creatures standing in the retch also have %d%% chance to remove a physical effect each turn; undeads will be stripped from a detrimental effect while others will be stripped from a beneficial effect.
+		When you stand in your own retch your racial -20%% global speed is cancelled.]]):format(t.getduration(self, t), damDesc(self, DamageType.BLIGHT, dam), dam * 1.5, t.getPurgeChance(self, t))
 	end,
 }
 
@@ -209,12 +208,6 @@ newTalent{
 		ghoul.unused_generics = 0
 		ghoul.unused_talents_types = 0
 
-		if self:knowTalent(self.T_BLIGHTED_SUMMONING) then
-			ghoul:incIncStat("mag", self:getMag())
-			ghoul.blighted_summon_talent = self.T_REND
-		end
-		self:attr("summoned_times", 1)
-
 		game.zone:addEntity(game.level, ghoul, "actor", x, y)
 		game.level.map:particleEmitter(target.x, target.y, 1, "slime")
 		game:playSoundNear(target, "talents/slime")
@@ -258,7 +251,7 @@ newTalent{
 		return ([[Gnaw your target for %d%% damage.  If your attack hits, the target may be infected with Ghoul Rot for %d turns.
 		Each turn, Ghoul Rot inflicts %0.2f blight damage.
 		Targets suffering from Ghoul Rot rise as friendly ghouls when slain.
-		Ghouls last for %d turns and can use Gnaw, Ghoulish Leap, Stun, and Rotting Disease.  Some of these talents will increase with level.
+		Ghouls last for %d turns and can use Gnaw, Ghoulish Leap, Stun, and Rotting Disease.
 		The blight damage scales with your Constitution.]]):
 		format(100 * damage, duration, damDesc(self, DamageType.BLIGHT, disease_damage), ghoul_duration)
 	end,

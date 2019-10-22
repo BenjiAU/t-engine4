@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -82,12 +82,7 @@ newEntity{ define_as = "SHADE",
 
 	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
 	-- In this case safe_range being set while talent_in is above 1 still results in a lot of kiting, so we lower the safe range too
-	on_added_to_level = function(self)
-		if self.level <= 16 then
-			self.ai_tactic.safe_range = 1
-			self.ai_tactic.escape = 0
-		end
-	end,
+	low_level_tactics_override = {escape=0, safe_range=1},
 
 	on_die = function(self, who)
 		game.state:activateBackupGuardian("KOR_FURY", 3, 35, ".. yes I tell you! The old ruins of Kor'Pul are still haunted!")
@@ -131,12 +126,7 @@ newEntity{ base = "BASE_NPC_THIEF", define_as = "THE_POSSESSED",
 	ai = "tactical", ai_state = { talent_in=2, ai_move="move_astar", },
 
 	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
-	on_added_to_level = function(self)
-		if self.level <= 16 then
-			self.ai_tactic.safe_range = 1
-			self.ai_tactic.escape = 0
-		end
-	end,
+	low_level_tactics_override = {escape=0, safe_range=1},
 	
 	on_die = function(self, who)
 		game.state:activateBackupGuardian("KOR_FURY", 3, 35, ".. yes I tell you! The old ruins of Kor'Pul are still haunted!")

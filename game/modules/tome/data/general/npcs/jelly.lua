@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 -- last updated:  10:00 AM 2/3/2010
 
+-- Squishy, immobile ranged nature nukers
+
 local Talents = require("engine.interface.ActorTalents")
 
 newEntity{
@@ -30,7 +32,7 @@ newEntity{
 	sound_random = {"creatures/jelly/jelly_%d", 1, 3},
 	desc = "A strange blob on the dungeon floor.",
 	body = { INVEN = 10 },
-	autolevel = "warrior",
+	autolevel = "summoner",
 	ai = "dumb_talented_simple", ai_state = { talent_in=1, },
 	stats = { str=10, dex=15, mag=3, con=10 },
 	combat = {sound="creatures/jelly/jelly_hit"},
@@ -60,11 +62,10 @@ newEntity{ base = "BASE_NPC_JELLY",
 	max_life = resolvers.rngavg(5,9),
 	combat = { dam=8, atk=0, apr=5, damtype=DamageType.POISON },
 	all_damage_convert = DamageType.NATURE,
-	all_damage_convert_percent = 50,
+	all_damage_convert_percent = 100,
 	talent_cd_reduction = {[Talents.T_SLIME_SPIT]=-10},
-	inc_damage = {all=-30},
 	resolvers.talents{
-		[Talents.T_SLIME_SPIT]={base=0, every=5, max=5},
+		[Talents.T_SLIME_SPIT]={base=0, every=5},
 	},
 }
 
@@ -77,11 +78,10 @@ newEntity{ base = "BASE_NPC_JELLY",
 	max_life = resolvers.rngavg(5,9),
 	combat = { dam=8, atk=0, apr=5, damtype=DamageType.FIRE },
 	all_damage_convert = DamageType.FIRE,
-	all_damage_convert_percent = 50,
+	all_damage_convert_percent = 100,
 	talent_cd_reduction = {[Talents.T_SLIME_SPIT]=-10},
-	inc_damage = {all=-30},
 	resolvers.talents{
-		[Talents.T_SLIME_SPIT]={base=0, every=5, max=5},
+		[Talents.T_SLIME_SPIT]={base=0, every=5},
 	},
 }
 
@@ -94,11 +94,10 @@ newEntity{ base = "BASE_NPC_JELLY",
 	max_life = resolvers.rngavg(5,9),
 	combat = { dam=8, atk=0, apr=5, damtype=DamageType.COLD },
 	all_damage_convert = DamageType.COLD,
-	all_damage_convert_percent = 50,
+	all_damage_convert_percent = 100,
 	talent_cd_reduction = {[Talents.T_SLIME_SPIT]=-10},
-	inc_damage = {all=-30},
 	resolvers.talents{
-		[Talents.T_SLIME_SPIT]={base=0, every=5, max=5},
+		[Talents.T_SLIME_SPIT]={base=0, every=5},
 	},
 }
 
@@ -111,9 +110,8 @@ newEntity{ base = "BASE_NPC_JELLY",
 	max_life = resolvers.rngavg(5,9),
 	combat = { dam=8, atk=0, apr=5 },
 	talent_cd_reduction = {[Talents.T_SLIME_SPIT]=-10},
-	inc_damage = {all=-30},
 	resolvers.talents{
-		[Talents.T_SLIME_SPIT]={base=0, every=5, max=5},
+		[Talents.T_SLIME_SPIT]={base=0, every=5},
 	},
 }
 
@@ -126,11 +124,10 @@ newEntity{ base = "BASE_NPC_JELLY",
 	max_life = resolvers.rngavg(5,9),
 	combat = { dam=8, atk=0, apr=5, damtype=DamageType.LIGHTNING },
 	all_damage_convert = DamageType.LIGHTNING,
-	all_damage_convert_percent = 50,
+	all_damage_convert_percent = 100,
 	talent_cd_reduction = {[Talents.T_SLIME_SPIT]=-10},
-	inc_damage = {all=-30},
 	resolvers.talents{
-		[Talents.T_SLIME_SPIT]={base=0, every=5, max=5},
+		[Talents.T_SLIME_SPIT]={base=0, every=5},
 	},
 }
 
@@ -143,11 +140,10 @@ newEntity{ base = "BASE_NPC_JELLY",
 	max_life = resolvers.rngavg(5,9),
 	combat = { dam=8, atk=0, apr=5, damtype=DamageType.ACID },
 	all_damage_convert = DamageType.ACID,
-	all_damage_convert_percent = 50,
+	all_damage_convert_percent = 100,
 	talent_cd_reduction = {[Talents.T_SLIME_SPIT]=-10},
-	inc_damage = {all=-30},
 	resolvers.talents{
-		[Talents.T_SLIME_SPIT]={base=0, every=5, max=5},
+		[Talents.T_SLIME_SPIT]={base=0, every=5},
 	},
 }
 

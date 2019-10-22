@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -28,11 +28,12 @@ uberTalent{
 			(self.damage_log.weapon.other and self.damage_log.weapon.other >= 50000)
 		)
 	end} },
-	cooldown = 12,
+	cooldown = 20,
 	radius = 1,
 	range = 10,
 	is_melee = true,
 	requires_target = true,
+	no_energy = true,
 	tactical = { CLOSEIN = 2, ATTACKAREA = { weapon = 2 }, DISABLE = { stun = 1 } },
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), selffire=false, radius=self:getTalentRadius(t)}

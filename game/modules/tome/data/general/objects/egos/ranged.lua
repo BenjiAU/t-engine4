@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -65,25 +65,11 @@ newEntity{
 	cost = 15,
 	wielder={
 		combat_atk = resolvers.mbonus_material(10, 5),
-		combat_physcrit = resolvers.mbonus_material(6, 1), -- give it some crit instead, this ego should prob be reworked now though
---		talent_cd_reduction={[Talents.T_STEADY_SHOT]=1}, --this is a bit too strong with how steady shot works now
+		combat_physcrit = resolvers.mbonus_material(6, 1),
 	},
 }
 
-newEntity{
-	power_source = {technique=true},
-	name = " of power", suffix=true, instant_resolve=true,
-	keywords = {power=true},
-	level_range = {1, 50},
-	rarity = 3,
-	cost = 6,
-	wielder = {
-		inc_damage={ [DamageType.PHYSICAL] = resolvers.mbonus_material(14, 8), },
-		resists_pen={ [DamageType.PHYSICAL] = resolvers.mbonus_material(14, 8), },
-	},
-}
-
--- Greater 
+-- Greater
 newEntity{
 	power_source = {technique=true},
 	name = "swiftstrike ", prefix=true, instant_resolve=true,
@@ -93,11 +79,13 @@ newEntity{
 	rarity = 25,
 	cost = 30,
 	combat = {
-		physspeed = -0.1,
 		travel_speed = 2,
+	},
+	wielder = {
 		inc_stats = {
 			[Stats.STAT_CUN] = resolvers.mbonus_material(6, 1),
-	},
+		},
+		combat_physspeed = 0.1,
 	},
 }
 
@@ -117,6 +105,24 @@ newEntity{
 		combat_physcrit = resolvers.mbonus_material(10, 5),
 	},
 }
+
+newEntity{
+	power_source = {technique=true},
+	name = " of piercing", suffix=true, instant_resolve=true,
+	keywords = {piercing=true},
+	level_range = {20, 50},
+	greater_ego = 1,
+	rarity = 20,
+	cost = 40,
+	wielder = {
+		combat_atk = resolvers.mbonus_material(20, 5),
+		combat_apr = resolvers.mbonus_material(10, 5),
+		resists_pen = {
+			['all'] = resolvers.mbonus_material(10, 5),
+		},
+	},
+}
+
 
 -------------------------------------------------------
 -- Arcane Egos-----------------------------------------
@@ -195,7 +201,6 @@ newEntity{
 		resists_pen = {
 			[DamageType.PHYSICAL] = resolvers.mbonus_material(20, 5),
 		},
-		damage_shield_penetrate = resolvers.mbonus_material(50, 10),
 	},
 }
 
@@ -218,7 +223,7 @@ newEntity{
 	},
 	combat = {
 		talent_on_hit = { [Talents.T_ARCANE_VORTEX] = {level=3, chance=10} },
-}
+	}
 }
 
 newEntity{
@@ -301,17 +306,17 @@ newEntity{
 	keywords = {blaze=true},
 	level_range = {30, 50},
 	greater_ego = 1,
-	rarity = 45,
+	rarity = 30,
 	cost = 40,
 	wielder = {
-		global_speed_add = resolvers.mbonus_material(5, 1, function(e, v) v=v/100 return 0, v end),
+		global_speed_add = resolvers.mbonus_material(10, 1, function(e, v) v=v/100 return 0, v end),
 		resists_pen = {
-			[DamageType.FIRE] = resolvers.mbonus_material(10, 5),
+			[DamageType.FIRE] = resolvers.mbonus_material(20, 5),
 		},
 	},
 	combat = {
-		ranged_project={
-			[DamageType.FIRE] = resolvers.mbonus_material(30, 5),
+		burst_on_crit = {
+			[DamageType.FIRE] = resolvers.mbonus_material(80, 5),
 		},
 	},
 }
@@ -322,88 +327,81 @@ newEntity{
 	keywords = {caustic=true},
 	level_range = {30, 50},
 	greater_ego = 1,
-	rarity = 45,
+	rarity = 30,
 	cost = 40,
 	wielder = {
-		life_regen = resolvers.mbonus_material(20, 5, function(e, v) v=v/10 return 0, v end),
+		combat_apr = resolvers.mbonus_material(10, 5),
 		resists_pen = {
-			[DamageType.ACID] = resolvers.mbonus_material(10, 5),
+			[DamageType.ACID] = resolvers.mbonus_material(20, 5),
+			[DamageType.NATURE] = resolvers.mbonus_material(20, 5),
 		},
 	},
 	combat = {
-		ranged_project={
-			[DamageType.ITEM_ACID_CORRODE] = resolvers.mbonus_material(15, 5),
+		burst_on_crit = {
+			[DamageType.ACID] = resolvers.mbonus_material(40, 5),
+			[DamageType.NATURE] = resolvers.mbonus_material(40, 5),
 		},
-	},
+	}
 }
 
 newEntity{
 	power_source = {nature=true},
-	name = "glacial ", prefix=true, instant_resolve=true,
-	keywords = {glacial=true},
-	level_range = {30, 50},
-	greater_ego = 1,
-	rarity = 45,
-	cost = 40,
-	wielder = {
-		combat_armor = resolvers.mbonus_material(10, 5),
-		resists_pen = {
-			[DamageType.COLD] = resolvers.mbonus_material(10, 5),
-		},
-	},
-	combat = {
-		ranged_project={
-			[DamageType.COLD] = resolvers.mbonus_material(15, 5),
-		},
-	},
-}
-
-newEntity{
-	power_source = {nature=true},
-	name = "thunderous ", prefix=true, instant_resolve=true,
-	keywords = {thunder=true},
-	level_range = {30, 50},
-	greater_ego = 1,
-	rarity = 45,
-	cost = 40,
-	wielder = {
-		inc_stats = {
-			[Stats.STAT_STR] = resolvers.mbonus_material(3, 1),
-			[Stats.STAT_DEX] = resolvers.mbonus_material(3, 1),
-			[Stats.STAT_MAG] = resolvers.mbonus_material(3, 1),
-			[Stats.STAT_WIL] = resolvers.mbonus_material(3, 1),
-			[Stats.STAT_CUN] = resolvers.mbonus_material(3, 1),
-			[Stats.STAT_CON] = resolvers.mbonus_material(3, 1),
-		},
-		resists_pen = {
-			[DamageType.LIGHTNING] = resolvers.mbonus_material(10, 5),
-		},
-	},
-	combat = {
-		ranged_project={
-			[DamageType.ITEM_LIGHTNING_DAZE] = resolvers.mbonus_material(15, 5),
-		},
-	},
-}
-
-newEntity{
-	power_source = {nature=true},
-	name = " of nature", suffix=true, instant_resolve=true,
-	keywords = {nature=true},
+	name = "stormbringer's ", prefix=true, instant_resolve=true,
+	keywords = {stormbringer=true},
 	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 30,
 	cost = 40,
 	wielder = {
-		resists = { all = resolvers.mbonus_material(8, 2) },
+		movement_speed = resolvers.mbonus_material(0.3, 0.2),
 		resists_pen = {
-			[DamageType.NATURE] = resolvers.mbonus_material(10, 5),
+			[DamageType.COLD] = resolvers.mbonus_material(20, 5),
+			[DamageType.LIGHTNING] = resolvers.mbonus_material(20, 5),
 		},
 	},
 	combat = {
-		ranged_project = { 
-			[DamageType.NATURE] = resolvers.mbonus_material(30, 5),
+		burst_on_crit = {
+			[DamageType.LIGHTNING] = resolvers.mbonus_material(40, 5),
+			[DamageType.COLD] = resolvers.mbonus_material(40, 5),
 		},
+	},
+}
+
+newEntity{
+	power_source = {nature=true},
+	name = "enhanced ", prefix=true, instant_resolve=true,
+	keywords = {enhanced=true},
+	level_range = {30, 50},
+	greater_ego = 1,
+	rarity = 30,
+	cost = 40,
+	wielder = {
+		inc_stats = {
+			[Stats.STAT_STR] = resolvers.mbonus_material(10, 3),
+			[Stats.STAT_DEX] = resolvers.mbonus_material(10, 3),
+			[Stats.STAT_MAG] = resolvers.mbonus_material(10, 3),
+			[Stats.STAT_WIL] = resolvers.mbonus_material(10, 3),
+			[Stats.STAT_CUN] = resolvers.mbonus_material(10, 3),
+			[Stats.STAT_CON] = resolvers.mbonus_material(10, 3),
+		},
+	},
+}
+
+
+newEntity{
+	power_source = {nature=true},
+	name = " of enduring", suffix=true, instant_resolve=true,
+	keywords = {enduring=true},
+	level_range = {20, 50},
+	greater_ego = 1,
+	rarity = 30,
+	cost = 40,
+	wielder = {
+		inc_stats = {
+			[Stats.STAT_CON] = resolvers.mbonus_material(10, 5),
+			[Stats.STAT_WIL] = resolvers.mbonus_material(10, 5),
+		},
+		max_life = resolvers.mbonus_material(100, 10),
 	},
 }
 
@@ -413,10 +411,11 @@ newEntity{
 	name = " of dampening", suffix=true, instant_resolve=true,
 	keywords = {dampening=true},
 	level_range = {1, 50},
-	rarity = 18,
+	rarity = 30,
 	cost = 22,
 	wielder = {
 		resists={
+			all = resolvers.mbonus_material(8, 2),
 			[DamageType.ACID] = resolvers.mbonus_material(10, 7),
 			[DamageType.LIGHTNING] = resolvers.mbonus_material(10, 7),
 			[DamageType.FIRE] = resolvers.mbonus_material(10, 7),
@@ -431,12 +430,9 @@ newEntity{
 	name = "mage-hunter's ", prefix=true, instant_resolve=true,
 	keywords = {magehunters=true},
 	level_range = {30, 50},
-	rarity = 18,
+	rarity = 30,
 	cost = 22,
 	greater_ego = 1,
-	combat = {
-		--talent_on_hit = { [Talents.T_MANA_CLASH] = {level=1, chance=20} },
-	},
 	wielder = {
 		inc_stats = {
 			[Stats.STAT_WIL] = resolvers.mbonus_material(6, 1),
@@ -457,7 +453,7 @@ newEntity{
 	name = "throat-seeking ", prefix=true, instant_resolve=true,
 	keywords = {throat=true},
 	level_range = {30, 50},
-	rarity = 18,
+	rarity = 30,
 	cost = 22,
 	greater_ego = 1,
 	wielder = {

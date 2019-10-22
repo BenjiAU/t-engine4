@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -97,10 +97,10 @@ function _M:textboxPopup(title, text, min, max, action, cancel, absolute)
 end
 
 --- Requests a simple, press any key, dialog
-function _M:listPopup(title, text, list, w, h, fct)
+function _M:listPopup(title, text, list, w, h, fct, select_fct)
 	local d = new(title, 1, 1)
 	local desc = require("engine.ui.Textzone").new{width=w, auto_height=true, text=text, scrollbar=true}
-	local l = require("engine.ui.List").new{width=w, height=h-16 - desc.h, list=list, fct=function() d.key:triggerVirtual("ACCEPT") end}
+	local l = require("engine.ui.List").new{width=w, height=h-16 - desc.h, list=list, fct=function() d.key:triggerVirtual("ACCEPT") end, select=function(item) if select_fct then select_fct(item) end end}
 	d:loadUI{
 		{left = 3, top = 3, ui=desc},
 		{left = 3, top = 3 + desc.h + 3, ui=require("engine.ui.Separator").new{dir="vertical", size=w - 12}},
@@ -360,10 +360,23 @@ function _M:webPopup(url)
 	return d
 end
 
+function _M:forceNextDialogUI(ui)
+	_M.force_ui_inside = ui
+	_M.force_ui_inside_once = true
+end
 
 title_shadow = true
 
 function _M:init(title, w, h, x, y, alpha, font, showup, skin)
+	if self.force_ui_inside then
+		self._lastui = self.ui
+		Base:changeDefault(self.force_ui_inside)
+		if _M.force_ui_inside_once then
+			_M.force_ui_inside_once = nil
+			_M.force_ui_inside = nil
+		end
+	end
+
 	self.title = title
 	self.alpha = self.alpha or 255
 	if showup ~= nil then
@@ -418,9 +431,11 @@ function _M:init(title, w, h, x, y, alpha, font, showup, skin)
 		self.frame.title_y = conf.title_bar.y
 		self.frame.title_w = conf.title_bar.w
 		self.frame.title_h = conf.title_bar.h
-		self.frame.b7 = self.frame.b7:gsub("dialogframe", "title_dialogframe")
-		self.frame.b8 = self.frame.b8:gsub("dialogframe", "title_dialogframe")
-		self.frame.b9 = self.frame.b9:gsub("dialogframe", "title_dialogframe")
+		if not conf.title_bar.no_gfx then
+			self.frame.b7 = self.frame.b7:gsub("dialogframe", "title_dialogframe")
+			self.frame.b8 = self.frame.b8:gsub("dialogframe", "title_dialogframe")
+			self.frame.b9 = self.frame.b9:gsub("dialogframe", "title_dialogframe")
+		end
 	end
 
 	self.uis = {}
@@ -585,6 +600,10 @@ function _M:generate()
 		end)
 	end
 
+	if self._lastui then
+		Base:changeDefault(self._lastui)
+		self._lastui = nil
+	end
 end
 
 function _M:updateTitle(title)

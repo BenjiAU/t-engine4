@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -52,15 +52,24 @@ newTalent{
 		local speed2, hit2 = self:attackTargetWith(target, offweapon.combat, nil, self:getOffHandMult(offweapon.combat, t.getDamage(self, t)))
 		DamageType:projectingFor(self, nil)
 
+		local effs = target:effectsFilter(function(e) return e.subtype.disease end, 9999)
 		if hit1 then
-			local effs = target:effectsFilter(function(e) return e.subtype.disease end, 1)
+			if #effs > 0 then table.sort(effs, function(a, b)
+				local eff = target:hasEffect(a)
+				local eff2 = target:hasEffect(b)
+				return eff.dur < eff2.dur end)
+			end
 			local eff2 = target:hasEffect(effs[1])
 			if eff2 then
 				eff2.dur = eff2.dur + t.getIncrease(self, t)
 			end
 		end
 		if hit2 then
-			local effs = target:effectsFilter(function(e) return e.subtype.disease end, 1)
+			if #effs > 0 then table.sort(effs, function(a, b)
+				local eff = target:hasEffect(a)
+				local eff2 = target:hasEffect(b)
+				return eff.dur < eff2.dur end)
+			end			
 			local eff2 = target:hasEffect(effs[1])
 			if eff2 then 
 				eff2.dur = eff2.dur + t.getIncrease(self, t)
@@ -70,7 +79,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Strike the target with both weapons dealing %d%% damage with each hit.  Each strike that hits will increase the duration of a random disease effect by %d.]]):
+		return ([[Strike the target with both weapons dealing %d%% damage with each hit.  Each strike that hits will increase the duration of the lowest duration disease effect by %d.]]):
 		format(100 * t.getDamage(self, t), t.getIncrease(self, t))
 	end,
 }

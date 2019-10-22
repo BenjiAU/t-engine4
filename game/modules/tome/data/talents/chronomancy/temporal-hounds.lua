@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -64,6 +64,10 @@ summonTemporalHound = function(self, t)
 	m.no_inventory_access = true
 	m.no_points_on_levelup = true
 	
+	-- Never flee
+	m.ai_tactic = m.ai_tactic or {}
+	m.ai_tactic.escape = 0
+
 	m:resolve()
 	m:resolve(nil, true)
 	
@@ -95,6 +99,7 @@ summonTemporalHound = function(self, t)
 	
 	-- Make sure to update sustain counter when we die
 	m.on_die = function(self)
+		if not self.summoner then return end
 		local p = self.summoner:isTalentActive(self.summoner.T_TEMPORAL_HOUNDS)
 		local tid = self.summoner:getTalentFromId(self.summoner.T_TEMPORAL_HOUNDS)
 		if p then
@@ -103,6 +108,7 @@ summonTemporalHound = function(self, t)
 	end
 	-- Make sure hounds stay close
 	m.on_act = function(self)
+		if not self.summoner then return end
 		local x, y = self.summoner.x, self.summoner.y
 		if game.level:hasEntity(self.summoner) and core.fov.distance(self.x, self.y, x, y) > 10 then
 			-- Clear it's targeting on teleport
@@ -118,6 +124,7 @@ summonTemporalHound = function(self, t)
 	end
 	-- Unravel?
 	m.on_takehit = function(self, value, src)
+		if not self.summoner then return end
 		if value >= self.life and self.summoner:knowTalent(self.summoner.T_TEMPORAL_VIGOUR) then
 			self.summoner:callTalent(self.summoner.T_TEMPORAL_VIGOUR, "doUnravel", self, value)
 		end
@@ -140,11 +147,11 @@ summonTemporalHound = function(self, t)
 		})
 	end
 	
-	self:attr("summoned_times", 1)
 end
 
 countHounds = function(self)
 	local hounds = 0
+	if not game.level then return 0 end
 	for _, e in pairs(game.level.entities) do
 		if e and e.summoner and e.summoner == self and e.name == "temporal hound" then 
 			hounds = hounds + 1 

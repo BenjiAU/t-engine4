@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -63,6 +63,16 @@ function math.sign(v)
 	return v >= 0 and 1 or -1
 end
 
+function math.triangle_area(p1, p2, p3)
+	local u = {x=p2.x - p1.x, y=p2.y - p1.y}
+	local v = {x=p3.x - p1.x, y=p3.y - p1.y}
+	local au = math.atan2(u.y, u.x)
+	local av = math.atan2(v.y, v.x)
+	local lu = math.sqrt(u.x*u.x + u.y*u.y)
+	local lv = math.sqrt(v.x*v.x + v.y*v.y)
+	return math.abs(0.5 * lu * lv * math.sin(av - au))
+end
+
 function lpeg.anywhere (p)
 	return lpeg.P{ p + 1 * lpeg.V(1) }
 end
@@ -94,6 +104,18 @@ function ripairs(t)
 		i = i - 1
 		return oi, t[oi]
 	end
+end
+
+function table.weak_keys(t)
+	t = t or {}
+	setmetatable(t, {__mode="k"})
+	return t
+end
+
+function table.weak_values(t)
+	t = t or {}
+	setmetatable(t, {__mode="v"})
+	return t
 end
 
 function table.empty(t)
@@ -780,6 +802,8 @@ function table.ruleMergeAppendAdd(dst, src, rules, state)
 	table.applyRules(dst, src, rules, state)
 end
 
+string.nextUTF = core.display.stringNextUTF
+
 function string.ordinal(number)
 	local suffix = "th"
 	number = tonumber(number)
@@ -868,6 +892,12 @@ function string.lpegSub(s, patt, repl)
 	return lpeg.match(patt, s)
 end
 
+function string.lpegSubT(s, patt, repl, fct)
+	patt = lpeg.Cmt(lpeg.P(patt), function(s, i, c) fct(c, i - #c, i - 1) return true end)
+	patt = lpeg.Cs((patt / repl + 1)^0)
+	return lpeg.match(patt, s)
+end
+
 function string.prefix(s, p)
 	if s:sub(1, #p) == p then return true end
 	return false
@@ -876,6 +906,23 @@ end
 function string.suffix(s, p)
 	if s:sub(#s - #p + 1) == p then return true end
 	return false
+end
+
+function string.iterateUTF(str, pos, get_char)
+	pos = pos or 1
+	return function()
+		if not pos then return nil end
+		local op = pos
+		pos = str:nextUTF(pos)
+		local np = pos
+		if not np then np = #str + 1 end
+		local s = nil
+		if get_char == "char" then s = str:sub(op, np-1)
+		elseif get_char == "to" then s = str:sub(1, np-1)
+		elseif get_char == "from" then s = str:sub(op)
+		end
+		return op, np-1, s
+	end
 end
 
 -- Those matching patterns are used both by splitLine and drawColorString*
@@ -893,8 +940,67 @@ function string.removeColorCodes(str)
 	return str:lpegSub("#" * (Puid + Pcolorcodefull + Pcolorname + Pfontstyle + Pextra) * "#", "")
 end
 
+function string.removeColorCodesT(str)
+	local posmap = {}
+	local last = 0
+	local res = str:lpegSubT("#" * (Puid + Pcolorcodefull + Pcolorname + Pfontstyle + Pextra) * "#", "", function(c, p1, p2)
+		for i = last + 1, p1 - 1 do
+			posmap[#posmap+1] = i
+		end
+		last = p2
+	end)
+
+	for i = last + 1, #str do
+		posmap[#posmap+1] = i
+	end
+
+	return res, posmap
+end
+
 function string.removeUIDCodes(str)
 	return str:lpegSub("#" * Puid * "#", "")
+end
+
+function string.splitAtSizeSimple(str, size, font)
+	local fontoldsize = font.simplesize or font.size
+	local left, right
+	local cs = 0
+
+	local oldleft
+	for pos, pos2, left in str:iterateUTF(1, "to") do
+		if not oldleft then oldleft = left end
+
+		local ps = fontoldsize(font, left)
+		if ps > size then
+			right = str:sub(pos)
+			return oldleft, fontoldsize(font, oldleft), right, fontoldsize(font, right)
+		end
+
+		oldleft = left
+	end
+	return str, fontoldsize(font, str), "", 0
+end
+
+function string.splitAtSize(bstr, size, font)
+	local str, posmap = bstr:removeColorCodesT()
+	local fontoldsize = font.simplesize or font.size
+	local left, right
+	local cs = 0
+
+	local oldpos2
+	for pos, pos2, left in str:iterateUTF(1, "to") do
+		if not oldpos2 then oldpos2 = pos2 end
+
+		local ps = fontoldsize(font, left)
+		if ps > size then
+			local left = bstr:sub(1, posmap[oldpos2])
+			right = bstr:sub(posmap[pos])
+			return left, fontoldsize(font, left), right, fontoldsize(font, right)
+		end
+
+		oldpos2 = pos2
+	end
+	return str, fontoldsize(font, str), "", 0
 end
 
 function string.splitLine(str, max_width, font)
@@ -903,19 +1009,47 @@ function string.splitLine(str, max_width, font)
 	local lines = {}
 	local cur_line, cur_size = "", 0
 	local v
+	local break_all_chars = core.display.getBreakTextAllCharacter()
 	local ls = str:split(lpeg.S"\n ")
 	for i = 1, #ls do
 		local v = ls[i]
-		local shortv = v:lpegSub("#" * (Puid + Pcolorcodefull + Pcolorname + Pfontstyle + Pextra) * "#", "")
+		local shortv = v:removeColorCodes()
 		local w, h = fontoldsize(font, shortv)
 
 		if cur_size + space_w + w < max_width then
 			cur_line = cur_line..(cur_size==0 and "" or " ")..v
 			cur_size = cur_size + (cur_size==0 and 0 or space_w) + w
 		else
-			lines[#lines+1] = cur_line
-			cur_line = v
-			cur_size = w
+			-- Normal whitespace breaking
+			if not break_all_chars then
+				lines[#lines+1] = cur_line
+				cur_line = v
+				cur_size = w
+			-- Break on any characters
+			else
+				local left, left_size, right, right_size
+				while true do
+					left, left_size, right, right_size = v:splitAtSize(max_width - cur_size, font)
+
+					-- Add to current line
+					cur_line = cur_line..(cur_size==0 and "" or " ")..left
+					cur_size = cur_size + (cur_size==0 and 0 or space_w) + left_size
+					lines[#lines+1] = cur_line
+
+					-- If the right side can fit on a line, we're done, otherwise we split again
+					if right_size <= max_width then
+						break
+					else
+						cur_line = ""
+						cur_size = 0
+						v = right
+					end
+				end
+
+				-- Put the rest on new line
+				cur_line = right
+				cur_size = right_size
+			end
 		end
 	end
 	if cur_size > 0 then lines[#lines+1] = cur_line end
@@ -1367,11 +1501,14 @@ function tstring:toTString() return self end
 function tstring:format() return self end
 
 function tstring:splitLines(max_width, font, max_lines)
+	local break_all_chars = core.display.getBreakTextAllCharacter()
 	local fstyle = font:getStyle()
+	local old_fstyle = fstyle
 	local ret = tstring{}
 	local cur_size = 0
 	local max_w = 0
 	local v, tv
+	local mustexit = false
 	for i = 1, #self do
 		v = self[i]
 		tv = type(v)
@@ -1385,7 +1522,7 @@ function tstring:splitLines(max_width, font, max_lines)
 					cur_size = 0
 					if max_lines then
 						max_lines = max_lines - 1
-						if max_lines <= 0 then break end
+						if max_lines <= 0 then mustexit = true break end
 					end
 				else
 					local w, h = fontcachewordsize(font, fstyle, vv)
@@ -1393,17 +1530,47 @@ function tstring:splitLines(max_width, font, max_lines)
 						cur_size = cur_size + w
 						ret[#ret+1] = vv
 					else
-						ret[#ret+1] = true
-						max_w = math.max(max_w, cur_size)
-						if max_lines then
-							max_lines = max_lines - 1
-							if max_lines <= 0 then break end
+						-- Normal whitespace breaking
+						if not break_all_chars then
+							ret[#ret+1] = true
+							max_w = math.max(max_w, cur_size)
+							if max_lines then max_lines = max_lines - 1 if max_lines <= 0 then mustexit = true break end end
+							ret[#ret+1] = vv
+							cur_size = w
+						-- Break on any characters
+						else
+							local left, left_size, right, right_size
+							while true do
+								left, left_size, right, right_size = vv:splitAtSizeSimple(max_width - cur_size, font)
+
+								-- Add to current line
+								ret[#ret+1] = left
+								cur_size = cur_size + left_size
+								max_w = math.max(max_w, cur_size)
+
+								-- If the right side can fit on a line, we're done, otherwise we split again
+								if right_size <= max_width then
+									break
+								else
+									if max_lines then max_lines = max_lines - 1 if max_lines <= 0 then mustexit = true break end end
+									ret[#ret+1] = true
+									cur_size = 0
+									vv = right
+								end
+							end
+							if mustexit then break end
+
+							-- Put the rest on new line
+							if max_lines then max_lines = max_lines - 1 if max_lines <= 0 then mustexit = true break end end
+							ret[#ret+1] = true
+							ret[#ret+1] = right
+							cur_size = right_size
+							max_w = math.max(max_w, cur_size)
 						end
-						ret[#ret+1] = vv
-						cur_size = w
 					end
 				end
 			end
+			if mustexit then break end
 		elseif tv == "table" and v[1] == "font" then
 			font:setStyle(v[2])
 			fstyle = v[2]
@@ -1437,6 +1604,7 @@ function tstring:splitLines(max_width, font, max_lines)
 		end
 	end
 	max_w = math.max(max_w, cur_size)
+	if fstyle ~= old_fstyle then font:setStyle(old_fstyle) end
 	return ret, max_w
 end
 
@@ -1933,6 +2101,34 @@ function util.adjacentCoords(x, y, no_diagonals, no_cardinals)
 	return coords
 end
 
+--- Return the closest adjacent coordinate to the source coordinate from the target coordinate (use for gap closer positioning, etc)
+-- @param x x-coordinate of the source tile.
+-- @param y y-coordinate of the source tile.
+-- @param tx x-coordinate of the target tile.
+-- @param ty y-coordinate of the target tile.
+-- @param check_block Boolean for whether to check for block_move
+-- @param extra_check(x,y) Function to run on each grid and return true if that grid is invalid
+-- @return Table containing the x,y coordinate of the closest grid.
+function util.closestAdjacentCoord(x, y, tx, ty, check_block, extra_check)
+	local check_block = check_block or true
+	local coords = util.adjacentCoords(x, y)
+	local valid = {}
+	for _, coord in pairs(coords) do
+		if not (check_block and game.level.map:checkEntity(coord[1], coord[2], engine.Map.TERRAIN, "block_move")) and not (extra_check and extra_check(coord[1], coord[2])) then 
+			valid[#valid+1] = coord
+		end
+	end
+
+	if #valid == 0 then return end
+	local closest = valid[1]
+	for _, coord in pairs(valid) do
+		if core.fov.distance(closest[1], closest[2], tx, ty, true) > core.fov.distance(coord[1], coord[2], tx, ty, true) then
+			closest = coord
+		end
+	end
+
+	return closest
+end
 function util.coordAddDir(x, y, dir)
 	local dx, dy = util.dirToCoord(dir, x, y)
 	return x + dx, y + dy
@@ -1978,6 +2174,16 @@ function util.getitem(val, index)
 		return index(val)
 	else
 		return util.getval(val[index], val)
+	end
+end
+
+function util.finalize(init, uninit, fct)
+	return function(...)
+		local myenv = {}
+		init(myenv, ...)
+		local rets = {fct(myenv, ...)}
+		uninit(myenv, ...)
+		return unpack(rets)
 	end
 end
 
@@ -2243,6 +2449,103 @@ function core.fov.beam_any_angle_grids(x, y, radius, angle, source_x, source_y, 
 	return grids
 end
 
+local function is_point_in_triangle(P, A, B, C)
+	local vector = require "vector"
+	local P, A, B, C = vector.newFrom(P), vector.newFrom(A), vector.newFrom(B), vector.newFrom(C)
+
+	if P == A or P == B or P == C then return true end
+
+	-- Compute vectors
+	local v0 = C - A
+	local v1 = B - A
+	local v2 = P - A
+
+	-- Compute dot products
+	local dot00 = v0:dot(v0)
+	local dot01 = v0:dot(v1)
+	local dot02 = v0:dot(v2)
+	local dot11 = v1:dot(v1)
+	local dot12 = v1:dot(v2)
+
+	-- Compute barycentric coordinates
+	local invDenom = 1 / (dot00 * dot11 - dot01 * dot01)
+	local u = (dot11 * dot02 - dot01 * dot12) * invDenom
+	local v = (dot00 * dot12 - dot01 * dot02) * invDenom
+
+	-- Check if point is in triangle
+	return (u >= 0) and (v >= 0) and (u + v < 1)
+end
+
+-- Very naive implementation, this will do for now
+function core.fov.calc_triangle(x, y, w, h, points, mode, block, apply)
+	local p1 = {x=x+points[1].x, y=y+points[1].y}
+	local p2 = {x=x+points[2].x, y=y+points[2].y}
+	local p3 = {x=x+points[3].x, y=y+points[3].y}
+
+	local mx, Mx = math.min(p1.x, p2.x, p3.x), math.max(p1.x, p2.x, p3.x)
+	local my, My = math.min(p1.y, p2.y, p3.y), math.max(p1.y, p2.y, p3.y)
+
+	local checkline = function(fx, fy, i, j)
+		local l = core.fov.line(fx, fy, i, j)
+		while true do
+			local lx, ly = l:step(true)
+			if not lx then break end
+			if lx == i and ly == j then return true end
+			if block(_, lx, ly) then break end
+		end
+		return false
+	end
+
+	local check
+	if mode == "corners" then
+		check = function(i, j)
+			return checkline(p1.x, p1.y, i, j) or checkline(p2.x, p2.y, i, j) or checkline(p3.x, p3.y, i, j)
+		end
+	else
+		check = function(i, j)
+			return checkline(x, y, i, j)
+		end
+	end
+
+	for i = mx, Mx do if i >= 0 and i < w then
+		for j = my, My do if j >= 0 and j < h then
+			if is_point_in_triangle({x=i,y=j}, {x=p1.x, y=p1.y}, {x=p2.x, y=p2.y}, {x=p3.x, y=p3.y}) and check(i, j) then
+				apply(nil, i, j)
+			end
+		end end
+	end end
+end
+
+
+-- Very naive implementation, this will do for now
+function core.fov.calc_wide_beam(x, y, w, h, sx, sy, radius, block, apply)
+	local tgts = {}
+	local dist = core.fov.distance(sx, sy, x, y)
+
+	-- Compute the line
+	local path = {}
+	local l = core.fov.line(sx, sy, x, y)
+	local lx, ly = l:step()
+	while lx and ly do
+		path[#path+1] = {x=lx, y=ly}
+		lx, ly = l:step()
+	end
+
+	for _, p in ipairs(path) do
+		if dist > 1 and p.x == x and p.y == y then
+		else
+			core.fov.calc_circle(p.x, p.y, w, h, radius, block, function(_, ppx, ppy)
+				tgts[ppy*game.level.map.w+ppx] = {x=ppx, y=ppy}
+			end, nil)
+		end
+	end
+
+	for _, p in pairs(tgts) do
+		apply(nil, p.x, p.y)
+	end
+end
+
+
 function core.fov.set_corner_block(l, block_corner)
 	block_corner = type(block_corner) == "function" and block_corner or
 		block_corner == false and function(_, x, y) return end or
@@ -2352,6 +2655,18 @@ function core.fov.set_vision_shape(val)
 	core.fov.set_vision_shape_base(val)
 	return val
 end
+end
+
+function core.fov.lineIterator(sx, sy, tx, ty, what)
+	what = what or "block_move"
+	local l = core.fov.line(sx, sy, tx, ty, what)
+	local lx, ly = l:step()
+	return function()
+		if not lx or not ly then return nil end
+		local rx, ry = lx, ly
+		lx, ly = l:step()
+		return rx, ry
+	end
 end
 
 --- create a basic bresenham line (or hex equivalent)

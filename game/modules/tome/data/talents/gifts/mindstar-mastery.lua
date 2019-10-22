@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -44,9 +44,11 @@ newTalent{
 			tmpid = self:addTemporaryValue("psiblades_active", self:getTalentLevel(t)),
 		}
 
+		self:attr("on_wear_simple_reload", 1)
 		for i, o in ipairs(self:getInven("MAINHAND") or {}) do self:onTakeoff(o, self.INVEN_MAINHAND, true) self:onWear(o, self.INVEN_MAINHAND, true) end
 		for i, o in ipairs(self:getInven("OFFHAND") or {}) do self:onTakeoff(o, self.INVEN_OFFHAND, true) self:onWear(o, self.INVEN_OFFHAND, true) end
 		for i, o in ipairs(self:getInven("PSIONIC_FOCUS") or {}) do self:onTakeoff(o, self.INVEN_PSIONIC_FOCUS, true) self:onWear(o, self.INVEN_PSIONIC_FOCUS, true) end
+		self:attr("on_wear_simple_reload", -1)
 		self:updateModdableTile()
 
 		return r
@@ -54,9 +56,11 @@ newTalent{
 	deactivate = function(self, t, p)
 		self:removeTemporaryValue("psiblades_active", p.tmpid)
 
+		self:attr("on_wear_simple_reload", 1)
 		for i, o in ipairs(self:getInven("MAINHAND") or {}) do self:onTakeoff(o, self.INVEN_MAINHAND, true) self:checkMindstar(o) self:onWear(o, self.INVEN_MAINHAND, true) end
 		for i, o in ipairs(self:getInven("OFFHAND") or {}) do self:onTakeoff(o, self.INVEN_OFFHAND, true) self:checkMindstar(o) self:onWear(o, self.INVEN_OFFHAND, true) end
 		for i, o in ipairs(self:getInven("PSIONIC_FOCUS") or {}) do self:onTakeoff(o, self.INVEN_PSIONIC_FOCUS, true) self:checkMindstar(o) self:onWear(o, self.INVEN_PSIONIC_FOCUS, true) end
+		self:attr("on_wear_simple_reload", -1)
 		self:updateModdableTile()
 
 		return true

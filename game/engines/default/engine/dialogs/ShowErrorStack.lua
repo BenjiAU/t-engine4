@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -28,6 +28,18 @@ local Textbox = require "engine.ui.Textbox"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init(errs)
+	local beta = engine.version_hasbeta()
+	table.insert(errs, 1, "Game version: "..game.__mod_info.version_name..(beta and "-"..beta or ""))
+	local addons = {}
+	for name, data in pairs(game.__mod_info.addons or {}) do
+		local extra = ""
+		-- So ugly!!! :<
+		if data.for_module == "tome" then
+			extra = "["..(data.author[1]=="DarkGod" and "O" or "X")..(engine.version_patch_same(game.__mod_info.version, data.version) and "" or "!").."]"
+		end
+		addons[#addons+1] = name.."-"..data.version_txt..extra
+	end
+	table.insert(errs, 2, "Addons: "..table.concat(addons, ", ").."\n")
 	errs = table.concat(errs, "\n")
 	self.errs = errs
 	Dialog.init(self, "Lua Error", 700, 500)

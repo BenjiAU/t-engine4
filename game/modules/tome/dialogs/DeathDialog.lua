@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -157,6 +157,8 @@ function _M:resurrectBasic(actor)
 
 	actor.changed = true
 	game.paused = true
+
+	actor:checkTwoHandedPenalty()
 end
 
 --- Send the party to the Eidolon Plane
@@ -185,6 +187,8 @@ function _M:eidolonPlane()
 		game.log("#LIGHT_RED#From the brink of death you seem to be yanked to another plane.")
 		game.player:updateMainShader()
 		if not config.settings.cheat then game:saveGame() end
+
+		self.actor:checkTwoHandedPenalty()
 	end)
 	return true
 end

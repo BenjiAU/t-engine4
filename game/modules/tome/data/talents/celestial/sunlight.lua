@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -17,36 +17,40 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
+local DamageType = require "engine.DamageType"
+
 newTalent{
 	name = "Searing Light",
 	type = {"celestial/sunlight", 1},
 	require = divi_req1,
 	random_ego = "attack",
 	points = 5,
-	cooldown = 6,
-	positive = -16,
+	cooldown = 5,
+	positive = -15,
 	range = 7,
+	radius = 1,
 	tactical = { ATTACK = {LIGHT = 2} },
 	direct_hit = true,
 	reflectable = true,
 	requires_target = true,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 6, 160) end,
-	getDamageOnSpot = function(self, t) return self:combatTalentSpellDamage(t, 6, 80) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 17, 200) end,
 	action = function(self, t)
-		local tg = {type="hit", range=self:getTalentRange(t), talent=t}
-		local x, y = self:getTarget(tg)
+		local tg = {type="ball", range=self:getTalentRange(t), radius=1, talent=t}
+		local x, y, target = self:getTarget(tg)
 		if not x or not y then return nil end
-		self:project(tg, x, y, DamageType.LIGHT, self:spellCrit(t.getDamage(self, t)), {type="light"})
-
 		local _ _, x, y = self:canProject(tg, x, y)
+
+		local dam = self:spellCrit(t.getDamage(self, t))
+		if target then self:project(target, x, y, DamageType.LIGHT, dam, {type="light"}) end
+
 		-- Add a lasting map effect
 		game.level.map:addEffect(self,
 			x, y, 4,
-			DamageType.LIGHT, t.getDamageOnSpot(self, t),
-			0,
+			DamageType.LIGHT, dam / 2,
+			1,
 			5, nil,
 			{type="light_zone"},
-			nil, self:spellFriendlyFire()
+			nil, false, false
 		)
 
 		game:playSoundNear(self, "talents/flame")
@@ -54,45 +58,47 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		local damageonspot = t.getDamageOnSpot(self, t)
-		return ([[Calls the power of the Sun into a searing lance, doing %0.2f damage to the target and leaving a spot on the ground for 4 turns that does %0.2f light damage to anyone within it.
+		return ([[Calls the power of the Sun into a searing lance, doing %d damage to the target and leaving a radius 1 area of searing light on the ground for 4 turns that does %d light damage to all foes within it.
 		The damage dealt will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHT, damage), damageonspot)
+		format(damDesc(self, DamageType.LIGHT, damage), damDesc(self, DamageType.LIGHT, damage/2))
 	end,
 }
 
+-- High end Light damage nuke, synergy with Darkest Light via resists mid/late game
 newTalent{
 	name = "Sun Flare",
 	type = {"celestial/sunlight", 2},
 	require = divi_req2,
 	points = 5,
 	random_ego = "attack",
-	cooldown = 22,
-	positive = -15,
+	cooldown = 12,
+	positive = 30,
 	tactical = { DISABLE = 2,
 		ATTACKAREA = function(self, t, aitarget)
 			if self:getTalentLevel(t) >= 3 then return {light = 1} end
 		end, },
 	direct_hit = true,
 	range = 0,
-	radius = function(self, t) return math.floor(self:combatTalentScale(t, 2.5, 4.5)) end,
+	radius = function(self, t) return math.min(8, math.floor(self:combatTalentScale(t, 2.5, 4.5))) end,
 	target = function(self, t)
-		return {type="ball", range=self:getTalentRange(t), selffire=false, radius=self:getTalentRadius(t), talent=t}
+		return {type="ball", range=self:getTalentRange(t), friendlyfire=false, selffire=false, radius=self:getTalentRadius(t), talent=t}
 	end,
 	requires_target = true,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 4, 80) end,
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 4, 8)) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 10, 250) end,
+	getDuration = function(self, t) return 4 end,
+	getRes = function(self, t) return self:combatTalentSpellDamage(t, 15, 50) end,
+	getResDuration = function(self, t) return 4 end,
+
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		-- Temporarily turn on "friendlyfire" to lite all tiles
-		tg.selffire = true
-		tg.radius = tg.radius * 2
+		tg.friendlyfire, tg.selffire = true
 		self:project(tg, self.x, self.y, DamageType.LITE, 1)
-		tg.radius = tg.radius / 2
-		tg.selffire = false
+		tg.friendlyfire, tg.selffire = false
 		local grids = self:project(tg, self.x, self.y, DamageType.BLIND, t.getDuration(self, t))
+		self:project(tg, self.x, self.y, DamageType.LIGHT, self:spellCrit(t.getDamage(self, t)))
 		if self:getTalentLevel(t) >= 3 then
-			self:project(tg, self.x, self.y, DamageType.LIGHT, t.getDamage(self, t))
+			self:setEffect(self.EFF_SOLAR_INFUSION, t.getResDuration(self, t), {resist=t.getRes(self, t)})
 		end
 		game.level.map:particleEmitter(self.x, self.y, tg.radius, "sunburst", {radius=tg.radius, grids=grids, tx=self.x, ty=self.y, max_alpha=80})
 		game:playSoundNear(self, "talents/flame")
@@ -102,43 +108,72 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		local damage = t.getDamage(self, t)
 		local duration = t.getDuration(self, t)
-		return ([[Invokes the Sun to cause a flare within radius %d, blinding your foes for %d turns and lighting up your immediate area (radius %d).
-		At level 3 it will also do %0.2f light damage within radius %d.
-		The damage done will increase with your Spellpower.]]):
-		format(radius, duration, radius * 2, damDesc(self, DamageType.LIGHT, damage), radius)
+		local res = t.getRes(self, t)
+		local resdur = t.getResDuration(self, t)
+		return ([[Invokes the Sun to cause a flare within radius %d, blinding your foes for %d turns and lighting up the area.
+		All enemies effected will take %0.2f light damage.
+		At talent level 3 you gain %d%% light, darkness, and fire resistance for %d turns.
+		The damage done and resistances will increase with your Spellpower.]]):
+		format(radius, duration, damDesc(self, DamageType.LIGHT, damage), res, resdur )
    end,
 }
 
+-- Some anti-synergy/potentially unexpected behavior with cooldown reduction, ideally we should distinguish between manual activation
 newTalent{
 	name = "Firebeam",
 	type = {"celestial/sunlight",3},
 	require = divi_req3,
 	points = 5,
 	random_ego = "attack",
-	cooldown = 7,
-	positive = -20,
+	cooldown = 12,
+	positive = 30,
 	tactical = { ATTACK = {FIRE = 2}  },
-	range = 7,
+	range = 10,
 	direct_hit = true,
 	requires_target = true,
 	target = function(self, t)
-		return {type="beam", range=self:getTalentRange(t), talent=t}
+		return {type="ball", radius=self:getTalentRange(t), friendlyfire=false, talent=t}
 	end,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 10, 200) end,
+	getDamage = function(self, t) return 10 + self:combatTalentSpellDamage(t, 1, 50) end,
+	callbackOnLevelChange = function(self, eff)
+		self.firebeam_turns_remaining = nil
+	end,
+	callbackOnAct = function(self, t)
+		if not self.firebeam_turns_remaining then return end
+		if self.firebeam_turns_remaining == 3 then self.firebeam_turns_remaining = 2 return end --hacked turn_procs for 1st activation
+		if self.firebeam_turns_remaining <= 0 then self.firebeam_turns_remaining = nil return end
+
+		self:forceUseTalent(self.T_FIREBEAM, {ignore_cd=true, ignore_energy=true, ignore_ressources=true})
+
+		self.firebeam_turns_remaining = self.firebeam_turns_remaining - 1
+	end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
-		local x, y = self:getTarget(tg)
-		if not x or not y then return nil end
-		self:project(tg, x, y, DamageType.FIRE, self:spellCrit(t.getDamage(self, t)))
+
+		local tgts = {}
+		self:project(tg, self.x, self.y, function(px, py)
+			local target = game.level.map(px, py, engine.Map.ACTOR)
+			if not target then return end
+			tgts[#tgts+1] = {tgt=target, distance=core.fov.distance(self.x, self.y, target.x, target.y)}
+		end)
+
+		if #tgts > 0 then table.sort(tgts, "distance") else return end
+
+		local tgt, x, y = tgts[#tgts].tgt, tgts[#tgts].tgt.x, tgts[#tgts].tgt.y
+		local dam = self:spellCrit(t.getDamage(self, t))
+		self:project({type="beam", friendlyfire=false, selffire=false, talent=t, self.x, self.y}, x, y, DamageType.FIRE, dam)
+
 		local _ _, x, y = self:canProject(tg, x, y)
 		game.level.map:particleEmitter(self.x, self.y, math.max(math.abs(x-self.x), math.abs(y-self.y)), "light_beam", {tx=x-self.x, ty=y-self.y})
 
 		game:playSoundNear(self, "talents/flame")
+		if not self.firebeam_turns_remaining then self.firebeam_turns_remaining = 3 end
 		return true
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		return ([[Call forth the Sun to summon a fiery beam, burning all targets in a line for %0.2f fire damage.
+		return ([[Call forth the Sun to summon a fiery beam that pierces to the farthest enemy dealing %d fire damage to all enemies hit.
+		This spell will automatically cast again at the start of every other one of your turns up to twice.
 		The damage done will increase with your Spellpower.]]):
 		format(damDesc(self, DamageType.FIRE, damage))
 	end,
@@ -151,28 +186,48 @@ newTalent{
 	points = 5,
 	random_ego = "attack",
 	cooldown = 15,
-	positive = -20,
+	positive = 30,
 	tactical = { ATTACKAREA = {LIGHT = 2} },
-	range = 0,
-	radius = 3,
+	radius = 10,
 	direct_hit = true,
 	target = function(self, t)
-		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), friendlyfire=false, talent=t}
+		return {type="ball", radius=self:getTalentRadius(t), friendlyfire=false, talent=t}
 	end,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 10, 160) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 10, 250) end,
+	getDuration = function(self, t) return 4 end,
+	getPower = function(self, t) return self:combatTalentLimit(t, 1, 0.2, 0.7) end,
+	getTargetCount = function(self, t) return math.floor(self:combatTalentScale(t, 1, 5)) end,
 	action = function(self, t)
-		local tg = self:getTalentTarget(t)
-		local grids = self:project(tg, self.x, self.y, DamageType.LIGHT, self:spellCrit(t.getDamage(self, t)))
+		local damInc = (self:combatGetDamageIncrease(DamageType.DARKNESS, true)) * t.getPower(self, t)
+		self:setEffect(self.EFF_SUNBURST, t.getDuration(self, t), {damInc=damInc})
 
-		game.level.map:particleEmitter(self.x, self.y, tg.radius, "sunburst", {radius=tg.radius, grids=grids, tx=self.x, ty=self.y})
+		--do cool lasers
+		local tgts = {}
+		local grids = core.fov.circle_grids(self.x, self.y, self:getTalentRadius(t), true)
+		for x, yy in pairs(grids) do for y, _ in pairs(grids[x]) do
+			local a = game.level.map(x, y, Map.ACTOR)
+			if a and self:reactionToward(a) < 0 then
+				tgts[#tgts+1] = a
+			end
+		end end
 
-		game:playSoundNear(self, "talents/fireflash")
+		if #tgts <= 0 then return true end
+
+		local dam = self:spellCrit(t.getDamage(self, t))
+
+		for i = 1, t.getTargetCount(self, t) do
+			if #tgts <= 0 then break end
+			local a, id = rng.table(tgts)
+			table.remove(tgts, id)
+			self:project({type="beam", friendlyfire=false, selffire=false, talent=t, self.x, self.y}, a.x, a.y, DamageType.LIGHT, dam)
+			game.level.map:particleEmitter(self.x, self.y, math.max(math.abs(a.x-self.x), math.abs(a.y-self.y)), "light_beam", {tx=a.x-self.x, ty=a.y-self.y})
+		end
+
+		game:playSoundNear(self, "talents/spell_generic")
+
 		return true
 	end,
 	info = function(self, t)
-		local radius = self:getTalentRadius(t)
-		local damage = t.getDamage(self, t)
-		return ([[Conjures a furious burst of Sunlight, dealing %0.2f light damage to all around you in a radius of %d.
-		The damage done will increase with your Spellpower.]]):format(damDesc(self, DamageType.LIGHT, damage), radius)
+		return ([[Release a burst of sunlight beams at %d random foes in radius %d, dealing %d damage to all foes hit and increasing your bonus light damage by %d%% of your bonus darkness damage for %d turns.]]):format(t.getTargetCount(self, t), self:getTalentRadius(t), damDesc(self, DamageType.LIGHT, t.getDamage(self, t)), t.getPower(self, t)*100, t.getDuration(self, t))
 	end,
 }

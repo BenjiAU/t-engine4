@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ function _M:loadup(level, zone, force_nb)
 	local i = 1
 	local rngfill = force_nb or (rng.range(s.min_fill, s.max_fill) - #inven)
 	while i <= rngfill do
-		local filter = util.getval(s.filters)
+		local filter = util.getval(s.filters or {})
 		if not filter then break end
 		filter = table.clone(filter)
 		local e

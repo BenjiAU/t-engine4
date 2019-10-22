@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ microtxn = {
 	frame_shadow = {x=15, y=15, a=0.5},
 	frame_alpha = 1,
 	frame_darkness = 0.6,
-	frame_ox1 = -60,
-	frame_ox2 =  60,
-	frame_oy1 = -60,
-	frame_oy2 =  60,
---	title_bar = {x=0, y=-17, w=4, h=25},
+	frame_ox1 = -128,
+	frame_ox2 =  128,
+	frame_oy1 = -155,
+	frame_oy2 =  165,
+	title_bar = {x=0, y=-65, w=4, h=25, no_gfx=true},
 }

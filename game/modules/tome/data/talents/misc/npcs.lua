@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -2076,7 +2076,7 @@ newTalent{
 }
 
 newTalent{
-	name = "Heal", short_name = "HEAL_NATURE", image = "talents/heal.png",
+	name = "Heal", short_name = "HEAL_NATURE",
 	type = {"wild-gift/other", 1},
 	points = 5,
 	equilibrium = 10,
@@ -2132,10 +2132,11 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		return ([[Calls forth a powerful beam of lightning doing %0.2f to %0.2f lightning damage.
+		return ([[Calls forth a powerful beam of lightning doing %0.2f to %0.2f lightning damage (%0.2f average).
 		The damage will increase with your Mindpower.]]):
 		format(damDesc(self, DamageType.LIGHTNING, damage / 3),
-		damDesc(self, DamageType.LIGHTNING, damage))
+		damDesc(self, DamageType.LIGHTNING, damage),
+		damDesc(self, DamageType.LIGHTNING, (damage + damage / 3) / 2))
 	end,
 }
 
@@ -2747,7 +2748,7 @@ newTalent{
 		if main then
 			-- Damage based on mainhand weapon and dex with an assumed 8 turn cut duration
 			return self:combatTalentScale(t, 1, 1.7) * self:combatDamage(main.combat)/8 + self:getDex()/2
-		else 
+		else
 			return 0
 		end
 	end,
@@ -3702,5 +3703,49 @@ newTalent{
 		return ([[You are linked to your shadows for %d turns, diverting %d%% of all damage you take to a random shadow.
 		Effect increases with Mindpower.]]):
 		format(duration, power)
+	end,
+}
+
+newTalent{
+	name = "Circle of Blazing Light",
+	type = {"spell/other", 2},
+	--type = {"celestial/circles", 2},
+	--require = divi_req_high2,
+	points = 5,
+	cooldown = 20,
+	positive = 10,
+	no_energy = true,
+	tactical = { ATTACKAREA = {FIRE = 0.5, LIGHT = 0.5} },
+	tactical_imp = { SELF = {POSITIVE = 0.5}, ATTACKAREA = {FIRE = 0.5, LIGHT = 0.5} }, -- debugging transitional
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 2, 15) end,
+	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 4, 8)) end,
+	range = 0,
+	radius = function(self, t) return math.floor(self:combatTalentScale(t, 2.5, 4.5)) end,
+	target = function(self, t) -- for AI only
+		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=false}
+	end,
+	action = function(self, t)
+		local radius = self:getTalentRadius(t)
+		local tg = {type="ball", range=0, selffire=true, radius=radius, talent=t}
+		self:project(tg, self.x, self.y, DamageType.LITE, 1)
+		-- Add a lasting map effect
+		game.level.map:addEffect(self,
+			self.x, self.y, self:spellCrit(t.getDuration(self, t)),
+			DamageType.BLAZINGLIGHT, self:spellCrit(t.getDamage(self, t)),
+			radius,
+			5, nil,
+			MapEffect.new{zdepth=6, overlay_particle={zdepth=6, only_one=true, type="circle", args={appear=8, img="sun_circle", radius=self:getTalentRadius(t)}}, color_br=255, color_bg=255, color_bb=255, effect_shader="shader_images/sunlight_effect.png"},
+			nil, true --self:spellFriendlyFire(true)
+		)
+		game:playSoundNear(self, "talents/arcane")
+		return true
+	end,
+	info = function(self, t)
+		local damage = t.getDamage(self, t)
+		local duration = t.getDuration(self, t)
+		local radius = self:getTalentRadius(t)
+		return ([[Creates a circle of radius %d at your feet; the circle lights up affected tiles, increases your positive energy by %d each turn and deals %0.2f light damage and %0.2f fire damage per turn to everyone else within its radius.  The circle lasts %d turns.
+		The damage will increase with your Spellpower.]]):
+		format(radius, 1 + (damage / 4), (damDesc (self, DamageType.LIGHT, damage)), (damDesc (self, DamageType.FIRE, damage)), duration)
 	end,
 }

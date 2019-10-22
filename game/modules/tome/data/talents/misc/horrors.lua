@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -670,11 +670,6 @@ newTalent{
 				m.ai = "summoned"
 			end
 
-			if self:knowTalent(self.T_BLIGHTED_SUMMONING) then
-				m.blighted_summon_talent = self.T_RUIN
-				m:incIncStat("mag", self:getMag())
-				m.summon_time=20
-			end
 			game.zone:addEntity(game.level, m, "actor", x, y)
 			if not self.player and self.ai_target.actor then m:setTarget(self.ai_target.actor) end
 		end

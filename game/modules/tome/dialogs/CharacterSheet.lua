@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -602,9 +602,11 @@ function _M:drawDialog(kind, actor_to_compare)
 		local cur_exp, max_exp = player.exp, player:getExpChart(player.level+1)
 		h = 0
 		w = 0
+		local class_evo = ""
+		if player.descriptor and player.descriptor.class_evolution then class_evo = " ("..player.descriptor.class_evolution..")" end
 		self:drawString(self.font, "Sex  : "..((player.descriptor and player.descriptor.sex) or (player.female and "Female" or "Male")), w, h, 0, 200, 255, true) h = h + self.font_h
 		self:drawString(self.font, (player.descriptor and "Race : " or "Type : ")..((player.descriptor and player.descriptor.subrace) or player.type:capitalize()), w, h, 0, 200, 255, true) h = h + self.font_h
-		self:drawString(self.font, (player.descriptor and "Class: " or "Stype: ")..((player.descriptor and player.descriptor.subclass) or player.subtype:capitalize()), w, h, 0, 200, 255, true)
+		self:drawString(self.font, (player.descriptor and "Class: " or "Stype: ")..((player.descriptor and player.descriptor.subclass) or player.subtype:capitalize())..class_evo, w, h, 0, 200, 255, true)
 		if player:attr("forbid_arcane") then
 			local follow = (player.faction == "zigur" or player:attr("zigur_follower")) and "Zigur follower" or "Antimagic adherent"
 			self:mouseTooltip(self.TOOLTIP_ANTIMAGIC_USER, self:drawString(self.font, "#ORCHID#"..follow, w+200, h, 255, 255, 255, true))
@@ -945,168 +947,6 @@ The amount of %s automatically gained or lost each turn.]]):format(res_def.name,
 				self:mouseTooltip(self.TOOLTIP_COMBAT_BLOCK, self:drawString(self.font, ("Block : #00ff00#%s"):format(text), self.w*.14, h, 255, 255, 255, true))-- h = h + self.font_h
 			end
 			h = h + self.font_h
-
--- DGDGDGDG Display old damage with previously unscaled stats
-
-	--- Previous combatDamage function with unscaled stat bonuses and old weapon masteries
-	-- Calculate combat damage for a weapon (with an optional damage field for ranged)
-	-- Talent bonuses are always based on the base weapon
-	local function combatDamageOld2(self, weapon, adddammod, damage)
-	
-		-- Old weapon mastery functions hardcoded to their old values
-		local function combatTrainingDamageOld(self, weapon)
-			local t = self:combatGetTraining(weapon)
-			if not t then return 0 end
-			return self:getTalentLevel(t) * 10
-		end
-
-		-- Gets the percent increase for a weapon based on training.
-		local function combatTrainingPercentIncOld(self, weapon)
-			local t = self:combatGetTraining(weapon)
-			if not t then return 0 end
-			return math.sqrt(self:getTalentLevel(t) / 5) / 2
-		end
-
-		local old_combatTrainingDamage = rawget(self, "combatTrainingDamage")
-		self.combatTrainingDamage = combatTrainingDamageOld
-
-		local old_combatTrainingPercentInc = rawget(self, "combatTrainingPercentInc")
-		self.combatTrainingPercentInc = combatTrainingPercentIncOld
-
-		weapon = weapon or self.combat or {}
-		local dammod = self:getDammod(damage or weapon)
-		local totstat = 0
-		for stat, mod in pairs(dammod) do
-			totstat = totstat + self:getStat(stat) * mod
-		end
-		if adddammod then
-			for stat, mod in pairs(adddammod) do
-				totstat = totstat + self:getStat(stat) * mod
-			end
-		end
-		if self:knowTalent(self["T_FORM_AND_FUNCTION"]) then totstat = totstat + self:callTalent(self["T_FORM_AND_FUNCTION"], "getDamBoost", weapon) end
-		local talented_mod = 1 + self:combatTrainingPercentInc(weapon)
-		local power = self:combatDamagePower(damage or weapon)
-		local phys = self:combatPhysicalpower(nil, weapon) + totstat
-
-		self.combatTrainingDamage = old_combatTrainingDamage
-		self.combatTrainingPercentInc = old_combatTrainingPercentInc
-		--	return self:rescaleDamage(0.3*self:combatPhysicalpower(nil, weapon, totstat) * power * talented_mod)
-
-		return self:rescaleDamage(0.3 * phys * power * talented_mod)
-	end
-	
-
---- Previous combatDamage function with scaled stat bonuses and old weapon masteries
--- Calculate combat damage for a weapon (with an optional damage field for ranged)
--- Talent bonuses are always based on the base weapon
-local function combatDamageOld(self, weapon, adddammod, damage)
-
-	-- Old weapon mastery functions hardcoded to their old values
-	local function combatTrainingDamageOld(self, weapon)
-		local t = self:combatGetTraining(weapon)
-		if not t then return 0 end
-		return self:getTalentLevel(t) * 10
-	end
-
-	-- Gets the percent increase for a weapon based on training.
-	local function combatTrainingPercentIncOld(self, weapon)
-		local t = self:combatGetTraining(weapon)
-		if not t then return 0 end
-		return math.sqrt(self:getTalentLevel(t) / 5) / 2
-	end
-
-	self.combatTrainingDamage = combatTrainingDamageOld
-	self.combatTrainingPercentInc = combatTrainingPercentIncOld
-
-	weapon = weapon or self.combat or {}
-	local dammod = self:getDammod(damage or weapon)
-	local totstat = 0
-	for stat, mod in pairs(dammod) do
-		totstat = totstat + self:getStat(stat) * mod
-	end
-	if adddammod then
-		for stat, mod in pairs(adddammod) do
-			totstat = totstat + self:getStat(stat) * mod
-		end
-	end
-	if self:knowTalent(self["T_FORM_AND_FUNCTION"]) then totstat = totstat + self:callTalent(self["T_FORM_AND_FUNCTION"], "getDamBoost", weapon) end
-	local talented_mod = 1 + self:combatTrainingPercentInc(weapon)
-	local power = self:combatDamagePower(damage or weapon, totstat)
-	local phys = self:combatPhysicalpower(nil, weapon, totstat)
-
-	self.combatTrainingDamage = old_combatTrainingDamage
-	self.combatTrainingPercentInc = old_combatTrainingPercentInc
-	--	return self:rescaleDamage(0.3*self:combatPhysicalpower(nil, weapon, totstat) * power * talented_mod)
-
-	return self:rescaleDamage(0.3 * phys * power * talented_mod)
-end
-
-local p_old_combatDamage, atc_old_combatDamage = rawget(player, "combatDamage")
-player.combatDamage = combatDamageOld
-local combat = get_combat_stats(player, type, inven_id, item)
-local combatc = {}
-if actor_to_compare then
-	atc_old_combatDamage = actor_to_compare and rawget(actor_to_compare, "combatDamage")
-	actor_to_compare.combatDamage = combatDamageOld
-	combatc = get_combat_stats(actor_to_compare, type, inven_id, item)
-end
-local dm = {}
-local dammod = player:getDammod(combat.ammo and combat.ammo.combat or combat.mean)
---table.set(game, "debug", "combat", combat)
-for stat, i in pairs(dammod) do
-	local name = Stats.stats_def[stat].short_name:capitalize()
-	if player:knowTalent(player.T_STRENGTH_OF_PURPOSE) then
-		if name == "Str" then name = "Mag" end
-	end
-	if combat.talented == "knife" and player:knowTalent(player.T_LETHALITY) then
-		if name == "Str" then name = "Cun" end
-	end
-	dm[#dm+1] = ("%d%% %s"):format(i * 100, name)
-end
-text = compare_fields(player, actor_to_compare,
-	function(actor, ...)
-		return actor == actor_to_compare and combatc.dmg or combat.dmg
-	end,
-	"%3d", "%+.0f", 1, false, false, dam)
-self:mouseTooltip("OLD DAMAGE (scaled stat bonuses, old masteries)", self:drawString(self.font, ("Old Damage   : #00ff00#%s [%s]"):format(text, table.concatNice(dm, ", ")), w, h, 255, 255, 255, true))
-	h = h + self.font_h
-player.combatDamage = p_old_combatDamage
-if actor_to_compare then actor_to_compare.combatDamage = atc_old_combatDamage end
-
-----------------------
-local p_old_combatDamage, atc_old_combatDamage = rawget(player, "combatDamage")
-player.combatDamage = combatDamageOld2
-local combat = get_combat_stats(player, type, inven_id, item)
-local combatc = {}
-if actor_to_compare then
-	atc_old_combatDamage = actor_to_compare and rawget(actor_to_compare, "combatDamage")
-	actor_to_compare.combatDamage = combatDamageOld2
-	combatc = get_combat_stats(actor_to_compare, type, inven_id, item)
-end
-local dm = {}
-local dammod = player:getDammod(combat.ammo and combat.ammo.combat or combat.mean)
---table.set(game, "debug", "combat", combat)
-for stat, i in pairs(dammod) do
-	local name = Stats.stats_def[stat].short_name:capitalize()
-	if player:knowTalent(player.T_STRENGTH_OF_PURPOSE) then
-		if name == "Str" then name = "Mag" end
-	end
-	if combat.talented == "knife" and player:knowTalent(player.T_LETHALITY) then
-		if name == "Str" then name = "Cun" end
-	end
-	dm[#dm+1] = ("%d%% %s"):format(i * 100, name)
-end
-text = compare_fields(player, actor_to_compare,
-	function(actor, ...)
-		return actor == actor_to_compare and combatc.dmg or combat.dmg
-	end,
-	"%3d", "%+.0f", 1, false, false, dam)
-self:mouseTooltip("OLDEST DAMAGE (unscaled and old masteries)", self:drawString(self.font, ("Oldest Damage   : #00ff00#%s [%s]"):format(text, table.concatNice(dm, ", ")), w, h, 255, 255, 255, true))
-	h = h + self.font_h
-player.combatDamage = p_old_combatDamage
-if actor_to_compare then actor_to_compare.combatDamage = atc_old_combatDamage end
--- DGDGDGDG end old damage display
 
 			text = compare_fields(player, actor_to_compare, function(actor, ...) return actor == actor_to_compare and combatc.apr or combat.apr end, "%3d", "%+.0f", 1, false, false, dam)
 			self:mouseTooltip(self.TOOLTIP_COMBAT_APR,    self:drawString(self.font, ("APR          : #00ff00#%s"):format(text), w, h, 255, 255, 255, true)) h = h + self.font_h

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -360,7 +360,7 @@ newEntity{
 
 newEntity{
 	power_source = {technique=true, psionic=true, arcane=true},
-	name = "of force", suffix=true, instant_resolve=true,
+	name = " of force", suffix=true, instant_resolve=true,
 	keywords = {force=true},
 	level_range = {30, 50},
 	greater_ego = 1,

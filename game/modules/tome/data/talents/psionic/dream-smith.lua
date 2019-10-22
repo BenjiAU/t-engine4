@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
+local Object = require "mod.class.Object"
 -- Dream-Forge Hammer
 function useDreamHammer(self)
 	local combat = {
@@ -106,23 +107,13 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		local weapon_damage = useDreamHammer(self).dam
-		local weapon_range = useDreamHammer(self).dam * useDreamHammer(self).damrange
-		local weapon_atk = useDreamHammer(self).atk
-		local weapon_apr = useDreamHammer(self).apr
-		local weapon_crit = useDreamHammer(self).physcrit
-		return ([[Craft a hammer from the dream forge and strike an adjacent foe, inflicting %d%% weapon damage.  If the attack hits, it will bring one random Dream Smith talent off cooldown.
+		local weapon_stats = Object:descCombat(self, {combat=useDreamHammer(self)}, {}, "combat")
+		return ([[Craft a hammer from the dream forge and strike an adjacent foe, inflicting %d%% weapon damage. If the attack hits, it will bring one random Dream Smith talent off cooldown.
 		At talent level 5, you'll bring a second random talent off cooldown.
 		The base power, Accuracy, Armour penetration, and critical strike chance of the weapon will scale with your Mindpower.
-
-		Current Dream Hammer Stats
-		Base Power: %0.2f - %0.2f
-		Uses Stats: 120%% Wil
-		Damage Type: Physical
-		Accuracy is based on willpower for this weapon.
-		Accuracy Bonus: +%d
-		Armour Penetration: +%d
-		Physical Crit. Chance: +%d]]):format(damage * 100, weapon_damage, weapon_range, weapon_atk, weapon_apr, weapon_crit)
+		
+		Current Dream Hammer Stats:
+		%s]]):format(damage * 100, tostring(weapon_stats))
 	end,
 }
 

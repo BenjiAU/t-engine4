@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2017 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -115,6 +115,8 @@ newEntity{
 	rarity = 40,
 	cost = 40,
 	wielder = {
+	    heal_on_nature_summon = resolvers.mbonus_material(30, 15),
+	    nature_summon_max = resolvers.mbonus_material(2,1),
 		inc_damage = {
 			[DamageType.FIRE] = resolvers.mbonus_material(10, 5),
 			[DamageType.ACID] = resolvers.mbonus_material(10, 5),
@@ -455,40 +457,41 @@ newEntity{
 	level_range = {30, 50},
 	rarity = 45,
 	greater_ego = 1,
+	unique_ego = 1,
 	cost = 40,
 	combat = {
-		melee_project = {
-			[DamageType.ITEM_ANTIMAGIC_MANABURN] = resolvers.mbonus_material(15, 10),
-		},
-		special_on_crit = {desc="burns a spell talent that is not on cooldown, placing it on cooldown and inflicting arcane damage equal to its resource cost", fct=function(combat, who, target)
-			local turns = 1 + math.ceil(who:combatMindpower() / 20)
-			local check = math.max(who:combatSpellpower(), who:combatMindpower(), who:combatAttack())
-			if not who:checkHit(check, target:combatMentalResist()) then game.logSeen(target, "%s resists!", target.name:capitalize()) return nil end
+		special_on_crit = {
+			desc=function(self, who, special)
+				local manaburn = special.manaburn(who)
+				return ("Deals #YELLOW#%d#LAST# Manaburn damage and puts 1 random spell talent on cooldown for #YELLOW#%d#LAST# turns (checks Confusion immunity)"):
+					format(manaburn or 0, 1 + math.ceil(who:combatMindpower() / 20))
+			end,
+			manaburn=function(who)
+				local dam = math.floor(who:combatStatScale(who:combatMindpower(), 1, 150))
+				return dam
+			end,
+			fct=function(combat, who, target, dam, special)
+				local manaburn = special.manaburn(who)
+				local tg = {type="hit", range=1}
+				who:project(tg, target.x, target.y, engine.DamageType.MANABURN, manaburn)
 
-			local tids = {}
-			for tid, lev in pairs(target.talents) do
-				local t = target:getTalentFromId(tid)
-				if t and not target.talents_cd[tid] and t.mode == "activated" and t.is_spell and not t.innate then tids[#tids+1] = t end
+				local turns = 1 + math.ceil(who:combatMindpower() / 20)
+				local check = math.max(who:combatSpellpower(), who:combatMindpower(), who:combatAttack())
+				if not who:checkHit(check, target:combatMentalResist()) or not target:canBe("confusion") then return end
+
+				local tids = {}
+				for tid, lev in pairs(target.talents) do
+					local t = target:getTalentFromId(tid)
+					if t and not target.talents_cd[tid] and t.mode == "activated" and not t.innate and t.is_spell then tids[#tids+1] = t end
+				end
+
+				local t = rng.tableRemove(tids)
+				if not t then return end
+				
+				target.talents_cd[t.id] = turns
+				game.logSeen(target, "#YELLOW#%s has their %s spell disrupted for for %d turns!", target.name:capitalize(), t.name, turns)
 			end
-
-			local t = rng.tableRemove(tids)
-			if not t then return nil end
-			local damage = t.mana or t.vim or t.positive or t.negative or t.paradox or 0
-			target.talents_cd[t.id] = turns
-
-			local tg = {type="hit", range=1}
-			damage = util.getval(damage, target, t)
-			if type(damage) ~= "number" then damage = 0 end
-			who:project(tg, target.x, target.y, engine.DamageType.ARCANE, damage)
-
-			game.logSeen(target, "%s's %s has been #ORCHID#burned#LAST#!", target.name:capitalize(), t.name)
-		end},
-	},
-	wielder = {
-		inc_damage={
-			[DamageType.ARCANE] = resolvers.mbonus_material(8, 2),
 		},
-		combat_spellresist = resolvers.mbonus_material(8, 2),
 	},
 }
 
@@ -510,52 +513,32 @@ newEntity{
 	},
 }
 
-newEntity{
-	power_source = {antimagic=true},
-	name = "purifying ", prefix=true, instant_resolve=true,
-	keywords = {purifying=true},
-	level_range = {30, 50},
-	greater_ego = 1,
-	rarity = 35,
-	cost = 40,
-	wielder = {
-		melee_project={
-			[DamageType.ITEM_ANTIMAGIC_MANABURN] = resolvers.mbonus_material(16, 4),
-		},
-		inc_damage={
-			[DamageType.ARCANE] = resolvers.mbonus_material(8, 2),
-		},
-		resists_pen={
-			[DamageType.ARCANE] = resolvers.mbonus_material(8, 2),
-		},
-		resists={
-			[DamageType.ARCANE] = resolvers.mbonus_material(8, 2),
-		},
-	},
-	resolvers.charmt(Talents.T_DESTROY_MAGIC, {3,4,5}, 30),
-}
-
 -- Suffix
 -------------------------------------------------------
 newEntity{
 	power_source = {antimagic=true},
-	name = " of persecution", suffix=true, instant_resolve=true,
+	name = " of disruption", suffix=true, instant_resolve=true,
 	keywords = {disruption=true},
-	level_range = {30, 50},
+	level_range = {1, 50},
 	greater_ego = 1,
+	unique_ego = 1,
 	rarity = 50,
 	cost = 40,
 	combat = {
 		inc_damage_type = {
 			unnatural=resolvers.mbonus_material(25, 5),
 		},
-		special_on_hit = {desc="inflicts spell disruption, causing a stacking 10% chance of spell failure for 10 turns (50% max), using the greater of your mindpower or accuracy against the victim's physical save", fct=function(combat, who, target)
-			local check = math.max(who:combatMindpower(), who:combatAttack())
-			target:setEffect(target.EFF_SPELL_DISRUPTION, 10, {src=who, power = 10, max = 50, apply_power=check})
-		end},
+		special_on_hit = {
+			desc=function(self, who, special)
+				return ("Cause the target to have a 10%% chance to fail spellcasting and 10%% chance to lose a magical sustain each turn, stacking up to 50%%"):format()
+			end,
+			fct=function(combat, who, target, dam, special)
+				local check = math.max(who:combatSpellpower(), who:combatMindpower(), who:combatAttack())
+				target:setEffect(target.EFF_SPELL_DISRUPTION, 5, {src=who, power = 10, max = 50, apply_power=check})
+			end
+		},
 	},
 }
-
 -------------------------------------------------------
 --Psionic----------------------------------------------
 -------------------------------------------------------

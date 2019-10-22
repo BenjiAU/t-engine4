@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ newTalent{
 
 		self:logCombat(target, "#Source# tries to swallow #Target#!")
 		local shield, shield_combat = self:hasShield()
-		local weapon = self:hasMHWeapon().combat
+		local weapon = self:hasMHWeapon() and self:hasMHWeapon().combat or self.combat
 		local hit = false
 		if not shield then
 			hit = self:attackTarget(target, DamageType.NATURE, t.getDamage(self, t), true)
@@ -86,7 +86,8 @@ return ([[Attack the target for %d%% Nature weapon damage.
 		The target may save against your physical power to prevent this attempt.
 		Levels in Swallow raise your Physical and Mental critical rate by %d%%.
 		Each point in sand drake talents increase your physical resistance by 0.5%%.
-
+		This talent will also attack with your shield, if you have one equipped.
+		
 		Max life threshold at your current size:
 		Tiny:  %d%%
 		Small:  %d%%

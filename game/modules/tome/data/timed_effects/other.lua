@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -153,11 +153,24 @@ newEffect{
 }
 
 newEffect{
+	name = "SURGING_CIRCLES", image = "talents/celestial_surge.png",
+	desc = "Circle Surge",
+	long_desc = function(self, eff) return [[Residual power from the surge is emanating from the circles.
+		Shifting Shadows: +1 negative.
+		Sanctity: +1 postive.
+		Warding: +0.5 postive and negative.]] end,
+	type = "other",
+	subtype = {},
+	status = "beneficial",
+	paramters = {},
+}
+
+newEffect{
 	name = "FLASH_SHIELD", image = "talents/flash_of_the_blade.png",
 	desc = "Protected by the Sun",
 	long_desc = function(self, eff) return "The Sun has granted a brief immunity to all damage." end,
 	type = "other",
-	subtype = { },
+	subtype = {},
 	status = "beneficial",
 	on_gain = function(self, err) return "#Target# whirls around and a radiant shield surrounds them!", "+Divine Shield" end,
 	parameters = {},
@@ -279,14 +292,14 @@ newEffect{
 		self:effectTemporaryValue(eff, "max_life", 300)
 		self:effectTemporaryValue(eff, "combat_armor", 20)
 		self:effectTemporaryValue(eff, "combat_armor_hardiness", 20)
-		
+
 		self.replace_display = mod.class.Actor.new{
-			image="invis.png", 
-			add_mos = {{image = "npc/giant_treant_wrathroot.png", 
-			display_y = -1, 
+			image="invis.png",
+			add_mos = {{image = "npc/giant_treant_wrathroot.png",
+			display_y = -1,
 			display_h = 2}},
 		}
-		
+
 		self:removeAllMOs()
 		game.level.map:updateMap(self.x, self.y)
 
@@ -411,7 +424,7 @@ newEffect{
 		if core.shader.active(4) then
 			self:removeParticles(eff.particle)
 			eff.particle = self:addParticles(Particles.new("shader_shield", 1, {size_factor=1.3, img="runicshield"}, {type="runicshield", shieldIntensity=0.14, ellipsoidalFactor=1.2, scrollingSpeed=-2, time_factor=4000, bubbleColor={1, 1, 0.3, 1.0}, auraColor={1, 0.8, 0.2, 1}}))
-		end		
+		end
 	end,
 	damage_feedback = function(self, eff, src, value)
 		if eff.particle and eff.particle._shader and eff.particle._shader.shad and src and src.x and src.y then
@@ -443,7 +456,6 @@ newEffect{
 		-- Time shield ends, setup a restoration field if needed
 		if eff.power - self.time_shield_absorb > 0 then
 			local val = (eff.power - self.time_shield_absorb) / eff.dot_dur / 2
-			if self:attr("shield_factor") then val = val * (100 + self:attr("shield_factor")) / 100 end
 			print("Time shield restoration field", eff.power - self.time_shield_absorb, val)
 			self:setEffect(self.EFF_TIME_DOT, eff.dot_dur, {power=val})
 		end
@@ -652,7 +664,7 @@ newEffect{
 		game:onTickEnd(function()
 			game:chronoClone("see_threads_base")
 		end)
-		
+
 		self:effectTemporaryValue(eff, "ignore_direct_crits", eff.crits)
 		self:effectTemporaryValue(eff, "combat_def", eff.defense)
 	end,
@@ -661,9 +673,9 @@ newEffect{
 		if self ~= game.player then
 			return
 		end
-		
+
 		game:onTickEnd(function()
-			
+
 			if game._chronoworlds == nil then
 				game.logSeen(self, "#LIGHT_RED#The see the threads spell fizzles and cancels, leaving you in this timeline.")
 				return
@@ -835,7 +847,7 @@ newEffect{
 	on_merge = function(self, old_eff, new_eff)
 		self:removeTemporaryValue("inc_damage", old_eff.dmgid)
 		self:removeTemporaryValue("resists", old_eff.rstid)
-		self:removeTemporaryValue("reduce_detrimental_status_effects_time", old_eff.durid)		
+		self:removeTemporaryValue("reduce_detrimental_status_effects_time", old_eff.durid)
 		old_eff.cur_power = (new_eff.power)
 		old_eff.cur_dur = new_eff.durred
 		old_eff.dmgid = self:addTemporaryValue("inc_damage", {all = - old_eff.dur * 2})
@@ -892,10 +904,10 @@ newEffect{
 					if sx then acts[#acts+1] = {act, sx, sy} end
 				end
 			end
-			if #acts == 0 then 
+			if #acts == 0 then
 				self.never_act = nil  -- If there was ever something worth making redundant..
 				self:removeEffect(self.EFF_SHADOW_VEIL)
-				return 
+				return
 			end
 
 			act = rng.table(acts)
@@ -998,7 +1010,7 @@ newEffect{
 		if bonusLevel < 3 then return end
 		eff.retchHealId = self:addTemporaryValue("retch_heal", 1)
 		eff.retchCooldown = eff.retchCooldown or 0
-		
+
 		-- level 4: Reprieve from Death
 	end,
 	deactivate = function(self, eff)
@@ -1007,7 +1019,7 @@ newEffect{
 		if eff.incStatsId then self:removeTemporaryValue("inc_stats", eff.incStatsId) eff.incStatsId = nil end
 		if eff.retchHealId then self:removeTemporaryValue("retch_heal", eff.retchHealId) eff.retchHealId = nil end
 	end,
-	
+
 	callbackOnTakeDamage = function(self, eff, src, x, y, type, dam, state)
 		local def, level, bonusLevel = self.tempeffect_def[self.EFF_CURSE_OF_CORPSES], eff.level, math.min(eff.unlockLevel, eff.level)
 		if math.min(eff.unlockLevel, eff.level) >= 3 then
@@ -1024,7 +1036,7 @@ newEffect{
 	on_timeout = function(self, eff)
 		if eff.retchCooldown and eff.retchCooldown > 0 then eff.retchCooldown = math.max(0, eff.retchCooldown - 1) end
 	end,
-	
+
 	on_merge = function(self, old_eff, new_eff) return old_eff end,
 	--[[
 	doCorpselight = function(self, eff, target)
@@ -1123,7 +1135,7 @@ newEffect{
 	end,
 	getDexChange = function(level) return -1 + level * 2 end,
 	getConspiratorChance = function(level) return 20 + (level * 10) end,
-	getManiaDamagePercent = function(level) 
+	getManiaDamagePercent = function(level)
 		return Combat:combatLimit(level - 4, 5, 15, 0, 8, 4) -- Limit > 5%
 	end,
 	display_desc = function(self, eff) return ([[Curse of Madness (power %0.1f)]]):format(eff.level) end,
@@ -1171,13 +1183,13 @@ newEffect{
 		if eff.getCombatCriticalPowerChangeId then self:removeTemporaryValue("combat_critical_power", eff.getCombatCriticalPowerChangeId) eff.getCombatCriticalPowerChangeId = nil end
 		if eff.incStatsId then self:removeTemporaryValue("inc_stats", eff.incStatsId) eff.incStatsId = nil end
 	end,
-	
+
 	--cooldown talents on taking damage
-	callbackOnTakeDamage = function(self, eff, src, x, y, type, dam, state) 
+	callbackOnTakeDamage = function(self, eff, src, x, y, type, dam, state)
 		if math.min(eff.unlockLevel, eff.level) >= 4 then
 			local def = self.tempeffect_def[self.EFF_CURSE_OF_MADNESS]
 			if dam > 0 and dam >= self.max_life * (def.getManiaDamagePercent(eff.level) / 100) and not self.turn_procs.CoMania then
-				
+
 				local list = {}
 				for tid, cd in pairs(self.talents_cd) do
 					if cd and cd > 0 then
@@ -1193,14 +1205,14 @@ newEffect{
 						if self.onTalentCooledDown then self:onTalentCooledDown(tid) end
 					end
 				end
-				
+
 				game.logSeen(self, "#F53CBE#%s's mania hastens cooldowns.", self.name:capitalize())
 				self.turn_procs.CoMania = true
 				return {dam = dam}
 			end
 		end
 	end,
-	
+
 	on_merge = function(self, old_eff, new_eff) return old_eff end,
 	--[[
 	--spread a random det mental effect on crit
@@ -1275,7 +1287,7 @@ newEffect{
 			end
 		end
 	end,
-	
+
 	--just confusions
 	--[[
 	doConspirator = function(self, eff, target)
@@ -1534,33 +1546,38 @@ newEffect{
 
 	--Harrow
 	callbackOnTemporaryEffect = function(self, eff, eff_id, e, p)
-		local def, level, bonusLevel = self.tempeffect_def[self.EFF_CURSE_OF_NIGHTMARES], eff.level, math.min(eff.unlockLevel, eff.level)
-		if math.min(eff.unlockLevel, eff.level) >= 3 then
-			--if e.status == "detrimental" and not e.subtype["cross tier"] and p.src and p.src._is_actor and not p.src.dead then
-				--local e = self.tempeffect_def[eff_id]
-			if e.status ~= "detrimental" or e.subtype["cross tier"] then return end
-			local harrowDam = def.getHarrowDam(self, level)
-			if p.src and p.src._is_actor then
-				DamageType:get(DamageType.MIND).projector(self, p.src.x, p.src.y, DamageType.MIND, dam)
-				DamageType:get(DamageType.MIND).projector(self, p.src.x, p.src.y, DamageType.DARKNESS, dam)
-				--game.logSeen(self, "#F53CBE#%s harrows '%s'!", self.name:capitalize(), p.src.name)
-				game.logSeen(self, "#F53CBE#%s harrows %s!", self.name:capitalize(), target.name)
-			else
-				local tgts = {}
-				self:project({type="ball", radius=10}, self.x, self.y, function(px, py)
-					local act = game.level.map(px, py, Map.ACTOR)
-					if not act or self:reactionToward(act) >= 0 then return end
-					tgts[#tgts+1] = act
-				end)
-				if #tgts > 0 then
-					local target = rng.table(tgts)
-					DamageType:get(DamageType.MIND).projector(self, target.x, target.y, DamageType.MIND, harrowDam)
-					DamageType:get(DamageType.MIND).projector(self, target.x, target.y, DamageType.DARKNESS, harrowDam)
-					--self:logCombat(target, "#F53CBE##Source# harrows #Target#!", self.name:capitalize(), target.name)
+		if self.__curse_nightmare_recurse then return end
+		self.__curse_nightmare_recurse = true
+		(function()
+			local def, level, bonusLevel = self.tempeffect_def[self.EFF_CURSE_OF_NIGHTMARES], eff.level, math.min(eff.unlockLevel, eff.level)
+			if math.min(eff.unlockLevel, eff.level) >= 3 then
+				--if e.status == "detrimental" and not e.subtype["cross tier"] and p.src and p.src._is_actor and not p.src.dead then
+					--local e = self.tempeffect_def[eff_id]
+				if e.status ~= "detrimental" or e.type == "other" or e.subtype["cross tier"] then return end
+				local harrowDam = def.getHarrowDam(self, level)
+				if p.src and p.src._is_actor then
+					DamageType:get(DamageType.MIND).projector(self, p.src.x, p.src.y, DamageType.MIND, dam)
+					DamageType:get(DamageType.MIND).projector(self, p.src.x, p.src.y, DamageType.DARKNESS, dam)
+					--game.logSeen(self, "#F53CBE#%s harrows '%s'!", self.name:capitalize(), p.src.name)
 					game.logSeen(self, "#F53CBE#%s harrows %s!", self.name:capitalize(), target.name)
+				else
+					local tgts = {}
+					self:project({type="ball", radius=10}, self.x, self.y, function(px, py)
+						local act = game.level.map(px, py, Map.ACTOR)
+						if not act or self:reactionToward(act) >= 0 then return end
+						tgts[#tgts+1] = act
+					end)
+					if #tgts > 0 then
+						local target = rng.table(tgts)
+						DamageType:get(DamageType.MIND).projector(self, target.x, target.y, DamageType.MIND, harrowDam)
+						DamageType:get(DamageType.MIND).projector(self, target.x, target.y, DamageType.DARKNESS, harrowDam)
+						--self:logCombat(target, "#F53CBE##Source# harrows #Target#!", self.name:capitalize(), target.name)
+						game.logSeen(self, "#F53CBE#%s harrows %s!", self.name:capitalize(), target.name)
+					end
 				end
 			end
-		end
+		end)()
+		self.__curse_nightmare_recurse = nil
 	end,
 	on_merge = function(self, old_eff, new_eff) return old_eff end,
 	--[[doSuffocate = function(self, eff, target)
@@ -1634,8 +1651,8 @@ newEffect{
 					DamageType.NIGHTMARE, 1,
 					radius,
 					5, nil,
-					engine.MapEffect.new{alpha=100, color_br=134, color_bg=60, color_bb=134, effect_shader="shader_images/darkness_effect.png"},
-					function(e, update_shape_only) if not update_shape_only then 
+					engine.MapEffect.new{alpha=93, color_br=134, color_bg=60, color_bb=134, effect_shader="shader_images/darkness_effect.png"},
+					function(e, update_shape_only) if not update_shape_only then
 						-- attempt one summon per turn
 						if not e.src:canBe("summon") then return end
 
@@ -1671,9 +1688,9 @@ newEffect{
 						return true
 					end end,
 					false, false)
-				
+
 				self.turn_procs.CoNightmare = true
-				
+
 				game.logSeen(self, "#F53CBE#The air around %s grows cold and terrifying shapes begin to coalesce. A nightmare has begun.", self.name:capitalize())
 				game:playSoundNear(self, "talents/cloud")
 			end
@@ -1740,7 +1757,7 @@ newEffect{
 		eff.missedEvasionId = self:addTemporaryValue("evasion", def.getMissedOpportunities(level))
 
 		-- level 4: Unfortunate End - handled in doUnfortunateEnd
-		
+
 	end,
 	deactivate = function(self, eff)
 		if eff.moneyValueMultiplierId then self:removeTemporaryValue("money_value_multiplier", eff.moneyValueMultiplierId) eff.moneyValueMultiplierId = nil end
@@ -1749,7 +1766,7 @@ newEffect{
 		if eff.missedEvasionId then self:removeTemporaryValue("evasion", eff.missedEvasionId) eff.missedEvasionId = nil end
 	end,
 	on_merge = function(self, old_eff, new_eff) return old_eff end,
-	
+
 	-- called by default projector in mod.data.damage_types.lua
 	doUnfortunateEnd = function(self, eff, target, dam)
 		if math.min(eff.unlockLevel, eff.level) >=4 then
@@ -1887,6 +1904,44 @@ newEffect{
 	end,
 }
 
+-- Predator is purely for the player's information
+newEffect{
+	name = "PREDATOR", image = "effects/predator.png",
+	desc = "Predator",
+	no_stop_enter_worlmap = true,
+	decrease = 0,
+	cancel_on_level_change = true,
+	long_desc = function(self, eff)
+		local desc = ("Hunting:")
+		local desc2 = ("\n%d%% Received damage reduction against SubType:"):format(eff.power)
+		if not game.level then return desc..desc2
+		else for i = 1, eff.count do
+			if self.mark_prey[game.level.id] and self.mark_prey[game.level.id][i] and self.mark_prey[game.level.id][i].name and not self.mark_prey[game.level.id][i].dead then
+				local mprank, mpcolour = self.mark_prey[game.level.id][i]:TextRank()
+				desc = desc..("\n%s%s.#LAST#"):format(mpcolour, self.mark_prey[game.level.id][i].name:capitalize())
+			end
+			if self.mark_prey[game.level.id] and self.mark_prey[game.level.id][i] and self.mark_prey[game.level.id][i].subtype then
+				for j = 1, i do
+					if self.mark_prey[game.level.id][j] and self.mark_prey[game.level.id][j].subtype and j ~= i and self.mark_prey[game.level.id][i].subtype == self.mark_prey[game.level.id][j].subtype then
+						eff.unique_subtype = false break
+					else
+						eff.unique_subtype = true
+					end
+				end
+				if eff.unique_subtype and eff.unique_subtype == true then
+					desc2 = desc2..("\n#ffa0ff#%s.#LAST#"):format(self.mark_prey[game.level.id][i].subtype:capitalize())
+				end
+			end
+		end end
+		return desc..desc2
+	end,
+	type = "other",
+	subtype = { predator=true },
+	status = "beneficial",
+	activate = function(self, eff) end,
+	deactivate = function(self, eff) end,
+}
+
 newEffect{
 	name = "FADED", image = "talents/shadow_fade.png",
 	desc = "Faded",
@@ -1992,11 +2047,11 @@ newEffect{
 		if not self.on_die then return end
 		-- Dreamscape doesn't cooldown in the dreamscape
 		self.talents_cd[self.T_DREAMSCAPE] = self.talents_cd[self.T_DREAMSCAPE] + 1
-		
+
 		-- Spawn a copy every other turn
 		local spawn_time = 2
 		if eff.dur%spawn_time == 0 then
-		
+
 			-- Find space
 			local x, y = util.findFreeGrid(eff.target.x, eff.target.y, 5, true, {[Map.ACTOR]=true})
 			if not x then
@@ -2020,7 +2075,7 @@ newEffect{
 				m.inc_damage.all = (m.inc_damage.all or 0) - 50
 			end
 			m.lucid_dreamer = 1
-			
+
 			-- Remove some talents
 			local tids = {}
 			for tid, _ in pairs(m.talents) do
@@ -2030,13 +2085,13 @@ newEffect{
 			for i, t in ipairs(tids) do
 				m:unlearnTalentFull(t.id)
 			end
-			
+
 			-- remove imprisonment
 			m:attr("invulnerable", -1)
 			m:attr("time_prison", -1)
 			m:attr("no_timeflow", -1)
 			m:attr("status_effect_immune", -1)
-			
+
 			m:removeParticles(eff.particle)
 			m:removeTimedEffectsOnClone()
 
@@ -2066,12 +2121,12 @@ newEffect{
 				end
 			end
 		end
-		
+
 		-- Try to insure the AI isn't attacking the invulnerable actor
 		if self.ai_target and self.ai_target.actor and self.ai_target.actor:attr("invulnerable") then
 			self:setTarget(nil)
 		end
-		
+
 		-- End the effect early if we've killed enough projections
 		if eff.projections_killed/10 >= eff.target.life/eff.target.max_life then
 			game:onTickEnd(function()
@@ -2096,7 +2151,7 @@ newEffect{
 	deactivate = function(self, eff)
 		-- Clone protection
 		if not self.on_die then return end
-		
+
 		-- Remove the target's invulnerability
 		eff.target:removeTemporaryValue("invulnerable", eff.iid)
 		eff.target:removeTemporaryValue("time_prison", eff.sid)
@@ -2106,7 +2161,7 @@ newEffect{
 		-- Remove the invaders damage bonus
 		self:removeTemporaryValue("inc_damage", eff.pid)
 		self:removeTemporaryValue("lucid_dreamer", eff.did)
-		
+
 		-- Return from the dreamscape
 		game:onTickEnd(function()
 			-- Collect objects
@@ -2512,7 +2567,7 @@ newEffect{
 		self.energy.value = 0
 	end,
 	deactivate = function(self, eff) --wake up vaulted npcs in LOS
-	  self:computeFOV(5, nil, 
+	  self:computeFOV(5, nil,
 		function(x, y, dx, dy, sqdist)
 			local act = game.level.map(x, y, Map.ACTOR)
 			if act then
@@ -2711,7 +2766,7 @@ newEffect{
 	on_lose = function(self, err) return "#Target# rearms.", "-Disarmed" end,
 	activate = function(self, eff)
 		self:removeEffect(self.EFF_COUNTER_ATTACKING) -- Cannot parry or counterattack while disarmed
-		self:removeEffect(self.EFF_DUAL_WEAPON_DEFENSE) 
+		self:removeEffect(self.EFF_DUAL_WEAPON_DEFENSE)
 		eff.tmpid = self:addTemporaryValue("disarmed", 1)
 	end,
 	deactivate = function(self, eff)
@@ -2766,7 +2821,7 @@ newEffect{
 		self:effectTemporaryValue(eff, "timestopping", 1)
 		self.no_leave_control = true
 		core.display.pauseAnims(true)
-		
+
 		-- clone protection
 		if self.player then
 			self:updateMainShader()
@@ -2775,7 +2830,7 @@ newEffect{
 	deactivate = function(self, eff)
 		self.no_leave_control = false
 		core.display.pauseAnims(false)
-		
+
 		-- clone protection
 		if self == game.player then
 			self:updateMainShader()
@@ -2879,7 +2934,7 @@ newEffect{
 	end,
 	callbackOnHit = function(self, eff, cb, src)
 		if cb.value <= 0 then return cb.value end
-		
+
 		local clones = {}
 		-- Find our clones
 		for i = 1, #eff.targets do
@@ -2888,7 +2943,7 @@ newEffect{
 				clones[#clones+1] = target
 			end
 		end
-		
+
 		-- Split the damage
 		if #clones > 0 and not self.turn_procs.temporal_fugue_damage_self and not self.turn_procs.temporal_fugue_damage_target then
 			self.turn_procs.temporal_fugue_damage_self = true
@@ -2903,15 +2958,15 @@ newEffect{
 					target.turn_procs.temporal_fugue_damage_target = nil
 				end
 			end
-			
+
 			self.turn_procs.temporal_fugue_damage_self = nil
 		end
-		
+
 		-- If we're the last clone remove the effect
 		if #clones <= 0 then
 			self:removeEffect(self.EFF_TEMPORAL_FUGUE)
 		end
-		
+
 		return cb.value
 	end,
 	on_timeout = function(self, eff)
@@ -2919,7 +2974,7 @@ newEffect{
 		if self.talents_cd[self.T_TEMPORAL_FUGUE] then
 			self.talents_cd[self.T_TEMPORAL_FUGUE] = self.talents_cd[self.T_TEMPORAL_FUGUE] + 1
 		end
-	
+
 		local alive = false
 		for i = 1, #eff.targets do
 			local target = eff.targets[i]
@@ -3074,11 +3129,11 @@ newEffect{
 newEffect{
 	name = "TWIST_FATE", image = "talents/twist_fate.png",
 	desc = "Twist Fate",
-	long_desc = function(self, eff) 
+	long_desc = function(self, eff)
 		local t = self:getTalentFromId(eff.talent)
-		return 
+		return
 		([[Currently Twisted Anomlay: %s
-		
+
 		%s]]):format(t.name or "none", t.info(self, t) or "none")
 	end,
 	type = "other",
@@ -3101,7 +3156,7 @@ newEffect{
 				-- manually use energy
 				local anom = self:getTalentFromId(eff.talent)
 				self:useEnergy(self:getTalentSpeed(anom) * game.energy_to_act)
-				
+
 				game:playSoundNear(self, "talents/dispel")
 				self:incParadox(-eff.paradox)
 			end
@@ -3426,25 +3481,16 @@ newEffect{
 newEffect{
 	name = "SCOUNDREL", image = "talents/scoundrel.png",
 	desc = "Scoundrel's Strategies",
-	long_desc = function(self, eff) return ("The target is suffering from disabling wounds, reducing their critical strike chance by %d%%."):
+	long_desc = function(self, eff) return ("The target is suffering from disabling wounds, reducing their critical strike damage by %d%%."):
 		format( eff.power ) end,
 	type = "other",
 	subtype = { tactic=true },
 	status = "detrimental",
 	parameters = { power=1 },
 	activate = function(self, eff)
-		eff.cur_pcrit = -eff.power
-		eff.cur_scrit = -eff.power
-		eff.cur_mcrit = -eff.power
-
-		eff.pcritid = self:addTemporaryValue("combat_physcrit", eff.cur_pcrit)
-		eff.scritid = self:addTemporaryValue("combat_spellcrit", eff.cur_scrit)
-		eff.mcritid = self:addTemporaryValue("combat_mindcrit", eff.cur_mcrit)
+		self:effectTemporaryValue(eff, "combat_critical_power", -eff.power)
 	end,
 	deactivate = function(self, eff)
-		self:removeTemporaryValue("combat_physcrit", eff.pcritid)
-		self:removeTemporaryValue("combat_spellcrit", eff.scritid)
-		self:removeTemporaryValue("combat_mindcrit", eff.mcritid)
 	end,
 }
 
@@ -3461,19 +3507,18 @@ newEffect{
 	parameters = { power=1, dam=10, stacks = 0, max_stacks=10 },
 	on_merge = function(self, old_eff, new_eff)
 		old_eff.dur = new_eff.dur
-		
+
 		local stackCount = old_eff.stacks + new_eff.stacks
-		if stackCount >= old_eff.max_stacks then 
+		if stackCount >= old_eff.max_stacks then
 			stackCount = old_eff.max_stacks
 		end
-		
+
 		self:removeTemporaryValue("scoundrel_failure", old_eff.failid)
 		old_eff.failid = self:addTemporaryValue("scoundrel_failure", old_eff.cur_fail*stackCount)
-		
+
 		old_eff.stacks = stackCount
-		
+
 		return old_eff
-		
 	end,
 	activate = function(self, eff)
 		eff.cur_fail = eff.power
@@ -3482,14 +3527,18 @@ newEffect{
 	deactivate = function(self, eff)
 		self:removeTemporaryValue("scoundrel_failure", eff.failid)
 	end,
-	callbackOnTalentDisturbed = function(self, eff, t)
+	do_Fumble = function(self, eff)
+		eff.src:projectSource({"hit"}, self.x, self.y, DamageType.PHYSICAL, eff.src:physicalCrit(eff.dam), nil, eff)
+	end,
+	callbackOnTalentDisturbed = function(self, eff, t, failure_cause)
 		if self:attr("scoundrel_failure") then
-			DamageType:get(DamageType.PHYSICAL).projector(eff.src or self, self.x, self.y, DamageType.PHYSICAL, eff.dam)
-			self:removeEffect(self.EFF_FUMBLE)
+			self:callEffect(self.EFF_FUMBLE, "do_Fumble")
+			if failure_cause == eff then
+				self:removeEffect(self.EFF_FUMBLE)
+			end
 		end
 	end,
 }
-
 
 newEffect{
 	name = "TOUCH_OF_DEATH", image = "talents/touch_of_death.png",
@@ -3711,5 +3760,212 @@ newEffect{
 	end,
 	deactivate = function(self, eff)
 		self:setTarget(eff.target.actor, eff.target.last)
+	end,
+}
+
+newEffect{
+	name = "UNLIT_HEART", image = "talents/armour_of_shadows.png",
+	desc = "Empowered by the shadows",
+	long_desc = function(self, eff) return ("Gain %d%% all damage and %d%% all res."):format(eff.dam, eff.res) end,
+	type = "other",
+	subtype = { darkness = true },
+	status = "beneficial",
+	parameters = { dam = 15, res = 10 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "inc_damage", {all = eff.dam})
+		self:effectTemporaryValue(eff, "resists", {all = eff.res})
+	end,
+}
+
+newEffect{
+	name = "INTIMIDATED",
+	desc = "Intimidated",
+	long_desc = function(self, eff) return ("The target's morale is weakened, reducing its attack power, mind power, and spellpower by %d."):format(eff.power) end,
+	charges = function(self, eff) return math.round(eff.power) end,
+	type = "other",
+	subtype = { },
+	status = "detrimental",
+	on_gain = function(self, err) return "#Target#'s morale has been lowered.", "+Intimidated" end,
+	on_lose = function(self, err) return "#Target# has regained its confidence.", "-Intimidated" end,
+	parameters = { power=1 },
+	on_merge = function(self, old_eff, new_eff, e)
+		self:removeTemporaryValue("combat_dam", old_eff.damid)
+		self:removeTemporaryValue("combat_spellpower", old_eff.spellid)
+		self:removeTemporaryValue("combat_mindpower", old_eff.mindid)
+		old_eff.damid = self:addTemporaryValue("combat_dam", -new_eff.power)
+		old_eff.spellid = self:addTemporaryValue("combat_spellpower", -new_eff.power)
+		old_eff.mindid = self:addTemporaryValue("combat_mindpower", -new_eff.power)
+		old_eff.dur = new_eff.dur
+		return old_eff
+	end,
+	activate = function(self, eff)
+		eff.damid = self:addTemporaryValue("combat_dam", -eff.power)
+		eff.spellid = self:addTemporaryValue("combat_spellpower", -eff.power)
+		eff.mindid = self:addTemporaryValue("combat_mindpower", -eff.power)
+		if core.shader.active() then
+			eff.particle = self:addParticles(Particles.new("circle", 1, {oversize=1, a=80, shader=true, appear=12, img="blood_vengeance_lightningshield", speed=0, base_rot=180, radius=0}))
+		end
+	end,
+	deactivate = function(self, eff)
+		if eff.particle then self:removeParticles(eff.particle) end
+		self:removeTemporaryValue("combat_dam", eff.damid)
+		self:removeTemporaryValue("combat_spellpower", eff.spellid)
+		self:removeTemporaryValue("combat_mindpower", eff.mindid)
+	end,
+}
+
+newEffect{
+	name = "FEED", image = "talents/feed.png",
+	desc = "Feeding",
+	long_desc = function(self, eff) return ("%s is feeding from %s."):format(self.name:capitalize(), eff.target.name) end,
+	type = "other",
+	subtype = { psychic_drain=true },
+	status = "beneficial",
+	parameters = { },
+	activate = function(self, eff, ed)
+		eff.src = self
+
+		-- hate
+		if eff.hateGain and eff.hateGain > 0 then
+			eff.hateGainId = self:addTemporaryValue("hate_regen", eff.hateGain)
+		end
+
+		-- health
+		if eff.constitutionGain and eff.constitutionGain > 0 then
+			eff.constitutionGainId = self:addTemporaryValue("inc_stats", { [Stats.STAT_CON] = eff.constitutionGain })
+		end
+		if eff.lifeRegenGain and eff.lifeRegenGain > 0 then
+			eff.lifeRegenGainId = self:addTemporaryValue("life_regen", eff.lifeRegenGain / 2)
+		end
+
+		-- power
+		if eff.damageGain and eff.damageGain > 0 then
+			eff.damageGainId = self:addTemporaryValue("inc_damage", {all=eff.damageGain})
+		end
+
+		-- strengths
+		if eff.resistGain and eff.resistGain > 0 then
+			local gainList = {}
+			for id, resist in pairs(eff.target.resists) do
+				if resist > 0 and id ~= "all" then
+					gainList[id] = eff.resistGain * 0.01 * resist
+				end
+			end
+
+			eff.resistGainId = self:addTemporaryValue("resists", gainList)
+		end
+
+		eff.target:setEffect(eff.target.EFF_FED_UPON, eff.dur, { src = eff.src, target = eff.target, constitutionLoss = -eff.constitutionGain, lifeRegenLoss = -eff.lifeRegenGain, damageLoss = -eff.damageGain, resistLoss = -eff.resistGain })
+
+		ed.updateFeed(self, eff)
+	end,
+	deactivate = function(self, eff)
+		-- hate
+		if eff.hateGainId then self:removeTemporaryValue("hate_regen", eff.hateGainId) end
+
+		-- health
+		if eff.constitutionGainId then self:removeTemporaryValue("inc_stats", eff.constitutionGainId) end
+		if eff.lifeRegenGainId then self:removeTemporaryValue("life_regen", eff.lifeRegenGainId) end
+
+		-- power
+		if eff.damageGainId then self:removeTemporaryValue("inc_damage", eff.damageGainId) end
+
+		-- strengths
+		if eff.resistGainId then self:removeTemporaryValue("resists", eff.resistGainId) end
+
+		if eff.particles then
+			-- remove old particle emitter
+			game.level.map:removeParticleEmitter(eff.particles)
+			eff.particles = nil
+		end
+
+		eff.target:removeEffect(eff.target.EFF_FED_UPON, false, true)
+	end,
+	updateFeed = function(self, eff)
+		local source = eff.src
+		local target = eff.target
+
+		if source.dead or target.dead or not game.level:hasEntity(source) or not game.level:hasEntity(target) or not source:hasLOS(target.x, target.y) or core.fov.distance(self.x, self.y, target.x, target.y) > (eff.range or 10) then
+			source:removeEffect(source.EFF_FEED)
+			if eff.particles then
+				game.level.map:removeParticleEmitter(eff.particles)
+				eff.particles = nil
+			end
+			return
+		end
+
+		-- update particles position
+		if not eff.particles or eff.particles.x ~= source.x or eff.particles.y ~= source.y or eff.particles.tx ~= target.x or eff.particles.ty ~= target.y then
+			if eff.particles then
+				game.level.map:removeParticleEmitter(eff.particles)
+			end
+			-- add updated particle emitter
+			local dx, dy = target.x - source.x, target.y - source.y
+			eff.particles = Particles.new("feed_hate", math.max(math.abs(dx), math.abs(dy)), { tx=dx, ty=dy })
+			eff.particles.x = source.x
+			eff.particles.y = source.y
+			eff.particles.tx = target.x
+			eff.particles.ty = target.y
+			game.level.map:addParticleEmitter(eff.particles)
+		end
+	end
+}
+
+newEffect{
+	name = "FED_UPON", image = "effects/fed_upon.png",
+	desc = "Fed Upon",
+	long_desc = function(self, eff) return ("%s is fed upon by %s."):format(self.name:capitalize(), eff.src.name) end,
+	type = "other",
+	subtype = { psychic_drain=true },
+	status = "detrimental",
+	remove_on_clone = true,
+	no_remove = true,
+	parameters = { },
+	activate = function(self, eff)
+		-- health
+		if eff.constitutionLoss and eff.constitutionLoss < 0 then
+			eff.constitutionLossId = self:addTemporaryValue("inc_stats", { [Stats.STAT_CON] = eff.constitutionLoss })
+		end
+		if eff.lifeRegenLoss and eff.lifeRegenLoss < 0 then
+			eff.lifeRegenLossId = self:addTemporaryValue("life_regen", eff.lifeRegenLoss)
+		end
+
+		-- power
+		if eff.damageLoss and eff.damageLoss < 0 then
+			eff.damageLossId = self:addTemporaryValue("inc_damage", {all=eff.damageLoss})
+		end
+
+		-- strengths
+		if eff.resistLoss and eff.resistLoss < 0 then
+			local lossList = {}
+			for id, resist in pairs(self.resists) do
+				if resist > 0 and id ~= "all" then
+					lossList[id] = eff.resistLoss * 0.01 * resist
+				end
+			end
+
+			eff.resistLossId = self:addTemporaryValue("resists", lossList)
+		end
+	end,
+	deactivate = function(self, eff)
+		-- health
+		if eff.constitutionLossId then self:removeTemporaryValue("inc_stats", eff.constitutionLossId) end
+		if eff.lifeRegenLossId then self:removeTemporaryValue("life_regen", eff.lifeRegenLossId) end
+
+		-- power
+		if eff.damageLossId then self:removeTemporaryValue("inc_damage", eff.damageLossId) end
+
+		-- strengths
+		if eff.resistLossId then self:removeTemporaryValue("resists", eff.resistLossId) end
+
+		if eff.target == self and eff.src:hasEffect(eff.src.EFF_FEED) then
+			eff.src:removeEffect(eff.src.EFF_FEED)
+		end
+	end,
+	on_timeout = function(self, eff)
+		-- no_remove prevents targets from dispelling feeding, make sure this gets removed if something goes wrong
+		if eff.dur <= 0 or eff.src.dead then
+			self:removeEffect(eff.src.EFF_FED_UPON, false, true)
+		end
 	end,
 }

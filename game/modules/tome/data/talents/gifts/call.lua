@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -75,14 +75,14 @@ newTalent{
 	end,
 	info = function(self, t)
 		local boost = 1 + (self.enhance_meditate or 0)
-		local pt = t.drain_equilibrium(self, t)
+		local pt = -t.drain_equilibrium(self, t)
 		local save = (5 + self:combatTalentMindDamage(t, 10, 40)) * boost
 		local heal = (5 + self:combatTalentMindDamage(t, 12, 30)) * boost
 		local rest = t.restingRegen(self, t)
 		return ([[Meditate on your link with Nature.
-		While meditating, you regenerate %0.2f equilibrium per turn, your Mental Save is increased by %d, and your healing factor increases by %d%%.
-		Your deep meditation does not, however, let you deal damage correctly, reducing the damage you and your summons deal by 50%%.
-		Also, any time you are resting (even with Meditation not sustained) you enter a simple meditative state that lets you regenerate %0.2f equilibrium per turn.
+		While meditating, your equilibrium decreases by %0.2f per turn, your Mental Save is increased by %d, and your healing factor increases by %d%%.
+		Your deep meditation does not let you deal damage correctly, reducing the damage you and your summons deal by 50%%.
+		Also, any time you are resting (even with Meditation not sustained) you enter a simple meditative state that decreases your equilibrium by %0.2f per turn.
 		The activated effects increase with your Mindpower.]]):
 		format(pt, save, heal, rest)
 	end,

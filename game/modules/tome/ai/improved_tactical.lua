@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -454,7 +454,7 @@ newAI("use_improved_tactical", function(self, t_filter, t_list)
 	--== LIFE ==--
 	local life -- fraction of maximum life
 	local life_regen, psi_regen = self:regenLife(true) -- regeneration, accounting for caps
-	life_regen, psi_regen = life_regen/self.global_speed, psi_regen/self.global_speed
+	life_regen, psi_regen = (life_regen or 0)/self.global_speed, (psi_regen or 0)/self.global_speed
 	local effect_life, life_range = self.life - self.die_at, self.max_life - self.die_at -- effective total life and maximum used by buff/disable calculation
 	
 	-- Note: The want function defined in the psi resource definition adjusts for Solipsism
@@ -481,7 +481,7 @@ newAI("use_improved_tactical", function(self, t_filter, t_list)
 
 	--== PROTECT ==--
 	-- like LIFE but for SELF's summoner
-	if self.summoner and self.summoner.ai_target.actor then
+	if self.summoner then
 		local life = math.max(0, self.summoner.life)/(self.summoner.max_life - self.summoner.die_at/2)
 		life = (1 - life)/(math.max(.001, life)) -- modified life loss
 		want.protect = 10*(life*ally_compassion/(life*ally_compassion + 2.5))^2
@@ -789,9 +789,9 @@ newAI("use_improved_tactical", function(self, t_filter, t_list)
 
 		if avail.buff or avail.disable then -- buff and disable depend on target's condition and fight_data
 			-- note: effect_life, life_range, calculated above for want.life
-			local aitarget_life, aitarget_life_range = aitarget.life - aitarget.die_at, aitarget.max_life - aitarget.die_at
+			local aitarget_life, aitarget_life_range = (aitarget.life or 1) - (aitarget.die_at or 0), (aitarget.max_life or 1) - (aitarget.die_at or 0)
 			
-			if aitarget:knowTalent(aitarget.T_SOLIPSISM) then
+			if aitarget.knowTalent and aitarget:knowTalent(aitarget.T_SOLIPSISM) then
 				local ratio = aitarget:callTalent(aitarget.T_SOLIPSISM, "getConversionRatio")
 				aitarget_life = math.min(aitarget_life/(1 - ratio), aitarget_life + aitarget:getPsi())
 				aitarget_life_range = math.min(aitarget_life_range/(1 - ratio), aitarget_life_range + aitarget:getMaxPsi())
@@ -865,7 +865,7 @@ newAI("use_improved_tactical", function(self, t_filter, t_list)
 			local dist_weight, want_closer = aitarget and 1 or 0.1
 			want_closer = util.bound((want.closein or 0)*(self.ai_tactic.closein or 1) + (want.attack or 0)*(self.ai_tactic.attack or 1) - (want.escape or 0)*(self.ai_tactic.excape or 1), -1, 1)
 			grid = self.ai_state.safe_grid
-			if not (grid and grid.path and #grid.path > 1 and core.fov.distance(self.x, self.y, grid.path[1].x, grid.path[1].y) == 1) then -- find a safer grid if needed/possible
+			if not (self.x and grid and grid.path and #grid.path > 1 and grid.path[1] and grid.path[1].x and core.fov.distance(self.x, self.y, grid.path[1].x, grid.path[1].y) == 1) then -- find a safer grid if needed/possible
 				grid = self:aiFindSafeGrid(10, want.life, want.air, dist_weight, want_closer)
 			else
 				grid.start_haz = self:aiGridHazard()

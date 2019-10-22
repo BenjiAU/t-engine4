@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -53,12 +53,17 @@ Talents.newTalent = function(self, t)
 	if tt.speed and not t.speed then t.speed = tt.speed end
 	if t.tactical then t.tactical = Talents.aiLowerTacticals(t.tactical) end
 	if t.tactical_imp then t.tactical_imp = Talents.aiLowerTacticals(t.tactical_imp) end -- DEBUGGING transitional
-	
+
 	if not t.image then
 		t.image = "talents/"..(t.short_name or t.name):lower():gsub("[^a-z0-9_]", "_")..".png"
 	end
 	if fs.exists(Tiles.baseImageFile(t.image)) then t.display_entity = Entity.new{image=t.image, is_talent=true}
 	else t.display_entity = Entity.new{image="talents/default.png", is_talent=true}
+	end
+
+	if t.is_class_evolution then
+		t.short_name = (t.short_name or t.name):upper():gsub("[ ']", "_")
+		t.name = "#LIGHT_STEEL_BLUE#"..t.name.." (Class Evolution)"
 	end
 
 	return oldNewTalent(self, t)

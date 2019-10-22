@@ -1,5 +1,5 @@
 -- ToME - Tales of Middle-Earth
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -125,10 +125,11 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		return ([[Strikes the target with a spark of lightning doing %0.2f to %0.2f damage.
+		return ([[Strikes the target with a spark of lightning doing %0.2f to %0.2f damage (%0.2f average).
 		The damage will increase with the Magic stat]]):
 		format(damDesc(self, DamageType.LIGHTNING, damage / 3),
-		damDesc(self, DamageType.LIGHTNING, damage))
+		damDesc(self, DamageType.LIGHTNING, damage),
+		damDesc(self, DamageType.LIGHTNING, (damage + damage / 3) / 2))
 	end,
 }
 
@@ -421,6 +422,11 @@ newTalent{
 		game.zone:addEntity(game.level, shadow, "actor", x, y)
 		shadow:feed()
 		game.level.map:particleEmitter(x, y, 1, "teleport_in")
+
+		-- Reduce power of shadows for low level rares
+		if self.inc_damage and self.inc_damage.all and self.inc_damage.all < 0 then
+			shadow.inc_damage.all = (shadow.inc_damage.all or 0) + self.inc_damage.all
+		end
 
 		shadow.no_party_ai = true
 		shadow.unused_stats = 0

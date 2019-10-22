@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -70,21 +70,36 @@ newTalent{
 	points = 5,
 	mode = "passive",
 	getEq = function(self, t) return self:combatTalentScale(t, 0.5, 2.5, 0.5, 0.5) end,
-	getTurn = function(self, t) return math.min(30, self:combatTalentMindDamage(t, 1, 20)) / 100 end,
+	getTurn = function(self, t) return math.min(15, self:combatTalentMindDamage(t, 1, 8)) / 100 end,
 	callbackOnHeal = function(self, t, value, src, raw_value)
 		local heal = (self.life + value) < self.max_life and value or self.max_life - self.life
 		if heal > 0 then
 			local amt = (heal / 100) * (t.getTurn(self, t) * game.energy_to_act)
 			self.energy.value = game.energy_to_act + amt
-			self.energy.value = math.min(self.energy.value, game.energy_to_act * 2.5)
-			game.logSeen(self, "#LIGHT_GREEN#%s gains %d%% of a turn from the healing.#LAST#", self.name, amt / 10 )
+			self.energy.value = math.min(self.energy.value, game.energy_to_act * 2)
+			self.ancestral_healing_display_amt = self.ancestral_healing_display_amt or 0
+			self.ancestral_healing_display_amt = self.ancestral_healing_display_amt + amt
+			game:onTickEnd(function() 
+				if not self.ancestral_healing_display_amt then return end
+				if self.last_ancestral_display == game.turn then return end
+				self:logCombat(self, "#LIGHT_GREEN##Source# gains %d%%%% of a turn from Ancestral Life.#LAST#", self.ancestral_healing_display_amt / 10)
+				self.ancestral_healing_display_amt = nil
+				self.last_ancestral_display = game.turn
+			end)
 		end
+	end,
+ -- Only log turn games after totaling heals for each tick to avoid log spam, but special case talent activation to dump it immediately so instant heals aren't weird
+	callbackOnTalentPost = function(self, t,  ab)
+		if not self.ancestral_healing_display_amt then return end		
+		self:logCombat(self, "#LIGHT_GREEN##Source# gains %d%%%% of a turn from Ancestral Life.#LAST#", self.ancestral_healing_display_amt / 10)
+		self.ancestral_healing_display_amt = nil
+		self.last_ancestral_display = game.turn
 	end,
 	info = function(self, t)
 		local eq = t.getEq(self, t)
 		local turn = t.getTurn(self, t)
 		return ([[Your fungus reaches into the primordial ages of the world, granting you ancient instincts.
-		Each time you receive a direct heal you gain %d%% of a turn per 100 life healed.  This effect can't add energy past 2.5 stored turns.
+		Each time you receive a direct heal you gain %d%% of a turn per 100 life healed.  This effect can't add energy past 2 stored turns.
 		Also, regeneration effects on you will decrease your equilibrium by %0.1f each turn.
 		The turn gain increases with your Mindpower.]]):
 		format(turn * 100, eq)

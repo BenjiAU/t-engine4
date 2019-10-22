@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ _M.cosmetic_options_config = {
 	tatoos = "single",
 	horns = "single",
 	special = "multiple",
+	golem = "single",
 }
 
 function _M:setSubclassIcon(t)
@@ -392,6 +393,8 @@ function _M:makeDefault()
 	self:setDescriptor("permadeath", "Adventure")
 	self:setDescriptor("race", "Human")
 	self:setDescriptor("subrace", "Cornac")
+	-- self:setDescriptor("class", "Mage")
+	-- self:setDescriptor("subclass", "Archmage")
 	self:setDescriptor("class", "Warrior")
 	self:setDescriptor("subclass", "Berserker")
 	__module_extra_info.no_birth_popup = true

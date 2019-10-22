@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ uberTalent{
 	cooldown = 15,
 	no_energy = true,
 	requires_target = true,
-	range = 10,
 	fixed_cooldown = true,
 	tactical = { DEFEND = 1}, -- instant talent
 	action = function(self, t)

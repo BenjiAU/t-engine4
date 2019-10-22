@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ newEntity{
 -----------------------------------------------------------
 -- Infusions - 5 types
 -----------------------------------------------------------
--- Pros:  Instant cast, clears 2 average/lesser debuff types, which makes other cleanses also more consistent
+-- Pros:  Instant cast, clears 3 average/lesser debuff types, which makes other cleanses also more consistent
 -- Cons:  Significantly less healing outputper cast than Regeneration
 newEntity{ base = "BASE_INFUSION",
 	name = "healing infusion",
@@ -138,7 +138,7 @@ newEntity{ base = "BASE_INFUSION",
 
 	inscription_kind = "heal",
 	inscription_data = {
-		cooldown = resolvers.rngrange(9, 13),
+		cooldown = resolvers.rngrange(10, 15),
 		heal = resolvers.mbonus_level(80, 40, function(e, v) return v * 0.06 end),
 		use_stat_mod = 2,
 	},
@@ -198,7 +198,7 @@ newEntity{ base = "BASE_INFUSION",
 
 	inscription_kind = "movement",
 	inscription_data = {
-		cooldown = resolvers.rngrange(10, 18),  -- High variance because this is the only really important stat
+		cooldown = resolvers.rngrange(8, 18),  -- High variance because this is the only really important stat
 		speed = resolvers.mbonus_level(500, 400, function(e, v) return v * 0.001 end),
 		use_stat_mod = 3,
 	},
@@ -263,9 +263,9 @@ newEntity{ base = "BASE_RUNE",
 
 	inscription_kind = "attack",
 	inscription_data = {
-		cooldown = resolvers.rngrange(15, 19),
+		cooldown = resolvers.rngrange(15, 23),
 		power = resolvers.mbonus_level(200, 30, function(e, v) return v * 0.1 end),
-		dur = 5,
+		dur = 4,
 		use_stat_mod = 2.2,
 	},
 	inscription_talent = "RUNE:_BITING_GALE",
@@ -279,10 +279,10 @@ newEntity{ base = "BASE_RUNE",
 
 	inscription_kind = "attack",
 	inscription_data = {
-		cooldown = resolvers.rngrange(15, 19),
+		cooldown = resolvers.rngrange(15, 23),
 		power = resolvers.mbonus_level(200, 30, function(e, v) return v * 0.1 end),
 		use_stat_mod = 2.2,
-		dur = 5,
+		dur = 4,
 	},
 	inscription_talent = "RUNE:_ACID_WAVE",
 }
@@ -311,7 +311,7 @@ newEntity{ base = "BASE_RUNE",
 	material_level = 1,
 	inscription_kind = "movement",
 	inscription_data = {
-		cooldown = resolvers.rngrange(10, 18),
+		cooldown = resolvers.rngrange(13, 20),
 		range = resolvers.mbonus_level(4, 2, function(e, v) return v * 0.06 end),
 		power = resolvers.mbonus_level(20, 10, function(e, v) return v * 1 end),
 		use_stat_mod = 0.04, -- +4 range at 100 stat
@@ -342,7 +342,7 @@ newEntity{ base = "BASE_RUNE",
 	cost = 10,
 	inscription_kind = "utility",
 	inscription_data = {
-		cooldown = resolvers.rngrange(16, 20),
+		cooldown = resolvers.rngrange(16, 24),
 		shield = resolvers.mbonus_level(120, 20, function(e, v) return v * 0.06 end),
 		use_stat_mod = 1 -- 1x, applied up to 3 times
 	},

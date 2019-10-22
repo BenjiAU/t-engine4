@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ newEntity{ base = "BASE_SHIELD", define_as = "SHIELD_UNSETTING",
 	rarity = 300,
 	level_range = {35, 45},
 	require = { stat = { str=40 }, },
-	cost = 400,
+	cost = math.random(700,1100),
 	material_level = 5,
 	special_combat = {
 		dam = 50,
@@ -110,7 +110,7 @@ newEntity{ base = "BASE_SHIELD", define_as = "SHIELD_UNSETTING",
 		dawn = "Glows brightly in the light of dawn.",
 	},
 	on_set_complete = function(self, who)
-		self:specialSetAdd({"wielder","life_regen"}, 0.25)
+		self:specialSetAdd({"wielder","life_regen"}, 5)
 		self:specialSetAdd({"wielder","lite"}, 1)
 	end,
 	on_set_broken = function(self, who)
@@ -455,7 +455,7 @@ newEntity{ base = "BASE_KNIFE", define_as = "MANDIBLE_UNGOLMOR",
 	level_range = {40, 50},
 	rarity = 270,
 	require = { stat = { cun=38 }, },
-	cost = 650,
+	cost = math.random(700,1100),
 	metallic = false,
 	material_level = 5,
 	combat = {
@@ -464,22 +464,22 @@ newEntity{ base = "BASE_KNIFE", define_as = "MANDIBLE_UNGOLMOR",
 		physcrit = 22,
 		dammod = {cun=0.30, str=0.35, dex=0.35},
 		convert_damage ={[DamageType.DARKNESS] = 30},
-		special_on_crit = {desc="inflicts pinning spydric poison upon the target", fct=function(combat, who, target)
+		special_on_crit = {desc="inflicts spydric poison dealing 200 damage over 3 turns and pinning the target", fct=function(combat, who, target)
 			if target:canBe("poison") then
 				local tg = {type="hit", range=1}
-				who:project(tg, target.x, target.y, engine.DamageType.SPYDRIC_POISON, {src=who, dam=30, dur=3})
+				who:project(tg, target.x, target.y, engine.DamageType.SPYDRIC_POISON, {src=who, dam=200, dur=3})
 			end
 		end},
+		talent_on_hit = { [Talents.T_BITE_POISON] = {level=3, chance=20} },
 	},
 	wielder = {
 		inc_damage={[DamageType.NATURE] = 30, [DamageType.DARKNESS] = 20,},
 		inc_stats = {[Stats.STAT_CUN] = 8, [Stats.STAT_DEX] = 4,},
-		combat_armor = 5,
-		combat_armor_hardiness = 5,
+		combat_armor = 15,
+		poison_immune = 1,
 		lite = -2,
+		learn_talent = { [Talents.T_TOXIC_DEATH] = 5, },  -- Radius 3 at TL5
 	},
-	max_power = 40, power_regen = 1,
-	use_talent = { id = Talents.T_CREEPING_DARKNESS, level = 3, power = 25 },
 }
 
 newEntity{ base = "BASE_KNIFE", define_as = "KINETIC_SPIKE",
@@ -542,7 +542,7 @@ newEntity{ base = "BASE_STAFF",
 	color=colors.VIOLET,
 	rarity = 250,
 	desc = [[A plain looking ceremonial rod. It has connections with Time that even chronomancers do not yet understand.]],
-	cost = 400,
+	cost = math.random(700,1100),
 	material_level = 5,
 
 	require = { stat = { mag=48 }, },
@@ -550,7 +550,7 @@ newEntity{ base = "BASE_STAFF",
 		is_greater = true,
 		dam = 30,
 		apr = 4,
-		dammod = {mag=1.5},
+		dammod = {mag=0.8},
 		element = DamageType.TEMPORAL,
 	},
 	wielder = {

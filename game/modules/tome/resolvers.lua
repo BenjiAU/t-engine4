@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -898,7 +898,7 @@ function resolvers.calc.tactic(t, e)
 	if t[1] == "default" then return {type="default", }
 	elseif t[1] == "standby" then return {type="standby", standby=1}
 	elseif t[1] == "melee" then return {type="melee", attack=2, attackarea=2, disable=2, escape=0, closein=2, go_melee=1}
-	elseif t[1] == "ranged" then return {type="ranged", disable=1.5, escape=3, closein=0, defend=2, heal=2, safe_range=4}
+	elseif t[1] == "ranged" then return {type="ranged", disable=1.5, escape=1.5, closein=0, defend=2, heal=2, safe_range=2}
 	elseif t[1] == "tank" then return {type="tank", disable=3, escape=0, closein=2, defend=2, protect=2, heal=3, go_melee=1}
 	elseif t[1] == "survivor" then return {type="survivor", disable=2, escape=5, closein=0, defend=3, protect=0, heal=6, safe_range=8}
 	end
@@ -934,6 +934,15 @@ function resolvers.calc.talented_ai_tactic(t, e)
 	--print("talented_ai_tactic resolver setting up on_added_to_level function")
 	--print(debug.traceback())
 	local on_added = function(e, level, x, y)
+		if e.ai_tactic then
+			for k, v in pairs(e.ai_tactic) do
+				if type(v) == "number" and v > 0 then
+					print("running talented_ai_tactic resolver but aborting due to existing tactics")
+					return
+				end
+			end
+		end
+
 		print("running talented_ai_tactic resolver on_added_to_level function for", e.uid, e.name)
 		local t = e.__ai_tactic_resolver
 		if not t then print("talented_ai_tactic: No resolver table. Aborting") return end
@@ -1084,6 +1093,11 @@ function resolvers.calc.talented_ai_tactic(t, e)
 		tactic.type = "simple_recursive"
 		--- print("### talented_ai_tactic resolver ai_tactic table:")
 		--- for tac, wt in pairs(tactic) do print("    ##", tac, wt) end
+
+		-- No thanks
+		tactic.escape = 0
+		tactic.safe_range = nil
+
 		e.ai_tactic = tactic
 --		e.__ai_tactic_resolver = nil
 		return tactic

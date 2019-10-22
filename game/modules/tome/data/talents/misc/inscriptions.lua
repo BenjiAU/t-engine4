@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -69,6 +69,7 @@ newInscription{
 	points = 1,
 	tactical = { HEAL = 2 },
 	on_pre_use = function(self, t) return not self:hasEffect(self.EFF_REGENERATION) end,
+	no_break_stealth = true,
 	action = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		self:setEffect(self.EFF_REGENERATION, data.dur, {power=(data.heal + data.inc_stat) / data.dur})
@@ -191,11 +192,11 @@ newInscription{
 	info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		return ([[Activate the infusion to heal for %d%% of all damage taken (calculated before resistances) and reduce the duration of a random debuff by %d each turn for %d turns.]]):
-			format(data.power+data.inc_stat*10, data.reduce + data.inc_stat, data.dur)
+			format(data.power+data.inc_stat*10, (data.reduce or 0) + data.inc_stat, data.dur)
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[affinity %d%%; reduction %d; dur %d; cd %d]]):format(data.power + data.inc_stat*10, data.reduce + data.inc_stat, data.dur, data.cooldown )
+		return ([[affinity %d%%; reduction %d; dur %d; cd %d]]):format(data.power + data.inc_stat*10, (data.reduce or 0) + data.inc_stat, data.dur, data.cooldown )
 	end,
 }
 
@@ -220,7 +221,7 @@ newInscription{
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[speed %d; cd %d]]):format(data.speed + data.inc_stat, data.cooldown)
+		return ([[speed %d%%; cd %d]]):format(data.speed + data.inc_stat, data.cooldown)
 	end,
 }
 
@@ -307,6 +308,7 @@ newInscription{
 	points = 1,
 	is_spell = true,
 	is_teleport = true,
+	no_break_stealth = true,
 	tactical = { ESCAPE = 3 },
 	action = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
@@ -491,6 +493,7 @@ newInscription{
 	type = {"inscriptions/runes", 1},
 	points = 1,
 	is_spell = true,
+	no_break_stealth = true,
 	tactical = { MANA = 1 },
 	on_pre_use = function(self, t)
 		return self:knowTalent(self.T_MANA_POOL) and not self:hasEffect(self.EFF_MANASURGE)
@@ -766,6 +769,7 @@ newInscription{
 	type = {"inscriptions/runes", 1},
 	points = 1,
 	is_spell = true,
+	no_break_stealth = true,
 	tactical = { DEFEND = 3,},
 	getDur = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
@@ -800,6 +804,7 @@ newInscription{
 	image = "talents/phase_shift.png",  -- re-used icon
 	points = 1,
 	is_spell = true,
+	no_break_stealth = true,
 	tactical = { DEFEND = 3,},
 	getDur = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
@@ -1084,6 +1089,7 @@ newInscription{
 	type = {"inscriptions/runes", 1},
 	points = 1,
 	is_spell = true,
+	no_break_stealth = true,
 	tactical = { CURE = 2 },
 	getDur = function(self, t)
 		local data = self:getInscriptionData(t.short_name)

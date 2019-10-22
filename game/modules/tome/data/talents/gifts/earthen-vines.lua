@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@ newTalent{
 	tactical = { ATTACK = { PHYSICAL = 2 }, BUFF = 2, DISABLE = { pin = 2 } },
 	radius = function(self, t) return math.floor(self:combatTalentScale(t, 4.5, 6.5)) end,
 	getValues = function(self, t) return math.floor(self:combatTalentScale(t, 5, 9)), self:combatTalentStatDamage(t, "wil", 3, 50), self:knowTalent(self.T_ELDRITCH_VINES) and self:callTalent(self.T_ELDRITCH_VINES, "getDamage") or nil end,
-	callbackOnRest = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
-	callbackOnRun = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
 	callbackOnActBase = function(self, t)
 		local p = self:isTalentActive(t.id)
 		local rad = self:getTalentRadius(t)
@@ -57,12 +55,10 @@ newTalent{
 	end,
 	activate = function(self, t)
 		return {
-			movid = self:addTemporaryValue("movement_speed", -0.5),
 			particle = self:addParticles(Particles.new("stonevine_static", 1, {})),
 		}
 	end,
 	deactivate = function(self, t, p)
-		self:removeTemporaryValue("movement_speed", p.movid)
 		self:removeParticles(p.particle)
 		return true
 	end,
@@ -72,12 +68,10 @@ newTalent{
 		local xs = arcanedam and (" and %0.1f Arcane"):format(damDesc(self, DamageType.ARCANE, arcanedam)) or ""
 		return ([[From the ground around you, you form living stone vines extending from your feet.
 		Each turn, the vines will attempt to seize a random target within radius %d.
-		Affected creatures are pinned to the ground and take %0.1f Physical%s damage each turn for %d turns.
+		Affected creatures are pinned to the ground and take %0.1f nature%s damage each turn for %d turns.
 		A creature entangled by the vines will have a chance to break free each turn, and will automatically succeed if it is more than %d grids away from you.
-		The chance to affect targets and damage increase with talent level and Willpower.
-		While stone vines are active your movement speed is reduced by 50%%.
-		Aautomatically disabled when you run or rest.]]):
-		format(rad, damDesc(self, DamageType.PHYSICAL, dam), xs, turns, rad+4)
+		The chance to affect targets and damage increase with talent level and Willpower.]]):
+		format(rad, damDesc(self, DamageType.NATURE, dam), xs, turns, rad+4)
 	end,
 }
 
@@ -160,7 +154,7 @@ newTalent{
 		if not x or not y or not target then return nil end
 		if not target:hasEffect(target.EFF_STONE_VINE) then return nil end
 
-		DamageType:get(DamageType.PHYSICAL).projector(self, target.x, target.y, DamageType.PHYSICAL, 80 + self:combatTalentStatDamage(t, "wil", 40, 330))
+		DamageType:get(DamageType.NATURE).projector(self, target.x, target.y, DamageType.NATURE, 80 + self:combatTalentStatDamage(t, "wil", 40, 330))
 
 		if target.dead then return true end
 
@@ -178,7 +172,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Merge your target (within range %d) with one of your stone vines that has seized it, forcing it to traverse the vine and reappear near you.
-		Merging with the stone is detrimental for the target, dealing %0.1f physical damage.
+		Merging with the stone is detrimental for the target, dealing %0.1f nature damage.
 		The damage will increases with your Willpower.]])
 		:format(self:getTalentRange(t), 80 + self:combatTalentStatDamage(t, "wil", 40, 330))
 	end,

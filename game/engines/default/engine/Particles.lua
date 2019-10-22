@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -81,7 +81,14 @@ function _M:loaded()
 		if t.sub_particle_args then sub_particle_args = t.sub_particle_args end
 		if t.can_shift then self.can_shift = true end
 		if t.supports_death_anim then self.supports_death_anim = true end
-	else error("unsupported particle type: "..type(self.def))
+	else
+		if not config.settings.cheat then
+			print("[PARTICLES] unsupported particle type: "..type(self.def).."; replacing with dummy")
+			self.def = "dummy"
+			return self:loaded()
+		else
+			error("unsupported particle type: "..type(self.def))
+		end
 	end
 
 	gl = gl or "particle"

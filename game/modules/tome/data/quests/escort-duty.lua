@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -261,6 +261,7 @@ Please help me! I am afraid I lost myself in this place. I know there is a tempo
 		},
 	},
 }
+local possible_types_safe = table.clone(possible_types, true)
 
 --------------------------------------------------------------------------------
 -- Quest code
@@ -344,8 +345,13 @@ on_grant = function(self, who)
 	local escorts_seen = game.state.escorts_seen
 	while true do
 		self.kind = rng.table(possible_types)
-		if not self.kind.unique or not escorts_seen[self.kind.name] then
-			if rng.percent(self.kind.chance) then break end
+		if not self.kind then
+			-- If some bad addon borked us, revert to base list
+			possible_types = possible_types_safe
+		else
+			if not self.kind.unique or not escorts_seen[self.kind.name] then
+				if rng.percent(self.kind.chance) then break end
+			end
 		end
 	end
 

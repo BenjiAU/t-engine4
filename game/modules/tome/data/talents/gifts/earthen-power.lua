@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[Creates a shield of impenetrable stone around you for 7 turns, absorbing up to %d damage.
 		Your equilibrium will increase by twice the damage absorbed.
-		When the effect ends, all equilibrium above minimum will be converted to mana in a storm of arcane energy.
+		When the effect ends, all equilibrium above minimum will be converted to mana in a storm of arcane energy and the cooldown of your Block is reset.
 		The storm inflicts Arcane damage equal to the converted equilibrium (maximum %d) against everyone around you in a radius %d.
 		Also while resting you will passively regenerate %0.2f mana each turn.
 		The shield strength will increase with Willpower]]):format(power, t.maxDamage(self, t), radius, t.manaRegen(self, t))

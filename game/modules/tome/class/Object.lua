@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ _M.requirement_flags_names = {
 
 function _M:getRequirementDesc(who)
 	local base_getRequirementDesc = engine.Object.getRequirementDesc
-	
+
 	local oldreq
 	self.require, oldreq = who:updateObjectRequirements(self)
 	local ret = base_getRequirementDesc(self, who)
@@ -171,7 +171,7 @@ function _M:canUseObject(who)
 	if not engine.interface.ObjectActivable.canUseObject(self, who) then
 		return false, "This object has no usable power."
 	end
-	
+
 	if who then
 		if who.no_inventory_access then
 			return false, "You cannot use items now!"
@@ -210,10 +210,10 @@ function _M:useObject(who, ...)
 
 	if self.use_power then
 		if (self.talent_cooldown and not who:isTalentCoolingDown(self.talent_cooldown)) or (not self.talent_cooldown and self.power >= usepower(self.use_power.power)) then
-		
+
 			local ret = self.use_power.use(self, who, ...) or {}
 			local no_power = not ret.used or ret.no_power
-			if not no_power then 
+			if not no_power then
 				if self.talent_cooldown then
 					who.talents_cd[self.talent_cooldown] = usepower(self.use_power.power)
 					local t = who:getTalentFromId(self.talent_cooldown)
@@ -235,14 +235,14 @@ function _M:useObject(who, ...)
 		return self.use_simple.use(self, who, ...) or {}
 	elseif self.use_talent then
 		if (self.talent_cooldown and not who:isTalentCoolingDown(self.talent_cooldown)) or (not self.talent_cooldown and (not self.use_talent.power or self.power >= usepower(self.use_talent.power))) then
-		
+
 			local id = self.use_talent.id
 			local ab = self:getTalentFromId(id)
 			local old_level = who.talents[id]; who.talents[id] = self.use_talent.level
 			local ret = ab.action(who, ab)
 			who.talents[id] = old_level
 
-			if ret then 
+			if ret then
 				if self.talent_cooldown then
 					who.talents_cd[self.talent_cooldown] = usepower(self.use_talent.power)
 					local t = who:getTalentFromId(self.talent_cooldown)
@@ -288,9 +288,9 @@ function _M:use(who, typ, inven, item)
 	inven = who:getInven(inven)
 	local types = {}
 	local useable, msg = self:canUseObject(who)
-	
+
 	if useable then
-		types[#types+1] = "use" 
+		types[#types+1] = "use"
 	else
 		game.logPlayer(who, msg)
 		return
@@ -425,7 +425,7 @@ function _M:descAttribute(attr)
 		local stat, i = next(self.wielder.resists)
 		return (i and i > 0 and "+"..i or tostring(i)).."%"
 	elseif attr == "REGEN" then
-		local i = self.wielder.mana_regen or self.wielder.stamina_regen or self.wielder.life_regen or self.wielder.hate_regen or self.wielder.positive_regen_ref_mod or self.wielder.negative_regen_ref_mod
+		local i = self.wielder.mana_regen or self.wielder.stamina_regen or self.wielder.life_regen or self.wielder.hate_regen or self.wielder.positive_regen or self.wielder.negative_regen
 		return ("%s%0.2f/turn"):format(i > 0 and "+" or "-", math.abs(i))
 	elseif attr == "COMBAT" then
 		local c = self.combat
@@ -441,7 +441,7 @@ function _M:descAttribute(attr)
 		return power(c)..", "..("%d"):format((c.apr or 0)).." apr, "..DamageType:get(c.element or DamageType.PHYSICAL).name.." element"
 	elseif attr == "SHIELD" then
 		local c = self.special_combat
-		if c and (game.player:knowTalentType("technique/shield-offense") or game.player:knowTalentType("technique/shield-defense") or game.player:attr("show_shield_combat")) then
+		if c and (game.player:knowTalentType("technique/shield-offense") or game.player:knowTalentType("technique/shield-defense") or game.player:attr("show_shield_combat") or config.settings.tome.display_shield_stats) then
 			return power(c)..", "..c.block.." block"
 		else
 			return c.block.." block"
@@ -590,7 +590,7 @@ function _M:getShortName(t)
 
 	t = t or {}
 	t.no_add_name = true
-	
+
 	local qty = self:getNumber()
 	local identified = t.force_id or self:isIdentified()
 	local name = self.short_name or "object"
@@ -632,15 +632,15 @@ function _M:descAccuracyBonus(desc, weapon, use_actor)
 
 	local m = weapon.accuracy_effect_scale or 1
 	if kind == "sword" then
-		desc:add("Accuracy bonus: ", {"color","LIGHT_GREEN"}, showpct(0.4, m), {"color","LAST"}, " crit.pwr / acc", true)
+		desc:add("Accuracy bonus: ", {"color","LIGHT_GREEN"}, showpct(0.4, m), {"color","LAST"}, " crit mult (max 40%)", true)
 	elseif kind == "axe" then
-		desc:add("Accuracy bonus: ", {"color","LIGHT_GREEN"}, showpct(0.2, m), {"color","LAST"}, " crit / acc", true)
+		desc:add("Accuracy bonus: ", {"color","LIGHT_GREEN"}, showpct(0.25, m), {"color","LAST"}, " crit chance (max 25%)", true)
 	elseif kind == "mace" then
-		desc:add("Accuracy bonus: ", {"color","LIGHT_GREEN"}, showpct(0.1, m), {"color","LAST"}, " dam / acc", true)
+		desc:add("Accuracy bonus: ", {"color","LIGHT_GREEN"}, showpct(0.2, m), {"color","LAST"}, " base dam (max 20%)", true)
 	elseif kind == "staff" then
-		desc:add("Accuracy bonus: ", {"color","LIGHT_GREEN"}, showpct(2.5, m), {"color","LAST"}, " procs dam / acc", true)
+		desc:add("Accuracy bonus: ", {"color","LIGHT_GREEN"}, showpct(2.5, m), {"color","LAST"}, " proc dam (max 200%)", true)
 	elseif kind == "knife" then
-		desc:add("Accuracy bonus: ", {"color","LIGHT_GREEN"}, showpct(0.5, m), {"color","LAST"}, " APR / acc", true)
+		desc:add("Accuracy bonus: ", {"color","LIGHT_GREEN"}, showpct(0.5, m), {"color","LAST"}, " APR (max 50%)", true)
 	end
 end
 
@@ -1074,7 +1074,7 @@ function _M:descCombat(use_actor, combat, compare_with, field, add_table, is_fak
 	compare_fields(combat, compare_with, field, "phasing", "%+d%%", "Damage Shield penetration (this weapon only): ", 1, false, false, add_table)
 
 	compare_fields(combat, compare_with, field, "lifesteal", "%+d%%", "Lifesteal (this weapon only): ", 1, false, false, add_table)
-	
+
 	local attack_recurse_procs_reduce_compare = function(orig, compare_with)
 		orig = 100 - 100 / orig
 		if compare_with then return ("%+d%%"):format(-(orig - (100 - 100 / compare_with)))
@@ -1105,12 +1105,12 @@ function _M:descCombat(use_actor, combat, compare_with, field, add_table, is_fak
 		nil, nil,
 		function(k, v) return not DamageType.dam_def[k].tdesc end)
 
-	compare_table_fields(combat, compare_with, field, "burst_on_hit", "%+d", "Burst (radius 1) on hit: ", function(item)
+	compare_table_fields(combat, compare_with, field, "burst_on_hit", "%+d", "Damage (radius 1) on hit: ", function(item)
 			local col = (DamageType.dam_def[item] and DamageType.dam_def[item].text_color or "#WHITE#"):toTString()
 			return col[2], (" %s"):format(DamageType.dam_def[item].name),{"color","LAST"}
 		end)
 
-	compare_table_fields(combat, compare_with, field, "burst_on_crit", "%+d", "Burst (radius 2) on crit: ", function(item)
+	compare_table_fields(combat, compare_with, field, "burst_on_crit", "%+d", "Damage (radius 2) on crit: ", function(item)
 			local col = (DamageType.dam_def[item] and DamageType.dam_def[item].text_color or "#WHITE#"):toTString()
 			return col[2], (" %s"):format(DamageType.dam_def[item].name),{"color","LAST"}
 		end)
@@ -1171,11 +1171,11 @@ function _M:getTextualDesc(compare_with, use_actor)
 		local combat = self.combat
 		if not combat and self.wielded then
 			-- shield combat
-			if self.subtype == "shield" and self.special_combat and ((use_actor:knowTalentType("technique/shield-offense") or use_actor:knowTalentType("technique/shield-defense") or use_actor:attr("show_shield_combat"))) then
+			if self.subtype == "shield" and self.special_combat and ((use_actor:knowTalentType("technique/shield-offense") or use_actor:knowTalentType("technique/shield-defense") or use_actor:attr("show_shield_combat") or config.settings.tome.display_shield_stats)) then
 				combat = self.special_combat
 			end
 			-- gloves combat
-			if self.subtype == "hands" and self.wielder and self.wielder.combat and (use_actor:knowTalent(use_actor.T_EMPTY_HAND) or use_actor:attr("show_gloves_combat")) then
+			if self.subtype == "hands" and self.wielder and self.wielder.combat and (use_actor:knowTalent(use_actor.T_EMPTY_HAND) or use_actor:attr("show_gloves_combat") or config.settings.tome.display_glove_stats) then
 				combat = self.wielder.combat
 			end
 		end
@@ -1742,8 +1742,8 @@ function _M:getTextualDesc(compare_with, use_actor)
 		compare_fields(w, compare_with, field, "psi_regen", "%+.2f", "Psi each turn: ")
 		compare_fields(w, compare_with, field, "equilibrium_regen", "%+.2f", "Equilibrium each turn: ", nil, true, true)
 		compare_fields(w, compare_with, field, "vim_regen", "%+.2f", "Vim each turn: ")
-		compare_fields(w, compare_with, field, "positive_regen_ref_mod", "%+.2f", "P.Energy each turn: ")
-		compare_fields(w, compare_with, field, "negative_regen_ref_mod", "%+.2f", "N.Energy each turn: ")
+		compare_fields(w, compare_with, field, "positive_regen", "%+.2f", "P.Energy each turn: ")
+		compare_fields(w, compare_with, field, "negative_regen", "%+.2f", "N.Energy each turn: ")
 
 		compare_fields(w, compare_with, field, "stamina_regen_when_hit", "%+.2f", "Stamina when hit: ")
 		compare_fields(w, compare_with, field, "mana_regen_when_hit", "%+.2f", "Mana when hit: ")
@@ -1834,6 +1834,8 @@ function _M:getTextualDesc(compare_with, use_actor)
 
 		compare_fields(w, compare_with, field, "slow_projectiles", "%+d%%", "Slows Projectiles: ")
 
+		compare_fields(w, compare_with, field, "shield_windwall", "%+d", "Bonus block near projectiles: ")
+
 		compare_fields(w, compare_with, field, "paradox_reduce_anomalies", "%+d", "Reduces paradox anomalies(equivalent to willpower): ")
 
 		compare_fields(w, compare_with, field, "damage_backfire", "%+d%%", "Damage Backlash: ", nil, true)
@@ -1896,8 +1898,10 @@ function _M:getTextualDesc(compare_with, use_actor)
 
 		if (w and w.combat or can_combat_unarmed) and (use_actor:knowTalent(use_actor.T_EMPTY_HAND) or use_actor:attr("show_gloves_combat") or config.settings.tome.display_glove_stats) then
 			desc:add({"color","YELLOW"}, "When used to modify unarmed attacks:", {"color", "LAST"}, true)
-			compare_tab = { dam=1, atk=1, apr=0, physcrit=0, physspeed =(use_actor:knowTalent(use_actor.T_EMPTY_HAND) and 0.6 or 1), dammod={str=1}, damrange=1.1 }
+			compare_tab = { dam=1, atk=1, apr=0, physcrit=0, physspeed =(use_actor:knowTalent(use_actor.T_EMPTY_HAND) and 0.8 or 1), dammod={str=1}, damrange=1.1 }
 			desc_combat(w, compare_unarmed, "combat", compare_tab, true)
+		elseif (w and w.combat or can_combat_unarmed) then
+			desc:add({"color","LIGHT_BLUE"}, "Learn an unarmed attack talent or enable 'Always show glove combat' to see combat stats.", {"color", "LAST"}, true)
 		end
 	end
 	local can_combat = false
@@ -1928,9 +1932,11 @@ function _M:getTextualDesc(compare_with, use_actor)
 		desc_combat(self, compare_with, "combat")
 	end
 
-	if (self.special_combat or can_special_combat) and (use_actor:knowTalentType("technique/shield-offense") or use_actor:knowTalentType("technique/shield-defense") or use_actor:attr("show_shield_combat")) then
+	if (self.special_combat or can_special_combat) and (use_actor:knowTalentType("technique/shield-offense") or use_actor:knowTalentType("technique/shield-defense") or use_actor:attr("show_shield_combat") or config.settings.tome.display_shield_stats) then
 		desc:add({"color","YELLOW"}, "When used to attack (with talents):", {"color", "LAST"}, true)
 		desc_combat(self, compare_with, "special_combat")
+	elseif (self.special_combat or can_special_combat) then
+		desc:add({"color","LIGHT_BLUE"}, "Learn shield attack talent or enable 'Always show shield combat' to see combat stats.", {"color", "LAST"}, true)
 	end
 
 	local found = false
@@ -2044,19 +2050,19 @@ function _M:getTextualDesc(compare_with, use_actor)
 
 	local talents = {}
 	if self.talent_on_spell then
-		for _, data in ipairs(self.talent_on_spell) do
+		for _, data in ipairs(self.talent_on_spell) do if data.talent then
 			talents[data.talent] = {data.chance, data.level}
-		end
+		end end
 	end
 	for i, v in ipairs(compare_with or {}) do
-		for _, data in ipairs(v[field] and (v[field].talent_on_spell or {})or {}) do
+		for _, data in ipairs(v[field] and (v[field].talent_on_spell or {})or {}) do if data.talent then
 			local tid = data.talent
 			if not talents[tid] or talents[tid][1]~=data.chance or talents[tid][2]~=data.level then
 				desc:add({"color","RED"}, ("Talent on hit(spell): %s (%d%% chance level %d)."):format(self:getTalentFromId(tid).name, data.chance, data.level), {"color","LAST"}, true)
 			else
 				talents[tid][3] = true
 			end
-		end
+		end end
 	end
 	for tid, data in pairs(talents) do
 		desc:add(talents[tid][3] and {"color","GREEN"} or {"color","WHITE"}, ("Talent on hit(spell): %s (%d%% chance level %d)."):format(self:getTalentFromId(tid).name, talents[tid][1], talents[tid][2]), {"color","LAST"}, true)
@@ -2064,19 +2070,19 @@ function _M:getTextualDesc(compare_with, use_actor)
 
 	local talents = {}
 	if self.talent_on_wild_gift then
-		for _, data in ipairs(self.talent_on_wild_gift) do
+		for _, data in ipairs(self.talent_on_wild_gift) do if data.talent then
 			talents[data.talent] = {data.chance, data.level}
-		end
+		end end
 	end
 	for i, v in ipairs(compare_with or {}) do
-		for _, data in ipairs(v[field] and (v[field].talent_on_wild_gift or {})or {}) do
+		for _, data in ipairs(v[field] and (v[field].talent_on_wild_gift or {})or {}) do if data.talent then
 			local tid = data.talent
 			if not talents[tid] or talents[tid][1]~=data.chance or talents[tid][2]~=data.level then
 				desc:add({"color","RED"}, ("Talent on hit(nature): %s (%d%% chance level %d)."):format(self:getTalentFromId(tid).name, data.chance, data.level), {"color","LAST"}, true)
 			else
 				talents[tid][3] = true
 			end
-		end
+		end end
 	end
 	for tid, data in pairs(talents) do
 		desc:add(talents[tid][3] and {"color","GREEN"} or {"color","WHITE"}, ("Talent on hit(nature): %s (%d%% chance level %d)."):format(self:getTalentFromId(tid).name, talents[tid][1], talents[tid][2]), {"color","LAST"}, true)
@@ -2084,19 +2090,19 @@ function _M:getTextualDesc(compare_with, use_actor)
 
 	local talents = {}
 	if self.talent_on_mind then
-		for _, data in ipairs(self.talent_on_mind) do
+		for _, data in ipairs(self.talent_on_mind) do if data.talent then
 			talents[data.talent] = {data.chance, data.level}
-		end
+		end end
 	end
 	for i, v in ipairs(compare_with or {}) do
-		for _, data in ipairs(v[field] and (v[field].talent_on_mind or {})or {}) do
+		for _, data in ipairs(v[field] and (v[field].talent_on_mind or {})or {}) do if data.talent then
 			local tid = data.talent
 			if not talents[tid] or talents[tid][1]~=data.chance or talents[tid][2]~=data.level then
 				desc:add({"color","RED"}, ("Talent on hit(nature): %s (%d%% chance level %d)."):format(self:getTalentFromId(tid).name, data.chance, data.level), {"color","LAST"}, true)
 			else
 				talents[tid][3] = true
 			end
-		end
+		end end
 	end
 	for tid, data in pairs(talents) do
 		desc:add(talents[tid][3] and {"color","GREEN"} or {"color","WHITE"}, ("Talent on hit(mindpower): %s (%d%% chance level %d)."):format(self:getTalentFromId(tid).name, talents[tid][1], talents[tid][2]), {"color","LAST"}, true)

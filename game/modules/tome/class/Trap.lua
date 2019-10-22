@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -301,7 +301,7 @@ end
 function _M:trigger(x, y, who)
 	engine.Trap.trigger(self, x, y, who)
 	if who.player then self:identify(true) end
-	if who.runStop then who:runStop("trap") end
+	if who.runStop and self:canTrigger(x, y, who) then who:runStop("trap") end
 end
 
 --- Identify the trap (controls info displayed for the player)

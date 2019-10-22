@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ newEntity{
 newEntity{ base = "BASE_NPC_MOLD",
 	name = "grey mold", color=colors.SLATE,
 	desc = "A strange grey growth on the dungeon floor.",
-	level_range = {1, 25}, exp_worth = 1,
+	level_range = {1, 15}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(5,9),
 	combat = { dam=8, atk=0, apr=10 },
@@ -59,7 +59,7 @@ newEntity{ base = "BASE_NPC_MOLD",
 newEntity{ base = "BASE_NPC_MOLD",
 	name = "brown mold", color=colors.UMBER,
 	desc = "A strange brown growth on the dungeon floor.",
-	level_range = {2, 25}, exp_worth = 1,
+	level_range = {2, 15}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(10,18),
 	combat = { dam=5, atk=0, apr=10 },
@@ -72,7 +72,7 @@ newEntity{ base = "BASE_NPC_MOLD",
 newEntity{ base = "BASE_NPC_MOLD",
 	name = "shining mold", color=colors.YELLOW,
 	desc = "A strange luminescent growth on the dungeon floor.",
-	level_range = {3, 25}, exp_worth = 1,
+	level_range = {3, 15}, exp_worth = 1,
 	rarity = 7,
 	max_life = resolvers.rngavg(5,9),
 	combat = { dam=8, atk=5, apr=10 },
@@ -87,7 +87,7 @@ newEntity{ base = "BASE_NPC_MOLD",
 newEntity{ base = "BASE_NPC_MOLD",
 	name = "green mold", color=colors.GREEN,
 	desc = "A strange sickly green growth on the dungeon floor.",
-	level_range = {5, 25}, exp_worth = 1,
+	level_range = {5, 15}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(10,18),
 	combat = { dam=5, atk=10, apr=10 },

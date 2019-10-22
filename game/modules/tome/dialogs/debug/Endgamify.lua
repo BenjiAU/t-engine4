@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -73,15 +73,16 @@ local endgame_items = {
 	["voratun amulet"] = {5,2},
 	["voratun mail armour"] = {5,4},
 	["voratun plate armour"] = {5,4},
-	["voratun helm"] = {10,3},
+	["elven-silk wizard hat"] = {10,3},
 	["elven-silk cloak"] = {10,3},
 	["dragonbone totem"] = {5,2},
 	["voratun torque"] = {5,2},
 	["dragonbone wand"] = {5,2},
-	["voratun helm"] = {10,3},
+	["drakeskin leather cap"] = {10,3},
 	["voratun pickaxe"] = {5,2},
 	["dwarven lantern"] = {5,2},
 	["pair of drakeskin leather boots"] = {10,3},
+	["pair of voratun boots"] = {10,3},
 	["drakeskin leather belt"] = {10,3},
 }
 

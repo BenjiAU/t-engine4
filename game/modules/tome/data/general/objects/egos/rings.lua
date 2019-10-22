@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ newEntity{
 
 newEntity{
 	power_source = {arcane=true},
-	name = " of arcana(#REGEN#)", suffix=true, instant_resolve=true,
+	name = " of arcana (#REGEN#)", suffix=true, instant_resolve=true,
 	keywords = {arcana=true},
 	level_range = {1, 50},
 	rarity = 6,

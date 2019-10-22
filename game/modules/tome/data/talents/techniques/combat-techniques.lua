@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ newTalent{
 	tactical = { ATTACK = { weapon = 1, stun = 1 }, CLOSEIN = 3 },
 	requires_target = true,
 	is_melee = true,
-	target = function(self, t) return {type="bolt", range=self:getTalentRange(t), nolock=true, nowarning=true, requires_knowledge=false, stop__block=true} end,
+	target = function(self, t) return {type="bolt", range=self:getTalentRange(t), requires_knowledge=false, stop__block=true} end,
 	range = function(self, t) return math.floor(self:combatTalentScale(t, 6, 10)) end,
 	on_pre_use = function(self, t)
 		if self:attr("never_move") then return false end
@@ -83,9 +83,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Rush toward a target spot with incredible speed.
-		If the spot is reached and occupied, you will perform a free melee attack against the target there.
-		This attack does 120% weapon damage and can daze the target for 3 turns if it hits.
+		return ([[Rush toward a target enemy with incredible speed and perform a melee attack for 120% weapon damage that can daze the target for 3 turns if it hits.
 		You must rush from at least 2 tiles away.]])
 	end,
 }
@@ -130,11 +128,11 @@ newTalent{
 	points = 5,
 	random_ego = "attack",
 	cooldown = 25,
-	stamina = 10,
+	stamina = 25,
 	require = techs_strdex_req3,
 	no_energy = true,
 	tactical = { BUFF = 2 },
-	getDuration = function(self, t) return math.floor(self:combatTalentLimit(t, 25, 2, 6)) end, -- Limit < 25
+	getDuration = function(self, t) return math.floor(self:combatTalentLimit(t, 7, 2, 5)) end, -- Limit < 25
 	getAtk = function(self, t) return self:combatTalentScale(t, 40, 100, 0.75) end,
 	action = function(self, t)
 		self:setEffect(self.EFF_ATTACK, t.getDuration(self, t), {power = t.getAtk(self, t)})

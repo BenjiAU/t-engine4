@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -39,7 +39,15 @@ Good day to you, fellow traveler!]],
 	answers = {
 		{"What brings an apprentice mage out into the wilds?", jump="quest", cond=function(npc, player) return not player:hasQuest("mage-apprentice") end},
 		{"I found this artefact; it looks powerful and arcane infused. Maybe it would be enough?",
-			jump="unique",
+			jump=function(npc, player)
+				if player:hasQuest("mage-apprentice"):isCompleted() then
+					-- An item was selected, continue.
+					return "unique"
+				else
+					-- No item was selected, stay on the current dialog.
+					return "welcome"
+				end
+			end,
 			cond=function(npc, player) return player:hasQuest("mage-apprentice") and player:hasQuest("mage-apprentice"):can_offer_unique(player) end,
 			action=function(npc, player, dialog) player:hasQuest("mage-apprentice"):collect_staff_unique(npc, player, dialog) end
 		},

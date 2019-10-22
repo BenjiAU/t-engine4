@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -99,32 +99,24 @@ newTalent{
 	mode = "sustained",
 	sustain_stamina = 20,
 	cooldown = 8,
-	tactical = { DEFEND = 2, DISABLE = 1, },
+	tactical = { BUFF = 2, DISABLE = 1, },
 	range = 0,
-	getRadius = function(self, t) return math.ceil(self:combatTalentScale(t, 0.25, 2.3)) end,
+	getRadius = function(self, t) return 6 end,
 	getPenalty = function(self, t) return self:combatTalentPhysicalDamage(t, 5, 36) end,
-	getMinimumLife = function(self, t)
-		return self.max_life * self:combatTalentLimit(t, 0.1, 0.45, 0.25) -- Limit > 10% life
-	end,
-	on_pre_use = function(self, t, silent) if t.getMinimumLife(self, t) > self.life then if not silent then game.logPlayer(self, "You are too injured to use this talent.") end return false end return true end,
 	do_daunting_presence = function(self, t)
+		if self.__do_daunting_presence_running then return end
+		self.__do_daunting_presence_running = true
 		local tg = {type="ball", range=0, radius=t.getRadius(self, t), friendlyfire=false, talent=t}
 		self:project(tg, self.x, self.y, function(px, py)
 			local target = game.level.map(px, py, engine.Map.ACTOR)
 			if target then
-				if target:canBe("fear") then
-					target:setEffect(target.EFF_INTIMIDATED, 4, {apply_power=self:combatAttackStr(), power=t.getPenalty(self, t), no_ct_effect=true})
-					game.level.map:particleEmitter(target.x, target.y, 1, "flame")
-				else
-					game.logSeen(target, "%s is not intimidated!", target.name:capitalize())
-				end
+				target:setEffect(target.EFF_INTIMIDATED, 2, {power=t.getPenalty(self, t)})
 			end
 		end)
+		self.__do_daunting_presence_running = nil
 	end,
-	callbackOnActBase = function(self, t)
-		if self.life < t.getMinimumLife(self, t) then
-			self:forceUseTalent(t.id, {ignore_energy=true})
-		end
+	callbackOnAct = function(self, t)
+		t.do_daunting_presence(self, t)
 	end,
 	activate = function(self, t)
 		local ret = {	}
@@ -136,11 +128,10 @@ newTalent{
 	info = function(self, t)
 		local radius = t.getRadius(self, t)
 		local penalty = t.getPenalty(self, t)
-		local min_life = t.getMinimumLife(self, t)
-		return ([[Enemies are intimidated by how composed you remain under fire.  When you take more then 5%% of your maximum life in a single hit, all enemies in a radius of %d will be intimidated, reducing their Physical Power, Mindpower, and Spellpower by %d for 4 turns.
-		If your health drops below %d, you'll be unable to maintain your daunting presence, and the sustain will deactivate.  
-		The power of the intimidation effect improves with your Physical power, and it's chance to affect your enemies improves with your Strength.]]):
-		format(radius, penalty, min_life)
+		return ([[Enemies are intimidated by your very presence.
+		Enemies within radius %d have their Physical Power, Mindpower, and Spellpower reduced by %d.
+		The power of the intimidation effect improves with your Physical power]]):
+		format(radius, penalty)
 	end,
 }
 
@@ -155,8 +146,8 @@ newTalent{
 		local tgt = self.ai_target.actor
 		if self.stamina/self.max_stamina < 0.5 or tgt and core.fov.distance(self.x, self.y, tgt.x, tgt.y) < 10 and self:hasLOS(tgt.x, tgt.y) then return true end
 	end,
-	getAttackPower = function(self, t) return self:combatTalentStatDamage(t, "con", 5, 25) end,
-	getDuration = function(self, t) return math.floor(self:combatTalentLimit(t, 24, 3, 7)) end, -- Limit < 24
+	getAttackPower = function(self, t) return self:combatTalentStatDamage(t, "con", 5, 45) end,
+	getDuration = function(self, t) return math.floor(self:combatTalentLimit(t, 10, 3, 7)) end, -- Limit < 24
 	no_energy = true,
 	action = function(self, t)
 		self:setEffect(self.EFF_ADRENALINE_SURGE, t.getDuration(self, t), {power = t.getAttackPower(self, t)})
@@ -166,7 +157,7 @@ newTalent{
 		local attack_power = t.getAttackPower(self, t)
 		local duration = t.getDuration(self, t)
 		return ([[You release a surge of adrenaline that increases your Physical Power by %d for %d turns. While the effect is active, you may continue to fight beyond the point of exhaustion.
-		Your stamina based sustains will not be disabled if your stamina reaches zero, and you may continue to use stamina based talents while at zero stamina at the cost of life.
+		You may continue to use stamina based talents while at zero stamina at the cost of life.
 		The Physical Power increase will scale with your Constitution.
 		Using this talent does not take a turn.]]):
 		format(attack_power, duration)

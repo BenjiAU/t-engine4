@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@ newTalent{
 	require = spells_req1,
 	points = 5,
 	mana = 10,
-	cooldown = 30,
+	cooldown = 15,
 	tactical = { DISABLE = 2 },
 	reflectable = true,
-	proj_speed = 3,
+	proj_speed = 5,
 	range = 6,
 	direct_hit = true,
 	requires_target = true,
@@ -119,7 +119,7 @@ newTalent{
 	require = spells_req4,
 	points = 5,
 	mode = "sustained",
-	sustain_mana = 250,
+	sustain_mana = 180,
 	cooldown = 20,
 	tactical = { BUFF = 2 },
 	getHaste = function(self, t) return self:combatTalentLimit(t, 0.35, 0.05, 0.25) end,

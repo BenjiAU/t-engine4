@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -155,7 +155,7 @@ newTalent{
 		
 		-- We need to alter behavior slightly to accomodate shields since they aren't used in attackTarget
 		local shield, shield_combat = self:hasShield()
-		local weapon = self:hasMHWeapon().combat
+		local weapon = self:hasMHWeapon() and self:hasMHWeapon().combat or self.combat
 		if not shield then
 			self:attackTarget(target, (self:getTalentLevel(t) >= 2) and DamageType.ACID_BLIND or DamageType.ACID, t.getDamage(self, t), true)
 			self:attackTarget(target, (self:getTalentLevel(t) >= 4) and DamageType.ACID_BLIND or DamageType.ACID, t.getDamage(self, t), true)

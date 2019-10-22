@@ -1,5 +1,5 @@
 -- ToME - Tales of Middle-Earth
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -103,8 +103,8 @@ newTalent{
 	radius = function(self, t) return math.floor(self:combatTalentScale(t, 1, 15, 1)) end,
 	getNb = function(self, t) return math.floor(self:combatTalentScale(t, 1, 3, 1)) end,
 	on_pre_use = function(self, t) return self:callTalent(self.T_CALL_SHADOWS, "nbShadowsUp") > 0 end,
-	action = function(self, t)
-		local tg = {type="hit", range=self:getTalentRadius(t)}
+	action = function(self, t) --closest friend will be a shadow almost all the time
+		local tg = {type="hit", nolock=true, first_target="friend", range=self:getTalentRadius(t)}
 		local x, y, target = self:getTarget(tg)
 		if not x or not y or not target then return nil end
 		if core.fov.distance(self.x, self.y, target.x, target.y) > self:getTalentRadius(t) then return nil end

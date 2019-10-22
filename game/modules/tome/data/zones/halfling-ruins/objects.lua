@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -42,28 +42,38 @@ newEntity{ base = "BASE_CLOTH_ARMOR",
 	name = "Yeek-fur Robe", color = colors.WHITE, image = "object/artifact/yeek_fur_robe.png",
 	unided_name = "sleek fur robe",
 	desc = [[A beautifully soft robe of fine white fur. It looks designed for a halfling noble, with glorious sapphires sewn across the hems. But entrancing as it is, you can't help but feel a little queasy wearing it.]],
-	level_range = {12, 22},
+	level_range = {16, 30},
 	rarity = 20,
 	cost = 250,
-	material_level = 2,
+	material_level = 3,
 	wielder = {
-		combat_def = 9,
-		combat_armor = 3,
-		combat_mindpower = 5,
+		esp = { humanoid=1 },
+		combat_def = 10,
+		combat_armor = 5,
+		combat_mindpower = 10,
+		combat_mindcrit = 5,
 		combat_mentalresist = 10,
-		inc_damage={[DamageType.MIND] = 5},
-		resists={[DamageType.COLD] = 20},
+		confusion_immune = 0.35,
+		inc_damage={
+			[DamageType.MIND] = 10,},
+		resists= {
+			[DamageType.MIND] = 20,
+			[DamageType.COLD] = 20,}
 	},
 	on_wear = function(self, who)
 		if who.descriptor and who.descriptor.race == "Yeek" then
 			local Talents = require "engine.interface.ActorStats"
-			self:specialWearAdd({"wielder","combat_mindpower"}, -15)
+			self:specialWearAdd({"wielder","combat_mindpower"}, -20)
+			self:specialWearAdd({"wielder","combat_mindcrit"}, -10)
 			self:specialWearAdd({"wielder","combat_mentalresist"}, -25)
+			self:specialWearAdd({"wielder","confusion_immune"}, -0.35)
+			self:specialWearAdd({"wielder","resists"}, {[engine.DamageType.MIND] = -30,}) --Yeek REALLY doesn't like wearing this
 			game.logPlayer(who, "#RED#You feel disgusted touching this thing!")
 		end
 		if who.descriptor and who.descriptor.race == "Halfling" then
 			local Talents = require "engine.interface.ActorStats"
 			self:specialWearAdd({"wielder","resists"}, {[engine.DamageType.MIND] = 15,})
+			self:specialWearAdd({"wielder","confusion_immune"}, 0.35)
 			self:specialWearAdd({"wielder","combat_mentalresist"}, 10)
 			game.logPlayer(who, "#LIGHT_BLUE#You feel this robe was made for you!")
 		end

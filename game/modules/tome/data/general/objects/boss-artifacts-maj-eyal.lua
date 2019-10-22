@@ -1,5 +1,5 @@
 -- ToME - Tales of Middle-Earth
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -40,8 +40,8 @@ It is said the Conclave created this weapon for their warmaster during the dark 
 	winterStorm = nil,
 	special_desc = function(self)
 		local storm = self.winterStorm
-		if not storm or storm.duration <=0 then 
-			return ("No Winter Storm Active") 
+		if not storm or storm.duration <=0 then
+			return ("No Winter Storm Active")
 		else
 			return ("Winter Storm: " .. ((storm.duration and storm.radius) and ("radius %d (%d turns remaining)"):format(math.floor(storm.radius), storm.duration) or "None"))
 		end
@@ -54,7 +54,7 @@ It is said the Conclave created this weapon for their warmaster during the dark 
 		damrange = 1.4,
 		melee_project={[DamageType.ICE] = 25}, -- Iceblock HP is based on damage, since were adding iceblock pierce we want this to be less generous
 		special_on_hit = {
-			desc=function(self, who, special) 
+			desc=function(self, who, special)
 				local dam = who:damDesc(engine.DamageType.COLD, special:damage(self, who))
 				return ("Create a Winter Storm that gradually expands (from radius %d to radius %d), dealing %0.2f cold damage (based on Strength) to your enemies each turn and slowing their ability to act by 20%%.  Subsequent melee strikes will relocate the storm on top of your target and increase its duration."):format(special.radius, special.max_radius, dam)
 			end,
@@ -70,7 +70,7 @@ It is said the Conclave created this weapon for their warmaster during the dark 
 				-- special_on_hit doesn't know what item triggered it, so find it
 				local self, item, inven_id = who:findInAllInventoriesBy("define_as", "LONGSWORD_WINTERTIDE")
 				if not self or not who:getInven(inven_id).worn then return end
-				
+
 				if who.turn_procs.wintertide_sword then return end
 
 				-- The reference to winterStorm is lost sometimes on reload but since we know only one can ever exist we can just check the map effects and set the reference every proc
@@ -86,7 +86,7 @@ It is said the Conclave created this weapon for their warmaster during the dark 
 					self.winterStorm = nil
 				end
 				who.turn_procs.wintertide_sword = true
-				 
+
 				-- If the map has no Winter Storm then create one
 				if not self.winterStorm then
 					game.logSeen(target, "#LIGHT_BLUE#A Winter Storm forms around %s.", target.name:capitalize())
@@ -98,8 +98,8 @@ It is said the Conclave created this weapon for their warmaster during the dark 
 						5, nil,
 						{type="icestorm", only_one=true, args = {radius = 1}},
 						function(e, update_shape_only)
-							if not update_shape_only then 
-								 -- Increase the radius by 0.2 each time the effect ticks (1000 energy)	
+							if not update_shape_only then
+								 -- Increase the radius by 0.2 each time the effect ticks (1000 energy)
 								if e.radius < e.max_radius then
 									e.radius = e.radius + 0.2
 									if e.particles and math.floor(e.particles[1].args.radius) ~= math.floor(e.radius) then -- expand the graphical effect
@@ -127,7 +127,7 @@ It is said the Conclave created this weapon for their warmaster during the dark 
 					game.level.map.changed = true
 				end
 			end
-		},	
+		},
 	},
 	wielder = {
 		iceblock_pierce=35, -- this can be generous because of how melee specific the item is
@@ -138,21 +138,21 @@ It is said the Conclave created this weapon for their warmaster during the dark 
 	max_power = 40, power_regen = 1,
 	use_power = { name ="precipitate ice walls (lasting 10 turns) within your Winter Storm's area", power = 30,
 		use = function(self, who)
-			
+
 			local Object = require "mod.class.Object"
 			local Map = require "engine.Map"
-			
+
 			if not self.winterStorm then return end
-			
+
 			if self.winterStorm and self.winterStorm.duration <= 0 then
 				self.winterStorm = nil
 				return
 			end
-			
+
 			local grids = core.fov.circle_grids(self.winterStorm.x, self.winterStorm.y, self.winterStorm.radius, true)
 			game.logSeen(who, "#LIGHT_BLUE#%s brandishes %s %s, releasing a wave of Winter cold!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
 			self.use_power.last_use = {turn = game.turn, x = self.winterStorm.x, y = self.winterStorm.y, radius = self.winterStorm.radius} -- for ai purposes
-			
+
 			local msg = false
 			for x, yy in pairs(grids) do for y, _ in pairs(grids[x]) do
 				local oe = game.level.map(x, y, engine.Map.TERRAIN)
@@ -223,7 +223,7 @@ It is said the Conclave created this weapon for their warmaster during the dark 
 				core.fov.distance(who.x, who.y, tx, ty), -- dist to target
 				core.fov.distance(tx, ty, self.winterStorm.x, self.winterStorm.y) < math.floor(self.winterStorm.radius), -- walls would surround target
 				core.fov.distance(who.x, who.y, self.winterStorm.x, self.winterStorm.y) < math.floor(self.winterStorm.radius) -- walls would surround us
-			
+
 			local tac = {}
 			-- escape: want walls around target but not around us if possible (so we can flee)
 			local val = 0
@@ -346,21 +346,76 @@ newEntity{ base = "BASE_LEATHER_BOOT",
 	callbackOnMove = function(self, who, moved, force, ox, oy, x, y)
 			if not moved or force or (ox == who.x and oy == who.y) then return end
 			local Talents = require "engine.interface.ActorTalents"
-			game.level.map:addEffect(who,
-				who.x, who.y, 5,
-				engine.DamageType.ITEM_FROST_TREADS, {},
-				1,
-				5, nil,
-				engine.MapEffect.new{zdepth=3, color_br=245, color_bg=245, color_bb=245, effect_shader="shader_images/ice_effect.png"},
-				nil, true
-			)
+
+			local e = game.level.map:hasEffectType(who.x, who.y, engine.DamageType.ITEM_FROST_TREADS)
+			if not e then
+				game.level.map:addEffect(who,
+					who.x, who.y, 5,
+					engine.DamageType.ITEM_FROST_TREADS, {},
+					1,
+					5, nil,
+					engine.MapEffect.new{zdepth=3, color_br=245, color_bg=245, color_bb=245, effect_shader="shader_images/ice_effect.png"},
+					function(e, update_shape_only, todel, i)
+						if not e.__setup_frost_tread then
+							e.__setup_frost_tread = true
+							e.grids_duration = {}
+							for lx, ys in pairs(e.grids) do
+								e.grids_duration[lx] = {}
+								for ly, _ in pairs(ys) do
+									e.grids_duration[lx][ly] = e.duration
+								end
+							end
+							e.duration = 50
+						end
+						if update_shape_only then return end
+
+						-- Find the ones to remove
+						local toremove = {}
+						for lx, ys in pairs(e.grids_duration) do
+							for ly, _ in pairs(ys) do
+								e.grids_duration[lx][ly] = e.grids_duration[lx][ly] - 1
+								if e.grids_duration[lx][ly] <= 0 then toremove[#toremove+1] = {x=lx, y=ly} end
+							end
+						end
+
+						-- Remove then now
+						while #toremove > 0 do
+							local g = table.remove(toremove)
+							e.grids_duration[g.x][g.y] = nil
+							if not next(e.grids_duration[g.x]) then e.grids_duration[g.x] = nil end
+							e.grids[g.x][g.y] = nil
+							if not next(e.grids[g.x]) then e.grids[g.x] = nil end
+						end
+
+						-- If nothing is left, we remove the while effect
+						if not next(e.grids) then
+							table.insert(todel, i)
+						end
+
+						return false
+					end, true
+				)
+			else
+				if not e.grids_duration then return end
+				e.x, e.y = who.x, who.y
+				e.duration = 50
+				local ngrids = core.fov.circle_grids(who.x, who.y, 1, true)
+				for lx, ys in pairs(ngrids) do
+					for ly, _ in pairs(ys) do
+						e.grids[lx] = e.grids[lx] or {}
+						e.grids[lx][ly] = true
+						e.grids_duration[lx] = e.grids_duration[lx] or {}
+						e.grids_duration[lx][ly] = 5
+					end
+				end
+			end
 	end,
 	wielder = {
 		lite = 1,
 		combat_armor = 4,
 		combat_def = 1,
 		fatigue = 7,
-		movement_speed = 0.1,
+		movement_speed = 0.2,
 		inc_damage = {
 			[DamageType.COLD] = 15,
 		},
@@ -419,7 +474,7 @@ newEntity{ base = "BASE_LIGHT_ARMOR",
 	},
 
 	max_power = 50, power_regen = 1,
-	use_talent = { id = Talents.T_CALL_LIGHTNING, level=2, power = 18 },
+	use_talent = { id = Talents.T_CALL_LIGHTNING, level=2, power = 20 },
 	talent_on_wild_gift = { {chance=10, talent=Talents.T_CALL_LIGHTNING, level=2} },
 }
 
@@ -442,11 +497,11 @@ newEntity{ base = "BASE_RING",
 		talent_cd_reduction={
 			[Talents.T_SHADOWSTEP]=1,
 		},
-		inc_damage={ [DamageType.PHYSICAL] = 5, },
+		inc_damage={ [DamageType.DARKNESS] = 10, },
 	},
 
 	max_power = 50, power_regen = 1,
-	use_talent = { id = Talents.T_DARK_TENDRILS, level=2, power = 40 },
+	use_talent = { id = Talents.T_SHADOWSTEP, level=2, power = 50 },
 }
 
 newEntity{ base = "BASE_HELM",
@@ -505,20 +560,17 @@ newEntity{ base = "BASE_SHIELD",
 		physcrit = 10,
 		dammod = {str=1},
 		damrange = 1.4,
-		damtype = DamageType.ARCANE,
+		damtype = DamageType.DARKNESS,
 	},
 	wielder = {
 		resists={[DamageType.DARKNESS] = 25},
-		inc_damage={[DamageType.DARKNESS] = 15},
+		inc_damage={[DamageType.DARKNESS] = 40},
 
-		combat_armor = 7,
-		combat_def = 12,
-		combat_def_ranged = 5,
-		combat_spellpower = 10,
+		combat_armor = 20,
+		combat_spellpower = 20,
 		fatigue = 2,
 
-		lite = 1,
-		talents_types_mastery = {["celestial/star-fury"]=0.2,["celestial/twilight"]=0.1,},
+		talents_types_mastery = {["celestial/star-fury"]=0.3, ["celestial/twilight"]=0.3,},
 		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 	talent_on_spell = { {chance=10, talent=Talents.T_MOONLIGHT_RAY, level=2} },
@@ -652,11 +704,6 @@ newEntity{ base = "BASE_STAFF",
 			crystal:forgetInven(crystal.INVEN_INVEN)
 
 			local setupSummon = getfenv(who:getTalentFromId(who.T_SPIDER).action).setupSummon
-			if who:knowTalent(who.T_BLIGHTED_SUMMONING) then
-				crystal.blighted_summon_talent = who.T_BONE_SHIELD
-				crystal:incIncStat("mag", who:getMag())
-				crystal.summon_time=15
-			end
 			setupSummon(who, crystal, x, y)
 			game:playSoundNear(who, "talents/ice")
 		end
@@ -740,7 +787,7 @@ newEntity{ base = "BASE_STAFF",
 
 newEntity{ base = "BASE_AMULET",
 	power_source = {arcane=true},
-	define_as = "VOX", 
+	define_as = "VOX",
 	name = "Vox", unique=true,
 	unided_name = "ringing amulet", color=colors.BLUE, image="object/artifact/jewelry_amulet_vox.png",
 	desc = [[No force can hope to silence the wearer of this amulet.]],
@@ -822,7 +869,7 @@ newEntity{ base = "BASE_AMULET",
 
 		local tg = {type="ball", radius=10, friendlyfire=false, selffire=false}
 		local tgts = {}
-		who:project(tg, who.x, who.y, function(px, py) 
+		who:project(tg, who.x, who.y, function(px, py)
 			local target = game.level.map(px, py, engine.Map.ACTOR)
 			if target then tgts[#tgts+1] = target end
 		end)
@@ -840,7 +887,7 @@ newEntity{ base = "BASE_AMULET",
 		end
 		print("Invoking guardian on", x, y)
 		game.logSeen(who, "%s taps %s %s, summoning a vampire thrall!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color=true}))
-		
+
 		-- No gear melee that forces things to attack it, we have to do some work to make this useful..
 		-- Worse, we need to be able to beat accuracy and ppower checks to land our talents, but scaling off our source on an item is bad for those
 		-- Better to let level handle most of the scaling then
@@ -899,7 +946,7 @@ newEntity{ base = "BASE_AMULET",
 		vampire:resolve(nil, true)
 		vampire:forceLevelup(who.level)
 		game.zone:addEntity(game.level, vampire, "actor", x, y)
-		vampire:setTarget(target) 
+		vampire:setTarget(target)
 		vampire:forceUseTalent(vampire.T_TAUNT, {ignore_energy=true})
 
 		if game.party:hasMember(who) then
@@ -912,7 +959,7 @@ newEntity{ base = "BASE_AMULET",
 			})
 		end
 		self.summoned_vampire = vampire
-		
+
 		game:playSoundNear(who, "talents/spell_generic")
 		return {id=true, used=true}
 	end,
@@ -994,13 +1041,15 @@ newEntity{ base = "BASE_SHIELD",
 		lifesteal = 8,
 	},
 	wielder = {
-		combat_armor = 4,
-		combat_def = 14,
-		combat_def_ranged = 14,
+		combat_armor = 15,
 		inc_stats = { [Stats.STAT_CON] = 10, },
 		fatigue = 19,
-		resists = { [DamageType.BLIGHT] = 25, },
+		resists = {
+		[DamageType.BLIGHT] = 25,
+		[DamageType.LIGHT] = 10,
+		},
 		life_regen = 5,
+		on_melee_hit = {[DamageType. DRAINLIFE] = 15},
 		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
 }
@@ -1054,7 +1103,7 @@ newEntity{ base = "BASE_GEM", define_as = "CRYSTAL_FOCUS",
 		alt_damage_type = 'ARCANE_SILENCE',
 		particle = 'manathrust',
 	},
-	
+
 	wielder = {
 		inc_stats = {[Stats.STAT_MAG] = 5 },
 		inc_damage = {[DamageType.ARCANE] = 20, [DamageType.BLIGHT] = 20 },
@@ -1101,7 +1150,7 @@ newEntity{ base = "BASE_GEM", define_as = "CRYSTAL_FOCUS",
 					if weapon then weapon.talent_on_hit = nil end
 					game.logPlayer(wearer, "#GOLD#The humming from the crystalline artifacts fades as they are separated.")
 				end,
-				resolvers.generic(function(o) 
+				resolvers.generic(function(o)
 					o.name = "Crystalline "..o.name:capitalize()
 					o.unique = o.name
 					o.desc = (o.desc or "") .." Transformed with the power of the Spellblaze."
@@ -1123,7 +1172,7 @@ newEntity{ base = "BASE_GEM", define_as = "CRYSTAL_FOCUS",
 							o.special_combat.block = o.special_combat.block * 1.25
 						end
 					end
-					
+
 					o.power = 1
 					o.max_power = 1
 					o.power_regen = 1
@@ -1167,7 +1216,7 @@ newEntity{ base = "BASE_GEM", define_as = "CRYSTAL_FOCUS",
 
 			who:sortInven()
 			who.changed = true
-			
+
 			game.logPlayer(who, "You fix the crystal on the %s and create the %s.", oldname, o:getName{do_color=true})
 		end)
 	end,
@@ -1192,7 +1241,7 @@ newEntity{ base = "BASE_GEM", define_as = "CRYSTAL_HEART",
 		alt_damage_type = 'ARCANE_SILENCE',
 		particle = 'manathrust',
 	},
-	
+
 	wielder = {
 		inc_stats = {[Stats.STAT_CON] = 5 },
 		resists = {[DamageType.ARCANE] = 20, [DamageType.BLIGHT] = 20 },
@@ -1242,7 +1291,7 @@ newEntity{ base = "BASE_GEM", define_as = "CRYSTAL_HEART",
 					o.wielder.combat_def = ((o.wielder.combat_def or 0) + 2) * 1.7
 					-- Same for armour. Yay crap cloth!
 					o.wielder.combat_armor = ((o.wielder.combat_armor or 0) + 3) * 1.7
-					
+
 					o.power = 1
 					o.max_power = 1
 					o.power_regen = 1
@@ -1379,9 +1428,9 @@ newEntity{ base = "BASE_DIGGER",
 	material_level = 1,
 	digspeed = 12,
 	wielder = {
-		inc_damage = { [DamageType.BLIGHT] = 4 },
-		on_melee_hit = {[DamageType.BLIGHT] = 15},
-		combat_apr = 5,
+		inc_damage = { [DamageType.BLIGHT] = 5 },
+		on_melee_hit = {[DamageType. DRAINLIFE] = 10},
+		combat_apr = 15,
 	},
 }
 
@@ -1582,7 +1631,7 @@ It has been kept somewhat intact with layers of salt and clay, but in spite of t
 		end
 		--Escape stuns/dazes/pins
 		self:regenPower()
-		
+
 		if not self.worn_by then return end
 		if game.level and not game.level:hasEntity(self.worn_by) and not self.worn_by.player then self.worn_by = nil return end
 		if self.worn_by:attr("dead") then return end
@@ -1620,9 +1669,9 @@ It has been kept somewhat intact with layers of salt and clay, but in spite of t
 		if who.descriptor and who.descriptor.race == "Halfling" then
 			local Stats = require "engine.interface.ActorStats"
 			self:specialWearAdd({"wielder","inc_stats"}, { [Stats.STAT_LCK] = -10}) -- Overcomes the +5 Bonus and adds a -5 penalty
-			self:specialWearAdd({"wielder","combat_physresist"}, -5)
-			self:specialWearAdd({"wielder","combat_mentalresist"}, -5)
-			self:specialWearAdd({"wielder","combat_spellresist"}, -5)
+			self:specialWearAdd({"wielder","combat_physresist"}, -10)
+			self:specialWearAdd({"wielder","combat_mentalresist"}, -10)
+			self:specialWearAdd({"wielder","combat_spellresist"}, -10)
 			game.logPlayer(who, "#LIGHT_RED#You feel uneasy carrying %s.", self:getName())
 		end
 	end,

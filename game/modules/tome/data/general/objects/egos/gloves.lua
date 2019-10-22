@@ -420,7 +420,7 @@ newEntity{
 newEntity{
 	power_source = {antimagic=true},
 	name = " of the verdant", suffix=true, instant_resolve=true,
-	keywords = {verdant_avenger=true},
+	keywords = {verdant=true},
 	level_range = {30, 50},
 	greater_ego = 1,
 	rarity = 40,
@@ -454,12 +454,10 @@ newEntity{
 	wielder = {
 		combat_spellresist = resolvers.mbonus_material(15, 8),
 		on_melee_hit = {
-			[DamageType.ITEM_ANTIMAGIC_SCOURING] = resolvers.mbonus_material(20, 15), 
 			[DamageType.ITEM_ANTIMAGIC_MANABURN] = resolvers.mbonus_material(20, 15),
 		},
 		combat = {
 			melee_project={
-				[DamageType.ITEM_ANTIMAGIC_SCOURING] = resolvers.mbonus_material(20, 15),
 				[DamageType.ITEM_ANTIMAGIC_MANABURN] = resolvers.mbonus_material(20, 15),
 			},
 		},

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -391,6 +391,7 @@ Items in the chest will not encumber you.]],
 	use_power = { name = "transmogrify all the items in your chest at once (also done automatically when you change level)", power = 0,
 		no_npc_use = true,
 		use = function(self, who)
+			if not who.player then return {id=true, used=false} end
 			local inven = who:getInven("INVEN")
 			local nb = 0
 			for i = #inven, 1, -1 do

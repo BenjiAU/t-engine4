@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -73,12 +73,12 @@ newBirthDescriptor{
 	power_source = {technique=true, arcane=true},
 	stats = { mag=4, str=5, },
 	talents_types = {
-		["technique/shield-offense"]={true, 0.1},
-		["technique/2hweapon-assault"]={true, 0.1},
-		["technique/combat-techniques-active"]={false, 0.1},
-		["technique/combat-techniques-passive"]={true, 0.1},
-		["technique/combat-training"]={true, 0.1},
-		["cunning/survival"]={false, 0.1},
+		["technique/shield-offense"]={true, 0.0},
+		["technique/2hweapon-assault"]={true, 0.0},
+		["technique/combat-techniques-active"]={false, 0.0},
+		["technique/combat-training"]={true, 0.0},
+		["cunning/survival"]={false, 0.0},
+		["technique/combat-techniques-passive"]={true, 0.0},
 		["celestial/sun"]={true, 0.3},
 		["celestial/chants"]={true, 0.3},
 		["celestial/combat"]={true, 0.3},
@@ -148,7 +148,7 @@ newBirthDescriptor{
 	power_source = {arcane=true},
 	stats = { mag=6, cun=3, },
 	talents_types = {
-		["cunning/survival"]={false, 0.1},
+		["cunning/survival"]={false, 0.0},
 		["celestial/sunlight"]={true, 0.3},
 		["celestial/chants"]={true, 0.3},
 		["celestial/glyphs"]={false, 0.3},

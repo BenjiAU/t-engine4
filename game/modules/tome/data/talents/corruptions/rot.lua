@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ carrionworm = function(self, target, duration, x, y)
 			desc = [[A worm spawned from a damaged horror.  Destroying it may have consequences.]],
 			autolevel = "none",
 			ai = "summoned", ai_real = "tactical",
-			ai_state = { ai_move="move_complex", talent_in=1, ally_compassion=10 },
+			ai_state = { ai_move="move_complex", talent_in=1, ally_compassion=10, ai_target="target_closest", },
 			ai_tactic = resolvers.tactic"melee",
 			stats = { str=10, dex=15, mag=3, con=3 },
 			level_range = {1, self.level}, exp_worth = 0,
@@ -236,8 +236,8 @@ newTalent{
 	getVim = function(self, t) return 8 + math.floor(self:combatTalentScale(t, 5, 35)) end,
 	getDam = function(self, t) return self:combatTalentLimit(t, 1, 20, 5) end,
 	tactical = {HEAL = 0.5},  -- Only use the healing functionality of this since in practice thats almost always optimal, but use it rarely so we don't waste time hopping around a lot as a melee
-	target = function(self, t)
-		return {type="hit", range=self:getTalentRange(t)}
+	target = function(self, t) -- no change to default_target because worms will usually be in melee with an enemy
+		return {type="hit", nolock=true, range=self:getTalentRange(t)}
 	end,
 	onAIGetTarget = function(self, t) -- Find a worm to target
 		local tgts = {}

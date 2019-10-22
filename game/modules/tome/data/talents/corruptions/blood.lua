@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -139,7 +139,7 @@ newTalent{
 	mode = "sustained",
 	require = corrs_req4,
 	points = 5,
-	sustain_vim = 60,
+	sustain_vim = 30,
 	cooldown = 30,
 	tactical = { BUFF = 2 },
 	on_crit = function(self, t)

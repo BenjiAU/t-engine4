@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ uberTalent = function(t)
 	t.type = {"uber/strength", 1}
 	t.uber = true
 	t.require = t.require or {}
-	t.require.level = 30
+	t.require.level = 25
 	t.require.stat = t.require.stat or {}
 	t.require.stat.str = 50
 	t.ai_level = function(self, t) return self:getStr()/10 end
@@ -52,7 +52,7 @@ uberTalent = function(t)
 	t.uber = true
 	t.require = t.require or {}
 	t.require.stat = t.require.stat or {}
-	t.require.level = 30
+	t.require.level = 25
 	t.require.stat.dex = 50
 	t.ai_level = function(self, t) return self:getDex()/10 end
 	newTalent(t)
@@ -64,7 +64,7 @@ uberTalent = function(t)
 	t.uber = true
 	t.require = t.require or {}
 	t.require.stat = t.require.stat or {}
-	t.require.level = 30
+	t.require.level = 25
 	t.require.stat.con = 50
 	t.ai_level = function(self, t) return self:getCon()/10 end
 	newTalent(t)
@@ -76,7 +76,7 @@ uberTalent = function(t)
 	t.uber = true
 	t.require = t.require or {}
 	t.require.stat = t.require.stat or {}
-	t.require.level = 30
+	t.require.level = 25
 	t.require.stat.mag = 50
 	t.ai_level = function(self, t) return self:getMag()/10 end
 	newTalent(t)
@@ -87,7 +87,7 @@ uberTalent = function(t)
 	t.type = {"uber/willpower", 1}
 	t.uber = true
 	t.require = t.require or {}
-	t.require.level = 30
+	t.require.level = 25
 	t.require.stat = t.require.stat or {}
 	t.require.stat.wil = 50
 	t.ai_level = function(self, t) return self:getWil()/10 end
@@ -99,7 +99,7 @@ uberTalent = function(t)
 	t.type = {"uber/cunning", 1}
 	t.uber = true
 	t.require = t.require or {}
-	t.require.level = 30
+	t.require.level = 25
 	t.require.stat = t.require.stat or {}
 	t.require.stat.cun = 50
 	t.ai_level = function(self, t) return self:getCun()/10 end

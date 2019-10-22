@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -1807,14 +1807,16 @@ newTalent{
 		local terrains = t.terrains or mod.class.Grid:loadList("/data/general/grids/lava.lua")
 		t.terrains = terrains -- cache
 
-		local meteor = function(src, x, y, dam)
-			game.level.map:particleEmitter(x, y, 10, "meteor", {x=x, y=y}).on_remove = function(self)
+		local meteor = function(src, x, y, dam, radius)
+			game.level.map:particleEmitter(x, y, 10, "meteor", {x=x, y=y, dam=dam, radius=radius}).on_remove = function(self)
 				local x, y = self.args.x, self.args.y
-				game.level.map:particleEmitter(x, y, 10, "fireflash", {radius=tg.radius})
+				local dam = self.args.dam
+				local radius = self.args.radius
+				game.level.map:particleEmitter(x, y, 10, "fireflash", {radius=radius})
 				game:playSoundNear(game.player, "talents/fireflash")
 
 				local grids = {}
-				for i = x-tg.radius, x+tg.radius do for j = y-tg.radius, y+tg.radius do
+				for i = x-radius, x+radius do for j = y-radius, y+radius do
 					local oe = game.level.map(i, j, engine.Map.TERRAIN)
 					if oe and not oe:attr("temporary") and
 					(core.fov.distance(x, y, i, j) < 1 or rng.percent(40)) and (game.level.map:checkEntity(i, j, engine.Map.TERRAIN, "dig") or game.level.map:checkEntity(i, j, engine.Map.TERRAIN, "grow")) then
@@ -1824,7 +1826,7 @@ newTalent{
 						grids[#grids+1] = {x=i,y=j,oe=oe}
 					end
 				end end
-				for i = x-tg.radius, x+tg.radius do for j = y-tg.radius, y+tg.radius do
+				for i = x-radius, x+radius do for j = y-radius, y+radius do
 					game.nicer_tiles:updateAround(game.level, i, j)
 				end end
 				for _, spot in ipairs(grids) do
@@ -1848,9 +1850,9 @@ newTalent{
 					game.level:addEntity(g)
 				end
 
-				src:project({type="ball", radius=tg.radius}, x, y, engine.DamageType.FIRE, dam/2)
-				src:project({type="ball", radius=tg.radius}, x, y, engine.DamageType.PHYSICAL, dam/2)
-				src:project({type="ball", radius=tg.radius}, x, y, function(px, py)
+				src:project({type="ball", radius=radius}, x, y, engine.DamageType.FIRE, dam/2)
+				src:project({type="ball", radius=radius}, x, y, engine.DamageType.PHYSICAL, dam/2)
+				src:project({type="ball", radius=radius}, x, y, function(px, py)
 					local target = game.level.map(px, py, engine.Map.ACTOR)
 					if target then
 						if target:canBe("stun") then
@@ -1860,13 +1862,13 @@ newTalent{
 						end
 					end
 				end)
-				if core.shader.allow("distort") then game.level.map:particleEmitter(x, y, tg.radius, "shockwave", {radius=tg.radius}) end
+				if core.shader.allow("distort") then game.level.map:particleEmitter(x, y, radius, "shockwave", {radius=radius}) end
 				game:getPlayer(true):attr("meteoric_crash", 1)
 			end
 		end
 
 		local dam = self:spellCrit(getAnomalyDamage(self, t))
-		meteor(self, x, y, dam)
+		meteor(self, x, y, dam, tg.radius)
 
 		return true
 	end,

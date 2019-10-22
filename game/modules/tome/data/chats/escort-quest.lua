@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -95,11 +95,13 @@ local reward_types = {
 	survival = {
 		types = {
 			["cunning/survival"] = 1.0,
+			["cunning/scoundrel"] = 1.0,
 		},
 		talents = {
 			[Talents.T_HEIGHTENED_SENSES] = 1,
-			[Talents.T_DEVICE_MASTERY] = 1,
 			[Talents.T_TRACK] = 1,
+			[Talents.T_LACERATING_STRIKES] = 1,
+			[Talents.T_MISDIRECTION] = 1,
 		},
 		stats = {
 			[Stats.STAT_DEX] = 5,
@@ -210,6 +212,7 @@ local hd = {"Quest:escort:reward", reward_types=reward_types}
 if require("engine.class"):triggerHook(hd) then reward_types = hd.reward_types end
 
 local reward = reward_types[npc.reward_type]
+if not reward then reward = reward_types.warrior end
 local quest = game.player:hasQuest(npc.quest_id)
 if quest.to_zigur and reward.antimagic then reward = reward.antimagic reward.is_antimagic = true end
 

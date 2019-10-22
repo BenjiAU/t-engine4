@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -658,7 +658,7 @@ newEntity{
 	display = '2', color=colors.UMBER,
 	store = {
 		purse = 25,
-		nb_fill = 20,
+		nb_fill = 2,
 		sell_percent = 300,
 		empty_before_restock = false,
 		minimum_level = 10,
@@ -828,9 +828,10 @@ newEntity{
 		sell_percent = 300,
 		minimum_level = 10,
 		filters = {
-			{type="weapon", subtype="sling", id=true, tome_drops="store"},
-			{type="weapon", subtype="longbow", id=true, tome_drops="store"},
-			{type="ammo", id=true, tome_drops="store"},
+			{type="weapon", subtype="staff", id=true, tome_drops="store"},
+			{type="weapon", subtype="staff", id=true, tome_drops="store"},
+			{type="weapon", subtype="staff", id=true, tome_drops="store"},
+			{type="charm", subtype="wand", id=true, tome_drops="store"},
 		},
 		post_filter = function(e)
 			if e.greater_ego and e.greater_ego > 1 then return true else return false end

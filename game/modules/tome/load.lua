@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ WorldAchievements:loadDefinition("/data/achievements/")
 PartyLore:loadDefinition("/data/lore/lore.lua")
 
 -- Useful keybinds
-KeyBind:load("move,hotkeys,inventory,actions,interface,tome,debug")
+KeyBind:load("move,hotkeys,inventory,actions,interface,tome,debug,mtxn")
 
 -- Additional entities resolvers
 dofile("/mod/resolvers.lua")
@@ -309,7 +309,7 @@ end
 ------------------------------------------------------------------------
 -- This updates talent and resource definitions to work with data for some AI functions
 -- use mod.class.interface.ActorAI.aiParseTalent(t) to parse any new talents defined later 
-mod.class.interface.ActorAI.AI_InitializeData()
+require("mod.class.interface.ActorAI").AI_InitializeData()
 engine.interface.ActorTalents.aiParseTalent = mod.class.interface.ActorAI.aiParseTalent
 print("[Tome:load] Updated AI tactics list:")
 --table.print(mod.class.interface.ActorAI.AI_TACTICS_BENEFIT)

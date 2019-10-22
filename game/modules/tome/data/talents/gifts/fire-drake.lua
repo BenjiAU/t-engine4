@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -51,13 +51,13 @@ newTalent{
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
 		local state = {}
+		local shield, shield_combat = self:hasShield()
+		local weapon = self:hasMHWeapon() and self:hasMHWeapon().combat or self.combat
 		self:project(tg, x, y, function(px, py, tg, self)
 			local target = game.level.map(px, py, Map.ACTOR)
 			if target and target ~= self and not state[target] then				
 				-- We need to alter behavior slightly to accomodate shields since they aren't used in attackTarget
 				state[target] = true
-				local shield, shield_combat = self:hasShield()
-				local weapon = self:hasMHWeapon().combat
 				if not shield then
 					self:attackTarget(target, DamageType.PHYSKNOCKBACK, t.getDamage(self, t), true)
 				else
@@ -199,8 +199,8 @@ newTalent{
 		return {type="cone", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=false, talent=t}
 	end,
 	getDamage = function(self, t)
-		local bonus = self:knowTalent(self.T_CHROMATIC_FURY) and self:combatTalentStatDamage(t, "wil", 30, 850) or 0
-		return self:combatTalentStatDamage(t, "str", 30, 850) + bonus
+		local bonus = self:knowTalent(self.T_CHROMATIC_FURY) and self:combatTalentStatDamage(t, "wil", 30, 650) or 0
+		return self:combatTalentStatDamage(t, "str", 30, 650) + bonus
 	end,  -- Higher damage because no debuff and delayed
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)

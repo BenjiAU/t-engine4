@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ newTalent{
 		-- Add a lasting map effect
 		local eff = game.level.map:addEffect(self,
 			x, y, t.getDuration(self, t), -- duration
-			engine.DamageType.ACID_BLIND, t.getDamage(self, t),
+			engine.DamageType.ACID_BLIND, self:mindCrit(t.getDamage(self, t)),
 			self:getTalentRadius(t), -- radius
 			5, nil,
 			{type="vapour"},
@@ -196,7 +196,7 @@ newTalent{
 		-- Add a lasting map effect
 		local eff = game.level.map:addEffect(self,
 			self.x, self.y, 7,
-			DamageType.NATURE, t.getDamage(self, t),
+			DamageType.NATURE, self:mindCrit(t.getDamage(self, t)),
 			t.radius(self, t),
 			5, nil,
 			{type="generic_vortex", args = {radius = t.radius(self, t), rm = 5, rM=55, gm=250, gM=255, bm = 180, bM=255, am= 35, aM=90, density = 100}, only_one=true },

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -154,7 +154,7 @@ newTalent{
 			return {type="ball", nolock=true, pass_terrain=true, nowarning=true, range=20, radius=20, requires_knowledge=false, selffire=false, block_path=false, block_radius=false}
 		else -- always hit the primary target
 			local tgt = self.ai_target.actor
-			if tgt then return {type="hit", range=self:getTalentRange(t), talent=t, x=tgt.x, y=tgt.y} end
+			return {type="hit", range=self:getTalentRange(t), talent=t, x=tgt and tgt.x, y=tgt and tgt.y}
 		end
 	end,
 	range = 5,
@@ -165,8 +165,6 @@ newTalent{
 		local p = self:isTalentActive(t.id)
 		if not p then return end
 		p.drain_add = (p.drain_add or 0) + 1
-		self:removeTemporaryValue("vim_regen", p.vim_drain)
-		p.vim_drain = self:addTemporaryValue("vim_regen", -p.drain_add)
 	end,
 	activate = function(self, t)
 		if game.zone.is_demon_plane then
@@ -279,7 +277,6 @@ newTalent{
 		if not self.on_die then return true end
 		
 		if p.particle then self:removeParticles(p.particle) end
-		self:removeTemporaryValue("vim_regen", p.vim_drain)
 
 		game:onTickEnd(function()
 			-- Collect objects

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -161,6 +161,9 @@ newEntity{ base = "BASE_NPC_TROLL", unique=true,
 	on_added_to_level = function(self)
 		self.inc_damage={[engine.DamageType.FIRE]=math.min(self.level*2,50),}
 	end,
+
+	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
+	low_level_tactics_override = {escape=0, safe_range=1},
 	
 	resolvers.talents{
 		[Talents.T_SHIELDING]={base=1, every=5, max=5},

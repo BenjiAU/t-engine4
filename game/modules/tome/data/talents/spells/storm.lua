@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -58,10 +58,13 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		local dam = damDesc(self, DamageType.LIGHTNING, t.getDamage(self, t))
+		local damage = t.getDamage(self, t)
 		local radius = self:getTalentRadius(t)
-		return ([[Lightning emanates from you in a circular wave with radius %d, doing %0.2f to %0.2f lightning damage and possibly dazing anyone affected (75%% chance).
-		The damage will increase with your Spellpower.]]):format(radius, dam / 3, dam)
+		return ([[Lightning emanates from you in a circular wave with radius %d, doing %0.2f to %0.2f lightning damage (%0.2f average) and possibly dazing anyone affected (75%% chance).
+		The damage will increase with your Spellpower.]]):format(radius,
+		damDesc(self, DamageType.LIGHTNING, damage / 3),
+		damDesc(self, DamageType.LIGHTNING, damage),
+		damDesc(self, DamageType.LIGHTNING, (damage + damage / 3) / 2))
 	end,
 }
 
@@ -88,10 +91,12 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
-		return ([[Conjures up a bolt of lightning, doing %0.2f to %0.2f lightning damage and dazing the target for 3 turns.
+		return ([[Conjures up a bolt of lightning, doing %0.2f to %0.2f damage (%0.2f average) and dazing the target for 3 turns.
 		If the target resists the daze effect it is instead shocked, which halves stun/daze/pin resistance, for 5 turns.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHTNING, damage/3), damDesc(self, DamageType.LIGHTNING, damage))
+		format(damDesc(self, DamageType.LIGHTNING, damage / 3),
+		damDesc(self, DamageType.LIGHTNING, damage),
+		damDesc(self, DamageType.LIGHTNING, (damage + damage / 3) / 2))
 	end,
 }
 
@@ -114,6 +119,7 @@ newTalent{
 			return radius
 		end,
 	do_hurricane = function(self, t, target)
+		if not self:isTalentActive(t.id) then return end
 		if target.dead then return end
 		if not rng.percent(t.getChance(self, t)) then return end
 
@@ -131,8 +137,11 @@ newTalent{
 		local chance = t.getChance(self, t)
 		local radius = t.getRadius(self, t)
 		return ([[Each time one of your lightning spells dazes a target, it has a %d%% chance to creates a chain reaction that summons a mighty Hurricane that lasts for 10 turns around the target with a radius of %d.
-		Each turn, the afflicted creature and all creatures around it will take %0.2f to %0.2f lightning damage.
-		The damage will increase with your Spellpower.]]):format(chance, radius, damage / 3, damage)
+		Each turn, the afflicted creature and all creatures around it will take %0.2f to %0.2f lightning damage (%0.2f average).
+		The damage will increase with your Spellpower.]]):format(chance, radius,
+		damDesc(self, DamageType.LIGHTNING, damage / 3),
+		damDesc(self, DamageType.LIGHTNING, damage),
+		damDesc(self, DamageType.LIGHTNING, (damage + damage / 3) / 2))
 	end,
 }
 

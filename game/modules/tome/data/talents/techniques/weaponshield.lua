@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -82,6 +82,9 @@ newTalent{
 	getCritInc = function(self, t)
 		return self:combatTalentIntervalDamage(t, "dex", 10, 50)
 	end,
+	passives = function(self, t, p)
+		self:talentTemporaryValue(p, "allow_incomplete_blocks", 1)
+	end,
 	info = function(self, t)
 		local inc = t.getDurInc(self, t)
 		return ([[Improves your ability to perform counterstrikes after blocks in the following ways:
@@ -148,11 +151,12 @@ newTalent{
 	is_special_melee = true,
 	range = 1,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
-	on_pre_use = function(self, t, silent) if not self:hasShield() then if not silent then game.logPlayer(self, "You require a weapon and a shield to use this talent.") end return false end return true end,
+	on_pre_use = function(self, t, silent) if not (self:hasShield() and self:hasMHWeapon() ) then if not silent then game.logPlayer(self, "You require a weapon and a shield to use this talent.") end return false end return true end,
 	action = function(self, t)
 		local shield, shield_combat = self:hasShield()
-		if not shield then
-			game.logPlayer(self, "You cannot use Assault without a shield!")
+		local weapon = self:hasMHWeapon() and self:hasMHWeapon().combat
+		if not shield or not weapon then
+			game.logPlayer(self, "You cannot use Assault without a mainhand weapon and shield!")
 			return nil
 		end
 
@@ -166,7 +170,6 @@ newTalent{
 		-- Second & third attack with weapon
 		if hit then
 			self.turn_procs.auto_phys_crit = true
-			local weapon = self:hasMHWeapon().combat
 			self:attackTargetWith(target, weapon, nil, self:combatTalentWeaponDamage(t, 0.8, 1.3))
 			self:attackTargetWith(target, weapon, nil, self:combatTalentWeaponDamage(t, 0.8, 1.3))
 			self.turn_procs.auto_phys_crit = nil
@@ -262,7 +265,7 @@ newTalent{
 		local tg = self:getTalentTarget(t)
 		self:project(tg, self.x, self.y, function(px, py, tg, self)
 			local target = game.level.map(px, py, Map.ACTOR)
-			if target then
+			if target and self:reactionToward(target) < 0 then
 				local damage = t.getShieldDamage(self, t)
 				local speed, hit = self:attackTargetWith(target, shield_combat, nil, damage)
 				if hit and self:getTalentFromId(game.player.T_RUSH) then self.talents_cd["T_RUSH"] = nil end
@@ -311,8 +314,16 @@ newTalent{
 	cooldown = 8,
 	sustain_stamina = 30,
 	tactical = { DEFEND = 3 },
-	callbackOnRest = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
-	callbackOnRun = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
+	callbackOnRest = function(self, t)  -- Make sure we've actually started resting/running before disabling the sustain
+		if self.resting.cnt and self.resting.cnt <= 0 then return true end
+		self:forceUseTalent(t.id, {ignore_energy=true}) 
+		return true
+	end,
+	callbackOnRun = function(self, t)
+		if self.running.cnt and self.running.cnt <= 0 then return true end
+		self:forceUseTalent(t.id, {ignore_energy=true})
+		return true
+	end,
 	no_npc_use = true,
 	no_energy = true,
 	on_pre_use = function(self, t, silent) if not self:hasShield() then if not silent then game.logPlayer(self, "You require a weapon and a shield to use this talent.") end return false end return true end,

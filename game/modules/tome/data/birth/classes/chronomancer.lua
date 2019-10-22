@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ newBirthDescriptor{
 
 		-- locked generic
 		["chronomancy/energy"]={false, 0.3},
-		["cunning/survival"]={false, 0},	
+		["cunning/survival"]={false, 0.0},	
 	},
 	talents = {
 		[ActorTalents.T_TEMPORAL_BOLT] = 1,
@@ -187,7 +187,7 @@ newBirthDescriptor{
 		["chronomancy/temporal-combat"]={true, 0.3},
 		
 		-- class locked
-		["chronomancy/stasis"]={false, 0.1},
+		["chronomancy/stasis"]={false, 0.0},
 		["chronomancy/threaded-combat"]={false, 0.3},
 		["chronomancy/temporal-hounds"]={false, 0.3},
 		
@@ -197,7 +197,7 @@ newBirthDescriptor{
 		["chronomancy/spacetime-weaving"]={true, 0.3},
 		
 		-- generic locked
-		["chronomancy/fate-weaving"]={false, 0.1},
+		["chronomancy/fate-weaving"]={false, 0.0},
 		["cunning/survival"]={false, 0},
 	},
 	talents = {

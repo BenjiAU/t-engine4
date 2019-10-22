@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ newTalent{
 	points = 5,
 	require = {
 		stat = { dex=function(level) return 12 + (level-1) * 2 end },
-		level = function(level) return 0 + (level-1) * 8  end,
+		level = function(level) return 0 + (level-1) * 4  end,
 	},
 	on_learn = function(self, t)
 		venomous_throw_check(self)

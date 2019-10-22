@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -142,7 +142,7 @@ function setupSummon(self, m, x, y, no_control)
 	m:attr("confusion_immune", self:attr("confusion_immune"))
 	m:attr("numbed", self:attr("numbed"))
 	if game.party:hasMember(self) then
-		local can_control = not no_control and self:knowTalent(self.T_SUMMON_CONTROL)
+
 
 		m.remove_from_party_on_death = true
 		game.party:addMember(m, {
@@ -150,14 +150,6 @@ function setupSummon(self, m, x, y, no_control)
 			type="summon",
 			title="Summon",
 			orders = {target=true, leash=true, anchor=true, talents=true},
-			on_control = function(self)
-				local summoner = self.summoner
-				self:setEffect(self.EFF_SUMMON_CONTROL, 1000, {incdur=summoner:callTalent(summoner.T_SUMMON_CONTROL, "lifetime"), res=summoner:callTalent(summoner.T_SUMMON_CONTROL, "DamReduc")})
-				self:hotkeyAutoTalents()
-			end,
-			on_uncontrol = function(self)
-				self:removeEffect(self.EFF_SUMMON_CONTROL)
-			end,
 		})
 	end
 	m:resolve() m:resolve(nil, true)
@@ -170,7 +162,7 @@ function setupSummon(self, m, x, y, no_control)
 	m.ai_tactic.escape = 0
 
 	local p = self:hasEffect(self.EFF_FRANTIC_SUMMONING)
-	if p then
+	if p and m.wild_gift_summon and not m.wild_gift_summon_ignore_cap then
 		p.dur = p.dur - 1
 		if p.dur <= 0 then self:removeEffect(self.EFF_FRANTIC_SUMMONING) end
 	end
@@ -184,7 +176,7 @@ function setupSummon(self, m, x, y, no_control)
 
 	if m.wild_gift_detonate and self:isTalentActive(self.T_MASTER_SUMMONER) and self:knowTalent(self.T_NATURE_CYCLE) then
 		local t = self:getTalentFromId(self.T_NATURE_CYCLE)
-		for _, tid in ipairs{self.T_RAGE, self.T_DETONATE, self.T_WILD_SUMMON} do
+		for _, tid in ipairs{self.T_SUMMON_CONTROL, self.T_DETONATE, self.T_WILD_SUMMON} do
 			if self.talents_cd[tid] and rng.percent(t.getChance(self, t)) then
 				self.talents_cd[tid] = self.talents_cd[tid] - t.getReduction(self, t)
 				if self.talents_cd[tid] <= 0 then self.talents_cd[tid] = nil end
@@ -193,9 +185,6 @@ function setupSummon(self, m, x, y, no_control)
 		end
 	end
 
-	if self:knowTalent(self.T_BLIGHTED_SUMMONING) then m:incIncStat("mag", self:getMag()) m:incVim(m:getMaxVim()) end
-
-	self:attr("summoned_times", 1)
 end
 
 load("/data/talents/gifts/call.lua")

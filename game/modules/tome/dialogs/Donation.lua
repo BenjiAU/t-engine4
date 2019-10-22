@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ local Savefile = require "engine.Savefile"
 local Map = require "engine.Map"
 
 module(..., package.seeall, class.inherit(Dialog))
+
+_M.force_ui_inside = "microtxn"
 
 function _M:init(source)
 	self.donation_source = source or "ingame"

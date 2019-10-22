@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -377,7 +377,7 @@ newTalent{
 	radius = 1,
 	requires_target = true,
 	target = function(self, t)
-		return  {type="beam", range=self:getTalentRange(t), talent=t }
+		return  {type="beam", nolock=true, default_target=self, range=self:getTalentRange(t), talent=t }
 	end,
 	getDamage = function (self, t) return self:combatTalentWeaponDamage(t, 0.6, 1.1) end,
 	proj_speed = 20, --not really a projectile, so make this super fast
@@ -392,6 +392,8 @@ newTalent{
 		return true 
 	end,
 	action = function(self, t)
+		local mh, oh = self:hasDualWeapon()
+		if not (mh and oh) then return end
 		local tg = self:getTalentTarget(t)
 		local x, y, target = self:getTarget(tg)
 		if not (x and y) then return nil end
@@ -420,35 +422,26 @@ newTalent{
 		end
 
 		game.logSeen(self, "%s becomes a whirlwind of weapons!", self.name:capitalize())
-		-- Create a high-speed projectile tracing a path to the destination that does the actual damage
-		local wwproj = self:projectile(tg, mx, my, function(px, py, tg, self, tmp_proj)
+
+		local seen_targets = {}
+		for px, py in core.fov.lineIterator(self.x, self.y, mx, my, "block_NOTHINGLOL") do
 			local aoe = {type="ball", radius=1, friendlyfire=false, selffire=false, talent=t, display={ } }
-			self.__project_source = nil
 			game.level.map:particleEmitter(px, py, 1, "meleestorm", {img="spinningwinds_red"})
 			self:project(aoe, px, py, function(tx, ty)
 				local target = game.level.map(tx, ty, engine.Map.ACTOR)
-				if not target or tmp_proj[target] or self.dead then return end
-				local mh, oh = self:hasDualWeapon()
-				if not (mh and oh) then return end
+				if not target or seen_targets[target] or self.dead then return end
 				local dam = 0
-				tmp_proj.targets = (tmp_proj.targets or 0) + 1
-				tmp_proj[target] = true
-				local s, h, d = self:attackTargetWith(target, mh.combat, nil, tmp_proj.weapon_mult)
+				seen_targets[target] = true
+				local s, h, d = self:attackTargetWith(target, mh.combat, nil, t.getDamage(self, t))
 				if h and d > 0 then dam = dam + d end
-				--print("\t WW mainhand damage", d)
-				s, h, d = self:attackTargetWith(target, oh.combat, nil, tmp_proj.weapon_mult)
+				s, h, d = self:attackTargetWith(target, oh.combat, nil, t.getDamage(self, t))
 				if h and d > 0 then dam = dam + d end
-				--print("\t WW offhand damage", d)
 				if dam > 0 and target:canBe('cut') then
 					target:setEffect(target.EFF_CUT, 5, {power=dam*0.1, src=self, apply_power=self:combatPhysicalpower(), no_ct_effect=true})
 				end
 			end)
-			
 		end
-		)
-		wwproj.tmp_proj.weapon_mult = t.getDamage(self, t)
-		wwproj.energy.value = game.energy_to_act -- make sure projectile begins moving immediately
-		
+
 		-- move the talent user
 		self:move(mx, my, true)
 

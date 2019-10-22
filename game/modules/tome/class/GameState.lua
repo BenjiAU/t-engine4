@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -1586,7 +1586,8 @@ function _M:entityFilterPost(zone, level, type, e, filter)
 				post = function(b, data)
 					-- Drop
 					for i = 1, data.nb_rares do -- generate rares as weak (1 ego) randarts with more and stronger powers
-						local fil = {lev=lev, egos=1, greater_egos_bias = 0, power_points_factor = 3, nb_themes_add = 1, nb_powers_add = 2, forbid_power_source=b.not_power_source,
+						local bonus = 1.5 + lev / 25  -- Scale power point bonus with level to account for egos gaining a lot of power per level relative
+						local fil = {lev=lev, egos=1, greater_egos_bias = 0, power_points_factor = bonus, nb_themes_add = 1, nb_powers_add = 2, forbid_power_source=b.not_power_source,
 							base_filter = {no_tome_drops=true, ego_filter={keep_egos=true, ego_chance=-1000}, 
 							special=function(e)
 								return (not e.unique and e.randart_able) and (not e.material_level or e.material_level >= 1) and true or false
@@ -2471,11 +2472,11 @@ function _M:applyRandomClassNew(b, data, instant)
 			if data.descriptor_choices and data.descriptor_choices.subclass and data.descriptor_choices.subclass[class.name] then mclass = data break end
 		end
 		if not mclass then
-			print("[applyRandomClass] ### ABORTING ###", b.uid, b.name, "No main class type for", class.name)
+			print("[applyRandomClassNew] ### ABORTING ###", b.uid, b.name, "No main class type for", class.name)
 			return
 		end
 
-		print("[applyRandomClass]", b.uid, b.name, "Adding class", class.name, mclass.name, "level_rate", level_rate)
+		print("[applyRandomClassNew]", b.uid, b.name, "Adding class", class.name, mclass.name, "level_rate", level_rate)
 
 		-- Add starting equipment and update filters as needed
 		local apply_resolvers = function(k, resolver)
@@ -2574,7 +2575,7 @@ function _M:applyRandomClassNew(b, data, instant)
 	
 	-- apply random classes
 	local to_apply = data.nb_classes or 1.5 -- 1.5 is one primary class and one secondary class @ 50% stats/talents
-	print("[applyRandomClass] applying", to_apply, "classes at", data.level_rate, "%%")
+	print("[applyRandomClassNew] applying", to_apply, "classes at", data.level_rate, "%%")
 	while to_apply > 0 do
 		local c = rng.tableRemove(list)
 		if not c then break end --repeat attempts until list is exhausted

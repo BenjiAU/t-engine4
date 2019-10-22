@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ function _M:project(t, x, y, damtype, dam, particles)
 		or function(_, bx, by) return false end
 
 	l:set_corner_block(block_corner)
-	local lx, ly, blocked_corner_x, blocked_corner_y = l:step()
+	local lx, ly, blocked_corner_x, blocked_corner_y = l:step(typ.force_max_range)
 
 	-- Being completely blocked by the corner of an adjacent tile is annoying, so let's make it a special case and hit it instead
 	if blocked_corner_x and game.level.map:isBound(blocked_corner_x, blocked_corner_y) then
@@ -110,7 +110,8 @@ function _M:project(t, x, y, damtype, dam, particles)
 			end
 
 			if block then break end
-			lx, ly, is_corner_blocked = l:step()
+			lx, ly, is_corner_blocked = l:step(typ.force_max_range)
+			if typ.force_max_range and core.fov.distance(typ.start_x, typ.start_y, lx, ly) > typ.range then break end
 		end
 	end
 
@@ -128,6 +129,45 @@ function _M:project(t, x, y, damtype, dam, particles)
 			end,
 			function(_, px, py)
 				-- Deal damage: ball
+				addGrid(px, py)
+			end,
+		nil)
+		addGrid(stop_x, stop_y)
+	end
+
+	if typ.triangle then
+		single_target = false
+		core.fov.calc_triangle(
+			stop_radius_x,
+			stop_radius_y,
+			game.level.map.w,
+			game.level.map.h,
+			typ.triangle,
+			typ.triangle_mode or "center",
+			function(_, px, py)
+				if typ.block_radius and typ:block_radius(px, py) then return true end
+			end,
+			function(_, px, py)
+				-- Deal damage: ball
+				addGrid(px, py)
+			end
+		)
+	end
+
+	if typ.widebeam and typ.widebeam > 0 then
+		single_target = false
+		core.fov.calc_wide_beam(
+			stop_radius_x,
+			stop_radius_y,
+			game.level.map.w,
+			game.level.map.h,
+			typ.start_x,
+			typ.start_y,
+			typ.widebeam,
+			function(_, px, py)
+				if typ.block_radius and typ:block_radius(px, py) then return true end
+			end,
+			function(_, px, py)
 				addGrid(px, py)
 			end,
 		nil)
@@ -264,7 +304,7 @@ function _M:canProject(t, x, y)
 		or function(_, bx, by) return false end
 
 	l:set_corner_block(block_corner)
-	local lx, ly, blocked_corner_x, blocked_corner_y = l:step()
+	local lx, ly, blocked_corner_x, blocked_corner_y = l:step(typ.force_max_range)
 
 	-- Being completely blocked by the corner of an adjacent tile is annoying, so let's make it a special case and hit it instead
 	if blocked_corner_x then
@@ -288,7 +328,8 @@ function _M:canProject(t, x, y)
 			end
 
 			if block then break end
-			lx, ly, is_corner_blocked = l:step()
+			lx, ly, is_corner_blocked = l:step(typ.force_max_range)
+			if typ.force_max_range and core.fov.distance(typ.start_x, typ.start_y, lx, ly) > typ.range then break end
 		end
 	end
 
@@ -299,6 +340,44 @@ function _M:canProject(t, x, y)
 
 	local is_hit = stop_x == x and stop_y == y
 	return is_hit, stop_x, stop_y, stop_radius_x, stop_radius_y
+end
+
+function _M:projectCollect(t, x, y, kind, cond, tgts)
+	tgts = tgts or {}
+	self:project(t, x, y, function(px, py)
+		local tgt = game.level.map(px, py, kind)
+		if not tgt then return end
+		local ok = false
+		if kind == Map.ACTOR and type(cond) ~= "function" then
+			if cond == "hostile" and self:reactionToward(tgt) < 0 then ok = true
+			elseif cond == "friend" and self:reactionToward(tgt) > 0 then ok = true
+			elseif cond == nil then ok = true
+			end
+		else
+			if cond(tgt, px, py) then ok = true end
+		end
+		if ok then tgts[tgt] = {x=px, y=py, dist=core.fov.distance(self.x, self.y, px, py)} end
+	end)
+	return tgts
+end
+
+function _M:projectApply(t, x, y, kind, fct, cond)
+	tgts = tgts or {}
+	self:project(t, x, y, function(px, py)
+		local tgt = game.level.map(px, py, kind)
+		if not tgt then return end
+		local ok = false
+		if kind == Map.ACTOR and type(cond) ~= "function" then
+			if cond == "hostile" and self:reactionToward(tgt) < 0 then ok = true
+			elseif cond == "friend" and self:reactionToward(tgt) > 0 then ok = true
+			elseif cond == nil then ok = true
+			end
+		else
+			if not cond or cond(tgt, px, py) then ok = true end
+		end
+		if ok then fct(tgt, px, py) end
+	end)
+	return tgts
 end
 
 --- Calls :getTarget and :canProject to limit the results and returns the same as getTarget
@@ -474,6 +553,24 @@ function _M:projectDoStop(typ, tg, damtype, dam, particles, lx, ly, tmp, rx, ry,
 			end,
 		nil)
 		addGrid(rx, ry)
+	elseif typ.widebeam and typ.widebeam > 0 then
+		core.fov.calc_wide_beam(
+			rx,
+			ry,
+			game.level.map.w,
+			game.level.map.h,
+			typ.start_x,
+			typ.start_y,
+			typ.widebeam,
+			function(_, px, py)
+				if typ.block_radius and typ:block_radius(px, py) then return true end
+			end,
+			function(_, px, py)
+				-- Deal damage: cone
+				addGrid(px, py)
+			end,
+		nil)
+		addGrid(rx, ry)
 	elseif typ.wall and typ.wall > 0 then
 		core.fov.calc_wall(
 			rx,
@@ -494,6 +591,22 @@ function _M:projectDoStop(typ, tg, damtype, dam, particles, lx, ly, tmp, rx, ry,
 				addGrid(px, py)
 			end,
 		nil)
+	elseif typ.triangle then
+		core.fov.calc_triangle(
+			rx,
+			rx,
+			game.level.map.w,
+			game.level.map.h,
+			typ.triangle,
+			typ.triangle_mode or "center",
+			function(_, px, py)
+				if typ.block_radius and typ:block_radius(px, py) then return true end
+			end,
+			function(_, px, py)
+				-- Deal damage: ball
+				addGrid(px, py)
+			end
+		)
 	else
 		-- Deal damage: single
 		addGrid(lx, ly)

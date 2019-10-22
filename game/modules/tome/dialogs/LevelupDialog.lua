@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -180,7 +180,7 @@ local subtleMessageOtherColor = {r=255, g=215, b=0}
 
 function _M:finish()
 	local ok, dep_miss = self:checkDeps(true, true)
-	if not ok then
+	if not ok and not config.settings.cheat then
 		self:simpleLongPopup("Impossible", "You cannot learn this talent(s): "..dep_miss, game.w * 0.4)
 		return nil
 	end
@@ -341,6 +341,7 @@ function _M:checkDeps(simple, ignore_special)
 end
 
 function _M:isUnlearnable(t, limit)
+	if config.settings.cheat then return 9999 end
 	if not self.actor.last_learnt_talents then return end
 	if self.on_birth and self.actor:knowTalent(t.id) and not t.no_unlearn_last then return 1 end -- On birth we can reset any talents except a very few
 	local list = self.actor.last_learnt_talents[t.generic and "generic" or "class"]
@@ -349,7 +350,7 @@ function _M:isUnlearnable(t, limit)
 	if limit then min = math.max(1, #list - (max - 1)) end
 	for i = #list, min, -1 do
 		if list[i] == t.id then
-			if not game.state.birth.force_town_respec or (game.level and game.level.data and game.level.data.allow_respec == "limited") then
+			if not game.state.birth.force_town_respec or not self.in_combat or (game.level and game.level.data and game.level.data.allow_respec == "limited") then
 				return i
 			else
 				return nil, i
@@ -390,7 +391,7 @@ function _M:learnTalent(t_id, v)
 		if not self:isUnlearnable(t, true) and self.actor_dup:getTalentLevelRaw(t_id) >= self.actor:getTalentLevelRaw(t_id) then
 			local _, could = self:isUnlearnable(t, true)
 			if could then
-				self:subtleMessage("Impossible here", "You could unlearn this talent in a quiet place, like a #{bold}#town#{normal}#.", {r=200, g=200, b=255})
+				self:subtleMessage("Impossible here", "You must be out of combat or in a quiet place like a #{bold}#town#{normal}# to unlearn this talent.", {r=200, g=200, b=255})
 			else
 				self:subtleMessage("Impossible", "You cannot unlearn this talent!", subtleMessageErrorColor)
 			end
@@ -434,7 +435,7 @@ function _M:learnType(tt, v)
 			self.talent_types_learned[tt][1] = true
 		else
 			self.actor.__increased_talent_types[tt] = (self.actor.__increased_talent_types[tt] or 0) + 1
-			self.actor:setTalentTypeMastery(tt, self.actor:getTalentTypeMastery(tt) + 0.2)
+			self.actor:setTalentTypeMastery(tt, self.actor:getTalentTypeMastery(tt, true) + 0.2)
 			self.talent_types_learned[tt][2] = true
 		end
 		self:triggerHook{"PlayerLevelup:addTalentType", actor=self.actor, tt=tt}
@@ -456,7 +457,7 @@ function _M:learnType(tt, v)
 
 		if (self.actor.__increased_talent_types[tt] or 0) > 0 then
 			self.actor.__increased_talent_types[tt] = (self.actor.__increased_talent_types[tt] or 0) - 1
-			self.actor:setTalentTypeMastery(tt, self.actor:getTalentTypeMastery(tt) - 0.2)
+			self.actor:setTalentTypeMastery(tt, self.actor:getTalentTypeMastery(tt, true) - 0.2)
 			self.actor.unused_talents_types = self.actor.unused_talents_types + 1
 			self.new_talents_changed = true
 			self.talent_types_learned[tt][2] = nil
@@ -637,11 +638,11 @@ local desc_types = ([[Talent category points allow you to either:
 - improve a known talent category efficiency by 0.2
 - learn a new inscription slot (up to a maximum of 5, learning it is automatic when using an inscription)
 
-You gain a new point at level 10, 20 and 36.
+You gain a new point at level 10, 20 and 34.
 Some races or items may increase them as well.]]):toTString()
 
 local desc_prodigies = ([[Prodigies are special talents that only the most powerful of characters can attain.
-All of them require at least 50 in a core stat and many also have more special demands. You can learn a new prodigy at level 30 and 42.]]):toTString()
+All of them require at least 50 in a core stat and many also have more special demands. You can learn a new prodigy at level 25 and 42.]]):toTString()
 
 local desc_inscriptions = ([[You can use a category point to unlock a new inscription slot (up to 5 slots).]]):toTString()
 
@@ -947,12 +948,12 @@ function _M:getTalentDesc(item)
 		local unlearnable, could_unlearn = self:isUnlearnable(t, true)
 		if unlearnable then
 			local max = tostring(self.actor:lastLearntTalentsMax(t.generic and "generic" or "class"))
-			text:add({"color","LIGHT_BLUE"}, "This talent was recently learnt, you can still unlearn it.", true, "The last ", max, t.generic and " generic" or " class", " talents you learnt are always unlearnable.", {"color","LAST"}, true, true)
+			text:add({"color","LIGHT_BLUE"}, "This talent was recently learnt; you can still unlearn it.", true, "The last ", max, t.generic and " generic" or " class", " talents you learnt are always unlearnable.", {"color","LAST"}, true, true)
 		elseif t.no_unlearn_last then
-			text:add({"color","YELLOW"}, "This talent can alter the world in a permanent way, as such you can never unlearn it once known.", {"color","LAST"}, true, true)
+			text:add({"color","YELLOW"}, "This talent can alter the world in a permanent way; as such, you can never unlearn it once known.", {"color","LAST"}, true, true)
 		elseif could_unlearn then
 			local max = tostring(self.actor:lastLearntTalentsMax(t.generic and "generic" or "class"))
-			text:add({"color","LIGHT_BLUE"}, "This talent was recently learnt, you can still unlearn it if you are in a quiet area like a #{bold}#town#{normal}#.", true, "The last ", max, t.generic and " generic" or " class", " talents you learnt are always unlearnable.", {"color","LAST"}, true, true)
+			text:add({"color","LIGHT_BLUE"}, "This talent was recently learnt; you can still unlearn it if you are in a quiet area like a #{bold}#town#{normal}#.", true, "The last ", max, t.generic and " generic" or " class", " talents you learnt are always unlearnable.", {"color","LAST"}, true, true)
 		end
 
 		local traw = self.actor:getTalentLevelRaw(t.id)

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -118,10 +118,10 @@ newBirthDescriptor{
 	power_source = {technique=true, arcane=true},
 	stats = { dex=3, mag=3, cun=3, },
 	talents_types = {
-		["spell/phantasm"]={true, 0},
+		["spell/phantasm"]={true, 0.0},
 		["spell/temporal"]={false, 0.0},
-		["spell/divination"]={false, 0},
-		["spell/conveyance"]={true, 0},
+		["spell/divination"]={false, 0.0},
+		["spell/conveyance"]={true, 0.0},
 		["technique/dualweapon-attack"]={true, 0.0},
 		["technique/duelist"]={true, 0.0},
 		["technique/combat-techniques-active"]={false, 0.0},
@@ -129,7 +129,7 @@ newBirthDescriptor{
 		["technique/combat-training"]={true, 0.0},
 		["technique/mobility"]={true, 0.3},
 		["cunning/stealth"]={true, 0.3},
-		["cunning/survival"]={true, 0.1},
+		["cunning/survival"]={true, 0.0},
 		["cunning/lethality"]={true, 0.3},
 		["cunning/dirty"]={true, 0.0},
 		["cunning/shadow-magic"]={true, 0.3},
@@ -174,23 +174,23 @@ newBirthDescriptor{
 	},
 	stats = { dex=4, str=4, cun=1, },
 	talents_types = {
-		["technique/dualweapon-attack"]={true, 0.2},
-		["technique/duelist"]={true, 0.2},
+		["technique/dualweapon-attack"]={true, 0.3},
+		["technique/duelist"]={true, 0.3},
 		["technique/combat-techniques-active"]={true, 0.3},
 		["technique/combat-techniques-passive"]={true, 0.0},
 		["technique/combat-training"]={true, 0.3},
-		["technique/battle-tactics"]={false, 0.2},
+		["technique/battle-tactics"]={false, 0.3},
 		["technique/mobility"]={true, 0.3},
 		["technique/thuggery"]={true, 0.3},
 		["technique/conditioning"]={true, 0.3},
-		["technique/bloodthirst"]={false, 0.1},
-		["technique/throwing-knives"]={true, 0.2},
+		["technique/bloodthirst"]={false, 0.0},
+		["technique/throwing-knives"]={true, 0.0},
 		["cunning/dirty"]={true, 0.3},
-		["cunning/tactical"]={false, 0.2},
+		["cunning/tactical"]={false, 0.3},
 		["cunning/survival"]={true, 0.3},
 	},
 	unlockable_talents_types = {
-		["cunning/poisons"]={false, -0.1, "rogue_poisons"},
+		["cunning/poisons"]={false, 0.0, "rogue_poisons"},
 	},
 	talents = {
 		[ActorTalents.T_DIRTY_FIGHTING] = 1,
@@ -232,7 +232,7 @@ newBirthDescriptor{
 		"#LIGHT_BLUE# * +0 Magic, +1 Willpower, +4 Cunning",
 		"#GOLD#Life per level:#LIGHT_BLUE# +0",
 	},
-	not_on_random_boss = true,
+	--not_on_random_boss = true,
 	power_source = {technique=true},
 	stats = {dex = 4, cun = 4, wil = 1},
 	talents_types = {
@@ -241,13 +241,13 @@ newBirthDescriptor{
 		["technique/buckler-training"]={true, 0.3},
 		["cunning/called-shots"]={true, 0.3},
 		["technique/tireless-combatant"]={true, 0.3},
-		["cunning/trapping"]={false, 0.1},
+		["cunning/trapping"]={false, 0.0},
 		
 		-- generic
 		["technique/mobility"]={true, 0.3},
 		["cunning/survival"]={true, 0.3},
 		["technique/combat-training"]={true, 0.3},
-		["cunning/scoundrel"]={false, 0.1},
+		["cunning/scoundrel"]={true, 0.3},
 	},
 	unlockable_talents_types = {
 		["cunning/poisons"]={false, 0.3, "rogue_poisons"},

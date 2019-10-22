@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -116,9 +116,10 @@ newEntity{ base = "BASE_NPC_XORN",
 			for i = 1, 4 do
 				local x, y = util.findFreeGrid(self.x, self.y, 15, true, {[engine.Map.ACTOR]=true})
 				if x and y then
-					local m = self:clone()
+					local m = self:cloneActor()
 					m:removeAllMOs()
 					m.on_added_to_level = nil
+					m.on_die = self.on_die
 					m.x, m.y = nil, nil
 					game.zone:addEntity(game.level, m, "actor", x, y)
 					all[#all+1] = m
@@ -131,6 +132,7 @@ newEntity{ base = "BASE_NPC_XORN",
 		end)
 	end,
 	on_die = function(self, who)
+		if not self.all_fragments then return end
 		local nb_alive = 0
 		-- Buff others
 		for _, m in ipairs(self.all_fragments) do

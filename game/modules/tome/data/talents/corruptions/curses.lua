@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Curses your target, decreasing all damage they do by %d%% for 10 turns.
+		return ([[Curses your target, decreasing all damage it does by %d%% for 10 turns.
 		The effects will improve with your Spellpower.]]):format(t.imppower(self,t))
 	end,
 }

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -212,7 +212,9 @@ uberTalent{
 		return o1 and o2 and o3
 	end} },
 	cant_steal = true,
+	np_npc_use = true,
 	on_learn = function(self, t)
+		if not game.party:hasMember(self) then return end
 		local list = mod.class.Object:loadList("/data/general/objects/special-artifacts.lua")
 		local o = game.zone:makeEntityByName(game.level, list, "TELOS_SPIRE", true)
 		if o then
@@ -258,7 +260,7 @@ uberTalent{
 		}
 	end,
 	getLight = function(self, t) return 20 end,
-	getLightning = function(self, t) return self:combatStatScale("cun", 10, 70, 0.75) end,
+	getLightning = function(self, t) return self:combatStatScale("cun", 200, 500, 0.75) end,
 	getFire = function(self, t) return 30 end,
 	range = 10,
 	radius = 3,
@@ -293,38 +295,38 @@ uberTalent{
 		if self.elemental_surge[damtype] > t.getThreshold(self, t) then
 			self.elemental_surge[damtype] = 0
 			if damtype == DamageType.PHYSICAL and not self:hasProc("elemental_surge_physical") then
-				self:setProc("elemental_surge_physical", true, 12)
+				self:setProc("elemental_surge_physical", true, 10)
 				game.logSeen(self, "%s surges with earthen power!", self.name:capitalize())
 				self:removeEffectsFilter({status="detrimental", type="physical", ignore_crosstier=true}, 1)
 				self:setEffect(self.EFF_ELEMENTAL_SURGE_PHYSICAL, 2, {})
 				t.doProject(self, t, damtype, "ball_earth")
 			elseif damtype == DamageType.ARCANE and not self:hasProc("elemental_surge_arcane") then
-				self:setProc("elemental_surge_arcane", true, 12)
+				self:setProc("elemental_surge_arcane", true, 10)
 				game.logSeen(self, "%s surges with #PURPLE#arcane#LAST# power!", self.name:capitalize())
 				self:setEffect(self.EFF_ELEMENTAL_SURGE_ARCANE, 3, {})
 				t.doProject(self, t, damtype, "ball_arcane")
 			elseif damtype == DamageType.FIRE and not self:hasProc("elemental_surge_fire") then
-				self:setProc("elemental_surge_fire", true, 12)
+				self:setProc("elemental_surge_fire", true, 10)
 				game.logSeen(self, "%s surges with #LIGHT_RED#fiery#LAST# power!", self.name:capitalize())
 				self:setEffect(self.EFF_ELEMENTAL_SURGE_FIRE, 3, {damage = t.getFire(self, t)})
 				t.doProject(self, t, damtype, "ball_fire")
 			elseif damtype == DamageType.COLD and not self:hasProc("elemental_surge_cold") then
-				self:setProc("elemental_surge_cold", true, 12)
+				self:setProc("elemental_surge_cold", true, 10)
 				game.logSeen(self, "%s surges with #1133F3#icy#LAST# power!", self.name:capitalize()) 
 				self:setEffect(self.EFF_ELEMENTAL_SURGE_COLD, 3, t.getCold(self, t) )
 				t.doProject(self, t, damtype, "ball_ice")
 			elseif damtype == DamageType.LIGHTNING and not self:hasProc("elemental_surge_lightning") then
-				self:setProc("elemental_surge_lightning", true, 12)
+				self:setProc("elemental_surge_lightning", true, 10)
 				game.logSeen(self, "%s surges with #ROYAL_BLUE#lightning#LAST# power!", self.name:capitalize())
-				self:setEffect(self.EFF_ELEMENTAL_SURGE_LIGHTNING, 3, {move = t.getLightning(self, t)})
+				self:setEffect(self.EFF_ELEMENTAL_SURGE_LIGHTNING, 2, {move = t.getLightning(self, t)})
 				t.doProject(self, t, damtype, "ball_lightning")
 			elseif damtype == DamageType.LIGHT and not self:hasProc("elemental_surge_light") then
-				self:setProc("elemental_surge_light", true, 12)
+				self:setProc("elemental_surge_light", true, 10)
 				game.logSeen(self, "%s surges with #YELLOW#light#LAST# power!", self.name:capitalize())
 				self:setEffect(self.EFF_ELEMENTAL_SURGE_LIGHT, 3, {cooldown = t.getLight(self, t)})
 				t.doProject(self, t, damtype, "ball_light")				
 			elseif damtype == DamageType.NATURE and not self:hasProc("elemental_surge_nature") then
-				self:setProc("elemental_surge_nature", true, 12)
+				self:setProc("elemental_surge_nature", true, 10)
 				game.logSeen(self, "%s surges with #LIGHT_GREEN#natural#LAST# power!", self.name:capitalize())
 				self:removeEffectsFilter({status="detrimental", type="magical", ignore_crosstier=true}, 1)
 				self:setEffect(self.EFF_ELEMENTAL_SURGE_NATURE, 2, {})
@@ -351,11 +353,11 @@ uberTalent{
 		#PURPLE#Arcane:#LAST#		Increases your mind and spell action speeds by 30%% for 3 turns.
 		#LIGHT_RED#Fire:#LAST#		Increases all damage dealt by %d%% for 3 turns.
 		#1133F3#Cold:#LAST#		Turns your skin into ice for 3 turns increasing armor by %d and dealing %d ice damage to attackers.
-		#ROYAL_BLUE#Lightning:#LAST#	Increases your movement speed by %d%% for 3 turns.
+		#ROYAL_BLUE#Lightning:#LAST#	Increases your movement speed by %d%% for 2 turns.
 		#YELLOW#Light:#LAST#		Reduces all cooldowns by 20%% for 3 turns.
 		#LIGHT_GREEN#Nature:#LAST#		Cleanses 1 magical debuff and grant immunity to magical debuffs for 2 turns.
 
-		Each effect can only happen once per 12 player turns.  This does not count as a typical cooldown.
+		Each effect can only happen once per 10 player turns.  This does not count as a typical cooldown.
 		The damage and some effect powers increase with your Cunning and the threshold with your level.
 		%s]])
 		:format(t.getThreshold(self, t), t.getDamage(self, t), self:getTalentRadius(t), t.getFire(self, t), cold.armor, cold.dam, t.getLightning(self, t), str)

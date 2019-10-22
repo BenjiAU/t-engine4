@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -128,6 +128,13 @@ newTalent{
 	range = function(self, t) return math.floor(self:combatTalentScale(t, 2, 6)) end,
 	tactical = { DEFEND = 2 },
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 40, 400) end,
+	iconOverlay = function(self, t, p)
+		local val = self.retribution_absorb or 0
+		if val <= 0 then return "" end
+		local fnt = "buff_font_small"
+		if val >= 1000 then fnt = "buff_font_smaller" end
+		return "#RED#"..tostring(math.ceil(val)).."#LAST#", fnt
+	end,
 	activate = function(self, t)
 		local shield = self:hasShield()
 		if not shield then
@@ -148,10 +155,13 @@ newTalent{
 		self.retribution_strike = nil
 		return true
 	end,
-	callbackOnRest = function(self, t)
-		-- Resting requires no enemies in view so we can safely clear all stored damage
-		-- Clear the stored damage by setting the remaining absorb to the max
-		self.retribution_absorb = self.retribution
+	callbackOnRest = function(self, t)  -- Make sure we've actually started resting/running before disabling the sustain
+		if self.resting.cnt and self.resting.cnt <= 0 then return end
+		self.retribution_absorb = self.retribution		
+	end,
+	callbackOnRun = function(self, t)
+		if self.running.cnt and self.running.cnt <= 0 then return end
+		self.retribution_absorb = self.retribution		
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)

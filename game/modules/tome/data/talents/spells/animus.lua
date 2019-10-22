@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -224,7 +224,7 @@ newTalent{
 		- Invoke Darkness: becomes a cone of darkness
 		- Shadow Tunnel: teleported minions will also be healed for 30%% of their max life
 		- Cold Flames: freeze chance increased to 100%%
-		- Ice Shards: each shard becomes a beam
+		- Freeze: becomes a ball of radius 2 and makes all targets wet
 		- Consume Soul: effect increased by 50%%]]):
 		format(nb)
 	end,

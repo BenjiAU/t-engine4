@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ newEntity{ base = "BASE_NPC_PLANT",
 	combat = { dam=5, atk=15, apr=10 },
 	resolvers.talents{
 		[Talents.T_CONSTRICT]={base=1, every=5},
-		[Talents.T_SPIT_POISON]={base=1, every=5, max=3},
+		[Talents.T_SPIT_POISON]={base=1, every=5},
 	},
 }
 
@@ -80,12 +80,10 @@ newEntity{ base = "BASE_NPC_PLANT",
 	max_life = resolvers.rngavg(1,1),
 	combat = { dam=5, atk=15, apr=3, damtype=DamageType.POISON},
 	can_multiply = 2,
-
-	inc_damage = {all=-30},
 	talent_cd_reduction = {[Talents.T_POISONOUS_SPORES]=-20},
 	resolvers.talents{
 		[Talents.T_CONSTRICT]={base=1, every=5},
-		[Talents.T_POISONOUS_SPORES]={base=0, every=12, max=1},
+		[Talents.T_POISONOUS_SPORES]={base=0, every=12},
 	},
 }
 

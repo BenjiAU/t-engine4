@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -79,14 +79,18 @@ newEntity{ base="BASE_NPC_ORC_RAK_SHOR", define_as = "CULTIST_RAK_SHOR",
 			local Talents = require("engine.interface.ActorTalents")
 			local a = mod.class.NPC.new{}
 			local plr = game.player:resolveSource()
+
+			local is_yeek = false
+			if plr.descriptor and plr.descriptor.subrace == "Yeek" then is_yeek = true end
+
 			a:replaceWith(plr:cloneActor({rank=4,
 				level_range=self.level_range,
 				is_player_doomed_shade = true,
-				faction = self.faction,
+				faction = is_yeek and plr.faction or self.faction,
 				life=plr.max_life*1.2,	max_life=plr.max_life*1.2, die_at=plr.die_at*1.2,
 				max_level=table.NIL_MERGE,
-				name = "Doomed Shade of "..plr.name,
-				desc = ([[The Dark Side of %s, completely consumed by hate...]]):format(plr.name),
+				name = is_yeek and ("Wayist Shade of %s"):format(plr.name) or ("Doomed Shade of %s"):format(plr.name),
+				desc = is_yeek and ([[%s under the mental protection of The Way could not be swayed and sided with you against the Cultist!]]):format(plr.name) or ([[The Dark Side of %s, completely consumed by hate...]]):format(plr.name),
 				killer_message = "but nobody knew why #sex# suddenly became evil",
 				color_r = 150, color_g = 150, color_b = 150,
 				ai = "tactical", ai_state = {talent_in=1},
@@ -123,6 +127,11 @@ newEntity{ base="BASE_NPC_ORC_RAK_SHOR", define_as = "CULTIST_RAK_SHOR",
 				self:doEmote("Ra'kk kor merk ZUR!!!", 120)
 				game.zone:addEntity(game.level, a, "actor", x, y)
 				a:resolve()
+				if is_yeek then
+					a:doEmote("FOR THE WAY! Die cultist!", 120)
+					a.can_talk = "shadow-crypt-yeek-clone"
+					self:logCombat(game.player, "#PURPLE#The #Source# looks afraid, he did not plan on his creation turning against him!")
+				end
 				self.copied_player = true
 			end
 

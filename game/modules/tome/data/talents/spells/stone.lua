@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ newTalent{
 	random_ego = "attack",
 	mana = 10,
 	cooldown = 6,
+	is_body_of_stone_affected = true,
 	tactical = { ATTACK = { PHYSICAL = 1, cut = 1} },
 	range = 10,
 	direct_hit = true,
@@ -88,16 +89,20 @@ newTalent{
 	activate = function(self, t)
 		local cdr = t.getCooldownReduction(self, t)
 		game:playSoundNear(self, "talents/earth")
+
+		local cd_recution = {}
+		for cdtid, _ in pairs(self.talents) do
+			local cdt = self:getTalentFromId(cdtid)
+			if cdt.is_body_of_stone_affected then
+				cd_recution[cdtid] = math.floor(cdr*(self:getTalentCooldown(cdt) or 0)/100)
+			end
+		end
+
 		return {
 			particle = self:addParticles(Particles.new("stone_skin", 1)),
 			move = self:addTemporaryValue("never_move", 1),
 			stun = self:addTemporaryValue("stun_immune", t.getStunRes(self, t)),
-			cdred = self:addTemporaryValue("talent_cd_reduction", {
-				[self.T_EARTHEN_MISSILES] = math.floor(cdr*self:getTalentCooldown(self.talents_def.T_EARTHEN_MISSILES)/100),
-				[self.T_MUDSLIDE] = math.floor(cdr*self:getTalentCooldown(self.talents_def.T_MUDSLIDE)/100),
-				[self.T_DIG] = math.floor(cdr*self:getTalentCooldown(self.talents_def.T_DIG)/100),
-				[self.T_EARTHQUAKE] = math.floor(cdr*self:getTalentCooldown(self.talents_def.T_EARTHQUAKE)/100),
-			}),
+			cdred = self:addTemporaryValue("talent_cd_reduction", cd_recution),
 			
 			res = self:addTemporaryValue("resists", {
 				[DamageType.FIRE] = t.getFireRes(self, t),
@@ -137,6 +142,7 @@ newTalent{
 	random_ego = "attack",
 	mana = 50,
 	cooldown = 30,
+	is_body_of_stone_affected = true,
 	tactical = { ATTACKAREA = { PHYSICAL = 2 }, DISABLE = { stun = 3 } },
 	range = 10,
 	radius = function(self, t) return math.floor(self:combatTalentScale(t, 2.5, 4.5)) end,
@@ -155,7 +161,7 @@ newTalent{
 		-- Add a lasting map effect
 		game.level.map:addEffect(self,
 			x, y, t.getDuration(self, t),
-			DamageType.PHYSICAL_STUN, t.getDamage(self, t),
+			DamageType.PHYSICAL_STUN, self:spellCrit(t.getDamage(self, t)),
 			self:getTalentRadius(t),
 			5, nil,
 			{type="quake"},

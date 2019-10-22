@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -17,35 +17,71 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
+local imbueEgo = function(gem, ring)
+	if not gem then return end
+	if not ring then return end
+	local Entity = require("engine.Entity")
+	local ego = Entity.new{
+		fake_ego = true,
+		name = "imbued_"..gem.name,
+		keywords = {[gem.name] = true},
+		wielder = table.clone(gem.imbue_powers, true),
+		been_imbued = true,
+		egoed = true,
+	}
+	if gem.talent_on_spell then ego.talent_on_spell = table.clone(gem.talent_on_spell, true) end  -- Its really weird that this table structure is different for one property
+	game.zone:applyEgo(ring, ego, "object", true)
+end
+
 local imbue_ring = function(npc, player)
-	player:showInventory("Imbue which ring?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "ring" and not o.egoed and not o.unique and not o.rare end, function(ring, ring_item)
-		player:showInventory("Use which gem?", player:getInven("INVEN"), function(gem) return gem.type == "gem" and (gem.material_level or 99) <= ring.material_level and gem.imbue_powers end, function(gem, gem_item)
-			local price = 10 + gem.material_level * 5 + ring.material_level * 7
+	player:showInventory("Imbue which ring?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "ring" and o.material_level end, function(ring, ring_item)
+		player:showInventory("Use which gem?", player:getInven("INVEN"), function(gem) return gem.type == "gem" and gem.imbue_powers and gem.material_level end, function(gem, gem_item)
+			local lev = (ring.material_level + gem.material_level) / 2 * 10 + 10  -- Average the material level then add a bonus so we guarantee greater ego level range
+			local new_ring
+			local r = rng.range(0, 99)
+			if r < 20 then
+				local ring = game.zone:makeEntity(game.level, "object", 
+					{base_list="mod.class.Object:/data/general/objects/jewelry.lua", type="jewelry", subtype="ring",
+					ignore_material_restriction=true, ego_filter={keep_egos=true, ego_chance=-1000},
+					special=function(e) return e.material_level == ring.material_level end}
+					, lev, true)
+				new_ring = game.state:generateRandart{base=ring, lev=lev}
+			else
+				new_ring = game.zone:makeEntity(game.level, "object",
+					{base_list="mod.class.Object:/data/general/objects/jewelry.lua", type="jewelry", subtype="ring",
+					ignore_material_restriction=true, tome = {greater=9, double_greater=1}, egos = 2,
+					special=function(e) return e.material_level == ring.material_level end}
+					, lev, true)
+			end
+			if not new_ring then
+				game.logPlayer(player, "%s failed to craft with %s and %s!", npc.name:capitalize(), ring:getName{do_colour=true, no_count=true}, gem:getName{do_colour=true, no_count=true})
+				return false
+			end
+			
+			local price = 300 * (ring.material_level + gem.material_level) / 2
 			if price > player.money then require("engine.ui.Dialog"):simplePopup("Not enough money", "This costs "..price.." gold, you need more gold.") return end
 
 			require("engine.ui.Dialog"):yesnoPopup("Imbue cost", "This will cost you "..price.." gold, do you accept?", function(ret) if ret then
+				imbueEgo(gem, new_ring)
 				player:incMoney(-price)
 				player:removeObject(player:getInven("INVEN"), gem_item)
-				ring.wielder = ring.wielder or {}
-				table.mergeAdd(ring.wielder, gem.imbue_powers, true)
-				if gem.talent_on_spell then
-					ring.talent_on_spell = ring.talent_on_spell or {}
-					table.append(ring.talent_on_spell, gem.talent_on_spell)
-				end
-				ring.name = gem.name .. " ring"
-				ring.been_imbued = true
-				ring.egoed = true
-				game.logPlayer(player, "%s creates: %s", npc.name:capitalize(), ring:getName{do_colour=true, no_count=true})
+
+				new_ring.name = (ring.short_name or ring.name or "weird").." "..gem.name .. " ring"
+				new_ring:identify(true)
+				game.zone:addEntity(game.level, new_ring, "object")
+				player:addObject(player:getInven("INVEN"), new_ring)
+
+				game.logPlayer(player, "%s creates: %s", npc.name:capitalize(), new_ring:getName{do_colour=true, no_count=true})
 			end end)
 		end)
 	end)
 end
 
 local artifact_imbue_amulet = function(npc, player)
-	player:showInventory("Imbue which amulet?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "amulet" and not o.egoed and not o.unique and not o.rare end, function(amulet, amulet_item)
+	player:showInventory("Imbue which amulet?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "amulet" and o.material_level end, function(amulet, amulet_item)
 		player:showInventory("Use which first gem?", player:getInven("INVEN"), function(gem1) return gem1.type == "gem" and (gem1.material_level or 99) <= amulet.material_level and gem1.imbue_powers end, function(gem1, gem1_item)
 			player:showInventory("Use which second gem?", player:getInven("INVEN"), function(gem2) return gem2.type == "gem" and (gem2.material_level or 99) <= amulet.material_level and gem1.name ~= gem2.name and gem2.imbue_powers end, function(gem2, gem2_item)
-				local price = 390
+				local price = 1000
 				if price > player.money then require("engine.ui.Dialog"):simplePopup("Not enough money", "Limmir needs more gold for the magical plating.") return end
 
 				require("engine.ui.Dialog"):yesnoPopup("Imbue cost", "You need to use "..price.." gold for the plating, do you accept?", function(ret) if ret then
@@ -54,6 +90,12 @@ local artifact_imbue_amulet = function(npc, player)
 					while gem3 == nil and tries > 0 do gem3 = game.zone:makeEntity(game.level, "object", {type="gem"}, nil, true) tries = tries - 1 end
 					if not gem3 then gem3 = rng.percent(50) and gem1 or gem2 end
 					print("Imbue third gem", gem3.name)
+				
+				local new_amulet = game.zone:makeEntity(game.level, "object",
+					{base_list="mod.class.Object:/data/general/objects/jewelry.lua", type="jewelry", subtype="amulet",
+					ignore_material_restriction=true, ego_filter={keep_egos=true, ego_chance=-1000},
+					special=function(e) return e.material_level == amulet.material_level end}
+					, player.level, true)
 
 					if gem1_item > gem2_item then
 						player:removeObject(player:getInven("INVEN"), gem1_item)
@@ -62,26 +104,17 @@ local artifact_imbue_amulet = function(npc, player)
 						player:removeObject(player:getInven("INVEN"), gem2_item)
 						player:removeObject(player:getInven("INVEN"), gem1_item)
 					end
-					amulet.wielder = amulet.wielder or {}
-					table.mergeAdd(amulet.wielder, gem1.imbue_powers, true)
-					table.mergeAdd(amulet.wielder, gem2.imbue_powers, true)
-					table.mergeAdd(amulet.wielder, gem3.imbue_powers, true)
-					if gem1.talent_on_spell then
-						amulet.talent_on_spell = amulet.talent_on_spell or {}
-						table.append(amulet.talent_on_spell, gem1.talent_on_spell)
-					end
-					if gem2.talent_on_spell then
-						amulet.talent_on_spell = amulet.talent_on_spell or {}
-						table.append(amulet.talent_on_spell, gem2.talent_on_spell)
-					end
-					if gem3.talent_on_spell then
-						amulet.talent_on_spell = amulet.talent_on_spell or {}
-						table.append(amulet.talent_on_spell, gem3.talent_on_spell)
-					end
-					amulet.name = "Limmir's Amulet of the Moon"
-					amulet.been_imbued = true
-					amulet.unique = util.uuid()
-					game.logPlayer(player, "%s creates: %s", npc.name:capitalize(), amulet:getName{do_colour=true, no_count=true})
+
+					imbueEgo(gem1, new_amulet)  -- Should keywords not be applied here since the item is unique?
+					imbueEgo(gem2, new_amulet)
+					imbueEgo(gem3, new_amulet)
+
+					new_amulet.name = "Limmir's Amulet of the Moon"
+					new_amulet.unique = util.uuid()
+					new_amulet:identify(true)
+					game.zone:addEntity(game.level, new_amulet, "object")
+					player:addObject(player:getInven("INVEN"), new_amulet)
+					game.logPlayer(player, "%s creates: %s", npc.name:capitalize(), new_amulet:getName{do_colour=true, no_count=true})
 				end end)
 			end)
 		end)
@@ -104,7 +137,7 @@ newChat{ id="welcome",
 
 newChat{ id="jewelry",
 	text = [[Then you are at the right place, for I am an expert jeweler.
-If you bring me a gem and a non-magical ring, I can imbue the gem inside the ring for you.
+If you bring me a gem and a ring, I can create a new ring imbued with the properties of the gem.  The original traits of the ring will be lost in the process but new ones of similar quality will be generated.
 There is a small fee dependent on the level of the ring, and you need a quality ring to use a quality gem.]],
 	answers = {
 		{"I need your services.", action=imbue_ring},
@@ -114,8 +147,8 @@ There is a small fee dependent on the level of the ring, and you need a quality 
 
 newChat{ id="artifact_jewelry",
 	text = [[Yes! Thanks to you this place is now free from the corruption. I will stay on this island to study the magical aura, and as promised I can make you powerful amulets.
-Bring me a non-magical amulet and two different gems and I will turn them into a powerful amulet.
-I will not make you pay a fee for it since you helped me so much, but I am afraid the ritual requires a gold plating. This should be equal to about 390 gold pieces.]],
+Bring me a an amulet and two different gems and I will turn them into a powerful amulet, though the original properties of the amulet will be lost.
+I will not make you pay a fee for it since you helped me so much, but I am afraid the ritual requires a gold plating. This should be equal to about 1000 gold pieces.]],
 	answers = {
 		{"I need your services.", action=artifact_imbue_amulet},
 		{"Not now, thanks."},
@@ -125,7 +158,7 @@ I will not make you pay a fee for it since you helped me so much, but I am afrai
 newChat{ id="quest",
 	text = [[#LIGHT_GREEN#*He quickly looks at the tome and looks amazed.*#WHITE# This is an amazing find! Truly amazing!
 With this knowledge I could create potent amulets. However, it requires a special place of power to craft such items.
-There are rumours about a site of power in the southern mountains. Old legends tell about a place where a part of the Winterglow Moon melted when it got too close to the Sun and fell from the sky.
+There are rumours about a site of power in the southern mountains. Old legends tell about a place where a part of the Wintertide Moon melted when it got too close to the Sun and fell from the sky.
 A lake formed in the crater of the crash. The water of this lake, soaked in intense Moonlight for eons, should be sufficient to forge powerful artifacts!
 Go to the lake and then summon me with this scroll. I will retire to study the tome, awaiting your summon.]],
 	answers = {

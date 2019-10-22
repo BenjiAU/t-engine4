@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ function _M:init(dialogdef, profile_help_text)
 	end
 
 	if self.justlogin then
-		self.c_login = Textbox.new{title="Username: ", text="", chars=30, max_len=20, fct=function(text) self:okclick() end}
-		self.c_pass = Textbox.new{title="Password: ", text="", chars=30, max_len=20, hide=true, fct=function(text) self:okclick() end}
+		self.c_login = Textbox.new{title="Username: ", text="", chars=30, max_len=200, fct=function(text) self:okclick() end}
+		self.c_pass = Textbox.new{title="Password: ", text="", chars=30, max_len=200, hide=true, fct=function(text) self:okclick() end}
 		local ok = require("engine.ui.Button").new{text="Login", fct=function() self:okclick() end}
 		local cancel = require("engine.ui.Button").new{text="Cancel", fct=function() self:cancelclick() end}
 
@@ -62,9 +62,9 @@ function _M:init(dialogdef, profile_help_text)
 	else
 		local pwa = "Password again: "
 		self.c_login = Textbox.new{title="Username: ", size_title=pwa, text="", chars=30, max_len=20, filter=login_filter, fct=function(text) self:okclick() end}
-		self.c_pass = Textbox.new{title="Password: ", size_title=pwa, text="", chars=30, max_len=20, hide=true, filter=pass_filter, fct=function(text) self:okclick() end}
-		self.c_pass2 = Textbox.new{title=pwa, text="", size_title=pwa, chars=30, max_len=20, hide=true, filter=pass_filter, fct=function(text) self:okclick() end}
-		self.c_email = Textbox.new{title="Email: ", size_title=pwa, text="", chars=30, max_len=60, filter=pass_filter, fct=function(text) self:okclick() end}
+		self.c_pass = Textbox.new{title="Password: ", size_title=pwa, text="", chars=30, max_len=40, hide=true, filter=pass_filter, fct=function(text) self:okclick() end}
+		self.c_pass2 = Textbox.new{title=pwa, text="", size_title=pwa, chars=30, max_len=40, hide=true, filter=pass_filter, fct=function(text) self:okclick() end}
+		self.c_email = Textbox.new{title="Email: ", size_title=pwa, text="", chars=30, max_len=80, filter=pass_filter, fct=function(text) self:okclick() end}
 		self.c_news = Checkbox.new{title="Accept to receive #{bold}#very infrequent#{normal}# (a few per year) mails about important game events from us.", default=false, fct=function() self:okclick() end}
 		self.c_age = Checkbox.new{title="You at least 16 years old, or have parental authorization to play the game.", default=false, fct=function() self:okclick() end}
 		local ok = require("engine.ui.Button").new{text="Create", fct=function() self:okclick() end}

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -83,6 +83,15 @@ newEntity{ define_as="SUBJECT_Z",
 		wayist:setTarget(self)
 		self:setTarget(wayist)
 		wayist:doEmote("Sacrifice for the Way!", 60)
+
+		-- Warning for our good yeek folks to GTFOH
+		if game:getPlayer(true) and game:getPlayer(true).starting_zone == "town-irkkk" then
+			require("engine.ui.Dialog"):yesnoLongPopup("#LIGHT_RED#Intense fight", "As you approach you come upon an other Wayist and receive a very clear mental message:\n#{italic}##UMBER#RUN AWAY! I am done for but you can save yourself still!#{normal}#", 600, function(ret) if ret then
+				who:setEffect(who.EFF_RECALL, 5, {})
+				game.bignews:say(120, "#GOLD#You hastily activate your Rod of Recall, vowing to come back later!")
+				game.logPlayer(who, "Space around you starts to dissolve...")
+			end end, "Emergency recall", "Stay and fight!")
+		end
 	end,
 
 	on_die = function(self, who)

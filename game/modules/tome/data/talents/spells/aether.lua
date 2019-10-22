@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@ local basetrap = function(self, t, x, y, dur, add)
 	local trap = {
 		id_by_type=true, unided_name = "trap",
 		display = '^',
+		disarmable = false,
+		no_disarm_message = true,
+		message = false,
 		faction = self.faction,
 		summoner = self, summoner_gain_exp = true,
 		temporary = dur,
@@ -101,9 +104,10 @@ newTalent{
 				self.list.i = util.boundWrap(self.list.i + 1, 1, #self.list)
 
 				local tg = {type="beam", x=self.x, y=self.y, range=self.rad, selffire=self.summoner:spellFriendlyFire()}
+				print()
 				self.summoner.__project_source = self
 				self.summoner:project(tg, self.x, self.y, engine.DamageType.ARCANE, self.dam/10, nil)
-				self:project(tg, x, y, function(tx, ty)
+				self.summoner:project(tg, x, y, function(tx, ty)
 					-- In rare circumstances this can hit the same target 4-7 times so we need to sanity check it
 					local target = game.level.map(tx, ty, engine.Map.ACTOR)
 					if not target then return end

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ newBirthDescriptor{
 		["spell/frost-alchemy"]={true, 0.3},
 		["spell/energy-alchemy"]={false, 0.3},
 		["spell/staff-combat"]={true, 0.3},
-		["cunning/survival"]={false, -0.1},
+		["cunning/survival"]={false, 0.0},
 	},
 	talents = {
 		[ActorTalents.T_CREATE_ALCHEMIST_GEMS] = 1,
@@ -130,7 +130,7 @@ newBirthDescriptor{
 		life_rating = -1,
 	},
 	cosmetic_options = {
-		special = {
+		golem = {
 			{name="Golem becomes a Drolem", on_actor=function(actor) actor.alchemist_golem_is_drolem = true end, unlock="cosmetic_class_alchemist_drolem"},
 		},
 	},
@@ -197,7 +197,7 @@ newBirthDescriptor{
 		["spell/divination"]={true, 0.3},
 		["spell/conveyance"]={true, 0.3},
 		["spell/aegis"]={true, 0.3},
-		["cunning/survival"]={false, -0.1},
+		["cunning/survival"]={false, 0.0},
 	},
 	unlockable_talents_types = {
 		["spell/wildfire"]={false, 0.3, "mage_pyromancer"},
@@ -255,8 +255,8 @@ newBirthDescriptor{
 	power_source = {arcane=true},
 	stats = { mag=5, wil=3, cun=1, },
 	talents_types = {
-		["spell/conveyance"]={true, 0.2},
-		["spell/divination"]={true, 0.2},
+		["spell/conveyance"]={true, 0.3},
+		["spell/divination"]={true, 0.3},
 		["spell/necrotic-minions"]={true, 0.3},
 		["spell/advanced-necrotic-minions"]={false, 0.3},
 		["spell/shades"]={false, 0.3},
@@ -264,7 +264,7 @@ newBirthDescriptor{
 		["spell/nightfall"]={true, 0.3},
 		["spell/grave"]={true, 0.3},
 		["spell/animus"]={true, 0.3},
-		["cunning/survival"]={true, -0.1},
+		["cunning/survival"]={true, 0.0},
 	},
 	unlockable_talents_types = {
 		["spell/ice"]={false, 0.2, "mage_cryomancer"},

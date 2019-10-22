@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="celestia
 newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="celestial/hymns-hymns", name = "hymns", generic = true, description = "Chant the glory of the Moon." }
 newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="celestial/circles", name = "circles", min_lev = 10, description = "Bind the power of the Moon into circles at your feet." }
 newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="celestial/eclipse", name = "eclipse", description = "The moment of the Eclipse is the moment of Truth, when Sun and Moon are in tandem and the energies of the world hang in the balance. Intense focus allows the greatest Anorithils to harness these energies to unleash devastating forces..." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="celestial/other", name = "other", description = "Other celestial powers." }
 
 
 newTalentType{ no_silence=true, is_spell=true, type="celestial/other", name = "other", description = "Various celestial talents." }
@@ -95,3 +96,6 @@ load("/data/talents/celestial/hymns.lua")
 load("/data/talents/celestial/star-fury.lua")
 load("/data/talents/celestial/eclipse.lua")
 load("/data/talents/celestial/circles.lua")
+
+load("/data/talents/celestial/other.lua")
+

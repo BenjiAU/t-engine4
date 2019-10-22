@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -108,4 +108,49 @@ newAI("charred_scar_target", function(self)
 	if self:runAI("target_simple") then return true end
 	self:setTarget(game.player)
 	return true
+end)
+
+-- Always retarget to closest
+-- This is most useful on immobile melee prone to just wasting their turns if their current target isn't adjacent
+newAI("target_closest", function(self)
+	if not self.x then return end
+	local log_detail = config.settings.log_detail_ai or 0
+	if log_detail > 0 then print("[ActorAI] Invoking target_closest AI for", self.uid, self.name, self.x, self.y) end
+	local aitarget = self.ai_target.actor
+	if aitarget then
+		if log_detail >= 2 then print("[target_closest AI] current target:", aitarget.uid, aitarget.name) end
+		if aitarget.summoner and (aitarget.dead or not game.level:hasEntity(aitarget)) then
+			if log_detail > 0 then print("[target_closest AI] targeting summoner of dead summon:",  aitarget.uid, aitarget.name) end
+			self:setTarget(aitarget.summoner)
+			aitarget = self.ai_target.actor
+		end
+	end
+
+	-- Find closest enemy and target it or set no target
+	-- Get list of actors ordered by distance
+	local arr = self.fov.actors_dist
+	local act
+	local sqsense = math.max(self.lite or 0, self.infravision or 0, self.heightened_senses or 0)
+	if log_detail >= 2 then print("[target_closest AI]", self.uid, self.name, "at", self.x, self.y, "searching for new targets in range", sqsense) end
+	sqsense = sqsense * sqsense
+	for i = 1, #arr do
+		act = self.fov.actors_dist[i]
+		if log_detail > 2 then print("\t checking target", act.x, act.y, act.uid, act.name) end
+		if act and act.x and not act.dead and self:reactionToward(act) < 0 and game.level.map:isBound(act.x, act.y) and
+			(((act.lite or 0) > 0) -- If it has lite we can always see it
+				or -- Otherwise check if we can see it with our "senses"
+				(self:canSee(act) and (self.fov.actors[act].sqdist <= sqsense) or game.level.map.lites(act.x, act.y))
+			) and not act:attr("invulnerable") then
+
+			print("[target_closest AI]", self.uid, self.name, "selecting NEW TARGET", act.x, act.y, act.uid, act.name)
+			self:setTarget(act)
+			return act
+		end
+	end
+	if aitarget then  -- clear old target if a new one wasn't found or kept
+		if log_detail > 0 then print("[target_closest AI] clearing old target (no replacement):", aitarget.uid, aitarget.name) end
+	if log_detail > 1.4 and config.settings.cheat then game.log("#RED# [%s]%s #ORANGE#CLEARING OLD TARGET#LAST#: [%s]%s", self.uid, self.name, aitarget.uid, aitarget.name) end -- debugging
+		self:setTarget()
+	end
+	return self.ai_target.actor
 end)

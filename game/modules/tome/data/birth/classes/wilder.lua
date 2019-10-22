@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -73,17 +73,16 @@ newBirthDescriptor{
 		end,
 	},
 	talents_types = {
-		["wild-gift/call"]={true, 0.2},
-		["wild-gift/harmony"]={false, 0.1},
+		["wild-gift/call"]={true, 0.3},
+		["wild-gift/harmony"]={false, 0.3},
 		["wild-gift/summon-melee"]={true, 0.3},
 		["wild-gift/summon-distance"]={true, 0.3},
 		["wild-gift/summon-utility"]={true, 0.3},
 		["wild-gift/summon-augmentation"]={false, 0.3},
 		["wild-gift/summon-advanced"]={false, 0.3},
-		["wild-gift/mindstar-mastery"]={false, 0.1},
-		["cunning/survival"]={true, 0},
+		["wild-gift/mindstar-mastery"]={true, 0.3},
 		["technique/combat-techniques-active"]={false, 0},
-		["technique/combat-techniques-passive"]={false, 0},
+		["cunning/survival"]={true, 0},
 		["technique/combat-training"]={true, 0},
 	},
 	talents = {
@@ -131,20 +130,19 @@ newBirthDescriptor{
 	power_source = {nature=true, technique=true},
 	stats = { str=5, wil=3, con=1, },
 	talents_types = {
-		["wild-gift/call"]={true, 0.2},
-		["wild-gift/harmony"]={false, 0.1},
+		["wild-gift/call"]={true, 0.3},
+		["wild-gift/harmony"]={false, 0.0},
 		["wild-gift/sand-drake"]={true, 0.3},
 		["wild-gift/fire-drake"]={true, 0.3},
 		["wild-gift/cold-drake"]={true, 0.3},
 		["wild-gift/storm-drake"]={true, 0.3},
 		["wild-gift/venom-drake"]={true, 0.3},
 		["wild-gift/higher-draconic"]={false, 0.3},
-		["wild-gift/fungus"]={true, 0.1},
-		["cunning/survival"]={false, 0},
-		["technique/shield-offense"]={true, 0.2},
-		["technique/2hweapon-assault"]={true, 0.2},
-		["technique/combat-techniques-active"]={false, 0.2},
-		["technique/combat-techniques-passive"]={true, 0.2},
+		["wild-gift/fungus"]={true, 0.0},
+		["cunning/survival"]={false, 0.0},
+		["technique/shield-offense"]={true, 0.3},
+		["technique/2hweapon-assault"]={true, 0.3},
+		["technique/combat-techniques-active"]={false, 0.3},
 		["technique/combat-training"]={true, 0.3},
 	},
 	talents = {
@@ -213,7 +211,7 @@ newBirthDescriptor{
 	},
 	stats = { wil=5, cun=4, },
 	talents_types = {
-		["cunning/survival"]={true, 0.1},
+		["cunning/survival"]={true, 0.0},
 		["wild-gift/call"]={true, 0.3},
 		["wild-gift/antimagic"]={true, 0.3},
 		["wild-gift/mindstar-mastery"]={true, 0.3},
@@ -277,7 +275,7 @@ newBirthDescriptor{
 	not_on_random_boss = true,
 	stats = { str=2, wil=3, mag=4, },
 	talents_types = {
-		["wild-gift/call"]={true, 0.2},
+		["wild-gift/call"]={true, 0.3},
 		["wild-gift/earthen-power"]={true, 0.3},
 		["wild-gift/earthen-vines"]={true, 0.3},
 		["wild-gift/dwarven-nature"]={true, 0.3},
@@ -285,10 +283,10 @@ newBirthDescriptor{
 		["spell/eldritch-stone"]={false, 0.3},
 		["spell/eldritch-shield"]={true, 0.3},
 		["spell/deeprock"]={false, 0.3},
-		["spell/earth"]={true, 0.2},
-		["spell/stone"]={false, 0.2},
-		["cunning/survival"]={true, 0},
-		["technique/combat-training"]={true, 0},
+		["spell/earth"]={true, 0.3},
+		["spell/stone"]={false, 0.3},
+		["cunning/survival"]={true, 0.0},
+		["technique/combat-training"]={true, 0.0},
 	},
 	talents = {
 		[ActorTalents.T_STONE_VINES] = 1,

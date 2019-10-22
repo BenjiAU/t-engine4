@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -100,12 +100,16 @@ newEntity{
 	rarity = 6,
 	cost = 2,
 	wielder = {},
-	resolvers.generic(function(e)
+	resolvers.genericlast(function(e)
 		local tts = {}
 		local p = game:getPlayer(true)
 		for i, def in ipairs(engine.interface.ActorTalents.talents_types_def) do
-			if p and def.allow_random and p:knowTalentType(def.type) or p:knowTalentType(def.type) == false then tts[#tts+1] = def.type end
-		end
+            if p and def.allow_random and p:knowTalentType(def.type) or p:knowTalentType(def.type) == false then 
+                if not (e.power_source.antimagic and def.is_spell) or (e.power_source.arcane and def.is_antimagic) then
+                    tts[#tts+1] = def.type
+                end
+            end
+        end
 		local tt = tts[rng.range(1, #tts)]
 
 		e.wielder.talents_types_mastery = {}
@@ -533,12 +537,16 @@ newEntity{
 	greater_ego = 1,
 	cost = 2,
 	wielder = {},
-	resolvers.generic(function(e)
+	resolvers.genericlast(function(e)
 		local tts = {}
 		local p = game:getPlayer(true)
 		for i, def in ipairs(engine.interface.ActorTalents.talents_types_def) do
-			if p and def.allow_random and p:knowTalentType(def.type) or p:knowTalentType(def.type) == false then tts[#tts+1] = def.type end
-		end
+            if p and def.allow_random and p:knowTalentType(def.type) or p:knowTalentType(def.type) == false then 
+                if not (e.power_source.antimagic and def.is_spell) or (e.power_source.arcane and def.is_antimagic) then
+                    tts[#tts+1] = def.type
+                end
+            end
+        end
 		--local tt = tts[rng.range(1, #tts)]
 		local tt = rng.tableRemove(tts)
 		local tt2 = rng.tableRemove(tts)

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -49,13 +49,14 @@ newTalent{
 			else
 				game.logSeen(target, "%s resists the stun!", target.name:capitalize())
 			end
+			self:forceUseTalent(self.T_BLOCK, {ignore_cooldown=true, ignore_energy=true})
 		end
 
 		return true
 	end,
 	info = function(self, t)
 		return ([[Channel eldritch forces into a melee attack, hitting the target with your weapon and shield for %d%% arcane damage.
-		If either attack hits, the target will be stunned for %d turns.
+		If either attack hits, the target will be stunned for %d turns and you automatically Block.
 		The chance for the attack to stun increases with your Physical Power, but it is considered a magical attack and thus is resisted with spell save, rather than physical save.
 		Damage increases with Spellpower.]])
 		:format(100 * self:combatTalentWeaponDamage(t, 0.6, (100 + self:combatTalentSpellDamage(t, 50, 300)) / 100), t.getDuration(self, t))
@@ -73,27 +74,31 @@ newTalent{
 	cooldown = 30,
 	tactical = { ATTACK = 3, BUFF = 2 },
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 15, 40) end,
+	getBlockCD = function(self, t) return math.floor(self:combatTalentLimit(t, 5, 0, 2)) end,
 	on_pre_use = function(self, t, silent)
 		if not self:hasShield() then if not silent then game.logPlayer(self, "You require a shield to use this talent.") end return false end
 		return true
 	end,
 	activate = function(self, t)
 		local dam = t.getDamage(self, t)
-		return {
-			proj = self:addTemporaryValue("melee_project", {[DamageType.ARCANE]=dam}),
-			onhit = self:addTemporaryValue("on_melee_hit", {[DamageType.ARCANE]=dam * 0.7}),
-		}
+		local block_cd = t.getBlockCD(self, t)
+
+		local ret = {}
+		self:talentTemporaryValue(ret, "allow_incomplete_blocks", 1)
+		self:talentTemporaryValue(ret, "talent_cd_reduction", {[self.T_BLOCK]=block_cd})
+		self:talentTemporaryValue(ret, "melee_project", {[DamageType.ARCANE]=dam})
+		self:talentTemporaryValue(ret, "on_melee_hit", {[DamageType.ARCANE]=dam * 0.7})
+		return ret
 	end,
 	deactivate = function(self, t, p)
-		self:removeTemporaryValue("melee_project", p.proj)
-		self:removeTemporaryValue("on_melee_hit", p.onhit)
 		return true
 	end,
 	info = function(self, t)
 		local dam = t.getDamage(self, t)
 		return ([[Imbues your shields with arcane power, dealing %0.2f arcane damage with each melee strike and %0.2f arcane damage when hit.
+		Allows counterstrikes after incomplete blocks and the cooldown of Block is reduced by %d turns.
 		The damage will increase with Spellpower.]]):
-		format(damDesc(self, DamageType.ARCANE, dam), damDesc(self, DamageType.ARCANE, dam * 0.7))
+		format(damDesc(self, DamageType.ARCANE, dam), damDesc(self, DamageType.ARCANE, dam * 0.7), t.getBlockCD(self, t))
 	end,
 }
 
@@ -128,13 +133,14 @@ newTalent{
 			else
 				game.logSeen(target, "%s resists the dazing blows!", target.name:capitalize())
 			end
+			self:alterTalentCoolingdown(self.T_BLOCK, -1000)
 		end
 
 		return true
 	end,
 	info = function(self, t)
 		return ([[Channel eldritch forces into a ferocious melee attack, hitting the target three times with your shields doing %d%% Nature damage.
-		If any of the attacks hit, the target will be dazed for %d turns.
+		If any of the attacks hit, the target will be dazed for %d turns and your Block cooldown is reset.
 		The chance for the attack to daze increases with you Physical Power, but it is considered a magical attack and thus is resisted with spell save, rather than physical save.]])
 		:format(100 * self:combatTalentWeaponDamage(t, 0.6, 1.6), t.getDuration(self, t))
 	end,
@@ -158,8 +164,16 @@ newTalent{
 		self:project(tg, self.x, self.y, function(px, py)
 			local target = game.level.map(px, py, Map.ACTOR)
 			if not target or target == self then return end
-			self:attackTarget(target, DamageType.ARCANE, self:combatTalentWeaponDamage(t, 1.3, 2.6), true)
+			local hit = self:attackTarget(target, DamageType.ARCANE, self:combatTalentWeaponDamage(t, 1.3, 2.6), true)
+			if hit then
+				target:setEffect(target.EFF_COUNTERSTRIKE, 2, {power=self:callTalent(self.T_BLOCK, "getBlockValue"), no_ct_effect=true, src=self, crit_inc=0, nb=1})
+			end
 		end)
+
+		if self:getTalentLevel(t) >= 5 then
+			self:alterTalentCoolingdown(self.T_BLOCK, -1000)
+		end
+
 		game.level.map:particleEmitter(self.x, self.y, tg.radius, "shieldstorm", {radius=tg.radius})
 		game:playSoundNear(self, "talents/icestorm")
 
@@ -167,7 +181,9 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Slam your shield on the ground creating a shockwave.
-		You perform a melee attack for %d%% Arcane damage against everyone within radius %d.]])
+		You perform a melee attack for %d%% arcane damage against everyone within radius %d.
+		Any creature hit by the attack will be submitted to a Counterstrike effect for 3 turns, as if you had blocked against them.
+		At level 5 your Block cooldown is reset.]])
 		:format(100 * self:combatTalentWeaponDamage(t, 1.3, 2.6), self:getTalentRadius(t))
 	end,
 }

@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -121,7 +121,7 @@ newGem("Amber",		"object/amber.png",	4,	16,	"yellow",	30,	40, 4, 65,
 	{ stun={chance=10, dur=2} }
 )
 newGem("Turquoise",	"object/turquoise.png",4,	16,	"green",	30,	40, 4, 65,
-	{ see_invisible=10, see_stealth=10 },
+	{ resists_pen = {all=10}, combat_atk = 10 },
 	{ splash={type="ACID", dam=30} }
 )
 newGem("Jade",		"object/jade.png",	4,	16,	"green",	30,	40, 4, 65,
@@ -181,7 +181,7 @@ newGem("Spinel",	"object/spinel.png",1,	8,	"green",	1,	10, 1, 20,
 	{ mana=10 }
 )
 newGem("Citrine",	"object/citrine.png",1,	8,	"yellow",	1,	10, 1, 20,
-	{ lite=1, infravision=2, },
+	{ lite=4, infravision=4, },
 	{ range=1 }
 )
 newGem("Agate",		"object/agate.png",	1,	8,	"black",	1,	10, 1, 20,

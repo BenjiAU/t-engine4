@@ -1,5 +1,5 @@
 -- ToME - Tales of Middle-Earth
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -136,7 +136,7 @@ end
 
 local function getDamageIncrease(self)
 	local total = 0
-		
+
 	local t = self:getTalentFromId(self.T_CREEPING_DARKNESS)
 	if t then total = total + self:getTalentLevelRaw(t) end
 	t = self:getTalentFromId(self.T_DARK_VISION)
@@ -145,7 +145,7 @@ local function getDamageIncrease(self)
 	if t then total = total + self:getTalentLevelRaw(t) end
 	t = self:getTalentFromId(self.T_DARK_TENDRILS)
 	if t then total = total + self:getTalentLevelRaw(t) end
-	
+
 	return self:combatScale(total, 5, 1, 40, 20)
 end
 
@@ -202,7 +202,12 @@ newTalent{
 	createDark = function(summoner, x, y, damage, duration, creep, creepChance, initialCreep)
 		local e = Object.new{
 			name = summoner.name:capitalize() .. "'s creeping dark",
-			block_sight=true,
+			block_sight=function(self, x, y, who)
+				if who and who.attr and who:attr("pierce_creeping_darkness") and x and who.x and core.fov.distance(x, y, who.x, who.y) <= who:attr("pierce_creeping_darkness") then
+					return false
+				end
+				return true
+			end,
 			canAct = false,
 			canCreep = true,
 			x = x, y = y,
@@ -302,6 +307,7 @@ newTalent{
 		local tg = {type="ball", nolock=true, pass_terrain=false, nowarning=true, friendly_fire=true, default_target=self, range=range, radius=radius, talent=t}
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
+		if t.canCreep(x, y) then t.createDark(self, x, y, damage, rng.range(5, 8), 4, 40, 0) end --creep target
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
 
 		-- get locations in line of movement from center
@@ -339,7 +345,7 @@ newTalent{
 		local damage = self:damDesc(DamageType.DARKNESS, t.getDamage(self, t))
 		local darkCount = t.getDarkCount(self, t)
 		local damageIncrease = getDamageIncrease(self)
-		return ([[Creeping dark slowly spreads from %d spots in a radius of %d around the targeted location. The dark deals %0.2f darkness damage each turn to anything in its area, and blocks the sight of any who do not possess Dark Vision or some other magical means of seeing.
+		return ([[Creeping dark slowly spreads from the target location and %d spots in a radius of %d around the targeted location. The dark deals %0.2f darkness damage each turn to anything in its area, and blocks the sight of any who do not possess Dark Vision or some other magical means of seeing.
 		The damage will increase with your Mindpower. You do +%d%% damage to anything that has entered your creeping dark.]]):format(darkCount, radius, damage, damageIncrease)
 	end,
 }
@@ -354,6 +360,9 @@ newTalent{
 	range = 10,
 	getMovementSpeedChange = function(self, t)
 		return self:combatTalentScale(t, 0.75, 2.5, 0.75)
+	end,
+	passives = function(self, t, p)
+		self:talentTemporaryValue(p, "pierce_creeping_darkness", self:getTalentRange(t))
 	end,
 	info = function(self, t)
 		local range = self:getTalentRange(t)
@@ -464,4 +473,3 @@ newTalent{
 		The damage will increase with your Mindpower. You do +%d%% damage to anything that has entered your creeping dark.]]):format(pinDuration, damage, damageIncrease)
 	end,
 }
-

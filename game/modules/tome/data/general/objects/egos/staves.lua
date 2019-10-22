@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ newEntity{
 	rarity = 3,
 	cost = 4,
 	wielder = {
-		combat_physcrit = resolvers.mbonus_material(10, 5),
+		combat_spellcrit = resolvers.mbonus_material(10, 5),
 		combat_critical_power = resolvers.mbonus_material(10, 10),
 	},
 }
@@ -151,9 +151,8 @@ newEntity{
 			[DamageType.TEMPORAL] = resolvers.mbonus_material(10, 5),
 	},
 		resist_all_on_teleport = resolvers.mbonus_material(20, 5),
-		defense_on_teleport = resolvers.mbonus_material(30, 5),
-		effect_reduction_on_teleport = resolvers.mbonus_material(35, 10),
-		paradox_reduce_anomalies = resolvers.mbonus_material(15, 10),
+		defense_on_teleport = resolvers.mbonus_material(20, 5),
+		effect_reduction_on_teleport = resolvers.mbonus_material(20, 5),
 	},
 }
 
@@ -539,12 +538,71 @@ newEntity{
 	power_source = {arcane=true},
 	name = " of the prodigy", suffix=true, instant_resolve=true,
 	keywords = {prodigy=true},
-	level_range = {40, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
-	rarity = 80,
+	rarity = 50,
 	cost = 45,
 	wielder = {
 		spellsurge_on_crit = resolvers.mbonus_material(5, 5),
 		inc_stats = { [Stats.STAT_MAG] = resolvers.mbonus_material(15, 5), [Stats.STAT_WIL] = resolvers.mbonus_material(15, 5), [Stats.STAT_CUN] = resolvers.mbonus_material(15, 5) },
 	},
+}
+
+newEntity{
+	power_source = {arcane=true},
+	name = "imbued ", prefix=true, instant_resolve=true,
+	keywords = {imbued=true},
+	level_range = {30, 50},
+	greater_ego = 1,
+	rarity = 50,
+	cost = 45,
+	unique_ego = true,
+	imbued_talent_level = resolvers.mbonus_material(5, 1),
+	resolvers.genericlast(function(e)
+		local talents = {
+			T_FLAME = 10,
+			T_LIGHTNING = 10,
+			T_MANATHRUST = 10,
+			T_GLACIAL_VAPOUR = 10,
+			T_MOONLIGHT_RAY=10,
+			T_SUN_BEAM = 10,
+			T_EARTHEN_MISSILES = 10,
+
+			T_SOUL_ROT=8,
+			T_DRAIN=8,
+
+			T_TEMPORAL_BOLT=6,
+			T_DUST_TO_DUST=6,
+			T_RETHREAD=6,
+
+			T_EPIDEMIC=5,
+			T_ICE_SHARDS = 5,
+			T_CHAIN_LIGHTNING = 5,
+			T_FIREFLASH = 5,
+			T_ARCANE_VORTEX = 5,
+
+			T_CURSE_OF_DEFENSELESSNESS=3,
+			T_CURSE_OF_IMPOTENCE=3,
+			T_CURSE_OF_DEATH=3,
+			T_CURSE_OF_VULNERABILITY=3,
+			T_IMPENDING_DOOM = 3,
+			T_FREEZE = 3,
+			T_DISPLACEMENT_SHIELD = 3,
+
+			T_SUNCLOAK = 1,
+			T_BONE_SPEAR = 1,
+			T_CHANNEL_STAFF = 1,
+			T_EARTHQUAKE = 1,
+			T_ENTROPY = 1,
+		}
+		local spells_probability = {}
+		local picked
+		for k,v in pairs(talents) do
+			for i=1,v do
+				spells_probability[#spells_probability+1] = k
+			end
+		end
+		picked = rng.table(spells_probability);
+		e.talent_on_spell = { {chance=10, talent=engine.interface.ActorTalents[picked], level=e.imbued_talent_level or 1} }
+	end),
 }

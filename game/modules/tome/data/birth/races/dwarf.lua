@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ newBirthDescriptor
 		"#GOLD#Stat modifiers:",
 		"#LIGHT_BLUE# * +4 Strength, -2 Dexterity, +3 Constitution",
 		"#LIGHT_BLUE# * -2 Magic, +3 Willpower, +0 Cunning",
-		"#GOLD#Life per level:#LIGHT_BLUE# 12",
+		"#GOLD#Life per level:#LIGHT_BLUE# 14",
 		"#GOLD#Experience penalty:#LIGHT_BLUE# 0%",
 	},
 	inc_stats = { str=4, con=3, wil=3, mag=-2, dex=-2 },

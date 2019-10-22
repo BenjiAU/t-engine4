@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ newTalent{
 	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 4, 8)) end,
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 5, 140) end,
 	action = function(self, t)
-		local tg = {type="bolt", range=self:getTalentRange(t), talent=t}
+		local tg = {type="bolt", range=self:getTalentRange(t), friendlyblock=false, talent=t}
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
 
@@ -82,13 +82,23 @@ newTalent{
 			if not target then return end
 
 			if core.fov.distance(self.x, self.y, target.x, target.y) > 1 then
-				target:pull(self.x, self.y, tg.range)
 				DamageType:get(DamageType.PHYSICAL).projector(self, target.x, target.y, DamageType.PHYSICAL, dam)
 				if target:canBe("pin") then
 					target:setEffect(target.EFF_BONE_GRAB, t.getDuration(self, t), {apply_power=self:combatSpellpower()})
 				else
 					game.logSeen(target, "%s resists the pin!", target.name:capitalize())
 				end
+
+				local hit = self:checkHit(self:combatSpellpower(), target:combatSpellResist() + (target:attr("continuum_destabilization") or 0))
+				if not target:canBe("teleport") or not hit then
+					game.logSeen(target, "%s resists being teleported by Bone Grab!", target.name:capitalize())
+					return true
+				end
+
+				-- Grab the closest adjacent grid that doesn't have block_move or no_teleport
+				local grid = util.closestAdjacentCoord(self.x, self.y, target.x, target.y, true, function(x, y) return game.level.map.attrs(x, y, "no_teleport") end)							
+				if not grid then return true end
+				target:teleportRandom(grid[1], grid[2], 0)				
 			else
 				local tg = {type="cone", cone_angle=90, range=0, radius=6, friendlyfire=false}
 				
@@ -141,9 +151,9 @@ newTalent{
 	end,
 	callbackOnTalentPost = function(self, t, ab, ret, silent)
 		if ab.no_energy then return end
+		if ab.mode ~= "activated" then return end
 		if self.turn_procs.bone_spike then return end
 		self.turn_procs.bone_spike = true
-		
 		local tg = self:getTalentTarget(t)
 		local dam = t.getDamage(self, t)
 		local did_crit = false
@@ -182,7 +192,7 @@ newTalent{
 	direct_hit = true,
 	getRegen = function(self, t) return self:combatTalentLimit(t, 3, 20, 3.3) end,
 	getNb = function(self, t) return math.floor(self:combatTalentScale(t, 1, 3.5)) end,
-	getThreshold = function(self, t) return math.floor(self:combatSpellpower()) end,
+	getThreshold = function(self, t) return math.floor(self:combatSpellpower() * 0.7) end,
 	iconOverlay = function(self, t, p)
 		local p = self.sustain_talents[t.id]
 		if not p or not p.nb then return "" end

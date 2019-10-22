@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -153,7 +153,9 @@ newEntity{ base = "BASE_NPC_CANINE",
 	combat = { dam=resolvers.levelup(20, 1, 1.3), atk=20, apr=16 },
 
 	ai = "tactical",
-
+	auto_classes={
+		{class="Brawler", start_level=20, level_rate=75},
+	},
 	resolvers.drops{chance=100, nb=1, {defined="RUNGOF_FANG"} },
 
 	make_escort = {

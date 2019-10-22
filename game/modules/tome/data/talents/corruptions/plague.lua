@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ newTalent{
 		game:playSoundNear(self, "talents/slime")
 	end,
 	info = function(self, t)
-		return ([[Whenever you dealt non-disease blight damage you apply a disease dealing %0.2f blight damage per turn for 6 turns and reducing one of its physical stats (strength, constitution, dexterity) by %d. The three diseases can stack.
+		return ([[Whenever you deal non-disease blight damage you apply a disease dealing %0.2f blight damage per turn for 6 turns and reducing one of its physical stats (strength, constitution, dexterity) by %d. The three diseases can stack.
 		Virulent Disease will always try to apply a disease the target does not currently have, and also one that will have the most debilitating effect for the target.
 		This disease will try to prioritize being applied to an enemy with a high disease count near the target.
 		The effect will increase with your Spellpower.]]):
@@ -293,8 +293,10 @@ newTalent{
 			params.__tmpvals = nil
 			params.src = self
 			params.apply_power = self:combatSpellpower()
+			local dur = math.max(6, params.dur)
+
 			if target:canBe("disease") then
-				target:setEffect(disease.id, 6, params)
+				target:setEffect(disease.id, dur, params)
 			else
 				game.logSeen(target, "%s resists the disease!", target.name:capitalize())
 			end

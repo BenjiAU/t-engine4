@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -355,7 +355,7 @@ newTalent{
 			local hit = self:attackTarget(target, DamageType.NATURE, dam, true)
 			if hit then t.applyVenomousEffects(self, t, target) end
 		else
-			local targets = self:archeryAcquireTargets(nil, {one_shot=true})
+			local targets = self:archeryAcquireTargets(nil, {no_energy=true, one_shot=true})
 			if not targets then return end
 			local hit = self:archeryShoot(targets, t, nil, {mult=dam, damtype=DamageType.NATURE})
 		end

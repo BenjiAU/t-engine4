@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -51,13 +51,16 @@ function _M:dumpToJSON(js, bypass, nosub)
 		addons[add.short_name] = ("%s %d.%d.%d"):format(add.long_name, add.version[1], add.version[2], add.version[3])
 	end
 
+	local class_evo = ""
+	if self.descriptor and self.descriptor.class_evolution then class_evo = " ("..self.descriptor.class_evolution..")" end
+
 	js:newSection("character", {
 		game = string.format("%s %d.%d.%d", game.__mod_info.long_name, game.__mod_info.version[1], game.__mod_info.version[2], game.__mod_info.version[3]),
 		addons = addons,
 		name = self.name,
 		sex = self.descriptor and self.descriptor.sex or (self.female and "Female" or "Male"),
 		race = ((self.descriptor and self.descriptor.subrace) or self.type:capitalize()),
-		class = ((self.descriptor and self.descriptor.subclass) or self.subtype:capitalize()),
+		class = ((self.descriptor and self.descriptor.subclass) or self.subtype:capitalize())..class_evo,
 		size = self:TextSizeCategory(),
 		campaign = self.descriptor and self.descriptor.world or "---",
 		difficulty = self.descriptor and self.descriptor.difficulty or "---",

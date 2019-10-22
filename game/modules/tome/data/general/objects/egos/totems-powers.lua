@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -17,13 +17,6 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
---[[
-Totems
-*healing
-*cure illness
-*thorny skin
-]]
-
 -- gfx
 newEntity{
 	name = " of healing", addon=true, instant_resolve=true,
@@ -31,7 +24,7 @@ newEntity{
 	level_range = {1, 50},
 	rarity = 8,
 
-	charm_power_def = {add=100, max=700, floor=true},
+	charm_power_def = {add=0, max=600, floor=true},
 	resolvers.charm(
 		function(self, who) 
 			local heal = self.use_power.heal(self, who)
@@ -68,10 +61,10 @@ newEntity{
 	level_range = {1, 50},
 	rarity = 8,
 
-	charm_power_def = {add=15, max=800, floor=true},
+	charm_power_def = {add=0, max=800, floor=true},
 	resolvers.charm(function(self, who)
 			local dam = self.use_power.damage(self, who)
-			return ("instantly sting an enemy dealing %d nature damage over 7 turns and reducing their healing by 50%%%%"):format(dam, 50)
+			return ("sting an enemy dealing %d nature damage over 7 turns and reducing their healing by 50%%%%"):format(dam, 50)
 		end,
 		15,
 		function(self, who)
@@ -180,7 +173,7 @@ newEntity{
 
 					local target = rng.tableRemove(tgts)
 					if target then
-						if self:attackTarget(target, nil, 1, true) and target:canBe("pin") then target:setEffect(target.EFF_PINNED, 2, {}) end
+						if self:attackTarget(target, nil, 1, true) and target:canBe("pin") then target:setEffect(target.EFF_PINNED, 1, {}) end
 					end
 					self.energy.value = 0
 				end,

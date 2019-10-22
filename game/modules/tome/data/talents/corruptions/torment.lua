@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -84,10 +84,15 @@ newTalent{
 
 		self.turn_procs.overkilling = true
 		local dam = (target.die_at - target.life) * t.getOversplash(self, t) / 100
-		local incdam = self.inc_damage
-		self.inc_damage = {}
+		
+		local incdam = {}
+		for t, v in pairs(self.inc_damage) do incdam[t] = -v end
+		local tmpid = self:addTemporaryValue("inc_damage", incdam)
+
 		local ok, err = pcall(function() self:project({type="ball", radius=2, selffire=false, x=target.x, y=target.y, talent=t}, target.x, target.y, DamageType.BLIGHT, dam, {type="acid"}) end)
-		self.inc_damage = incdam
+
+		self:removeTemporaryValue("inc_damage", tmpid)
+
 		self.turn_procs.overkilling = nil
 		if not ok then error(err) end
 	end,

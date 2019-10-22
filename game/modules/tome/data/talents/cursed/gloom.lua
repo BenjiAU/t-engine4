@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ newTalent{
 	cooldown = 0,
 	range = 3,
 	no_energy = true,
-	tactical = { BUFF = 5 },	
+	tactical = { BUFF = 5 },
 	getChance = function(self, t) return math.min(25, self:combatScale(self:getTalentLevel(t), 7, 1, 15, 6.5) * math.max(1, self:combatScale(self.combat_mindspeed, 1, 1, 1.35, 1.5))) end,
 	getMindpower = gloomTalentsMindpower,
 	getDuration = function(self, t)
@@ -60,9 +60,9 @@ newTalent{
 		-- all gloom effects are handled here
 		local tWeakness = self:getTalentFromId(self.T_WEAKNESS)
 		local tDismay = self:getTalentFromId(self.T_DISMAY)
-		
+
 		local mindpower = self:combatMindpower()
-		
+
 		local grids = core.fov.circle_grids(self.x, self.y, self:getTalentRange(tGloom), true)
 		for x, yy in pairs(grids) do
 			for y, _ in pairs(grids[x]) do
@@ -75,7 +75,7 @@ newTalent{
 						game.logPlayer(self, "#F53CBE#Your heart hardens as a powerful foe enters your gloom! (+%d hate)", hateGain)
 						target.gloom_hate_bonus = true
 					end
-				
+
 					-- Gloom
 					if self:getTalentLevel(tGloom) > 0 and rng.percent(tGloom.getChance(self, tGloom)) and target:checkHit(mindpower, target:combatMentalResist(), 5, 95, 15) then
 						local effect = rng.range(1, 3)
@@ -176,13 +176,14 @@ newTalent{
 	callbackOnActEnd = function(self, t)
 		if self:isTalentActive(self.T_GLOOM) and t.hasFoes(self) then
 			local tg = self:getTalentTarget(t)
-			self:projectSource(tg, self.x, self.y, DamageType.MIND, self:mindCrit(t.getDamage(self, t) * 0.5), nil, t)
-			self:projectSource(tg, self.x, self.y, DamageType.DARKNESS, self:mindCrit(t.getDamage(self, t) * 0.5), nil, t)
+			local damage = self:mindCrit(t.getDamage(self, t) * 0.5)
+			self:projectSource(tg, self.x, self.y, DamageType.MIND, damage, nil, t)
+			self:projectSource(tg, self.x, self.y, DamageType.DARKNESS, damage, nil, t)
 		end
 	end,
 	info = function(self, t)
-		return ([[Each turn, all enemies in your gloom take %0.2f mind damage and %0.2f darkness damage.
-		The damage scales with your Mindpower and mind speed.
+		return ([[Every time you act, all enemies in your gloom take %0.2f mind damage and %0.2f darkness damage.
+		The damage scales with your Mindpower.
 		Each point in Gloom talents increases your Mindpower (current total: %d).]]):format(damDesc(self, DamageType.MIND, t.getDamage(self, t) * 0.5), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t) * 0.5), gloomTalentsMindpower(self))
 	end,
 }

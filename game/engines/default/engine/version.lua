@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -105,4 +105,11 @@ function engine.version_patch_same(v, ev)
 	if v[2] ~= ev[2] then return false end
 	if v[3] >= ev[3] then return true end
 	return false
+end
+
+--- Check if we are running as beta
+function engine.version_hasbeta()
+	if fs.exists("/engine/version_beta.lua") then
+		return dofile("/engine/version_beta.lua")
+	end
 end

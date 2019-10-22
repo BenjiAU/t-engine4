@@ -1103,6 +1103,16 @@ static int sdl_set_window_pos(lua_State *L)
 	return 1;
 }
 
+static bool draw_string_split_anywhere = FALSE;
+static int font_display_split_anywhere(lua_State *L) {
+	draw_string_split_anywhere = lua_toboolean(L, 1);
+	return 0;
+}
+static int font_display_split_anywhere_get(lua_State *L) {
+	lua_pushboolean(L, draw_string_split_anywhere);
+	return 1;
+}
+
 extern void on_redraw();
 static int sdl_redraw_screen(lua_State *L) {
 	redraw_now(redraw_type_normal);
@@ -1440,6 +1450,8 @@ static int gl_get_fps(lua_State *L) {
 
 static const struct luaL_Reg displaylib[] =
 {
+	{"breakTextAllCharacter", font_display_split_anywhere},
+	{"getBreakTextAllCharacter", font_display_split_anywhere_get},
 	{"forceRedraw", sdl_redraw_screen},
 	{"forceRedrawForScreenshot", sdl_redraw_screen_for_screenshot},
 	{"redrawingForSavefileScreenshot", redrawing_for_savefile_screenshot},

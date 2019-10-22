@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -170,6 +170,7 @@ uberTalent{
 	name = "Crafty Hands",
 	mode = "passive",
 	no_npc_use = true,
+	cant_steal = true,
 	require = { special={desc="Know Imbue Item to level 5", fct=function(self)
 		return self:getTalentLevelRaw(self.T_IMBUE_ITEM) >= 5
 	end} },

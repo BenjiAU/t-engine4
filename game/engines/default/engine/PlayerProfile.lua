@@ -1,5 +1,5 @@
 -- TE4 - T-Engine 4
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -859,6 +859,8 @@ function _M:sendError(what, err)
 	end
 	local version = game.__mod_info.version_name
 	if game.__mod_info.version_desc then version = game.__mod_info.version_name.." ("..tostring(game.__mod_info.version_desc)..")" end
+	local beta = engine.version_hasbeta()
+	if beta then version = version.."-"..beta end
 	core.profile.pushOrder(table.serialize{
 		o="SendError",
 		login=self.login,
@@ -866,6 +868,7 @@ function _M:sendError(what, err)
 		err=err,
 		module=game.__mod_info.short_name,
 		version=version,
+		charuuid=game:getPlayer(true) and game:getPlayer(true).__te4_uuid,
 		addons=table.concat(addons, ", "),
 	})
 end
@@ -1051,6 +1054,10 @@ function _M:isDonator(s)
 	s = s or 1
 	if core.steam then return true end
 	if not self.auth or not tonumber(self.auth.donated) or tonumber(self.auth.donated) < s then return false else return true end
+end
+
+function _M:canMTXN()
+	return self:isDonator()
 end
 
 function _M:allowDLC(dlc)

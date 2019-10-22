@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2018 Nicolas Casalini
+-- Copyright (C) 2009 - 2019 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -137,16 +137,12 @@ newTalent{
 	end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
-		local x, y, dist = self:getTarget(tg)
-		if not (x and y) then return end
+		local x, y, target = self:getTargetLimitedWallStop(tg)
+		if not x then return end
+		if x == self.x and y == self.y then return end
+		if target then game.logPlayer(self, "You can not jump onto a creature.") return end
 		
-		local _ _, _, _, fx, fy = self:canProject(tg, x, y)
-		if not (fx and fy) or (fx == self.x and fy == self.y) then return end
-		if fx ~= x or fy ~= y then
-			game.logPlayer(self, "Terrain blocked your trajectory.")
-		end
-		
-		return self:move(fx, fy, true)
+		return self:move(x, y, true)
 	end,
 	info = function(self, t)
 		local range = self:getTalentRange(t)
