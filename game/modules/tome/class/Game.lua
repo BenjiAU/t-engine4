@@ -2345,6 +2345,9 @@ do return end
 				"exit",
 			}
 			local adds = self.uiset:getMainMenuItems()
+			if config.settings.cheat then
+				table.insert(adds, {"Particles Editor", function() self:unregisterDialog(menu) self:registerDialog(require("engine.dialogs.ParticlesComposeEditor").new(true)) end})
+			end
 			for i = #adds, 1, -1 do table.insert(l, 10, adds[i]) end
 			self:triggerHook{"Game:alterGameMenu", menu=l, unregister=function() self:unregisterDialog(menu) end}
 			menu = require("engine.dialogs.GameMenu").new(l)
