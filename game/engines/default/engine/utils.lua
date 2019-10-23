@@ -2655,7 +2655,6 @@ function core.fov.set_vision_shape(val)
 	core.fov.set_vision_shape_base(val)
 	return val
 end
-end
 
 function core.fov.lineIterator(sx, sy, tx, ty, what)
 	what = what or "block_move"
@@ -2667,6 +2666,7 @@ function core.fov.lineIterator(sx, sy, tx, ty, what)
 		lx, ly = l:step()
 		return rx, ry
 	end
+end
 end
 
 --- create a basic bresenham line (or hex equivalent)
