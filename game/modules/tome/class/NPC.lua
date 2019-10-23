@@ -451,7 +451,11 @@ function _M:addedToLevel(level, x, y)
 			-- increase level of innate talents
 			-- Note: talent levels from added classes are not adjusted for difficulty directly
 			-- This means that the NPC's innate talents are generally higher level, preserving its "character"
-			for tid, lev in pairs(self.talents) do
+
+			-- Copy the table first so we don't insert talents that teach talents during iteration or double dip their scaling
+			local talents = table.clone(self.talents)
+
+			for tid, lev in pairs(talents) do
 				local t = self:getTalentFromId(tid)
 				if t.points ~= 1 then
 					self:learnTalent(tid, true, math.floor(lev*(talent_mult - 1)))

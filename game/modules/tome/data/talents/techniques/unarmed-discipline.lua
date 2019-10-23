@@ -99,7 +99,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t) * 100
-		return ([[Unleash a flurry of disruptive kicks at your target's vulnerable areas.  For each combo point you attack for %d%% weapon damage and deactivate one physical sustain.
+		return ([[Unleash a flurry of disruptive kicks at your target's vulnerable areas. For each combo point you attack for %d%% weapon damage and deactivate one physical sustain.
 			At talent level 3 #DARK_ORCHID#Magical#LAST# sustains will also be effected.
 			At talent level 5 #YELLOW#Mental#LAST# sustains will also be effected.
 			Using this talent removes your combo points.]])
@@ -118,7 +118,7 @@ newTalent{
 	info = function(self, t)
 		local stamina = t.getStamina(self, t)
 		local chance = t.getChance(self, t)
-		return ([[When gaining a combo point, you have a %d%% chance to gain an extra combo point.  Additionally, every time you earn a combo point, you will regain %0.2f stamina, or %0.2f stamina if you would exceed 5 combo points.]])
+		return ([[When gaining a combo point, you have a %d%% chance to gain an extra combo point. Additionally, every time you earn a combo point, you will regain %0.2f stamina, or %0.2f stamina if you would exceed 5 combo points.]])
 		:format(chance, stamina, stamina*2)
 	end,
 }
@@ -148,7 +148,7 @@ newTalent{
 		local block = t.getBlock(self, t)
 		local maxblock = block*5
 		return ([[Toughen your body blocking up to %d damage per combo point (Max %d) across 2 turns.
-			Current block value:  %d
+			Current block value: %d
 			Using this talent removes your combo points.
 			The damage absorbed scales with your Physical Power.]])
 		:format(block, block * 5, block * self:getCombo())

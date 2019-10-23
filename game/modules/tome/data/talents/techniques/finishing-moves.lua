@@ -122,7 +122,7 @@ newTalent{
 		local area = t.getAreaDamage(self, t) * 0.25
 		local areamax = t.getAreaDamage(self, t) * 1.25
 		local radius = self:getTalentRadius(t)
-		return ([[A powerful concussive punch that deals %d%% weapon damage to your target.  If the punch hits, all targets in a radius of %d will take %0.2f to %0.2f damage, depending on the amount of combo points you've accumulated.
+		return ([[A powerful concussive punch that deals %d%% weapon damage to your target. If the punch hits, all targets in a radius of %d will take %0.2f to %0.2f damage, depending on the amount of combo points you've accumulated.
 		The area damage will scale with your Strength, and the radius will increase by 1 per combo point.
 		Using this talent removes your combo points.]])
 		:format(damage, radius, damDesc(self, DamageType.PHYSICAL, area), damDesc(self, DamageType.PHYSICAL, areamax))
@@ -192,7 +192,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[You spin into a flying leap and deliver a powerful kick dealing %d%% weapon damage to all enemies in a radius of 1 as you land.  The range will increase by 1 per combo point and total damage will increase by 10%% per combo point.
+		return ([[You spin into a flying leap and deliver a powerful kick dealing %d%% weapon damage to all enemies in a radius of 1 as you land. The range will increase by 1 per combo point and total damage will increase by 10%% per combo point.
 		Using this talent removes your combo points and you must have at least 1 combo point to use it.]]):format(t.getDamage(self, t)*100)
 	end,
 }
@@ -259,7 +259,7 @@ newTalent{
 		local maxDamage = damage * 2
 		local stamina = t.getStamina(self, t, 0)/self.max_stamina*100
 		local staminamax = t.getStamina(self, t, 5)/self.max_stamina*100
-		return ([[A vicious finishing strike that deals %d%% damage increased by 20%% per combo point you have up to a max of %d%%.  If the target ends up with low enough life (<20%%), it might be instantly killed.
+		return ([[A vicious finishing strike that deals %d%% damage increased by 20%% per combo point you have up to a max of %d%%. If the target ends up with low enough life (<20%%), it might be instantly killed.
 		Killing a target with Haymaker will instantly restore %d%% to %d%% of your maximum stamina, depending on the amount of combo points you've accumulated.
 		Using this talent removes your combo points.]])
 		:format(damage, maxDamage, stamina, staminamax)

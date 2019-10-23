@@ -134,10 +134,10 @@ or [[]])),
 }
 
 newChat{ id="hiton",
-	text = [[What?!?  Just because you rescued me from a moderately-to-extremely gruesome death, you think that entitles you to take liberties?!]],
+	text = [[What?!? Just because you rescued me from a moderately-to-extremely gruesome death, you think that entitles you to take liberties?!]],
 	answers = {
 		{"WHY AREN'T WOMEN ATTRACTED TO ME I'M A NICE "..(p.female and "GIRL" or "GUY")..".", quick_reply="Uhh, sorry I hear my father calling, see you.", action=function() ql.nolove = true end},
-		{"Just a minute, I was just ...", jump="reassurance"},
+		{"Just a minute, I was just...", jump="reassurance"},
 	}
 }
 

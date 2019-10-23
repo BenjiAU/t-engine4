@@ -27,7 +27,7 @@ newTalent{
 	tactical = { ATTACKAREA = { COLD = 1, stun = 1 } },
 	range = 10,
 	radius = 1,
-	proj_speed = 4,
+	proj_speed = 8,
 	requires_target = true,
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), talent=t}
@@ -38,7 +38,7 @@ newTalent{
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
 		local empower = necroEssenceDead(self)
-		local grids = self:project(tg, x, y, function(px, py)
+		self:project(tg, x, y, function(px, py)
 			local actor = game.level.map(px, py, Map.ACTOR)
 			if actor and actor ~= self then
 				if empower then

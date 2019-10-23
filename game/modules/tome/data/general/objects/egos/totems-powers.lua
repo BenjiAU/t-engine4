@@ -57,7 +57,7 @@ newEntity{
 
 newEntity{
 	name = " of stinging", addon=true, instant_resolve=true,
-	keywords = {conjure=true},
+	keywords = {stinging=true},
 	level_range = {1, 50},
 	rarity = 8,
 

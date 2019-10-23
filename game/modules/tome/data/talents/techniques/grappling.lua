@@ -102,7 +102,7 @@ newTalent{
 		local share = t.getSharePct(self, t)*100
 		local damage = t.getDamage(self, t)*100
 		return ([[Make a melee attack for %d%% damage and then attempt to grapple a target up to one size category larger than yourself for %d turns. A grappled opponent will be unable to move, take %d damage each turn, and %d%% of the damage you receive from any source will be redirected to them as physical damage.
-		Any movement from the target or you will break the grapple.  Maintaining a grapple drains %d stamina per turn.
+		Any movement from the target or you will break the grapple. Maintaining a grapple drains %d stamina per turn.
 		You may only grapple a single target at a time, and using any targeted unarmed talent on a target that you're not grappling will break the grapple.]])
 		:format(damage, duration, power, share, drain)
 	end,
@@ -141,7 +141,7 @@ newTalent{
 		local reduction = t.getDamageReduction(self, t)
 		local slow = t.getSlow(self, t)
 
-		return ([[Enhances your grapples with additional effects.  All additional effects will apply to every grapple with no additional save or resist check.
+		return ([[Enhances your grapples with additional effects. All additional effects will apply to every grapple with no additional save or resist check.
 		#RED#Talent Level 1:  Reduces physical power by %d
 		Talent Level 3:  Silences
 		Talent Level 5:  Reduces global action speed by %d%%]])

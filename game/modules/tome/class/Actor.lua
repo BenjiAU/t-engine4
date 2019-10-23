@@ -1663,7 +1663,7 @@ function _M:tooltip(x, y, seen_by)
 	local resists = tstring{}
 	local first = true
 	ts:add({"color", "ANTIQUE_WHITE"}, "Resists: ")
-	for t, _ in table.orderedPairs2(self.resists, dt_order) do
+	for t, _ in table.orderedPairs2(self.resists or {}, dt_order) do
 		local v = self:combatGetResist(t)
 		if t == "all" or t == "absolute" then
 			ts:add({"color", "LIGHT_BLUE"}, tostring(math.floor(v)) .. "%", " ", {"color", "LAST"}, t..", ")
@@ -2627,17 +2627,17 @@ end
 
 -- Superloaded
 function _M:cloneActor(post_copy, alt_nodes)
+	self._ai_tact_wt_cache = nil
+	self._turn_ai_tactical = nil
 	local a, post_copy = engine.Actor.cloneActor(self, post_copy, alt_nodes)
 	a.immune_possession = 1
-	a._ai_tact_wt_cache = nil
-	a._turn_ai_tactical = nil
 	a:fireTalentCheck("callbackOnCloned", "actor", self, post_copy, alt_nodes)
 	return a, post_copy
 end
 function _M:cloneFull(post_copy)
+	self._ai_tact_wt_cache = nil
+	self._turn_ai_tactical = nil
 	local a = engine.Actor.cloneFull(self, post_copy)
-	a._ai_tact_wt_cache = nil
-	a._turn_ai_tactical = nil
 	a:fireTalentCheck("callbackOnCloned", "full", self, post_copy)
 	return a
 end
@@ -3207,16 +3207,12 @@ function _M:levelupClass(c_data)
 		c_data.unknown_tt = unknown_tt
 		c_data.ttypes = ttypes
 
-		-- Assign class starting talents and set them to level up later
+		-- Assign class starting talents
 		for tid, v in pairs(c_def.talents or {}) do
 			c_data.auto_talents = c_data.auto_talents or {}
 			local t = self:getTalentFromId(tid)
 			if not t.no_npc_use and (not t.random_boss_rarity or rng.chance(t.random_boss_rarity)) then
 				local every = 0
-				if t.points > 1 then
-					every = math.ceil(50/(t.points * 1.2))
-					table.insert(c_data.auto_talents, {tid=tid, start_level=c_data.start_level, base=v, every=every})
-				end
 				print(("\t ** learning %s birth talent %s %s (every %s levels)"):format(c_data.class, tid, v, every))
 				self:learnTalent(tid, true, v)
 			end
@@ -3252,17 +3248,6 @@ function _M:levelupClass(c_data)
 		end
 
 		--print((" *** level: %s/%s stats: %s talents: %s generics: %s categories: %s prodigies: %s"):format(c_data.last_level, new_level, self.unused_stats, self.unused_talents, self.unused_generics, self.unused_talents_types, self.unused_prodigies))
-
-		-- automatically level up any auto_talents, (usualy birth talents)
-		if c_data.auto_talents then
-			for i, d in ipairs(c_data.auto_talents) do
-				if c_data.last_level > d.start_level and (c_data.last_level - d.start_level)%d.every == 0 then
-					--print(("\t ** advancing %s auto_talent %s"):format(c_data.class, d.tid))
-					self:learnTalent(d.tid, true)
-				end
-			end
-		end
-
 		ttypes = c_data.ttypes
 
 		-- generate list of possible talent types based on the master list
@@ -6002,6 +5987,11 @@ function _M:postUseTalent(ab, ret, silent)
 		local name = (ab.display_entity and ab.display_entity:getDisplayString() or "")..ab.name
 		local sx, sy = game.level.map:getTileToScreen(self.x, self.y, true)
 		game.flyers:add(sx, sy - game.level.map.tile_h / 2, 20, rng.float(-0.1, 0.1), rng.float(-0.5,-0.8), name, colors.simple(colors.OLIVE_DRAB))
+	end
+
+	if self.shimmer_sustains_hide and self.shimmer_sustains_hide[ab.id] then
+		local ShimmerRemoveSustains = require "mod.dialogs.ShimmerRemoveSustains"
+		ShimmerRemoveSustains:removeAura(self, ab.id, ret)
 	end
 
 	return true

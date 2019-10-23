@@ -55,7 +55,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Conjures up a spear of bones, doing %0.2f physical damage to all targets in a line.  Each target takes an additional %d%% damage for each magical debuff they are afflicted with.
-		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), damDesc(self, DamageType.PHYSICAL, t.getBonus(self, t)*100))
+		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), t.getBonus(self, t)*100)
 	end,
 }
 

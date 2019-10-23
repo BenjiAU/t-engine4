@@ -732,7 +732,7 @@ newTalent{
 	range = 10,
 	reflectable = true,
 	requires_target = true,
-	proj_speed = 2,
+	proj_speed = 20,
 	target = function(self, t) return {type="beam", range=self:getTalentRange(t), talent=t, selffire=false, display={particle="bolt_void", trail="voidtrail"}} end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)

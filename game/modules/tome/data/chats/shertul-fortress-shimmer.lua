@@ -17,6 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
+local ShimmerRemoveSustains = require("mod.dialogs.ShimmerRemoveSustains")
+
 local function shimmer(player, slot)
 	return function()
 		package.loaded['mod.dialogs.Shimmer'] = nil
@@ -29,6 +31,14 @@ local function shimmer_other(player, slot)
 	return function()
 		package.loaded['mod.dialogs.ShimmerOther'] = nil
 		local d = require("mod.dialogs.ShimmerOther").new(player, slot)
+		game:registerDialog(d)
+	end
+end
+
+local function sustains_aura_remove(player)
+	return function()
+		package.loaded['mod.dialogs.ShimmerRemoveSustains'] = nil
+		local d = require("mod.dialogs.ShimmerRemoveSustains").new(player)
 		game:registerDialog(d)
 	end
 end
@@ -53,9 +63,12 @@ if world.unlocked_shimmers and world.unlocked_shimmers.SHIMMER_HAIR then
 	answers[#answers+1] = {"[Alter the appearance of your hair]", action=shimmer_other(player, "SHIMMER_HAIR"), jump="welcome"}
 end
 if world.unlocked_shimmers and world.unlocked_shimmers.SHIMMER_AURA then
-	answers[#answers+1] = {"[Alter the appearance of your aura]", action=shimmer_other(player, "SHIMMER_AURA"), jump="welcome"}
+	answers[#answers+1] = {"[Alter the appearance of your cosmetic aura]", action=shimmer_other(player, "SHIMMER_AURA"), jump="welcome"}
 end
 
+if ShimmerRemoveSustains:hasRemovableAuras(player) then
+	answers[#answers+1] = {"[Disable the visual effects of your sustains]", action=sustains_aura_remove(player), jump="welcome"}
+end
 
 answers[#answers+1] = {"[Leave the mirror alone]"}
 	

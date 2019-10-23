@@ -121,9 +121,9 @@ newTalent{
 		local damage = t.getDamage(self, t) * 100
 		local penalty = t.getDamagePenalty(self, t)
 		return ([[Fire an arrow for %d%% weapon damage and call up to 2 wardens, depending on available space, that will each fire a single arrow before returning to their timelines.
-		The wardens are out of phase with normal reality and deal %d%% less damage but shoot through friendly targets.  All your arrows, including arrows from Shoot and other talents, now phase through friendly targets without causing them harm.
+		The wardens are out of phase with normal reality and deal %d%% less damage but shoot through friendly targets. All your arrows, including arrows from Shoot and other talents, now phase through friendly targets without causing them harm.
 		
-		Bow Threading talents will freely swap to your bow when activated if you have one in your secondary slot.  You may use the Shoot talent in a similar manner.]])
+		Bow Threading talents will freely swap to your bow when activated if you have one in your secondary slot. You may use the Shoot talent in a similar manner.]])
 		:format(damage, penalty)
 	end
 }
@@ -218,7 +218,7 @@ newTalent{
 		local damage = t.getDamage(self, t) * 100
 		local radius = self:getTalentRadius(t)
 		local aoe = t.getDamageAoE(self, t)
-		return ([[Fire an arrow for %d%% weapon damage.  When the arrow reaches its destination or hits a target it will draw in all other targets in a radius of %d and inflict %0.2f physical damage.
+		return ([[Fire an arrow for %d%% weapon damage. When the arrow reaches its destination or hits a target it will draw in all other targets in a radius of %d and inflict %0.2f physical damage.
 		Each target moved beyond the first increases the damage %0.2f (up to %0.2f bonus damage).
 		Targets take reduced damage the further they are from the epicenter (20%% less per tile).
 		The additional damage scales with your Spellpower.]])

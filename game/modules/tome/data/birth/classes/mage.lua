@@ -50,7 +50,7 @@ newBirthDescriptor{
 	copy = {
 		mana_regen = 0.5,
 		mana_rating = 7,
-		resolvers.inscription("RUNE:_MANASURGE", {cooldown=25, dur=10, mana=620}, 3),
+		resolvers.inscription("RUNE:_MANASURGE", {cooldown=15, dur=10, mana=820}, 3),
 	},
 }
 

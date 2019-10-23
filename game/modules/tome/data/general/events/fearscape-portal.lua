@@ -58,7 +58,6 @@ local changer = function(id)
 		width = 30, height = 30,
 		ambient_music = "World of Ice.ogg",
 		reload_lists = false,
-		projectile_speed_mod = 0.3,
 		persistent = "zone",
 		
 		no_worldport = game.zone.no_worldport,

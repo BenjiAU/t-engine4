@@ -88,7 +88,7 @@ newTalent{
 		end
 	end,
 	info = function(self, t)
-		return ([[Your mastery of unarmed combat unifies your body.  Increases your Strength by %d based on Cunning and your Constitution by %d based on Dexterity.]]):format(t.getStr(self, t), t.getCon(self, t))
+		return ([[Your mastery of unarmed combat unifies your body. Increases your Strength by %d based on Cunning and your Constitution by %d based on Dexterity.]]):format(t.getStr(self, t), t.getCon(self, t))
 	end
 }
 

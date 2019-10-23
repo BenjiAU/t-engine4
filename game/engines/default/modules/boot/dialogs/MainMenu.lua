@@ -141,7 +141,7 @@ function _M:setupDLCButtons()
 		if v then game:floatingTooltip(posx, posy, "top", {
 			Image.new{file="dlcs-icons/ashes-banner.png", width=467, height=181},
 [[#{bold}##GOLD#Ashes of Urh'Rok - Expansion#LAST##{normal}#
-#{italic}##ANTIQUE_WHITE#Many in Maj'Eyal have heard of "demons", sadistic creatures who appear seemingly from nowhere, leaving a trail of suffering and destruction whereever they go.#{normal}##LAST#
+#{italic}##ANTIQUE_WHITE#Many in Maj'Eyal have heard of "demons", sadistic creatures who appear seemingly from nowhere, leaving a trail of suffering and destruction wherever they go.#{normal}##LAST#
 
 #{bold}#Features#{normal}#:
 #LIGHT_UMBER#New class:#WHITE# Doombringers. These avatars of demonic destruction charge into battle with massive two-handed weapons, cutting swaths of firey devastation through hordes of opponents. Armed with flame magic and demonic strength, they delight in fighting against overwhelming odds

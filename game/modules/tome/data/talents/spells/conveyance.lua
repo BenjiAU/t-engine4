@@ -61,8 +61,8 @@ newTalent{
 	require = spells_req1,
 	points = 5,
 	random_ego = "utility",
-	mana = function(self, t) return game.zone and game.zone.force_controlled_teleport and 1 or 30 end,
-	cooldown = function(self, t) return game.zone and game.zone.force_controlled_teleport and 3 or 12 end,
+	mana = function(self, t) return self:attr("phase_door_force_precise") and 1 or 30 end,
+	cooldown = function(self, t) return self:attr("phase_door_force_precise") and 3 or 12 end,
 	tactical = teleport_tactical,
 	getRange = function(self, t) return self:combatLimit(self:combatTalentSpellDamage(t, 10, 15), 40, 4, 0, 13.4, 9.4) end, -- Limit to range 40
 	range = function(self, t) return self:getTalentLevel(t) >= 4 and 10 or 0 end, -- for targeting enemies
@@ -98,7 +98,7 @@ newTalent{
 		local x, y = self.x, self.y
 		local range = t.getRange(self, t)
 		local radius = t.getRadius(self, t)
-		if self:getTalentLevel(t) >= 5 or game.zone.force_controlled_teleport then
+		if self:getTalentLevel(t) >= 5 or self:attr("phase_door_force_precise") then
 			game.logPlayer(self, "Select a teleport location...")
 			local tg = {type="ball", nolock=true, pass_terrain=true, nowarning=true, range=range, radius=radius, requires_knowledge=false}
 			if self.aiSeeTargetPos then -- ai code for NPCs
@@ -202,7 +202,7 @@ newTalent{
 		local range = t.getRange(self, t)
 		local radius = t.getRadius(self, t)
 		local newpos
-		if self:getTalentLevel(t) >= 5 or game.zone.force_controlled_teleport then
+		if self:getTalentLevel(t) >= 5 or self:attr("phase_door_force_precise") then
 			game.logPlayer(self, "Select a teleport location...")
 			local tg = {type="ball", nolock=true, pass_terrain=true, nowarning=true, range=range, radius=radius, requires_knowledge=false}
 			if self.aiSeeTargetPos then -- ai code for NPCs

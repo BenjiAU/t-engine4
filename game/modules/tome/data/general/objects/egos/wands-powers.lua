@@ -102,7 +102,7 @@ newEntity{
 		}
 	end),
 
-	charm_power_def = {add=0, max=1000, floor=true},
+	charm_power_def = {add=0, max=800, floor=true},
 	resolvers.charm(function(self, who)
 			local dam = self.use_power.damage(self, who)
 			return ("fire a magical bolt dealing %d %s damage"):format(dam, self.elem[3] )

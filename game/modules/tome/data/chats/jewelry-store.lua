@@ -34,7 +34,7 @@ local imbueEgo = function(gem, ring)
 end
 
 local imbue_ring = function(npc, player)
-	player:showInventory("Imbue which ring?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "ring" and o.material_level end, function(ring, ring_item)
+	player:showInventory("Imbue which ring?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "ring" and o.material_level and not o.unique and not o.plot and not o.special and not o.tinker end, function(ring, ring_item)
 		player:showInventory("Use which gem?", player:getInven("INVEN"), function(gem) return gem.type == "gem" and gem.imbue_powers and gem.material_level end, function(gem, gem_item)
 			local lev = (ring.material_level + gem.material_level) / 2 * 10 + 10  -- Average the material level then add a bonus so we guarantee greater ego level range
 			local new_ring
@@ -68,8 +68,9 @@ local imbue_ring = function(npc, player)
 
 				new_ring.name = (ring.short_name or ring.name or "weird").." "..gem.name .. " ring"
 				new_ring:identify(true)
-				game.zone:addEntity(game.level, new_ring, "object")
-				player:addObject(player:getInven("INVEN"), new_ring)
+				-- player:addObject(player:getInven("INVEN"), new_ring)
+				ring:replaceWith(new_ring)
+				game.zone:addEntity(game.level, ring, "object")
 
 				game.logPlayer(player, "%s creates: %s", npc.name:capitalize(), new_ring:getName{do_colour=true, no_count=true})
 			end end)
@@ -78,7 +79,7 @@ local imbue_ring = function(npc, player)
 end
 
 local artifact_imbue_amulet = function(npc, player)
-	player:showInventory("Imbue which amulet?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "amulet" and o.material_level end, function(amulet, amulet_item)
+	player:showInventory("Imbue which amulet?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "amulet" and o.material_level and not o.unique and not o.plot and not o.special and not o.tinker end, function(amulet, amulet_item)
 		player:showInventory("Use which first gem?", player:getInven("INVEN"), function(gem1) return gem1.type == "gem" and (gem1.material_level or 99) <= amulet.material_level and gem1.imbue_powers end, function(gem1, gem1_item)
 			player:showInventory("Use which second gem?", player:getInven("INVEN"), function(gem2) return gem2.type == "gem" and (gem2.material_level or 99) <= amulet.material_level and gem1.name ~= gem2.name and gem2.imbue_powers end, function(gem2, gem2_item)
 				local price = 1000
@@ -112,8 +113,9 @@ local artifact_imbue_amulet = function(npc, player)
 					new_amulet.name = "Limmir's Amulet of the Moon"
 					new_amulet.unique = util.uuid()
 					new_amulet:identify(true)
-					game.zone:addEntity(game.level, new_amulet, "object")
-					player:addObject(player:getInven("INVEN"), new_amulet)
+					-- player:addObject(player:getInven("INVEN"), new_amulet)
+					amulet:replaceWith(new_amulet)
+					game.zone:addEntity(game.level, amulet, "object")
 					game.logPlayer(player, "%s creates: %s", npc.name:capitalize(), new_amulet:getName{do_colour=true, no_count=true})
 				end end)
 			end)

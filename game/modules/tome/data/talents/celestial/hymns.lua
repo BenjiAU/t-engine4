@@ -124,7 +124,7 @@ newTalent{
 	adept_deac_tactical = {escape = -0.5}, -- adept tactic adjustments when deactivating (negated)
 	base_tactical = function(self, t, aitarget) -- buff tactic up to +3 depending on how much the talent helps to see a stealthed/invisible target or a target that is out of sense range
 		local buff, max_buff = 0, 4
-		if not aitarget then -- out of combat, stay vigilant for enemies
+		if not aitarget or not self.aiSeeTargetPos then -- out of combat, stay vigilant for enemies
 			buff = max_buff
 		else
 			if self:attr("blind") or self:attr("esp_all") then return end -- target automatically seen or unseen

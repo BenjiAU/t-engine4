@@ -165,6 +165,14 @@ return {
 			game.player:updateMainShader()
 			game.nicer_tiles:postProcessLevelTilesOnLoad(game.level)
 			game:onLevelLoadRun()
+
+			if game.level.data.effects then
+				for uid, act in pairs(game.level.entities) do
+					if act.setEffect then for _, effid in ipairs(game.level.data.effects) do
+						act:setEffect(effid, 1, {})
+					end end
+				end
+			end
 		end)
 	end,
 }

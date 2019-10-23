@@ -76,8 +76,11 @@ newTalent{
 		local sx, sy = util.findFreeGrid(self.x, self.y, 5, true, {[engine.Map.ACTOR]=true})
 		if not sx then return end
 
-		-- Move first so we get the full benefit of Shadowstrike
-		target:move(sx, sy, true)
+		if core.fov.distance(self.x, self.y, target.x, target.y) > 1 then
+			-- Move first so we get the full benefit of Shadowstrike
+			target:move(sx, sy, true)
+		end
+		
 		self:project(tg, target.x, target.y, DamageType.DARKNESS, self:spellCrit(t.getDamage(self, t)))
 
 		if target:canBe("silence") then

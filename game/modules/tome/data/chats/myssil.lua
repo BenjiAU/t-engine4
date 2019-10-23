@@ -59,7 +59,7 @@ Erase him.]],
 
 newChat{ id="tempest-dead",
 	text = [[So I have heard, @playername@. You prove worthy of your training. Go with the blessing of nature, @playername@ of Zigur.
-#LIGHT_GREEN#*She touches your skin.  You can feel nature infusing your very being.*#WHITE#
+#LIGHT_GREEN#*She touches your skin. You can feel nature infusing your very being.*#WHITE#
 This shall help you on your travels. Farewell!]],
 	answers = {
 		{"Thank you, Protector.", action=function(npc, player)

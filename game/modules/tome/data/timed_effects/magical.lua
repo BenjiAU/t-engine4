@@ -337,7 +337,7 @@ newEffect{
 	type = "magical",
 	subtype = { lightning=true, shield=true },
 	status = "beneficial",
-	charges = function(self, eff) return eff.blocks end,
+	charges = function(self, eff) return math.floor(eff.blocks) end,
 	parameters = {threshold = 1, blocks = 1,},
 	on_gain = function(self, err) return "#Target# summons a storm to protect him!", "+Stormshield" end,
 	on_lose = function(self, err) return "#Target#'s storm dissipates.", "-Stormshield" end,

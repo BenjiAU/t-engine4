@@ -4233,6 +4233,23 @@ newDamageType{
 	end,
 }
 
+newDamageType{
+	name = "void echoes", type = "VOID_ECHOES",
+	projector = function(src, x, y, type, dam, state)
+		state = initState(state)
+		useImplicitCrit(src, state)
+		local target = game.level.map(x, y, Map.ACTOR)
+		if target then
+			if target:canBe("fear") then
+				target:setEffect(target.EFF_VOID_ECHOES, 6, {src=src, power=dam, apply_power=src:combatMindpower()})
+				target:crossTierEffect(target.EFF_VOID_ECHOES, src:combatMindpower())
+			else
+				game.logSeen(target, "%s resists the void!", target.name:capitalize())
+			end
+		end
+	end,
+}
+
 ---new lite light burst for summertide phial
 newDamageType{
 	name = "#YELLOW#Lite Light#LAST# Burst (radius 1)", type = "LITE_LIGHT_BURST", --text_color = "#YELLOW#",

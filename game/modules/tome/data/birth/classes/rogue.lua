@@ -144,7 +144,7 @@ newBirthDescriptor{
 		[ActorTalents.T_WEAPON_COMBAT] = 1,
 	},
 	copy = {
-		resolvers.inscription("RUNE:_MANASURGE", {cooldown=25, dur=10, mana=620}, 3),
+		resolvers.inscription("RUNE:_MANASURGE", {cooldown=15, dur=10, mana=820}, 3),
 		resolvers.auto_equip_filters{
 			MAINHAND = {type="weapon", subtype="dagger"},
 			OFFHAND = {type="weapon", subtype="dagger"},

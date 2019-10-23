@@ -26,9 +26,15 @@ local r = rng.range(0, 99)
 if r < 10 then
 	o = game.state:generateRandart{lev=resolvers.current_level+10}
 elseif r < 40 then
-	o = game.zone:makeEntity(game.level, "object", {tome={double_greater=1}}, nil, true)
+	o = game.zone:makeEntity(game.level, "object", 
+			{tome={double_greater=10},  -- note that this can still generate uniques
+			special=function(e) return (e.type and e.type ~= "scroll") and (e.egos or e.unique) end}
+			, nil, true)
 else
-	o = game.zone:makeEntity(game.level, "object", {tome={greater_normal=1}}, nil, true)
+	o = game.zone:makeEntity(game.level, "object", 
+			{tome={greater_normal=10},  -- note that this can still generate uniques
+			special=function(e) return (e.type and e.type ~= "scroll") and (e.egos or e.unique) end}
+			, nil, true)
 end
 r = 99 - r 
 local ms

@@ -236,7 +236,7 @@ newTalent{
 	range = 10,
 	requires_target = true,
 	tactical = { ATTACK = { MIND = 3 }, DISABLE = 1.5 },
-	target = function(self, t) return {type="hit", range=self:getTalentRange(t), talent=t} end,
+	target = function(self, t) return {type="bolt", range=self:getTalentRange(t), talent=t, display={particle="bolt_dark", trail="darktrail"}} end,
 	direct_hit = true,
 	requires_target = true,
 	getDamage = function(self, t) return self:combatTalentMindDamage(t, 10, 100) end,
@@ -244,17 +244,8 @@ newTalent{
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		local _ _, x, y = self:canProject(tg, x, y)
-		if not x or not y then return nil end
-		local target = game.level.map(x, y, Map.ACTOR)
-		if not target then return nil end
 
-		if target:canBe("fear") then
-			target:setEffect(target.EFF_VOID_ECHOES, 6, {src=self, power=t.getDamage(self, t), apply_power=self:combatMindpower()})
-			target:crossTierEffect(target.EFF_VOID_ECHOES, self:combatMindpower())
-		else
-			game.logSeen(target, "%s resists the void!", target.name:capitalize())
-		end
+		self:projectile(tg, x, y, DamageType.VOID_ECHOES, t.getDamage(self, t))
 
 		game:playSoundNear(self, "talents/arcane")
 		return true

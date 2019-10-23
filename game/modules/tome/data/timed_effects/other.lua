@@ -3410,7 +3410,7 @@ newEffect{
 	name = "ZONE_AURA_ABASHED",
 	desc = "Abashed Expanse",
 	no_stop_enter_worlmap = true,
-	long_desc = function(self, eff) return ("Zone-wide effect: Your Phase Door spell is super easy to use here, allowing you to target it regardless of level.") end,
+	long_desc = function(self, eff) return ("Zone-wide effect: Your Phase Door spell is super easy to use here, allowing you to target it regardless of level. Any projectiles is slowed down by 80%.") end,
 	decrease = 0, no_remove = true,
 	type = "other",
 	subtype = { aura=true },
@@ -3418,6 +3418,8 @@ newEffect{
 	zone_wide_effect = true,
 	parameters = {},
 	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "slow_projectiles_outgoing", 80)
+		self:effectTemporaryValue(eff, "phase_door_force_precise", 1)
 	end,
 	deactivate = function(self, eff)
 	end,

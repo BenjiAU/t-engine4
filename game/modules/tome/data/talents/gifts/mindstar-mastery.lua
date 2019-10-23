@@ -144,7 +144,7 @@ newTalent{
 		return ([[Smash your psiblades into the ground, creating a tide of crystallized leaves circling you in a radius of 3 for 7 turns.
 		All foes hit by the leaves will start bleeding for %0.2f per turn (cumulative).
 		All allies hit will be covered in leaves, granting them %d%% chance to completely avoid any damaging attack.
-		Damage and avoidance will increase with your Mindpower and Mindstar power (requires two mindstars, multiplier %2.f).]]):
+		Damage and avoidance will increase with your Mindpower and Mindstar power (requires two mindstars, multiplier %0.2f).]]):
 		format(dam, c, get_mindstar_power_mult(self))
 	end,
 }

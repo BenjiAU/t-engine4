@@ -27,7 +27,7 @@ newTalent{
 	require = gifts_req1,
 	mode = "passive",
 	points = 5,
-	getRegen = function(self, t) return 0.5 end,
+	getRegen = function(self, t) return 1 end,
 	getResist = function(self, t) return 5 + combatTalentPhysicalMindDamage(self, t, 15, 30) end,  -- This can crit
 	on_absorb = function(self, t, damtype)
 		if not DamageType:get(damtype).antimagic_resolve then return end

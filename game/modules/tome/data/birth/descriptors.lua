@@ -71,7 +71,7 @@ newBirthDescriptor{
 		mana_regen = 0,
 
 		max_level = 50,
-		money = 15,
+		money = 0,
 		resolvers.equip{ id=true,
 			{type="lite", subtype="lite", name="brass lantern", ignore_material_restriction=true, ego_chance=-1000},
 		},

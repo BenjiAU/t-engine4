@@ -2224,6 +2224,7 @@ end
 
 --- Returns the resistance
 function _M:combatGetResist(type)
+	if not self.resists then return 0 end -- wtf
 	local power = 100
 	if self.force_use_resist and self.force_use_resist ~= type then
 		type = self.force_use_resist

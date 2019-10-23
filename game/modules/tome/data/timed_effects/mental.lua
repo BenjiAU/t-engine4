@@ -1678,8 +1678,8 @@ newEffect{
 
 newEffect{
 	name = "ATTACK", image = "talents/perfect_strike.png",
-	desc = "Attack",
-	long_desc = function(self, eff) return ("The target's combat attack is improved by %d."):format(eff.power) end,
+	desc = "Perfect Accuracy",
+	long_desc = function(self, eff) return ("The target's accuracy is improved by %d."):format(eff.power) end,
 	type = "mental",
 	subtype = { focus=true },
 	status = "beneficial",

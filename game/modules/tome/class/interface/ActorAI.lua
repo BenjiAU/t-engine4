@@ -172,6 +172,7 @@ function _M.aiParseTalent(t, who)
 			ok, tactical = pcall(t.tactical, who, t, who) -- (test function with who as target, only looking for fields)
 			if not ok then -- defer parsing without proper input
 				print("[aiParseTalent] FAILED TO PARSE tactical table function for", t.id, who and who.uid, who and who.name)
+				print("   => because of error", tactical)
 				t._ai_parsed = nil return
 			end
 		else tactical = t.tactical

@@ -70,7 +70,7 @@ newTalent{
 }
 
 newTalent{
-	name = "Double Strike",  -- no stamina cost attack that will replace the bump attack under certain conditions
+	name = "Double Strike", -- no stamina cost attack that will replace the bump attack under certain conditions
 	type = {"technique/pugilism", 1},
 	require = techs_dex_req1,
 	points = 5,
@@ -145,8 +145,8 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t) * 100
-		return ([[Deliver two quick punches that deal %d%% damage each, and switch your stance to Striking Stance.  If you already have Striking Stance active and Double Strike isn't on cooldown, this talent will automatically replace your normal attacks (and trigger the cooldown).
-		If either jab connects, you earn one combo point.  At talent level 4 or greater, if both jabs connect, you'll earn two combo points.]])
+		return ([[Deliver two quick punches that deal %d%% damage each, and switch your stance to Striking Stance. If you already have Striking Stance active and Double Strike isn't on cooldown, this talent will automatically replace your normal attacks (and trigger the cooldown).
+		If either jab connects, you earn one combo point. At talent level 4 or greater, if both jabs connect, you'll earn two combo points.]])
 		:format(damage)
 	end,
 }
@@ -257,7 +257,7 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t) * 100
 		local charge =t.chargeBonus(self, t, t.range(self, t)-1)*100
-		return ([[Attack your foes in a frontal arc with a spinning backhand, doing %d%% damage.  If you're not adjacent to the target, you'll step forward as you spin, gaining up to %d%% bonus damage, which increases the farther you move.
+		return ([[Attack your foes in a frontal arc with a spinning backhand, doing %d%% damage. If you're not adjacent to the target, you'll step forward as you spin, gaining up to %d%% bonus damage, which increases the farther you move.
 		This attack will remove any grapples you're maintaining, and earn one combo point (or one combo point per attack that connects, if the talent level is 4 or greater).]])
 		:format(damage, charge)
 	end,
@@ -314,7 +314,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t) * 100
-		return ([[Deliver a devastating axe kick dealing %d%% damage.  If the blow connects your target is brain damaged, causing all talents to fail for %d turns and earning 2 combo points.
+		return ([[Deliver a devastating axe kick dealing %d%% damage. If the blow connects your target is brain damaged, causing all talents to fail for %d turns and earning 2 combo points.
 		This effect cannot be saved against, though it can be dodged and checks confusion immunity.]])
 		:format(damage, t.getDuration(self, t))
 	end,
@@ -379,7 +379,7 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t) * 100
 		return ([[Lashes out at the target with three quick punches that each deal %d%% damage.
-		Earns one combo point.  If your talent level is 4 or greater, this instead earns one combo point per blow that connects.]])
+		Earns one combo point. If your talent level is 4 or greater, this instead earns one combo point per blow that connects.]])
 		:format(damage)
 	end,
 }

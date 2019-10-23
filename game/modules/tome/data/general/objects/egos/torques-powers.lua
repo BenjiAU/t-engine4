@@ -69,7 +69,7 @@ newEntity{
 	keywords = {galeforce=true},
 	level_range = {1, 50},
 	rarity = 10,
-	charm_power_def = {add=0, max=800, floor=true},
+	charm_power_def = {add=0, max=700, floor=true},
 	resolvers.charm(
 		function(self, who)
 			local dam = who:damDesc(engine.DamageType.PHYSICAL, self.use_power.damage(self, who))
@@ -115,7 +115,7 @@ newEntity{
 	keywords = {mindblast=true},
 	level_range = {1, 50},
 	rarity = 10,
-	charm_power_def = {add=0, max=800, floor=true},
+	charm_power_def = {add=0, max=700, floor=true},
 	resolvers.charm(function(self, who)
 			local dam = self.use_power.damage(self, who)
 			return ("blast the opponent's mind dealing %d mind damage and silencing them for 4 turns"):format(dam )

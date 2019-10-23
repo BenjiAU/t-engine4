@@ -620,7 +620,7 @@ newEntity{ base = "BASE_SHIELD",
 	on_block = {desc = "Up to once per turn, pull an attacker up to 15 spaces away into melee range, pinning and asphyxiating it", fct = function(self, who, src, type, dam, eff)
 		if not src then return end
 		if who.turn_procs.black_mesh then return end
- 		if src.canBe then return end
+ 		if not src.canBe then return end
 
 		who:logCombat(src, "#ORCHID#Black tendrils from #Source# grab #Target#!")
 		local kb = src:canBe("knockback")

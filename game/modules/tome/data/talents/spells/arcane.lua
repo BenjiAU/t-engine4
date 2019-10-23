@@ -29,11 +29,12 @@ newTalent{
 	use_only_arcane = 1,
 	tactical = { ATTACK = { ARCANE = 2 } },
 	range = 10,
+	proj_speed = 20,
 	direct_hit = function(self, t) if self:getTalentLevel(t) >= 3 then return true else return false end end,
 	reflectable = true,
 	requires_target = true,
 	target = function(self, t)
-		local tg = {type="bolt", range=self:getTalentRange(t), talent=t}
+		local tg = {type="bolt", range=self:getTalentRange(t), talent=t, display={particle="bolt_arcane", trail="arcanetrail"}}
 		if self:getTalentLevel(t) >= 3 then tg.type = "beam" end
 		return tg
 	end,
@@ -42,12 +43,11 @@ newTalent{
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		self:project(tg, x, y, DamageType.ARCANE, self:spellCrit(t.getDamage(self, t)), nil)
-		local _ _, x, y = self:canProject(tg, x, y)
 		if tg.type == "beam" then
+			self:project(tg, x, y, DamageType.ARCANE, self:spellCrit(t.getDamage(self, t)), nil)
 			game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "arcane_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h})
 		else
-			game.level.map:particleEmitter(x, y, 1, "manathrust")
+			self:projectile(tg, x, y, DamageType.ARCANE, self:spellCrit(t.getDamage(self, t)), {type="manathrust"})
 		end
 		game:playSoundNear(self, "talents/arcane")
 		return true

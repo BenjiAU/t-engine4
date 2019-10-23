@@ -2740,7 +2740,8 @@ function _M:saveGame()
 			party:attr("save_cleanup", 1)
 			party:stripForExport()
 			party:attr("save_cleanup", -1)
-			game.player:saveUUID(party)
+			game.player:saveUUID(nil)
+			-- game.player:saveUUID(party)
 		end end))
 		_G.game = self
 
