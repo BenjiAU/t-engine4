@@ -65,7 +65,6 @@ newEntity{ base="BASE_NPC_CRYSTAL", define_as = "SPELLBLAZE_CRYSTAL",
 
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("start-shaloren", engine.Quest.COMPLETED, "spellblaze")
-		game.state:activateBackupGuardian("SPELLBLAZE_SIMULACRUM", 3, 35, "I heard that some old crystals are nearly alive now in the scintillating caves.")
 	end,
 }
 

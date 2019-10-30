@@ -89,6 +89,26 @@ newBirthDescriptor{
 			local x, y = mod.class.Encounter:findSpot(where)
 			return x, y
 		end,
+		on_change_to_advanced = function()
+			game.state:activateBackupGuardian("ALUIN", "trollmire", 1, 35, "... and we thought the trollmire was safer now!")
+			game.state:activateBackupGuardian("SPELLBLAZE_SIMULACRUM", "scintillating-caves", 1, 35, "I heard that some old crystals are nearly alive now in the scintillating caves.")
+			game.state:activateBackupGuardian("CORRUPTED_SAND_WYRM", "sandworm-lair", 1, 45, "Did you hear? Something seems to have devoured all the last sandworms!", function(gen)
+				if gen then return end
+				for i = #game.level.e_array, 1, -1 do
+					local e = game.level.e_array[i]
+					if not e.unique and not e.player then game.level:removeEntity(e) end
+				end
+			end)
+			game.state:activateBackupGuardian("KOR_FURY", "ruins-kor-pul", 1, 35, ".. yes I tell you! The old ruins of Kor'Pul are still haunted!")
+			game.state:activateBackupGuardian("LITHFENGEL", "reknor", 4, 35, "They say that after it has been confirmed orcs still inhabited Reknor, they found a mighty demon there.", function(gen)
+				if gen then require("engine.ui.Dialog"):simpleLongPopup("Danger...", "When last you saw it, this cavern was littered with the corpses of orcs that you had slain. Now many, many more corpses carpet the floor, all charred and reeking of sulfur. An orange glow dimly illuminates the far reaches of the cavern to the east.", 400) end
+			end)
+			game.state:activateBackupGuardian("SNAPROOT", "old-forest", 1, 50, "Have you heard, the old forest seems to have been claimed by a new evil!")
+			game.state:activateBackupGuardian("NIMISIL", "maze", 1, 40, "Have you hard about the patrol that disappeared in the maze in the west?")
+			game.state:activateBackupGuardian("PALE_DRAKE", "dreadfell", 1, 40, "It has been months since the hero cleansed the Dreadfell, yet rumours are growing: evil is back.")
+			game.state:activateBackupGuardian("ABOMINATION", "deep-bellow", 1, 35, "I have heard a dwarf whispering about some abomination in the deep bellow.")
+			game.state:activateBackupGuardian("MASSOK", "daikara", 1, 43, "I have heard there is a dragon hunter in the Daikara that is unhappy about the wyrm being already dead.")
+		end,
 		zone_tiers = {
 			{name="tier1", "trollmire", "norgos-lair", "scintillating-caves", "rhaloren-camp", "heart-gloom", "ruins-kor-pul"},
 			{name="tier2", "sandworm-lair", "old-forest", "maze", "daikara", "halfling-ruins"},

@@ -333,6 +333,7 @@ local function getPortalSpot(npc, dist, min_dist)
 end
 
 on_grant = function(self, who)
+-- do return true end
 	local x, y = util.findFreeGrid(who.x, who.y, 10, true, {[engine.Map.ACTOR]=true})
 	if not x then return true end
 

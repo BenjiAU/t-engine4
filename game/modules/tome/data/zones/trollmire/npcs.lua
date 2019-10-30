@@ -104,7 +104,6 @@ newEntity{ define_as = "TROLL_PROX",
 				game.zone:addEntity(game.level, n, "object", self.x, self.y)
 			end
 		end
-		game.state:activateBackupGuardian("ALUIN", 2, 35, "... and we thought the trollmire was safer now!")
 		game.player:resolveSource():setQuestStatus("start-allied", engine.Quest.COMPLETED, "trollmire")
 	end,
 }
@@ -170,7 +169,6 @@ newEntity{ define_as = "TROLL_SHAX",
 				game.zone:addEntity(game.level, n, "object", self.x, self.y)
 			end
 		end
-		game.state:activateBackupGuardian("ALUIN", 2, 35, "... and we thought the trollmire was safer now!")
 		game.player:resolveSource():setQuestStatus("start-allied", engine.Quest.COMPLETED, "trollmire")
 		game.player:resolveSource():setQuestStatus("start-allied", engine.Quest.COMPLETED, "trollmire-flooded")
 	end,

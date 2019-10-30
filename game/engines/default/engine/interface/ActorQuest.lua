@@ -60,6 +60,7 @@ function _M:grantQuest(quest, args)
 	self.quests[quest.id].gained_turn = game.turn
 	print("[QUEST] given to", self, quest.id)
 	self:check("on_quest_grant", quest)
+	return true
 end
 
 --- Sets the status of a quest for an actor

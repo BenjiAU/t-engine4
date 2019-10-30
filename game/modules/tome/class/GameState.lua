@@ -68,6 +68,23 @@ function _M:tier1Killed(nb)
 	return self.tier1_done >= nb
 end
 
+--- Called each time a T1 level is entered
+function _M:registerT1ZoneVisit()
+	self.tier1_zones_entered = self.tier1_zones_entered or {}
+	self.tier1_zones_entered[game.zone.short_name] = true
+
+	local p = game:getPlayer(true)
+	if not p or not p.random_escort_levels then return end
+	if self.tier1_escorts_reshuffled then return end
+
+	self.tier1_escorts_reshuffled = true
+	for _, zone in ipairs{"tier1.1", "tier1.2"} do
+		if p.random_escort_levels[zone] and not p.random_escort_levels[zone].seen_zone then
+			p:reshuffleEscortsZone(zone)
+		end
+	end
+end
+
 --- Sets unique as dead
 function _M:registerUniqueDeath(u)
 	if u.randboss then return end
@@ -97,6 +114,9 @@ end
 
 --- Discovered the far east
 function _M:goneEast()
+	if self.birth.on_change_to_advanced then
+		self.birth.on_change_to_advanced()
+	end
 	self.is_advanced = true
 end
 
@@ -116,12 +136,11 @@ function _M:canEastPatrol()
 end
 
 --- Setup a backup guardian for the given zone
-function _M:activateBackupGuardian(guardian, on_level, zonelevel, rumor, action)
+function _M:activateBackupGuardian(guardian, zone, on_level, zonelevel, rumor, action)
 	if self.is_advanced then return end
 	print("Zone guardian dead, setting up backup guardian", guardian, zonelevel)
-	self.allow_backup_guardians[game.zone.short_name] =
+	self.allow_backup_guardians[zone] =
 	{
-		name = game.zone.name,
 		guardian = guardian,
 		on_level = on_level,
 		new_level = zonelevel,

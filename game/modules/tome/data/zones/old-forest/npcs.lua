@@ -82,7 +82,6 @@ newEntity{ define_as = "SHARDSKIN",
 	resolvers.inscriptions(1, "rune"),
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("SNAPROOT", 3, 50, "Have you heard, the old forest seems to have been claimed by a new evil!")
 		game.player:resolveSource():grantQuest("starter-zones")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "old-forest")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "old-forest-crystal")
@@ -133,7 +132,6 @@ newEntity{ define_as = "WRATHROOT",
 	resolvers.inscriptions(1, "infusion"),
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("SNAPROOT", 3, 50, "Have you heard, the old forest seems to have been claimed by a new evil!")
 		game.player:resolveSource():grantQuest("starter-zones")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "old-forest")
 	end,

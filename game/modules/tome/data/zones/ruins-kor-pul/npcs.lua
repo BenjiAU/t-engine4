@@ -85,7 +85,6 @@ newEntity{ define_as = "SHADE",
 	low_level_tactics_override = {escape=0, safe_range=1},
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("KOR_FURY", 3, 35, ".. yes I tell you! The old ruins of Kor'Pul are still haunted!")
 		game.player:resolveSource():setQuestStatus("start-allied", engine.Quest.COMPLETED, "kor-pul")
 	end,
 }
@@ -129,7 +128,6 @@ newEntity{ base = "BASE_NPC_THIEF", define_as = "THE_POSSESSED",
 	low_level_tactics_override = {escape=0, safe_range=1},
 	
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("KOR_FURY", 3, 35, ".. yes I tell you! The old ruins of Kor'Pul are still haunted!")
 		game.player:resolveSource():setQuestStatus("start-allied", engine.Quest.COMPLETED, "kor-pul")
 		game.player:resolveSource():setQuestStatus("start-allied", engine.Quest.COMPLETED, "kor-pul-invaded")
 	end,

@@ -1117,6 +1117,19 @@ function _M:changeLevelReal(lev, zone, params)
 		world:seenZone(self.zone.short_name)
 		force_recreate = true
 	elseif not params.temporary_zone_shift then -- We move to a new zone as normal
+		local nztmp = nil
+		if zone then
+			if type(zone) == "string" then
+				nztmp = Zone.new(zone)
+			else
+				nztmp = zone
+			end
+			if nztmp.tier1 and table.count(self.state.tier1_zones_entered or {}) >= 3 then
+				Dialog:simplePopup("Empty place", "It looks like somebody came here first, the place is now empty.")
+				return
+			end
+		end
+
 		if self.zone and self.zone.on_leave then
 			local nl, nz, stop = self.zone.on_leave(lev, old_lev, zone)
 			if stop then self.change_level_party = nil self.change_level_party_back = nil return end
@@ -1131,11 +1144,7 @@ function _M:changeLevelReal(lev, zone, params)
 				self.zone:leaveLevel(false, lev, old_lev)
 				self.zone:leave()
 			end
-			if type(zone) == "string" then
-				self.zone = Zone.new(zone)
-			else
-				self.zone = zone
-			end
+			self.zone = nztmp
 			if self.zone.tier1 then
 				if lev == 1 and game.state:tier1Killed(game.state.birth.start_tier1_skip or 3) then
 					self.zone.tier1 = nil
@@ -1405,6 +1414,10 @@ function _M:changeLevelReal(lev, zone, params)
 
 	self.change_level_party = nil
 	self.change_level_party_back = nil
+
+	if self.zone and self.zone.tier1 then
+		self.state:registerT1ZoneVisit()
+	end
 
 	self:dieClonesDie()
 end

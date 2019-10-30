@@ -137,6 +137,31 @@ function _M:onBirth(birther)
 	self._on_birth = nil
 end
 
+function _M:reshuffleEscortsZone(zone)
+	-- Make a list of random escort levels
+	local birther = require "engine.Birther"
+	local race_def = birther.birth_descriptor_def.race[self.descriptor.race]
+	local subrace_def = birther.birth_descriptor_def.subrace[self.descriptor.subrace]
+	local world = birther.birth_descriptor_def.world[self.descriptor.world]
+	local def = subrace_def.random_escort_possibilities or race_def.random_escort_possibilities
+	if world.random_escort_possibilities then def = world.random_escort_possibilities end -- World overrides
+	if def then
+		local zones = {}
+		for i, zd in ipairs(def) do if zd[1] ~= "tier1.1" and zd[1] ~= "tier1.2" then
+			for j = zd[2], zd[3] do if not self.random_escort_levels[zd[1]] or not self.random_escort_levels[zd[1]][j] then
+				zones[#zones+1] = {zd[1], j}
+			end end
+		end end
+		for i, _ in pairs(self.random_escort_levels[zone]) do
+			local z = rng.tableRemove(zones)
+			print("Random escort on", z[1], z[2])
+			self.random_escort_levels[z[1]] = self.random_escort_levels[z[1]] or {}
+			self.random_escort_levels[z[1]][z[2]] = true
+		end
+		self.random_escort_levels[zone] = nil
+	end
+end
+
 function _M:onEnterLevel(zone, level)
 	-- Save where we entered
 	self.entered_level = {x=self.x, y=self.y}
@@ -166,8 +191,11 @@ function _M:onEnterLevel(zone, level)
 	end
 
 	-- Fire random escort quest
-	if self.random_escort_levels and self.random_escort_levels[escort_zone_name] and self.random_escort_levels[escort_zone_name][level.level - escort_zone_offset] then
-		self:grantQuest("escort-duty")
+	if self.random_escort_levels and self.random_escort_levels[escort_zone_name] then
+		self.random_escort_levels[escort_zone_name].seen_zone = true
+		if self.random_escort_levels[escort_zone_name][level.level - escort_zone_offset] then
+			self:grantQuest("escort-duty")
+		end
 	end
 
 	-- Cancel effects
