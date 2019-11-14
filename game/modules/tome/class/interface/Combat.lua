@@ -1427,9 +1427,9 @@ end
 --- Scale damage values
 -- This currently beefs up high-end damage values to make up for the combat stat rescale nerf.
 function _M:rescaleDamage(dam)
-	if dam <= 0 then return math.decimals(dam, 2) end
+	if dam <= 0 then return dam end
 --	return dam * (1 - math.log10(dam * 2) / 7) --this is the old version, pre-combat-stat-rescale
-	return math.decimals(dam ^ 1.04, 2)
+	return dam ^ 1.04
 end
 
 --Diminishing-returns method of scaling combat stats, observing this rule: the first twenty ranks cost 1 point each, the second twenty cost two each, and so on. This is much, much better for players than some logarithmic mess, since they always know exactly what's going on, and there are nice breakpoints to strive for.
@@ -1486,12 +1486,12 @@ function _M:combatLimit(x, limit, y_low, x_low, y_high, x_high)
 --		local add = (limit*(x_high*y_low-x_low*y_high) + y_high*y_low*(x_low-x_high))/(p-m)
 --		return (limit-add)*x/(x + halfpoint) + add
 		local ah = (limit*(x_high*y_low-x_low*y_high)+ y_high*y_low*(x_low-x_high))/(y_high - y_low) -- add*halfpoint product calculated at once to avoid possible divide by zero
-		return math.decimals((limit*x + ah)/(x + (p-m)/(y_high - y_low)), 2) --factored version of above formula
+		return (limit*x + ah)/(x + (p-m)/(y_high - y_low)) --factored version of above formula
 --		return (limit-add)*x/(x + halfpoint) + add, halfpoint, add
 	else
 		local add = 0
 		local halfpoint = limit*x_high/(y_high-add)-x_high
-		return math.decimals((limit-add)*x/(x + halfpoint) + add, 2)
+		return (limit-add)*x/(x + halfpoint) + add
 --		return (limit-add)*x/(x + halfpoint) + add, halfpoint, add
 	end
 end
@@ -1519,10 +1519,10 @@ function _M:combatTalentScale(t, low, high, power, add, shift, raw)
 	local m = (high - low)/(x_high_adj - x_low_adj)
 	local b = low - m*x_low_adj
 	if power == "log" then -- always >= 0
-		return math.decimals(math.max(0, m * math.log10(tl + shift) + b + add), 2)
+		return math.max(0, m * math.log10(tl + shift) + b + add)
 --		return math.max(0, m * math.log10(tl + shift) + b + add), m, b
 	else
-		return math.decimals(math.max(0, m * (tl + shift)^power + b + add), 2)
+		return math.max(0, m * (tl + shift)^power + b + add)
 --		return math.max(0, m * (tl + shift)^power + b + add), m, b
 	end
 end
@@ -1548,10 +1548,10 @@ function _M:combatStatScale(stat, low, high, power, add, shift)
 	local m = (high - low)/(x_high_adj - x_low_adj)
 	local b = low -m*x_low_adj
 	if power == "log" then -- always >= 0
-		return math.decimals(math.max(0, m * math.log10(stat + shift) + b + add), 2)
+		return math.max(0, m * math.log10(stat + shift) + b + add)
 --		return math.max(0, m * math.log10(stat + shift) + b + add), m, b
 	else
-		return math.decimals(math.max(0, m * (stat + shift)^power + b + add), 2)
+		return math.max(0, m * (stat + shift)^power + b + add)
 --		return math.max(0, m * (stat + shift)^power + b + add), m, b
 	end
 end
@@ -1575,11 +1575,11 @@ function _M:combatTalentLimit(t, limit, low, high, raw)
 --		local halfpoint = (p-m)/(high - low) -- point at which half progress towards the limit is reached
 --		local add = (limit*(x_high*low-x_low*high) + high*low*(x_low-x_high))/(p-m)
 		local ah = (limit*(x_high*low-x_low*high)+ high*low*(x_low-x_high))/(high - low) -- add*halfpoint product calculated at once to avoid possible divide by zero
-		return math.decimals((limit*tl + ah)/(tl + (p-m)/(high - low)), 2) --factored version of above formula
+		return (limit*tl + ah)/(tl + (p-m)/(high - low)) --factored version of above formula
 --		return (limit-add)*tl/(tl + halfpoint) + add, halfpoint, add
 	else -- assume low and x_low are both 0
 		local halfpoint = limit*x_high/high-x_high
-		return math.decimals(limit*tl/(tl + halfpoint), 2)
+		return limit*tl/(tl + halfpoint)
 --		return (limit-add)*tl/(tl + halfpoint) + add, halfpoint, add
 	end
 end
@@ -1601,11 +1601,11 @@ function _M:combatStatLimit(stat, limit, low, high)
 --		local halfpoint = (p-m)/(high - low) -- point at which half progress towards the limit is reached
 --		local add = (limit*(x_high*low-x_low*high) + high*low*(x_low-x_high))/(p-m)
 		local ah = (limit*(x_high*low-x_low*high)+ high*low*(x_low-x_high))/(high - low) -- add*halfpoint product calculated at once to avoid possible divide by zero
-		return math.decimals((limit*stat + ah)/(stat + (p-m)/(high - low)), 2) --factored version of above formula
+		return (limit*stat + ah)/(stat + (p-m)/(high - low)) --factored version of above formula
 --		return (limit-add)*stat/(stat + halfpoint) + add, halfpoint, add
 	else -- assume low and x_low are both 0
 		local halfpoint = limit*x_high/high-x_high
-		return math.decimals(limit*stat/(stat + halfpoint), 2)
+		return limit*stat/(stat + halfpoint)
 --		return (limit-add)*stat/(stat + halfpoint) + add, halfpoint, add
 	end
 end

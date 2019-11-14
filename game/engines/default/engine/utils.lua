@@ -30,6 +30,20 @@ function math.decimals(v, nb)
 	return math.floor(v * nb) / nb
 end
 
+-- Let's be super safe, if we cant figure out the size of double, just don't use the fixer
+local ffi = require "ffi"
+if not ffi or not ffi.sizeof or ffi.sizeof("double") ~= 8 then
+	function math.fixfloat(x)
+		return x
+	end
+else
+	-- This is horrible horrible black magic to "binary round" floats
+	local _fixfloat = 2^40
+	function math.fixfloat(x)
+		return x+_fixfloat-_fixfloat
+	end
+end
+
 -- Rounds to nearest multiple
 -- (round away from zero): math.round(4.65, 0.1)=4.7, math.round(-4.475, 0.01) = -4.48
 -- num = rounding multiplier to compensate for numerical rounding (default 1000000 for 6 digits accuracy)

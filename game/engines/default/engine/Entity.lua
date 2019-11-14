@@ -914,7 +914,7 @@ function _M:addTemporaryValue(prop, v, noupdate)
 -- 	print("Entity:", self) -- table.print(self)
 -- 	game.debug._debug_entity = self
 -- end
-				base[prop] = (base[prop] or 0) + v
+				base[prop] = (base[prop] or 0) + math.fixfloat(v)
 			end
 			self:onTemporaryValueChange(prop, v, base)
 --			print("addTmpVal", base, prop, v, " :=: ", #t, id, method)
@@ -1014,7 +1014,7 @@ function _M:removeTemporaryValue(prop, id, noupdate)
 				if not next(base["__tlast_"..prop]) then base["__tlast_"..prop] = nil end
 			else
 				if not base[prop] then util.send_error_backtrace("Error removing property "..tostring(prop).." with value "..tostring(v).." : base[prop] is nil") return end
-				base[prop] = base[prop] - v
+				base[prop] = base[prop] - math.fixfloat(v)
 			end
 			self:onTemporaryValueChange(prop, -v, base)
 --			print("delTmpVal", prop, v, method)
@@ -1118,7 +1118,7 @@ end
 function _M:attr(prop, v, fix)
 	if v then
 		if fix then self[prop] = v
-		else self[prop] = (self[prop] or 0) + v
+		else self[prop] = (self[prop] or 0) + math.fixfloat(v)
 		end
 	else
 		if self[prop] and self[prop] ~= 0 then
