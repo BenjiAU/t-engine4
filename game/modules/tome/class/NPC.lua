@@ -62,6 +62,14 @@ function _M:actBase()
 	return mod.class.Actor.actBase(self)
 end
 
+function _M:isFirstTimeSeenPlayer()
+	if not self._npc_seen_party and self.ai_target and self.ai_target.actor and self.ai_target.actor.x and self.ai_target.actor.y and game.party and game.party:hasMember(self.ai_target.actor) and self:hasLOS(self.ai_target.actor.x, self.ai_target.actor.y) then
+		self._npc_seen_party = true
+		return true
+	end
+	return false
+end
+
 -- Entry point for NPC's to act, invoking the AI, called by engine.GameEnergyBased:tickLevel
 function _M:act()
 	if config.settings.log_detail_ai > 2 then print("[NPC:act] turn", game.turn, "pre act ENERGY for", self.uid, self.name) table.print(self.energy, "\t_energy_") end
@@ -73,8 +81,14 @@ function _M:act()
 		-- Compute FOV, if needed
 		self:doFOV()
 
-		-- Let the AI think .... beware of Shub !
-		self:doAI()
+		-- Anti "enter LOS" oneshot hack: make sure the player gets the initiative
+		if self:isFirstTimeSeenPlayer() then
+			self:useEnergy()
+			game.log("===========%s first seen player, skipping turn", self.name)
+		else
+			-- Let the AI think .... beware of Shub !
+			self:doAI()
+		end
 
 		if self.emote_random and self.x and self.y and game.level.map.seens(self.x, self.y) and rng.range(0, 999) < self.emote_random.chance * 10 then
 			local e = util.getval(rng.table(self.emote_random))

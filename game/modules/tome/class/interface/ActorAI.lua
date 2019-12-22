@@ -1806,4 +1806,9 @@ function _M:setTarget(target, last_seen)
 	if target and target ~= old_target and game.level:hasEntity(target) then
 		if target.fireTalentCheck then target:fireTalentCheck("callbackOnTargeted", self) end
 	end
+
+	if self:isFirstTimeSeenPlayer() then
+		self:useEnergy()
+		game.log("===========%s first seen2 player, skipping turn", self.name)
+	end
 end
