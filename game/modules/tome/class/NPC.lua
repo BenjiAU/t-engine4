@@ -84,7 +84,7 @@ function _M:act()
 		-- Anti "enter LOS" oneshot hack: make sure the player gets the initiative
 		if self:isFirstTimeSeenPlayer() then
 			self:useEnergy()
-			game.log("===========%s first seen player, skipping turn", self.name)
+			if config.settings.cheat then game.log("===========%s first seen player, skipping turn", self.name) end
 		else
 			-- Let the AI think .... beware of Shub !
 			self:doAI()

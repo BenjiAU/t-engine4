@@ -1809,6 +1809,6 @@ function _M:setTarget(target, last_seen)
 
 	if self:isFirstTimeSeenPlayer() then
 		self:useEnergy()
-		game.log("===========%s first seen2 player, skipping turn", self.name)
+		if config.settings.cheat then game.log("===========%s first seen2 player, skipping turn", self.name) end
 	end
 end
