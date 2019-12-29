@@ -69,8 +69,13 @@ return {
 				if e.immediate then
 					e = e:clone()
 					e:resolve() e:resolve(nil, true)
-					local where = game.level:pickSpotRemove{type=e.immediate[1], subtype=e.immediate[2]}
-					while where and (game.level.map:checkAllEntities(where.x, where.y, "block_move") or not game.level.map:checkAllEntities(where.x, where.y, "can_encounter")) do where = game.level:pickSpotRemove{type=e.immediate[1], subtype=e.immediate[2]} end
+					local where
+					if e.immediate.force_spot then
+						where = e.immediate.force_spot
+					else
+						where = game.level:pickSpotRemove{type=e.immediate[1], subtype=e.immediate[2]}
+						while where and (game.level.map:checkAllEntities(where.x, where.y, "block_move") or not game.level.map:checkAllEntities(where.x, where.y, "can_encounter")) do where = game.level:pickSpotRemove{type=e.immediate[1], subtype=e.immediate[2]} end
+					end
 					if e:check("on_encounter", where) then
 						e:added()
 						print("[Encounter] Immediate set", e.name, where.x, where.y)

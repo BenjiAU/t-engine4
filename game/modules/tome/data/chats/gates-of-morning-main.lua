@@ -73,15 +73,105 @@ newChat{ id="prides-dead",
 Now they are dead? At the hands of just one @playerdescriptor.race@? Truly I am amazed by your power.
 While you were busy bringing an end to the orcs, we managed to discover some parts of the truth from a captive orc.
 He talked about the shield protecting the High Peak. It seems to be controlled by "orbs of command" which the masters of the Prides had in their possession.
-Look for them if you have not yet found them.
 He also said the only way to enter the peak and de-activate the shield is through the "slime tunnels", located somewhere in one of the Prides, probably Grushnak.
 ]],
 	answers = {
-		{"Thanks, my lady. I will look for the tunnel and venture inside the Peak.", action=function(npc, player)
+		{"Thanks, my lady. I have not been able to find all of the orbs of command in my travels; could you have some of your men search for me?",
+		jump="prides-dead-orbs-missing",
+		cond=function(npc, player) return not (game.party:findInAllPartyInventoriesBy("define_as", "ORB_DRAGON") and game.party:findInAllPartyInventoriesBy("define_as", "ORB_DESTRUCTION") and game.party:findInAllPartyInventoriesBy("define_as", "ORB_UNDEATH") and game.party:findInAllPartyInventoriesBy("define_as", "ORB_ELEMENTS")) end
+		},
+		{"Thanks, my lady. I will look for the tunnel and venture inside the Peak.", 
+		cond=function(npc, player) return (game.party:findInAllPartyInventoriesBy("define_as", "ORB_DRAGON") and game.party:findInAllPartyInventoriesBy("define_as", "ORB_DESTRUCTION") and game.party:findInAllPartyInventoriesBy("define_as", "ORB_UNDEATH") and game.party:findInAllPartyInventoriesBy("define_as", "ORB_ELEMENTS")) end,
+		action=function(npc, player)
 			player:setQuestStatus("orc-pride", engine.Quest.DONE)
 			player:grantQuest("high-peak")
 		end},
 	},
+}
+
+newChat{ id="prides-dead-orbs-missing", 
+	text = [[I have already sent parties to clear out the remainder of the prides as you progressed, and have instructed to keep a sharp eye out for any orbs of command you may have missed.
+	Which do you not have? I can check with the parties if they found any. Our sources indicate that you should have four: one of Undeath, one of Destruction, one of Dragons, and one of Elemental might.]],
+	answers = {
+				{"The orb of Undeath.",
+		jump="prides-dead-orbs-missing-undeath",
+		cond=function(npc, player) return not (game.party:findInAllPartyInventoriesBy("define_as", "ORB_UNDEATH")) end
+		},
+				{"The orb of Destruction.",
+		jump="prides-dead-orbs-missing-destruction",
+		cond=function(npc, player) return not (game.party:findInAllPartyInventoriesBy("define_as", "ORB_DESTRUCTION")) end
+		},
+				{"The orb of Dragons.",
+		jump="prides-dead-orbs-missing-dragon",
+		cond=function(npc, player) return not (game.party:findInAllPartyInventoriesBy("define_as", "ORB_DRAGON")) end
+		},
+				{"The orb of Elements.",
+		jump="prides-dead-orbs-missing-elements",
+		cond=function(npc, player) return not (game.party:findInAllPartyInventoriesBy("define_as", "ORB_ELEMENTS")) end
+		},
+				{"Thanks, my lady, that is all of them. I will look for the tunnel and venture inside the Peak.", 
+		cond=function(npc, player) return (game.party:findInAllPartyInventoriesBy("define_as", "ORB_DRAGON") and game.party:findInAllPartyInventoriesBy("define_as", "ORB_DESTRUCTION") and game.party:findInAllPartyInventoriesBy("define_as", "ORB_UNDEATH") and game.party:findInAllPartyInventoriesBy("define_as", "ORB_ELEMENTS")) end,
+		action=function(npc, player)
+			player:setQuestStatus("orc-pride", engine.Quest.DONE)
+			player:grantQuest("high-peak")
+		end},
+	},
+}
+
+newChat{ id="prides-dead-orbs-missing-undeath",
+	text = [[Ah yes, my men have found that in Rak'Shor Pride. Here: ]],
+	answers = {
+		{"Thank you, my lady.", 
+		jump="prides-dead-orbs-missing",
+		action = function(npc, player)
+			local orb = game.zone:makeEntityByName(game.level, "object", "ORB_UNDEATH", true)
+			orb:identify(true)
+			game.zone:addEntity(game.level, orb, "object")
+			player:addObject(player:getInven("INVEN"), orb)
+		end},
+	}
+}
+
+newChat{ id="prides-dead-orbs-missing-elements",
+	text = [[Ah yes, my men have found that in Vor Pride. Here: ]],
+	answers = {
+		{"Thank you, my lady.", 
+		jump="prides-dead-orbs-missing",
+		action = function(npc, player)
+			local orb = game.zone:makeEntityByName(game.level, "object", "ORB_ELEMENTS", true)
+			orb:identify(true)
+			game.zone:addEntity(game.level, orb, "object")
+			player:addObject(player:getInven("INVEN"), orb)
+		end},
+	}
+}
+
+newChat{ id="prides-dead-orbs-missing-destruction",
+	text = [[Ah yes, my men have found that in Grushnak Pride. Here: ]],
+	answers = {
+		{"Thank you, my lady.", 
+		jump="prides-dead-orbs-missing",
+		action = function(npc, player)
+			local orb = game.zone:makeEntityByName(game.level, "object", "ORB_DESTRUCTION", true)
+			orb:identify(true)
+			game.zone:addEntity(game.level, orb, "object")
+			player:addObject(player:getInven("INVEN"), orb)
+		end},
+	}
+}
+
+newChat{ id="prides-dead-orbs-missing-dragon",
+	text = [[Ah yes, my men have found that in Gorbat Pride. Here: ]],
+	answers = {
+		{"Thank you, my lady.", 
+		jump="prides-dead-orbs-missing",
+		action = function(npc, player)
+			local orb = game.zone:makeEntityByName(game.level, "object", "ORB_DRAGON", true)
+			orb:identify(true)
+			game.zone:addEntity(game.level, orb, "object")
+			player:addObject(player:getInven("INVEN"), orb)
+		end},
+	}
 }
 
 newChat{ id="clues",

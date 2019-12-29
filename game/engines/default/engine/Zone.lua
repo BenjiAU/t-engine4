@@ -111,6 +111,11 @@ function _M:init(short_name, dynamic)
 	end
 
 	self.short_name = short_name
+	if short_name:find("+", 1, 1) then
+		self.from_addon = short_name:gsub("%+.*$", "")
+	else
+		self.from_addon = "base"
+	end
 	self.specific_base_level = self.specific_base_level or {}
 	if not self:load(dynamic) then
 		self.level_range = self.level_range or {1,1}
@@ -118,7 +123,7 @@ function _M:init(short_name, dynamic)
 		self.level_scheme = self.level_scheme or "fixed"
 		assert(self.max_level, "no zone max level")
 		self.levels = self.levels or {}
-		if not dynamic then self:loadBaseLists() end
+		if type(self.reload_lists) ~= "boolean" or self.reload_lists then self:loadBaseLists() end
 
 		if self.on_setup then self:on_setup() end
 
@@ -163,10 +168,14 @@ end
 local _load_zone = nil
 function _M:loadBaseLists()
 	_load_zone = self
-	self.npc_list = self.npc_class:loadList(self:getBaseName().."npcs.lua")
-	self.grid_list = self.grid_class:loadList(self:getBaseName().."grids.lua")
-	self.object_list = self.object_class:loadList(self:getBaseName().."objects.lua")
-	self.trap_list = self.trap_class:loadList(self:getBaseName().."traps.lua")
+	if self.embed_lists then
+		self:embed_lists()
+	else
+		self.npc_list = self.npc_class:loadList(self:getBaseName().."npcs.lua")
+		self.grid_list = self.grid_class:loadList(self:getBaseName().."grids.lua")
+		self.object_list = self.object_class:loadList(self:getBaseName().."objects.lua")
+		self.trap_list = self.trap_class:loadList(self:getBaseName().."traps.lua")
+	end
 	_load_zone = nil
 end
 
@@ -723,6 +732,7 @@ function _M:finishEntity(level, type, e, ego_filter)
 
 	e:resolve(nil, true)
 	e:check("finish", e, self, level)
+	self:triggerHook{"Zone:finishEntity", type=type, e=e}
 	return e
 end
 
@@ -812,6 +822,15 @@ function _M:load(dynamic)
 	elseif not data and dynamic then
 		data = dynamic
 		ret = false
+
+		if data.reload_lists == true then -- We do not check for nil here to force dynamic zones that want reloading to explicitly say so
+			self._no_save_fields = table.clone(self._no_save_fields, true)
+			self._no_save_fields.npc_list = true
+			self._no_save_fields.grid_list = true
+			self._no_save_fields.object_list = true
+			self._no_save_fields.trap_list = true
+		end
+
 		for k, e in pairs(data) do self[k] = e end
 		self:onLoadZoneFile(false)
 		self:triggerHook{"Zone:create", dynamic=dynamic}
@@ -1099,6 +1118,7 @@ function _M:newLevel(level_data, lev, old_lev, game)
 	if level_data.post_process_map then
 		level_data.post_process_map(level, self)
 		if level.force_recreate then
+			forceprint("[Zone:newLevel] post_process_map "..generator.__CLASSNAME.." forced recreation: ",level.force_recreate)
 			level:removed()
 			return self:newLevel(level_data, lev, old_lev, game)
 		end
@@ -1150,6 +1170,7 @@ function _M:newLevel(level_data, lev, old_lev, game)
 	if level_data.post_process then
 		level_data.post_process(level, self)
 		if level.force_recreate then
+			forceprint("[Zone:newLevel] post_process "..generator.__CLASSNAME.." forced recreation: ",level.force_recreate)
 			level:removed()
 			return self:newLevel(level_data, lev, old_lev, game)
 		end
@@ -1160,7 +1181,7 @@ function _M:newLevel(level_data, lev, old_lev, game)
 	if not level_data.no_level_connectivity then
 		print("[LEVEL GENERATION] checking entrance to exit A*", ux, uy, "to", dx, dy)
 		if ux and uy and dx and dy and (ux ~= dx or uy ~= dy) and not a:calc(ux, uy, dx, dy) then
-			forceprint("Level unconnected, no way from entrance", ux, uy, "to exit", dx, dy)
+			forceprint("[Zone:newLevel] Level unconnected, no way from entrance", ux, uy, "to exit", dx, dy)
 			level:removed()
 			return self:newLevel(level_data, lev, old_lev, game)
 		end
@@ -1177,7 +1198,7 @@ function _M:newLevel(level_data, lev, old_lev, game)
 
 			print("[LEVEL GENERATION] checking A*", spot.x, spot.y, "to", cx, cy)
 			if spot.x and spot.y and cx and cy and (spot.x ~= cx or spot.y ~= cy) and not a:calc(spot.x, spot.y, cx, cy) then
-				forceprint("Level unconnected, no way from spot", spot.type, spot.subtyp, "at", spot.x, spot.y, "to", cx, cy, spot.check_connectivity)
+				forceprint("[Zone:newLevel] Level unconnected, no way from spot", spot.type, spot.subtyp, "at", spot.x, spot.y, "to", cx, cy, spot.check_connectivity)
 				level:removed()
 				return self:newLevel(level_data, lev, old_lev, game)
 			end
@@ -1188,6 +1209,11 @@ function _M:newLevel(level_data, lev, old_lev, game)
 
 	-- Call a "post" finisher
 	if level_data.post_process_end then level_data.post_process_end(level, self) end
+
+	-- Safety checks, look for upvalues EVERYWHERE
+	if config.settings.cheat then
+		map:applyAll(function(x, y, where, e) e:checkForUpvalues() end)
+	end
 
 	return level
 end

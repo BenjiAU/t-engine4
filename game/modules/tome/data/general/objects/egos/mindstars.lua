@@ -430,7 +430,7 @@ newEntity{
 	power_source = {antimagic=true},
 	name = "manaburning ", prefix=true, instant_resolve=true,
 	keywords = {manaburning=true},
-	level_range = {1, 50},
+	level_range = {20, 50},
 	rarity = 20,
 	cost = 40,
 	combat = {
@@ -519,7 +519,7 @@ newEntity{
 	power_source = {antimagic=true},
 	name = " of disruption", suffix=true, instant_resolve=true,
 	keywords = {disruption=true},
-	level_range = {1, 50},
+	level_range = {30, 50},
 	greater_ego = 1,
 	unique_ego = 1,
 	rarity = 50,

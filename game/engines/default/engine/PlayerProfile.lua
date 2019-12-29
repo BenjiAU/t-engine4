@@ -1057,6 +1057,7 @@ function _M:isDonator(s)
 end
 
 function _M:canMTXN()
+	if config.settings.disable_all_connectivity then return false end
 	return self:isDonator()
 end
 

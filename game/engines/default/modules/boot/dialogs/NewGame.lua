@@ -34,7 +34,7 @@ function _M:init()
 	self.c_desc = Textzone.new{width=math.floor(self.iw / 3 * 2 - 10), height=self.ih, text=""}
 
 	self.c_switch = Checkbox.new{default=false, width=math.floor(self.iw / 3 - 40), title="Show all versions", on_change=function() self:switch() end}
-	self.c_compat = Checkbox.new{default=false, width=math.floor(self.iw / 3 - 40), title="Show incompatible", on_change=function() self:switch() end}
+	self.c_compat = Checkbox.new{default=true, width=math.floor(self.iw / 3 - 40), title="Show incompatible", on_change=function() self:switch() end}
 
 	local url = Textzone.new{text="You can get new games at\n#LIGHT_BLUE##{underline}#https://te4.org/games#{normal}#", auto_height=true, auto_width=true, fct=function() util.browserOpenUrl("https://te4.org/games") end}
 
@@ -65,18 +65,7 @@ function _M:init()
 end
 
 function _M:on_register()
-	if
-		#self.list == 1 and
-		not self.has_incompatible and
-		(
-			not profile or
-			not profile.generic or
-			not profile.generic.modules_played or
-			not profile.generic.modules_played.tome or
-			profile.generic.modules_played.tome < 20 * 60 * 60
-		) and
-		not config.settings.cheat
-	then
+	if #self.list == 1 and not config.settings.cheat then
 		game:unregisterDialog(self)
 		self.list[1]:fct()
 	end

@@ -63,7 +63,7 @@ newTalent{
 	requires_target = true,
 	no_break_stealth = true,
 	getDuration = function(self, t) return 3 end,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 1, 600) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 1, 450) end,
 	speed = "combat",
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
@@ -95,6 +95,7 @@ newTalent{
 			game.logSeen(target, "%s resists the disarm!", target.name:capitalize())
 		end
 
+		game:playSoundNear(self, "talents/arcane")
 		return true
 	end,
 	info = function(self, t)

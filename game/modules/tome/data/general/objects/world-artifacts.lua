@@ -76,10 +76,10 @@ newEntity{ base = "BASE_INFUSION",
 	inscription_kind = "protect",
 	inscription_data = {
 		cooldown = 18,
-		dur = 10,
-		reduce = 1,
+		dur = 5,
+		reduce = 2,
 		power = 10,
-		use_stat_mod = 0.02, -- +2 duration reduction and +20% affinity at 100 stat
+		use_stat_mod = 0.01, -- +2 duration reduction and +10% affinity at 100 stat
 		use_stat = "wil",
 	},
 	inscription_talent = "INFUSION:_PRIMAL",
@@ -285,11 +285,33 @@ newEntity{ base = "BASE_AMULET",
 	cost = 90,
 	material_level = 2,
 	wielder = {
+		slow_projectiles = 15,
+		combat_def = 15,
 		max_encumber = 20,
 		fatigue = -20,
 		avoid_pressure_traps = 1,
 		movement_speed = 0.25, --ghoul movespeed breakpoint!--
 	},
+}
+
+newEntity{ base = "BASE_AMULET",
+	power_source = {unknown=true},
+	unique = true,
+	name = "The Far-Hand", color = colors.YELLOW, image = "object/artifact/the_far_hand.png",
+	unided_name = "a weird metallic hand",
+	desc = [[You can feel this strange metallic hand wriggling around, it feels as if space distorts around it.]],
+	level_range = {20, 40},
+	rarity = 200,
+	cost = 1000,
+	material_level = 3,
+	wielder = {
+		teleport_immune = 1,
+		inc_stats = {
+			[Stats.STAT_CON] = 10,
+		},
+	},
+	max_power = 36, power_regen = 1,
+	use_talent = { id = Talents.T_TELEPORT, level = 4, power = 36 },
 }
 
 newEntity{ base = "BASE_AMULET", define_as = "SET_GARKUL_TEETH",
@@ -547,10 +569,13 @@ newEntity{ base = "BASE_SHIELD",
 		fatigue = 20,
 		learn_talent = { [Talents.T_BLOCK] = 1, },
 	},
-	on_block = {desc = "30% chance that you'll breath stunning fire in a cone at the attacker (if within range 6).", fct = function(self, who, target, type, dam, eff)
-	if rng.percent(30) then
-		if not target or not target.x or not target.y or core.fov.distance(who.x, who.y, target.x, target.y) > 6 then return end
+	on_block = {desc = "30% chance that you'll breathe fire in a cone at the attacker (if within range 6).  This can only occur up to 4 times per turn.", fct = function(self, who, target, type, dam, eff)
+		local hits = table.get(who.turn_procs, "flame_shield_procs") or 0
+		if hits and hits >= 4 then return end
 
+		if rng.percent(30) then
+		table.set(who.turn_procs, "flame_shield_procs", hits + 1)
+		if not target or not target.x or not target.y or core.fov.distance(who.x, who.y, target.x, target.y) > 6 then return end
 			who:forceUseTalent(who.T_FIRE_BREATH, {ignore_energy=true, no_talent_fail=true, no_equilibrium_fail=true, ignore_cd=true, force_target=target, force_level=2, ignore_ressources=true})
 		end
 	end,
@@ -1035,7 +1060,7 @@ newEntity{ base = "BASE_CLOTH_ARMOR",
 		combat_mindcrit = 5,
 		combat_spellresist = 10,
 		combat_physresist = 10,
-		inc_damage={[DamageType.NATURE] = 10, [DamageType.MIND] = 10, [DamageType.ACID] = 10},
+		inc_damage={[DamageType.NATURE] = 15, [DamageType.MIND] = 15, [DamageType.ACID] = 15},
 		resists={[DamageType.NATURE] = 30},
 		on_melee_hit={[DamageType.POISON] = 20, [DamageType.SLIME] = 20},
 	},
@@ -1318,7 +1343,7 @@ It was made by Humans for Humans; only they can harness the true power of the ro
 	cost = math.random(125,200),
 	material_level = 2,
 	wielder = {
-		inc_damage = {[DamageType.ARCANE]=10},
+		inc_damage = {[DamageType.ARCANE]=15},
 		inc_stats = { [Stats.STAT_MAG] = 6 },
 		combat_spellcrit = 15,
 		combat_spellpower = 15,
@@ -1330,7 +1355,7 @@ It was made by Humans for Humans; only they can harness the true power of the ro
 
 			self:specialWearAdd({"wielder","inc_stats"}, { [Stats.STAT_MAG] = 3, [Stats.STAT_CUN] = 9, })
 			self:specialWearAdd({"wielder","inc_damage"}, {[DamageType.ARCANE]=7})
-			self:specialWearAdd({"wielder","combat_spellcrit"}, 2)
+			self:specialWearAdd({"wielder","combat_spellcrit"}, 5)
 			game.logPlayer(who, "#LIGHT_BLUE#You feel as surge of power as you wear the vestments of the old Human Conclave!")
 		end
 	end,
@@ -1690,14 +1715,15 @@ newEntity{ base = "BASE_LIGHT_ARMOR", define_as = "SKIN_OF_MANY",
 		talents_types_mastery = { ["cunning/stealth"] = -0.2, },
 	},
 	on_wear = function(self, who)
-		if who.descriptor and who.descriptor.race == "Undead" then
+		-- We cant use :attr("undead") as this can easily change so .. ugh :/
+		if who.descriptor and (who.descriptor.race == "Undead" or who.descriptor.race == "MinotaurUndead" or who.descriptor.race == "EmpireUndead") then
 			local Stats = require "engine.interface.ActorStats"
 			local DamageType = require "engine.DamageType"
 
-			self:specialWearAdd({"wielder", "talents_types_mastery"}, { ["cunning/stealth"] = 0.2 })
-			self:specialWearAdd({"wielder","confusion_immune"}, 0.3)
-			self:specialWearAdd({"wielder","blind_immune"}, 0.3)
-			game.logPlayer(who, "#DARK_BLUE#The skin seems pleased to be worn by the unliving, and grows silent.")
+			self:specialWearAdd({"wielder", "talents_types_mastery"}, { ["cunning/stealth"] = 0.4 })
+			self:specialWearAdd({"wielder","confusion_immune"}, 0.4)
+			self:specialWearAdd({"wielder","blind_immune"}, 0.4)
+			game.logPlayer(who, "#BLUE#The skin seems pleased to be worn by the unliving, and grows silent.")
 		end
 	end,
 }
@@ -2179,7 +2205,7 @@ newEntity{ base = "BASE_AMULET",
 }
 
 newEntity{ base = "BASE_DIGGER",
-	power_source = {technique=true},
+	power_source = {technique=true, arcane=true},
 	unique = true,
 	name = "Pick of Dwarven Emperors", color = colors.GREY, image = "object/artifact/pick_of_dwarven_emperors.png",
 	unided_name = "crude iron pickaxe",
@@ -2191,14 +2217,14 @@ newEntity{ base = "BASE_DIGGER",
 	digspeed = 12,
 	wielder = {
 		resists_pen = { [DamageType.PHYSICAL] = 10, },
-		inc_stats = { [Stats.STAT_STR] = 3, [Stats.STAT_CON] = 3, },
-		combat_mentalresist = 7,
-		combat_physresist = 7,
-		combat_spellresist = 7,
+		inc_stats = { [Stats.STAT_STR] = 5, [Stats.STAT_CON] = 5, },
+		combat_mentalresist = 10,
+		combat_physresist = 10,
+		combat_spellresist = 10,
 		max_life = 50,
 	},
 	max_power = 30, power_regen = 1,
-	use_talent = { id = Talents.T_DIG, level = 4, power = 30 },
+	use_talent = { id = Talents.T_EARTHQUAKE, level = 4, power = 30 },
 	on_wear = function(self, who)
 		if who.descriptor and who.descriptor.race == "Dwarf" then
 			local Stats = require "engine.interface.ActorStats"
@@ -3704,6 +3730,7 @@ newEntity{ base = "BASE_GAUNTLETS",
 	on_preaddobject = function(self, who, inven) -- generated in an actor's inventory
 		if not self.material_level then self.addedToLevel(self, game.level) end
 	end,
+	cost = 450,
 	wielder = {
 		combat_mindpower=4,
 		combat_mindcrit=3,
@@ -4990,16 +5017,16 @@ newEntity{ base = "BASE_GREATSWORD", --Thanks Grayswandir!
 	encumber = 0.1,
 	desc = [[This sword appears weightless, and nearly invisible.]],
 	cost = 400,
-	require = { stat = { str=24, }, },
+	require = { stat = { mag=18, }, },
 	metallic = false,
 	material_level = 2,
 	combat = {
-		dam = 24,
+		dam = 26,
 		physspeed=0.9,
 		apr = 25,
 		physcrit = 3,
-		dammod = {str=1.2},
-		melee_project={[DamageType.ARCANE] = 10,},
+		dammod = {str=1.2, mag=0.1},
+		melee_project={[DamageType.ARCANE] = 15,},
 		burst_on_crit = {
 			[DamageType.ARCANE_SILENCE] = 30,
 		},
@@ -5463,6 +5490,13 @@ newEntity{ base = "BASE_WIZARD_HAT", --Thanks SageAcrin!
 			[DamageType.PHYSICAL]	= 10,
 		},
 	},
+	on_wear = function(self, who)
+		if who.descriptor and who.descriptor.subclass == "Doomed" then
+			local Talents = require "engine.interface.ActorTalents"
+			self.talent_on_mind = { {chance=10, talent=Talents.T_DARK_TORRENT, level=2} }
+			game.logPlayer(who, "#RED#Malslek's hatred flows through you.")
+		end
+	end,
 	talent_on_spell = { {chance=10, talent=Talents.T_AGONY, level=2} },
 	talent_on_mind  = { {chance=10, talent=Talents.T_HATEFUL_WHISPER, level=2} },
 }
@@ -5978,14 +6012,14 @@ newEntity{ base = "BASE_AMULET",
 	wielder = {
 		combat_mindpower = 5,
 		enhance_meditate=0.2,
-		inc_stats = { [Stats.STAT_WIL] = 4,},
-		life_regen=0.2,
+		inc_stats = { [Stats.STAT_WIL] = 5,},
+		life_regen=2,
 		damage_affinity={
 			[DamageType.NATURE] = 15,
 		},
 	},
-	max_power = 40, power_regen = 1,
-	use_talent = { id = Talents.T_NATURE_TOUCH, level = 2, power = 40 },
+	max_power = 35, power_regen = 1,
+	use_talent = { id = Talents.T_NATURE_TOUCH, level = 2, power = 35 },
 }
 
 newEntity{ base = "BASE_GAUNTLETS",
@@ -6758,6 +6792,14 @@ newEntity{ base = "BASE_CLOTH_ARMOR", --Thanks SageAcrin!
 			self:specialWearAdd({"wielder","global_speed_add"}, 0.15)
 			game.logPlayer(who, "#RED#You feel yourself lost in the aura of the robe.")
 		end
+		if who.descriptor and who.descriptor.subclass == "Doomed" then
+			local Talents = require "engine.interface.ActorTalents"
+			self.talent_on_mind = {
+				{chance=8, talent=Talents.T_CURSED_BOLT, level=2},
+				{chance=8, talent=Talents.T_WAKING_NIGHTMARE, level=2 }
+			}
+			game.logPlayer(who, "#RED#The robe drapes comfortably over your doomed body.")
+		end
 	end,
 	talent_on_mind  = { {chance=8, talent=Talents.T_HATEFUL_WHISPER, level=2}, {chance=8, talent=Talents.T_AGONY, level=2}  },
 }
@@ -6874,7 +6916,7 @@ newEntity{ base = "BASE_SHIELD",
 		if rng.percent(30) then
 			if not src then return end
 			game.logSeen(src, "The eye locks onto %s, freezing it in place!", src.name:capitalize())
-			if src:canBe("stun") and src:canBe("stone") and src:canBe("instakill") then
+			if src.canBe and src:canBe("stun") and src:canBe("stone") and src:canBe("instakill") then
 				src:setEffect(who.EFF_STONED, 5, {})
 			end
 		end
@@ -7283,7 +7325,7 @@ newEntity{ base = "BASE_GREATMAUL",
 		special_on_hit = { --thanks nsrr!--
 			desc=function(self, who, special)
 				local damage = special.damage(self, who)
-				local s = ("Sends a tremor through the ground which causes jagged rocks to errupt in a beam of length 5, dealing %d Physical damage (equal to your Strength, up to 150) and causing targets hit to bleed for an additional 50 damage over 5 turns. Bleeding can stack."):format(damage)
+				local s = ("Sends a tremor through the ground which causes jagged rocks to erupt in a beam of length 5, dealing %d Physical damage (equal to your Strength, up to 150) and causing targets hit to bleed for an additional 50 damage over 5 turns. Bleeding can stack."):format(damage)
 				return s
 			end,
 			damage = function(self, who)
@@ -7962,13 +8004,13 @@ newEntity{ base = "BASE_BATTLEAXE",
 	cost = 100,
 	material_level = 2,
 	combat = {
-		dam = 20,
-		apr = 2,
+		dam = 30,
+		apr = 15,
 		physcrit = 5,
 		dammod = {str=1.2},
 		melee_project={
-			[DamageType.LIGHTNING]=10,
-			[DamageType.COLD]=10,
+			[DamageType.LIGHTNING]=15,
+			[DamageType.COLD]=15,
 		},
 		special_on_crit = {desc="inflicts either shocked or wet, chosen at random", fct=function(combat, who, target)
 			if not target or target == self then return end
@@ -7981,8 +8023,8 @@ newEntity{ base = "BASE_BATTLEAXE",
 	},
 	wielder = {
 		inc_damage = {
-			[DamageType.LIGHTNING]=10,
-			[DamageType.COLD]=10,
+			[DamageType.LIGHTNING]=12,
+			[DamageType.COLD]=12,
 		},
 	},
 }

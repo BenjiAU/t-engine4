@@ -20,7 +20,7 @@
 name = "Following The Way"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You have been tasked to remove two threats to the yeeks.\n"
+	desc[#desc+1] = "You have been tasked to remove at leastg one of the threats to the yeeks.\n"
 	desc[#desc+1] = "Protect the Way, and vanquish your foes.\n"
 	if self:isCompleted("murgol") then
 		if self:isCompleted("murgol-invaded") then
@@ -41,7 +41,7 @@ end
 
 on_status_change = function(self, who, status, sub)
 	if sub then
-		if self:isCompleted("ritch") and self:isCompleted("murgol") then
+		if self:isCompleted("ritch") or self:isCompleted("murgol") then
 			who:setQuestStatus(self.id, engine.Quest.DONE)
 			who:grantQuest("rel-tunnel")
 			game.logPlayer(game.player, "You should head to the tunnel to Maj'Eyal and explore the world. For the Way.")

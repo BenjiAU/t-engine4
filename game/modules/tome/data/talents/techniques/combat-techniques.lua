@@ -207,11 +207,12 @@ newTalent{
 	require = techs_strdex_req3,
 	mode = "passive",
 	points = 5,
+	getSaves = function(self, t) return math.floor(self:combatTalentScale(t, 12, 48)) end,
 	passives = function(self, t, p)
-		self:talentTemporaryValue(p, "combat_spellresist", self:getTalentLevel(t) * 9)
+		self:talentTemporaryValue(p, "combat_spellresist", t.getSaves(self,t))
 	end,
 	info = function(self, t)
-		return ([[Rigorous training allows you to be more resistant to some spell effects (+%d spell save).]]):format(self:getTalentLevel(t) * 9)
+		return ([[Rigorous training allows you to be more resistant to some spell effects (+%d spell save).]]):format(t.getSaves(self,t))
 	end,
 }
 

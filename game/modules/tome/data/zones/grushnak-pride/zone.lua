@@ -19,46 +19,35 @@
 
 return {
 	name = "Grushnak Pride",
-	display_name = function()
-		if game.level.level % 2 == 0 then return "Grushnak Pride ("..(game.level.level/2)..")"
-		else return "Grushnak Pride (guarded barracks)"
-		end
-	end,
-	variable_zone_name = true,
 	level_range = {35, 60},
 	level_scheme = "player",
-	max_level = 6,
+	max_level = 3,
 	decay = {300, 800},
-	-- 10 levels but really only 5, the 5 others are just transitions
-	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + math.floor(level.level / 2) + rng.range(-1,2) end,
-	level_adjust_level = function(zone, level) return zone.base_level + math.floor(level.level / 2) end,
-	width = 50, height = 50,
+	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(-1,2) end,
+	width = 40, height = 40,
 	persistent = "zone",
---	all_remembered = true,
---	all_lited = true,
+	-- no_level_connectivity = true,
+	-- all_remembered = true,
+	-- all_lited = true,
 	ambient_music = "Thrall's Theme.ogg",
 	min_material_level = 4,
 	max_material_level = 5,
 	effects = {"EFF_ZONE_AURA_GRUSHNAK"},
 	generator =  {
 		map = {
-			class = "engine.generator.map.Roomer",
+			class = "engine.generator.map.MapScript",
+			['<'] = "UP", ['>'] = "DOWN",
+			['.'] = "UNDERGROUND_FLOOR", ['+'] = "DOOR", ['#'] = "WALL",
+			[';'] = "UNDERGROUND_CREEP", ['T'] = 'UNDERGROUND_TREE',
+			['='] = "UNDERGROUND_CREEP",
+			door = "DOOR",
+			mapscript = "!main",
 			pride = "grushnak",
-			nb_rooms = 10,
-			lite_room_chance = 20,
-			required_rooms = {"greater_vault"},
-			rooms = {"forest_clearing", {"pit",4}, {"greater_vault",2}},
-			rooms_config = {pit={filters={{subtype="orc"},{subtype="troll"}}}},
-			['.'] = "UNDERGROUND_FLOOR",
-			['#'] = "UNDERGROUND_TREE",
-			up = "UNDERGROUND_LADDER_UP",
-			down = "UNDERGROUND_LADDER_DOWN",
-			door = "UNDERGROUND_FLOOR",
-			['+'] = "UNDERGROUND_FLOOR",
 		},
 		actor = {
 			class = "mod.class.generator.actor.Random",
-			nb_npc = {50, 60},
+			nb_npc = {35, 40},
+			-- nb_npc = {0, 0},
 			guardian = "GRUSHNAK",
 		},
 		object = {
@@ -68,69 +57,17 @@ return {
 	},
 	post_process = function(level)
 		-- Place a lore note on each level
-		if level.level >= 2 and level.level <= 6 then
-			game:placeRandomLoreObject("GARKUL_HISTORY"..(level.level-1))
-		end
+		game:placeRandomLoreObjectScale("GARKUL_HISTORY", {{1,2}, {3,4}, {5}}, level.level)
 
 		for uid, e in pairs(level.entities) do e.faction = e.hard_faction or "orc-pride" end
 	end,
 	levels =
 	{
 		[1] = { generator = {
-			map = { class = "engine.generator.map.Static", map = "zones/prides-middle" },
-			actor = { nb_npc = {0, 0} },
-			object = { nb_object = {0, 0} },
-		}},
-		[2] = { generator = {
-			map = { static_replace_tiles = {
-					FLOOR = "UNDERGROUND_FLOOR",
-					DOOR = "UNDERGROUND_FLOOR",
-					WALL = "UNDERGROUND_TREE",
-					HARDWALL = "UNDERGROUND_HARDTREE",
-					DOOR_VAULT = "UNDERGROUND_VAULT",
-			}, },
-		}},
+			map = { ['<'] = "UP_WILDERNESS" },
+		} },
 		[3] = { generator = {
-			map = { class = "engine.generator.map.Static", map = "zones/prides-middle" },
-			actor = { nb_npc = {0, 0} },
-			object = { nb_object = {0, 0} },
-		}},
-		[4] = { generator = {
-			map = { static_replace_tiles = {
-					FLOOR = "UNDERGROUND_FLOOR",
-					DOOR = "UNDERGROUND_FLOOR",
-					WALL = "UNDERGROUND_TREE",
-					HARDWALL = "UNDERGROUND_HARDTREE",
-					DOOR_VAULT = "UNDERGROUND_VAULT",
-			}, },
-		}},
-		[5] = { generator = {
-			map = { class = "engine.generator.map.Static", map = "zones/prides-middle" },
-			actor = { nb_npc = {0, 0} },
-			object = { nb_object = {0, 0} },
-		}},
-		[6] = {
-			generator = { map = {
-				static_replace_tiles = {
-					FLOOR = "UNDERGROUND_FLOOR",
-					DOOR = "UNDERGROUND_FLOOR",
-					WALL = "UNDERGROUND_TREE",
-					HARDWALL = "UNDERGROUND_HARDTREE",
-					DOOR_VAULT = "UNDERGROUND_VAULT",
-				},
-				['.'] = {
-					"UNDERGROUND_FLOOR",
-					"UNDERGROUND_FLOOR",
-					"UNDERGROUND_FLOOR",
-					"UNDERGROUND_FLOOR",
-					"UNDERGROUND_FLOOR",
-					"UNDERGROUND_FLOOR",
-					"UNDERGROUND_FLOOR",
-					"UNDERGROUND_CREEP",
-				},
-				down = "SLIME_TUNNELS",
-				force_last_stair = true,
-			}, },
-		},
+			map = { mapscript = "!last" },
+		} },
 	},
 }

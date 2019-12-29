@@ -113,18 +113,7 @@ function _M:init(t, no_default)
 	end
 
 	if config.settings.cheat and not self._no_upvalues_check then
-		local ok, err = table.check(
-			self,
-			function(t, where, v, tv)
-				if tv ~= "function" then return true end
-				local n, v = debug.getupvalue(v, 1)
-				if not n then return true end
-				return nil, ("%s has upvalue %s"):format(tostring(where), tostring(n))
-			end,
-			function(value) return not value._allow_upvalues end)
-		if not ok then
-			error("Entity definition has a closure: "..err)
-		end
+		self:checkForUpvalues()
 	end
 	if self.color then
 		self.color_r = self.color.r
@@ -171,6 +160,21 @@ function _M:init(t, no_default)
 		end
 	end
 
+end
+
+function _M:checkForUpvalues()
+	local ok, err = table.check(
+		self,
+		function(t, where, v, tv)
+			if tv ~= "function" then return true end
+			local n, v = debug.getupvalue(v, 1)
+			if not n then return true end
+			return nil, ("%s has upvalue %s"):format(tostring(where), tostring(n))
+		end,
+		function(value) return not value._allow_upvalues end)
+	if not ok then
+		error(("Entity %s/%s definition has a closure: %s"):format(tostring(self.uid), tostring(self.name), err))
+	end
 end
 
 --- If we are cloned we need a new uid

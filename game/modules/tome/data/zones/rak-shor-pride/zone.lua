@@ -42,6 +42,7 @@ return {
 			up = "BONE_LADDER_UP",
 			down = "BONE_LADDER_DOWN",
 			door = "BONE_DOOR",
+			subvault_exterior_wall = "HARDBONEWALL",
 			static_replace_tiles = {
 				FLOOR = "BONEFLOOR",
 				DOOR = "BONE_DOOR",
@@ -49,14 +50,13 @@ return {
 				HARDWALL = "HARDBONEWALL",
 				DOOR_VAULT = "BONE_VAULT_DOOR",
 			},
-			required_rooms = {"greater_vault"},
-			rooms = {{"forest_clearing",2}, "random_room", {"lesser_vault",2}, {"greater_vault",4}},
+			rooms = {{"forest_clearing",2}, "random_room", {"lesser_vault",2}},
 			lesser_vaults_list = {"orc-armoury", "double-t", "crypt", "hostel", "horror-chamber"},
-			lite_room_chance = 100,
+			lite_room_chance = 20,
 		},
 		actor = {
 			class = "mod.class.generator.actor.Random",
-			nb_npc = {50, 60},
+			nb_npc = {35, 40},
 			guardian = "RAK_SHOR",
 		},
 		object = {
@@ -76,44 +76,18 @@ return {
 	levels =
 	{
 		[1] = {
-			width = 64, height = 64,
 			generator = { map = {
-				class = "engine.generator.map.Static",
-				map = "zones/prides",
-				up = "BONE_UP_WILDERNESS",
-				down = "BONE_LADDER_DOWN",
-				floor = "BONEFLOOR",
-				wall = "HARDBONEWALL",
-				generic_leveler = "BONE_GENERIC_LEVER",
-				generic_leveler_door = "BONE_GENERIC_LEVER_DOOR",
-				sublevel = {
-					class = "engine.generator.map.Town",
-					pride = "rak-shor",
-					building_chance = 70,
-					max_building_w = 8, max_building_h = 8,
-					edge_entrances = {6,4},
-					floor = "BONEFLOOR",
-					external_floor = "BONEFLOOR",
-					wall = "BONEWALL",
-					up = "BONEFLOOR",
-					down = "BONEFLOOR",
-					door = "BONE_DOOR",
-
-					static_replace_tiles = {
-						FLOOR = "BONEFLOOR",
-						DOOR = "BONE_DOOR",
-						WALL = "BONEWALL",
-						HARDWALL = "HARDBONEWALL",
-						DOOR_VAULT = "BONE_VAULT_DOOR",
-					},
-					nb_rooms = {1,1,2,3},
-					rooms = {"lesser_vault", "greater_vault"},
-					lesser_vaults_list = {"orc-armoury", "double-t", "crypt", "hostel", "horror-chamber"},
-					lite_room_chance = 100,
-				},
+				class = "engine.generator.map.MapScript",
+				['<'] = "BONE_UP_WILDERNESS", ['>'] = "BONE_LADDER_DOWN",
+				['.'] = "BONEFLOOR", ['+'] = "BONE_DOOR", ['#'] = "BONEWALL",
+				['_'] = "BONEFLOOR", [';'] = "BONEFLOOR",
+				door = "BONE_DOOR",
+				mapscript = "!main",
+				pride = "rak-shor",
 			}, },
 		},
 		[3] = {
+			width = 30, height = 30,
 			generator = { map = {
 				down = "BONE_UP_WILDERNESS",
 			}, },

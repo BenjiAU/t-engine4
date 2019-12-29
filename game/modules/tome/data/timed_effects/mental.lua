@@ -91,33 +91,32 @@ newEffect{
 newEffect{
 	name = "SUMMON_CONTROL", image = "talents/summon_control.png", --Backwards compatibility
 	desc = "Pheromones",
-	long_desc = function(self, eff) return ("The target has been marked as the focus for all summons within %d radius."):format(eff.range) end,
+	long_desc = function(self, eff) return ("The target has been marked as the focus for all nature summons within %d radius, receiving %d%% increased damage from nature summons."):format(eff.range, eff.power) end,
 	type = "mental",
 	subtype = { focus=true },
 	status = "detrimental",
-	parameters = { },
+	parameters = { power = 10 },
 	on_gain = function(self, err) return "Summons flock towards #Target#.", true end,
 	on_lose = function(self, err) return "#Target# is no longer being targeted by summons.", true end,
 	on_timeout = function(self, eff)
-
-			self:project({type="ball", range=0, friendlyfire=false, radius=eff.range}, self.x, self.y, function(px, py)
-			local target = game.level.map(px, py, Map.ACTOR)
-			if not target then return end
-			if target.summoner == eff.src then
-				target:setTarget(self)
-			end
-			end)
-
+		self:project({type="ball", range=0, friendlyfire=false, radius=eff.range}, self.x, self.y, function(px, py)
+		local target = game.level.map(px, py, Map.ACTOR)
+		if not target then return end
+		if target.summoner == eff.src then
+			target:setTarget(self)
+		end
+		end)
 	end,
 	activate = function(self, eff)
-			self:project({type="ball", range=0, friendlyfire=false, radius=eff.range}, self.x, self.y, function(px, py)
-			local target = game.level.map(px, py, Map.ACTOR)
-			if not target then return end
-			if target.summoner == eff.src then
-				target:setTarget(self)
-			end
-			end)
+		self:effectTemporaryValue(eff, "inc_nature_summon", eff.power)
 
+		self:project({type="ball", range=0, friendlyfire=false, radius=eff.range}, self.x, self.y, function(px, py)
+		local target = game.level.map(px, py, Map.ACTOR)
+		if not target then return end
+		if target.summoner == eff.src then
+			target:setTarget(self)
+		end
+		end)
 	end,
 	deactivate = function(self, eff)
 	end,
@@ -135,7 +134,7 @@ newEffect{
 	on_gain = function(self, err) return "#Target# wanders around!.", "+Confused" end,
 	on_lose = function(self, err) return "#Target# seems more focused.", "-Confused" end,
 	activate = function(self, eff)
-		eff.power = util.bound(eff.power, 0, 50)
+		eff.power = math.floor(util.bound(eff.power, 0, 50))
 		eff.tmpid = self:addTemporaryValue("confused", eff.power)
 		if eff.power <= 0 then eff.dur = 0 end
 	end,
@@ -187,6 +186,7 @@ newEffect{
 				end,
 				leave_level = function(self, party_def) -- Cancel control and restore previous actor status.
 					local eff = self:hasEffect(self.EFF_DOMINANT_WILL)
+					if not eff then return end
 					local uid = self.uid
 					eff.survive_domination = true
 					self:removeTemporaryValue("inc_damage", eff.pid)
@@ -388,7 +388,7 @@ newEffect{
 	on_lose = function(self, err) return "#Target# overcomes the gloom", "-Confused" end,
 	activate = function(self, eff)
 		eff.particle = self:addParticles(Particles.new("gloom_confused", 1))
-		eff.power = util.bound(eff.power, 0, 50)
+		eff.power = math.floor(util.bound(eff.power, 0, 50))
 		eff.tmpid = self:addTemporaryValue("confused", eff.power)
 		if eff.power <= 0 then eff.dur = 0 end
 	end,
@@ -628,7 +628,7 @@ newEffect{
 	on_lose = function(self, err) return "#Target# is no longer overwhelmed.", "-Overwhelmed" end,
 	parameters = { chance=5 },
 	activate = function(self, eff)
-		eff.defenseChangeId = self:addTemporaryValue("combat_atk", eff.defenseChange)
+		eff.defenseChangeId = self:addTemporaryValue("combat_def", -eff.defenseChange)
 		eff.particle = self:addParticles(Particles.new("overwhelmed", 1))
 	end,
 	deactivate = function(self, eff)
@@ -737,7 +737,7 @@ newEffect{
 
 		if eff.particle then self:removeParticles(eff.particle) end
 		eff.particle = nil
-		eff.particle = self:addParticles(Particles.new("agony", 1, { power = 10 * eff.turn / eff.duration }))
+		eff.particle = self:addParticles(Particles.new("agony", 1, { power = 5 * eff.turn / eff.duration }))
 	end,
 }
 
@@ -902,7 +902,7 @@ newEffect{
 	activate = function(self, eff)
 		eff.particle = self:addParticles(Particles.new("gloom_confused", 1))
 		eff.mindResistChangeId = self:addTemporaryValue("resists", { [DamageType.MIND]=eff.mindResistChange })
-		eff.power = util.bound(eff.power, 0, 50)
+		eff.power = math.floor(util.bound(eff.power, 0, 50))
 		eff.tmpid = self:addTemporaryValue("confused", eff.power)
 	end,
 	deactivate = function(self, eff)
@@ -1081,6 +1081,7 @@ newEffect{
 	name = "DISPAIR", image = "effects/despair.png",
 	desc = "Despair",
 	long_desc = function(self, eff) return ("The target is in despair, reducing their armour, defence, mindsave and mind resist by %d."):format(-eff.statChange) end,
+	charges = function(self, eff) return math.floor(-eff.statChange) end,	
 	type = "mental",
 	subtype = { fear=true },
 	status = "detrimental",
@@ -1115,6 +1116,7 @@ newEffect{
 	subtype = { fear=true },
 	status = "detrimental",
 	parameters = {},
+	charges = function(self, eff) return (tostring(math.floor(eff.cooldownPower * 100)).."%") end,
 	on_gain = function(self, err) return "#F53CBE##Target# becomes terrified!", "+Terrified" end,
 	on_lose = function(self, err) return "#Target# is no longer terrified", "-Terrified" end,
 	activate = function(self, eff) --cooldown increase handled in class.actor.lua
@@ -1167,6 +1169,7 @@ newEffect{
 	name = "HAUNTED", image = "effects/haunted.png",
 	desc = "Haunted",
 	long_desc = function(self, eff) return ("The target is haunted by a feeling of dread, causing each detrimental mental effect to inflict %d mind and darkness damage every turn."):format(eff.damage) end, --perhaps add total.
+	charges = function(self, eff) return (math.floor(eff.damage)) end,	
 	type = "mental",
 	subtype = { fear=true },
 	status = "detrimental",
@@ -2098,7 +2101,7 @@ newEffect{
 	parameters = { power=1, confuse=10, dam=1 },
 	activate = function(self, eff)
 		DamageType:get(DamageType.MIND).projector(eff.src or self, self.x, self.y, DamageType.MIND, {dam=eff.dam, alwaysHit=true})
-		eff.confuse = util.bound(eff.confuse, 0, 50) -- Confusion cap of 50%
+		eff.confuse = math.floor(util.bound(eff.confuse, 0, 50)) -- Confusion cap of 50%
 		eff.tmpid = self:addTemporaryValue("confused", eff.confuse)
 		eff.cid = self:addTemporaryValue("inc_stats", {[Stats.STAT_CUN]=-eff.power/2})
 		if eff.power <= 0 then eff.dur = 0 end
@@ -2254,13 +2257,16 @@ newEffect{
 newEffect{
 	name = "FOCUSED_WRATH", image = "talents/focused_wrath.png",
 	desc = "Focused Wrath",
-	long_desc = function(self, eff) return ("The target's subconscious has focused its attention on %s."):format(eff.target.name:capitalize()) end,
+	long_desc = function(self, eff) return ("The target's subconscious has focused, increasing Mind resistance penetration by +%d%% and turning its attention on %s."):format(eff.pen, eff.target.name:capitalize()) end,
 	type = "mental",
 	subtype = { psionic=true },
 	status = "beneficial",
 	parameters = { power = 1 },
 	on_gain = function(self, err) return "#Target#'s subconscious has been focused.", "+Focused Wrath" end,
 	on_lose = function(self, err) return "#Target#'s subconscious has returned to normal.", "-Focused Wrath" end,
+	activate = function(self, eff)
+			self:effectTemporaryValue(eff, "resists_pen", {[DamageType.MIND]=eff.pen})
+		end,
 	on_timeout = function(self, eff)
 		if not eff.target or eff.target.dead or not game.level:hasEntity(eff.target) then
 			self:removeEffect(self.EFF_FOCUSED_WRATH)

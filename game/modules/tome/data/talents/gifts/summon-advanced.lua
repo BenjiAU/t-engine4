@@ -72,16 +72,16 @@ newTalent{
 	info = function(self, t)
 		local radius = self:getTalentRadius(t)
 		return ([[While Master Summoner is active, when a creature you summon appears in the world, it will trigger a wild effect:
-		- Ritch Flamespitter: Reduce fire resistance of all foes in a radius by %d%%
+		- Ritch Flamespitter: Reduce fire resistance of all foes in the radius by %d%%
 		- Hydra: Generates a cloud of lingering poison, poisoning all foes caught within for %0.1f nature damage per turn (cumulative)
-		- Rimebark: Reduce cold resistance of all foes in a radius by %d%%
+		- Rimebark: Reduce cold resistance of all foes in the radius by %d%%
 		- Fire Drake: Appears with %d fire drake hatchling(s)
-		- War Hound: Reduce physical resistance of all foes in a radius by %d%%
-		- Jelly: Reduce nature resistance of all foes in a radius by %d%%
-		- Minotaur: Reduces movement speed of all foes in a radius by %0.1f%%
-		- Stone Golem: Dazes all foes in a radius
-		- Turtle: Heals all friendly targets in a radius %d HP
-		- Spider: Pins all foes in a radius
+		- War Hound: Reduce physical resistance of all foes in the radius by %d%%
+		- Jelly: Reduce nature resistance of all foes in the radius by %d%%
+		- Minotaur: Reduces movement speed of all foes in the radius by %0.1f%%
+		- Stone Golem: Dazes all foes in the radius
+		- Turtle: Heals all friendly targets in the radius %d HP
+		- Spider: Pins all foes in the radius
 		Radius for effects is %d, and the duration of each lasting effect is %d turns.
 		The effects improve with your mindpower.]]):format(t.resReduction(self, t), t.poisonDamage(self,t) / 6, t.resReduction(self, t), t.nbEscorts(self, t), t.resReduction(self, t), t.resReduction(self, t), 100*t.slowStrength(self,t), t.amtHealing(self,t), radius, t.effectDuration(self, t))
 	end,

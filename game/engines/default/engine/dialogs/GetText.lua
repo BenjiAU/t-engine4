@@ -54,6 +54,10 @@ function _M:init(title, text, min, max, action, cancel, absolute)
 	}
 end
 
+function _M:setText(text)
+	self.c_box:setText(text)
+end
+
 function _M:okclick()
 	self.name = self.c_box.text
 	if self.name:len() >= self.min and self.name:len() <= self.max then

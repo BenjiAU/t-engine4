@@ -321,6 +321,95 @@ venomous_throw_check = function(self)
 	end
 end
 
+archeryWeaponCheck = function(self, weapon, ammo, silent, weapon_type)
+	if not weapon then
+		if not silent then
+			-- ammo contains error message
+			game.logPlayer(self, ({
+				["disarmed"] = "You are currently disarmed and cannot use this talent.",
+				["no shooter"] = ("You require a %s to use this talent."):format(weapon_type or "missile launcher"),
+				["no ammo"] = "You require ammo to use this talent.",
+				["bad ammo"] = "Your ammo cannot be used.",
+				["incompatible ammo"] = "Your ammo is incompatible with your missile launcher.",
+				["incompatible missile launcher"] = ("You require a %s to use this talent."):format(weapon_type or "bow"),
+			})[ammo] or "You require a missile launcher and ammo for this talent.")
+		end
+		return false
+	else
+		local infinite = ammo and ammo.infinite or self:attr("infinite_ammo")
+		if not ammo or (ammo.combat.shots_left <= 0 and not infinite) then
+			if not silent then game.logPlayer(self, "You do not have enough ammo left!") end
+			return false
+		end
+	end
+	return true
+end
+
+archerPreUse = function(self, t, silent, weapon_type)
+	local weapon, ammo, offweapon, pf_weapon = self:hasArcheryWeapon(weapon_type)
+	weapon = weapon or pf_weapon
+	return archeryWeaponCheck(self, weapon, ammo, silent, weapon_type)
+end
+
+wardenPreUse = function(self, t, silent, weapon_type)
+	local weapon, ammo, offweapon, pf_weapon = self:hasArcheryWeapon(weapon_type)
+	weapon = weapon or pf_weapon
+	if self:attr("warden_swap") and not weapon and weapon_type == nil or weapon_type == "bow" then
+		weapon, ammo = doWardenPreUse(self, "bow")
+	end
+	return archeryWeaponCheck(self, weapon, ammo, silent, weapon_type)
+end
+
+--- Warden weapon functions
+-- Checks for weapons in main and quickslot
+doWardenPreUse = function(self, weapon, silent)
+	if weapon == "bow" then
+		local bow, ammo, oh, pf_bow= self:hasArcheryWeapon("bow")
+		if not bow and not pf_bow then
+			bow, ammo, oh, pf_bow= self:hasArcheryWeaponQS("bow")
+		end
+		return bow or pf_bow, ammo
+	end
+	if weapon == "dual" then
+		local mh, oh = self:hasDualWeapon()
+		if not mh then
+			mh, oh = self:hasDualWeaponQS()
+		end
+		return mh, oh
+	end
+end
+
+-- Swaps weapons if needed
+doWardenWeaponSwap = function(self, t, type, silent)
+	local swap = false
+	local mainhand, offhand, ammo, pf_weapon
+	
+	if type == "blade" then
+		mainhand, offhand = self:hasDualWeapon()
+		if not mainhand and self:hasDualWeapon(nil, nil, true) then  -- weird but this is lets ogers offhanding daggers still swap
+		
+			swap = true
+		end
+	end
+	if type == "bow" then
+		mainhand, offhand, ammo, pf_weapon = self:hasArcheryWeapon("bow")
+		if not mainhand and not pf_weapon then
+			mainhand, offhand, ammo, pf_weapon = self:hasArcheryWeapon("bow", true)
+			if mainhand or pf_weapon then swap = true end
+		end
+	end
+	
+	if swap == true then
+		local old_inv_access = self.no_inventory_access -- Make sure clones can swap
+		self.no_inventory_access = nil
+		self:attr("no_sound", 1)
+		self:quickSwitchWeapons(true, "warden", silent)
+		self:attr("no_sound", -1)
+		self.no_inventory_access = old_inv_access
+	end
+	return swap
+end
+
 load("/data/talents/techniques/2hweapon.lua")
 load("/data/talents/techniques/2h-assault.lua")
 load("/data/talents/techniques/strength-of-the-berserker.lua")

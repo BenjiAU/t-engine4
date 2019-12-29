@@ -35,15 +35,15 @@ newTalent{
 	cooldown = 12,
 	tactical = { BUFF = 2 },
 	type_no_req = true,
-	no_npc_use = true, -- They dont need it since it auto switches anyway
+	--no_npc_use = true, -- They dont need it since it auto switches anyway
 	no_unlearn_last = true,
 	getAttack = function(self, t) return self:getDex(25, true) end,
-	getDamage = function(self, t) return self:combatStatScale("dex", 5, 35) end,
+	getDamage = function(self, t) return self:combatStatScale("dex", 25, 60) end,
 	getFlatReduction = function(self, t) 
 		if self:knowTalent(self.T_REFLEX_DEFENSE) then
 			return math.min(35, self:combatStatScale("str", 1, 30, 0.75)) * (1 + (self:callTalent(self.T_REFLEX_DEFENSE, "getFlatReduction")/100) )
 		else
-			return math.min(35, self:combatStatScale("str", 1, 30, 0.75)) 
+			return math.min(35, self:combatStatScale("str", 1, 30, 0.75))
 		end	
 	end,
 	-- 13 Strength = 2, 20 = 5, 30 = 9, 40 = 12, 50 = 16, 55 = 17, 70 = 22, 80 = 25

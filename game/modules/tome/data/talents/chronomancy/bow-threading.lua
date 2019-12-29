@@ -19,9 +19,6 @@
 
 -- EDGE TODO: Particles, Timed Effect Particles
 
-
-local wardenPreUse = Talents.wardenPreUse
-
 newTalent{
 	name = "Arrow Stitching",
 	type = {"chronomancy/bow-threading", 1},

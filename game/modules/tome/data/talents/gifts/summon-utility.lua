@@ -55,7 +55,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Under the cover of your shell, gain %d%% global resistance for %d turns]]):format(t.resistPower(self, t), t.getDuration(self, t))
+		return ([[Under the cover of your shell, gain %d%% all resistance for %d turns]]):format(t.resistPower(self, t), t.getDuration(self, t))
 	end,
 }
 
@@ -209,7 +209,7 @@ newTalent{
 		local incStats = t.incStats(self, t, true)
 		return ([[Summon a Turtle for %d turns to distract your foes. Turtles are resilient, but not very powerful. However, they will periodically force any foes to attack them, and can protect themselves with their shell.
 		It will get %d Constitution, %d Dexterity and 18 willpower.
-		Your summons inherit some of your stats: increased damage%%, stun/pin/confusion/blindness resistance, armour penetration.
+		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		Their Constitution will increase with your Mindpower.]])
 		:format(t.summonTime(self, t), incStats.con, incStats.dex)
 	end,
@@ -323,7 +323,7 @@ newTalent{
 		local incStats = t.incStats(self, t,true)
 		return ([[Summon a Spider for %d turns to harass your foes. Spiders can poison your foes and throw webs to pin them to the ground.
 		It will get %d Dexterity, %d Strength, 18 Willpower and %d Constitution.
-		Your summons inherit some of your stats: increased damage%%, stun/pin/confusion/blindness resistance, armour penetration.
+		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		Their Dexterity will increase with your Mindpower.]])
 		:format(t.summonTime(self, t), incStats.dex, incStats.str, incStats.con)
 	end,
@@ -363,13 +363,14 @@ newTalent{
 	points = 5,
 	equilibrium = 7,
 	cooldown = 10,
-	no_npc_use = true,
+	tactical = { DISABLE = 2 },
 	no_energy = true,
 	requires_target = true,
 	range = 10,
 	direct_hit = true,
 	getRad = function(self, t) return self:combatTalentScale(t, 3, 7) end,
-	getDur = function(self, t) return self:combatTalentScale(t, 3, 8) end,
+	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 3, 5.5)) end,
+	getDamage = function(self, t) return 10 + self:combatTalentMindDamage(t, 10, 25) end,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
@@ -377,13 +378,14 @@ newTalent{
 		if not target or target == self then return nil
 
 		else
-			target:setEffect(target.EFF_SUMMON_CONTROL, t.getDur(self, t), {range=t.getRad(self,t), src=self})
+			target:setEffect(target.EFF_SUMMON_CONTROL, t.getDur(self, t), {range=t.getRad(self,t), src=self, power=t.getDamage(self,t)})
 		end
 
 		game:playSoundNear(self, "talents/spell_generic")
 		return true
 	end,
 	info = function(self, t)
-		return ([[Mark a creature with pheromones, signalling to all of your summons within %d tiles of it to shift aggression towards the marked creature for %d turns.]]):format(t.getRad(self,t), t.getDur(self,t))
+		return ([[Mark a creature with pheromones, signalling to all of your summons within %d tiles to shift aggression towards the marked creature for %d turns. Marked targets will receive %d%% increased damage from your summons and your summons will change target to it.
+		The increased damage from your summons will increase with your Mindpower]]):format(t.getRad(self,t), t.getDur(self,t), t.getDamage(self,t))
 	end,
 }

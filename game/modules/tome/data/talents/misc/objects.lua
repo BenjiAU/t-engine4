@@ -19,6 +19,7 @@
 
 newTalentType{ no_silence=true, is_spell=true, type="sher'tul/fortress", name = "fortress", description = "Yiilkgur abilities." }
 newTalentType{ no_silence=true, is_spell=true, type="spell/objects", name = "object spells", description = "Spell abilities of the various objects of the world." }
+newTalentType{ no_silence=true, type="other/objects", name = "object powers", description = "Abilities of the various objects of the world." }
 newTalentType{ type="technique/objects", name = "object techniques", description = "Techniques of the various objects of the world." }
 newTalentType{ type="wild-gift/objects", name = "object techniques", description = "Wild gifts of the various objects of the world." }
 newTalentType{ type="misc/objects", name = "object techniques", description = "Powers of the various objects of the world." }
@@ -28,7 +29,7 @@ newTalentType{ type="misc/objects", name = "object techniques", description = "P
 
 newTalent{
 	name = "charms", short_name = "GLOBAL_CD",
-	type = {"spell/objects",1},
+	type = {"other/objects",1},
 	points = 1,
 	cooldown = 1,
 	no_npc_use = true,
@@ -102,6 +103,38 @@ newTalent{
 		local count = t.getRemoveCount(self, t)
 		return ([[Removes up to %d detrimental magical effects and empowers you with arcane energy for ten turns, increasing spellpower and spell save by 5 plus 5 per effect removed.]]):
 		format(count)
+	end,
+}
+
+newTalent{
+	name = "Attune Mindstar",
+	type = {"wild-gift/objects", 1},
+	cooldown = 5,
+	points = 5,
+	no_unlearn_last = true,
+	no_npc_use = true,
+	message = function(self, t)
+		return ("@Source@ refocuses the energies of %s mindstar."):format(self:his_her())
+	end,
+	action = function(self, t)
+		local apply = function(o)
+			if not o.combat or not o.wielder or not o.wielder.learn_talent or not o.wielder.learn_talent[self.T_ATTUNE_MINDSTAR] then return end
+			if o.combat.damtype == DamageType.NATURE then
+				o.combat.damtype = DamageType.MIND
+				game.logPlayer(self, "You attune your %s to deal #ORANGE#mind#LAST# damage.", o:getName{do_color=1})
+			elseif o.combat.damtype == DamageType.MIND then
+				o.combat.damtype = DamageType.NATURE
+				game.logPlayer(self, "You attune your %s to deal #LIGHT_GREEN#nature#LAST# damage.", o:getName{do_color=1})
+			end
+		end
+
+		local mh = self:hasWeaponType("mindstar")
+		local oh = self:hasOffWeaponType("mindstar")
+		if mh then apply(mh) end
+		if oh then apply(oh) end
+	end,
+	info = function(self, t)
+		return ([[Alter the flow of energies of your equiped mindstars, changing their damage type between nature and mind.]])
 	end,
 }
 

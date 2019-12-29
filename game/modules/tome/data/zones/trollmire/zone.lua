@@ -61,9 +61,9 @@ return {
 			road = "GRASS_ROAD_DIRT",
 			add_road = true,
 
-			nb_rooms = {0,0,0,1},
+			nb_rooms = {0,1},
 			rooms = {"lesser_vault"},
-			lesser_vaults_list = {"honey_glade", "forest-ruined-building1", "forest-ruined-building2", "forest-ruined-building3", "forest-snake-pit", "mage-hideout"},
+			lesser_vaults_list = {"honey_glade", "forest-ruined-building1", "forest-ruined-building2", "forest-ruined-building3", "snake-pit", "mage-hideout", "collapsed-tower"},
 			lite_room_chance = 100,
 		},
 		actor = {
@@ -189,9 +189,9 @@ return {
 				pond = {{0.6, "DEEP_WATER"}, {0.8, "DEEP_WATER"}},
 			},
 
-			nb_rooms = {0,0,0,1},
+			nb_rooms = {0,1},
 			rooms = {"lesser_vault"},
-			lesser_vaults_list = {"honey_glade", "forest-ruined-building1", "forest-ruined-building2", "forest-ruined-building3", "forest-snake-pit", "mage-hideout"},
+			lesser_vaults_list = {"honey_glade", "forest-ruined-building1", "forest-ruined-building2", "forest-ruined-building3", "snake-pit", "mage-hideout", "collapsed-tower"},
 			lite_room_chance = 100,
 		},
 		actor = {

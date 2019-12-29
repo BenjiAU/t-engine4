@@ -74,7 +74,7 @@ newEntity{ base = "BASE_NPC_ORC_GRUSHNAK",
 	},
 }
 
-newEntity{ base = "BASE_NPC_ORC_GRUSHNAK",
+newEntity{ base = "BASE_NPC_ORC_GRUSHNAK", define_as = "ORC_ELITE_FIGHTER",
 	name = "orc elite fighter", color=colors.MOCCASIN,
 	desc = [[An orc clad in massive armour, wielding a shield and a deadly axe.]],
 	level_range = {35, nil}, exp_worth = 1,
@@ -129,7 +129,7 @@ newEntity{ base = "BASE_NPC_ORC_GRUSHNAK",
 	},
 }
 
-newEntity{ base = "BASE_NPC_ORC_GRUSHNAK",
+newEntity{ base = "BASE_NPC_ORC_GRUSHNAK", define_as = "ORC_ELITE_BERSERKER",
 	name = "orc elite berserker", color=colors.YELLOW,
 	desc = [[An orc clad in massive armour, wielding a huge axe.]],
 	level_range = {35, nil}, exp_worth = 1,

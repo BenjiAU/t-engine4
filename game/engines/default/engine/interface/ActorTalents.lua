@@ -704,6 +704,13 @@ function _M:updateTalentPassives(tid)
 	t.passives(self, t, self.talents_learn_vals[t.id])
 end
 
+--- Force all known passives to update
+function _M:updateAllTalentsPassives()
+	for tid, _ in pairs(self.talents) do
+		self:updateTalentPassives(tid)
+	end
+end
+
 --- Checks if the talent can be learned
 -- @param t the talent to check
 -- @param offset the level offset to check, defaults to 1
@@ -730,6 +737,16 @@ function _M:canLearnTalent(t, offset, ignore_special)
 		if req.special and not ignore_special then
 			if not req.special.fct(self, t, offset) then
 				return nil, req.special.desc
+			end
+		end
+		if req.special2 and not ignore_special then
+			if not req.special2.fct(self, t, offset) then
+				return nil, req.special2.desc
+			end
+		end
+		if req.special3 and not ignore_special then
+			if not req.special3.fct(self, t, offset) then
+				return nil, req.special3.desc
 			end
 		end
 		if req.talent then
@@ -803,6 +820,14 @@ function _M:getTalentReqDesc(t_id, levmod)
 	if req.special then
 		local c = (req.special.fct(self, t, offset)) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
 		str:add(c, ("- %s"):format(req.special.desc), true)
+	end
+	if req.special2 then
+		local c = (req.special2.fct(self, t, offset)) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
+		str:add(c, ("- %s"):format(req.special2.desc), true)
+	end
+	if req.special3 then
+		local c = (req.special3.fct(self, t, offset)) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
+		str:add(c, ("- %s"):format(req.special3.desc), true)
 	end
 	if req.talent then
 		for _, tid in ipairs(req.talent) do

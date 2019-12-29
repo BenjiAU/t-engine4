@@ -122,9 +122,15 @@ newEntity{
 	-- L75ish Normal
 	-- L97-99 Insane
 	auto_classes={
-		{class="Archmage", start_level=77, level_rate=100},
+		{class="Archmage", start_level=77, level_rate=100,
+			max_talent_types = 1,  -- Don't waste points on extra elemental trees or learn 20000 sustains
+			banned_talents = {
+				T_INVISIBILITY=true,  -- Reduces damage dramatically, basically a nerf
+				T_PROBABILITY_TRAVEL=true,  -- Does this even work on AI?  Possibly should kill this on all NPCs
+				T_DISRUPTION_SHIELD=true,  -- Stupid scaling with infinite mana
+			},
+		},
 	},
-
 	autolevel = "caster",
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", sense_radius=25, ai_target="target_simple_or_player_radius" },
 	ai_tactic = resolvers.tactic"ranged",
@@ -284,21 +290,26 @@ newEntity{ define_as = "FALLEN_SUN_PALADIN_AERYN",
 		[Talents.T_WEAPONS_MASTERY]=5,
 		[Talents.T_RUSH]=3,
 
-		[Talents.T_CHANT_OF_FORTRESS]=7,
+		[Talents.T_CHANT_OF_FORTRESS]=1,
 		[Talents.T_SUN_BEAM]=7,
 		[Talents.T_BARRIER]=7,
 		[Talents.T_WEAPON_OF_LIGHT]=7,
 		[Talents.T_HEALING_LIGHT]=7,
 		[Talents.T_CRUSADE]=7,
-		[Talents.T_SHIELD_OF_LIGHT]=7,
+		[Talents.T_SHIELD_OF_LIGHT]=1,
 		[Talents.T_SECOND_LIFE]=7,
-		[Talents.T_BATHE_IN_LIGHT]=7,
-		[Talents.T_PROVIDENCE]=7,
+		[Talents.T_BATHE_IN_LIGHT]=3,
+		[Talents.T_PROVIDENCE]=3,
 		[Talents.T_THICK_SKIN]=5,
 
 		[Talents.T_IRRESISTIBLE_SUN]=1,
 	},
-	auto_classes={{class="Sun Paladin", start_level=57, level_rate=100}},
+	auto_classes={{class="Sun Paladin", start_level=57, level_rate=50,
+			banned_talents = {
+				T_SUNCLOAK=true,  -- Hyperscaler for survivability
+			},
+		}
+	},
 	resolvers.sustains_at_birth(),
 }
 
@@ -326,7 +337,12 @@ newEntity{ define_as = "HIGH_SUN_PALADIN_AERYN",
 	
 	no_auto_resists = true,
 
-	auto_classes={{class="Sun Paladin", start_level=57, level_rate=100}},
+	auto_classes={{class="Sun Paladin", start_level=57, level_rate=50,
+			banned_talents = {
+				T_SUNCLOAK=true,  -- Hyperscaler for survivability
+			},
+		}
+	},
 
 	autolevel = "warriormage",
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
@@ -351,16 +367,16 @@ newEntity{ define_as = "HIGH_SUN_PALADIN_AERYN",
 		[Talents.T_WEAPONS_MASTERY]=5,
 		[Talents.T_RUSH]=3,
 
-		[Talents.T_CHANT_OF_FORTRESS]=7,
+		[Talents.T_CHANT_OF_FORTRESS]=1,
 		[Talents.T_SUN_BEAM]=7,
 		[Talents.T_BARRIER]=7,
 		[Talents.T_WEAPON_OF_LIGHT]=7,
 		[Talents.T_HEALING_LIGHT]=7,
 		[Talents.T_CRUSADE]=7,
-		[Talents.T_SHIELD_OF_LIGHT]=7,
+		[Talents.T_SHIELD_OF_LIGHT]=1,
 		[Talents.T_SECOND_LIFE]=7,
-		[Talents.T_BATHE_IN_LIGHT]=7,
-		[Talents.T_PROVIDENCE]=7,
+		[Talents.T_BATHE_IN_LIGHT]=3,
+		[Talents.T_PROVIDENCE]=3,
 		[Talents.T_THICK_SKIN]=5,
 
 		[Talents.T_IRRESISTIBLE_SUN]=1,

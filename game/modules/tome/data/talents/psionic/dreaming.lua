@@ -31,7 +31,8 @@ newTalent{
 	radius = function(self, t) return math.floor(self:combatTalentScale(t, 1.25, 2.25)) end,
 	target = function(self, t) return {type="ball", radius=self:getTalentRadius(t), range=self:getTalentRange(t), talent=t} end,
 	getDuration = function(self, t) return math.ceil(self:combatTalentScale(t, 2.1, 3.5)) end,
-	getInsomniaPower= function(self, t)
+	getInsomniaPower = function(self, t)
+		if not self:knowTalent(self.T_SANDMAN) then return 20 end
 		local t = self:getTalentFromId(self.T_SANDMAN)
 		local reduction = t.getInsomniaPower(self, t)
 		return 20 - reduction

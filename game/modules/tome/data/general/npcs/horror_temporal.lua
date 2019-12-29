@@ -141,14 +141,14 @@ newEntity{ base = "BASE_NPC_HORROR_TEMPORAL",
 	ai = "dumb_talented_simple", ai_state = { ai_move="move_complex", talent_in=2, },
 	combat_armor = 10, combat_def = 10,
 	combat = { dam=resolvers.levelup(resolvers.rngavg(25,100), 1, 1.2), atk=resolvers.rngavg(25,100), apr=25, dammod={dex=1.1} },
-
+	combat_critical_power = 20,
 	resists = {all = 10, [DamageType.TEMPORAL] = 50},
 
 	resolvers.talents{
 		[Talents.T_FATEWEAVER]={base=5, every=7, max=8},
 		[Talents.T_SPIN_FATE]={base=5, every=7, max=8},
 		[Talents.T_STEALTH]={base=3, every=7, max=5},
-		[Talents.T_SHADOWSTRIKE]={base=3, every=7, max=5},
+		-- [Talents.T_SHADOWSTRIKE]={base=3, every=7, max=5},
 	},
 
 	resolvers.inscriptions(1, "rune"),

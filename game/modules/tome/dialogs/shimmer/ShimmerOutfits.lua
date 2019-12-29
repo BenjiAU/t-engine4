@@ -18,22 +18,25 @@
 -- darkgod@te4.org
 
 require "engine.class"
+local CommonData = require "mod.dialogs.shimmer.CommonData"
 local Dialog = require "engine.ui.Dialog"
 local Textzone = require "engine.ui.Textzone"
 local ActorFrame = require "engine.ui.ActorFrame"
 local Textbox = require "engine.ui.Textbox"
 local ListColumns = require "engine.ui.ListColumns"
+local GetText = require "engine.dialogs.GetText"
 
-module(..., package.seeall, class.inherit(Dialog))
+module(..., package.seeall, class.inherit(Dialog, CommonData))
 
-function _M:init(player, slot)
-	self.slot = slot
+function _M:init(player)
+	world.shimmer_sets = world.shimmer_sets or {}
 	self.true_actor = player
 	self.actor = player:cloneFull()
 	self.actor.x, self.actor.y = nil, nil
 	self.actor:removeAllMOs()
+	self.search_filter = nil
 
-	Dialog.init(self, "Shimmer: "..self:getShimmerName(), 680, 500)
+	Dialog.init(self, "Shimmer Sets: "..player.name, 680, 500)
 
 	self:generateList()
 
@@ -42,7 +45,7 @@ function _M:init(player, slot)
 	self.c_list = ListColumns.new{columns={{name="Name", width=100, display_prop="name", sort="sortname"}}, hide_columns=true, scrollbar=true, width=300, height=self.ih - 5 - self.c_search.h, list=self.list, fct=function(item) self:use(item) end, select=function(item) self:select(item) end}
 	local donatortext = ""
 	if not profile:isDonator(1) then donatortext = "\n#{italic}##CRIMSON#This cosmetic feature is only available to donators/buyers. You can only preview.#WHITE##{normal}#" end
-	local help = Textzone.new{width=math.floor(self.iw - self.c_list.w - 20), height=self.ih, no_color_bleed=true, auto_height=true, text="You can alter your look.\n#{bold}#This is a purely cosmetic change.#{normal}#"..donatortext}
+	local help = Textzone.new{width=math.floor(self.iw - self.c_list.w - 20), height=self.ih, no_color_bleed=true, auto_height=true, text="You can switch your appearance to a saved set of shimmers.\n#{bold}#This is a purely cosmetic change.#{normal}#"..donatortext}
 	local actorframe = ActorFrame.new{actor=self.actor, w=128, h=128}
 
 	self:loadUI{
@@ -60,50 +63,23 @@ function _M:init(player, slot)
 	}
 end
 
-function _M:getShimmerName()
-	if self.slot == "SHIMMER_DOLL" then return "Character's Skin"
-	elseif self.slot == "SHIMMER_HAIR" then return "Character's Hair"
-	elseif self.slot == "SHIMMER_FACIAL" then return "Character's Facial Features"
-	elseif self.slot == "SHIMMER_AURA" then return "Character's Aura"
-	end
-	return "unknown"
-end
-
-function _M:applyShimmer(actor, shimmer)
-	if not shimmer then return self:resetShimmer(actor) end
-
-	if self.slot == "SHIMMER_DOLL" then
-		actor.moddable_tile_base_shimmer = shimmer.moddable_tile
-	elseif self.slot == "SHIMMER_HAIR" then
-		actor.moddable_tile_base_shimmer_hair = shimmer.moddable_tile
-	elseif self.slot == "SHIMMER_FACIAL" then
-		actor.moddable_tile_base_shimmer_facial = shimmer.moddable_tile
-	elseif self.slot == "SHIMMER_AURA" then
-		actor.moddable_tile_base_shimmer_aura = shimmer.moddable_tile
-		actor.moddable_tile_base_shimmer_particle = shimmer.moddable_tile2
-	end
-end
-
-function _M:resetShimmer(actor)
-	if self.slot == "SHIMMER_DOLL" then
-		actor.moddable_tile_base_shimmer = nil
-	elseif self.slot == "SHIMMER_HAIR" then
-		actor.moddable_tile_base_shimmer_hair = nil
-	elseif self.slot == "SHIMMER_FACIAL" then
-		actor.moddable_tile_base_shimmer_facial = nil
-	elseif self.slot == "SHIMMER_AURA" then
-		actor.moddable_tile_base_shimmer_aura = nil
-		actor.moddable_tile_base_shimmer_particle = nil
-	end
-end
-
 function _M:use(item)
 	if not item then end
 	game:unregisterDialog(self)
 
 	if profile:isDonator(1) then
-		self:applyShimmer(self.true_actor, item.moddables)
-		self.true_actor:updateModdableTile()
+		if item.id == "current" then
+			local set = table.clone(self.true_actor.shimmer_current_outfit, true)
+			local d = GetText.new("Save Outfit", "Outfit name?", 1, 100, function(text)
+				set.name = text
+				world.shimmer_sets[set.name] = set
+				self:generateList()
+			end)
+			if set.name then d:setText(set.name) end
+			game:registerDialog(d)
+		else
+			self:applyShimmers(self.true_actor, item.set)
+		end
 	else
 		Dialog:yesnoPopup("Donator Cosmetic Feature", "This cosmetic feature is only available to donators/buyers.", function(ret) if ret then
 			game:registerDialog(require("mod.dialogs.Donation").new("shimmer ingame"))
@@ -113,8 +89,11 @@ end
 
 function _M:select(item)
 	if not item then end
-	self:applyShimmer(self.actor, item.moddables)
-	self.actor:updateModdableTile()
+	if item.id == "current" then
+		self:applyShimmers(self.actor, self.true_actor.shimmer_current_outfit)
+	else
+		self:applyShimmers(self.actor, item.set)
+	end
 end
 
 function _M:search(text)
@@ -130,23 +109,26 @@ function _M:matchSearch(name)
 end
 
 function _M:generateList()
-	local unlocked = world.unlocked_shimmers and world.unlocked_shimmers[self.slot] or {}
+	local sets = world.shimmer_sets
 	local list = {}
 
-	list[#list+1] = {
-		moddables = nil,
-		name = "#GREY#[Default]",
-		sortname = "--",
-	}
+	if self:matchSearch("current") then
+		list[#list+1] = {
+			name = "#GOLD#[save current outfit]",
+			id = "current",
+			sortname = "--",
+		}
+	end
 
-	for name, data in pairs(unlocked) do
+	for name, data in pairs(sets) do
+		-- if self.object.type == data.type and self.object.subtype == data.subtype then
 		if self:matchSearch(name:removeColorCodes()) then
 			local d = {
-				moddables = table.clone(data.moddables, true),
+				set = table.clone(data, true),
 				name = name,
+				id = name,
 				sortname = name:removeColorCodes(),
 			}
-			d.moddables.name = name
 			list[#list+1] = d
 		end
 	end

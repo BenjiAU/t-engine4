@@ -55,7 +55,7 @@ newEntity{ base = "BASE_CLOTH_ARMOR",
 		combat_mentalresist = 10,
 		confusion_immune = 0.35,
 		inc_damage={
-			[DamageType.MIND] = 10,},
+			[DamageType.MIND] = 20,},
 		resists= {
 			[DamageType.MIND] = 20,
 			[DamageType.COLD] = 20,}
@@ -73,7 +73,7 @@ newEntity{ base = "BASE_CLOTH_ARMOR",
 		if who.descriptor and who.descriptor.race == "Halfling" then
 			local Talents = require "engine.interface.ActorStats"
 			self:specialWearAdd({"wielder","resists"}, {[engine.DamageType.MIND] = 15,})
-			self:specialWearAdd({"wielder","confusion_immune"}, 0.35)
+			self:specialWearAdd({"wielder","confusion_immune"}, 0.65)
 			self:specialWearAdd({"wielder","combat_mentalresist"}, 10)
 			game.logPlayer(who, "#LIGHT_BLUE#You feel this robe was made for you!")
 		end

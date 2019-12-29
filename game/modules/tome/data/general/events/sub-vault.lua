@@ -18,7 +18,10 @@
 -- darkgod@te4.org
 
 -- Find a random spot
-local x, y = game.state:findEventGrid(level)
+local x, y
+local spot = level:pickSpotRemove{type="event-spot", subtype="subvault-place"}
+if spot then x, y = spot.x, spot.y
+else x, y = game.state:findEventGrid(level) end
 if not x then return false end
 local id = "sub-vault"..game.turn.."-"..rng.range(1,9999)
 print("[EVENT] Placing event", id, "at", x, y)

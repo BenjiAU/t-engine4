@@ -17,8 +17,6 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-local archerPreUse = Talents.archerPreUse
-
 newTalent{
 	name = "Shoot Down", short_name = "SHOOT_DOWN_OLD",
 	type = {"technique/archery-excellence", 1},

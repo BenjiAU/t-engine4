@@ -69,6 +69,21 @@ for i = 1, 30 do
 	}))
 end
 
+newEntity{ define_as = "CLIFFSIDE",
+	type = "floor", subtype = "rock",
+	name = "cliffside",  image = "terrain/rocky_ground.png", add_mos = {{image = "terrain/half_wall.png"}},
+	display = 'v', color=colors.UMBER, back_color=colors.LIGHT_UMBER,
+	always_remember = true,
+
+	does_block_move = true,
+	block_sight = false,
+	pass_projectile = true,
+
+	can_pass = {pass_wall=1},
+
+	dig = "ROCKY_GROUND",
+}
+
 newEntity{
 	define_as = "HARDMOUNTAIN_WALL",
 	type = "rockwall", subtype = "rock",

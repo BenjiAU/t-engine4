@@ -623,7 +623,7 @@ newEntity{
 }
 
 -------------------------------------------------------------
--- Gates of Morning:  Smaller stock size, 2 greater egos guaranteed, 300% sell prices (avoid Celestials buying high tier stuff early)
+-- Gates of Morning:  Smaller stock size, 2 greater egos guaranteed
 -------------------------------------------------------------
 
 newEntity{
@@ -633,7 +633,6 @@ newEntity{
 	store = {
 		purse = 25,
 		nb_fill = 2,
-		sell_percent = 300,
 		empty_before_restock = false,
 		filters = {
 			{type="armor", subtype="heavy", id=true, tome_drops="store"},
@@ -654,7 +653,6 @@ newEntity{
 	store = {
 		purse = 25,
 		nb_fill = 2,
-		sell_percent = 300,
 		empty_before_restock = false,
 		filters = {
 				{type="armor", subtype="light", id=true, tome_drops="store"},
@@ -676,7 +674,6 @@ newEntity{
 		purse = 25,
 		empty_before_restock = false,
 		nb_fill = 2,
-		sell_percent = 300,
 		filters = {
 			{type="armor", subtype="cloth", id=true, tome_drops="store"},
 			{type="armor", subtype="cloak", id=true, tome_drops="store"},
@@ -696,7 +693,6 @@ newEntity{
 		purse = 25,
 		empty_before_restock = false,
 		nb_fill = 2,
-		sell_percent = 300,
 		filters = {
 			{type="weapon", subtype="greatsword", id=true, tome_drops="store"},
 			{type="weapon", subtype="longsword", id=true, tome_drops="store"},
@@ -715,7 +711,6 @@ newEntity{
 		purse = 25,
 		empty_before_restock = false,
 		nb_fill = 2,
-		sell_percent = 300,
 		filters = {
 			{type="weapon", subtype="waraxe", id=true, tome_drops="store"},
 			{type="weapon", subtype="battleaxe", id=true, tome_drops="store"},
@@ -734,7 +729,6 @@ newEntity{
 		purse = 25,
 		empty_before_restock = false,
 		nb_fill = 2,
-		sell_percent = 300,
 		filters = {
 			{type="weapon", subtype="greatmaul", id=true, tome_drops="store"},
 			{type="weapon", subtype="mace", id=true, tome_drops="store"},
@@ -753,7 +747,6 @@ newEntity{
 		purse = 25,
 		empty_before_restock = false,
 		nb_fill = 2,
-		sell_percent = 300,
 		filters = function()
 			return {type="weapon", subtype="dagger", id=true, tome_drops="store"}
 		end,
@@ -771,7 +764,6 @@ newEntity{
 		purse = 25,
 		empty_before_restock = false,
 		nb_fill = 2,
-		sell_percent = 300,
 		filters = {
 			{type="weapon", subtype="sling", id=true, tome_drops="store"},
 			{type="weapon", subtype="longbow", id=true, tome_drops="store"},
@@ -791,7 +783,6 @@ newEntity{
 		purse = 25,
 		empty_before_restock = false,
 		nb_fill = 2,
-		sell_percent = 300,
 		filters = {
 			{type="weapon", subtype="staff", id=true, tome_drops="store"},
 			{type="weapon", subtype="staff", id=true, tome_drops="store"},

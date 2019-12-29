@@ -612,7 +612,7 @@ newTalent{
 	range = 6,
 	requires_target = true,
 	tactical = { ATTACK = 2 },
-	target = function(self, t) return {type="hit", range=self:getTalentRange(t), nowarning=true} end,
+	target = function(self, t) return {type="hit", range=self:getTalentRange(t), nowarning=true, can_autoaccept=true } end,
 	on_pre_use = function(self, t, silent)
 		return self:isTalentActive(self.T_CALL_SHADOWS)
 	end,

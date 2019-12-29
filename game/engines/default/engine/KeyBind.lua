@@ -225,6 +225,7 @@ function _M:formatKeyString(ks)
 end
 
 function _M:receiveKey(sym, ctrl, shift, alt, meta, unicode, isup, key, ismouse)
+	if not self:isEnabled() then return end
 	if unicode and not self.use_unicode then return end
 
 	self:handleStatus(sym, ctrl, shift, alt, meta, unicode, isup)

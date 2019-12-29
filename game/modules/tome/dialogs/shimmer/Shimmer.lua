@@ -18,24 +18,26 @@
 -- darkgod@te4.org
 
 require "engine.class"
+local CommonData = require "mod.dialogs.shimmer.CommonData"
 local Dialog = require "engine.ui.Dialog"
 local Textzone = require "engine.ui.Textzone"
 local ActorFrame = require "engine.ui.ActorFrame"
 local Textbox = require "engine.ui.Textbox"
 local ListColumns = require "engine.ui.ListColumns"
 
-module(..., package.seeall, class.inherit(Dialog))
+module(..., package.seeall, class.inherit(Dialog, CommonData))
 
 function _M:init(player, slot)
+	if type(slot) == "number" then slot = player.inven_def[slot].short_name end
 	self.true_actor = player
-	self.true_object = player:getInven(slot)[1]
 	self.actor = player:cloneFull()
 	self.actor.x, self.actor.y = nil, nil
 	self.actor:removeAllMOs()
 	self.object = self.actor:getInven(slot)[1]
+	self.slot = slot
 	self.search_filter = nil
 
-	local oname = self.object:getName{do_color=true, no_add_name=true}
+	local oname = self:getShimmerName(player, slot)
 	Dialog.init(self, "Shimmer object: "..oname, 680, 500)
 
 	self:generateList()
@@ -68,8 +70,7 @@ function _M:use(item)
 	game:unregisterDialog(self)
 
 	if profile:isDonator(1) then
-		self.true_object.shimmer_moddable = item.moddables
-		self.true_actor:updateModdableTile()
+		self:applyShimmers(self.true_actor, self.slot, item.id)
 	else
 		Dialog:yesnoPopup("Donator Cosmetic Feature", "This cosmetic feature is only available to donators/buyers.", function(ret) if ret then
 			game:registerDialog(require("mod.dialogs.Donation").new("shimmer ingame"))
@@ -79,8 +80,7 @@ end
 
 function _M:select(item)
 	if not item then end
-	self.object.shimmer_moddable = item.moddables
-	self.actor:updateModdableTile()
+	self:applyShimmers(self.actor, self.slot, item.id)
 end
 
 function _M:search(text)
@@ -103,6 +103,7 @@ function _M:generateList()
 		list[#list+1] = {
 			moddables = {},
 			name = "#GREY#[Invisible]",
+			id = "invisible",
 			sortname = "--",
 		}
 	end
@@ -113,6 +114,7 @@ function _M:generateList()
 			local d = {
 				moddables = table.clone(data.moddables, true),
 				name = name,
+				id = name,
 				sortname = name:removeColorCodes(),
 			}
 			d.moddables.name = name

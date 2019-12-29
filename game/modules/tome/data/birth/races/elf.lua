@@ -107,7 +107,7 @@ newBirthDescriptor
 		"#LIGHT_BLUE# * -2 Strength, +1 Dexterity, +0 Constitution",
 		"#LIGHT_BLUE# * +2 Magic, +3 Willpower, +1 Cunning",
 		"#GOLD#Life per level:#LIGHT_BLUE# 9",
-		"#GOLD#Experience penalty:#LIGHT_BLUE# 25%",
+		"#GOLD#Experience penalty:#LIGHT_BLUE# 12%",
 	},
 	inc_stats = { str=-2, mag=2, wil=3, cun=1, dex=1, con=0 },
 	experience = 1.3,
@@ -126,10 +126,10 @@ newBirthDescriptor
 		starting_intro = "shalore",
 		life_rating = 9,
 		resolvers.inscription("RUNE:_SHIELDING", {cooldown=14, dur=5, power=100}, 1),
-		resolvers.inscription("RUNE:_BLINK", {cooldown=16, range=3, dur=3, power=15}, 2),
-		resolvers.inscription("RUNE:_SHATTER_AFFLICTIONS", {cooldown=18, shield=50}, 3),
+		resolvers.inscription("RUNE:_SHATTER_AFFLICTIONS", {cooldown=18, shield=50}, 2),
+		resolvers.inscription("RUNE:_BLINK", {cooldown=16, range=3, dur=3, power=15}, 3),
 	},
-	experience = 1.25,
+	experience = 1.12,
 	random_escort_possibilities = { {"tier1.1", 1, 2}, {"tier1.2", 1, 2}, {"daikara", 1, 2}, {"old-forest", 1, 4}, {"dreadfell", 1, 8}, {"reknor", 1, 2}, },
 }
 

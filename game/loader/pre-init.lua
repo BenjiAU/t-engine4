@@ -63,6 +63,23 @@ function rng.mbonus(max, level, max_level)
 	return val
 end
 
+local printlog = {}
+local oprint = print
+function print(...)
+	local t = {}
+	for k, e in pairs{...} do t[k] = tostring(e) end
+	printlog[#printlog+1] = t
+	oprint(...)
+end
+
+function get_printlog()
+	return printlog
+end
+
+function truncate_printlog(nb)
+	while #printlog > nb do table.remove(printlog, 1) end
+end
+
 local rngavg = rng.avg
 function rng.avg(min, max, nb)
 	if max > min then return rngavg(min, max, nb)

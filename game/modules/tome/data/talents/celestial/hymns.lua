@@ -133,7 +133,7 @@ newTalent{
 			if dist <= self.sight then -- target within sight range
 				local is_active = self:isTalentActive(t.id)
 				local see, see_chance = self:canSeeNoCache(aitarget)
-				if see_chance < 100 then -- detecting hidden is useful (rules out esp, etc.)
+				if see_chance and see_chance < 100 then -- detecting hidden is useful (rules out esp, etc.)
 					local tgt_inv = aitarget:attr("invisible")
 					if tgt_inv then -- buff value increases depending on relative invisibility detection
 						local base_det = self:combatSeeInvisible() - (is_active and self.compute_vals[is_active.invis] or 0)

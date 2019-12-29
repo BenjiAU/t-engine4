@@ -353,11 +353,13 @@ newTalent{
 	points = 5,
 	equilibrium = 10,
 	cooldown = 6,
+	requires_target = true,
 	tactical = { ATTACKAREA = {PHYSICAL=2}, },
 	radius = function(self, t) return math.floor(self:combatTalentScale(t, 3, 7)) end,
 	getDamage = function(self, t) return self:combatTalentStatDamage(t, "wil", 60, 330) end,
+	target = function(self, t) return {type="ball", radius=self:getTalentRadius(t), friendlyfire=false} end,
 	action = function(self, t)
-		self:project({type="ball", radius=self:getTalentRadius(t), friendlyfire=false}, self.x, self.y, function(px, py)
+		self:project(self:getTalentTarget(t), self.x, self.y, function(px, py)
 			local target = game.level.map(px, py, Map.ACTOR)
 			if not target then return end
 

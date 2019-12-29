@@ -43,16 +43,16 @@ newTalent{
 		if not x or not y then return nil end
 		self:project(tg, x, y, DamageType.CONFUSION, {
 			dur=t.getDuration(self, t),
-			dam=50+self:getTalentLevelRaw(t)*10,
+			dam=50,
 			power_check=function() return self:combatPhysicalpower() end,
-			resist_check=self.combatPhysicalResist,
+			resist_check=self.combatMentalResist,
 		})
 		game.level.map:particleEmitter(self.x, self.y, tg.radius, "directional_shout", {life=8, size=3, tx=x-self.x, ty=y-self.y, distorion_factor=0.1, radius=self:getTalentRadius(t), nb_circles=8, rm=0.8, rM=1, gm=0.4, gM=0.6, bm=0.1, bM=0.2, am=1, aM=1})
 		if core.shader.allow("distort") then game.level.map:particleEmitter(self.x, self.y, tg.radius, "gravity_breath", {life=8, radius=tg.radius, tx=x-self.x, ty=y-self.y, allow=true}) end
 		return true
 	end,
 	info = function(self, t)
-		return ([[Shout your warcry in a frontal cone of radius %d. Any targets caught inside will be confused for %d turns.]]):
+		return ([[Shout your warcry in a frontal cone of radius %d. Any targets caught inside will be confused (50%% confusion power) for %d turns.]]):
 		format(self:getTalentRadius(t), t.getDuration(self, t))
 	end,
 }

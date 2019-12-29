@@ -219,9 +219,9 @@ function _M:finish()
 		end
 	end
 
-	for t_id, _ in pairs(self.talents_learned) do
+	for t_id, level in pairs(self.talents_learned) do
 		local t = self.actor:getTalentFromId(t_id)
-		if t.on_levelup_close then
+		if level > 0 and t.on_levelup_close then
 			local lvl = self.actor:getTalentLevel(t_id)
 			local lvl_raw = self.actor:getTalentLevelRaw(t_id)
 			local old_lvl = self.actor_dup:getTalentLevel(t_id)
@@ -350,7 +350,7 @@ function _M:isUnlearnable(t, limit)
 	if limit then min = math.max(1, #list - (max - 1)) end
 	for i = #list, min, -1 do
 		if list[i] == t.id then
-			if not game.state.birth.force_town_respec or not self.in_combat or (game.level and game.level.data and game.level.data.allow_respec == "limited") then
+			if not self.actor.in_combat or (game.level and game.level.data and game.level.data.allow_respec == "limited") then
 				return i
 			else
 				return nil, i
@@ -930,7 +930,7 @@ function _M:getTalentDesc(item)
 
 	if item.type then
 		text:add({"color",0x00,0xFF,0xFF}, "Talent Category", true)
-		text:add({"color",0x00,0xFF,0xFF}, "A talent category contains talents you may learn. You gain a talent category point at level 10, 20 and 36. You may also find trainers or artifacts that allow you to learn more.\nA talent category point can be used either to learn a new category or increase the mastery of a known one.", true, true, {"color", "WHITE"})
+		text:add({"color",0x00,0xFF,0xFF}, "A talent category contains talents you may learn. You gain a talent category point at level 10, 20 and 34. You may also find trainers or artifacts that allow you to learn more.\nA talent category point can be used either to learn a new category or increase the mastery of a known one.", true, true, {"color", "WHITE"})
 
 		if self.actor.talents_types_def[item.type].generic then
 			text:add({"color",0x00,0xFF,0xFF}, "Generic talent tree", true)
@@ -953,7 +953,7 @@ function _M:getTalentDesc(item)
 			text:add({"color","YELLOW"}, "This talent can alter the world in a permanent way; as such, you can never unlearn it once known.", {"color","LAST"}, true, true)
 		elseif could_unlearn then
 			local max = tostring(self.actor:lastLearntTalentsMax(t.generic and "generic" or "class"))
-			text:add({"color","LIGHT_BLUE"}, "This talent was recently learnt; you can still unlearn it if you are in a quiet area like a #{bold}#town#{normal}#.", true, "The last ", max, t.generic and " generic" or " class", " talents you learnt are always unlearnable.", {"color","LAST"}, true, true)
+			text:add({"color","LIGHT_BLUE"}, "This talent was recently learnt; you can still unlearn it if you are out of combat or in a quiet area like a #{bold}#town#{normal}#.", true, "The last ", max, t.generic and " generic" or " class", " talents you learnt are always unlearnable.", {"color","LAST"}, true, true)
 		end
 
 		local traw = self.actor:getTalentLevelRaw(t.id)

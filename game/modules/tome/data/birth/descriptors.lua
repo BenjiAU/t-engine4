@@ -81,8 +81,8 @@ newBirthDescriptor{
 	},
 	game_state = {
 		force_town_respec = 1,
-		rare_minimum_level = 8,  -- Player level rare NPCs start appearing, handled by the actor generator defined by zones
-		random_boss_minimum_level = 10,  -- Player level random bosses above rare start spawning, handled by the actor generator typically defined by zones
+		rare_minimum_level = 4,  -- Player level rare NPCs start appearing, handled by the actor generator defined by zones
+		random_boss_minimum_level = 10,   -- Player level random bosses above rare start spawning, handled by the actor generator typically defined by zones
 		fixedboss_class_minimum_level = 10,  -- Player level fixed bosses can gain levels in bonus classes, handled in Actor.levelupClass
 		default_fixedboss_class_level_rate = 0.5,  -- Default level rate of classes applied to fixedbosses, handled in NPC.addedToLevel
 		default_fixedboss_class_start_level_pct = 0.8, -- Default % of level to use as start level if not explicitly defined, handled in NPC.addedToLevel
@@ -200,7 +200,6 @@ newBirthDescriptor{
 		"All zone levels increased by 50% by the time Player reaches level 10",
 		"All creature talent levels increased by 30%",
 		"Unique (fixed) bosses advance in bonus classes 30% faster",		
-		"All enemies have 10% more life",
 		"Rare creatures are slightly more frequent",
 		"Stairs can not be used for 3 turns after a kill.",
 		"Player can earn Nightmare version of achievements if also playing in Roguelike or Adventure permadeath mode.",
@@ -221,7 +220,7 @@ newBirthDescriptor{
 		difficulty_level_add = 0,  -- Flat value added to Zone.level_range, handled in Game.applyDifficulty 
 
 		difficulty_talent_mult = 1.3,  -- Talent level multiplier for non-summoned NPC talents and base (non-autoclass) fixedboss talents, handled in NPC.addedToLevel
-		difficulty_life_mult = 1.1,  -- Max life multiplier for hostile non-summoned NPCs, handled in NPC.addedToLevel
+		--difficulty_life_mult = 1.1,  -- Max life multiplier for hostile non-summoned NPCs, handled in NPC.addedToLevel
 		fixedboss_class_level_rate_mult = 1.3,  -- Multiplier for auto_classes level rates, handled in Actor.levelupClass
 	},
 }
@@ -238,7 +237,6 @@ newBirthDescriptor{
 		"All zone levels increased by 50% + 1 by the time Player reaches level 10",
 		"All creature talent levels increased by 80%",
 		"Unique (fixed) bosses advance in bonus classes 80% faster",
-		"All enemies have 20% more life",
 		"Rare creatures are far more frequent and random bosses start to appear",
 		"Stairs can not be used for 5 turns after a kill.",
 		"Player can earn Insane version of achievements if also playing in Roguelike or Adventure permadeath mode.",
@@ -260,7 +258,7 @@ newBirthDescriptor{
 		difficulty_level_add = 1,  -- Flat value added to Zone.level_range, handled in Game.applyDifficulty 
 
 		difficulty_talent_mult = 1.8,  -- Talent level multiplier for non-summoned NPC talents and base (non-autoclass) fixedboss talents, handled in NPC.addedToLevel
-		difficulty_life_mult = 1.2,  -- Max life multiplier for hostile non-summoned NPCs, handled in NPC.addedToLevel
+		--difficulty_life_mult = 1.2,  -- Max life multiplier for hostile non-summoned NPCs, handled in NPC.addedToLevel
 		fixedboss_class_level_rate_mult = 1.8,  -- Multiplier for auto_classes level rates, handled in Actor.levelupClass
 	},
 }

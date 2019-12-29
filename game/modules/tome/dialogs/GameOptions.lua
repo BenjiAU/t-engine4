@@ -493,6 +493,18 @@ function _M:generateListGameplay()
 		end, 1))
 	end,}
 
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"If you loose more than this percentage of life in a turn, a warning will display and all key/mouse input will be ignored for 2 seconds to prevent mistakes.#WHITE#"}
+	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Life Lost Warning#WHITE##{normal}#", status=function(item)
+		return (not config.settings.tome.life_lost_warning or config.settings.tome.life_lost_warning == 100) and "disabled" or tostring(config.settings.tome.life_lost_warning).."%"
+	end, fct=function(item)
+		game:registerDialog(GetQuantity.new("Life lost percentage (out of max life)", "From 1 to 99 (100 to disable)", config.settings.tome.life_lost_warning or 100, 100, function(qty)
+			qty = util.bound(qty, 1, 100)
+			game:saveSettings("tome.life_lost_warning", ("tome.life_lost_warning = %d\n"):format(qty))
+			config.settings.tome.life_lost_warning = qty
+			self.c_list:drawItem(item)
+		end, 1))
+	end,}
+
 	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Enables or disables weather effects in some zones.\nDisabling it can gain some performance. It will not affect previously visited zones.#WHITE#"}
 	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Weather effects#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.weather_effects and "enabled" or "disabled")

@@ -25,7 +25,7 @@ newEntity{
 	display = "/", color=colors.WHITE, image = resolvers.image_material("knife", "metal"),
 	moddable_tile = resolvers.moddable_tile("dagger"),
 	encumber = 1,
-	rarity = 5,
+	rarity = 4,
 	metallic = true,
 	combat = { talented = "knife", accuracy_effect="axe", damrange = 1.3, physspeed = 1, sound = {"actions/melee", pitch=1.2, vol=1.2}, sound_miss = {"actions/melee", pitch=1.2, vol=1.2} },
 	desc = [[Sharp, short and deadly.]],

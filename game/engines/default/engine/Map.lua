@@ -859,6 +859,27 @@ function _M:rememberAll(x, y, w, h, v)
 	end end
 end
 
+--- Apply function to all entities of all the map
+function _M:applyAll(fct)
+	for x = 0, self.w - 1 do for y = 0, self.h - 1 do
+		local tile = self.map[x + y * self.w]
+		if tile then
+			-- Collect the keys so we can modify the table while iterating
+			local keys = {}
+			for k, _ in pairs(tile) do
+				table.insert(keys, k)
+			end
+			-- Now iterate over the stored keys, checking if the entry exists
+			for i = 1, #keys do
+				local e = tile[keys[i]]
+				if e then
+					fct(x, y, keys[i], e)
+				end
+			end
+		end
+	end end
+end
+
 --- Sets the current view at a precise location
 function _M:setScroll(x, y)
 	if self.mx == x and self.my == y then return end

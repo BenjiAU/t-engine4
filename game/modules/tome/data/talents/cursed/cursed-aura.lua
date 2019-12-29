@@ -510,7 +510,7 @@ newTalent{
 		o.power = charges
 		if not result then
 			game.logPlayer(self, "Your animated sentry struggles for a moment and then returns to your inventory inexplicably.")
-			self.summoner:addObject(self.summoner.INVEN_INVEN, self.cursed_item )
+			self:addObject(self.INVEN_INVEN, o)
 			return nil
 		end
 		local qo = nil

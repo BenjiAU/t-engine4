@@ -245,6 +245,18 @@ A usual problem is shaders and thus should be your first target to disable.]], 7
 	end
 
 	self:checkBootLoginRegister()
+
+	if __module_extra_info.duplicate_addon then
+		Dialog:simpleLongPopup("Duplicate Addon", ([[Oops! It seems like you have the same addon/dlc installed twice.
+This is unsupported and would make many things explode. Please remove one of the copies.
+
+Addon name: #YELLOW#%s#LAST#
+
+Check out the following folder on your computer:
+%s
+%s
+]]):format(__module_extra_info.duplicate_addon, fs.getRealPath("/addons/") or "", fs.getRealPath("/dlfcs/") or ""), 600)
+	end
 end
 
 function _M:floatingTooltip(x, y, pos, txt)

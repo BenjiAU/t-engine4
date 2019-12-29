@@ -154,6 +154,8 @@ newTalent{
 			tg.x = target.x
 			tg.y = target.y
 			self:project(tg, target.x, target.y, DamageType.ACID, self:spellCrit(t.getSplash(self, t)))
+			game.level.map:particleEmitter(target.x, target.y, tg.radius, "ball_acid", {radius=tg.radius})
+			game:playSoundNear(self, "talents/slime")
 		end
 
 		return true

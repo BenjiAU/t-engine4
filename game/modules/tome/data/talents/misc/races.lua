@@ -318,14 +318,15 @@ newTalent{
 	tactical = { HEAL = 2 },
 	on_pre_use = function(self, t) return not self:hasEffect(self.EFF_REGENERATION) end,
 	getHealMod = function(self, t) return self:combatTalentLimit(t, 50, 10, 30) end,
+	getHealing = function(self, t) return 6 + math.max(self:getWil(), self:getCon()) * 0.6 end,
 	action = function(self, t)
-		self:setEffect(self.EFF_REGENERATION, 10, {power=5 + self:getWil() * 0.5})
-		self:setEffect(self.EFF_EMPOWERED_HEALING, 10, {power=t.getHealMod(self, t) / 100})
+		self:setEffect(self.EFF_REGENERATION, 8, {power=t.getHealing(self,  t)})
+		self:setEffect(self.EFF_GIFT_WOODS, 8, {power=t.getHealMod(self, t) / 100})
 		return true
 	end,
 	info = function(self, t)
-		return ([[Call upon nature to regenerate your body for %d life every turn and increase healing mod by %d%% for 10 turns.
-		The life healed will increase with your Willpower.]]):format(5 + self:getWil() * 0.5, t.getHealMod(self, t))
+		return ([[Call upon nature to regenerate your body for %d life every turn and increase healing mod by %d%% for 8 turns.
+		The life healed will increase with your Willpower or Constitution (whichever is higher).]]):format(t.getHealing(self,  t), t.getHealMod(self, t))
 	end,
 }
 
@@ -762,9 +763,9 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Orcs have been the prey of the other races for thousands of years, with or without justification. They have learnt to withstand things that would break weaker races.
-		When your life goes below 50%% your sheer determination cleanses you of %d mental debuff(s) based on talent level and Willpower.  This can only happen once every 10 turns.
+		When your life goes below 50%% your sheer determination cleanses you of %d mental debuff(s) based on talent level and Willpower.  This can only happen once every %d turns.
 		Also increases physical save by +%d.]]):
-		format(t.getDebuff(self, t), t.getSaves(self, t))
+		format(t.getDebuff(self, t), t.getSaves(self, t), self:getTalentCooldown(t))
 	end,
 }
 
@@ -944,7 +945,7 @@ newTalent{
 	end,
 	callbackOnTakeDamage = function(self, t, src, x, y, type, dam, state)
 		if self:isTalentCoolingDown(t) then return end
-		if (self.life / self.max_life) >= 0.7 then return end
+		if (self.life / self.max_life) >= 0.3 then return end
 
 		game.logSeen(self, "#RED#%s reacts immediately after taking severe wounds!#LAST#", self.name:capitalize())
 		self.energy.value = self.energy.value + game.energy_to_act * 1.5

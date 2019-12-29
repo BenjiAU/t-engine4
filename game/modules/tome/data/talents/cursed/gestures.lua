@@ -124,7 +124,7 @@ newTalent{
 		local damage = 0
 		if self:checkHit(mindpower, target:combatMentalResist()) then
 			damage = self:mindCrit(baseDamage * rng.float(0.5, 1) + bonusDamage, bonusCritical)
-			self:project({type="hit", x=target.x,y=target.y}, target.x, target.y, DamageType.MIND, { dam=damage,alwaysHit=true,crossTierChance=25 })
+			self:project({type="hit", x=target.x,y=target.y, talent=t}, target.x, target.y, DamageType.MIND, { dam=damage,alwaysHit=true,crossTierChance=25 })
 			game:playSoundNear(self, "actions/melee_hit_squish")
 			hit = true
 

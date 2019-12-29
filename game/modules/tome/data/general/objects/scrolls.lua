@@ -167,7 +167,7 @@ newEntity{ base = "BASE_INFUSION",
 	level_range = {1, 50},
 	rarity = 15,
 	cost = 20,
-	chance = resolvers.mbonus_level(80, -20), -- No chance of 2 cleanses until higher ilvl to discourage rerolling the earliest shops
+	chance = resolvers.mbonus_level(110, -10), -- No chance of 2 cleanses until higher ilvl to discourage rerolling the earliest shops
 	inscription_kind = "utility",
 	inscription_data = resolvers.generic(function(e)
 		local what = {}
@@ -180,7 +180,7 @@ newEntity{ base = "BASE_INFUSION",
 			what[eff2] = true
 		end
 		return {
-			cooldown = rng.range(12, 16),
+			cooldown = rng.range(10, 16),
 			dur = rng.range(2, 4),
 			power = resolvers.mbonus_level(10, 15),  -- Low variance because duration and chance for second debuff type is enough randomness
 			use_stat_mod = 0.2,  -- +20% resist all at 100 stat
@@ -192,7 +192,7 @@ newEntity{ base = "BASE_INFUSION",
 
 newEntity{ base = "BASE_INFUSION",
 	name = "movement infusion",
-	level_range = {10, 50},
+	level_range = {1, 50},
 	rarity = 20,
 	cost = 30,
 
@@ -208,7 +208,7 @@ newEntity{ base = "BASE_INFUSION",
 newEntity{ base = "BASE_INFUSION",
 	name = "heroism infusion",
 	level_range = {20, 50},
-	rarity = 20,
+	rarity = 30,
 	cost = 40,
 
 	inscription_kind = "utility",
@@ -258,7 +258,7 @@ newEntity{ base = "BASE_RUNE",
 newEntity{ base = "BASE_RUNE",
 	name = "biting gale rune",
 	level_range = {10, 50},
-	rarity = 20,
+	rarity = 35,
 	cost = 20,
 
 	inscription_kind = "attack",
@@ -274,7 +274,7 @@ newEntity{ base = "BASE_RUNE",
 newEntity{ base = "BASE_RUNE",
 	name = "acid wave rune",
 	level_range = {10, 50},
-	rarity = 20,
+	rarity = 35,
 	cost = 20,
 
 	inscription_kind = "attack",
@@ -295,7 +295,7 @@ newEntity{ base = "BASE_RUNE",
 
 	inscription_kind = "utility",
 	inscription_data = {
-		cooldown = resolvers.rngrange(15, 20),
+		cooldown = resolvers.rngrange(12, 18),
 		dur = 10,
 		mana = resolvers.mbonus_level(1200, 600, function(e, v) return v * 0.003 end),
 		use_stat_mod = 6,
@@ -312,7 +312,7 @@ newEntity{ base = "BASE_RUNE",
 	inscription_kind = "movement",
 	inscription_data = {
 		cooldown = resolvers.rngrange(13, 20),
-		range = resolvers.mbonus_level(4, 2, function(e, v) return v * 0.06 end),
+		range = resolvers.mbonus_level(5, 3, function(e, v) return v * 0.06 end),
 		power = resolvers.mbonus_level(20, 10, function(e, v) return v * 1 end),
 		use_stat_mod = 0.04, -- +4 range at 100 stat
 	},
@@ -342,7 +342,7 @@ newEntity{ base = "BASE_RUNE",
 	cost = 10,
 	inscription_kind = "utility",
 	inscription_data = {
-		cooldown = resolvers.rngrange(16, 24),
+		cooldown = resolvers.rngrange(12, 22),
 		shield = resolvers.mbonus_level(120, 20, function(e, v) return v * 0.06 end),
 		use_stat_mod = 1 -- 1x, applied up to 3 times
 	},

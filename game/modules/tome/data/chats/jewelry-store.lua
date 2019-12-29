@@ -28,13 +28,14 @@ local imbueEgo = function(gem, ring)
 		wielder = table.clone(gem.imbue_powers, true),
 		been_imbued = true,
 		egoed = true,
+		shop_gem_imbue=true,
 	}
 	if gem.talent_on_spell then ego.talent_on_spell = table.clone(gem.talent_on_spell, true) end  -- Its really weird that this table structure is different for one property
 	game.zone:applyEgo(ring, ego, "object", true)
 end
 
 local imbue_ring = function(npc, player)
-	player:showInventory("Imbue which ring?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "ring" and o.material_level and not o.unique and not o.plot and not o.special and not o.tinker end, function(ring, ring_item)
+	player:showInventory("Imbue which ring?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "ring" and o.material_level and not o.unique and not o.plot and not o.special and not o.tinker and not o.shop_gem_imbue end, function(ring, ring_item)
 		player:showInventory("Use which gem?", player:getInven("INVEN"), function(gem) return gem.type == "gem" and gem.imbue_powers and gem.material_level end, function(gem, gem_item)
 			local lev = (ring.material_level + gem.material_level) / 2 * 10 + 10  -- Average the material level then add a bonus so we guarantee greater ego level range
 			local new_ring
@@ -58,7 +59,8 @@ local imbue_ring = function(npc, player)
 				return false
 			end
 			
-			local price = 300 * (ring.material_level + gem.material_level) / 2
+			local price = 200 * (ring.material_level + gem.material_level) / 2
+			if gem.unique then price = price * 1.5 end
 			if price > player.money then require("engine.ui.Dialog"):simplePopup("Not enough money", "This costs "..price.." gold, you need more gold.") return end
 
 			require("engine.ui.Dialog"):yesnoPopup("Imbue cost", "This will cost you "..price.." gold, do you accept?", function(ret) if ret then

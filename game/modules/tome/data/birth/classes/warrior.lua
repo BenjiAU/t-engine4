@@ -374,6 +374,7 @@ newBirthDescriptor{
 		[ActorTalents.T_ARMOUR_TRAINING] = 1,
 		[ActorTalents.T_UNARMED_MASTERY] = 1,
 	},
+	npc_class_use_default_combat_table = true,
 	copy = {
 		resolvers.auto_equip_filters{-- will not try to equip weapons
 			MAINHAND = {type="none"}, OFFHAND = {type="none"}

@@ -19,6 +19,7 @@ game/modules/uaws/
 game/modules/bare_minimum/
 game/modules/bone/
 game/modules/demo/
+game/modules/unused/
 game/modules/particles_editor/
 steam_appid.txt
 oprofile_data/

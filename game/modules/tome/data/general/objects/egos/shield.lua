@@ -683,7 +683,7 @@ newEntity{
 
 -- needs gfx
 newEntity{
-	power_source = {techniquee=true},
+	power_source = {technique=true},
 	name = " of shrapnel", suffix=true, instant_resolve=true,
 	keywords = {shrapnel=true},
 	level_range = {10, 50},

@@ -367,6 +367,7 @@ newEntity{
 	block_sense = true,
 	block_esp = true,
 	force_clone = true,
+	special = true,
 	door_player_stop = "This door seems to have been sealed off. You need to find a way to open it.",
 	is_door = true,
 	door_opened = "GENERIC_LEVER_DOOR_OPEN",
@@ -391,6 +392,7 @@ newEntity{
 	nice_tiler = { method="door3d", north_south="GENERIC_LEVER_DOOR_OPEN_VERT", west_east="GENERIC_LEVER_DOOR_HORIZ_OPEN" },
 	always_remember = true,
 	is_door = true,
+	special = true,
 	door_closed = "GENERIC_LEVER_DOOR",
 	door_player_stop = "This door seems to have been sealed off. You need to find a way to close it.",
 	on_lever_change = function(self, x, y, who, val, oldval)
@@ -415,6 +417,7 @@ newEntity{
 	always_remember = true,
 	lever = false,
 	force_clone = true,
+	special = true,
 	block_move = function(self, x, y, e, act)
 		if act and e.player then
 			if self.lever then
@@ -437,6 +440,7 @@ newEntity{
 	define_as = "GENERIC_TRIGGER_BOOL",
 	type = "trigger", subtype = "bool",
 	lever = false,
+	special = true,
 	on_move = function(self, x, y, e)
 		if e.player then self:leverActivated(x, y, e) end
 	end,

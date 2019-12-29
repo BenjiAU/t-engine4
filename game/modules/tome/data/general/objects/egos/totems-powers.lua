@@ -24,16 +24,16 @@ newEntity{
 	level_range = {1, 50},
 	rarity = 8,
 
-	charm_power_def = {add=0, max=600, floor=true},
+	charm_power_def = {add=50, max=600, floor=true},
 	resolvers.charm(
 		function(self, who) 
 			local heal = self.use_power.heal(self, who)
-			return ("heals yourself and all friendly characters within 10 spaces for %d"):
+			return ("heal yourself and all friendly characters within 10 spaces for %d"):
 				format(heal) end,
 		15,
 		function(self, who)
 			local tg = self.use_power.target(self, who)
-			local heal = who:mindCrit(self.use_power.heal(self, who))
+			local heal = self.use_power.heal(self, who)
 			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
 			who:project(tg, who.x, who.y, function(px, py)
 				local target = game.level.map(px, py, engine.Map.ACTOR)
@@ -61,9 +61,9 @@ newEntity{
 	level_range = {1, 50},
 	rarity = 8,
 
-	charm_power_def = {add=0, max=800, floor=true},
+	charm_power_def = {add=50, max=600, floor=true},  -- Higher damage because the damage can be cleansed and is delayed
 	resolvers.charm(function(self, who)
-			local dam = self.use_power.damage(self, who)
+			local dam = who:damDesc(engine.DamageType.NATURE, self.use_power.damage(self, who))
 			return ("sting an enemy dealing %d nature damage over 7 turns and reducing their healing by 50%%%%"):format(dam, 50)
 		end,
 		15,
@@ -71,7 +71,7 @@ newEntity{
 			local tg = self.use_power.target(self, who)
 			local x, y = who:getTarget(tg)
 			if not x or not y then return nil end
-			local dam = {dam = who:mindCrit(self.use_power.damage(self, who)), heal_factor = 50, dur = 7}
+			local dam = {dam = self.use_power.damage(self, who), heal_factor = 50, dur = 7}
 			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
 			who:project(tg, x, y, engine.DamageType.INSIDIOUS_POISON, dam, {type="slime"})
 			return {id=true, used=true}

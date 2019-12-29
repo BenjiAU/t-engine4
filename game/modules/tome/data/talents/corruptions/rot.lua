@@ -200,9 +200,11 @@ newTalent{
 				end)
 
 				local spot = rng.table(grids)
-				local gx, gy = util.findFreeGrid(spot.x, spot.y, 4, true, {[Map.ACTOR]=true})
-				if gx and gy then 
-					carrionworm(self, self, 5, gx, gy)
+				if spot then
+					local gx, gy = util.findFreeGrid(spot.x, spot.y, 4, true, {[Map.ACTOR]=true})
+					if gx and gy then 
+						carrionworm(self, self, 5, gx, gy)
+					end
 				end
 			end
 			return {dam = dam}

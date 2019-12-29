@@ -19,15 +19,14 @@
 
 require "engine.class"
 local Map = require "engine.Map"
-local BaseGenerator = require "engine.Generator"
 local RoomsLoader = require "engine.generator.map.RoomsLoader"
-require "engine.Generator"
+local Generator = require "engine.Generator"
 
 --- @classmod engine.generator.map.MapScript
-module(..., package.seeall, class.inherit(engine.Generator, RoomsLoader))
+module(..., package.seeall, class.inherit(Generator, RoomsLoader))
 
 function _M:init(zone, map, level, data)
-	engine.Generator.init(self, zone, map, level)
+	Generator.init(self, zone, map, level)
 	self.data = data
 	self.grid_list = zone.grid_list
 	self.spots = {}
@@ -35,10 +34,19 @@ function _M:init(zone, map, level, data)
 	self.post_gen = {}
 	self.maps_positions = {}
 	self.maps_registers = {}
+	self.self_tiles = {}
 
 	RoomsLoader.init(self, data)
 end
 
+function _M:resolve(c, list, force)
+	if force then return Generator.resolve(self, c, list, force) end
+	if self.self_tiles[c] then
+		return Generator.resolve(self, self.self_tiles[c].grid or '.', list, true)
+	else
+		return Generator.resolve(self, c, list, force)
+	end
+end
 
 --- Resolve a filename, from /data/ /data-addon/ or subfodler of zonedir
 function _M:getFile(file, folder)
@@ -58,6 +66,10 @@ function _M:regenerate()
 	self.force_regen = true
 end
 
+function _M:redo()
+	self.force_redo = true
+end
+
 function _M:loadFile(mapscript, lev, old_lev, args)
 	local file = self:getFile(mapscript..".lua", "mapscripts")
 	local f, err = loadfile(file)
@@ -71,23 +83,26 @@ function _M:loadFile(mapscript, lev, old_lev, args)
 		lev = lev,
 		old_lev = old_lev,
 		loadMapScript = function(name, args) return self:loadFile(name, lev, old_lev, args) end,
+		merge_order = {'.', '_', 'r', '+', '#', 'O', ';', '=', 'T'},
 	}
 	for f in fs.iterate("/engine/tilemaps/", function(f) return f:find("%.lua$") end) do
 		local n = f:sub(1, -5)
 		local nf = "engine.tilemaps."..n
 		nenv[n] = require(nf)
 	end
+	nenv.tm = nenv.Tilemap.new(self.mapsize)
 	setfenv(f, setmetatable(nenv, {__index=_G}))
 	return f()
 end
 
 function _M:custom(lev, old_lev)
-	for f in fs.iterate("/engine/tilemaps/", function(f) return f:find("%.lua$") end) do
-		local n = f:sub(1, -5)
-		local nf = "engine.tilemaps."..n
-		package.loaded[nf] = nil
+	if config.settings.cheat then
+		for f in fs.iterate("/engine/tilemaps/", function(f) return f:find("%.lua$") end) do
+			local n = f:sub(1, -5)
+			local nf = "engine.tilemaps."..n
+			package.loaded[nf] = nil
+		end
 	end
-
 
 	local ret = nil
 	if self.data.mapscript then
@@ -102,6 +117,8 @@ function _M:custom(lev, old_lev)
 		return ret
 	elseif self.force_regen then
 		return nil
+	elseif self.force_redo then
+		return self:custom(lev, old_lev)
 	else
 		error("Generator MapScript called without mapscript or custom fields set!")
 	end
@@ -127,19 +144,100 @@ function _M:generate(lev, old_lev)
 	if not self.exit_pos then self.exit_pos = data:point(1, 1) end
 
 	data = data:getResult(true)
-	for i = 0, self.map.w - 1 do
-		for j = 0, self.map.h - 1 do
-			if data[j+1][i+1] ~= "⍓" and data[j+1][i+1] ~= "⎕" then
-				self.map(i, j, Map.TERRAIN, self:resolve(data[j+1][i+1] or '#'))
+
+	-- First do the map itself
+	for i = 0, self.map.w - 1 do for j = 0, self.map.h - 1 do
+		if data[j+1][i+1] ~= "⍓" and data[j+1][i+1] ~= "⎕" then
+			self.map(i, j, Map.TERRAIN, self:resolve(data[j+1][i+1] or '#'))
+		end
+
+		if self.status_all then
+			local s = table.clone(self.status_all)
+			if s.lite then self.level.map.lites(i, j, true) s.lite = nil end
+			if s.remember then self.level.map.remembers(i, j, true) s.remember = nil end
+			if s.special then self.map.room_map[i][j].special = s.special s.special = nil end
+			if s.room_map then for k, v in pairs(s.room_map) do self.map.room_map[i][j][k] = v end s.room_map = nil end
+			if pairs(s) then for k, v in pairs(s) do self.level.map.attrs(i, j, k, v) end end
+		end
+	end end
+
+	-- Now add the various entities
+	for i = 0, self.map.w - 1 do for j = 0, self.map.h - 1 do local def = self.self_tiles[data[j+1][i+1]] if def then
+		local actor = def.actor
+		local trap = def.trap
+		local object = def.object
+		local trigger = def.trigger
+		local status = def.status
+		local define_spot = def.define_spot
+
+		if trigger then
+			if type(trigger) == "table" and trigger.alternate == true then trigger = rng.table(trigger) end
+			local t, mod
+			if type(trigger) == "string" then t = self.zone:makeEntityByName(self.level, "trigger", trigger)
+			elseif type(trigger) == "table" and trigger.random_filter then mod = trigger.entity_mod t = self.zone:makeEntity(self.level, "terrain", trigger.random_filter, nil, true)
+			else t = self.zone:finishEntity(self.level, "terrain", trigger)
+			end
+			if t then if mod then t = mod(t) end self:roomMapAddEntity(i, j, "trigger", t) end
+		end
+
+		if object then
+			if type(object) == "table" and object.alternate == true then object = rng.table(object) end
+			local o, mod
+			if type(object) == "string" then o = self.zone:makeEntityByName(self.level, "object", object)
+			elseif type(object) == "table" and object.random_filter then mod = object.entity_mod o = self.zone:makeEntity(self.level, "object", object.random_filter, nil, true)
+			else o = self.zone:finishEntity(self.level, "object", object)
+			end
+			if o then if mod then o = mod(o) end self:roomMapAddEntity(i, j, "object", o, elists) end --takes care of uniques
+		end
+
+		if trap then
+			if type(trap) == "table" and trap.alternate == true then trap = rng.table(trap) end
+			local t, mod
+			if type(trap) == "string" then t = self.zone:makeEntityByName(self.level, "trap", trap)
+			elseif type(trap) == "table" and trap.random_filter then mod = trap.entity_mod t = self.zone:makeEntity(self.level, "trap", trap.random_filter, nil, true)
+			else t = self.zone:finishEntity(self.level, "trap", trap)
+			end
+			if t then if mod then t = mod(t) end self:roomMapAddEntity(i, j, "trap", t, elists) end
+		end
+
+		if actor then
+			if type(actor) == "table" and actor.alternate == true then actor = rng.table(actor) end
+			local m, mod
+			if type(actor) == "string" then m = self.zone:makeEntityByName(self.level, "actor", actor)
+			elseif type(actor) == "table" and actor.random_filter then mod = actor.entity_mod m = self.zone:makeEntity(self.level, "actor", actor.random_filter, nil, true)
+			else m = self.zone:finishEntity(self.level, "actor", actor)
+			end
+			if m then
+				if mod then m = mod(m) end
+				self:roomMapAddEntity(i, j, "actor", m, elists)
 			end
 		end
-	end
 
+		if status then
+			local s = table.clone(status)
+			if s.lite then self.level.map.lites(i, j, true) s.lite = nil end
+			if s.remember then self.level.map.remembers(i, j, true) s.remember = nil end
+			if s.special then self.map.room_map[i][j].special = s.special s.special = nil end
+			if s.room_map then for k, v in pairs(s.room_map) do self.map.room_map[i][j][k] = v end s.room_map = nil end
+			if pairs(s) then for k, v in pairs(s) do self.level.map.attrs(i, j, k, v) end end
+		end
+
+		if define_spot then
+			define_spot = table.clone(define_spot, true)
+			assert(define_spot.type, "defineTile auto spot without type field")
+			assert(define_spot.subtype, "defineTile auto spot without subtype field")
+			define_spot.x = i
+			define_spot.y = j
+			self.spots[#self.spots+1] = define_spot
+		end
+	end end end
+
+	-- Any psot gen stuff
 	for _, post in pairs(self.post_gen) do
 		post(self, lev, old_lev)
 	end
 
-	return self.entrance_pos.x - 1, self.entrance_pos.y - 1, self.exit_pos.x - 1, self.exit_pos.y - 1
+	return self.entrance_pos.x - 1, self.entrance_pos.y - 1, self.exit_pos.x - 1, self.exit_pos.y - 1, self.spots
 end
 
 function _M:setEntrance(pos)
@@ -149,14 +247,42 @@ function _M:setExit(pos)
 	self.exit_pos = pos
 end
 
-function _M:addSpot(x, y, type, subtype, data)
+function _M:setStatusAll(s)
+	self.status_all = s
+end
+
+function _M:addSpot(x, y, _type, subtype, data)
+	if type(x) == "table" then x, y, _type, subtype, data = x.x, x.y, y, _type, subtype end
 	data = data or {}
 	-- Tilemap uses 1 based indexes
 	data.x = math.floor(x) - 1
 	data.y = math.floor(y) - 1
-	data.type = type
+	data.type = _type
 	data.subtype = subtype
 	self.spots[#self.spots+1] = data
+end
+
+function _M:addZone(p1, p2, type, subtype, additional)
+	local zone = {x1=p1.x-1, y1=p1.y-1, x2=p2.x-1, y2=p2.y-1, type=type or "static", subtype=subtype or "static"}
+	table.update(zone, additional or {})
+	self.level.custom_zones = self.level.custom_zones or {}
+	self.level.custom_zones[#self.level.custom_zones+1] = zone
+end
+
+function _M:checkConnectivity(dst, src, type, subtype)
+	local data = {}
+	if type(src) == "string" then data.check_connectivity = src
+	else data.check_connectivity = {x=src.x-1, y=src.y-1} end
+	self:addSpot(dst, type or "static", subtype or "static", data)
+end
+
+function _M:defineTile(char, grid, obj, actor, trap, status, spot)
+	self.self_tiles[char] = {grid=grid, object=obj, actor=actor, trap=trap, status=status, define_spot=spot}
+end
+
+function _M:copyTile(dchar, schar, alter)
+	self.self_tiles[dchar] = table.clone(self.self_tiles[schar], true)
+	if alter then alter(self.self_tiles[dchar]) end
 end
 
 function _M:postGen(fct)
@@ -174,7 +300,7 @@ function _M:makeTemporaryMap(map_w, map_h, fct)
 	local new_data = table.clone(self.data, true)
 
 	-- Fake a generator call to init tmp_map.room_map
-	local ngen = BaseGenerator.new({}, tmp_map, {}, {})
+	local ngen = Generator.new({}, tmp_map, {}, {})
 
 	fct(tmp_map, new_data)
 

@@ -44,7 +44,7 @@ newTalent{
 		end
 
 		local tg = self:getTalentTarget(t)
-		local x, y, target = self:getTarget(tg)
+		local x, y, target = self:getTargetLimited(tg)
 		if not x or not y or not target then return nil end
 
 		local mult = t.getDamage(self,t)

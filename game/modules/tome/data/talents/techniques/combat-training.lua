@@ -165,7 +165,7 @@ newTalent{
 	points = 5,
 	require = { level=function(level) return (level - 1) * 4 end },
 	mode = "passive",
-	getAttack = function(self, t) return self:combatTalentScale(t, 10, 50, 0.75) end, -- match values at 1 and 5 for old formula
+	getAttack = function(self, t) return math.floor(self:combatTalentScale(t, 14, 55)) end,
 	info = function(self, t)
 		local attack = t.getAttack(self, t)
 		return ([[Increases the accuracy of unarmed, melee and ranged weapons by %d.]]):

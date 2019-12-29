@@ -262,6 +262,7 @@ newBirthDescriptor{
 		"Stone Wardens are dwarves trained in both the eldritch arts and the worship of nature.",
 		"While other races are stuck in their belief that arcane forces and natural forces are meant to oppose, dwarves have found a way to combine them in harmony.",
 		"Stone Wardens are armoured fighters, dual wielding shields to channel many of their powers.",
+		"Their most important stats are: Strength, Magic and Willpower",
 		"#GOLD#Stat modifiers:",
 		"#LIGHT_BLUE# * +2 Strength, +0 Dexterity, +0 Constitution",
 		"#LIGHT_BLUE# * +4 Magic, +3 Willpower, +0 Cunning",

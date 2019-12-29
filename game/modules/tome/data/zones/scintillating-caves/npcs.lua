@@ -61,6 +61,9 @@ newEntity{ base="BASE_NPC_CRYSTAL", define_as = "SPELLBLAZE_CRYSTAL",
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	ai_tactic = resolvers.tactic"ranged",
 	
+	-- Override the recalculated AI tactics to avoid problematic kiting in the early game
+	low_level_tactics_override = {escape=0},
+	
 	auto_classes={{class="Archmage", start_level=12, level_rate=75}},
 
 	on_die = function(self, who)

@@ -33,15 +33,15 @@ newTalent{
 	direct_hit = true,
 	reflectable = true,
 	requires_target = true,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 17, 200) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 15, 170) end,
 	action = function(self, t)
-		local tg = {type="ball", range=self:getTalentRange(t), radius=1, talent=t}
+		local tg = {type="ball", range=self:getTalentRange(t), radius=1}
 		local x, y, target = self:getTarget(tg)
 		if not x or not y then return nil end
 		local _ _, x, y = self:canProject(tg, x, y)
 
 		local dam = self:spellCrit(t.getDamage(self, t))
-		if target then self:project(target, x, y, DamageType.LIGHT, dam, {type="light"}) end
+		self:project({type="hit", talent=t}, x, y, DamageType.LIGHT, dam, {type="light"})
 
 		-- Add a lasting map effect
 		game.level.map:addEffect(self,
@@ -135,6 +135,7 @@ newTalent{
 		return {type="ball", radius=self:getTalentRange(t), friendlyfire=false, talent=t}
 	end,
 	getDamage = function(self, t) return 10 + self:combatTalentSpellDamage(t, 1, 50) end,
+	getPositive = function(self, t) return self:combatTalentScale(t, 2.75, 4.94) end,
 	callbackOnLevelChange = function(self, eff)
 		self.firebeam_turns_remaining = nil
 	end,
@@ -146,6 +147,9 @@ newTalent{
 		self:forceUseTalent(self.T_FIREBEAM, {ignore_cd=true, ignore_energy=true, ignore_ressources=true})
 
 		self.firebeam_turns_remaining = self.firebeam_turns_remaining - 1
+	end,
+	callbackOnDealDamage = function(self, t)
+		if not self.firebeam_gives_pos then return else self:incPositive(self.firebeam_gives_pos) end
 	end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
@@ -161,7 +165,9 @@ newTalent{
 
 		local tgt, x, y = tgts[#tgts].tgt, tgts[#tgts].tgt.x, tgts[#tgts].tgt.y
 		local dam = self:spellCrit(t.getDamage(self, t))
+		self.firebeam_gives_pos = t.getPositive(self, t)
 		self:project({type="beam", friendlyfire=false, selffire=false, talent=t, self.x, self.y}, x, y, DamageType.FIRE, dam)
+		self.firebeam_gives_pos = nil
 
 		local _ _, x, y = self:canProject(tg, x, y)
 		game.level.map:particleEmitter(self.x, self.y, math.max(math.abs(x-self.x), math.abs(y-self.y)), "light_beam", {tx=x-self.x, ty=y-self.y})
@@ -173,9 +179,10 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		return ([[Call forth the Sun to summon a fiery beam that pierces to the farthest enemy dealing %d fire damage to all enemies hit.
-		This spell will automatically cast again at the start of every other one of your turns up to twice.
+		This spell will automatically cast again at the start of your next two turns.
+		You will gain %0.2f positive energy each time firebeam or an instant damage proc caused by firebeam deals damage.
 		The damage done will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.FIRE, damage))
+		format(damDesc(self, DamageType.FIRE, damage), t.getPositive(self, t))
 	end,
 }
 

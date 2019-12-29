@@ -44,8 +44,8 @@ uberTalent{
 	getLava = function(self, t) return math.max(self:combatSpellpower() + 30, self:combatMindpower() + 30) end,
 	require = { special={desc="Have witnessed a meteoric crash", fct=function(self) return game.state.birth.ignore_prodigies_special_reqs or self:attr("meteoric_crash") end} },
 	passives = function(self, t, tmptable)
-		self:talentTemporaryValue(tmptable, "auto_highest_inc_damage", {[DamageType.FIRE] = 0})
-		self:talentTemporaryValue(tmptable, "auto_highest_resists_pen", {[DamageType.FIRE] = 0})
+		self:talentTemporaryValue(tmptable, "auto_highest_inc_damage", {[DamageType.FIRE] = 1})
+		self:talentTemporaryValue(tmptable, "auto_highest_resists_pen", {[DamageType.FIRE] = 1})
 		self:talentTemporaryValue(tmptable, "inc_damage", {[DamageType.FIRE] = 0.00001})  -- 0 so that it shows up in the UI
 		self:talentTemporaryValue(tmptable, "resists_pen", {[DamageType.FIRE] = 0.00001})
 	end,	

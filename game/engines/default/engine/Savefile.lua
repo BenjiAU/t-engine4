@@ -37,6 +37,8 @@ _M.current_save = false
 _M.hotkeys_file = "/save/quick_hotkeys"
 _M.md5_types = {}
 
+_M.TRUNCATE_PRINTLOG_TO = 5000
+
 --- Init a savefile
 -- @param savefile the name of the savefile, usually the player's name. It will be sanitized so dont bother doing it
 -- @param coroutine if true the saving will yield sometimes to let other code run
@@ -268,6 +270,19 @@ function _M:saveGame(game, no_dialog)
 	--fs.rename(self.save_dir..self:nameSaveGame(game)..".tmp", self.save_dir..self:nameSaveGame(game))
 
 	savefile_pipe:pushGeneric("saveGame_md5", function() self:md5Upload("game", self:nameSaveGame(game)) end)
+
+	local f = fs.open(self.save_dir.."last_log.txt", "w")
+	truncate_printlog(self.TRUNCATE_PRINTLOG_TO)
+	local log = get_printlog()
+	for _, line in ipairs(log) do
+		local max = 1
+		for k, _ in pairs(line) do max = math.max(max, k) end
+		local list = {}
+		for i = 1, max do list[i] = tostring(line[i]) end
+		f:write(table.concat(list, "\t").."\n")
+	end
+	f:close()
+	if util.steamCanCloud() then core.steam.writeFile(self.save_dir.."last_log.txt") end
 
 	local desc = game:getSaveDescription()
 	local f = fs.open(self.save_dir.."desc.lua", "w")

@@ -165,7 +165,7 @@ uberTalent{
 	end,
 	info = function(self, t)
 		return ([[Fungal spores have colonized your blood, so that each time you use an infusion you store %d fungal power.
-		You may use this prodigy to release the power as a heal (never more than than %d life) and remove up to 10 detrimental magical effects.
+		You may use this prodigy to release the power as a heal (never more than %d life) and remove up to 10 detrimental magical effects.
 		Fungal power lasts for up to 6 turns, losing the greater of 10 potency or 10%% of its power each turn.
 		The amount of fungal power produced and the maximum heal possible increase with your Constitution and maximum life.]])
 		:format(t.fungalPower(self, t), t.healmax(self,t))

@@ -28,8 +28,8 @@ newTalent{
 	tactical = { ATTACK = {PHYSICAL = 2} },
 	direct_hit = true,
 	requires_target = true,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 250) end,
-	getBonus = function(self, t) return 0.3 end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 250) end,  -- 40, 500 at 5 debuffs
+	getBonus = function(self, t) return 0.2 end,
 	target = function(self, t)
 		return {type="beam", range=self:getTalentRange(t), talent=t}
 	end,
@@ -44,7 +44,7 @@ newTalent{
 			local target = game.level.map(tx, ty, Map.ACTOR)
 			if not target then return end
 			local effs = #target:effectsFilter({status="detrimental", type="magical"})
-			local damage = dam * (1 + t.getBonus(self, t) * effs)
+			local damage = dam * math.min(2, (1 + t.getBonus(self, t) * effs))
 			DamageType:get(DamageType.PHYSICAL).projector(self, tx, ty, DamageType.PHYSICAL, damage)
 		end)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
@@ -54,8 +54,8 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Conjures up a spear of bones, doing %0.2f physical damage to all targets in a line.  Each target takes an additional %d%% damage for each magical debuff they are afflicted with.
-		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), t.getBonus(self, t)*100)
+		return ([[Conjures up a spear of bones, doing %0.2f physical damage to all targets in a line.  Each target takes an additional %d%% damage for each magical debuff they are afflicted with up to a max of %d%% (%d).
+		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), t.getBonus(self, t)*100, t.getBonus(self, t)*100 * 5, damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t) * 2))
 	end,
 }
 

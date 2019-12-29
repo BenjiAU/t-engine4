@@ -65,7 +65,8 @@ function _M:generate(lev, old_lev)
 			end
 		end end
 		-- search for ways into the vault, always including the vault connection point
-		local possible_entrances = {{x=ret.cx, y=ret.cy}}
+		local possible_entrances_backup = {{x=ret.cx, y=ret.cy}}
+		local possible_entrances = {}
 		for i = rx, rx + room.w -1 do
 			local y1, y2 = ry, ry + room.h - 1
 			if self.map:checkEntity(i, y1, Map.TERRAIN, "is_door") then possible_entrances[#possible_entrances+1] = {x=i, y=y1, sx=i, sy=util.bound(y1-entry_path_length, 0, self.map.h-1)} end
@@ -74,28 +75,30 @@ function _M:generate(lev, old_lev)
 		for j = ry, ry + room.h - 1 do
 			local x1, x2 = rx, rx + room.w - 1
 			if self.map:checkEntity(x1, j, Map.TERRAIN, "is_door") then possible_entrances[#possible_entrances+1] = {x=x1, y=j, sx=util.bound(x1-entry_path_length, 0, self.map.w-1), sy=j} end
-			if self.map:checkEntity(x2, j, Map.TERRAIN, "is_door") then possible_entrances[#possible_entrances+1] = {x=x2, y=j, sx=util.bound(x1+entry_path_length, 0, self.map.w-1), sy=j} end
+			if self.map:checkEntity(x2, j, Map.TERRAIN, "is_door") then possible_entrances[#possible_entrances+1] = {x=x2, y=j, sx=util.bound(x2+entry_path_length, 0, self.map.w-1), sy=j} end
 		end
 		if #possible_entrances > 0 then
 			local e = rng.table(possible_entrances)
 			sx, sy = e.sx, e.sy
 			ex, ey = e.x, e.y
-			if not (sx and sy) then -- vault connection point: connect to a (nearest) non-vault grid
-				print("[VaultLevel] generating level start point from vault connection at", ex, ey)
-				-- start at center of room and pick a random direction
-				sx, sy = math.floor(rx+(room.w-1)/2), math.floor(ry+(room.h-1)/2)
-				local dir, xd, yd = util.getDir(ex, ey, sx+rng.normal(0, 1), sy+rng.normal(0, 1))
-				if dir == 5 then dir = rng.table(util.primaryDirs()) end
-				local rm
-				local steps = math.max(room.w, room.h) + 2*(room.border or 0) + 1
-				repeat
-					steps = steps - 1
-					rm = self.map.room_map[sx][sy]
-					sx, sy = util.coordAddDir(sx, sy, dir)
-					if not (rm.room or rm.border) then entry_path_length = entry_path_length - 1 end
-				until steps <= 0 or entry_path_length <= 0 or not self.map:isBound(sx, sy)
-				sx, sy = util.bound(sx, 0, self.map.w-1), util.bound(sy, 0, self.map.h-1)
-			end
+		elseif #possible_entrances_backup > 0 then
+			local e = rng.table(possible_entrances_backup)
+			ex, ey = e.x, e.y
+			-- vault connection point: connect to a (nearest) non-vault grid
+			print("[VaultLevel] generating level start point from vault connection at", ex, ey)
+			-- start at center of room and pick a random direction
+			sx, sy = math.floor(rx+(room.w-1)/2), math.floor(ry+(room.h-1)/2)
+			local dir, xd, yd = util.getDir(ex, ey, sx+rng.normal(0, 1), sy+rng.normal(0, 1))
+			if dir == 5 then dir = rng.table(util.primaryDirs()) end
+			local rm
+			local steps = math.max(room.w, room.h) + 2*(room.border or 0) + 1
+			repeat
+				steps = steps - 1
+				rm = self.map.room_map[sx][sy]
+				sx, sy = util.coordAddDir(sx, sy, dir)
+				if not (rm.room or rm.border) then entry_path_length = entry_path_length - 1 end
+			until steps <= 0 or entry_path_length <= 0 or not self.map:isBound(sx, sy)
+			sx, sy = util.bound(sx, 0, self.map.w-1), util.bound(sy, 0, self.map.h-1)
 		else
 			ex, ey = ret.cx, ret.cy
 		end

@@ -19,11 +19,12 @@
 
 load("/data/general/npcs/orc.lua", rarity(3))
 load("/data/general/npcs/orc-gorbat.lua", rarity(0))
-load("/data/general/npcs/cold-drake.lua", rarity(0))
-load("/data/general/npcs/storm-drake.lua", rarity(0))
-load("/data/general/npcs/fire-drake.lua", rarity(0))
-load("/data/general/npcs/venom-drake.lua", rarity(0))
-load("/data/general/npcs/multihued-drake.lua", rarity(3))
+load("/data/general/npcs/cold-drake.lua", function(e) e.drake_rarity, e.rarity = e.rarity, nil end)
+load("/data/general/npcs/storm-drake.lua", function(e) e.drake_rarity, e.rarity = e.rarity, nil end)
+load("/data/general/npcs/fire-drake.lua", function(e) e.drake_rarity, e.rarity = e.rarity, nil end)
+load("/data/general/npcs/venom-drake.lua", function(e) e.drake_rarity, e.rarity = e.rarity, nil end)
+load("/data/general/npcs/multihued-drake.lua", function(e) e.drake_rarity, e.rarity = e.rarity, nil end)
+load("/data/general/npcs/wild-drake.lua", function(e) e.drake_rarity, e.rarity = e.rarity, nil end)
 
 load("/data/general/npcs/all.lua", rarity(4, 35))
 
@@ -76,7 +77,6 @@ newEntity{ base="BASE_NPC_ORC_GORBAT", define_as = "GORBAT",
 
 		[Talents.T_BELLOWING_ROAR]={base=7, every=6, max=10},
 		[Talents.T_WING_BUFFET]={base=5, every=6, max=7},
-		[Talents.T_ACIDIC_SKIN]={base=7, every=6, max=10},
 
 		[Talents.T_RIMEBARK]={base=7, every=6, max=10},
 		[Talents.T_RITCH_FLAMESPITTER]={base=10, every=6, max=12},
@@ -93,7 +93,6 @@ newEntity{ base="BASE_NPC_ORC_GORBAT", define_as = "GORBAT",
 		[Talents.T_ARMOUR_TRAINING]=3,
 
 		[Talents.T_SPELL_FEEDBACK]=1,
-		[Talents.T_SPINE_OF_THE_WORLD]=1,
 		[Talents.T_MASSIVE_BLOW]=1,
 		[Talents.T_BLIGHTED_SUMMONING]=1,
 	},

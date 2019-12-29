@@ -46,7 +46,7 @@ newEntity{ base = "BASE_CLOTH_ARMOR", define_as = "ROBES_DEFLECTION",
 		combat_armor_hardiness = 30,
 		combat_armor = 7,
 		inc_stats = { [Stats.STAT_CON] = 3, [Stats.STAT_MAG] = 3, },
-		combat_spellpower = 4,
+		combat_spellpower = 5,
 	},
 	talent_on_spell = { {chance=4, talent=Talents.T_EVASION, level=1} },
 }

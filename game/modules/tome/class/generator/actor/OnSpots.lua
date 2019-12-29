@@ -32,7 +32,11 @@ end
 function _M:generateOne()
 	local f = nil
 	if self.filters then f = self.filters[rng.range(1, #self.filters)] end
-	if self.randelite > 0 and rng.chance(self.randelite) and game.player.level >= (game.state.birth.rare_minimum_level or 0) and game.difficulty ~= game.DIFFICULTY_EASY then
+	if self.randboss > 0 and rng.chance(self.randboss) and game.player.level >= (game.state.birth.random_boss_minimum_level or 0) and game.difficulty ~= game.DIFFICULTY_EASY then
+		print("Random boss generating")
+		if not f then f = {} else f = table.clone(f, true) end
+		f.random_boss = f.random_boss or true
+	elseif self.randelite > 0 and rng.chance(self.randelite) and game.player.level >= (game.state.birth.rare_minimum_level or 0) and game.difficulty ~= game.DIFFICULTY_EASY then
 		print("Random elite generating")
 		if not f then f = {} else f = table.clone(f, true) end
 		f.random_elite = f.random_elite or true

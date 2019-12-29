@@ -454,7 +454,12 @@ local function archery_projectile(tx, ty, tg, self, tmp)
 
 		target:fireTalentCheck("callbackOnArcheryMiss", self, tg)
 	end
-
+	
+	if tg.archery.proc_mult then
+		self.__global_accuracy_damage_bonus = self.__global_accuracy_damage_bonus or 1
+		self.__global_accuracy_damage_bonus = self.__global_accuracy_damage_bonus * tg.archery.proc_mult
+	end
+	
 	-- Ranged project
 	local weapon_ranged_project = weapon.ranged_project or {}
 	local ammo_ranged_project = ammo.ranged_project or {}
@@ -657,8 +662,10 @@ local function archery_projectile(tx, ty, tg, self, tmp)
 		target.turn_procs.roll_with_it = true
 	end
 
-	self.turn_procs.weapon_type = nil
+	self.turn_procs.weapon_type = nil	
 	if tg.archery.use_psi_archery then self:attr("use_psi_combat", -1) end
+	self.__global_accuracy_damage_bonus = nil
+
 end
 
 -- Store it for addons

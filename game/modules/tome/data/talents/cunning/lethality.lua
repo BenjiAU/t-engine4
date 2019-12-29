@@ -43,7 +43,7 @@ newTalent{
 	type = {"cunning/lethality", 2},
 	points = 5,
 	cooldown = 6,
-	stamina = 30,
+	stamina = 20,
 	require = cuns_req2,
 	tactical = { ATTACK = {weapon = 2}, BUFF = 1 },
 	requires_target = true,

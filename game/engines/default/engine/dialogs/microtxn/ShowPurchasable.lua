@@ -59,8 +59,10 @@ function _M:init(mode)
 		cosmetic = "/data/gfx/microtxn-ui/category_cosmetic.png",
 		misc = "/data/gfx/microtxn-ui/category_misc.png",
 	}
+	local categories_icons_entities = {}
+	for i, c in pairs(self.categories_icons) do categories_icons_entities[i] = Entity.new{image=c} end
 	local in_cart_icon = Entity.new{image="/data/gfx/microtxn-ui/in_cart.png"}
-	-- local icon_frame = Entity.new{image="/data/gfx/microtxn-ui/icon_frame.png"}
+	local icon_frame = Entity.new{image="/data/gfx/microtxn-ui/icon_frame.png"}
 
 	self.list = {}
 	self.purchasables = {}
@@ -70,10 +72,22 @@ function _M:init(mode)
 
 	self.c_waiter = Textzone.new{auto_width=1, auto_height=1, text="#YELLOW#-- connecting to server... --"}
 
+	local last_displayed_item = nil
 	self.c_list = VariableList.new{width=self.iw - 350 - vsep.w, max_height=self.ih, scrollbar=true, sortable=true,
 		direct_draw=function(item, x, y, get_size)
 			if get_size then return 132 end
-			item.img:toScreen(nil, x+2, y+2, 128, 128)
+			if self.cur_sel_item == item and item.demo_url and self.webview and self.webview.view then
+				if last_displayed_item ~= item then
+					self.webview.view:loadURL(item.demo_url)
+				end
+				self.webview:display(x+2, y+2, 1)
+				icon_frame:toScreen(nil, x+2, y+1, 128, 128)
+				icon_frame:toScreen(nil, x+2, y+1, 128, 128)
+				if categories_icons_entities[item.category] then categories_icons_entities[item.category]:toScreen(nil, x+2, y+2, 128, 128) end
+				last_displayed_item = item
+			else
+				item.img:toScreen(nil, x+2, y+2, 128, 128)
+			end
 			if self.cart[item.id_purchasable] and item.nb_purchase > 0 then
 				in_cart_icon:toScreen(nil, x+2, y+2, 128, 128)
 				if item.nb_purchase > 1 and item.p_txt then
@@ -126,7 +140,8 @@ function _M:init(mode)
 		self:use(item.item, button)
 	end, select=function(item, sel) end}
 
-	-- local wv = WebView.new{width=500,height=500, url='https://te4.org/images/tmp/mtx-short.gif'}
+	self.webview = WebView.new{width=128,height=128, url=''}
+	self.webview.hide_loading = true
 
 	local uis = {
 		{vcenter=0, hcenter=0, ui=self.c_waiter},
@@ -134,7 +149,6 @@ function _M:init(mode)
 		{left=self.c_list, top=0, ui=vsep},
 		{right=0, top=0, ui=self.c_recap},
 		{right=0, bottom=0, ui=self.c_do_purchase},
-		-- {left=0, top=0, ui=wv},
 	}
 	-- Only show those for steam as te4.org purchases require already having a donation up
 	if mode == "steam" then
@@ -518,6 +532,8 @@ function _M:generateList()
 		self:toggleDisplay(self.c_list, true)
 		self:toggleDisplay(self.c_waiter, false)
 		self:setFocus(self.c_list)
+
+		self.cur_sel_item = self.list[self.c_list.sel or 1]
 
 		self.c_coins_available.text = coins_balance_text:format((e.data.infos.balance or 0) * 10)
 		self.c_coins_available:generate()

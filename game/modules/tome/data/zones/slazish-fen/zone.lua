@@ -31,6 +31,7 @@ return {
 	day_night = true,
 	no_worldport = true,
 	persistent = "zone",
+	objects_cost_modifier = 0.2, --prevent celestial starts from getting enough gold to buy items from Gates of Morning 
 	color_shown = {0.7, 0.7, 0.7, 1},
 	color_obscure = {0.7*0.6, 0.7*0.6, 0.7*0.6, 0.6},
 	ambient_music = "Valve.ogg",
@@ -52,7 +53,7 @@ return {
 
 --			nb_rooms = {0,0,0,1},
 --			rooms = {"lesser_vault"},
---			lesser_vaults_list = {"honey_glade", "forest-ruined-building1", "forest-ruined-building2", "forest-ruined-building3", "forest-snake-pit", "mage-hideout"},
+--			lesser_vaults_list = {"honey_glade", "forest-ruined-building1", "forest-ruined-building2", "forest-ruined-building3", "snake-pit", "mage-hideout"},
 --			lite_room_chance = 100,
 		},
 		actor = {

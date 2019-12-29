@@ -53,7 +53,7 @@ newBirthDescriptor
 		"#LIGHT_BLUE# * +3 Strength, -2 Dexterity, +3 Constitution",
 		"#LIGHT_BLUE# * +2 Magic, +2 Willpower, -5 Cunning",
 		"#GOLD#Life per level:#LIGHT_BLUE# 13",
-		"#GOLD#Experience penalty:#LIGHT_BLUE# 50%",
+		"#GOLD#Experience penalty:#LIGHT_BLUE# 25%",
 	},
 	moddable_attachement_spots = "race_runic_golem", moddable_attachement_spots_sexless=true,
 	descriptor_choices =
@@ -110,7 +110,7 @@ newBirthDescriptor
 		moddable_tile = "runic_golem",
 		moddable_tile_nude = 1,
 	},
-	experience = 1.5,
+	experience = 1.25,
 
 	cosmetic_options = {
 		skin = {

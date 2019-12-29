@@ -176,7 +176,7 @@ newTalent{
 		local incStats = t.incStats(self, t, true)
 		return ([[Summon a War Hound for %d turns to attack your foes. War hounds are good basic melee attackers.
 		It will get %d Strength, %d Dexterity and %d Constitution.
-		Your summons inherit some of your stats: increased damage%%, stun/pin/confusion/blindness resistance, armour penetration.
+		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		The hound's Strength and Dexterity will increase with your Mindpower.]])
 		:format(t.summonTime(self, t), incStats.str, incStats.dex, incStats.con)
 	end,
@@ -297,7 +297,7 @@ newTalent{
 		local incStats = t.incStats(self, t, true)
 		return ([[Summon a Jelly for %d turns to attack your foes. Jellies do not move, but your equilibrium will be reduced by 10%% of all damage received by the jelly.
 		It will get %d Constitution and %d Strength.
-		Your summons inherit some of your stats: increased damage%%, stun/pin/confusion/blindness resistance, armour penetration.
+		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		The jelly's Constitution will increase with your Mindpower.]])
 		:format(t.summonTime(self, t), incStats.con, incStats.str)
        end,
@@ -412,7 +412,7 @@ newTalent{
 		local incStats = t.incStats(self, t, true)
 		return ([[Summon a Minotaur for %d turns to attack your foes. Minotaurs cannot stay summoned for long, but they deal high damage.
 		It will get %d Strength, %d Constitution and %d Dexterity.
-		Your summons inherit some of your stats: increased damage%%, stun/pin/confusion/blindness resistance, armour penetration.
+		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		The minotaur's Strength and Dexterity will increase with your Mindpower.]])
 		:format(t.summonTime(self,t), incStats.str, incStats.con, incStats.dex)
 	end,
@@ -533,7 +533,7 @@ newTalent{
 		local incStats = t.incStats(self, t,true)
 		return ([[Summon a Stone Golem for %d turns to attack your foes. Stone golems are formidable foes that can become unstoppable.
 		It will get %d Strength, %d Constitution and %d Dexterity.
-		Your summons inherit some of your stats: increased damage%%, stun/pin/confusion/blindness resistance, armour penetration.
+		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		The golem's Strength and Dexterity will increase with your Mindpower.]])
 		:format(t.summonTime(self, t), incStats.str, incStats.con, incStats.dex)
 	end,

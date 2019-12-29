@@ -17,8 +17,6 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-local archerPreUse = Talents.archerPreUse
-
 newTalent{
 	name = "Bow Mastery",
 	type = {"technique/archery-bow", 1},

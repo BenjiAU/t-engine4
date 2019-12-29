@@ -197,7 +197,7 @@ newTalent{
 	sustain_stamina = 30,
 	tactical = { DEFEND = 2 },
 	on_pre_use = function(self, t, silent) if not self:hasShield() then if not silent then game.logPlayer(self, "You require a weapon and a shield to use this talent.") end return false end return true end,
-	getArmor = function(self,t) return self:combatTalentStatDamage(t, "str", 6, 40) + self:combatTalentStatDamage(t, "dex", 6, 40) end,
+	getArmor = function(self,t) return self:combatTalentStatDamage(t, "str", 6, 30) + self:combatTalentStatDamage(t, "dex", 6, 30) end,
 	getBlock = function(self, t) return self:combatTalentStatDamage(t, "str", 20, 75) + self:combatTalentStatDamage(t, "dex", 20, 75) end,
 	stunKBresist = function(self, t) return self:combatTalentLimit(t, 1, 0.15, 0.50) end, -- Limit <100%
 	activate = function(self, t)
@@ -357,6 +357,7 @@ newTalent{
 		self:removeTemporaryValue("never_move", p.nomove)
 		self:removeTemporaryValue("die_at", p.dieat)
 		self:removeTemporaryValue("life", p.extra_life)
+		if self.life <= 0 then self.life = 1 end  -- Don't kill players on deactivation, this does let you use die_at tricks to heal though
 		return true
 	end,
 	info = function(self, t)
@@ -368,6 +369,7 @@ newTalent{
 		end
 		return ([[You brace yourself for the final stand, increasing Defense and Armor by %d, maximum and current life by %d, but making you unable to move.
 		Your stand lets you concentrate on every blow, allowing you to avoid death from normally fatal wounds. You can only die when reaching -%d life.
+		If your life is below 0 when Last Stand ends it will be set to 1.
 		The increase in Defense and Armor is based on your Dexterity, and the increase in life is based on your Constitution and normal maximum life.]]):
 		format(t.getDefense(self, t), hp, hp)
 	end,

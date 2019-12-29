@@ -49,6 +49,7 @@ Talents.newTalent = function(self, t)
 	if tt.is_nature then t.is_nature = true end
 	if tt.is_antimagic then t.is_antimagic = true end
 	if tt.is_unarmed then t.is_unarmed = true end
+	if tt.is_necromancy then t.is_necromancy = true end
 	if tt.autolearn_mindslayer then t.autolearn_mindslayer = true end
 	if tt.speed and not t.speed then t.speed = tt.speed end
 	if t.tactical then t.tactical = Talents.aiLowerTacticals(t.tactical) end
@@ -65,6 +66,10 @@ Talents.newTalent = function(self, t)
 		t.short_name = (t.short_name or t.name):upper():gsub("[ ']", "_")
 		t.name = "#LIGHT_STEEL_BLUE#"..t.name.." (Class Evolution)"
 	end
+	if t.is_race_evolution then
+		t.short_name = (t.short_name or t.name):upper():gsub("[ ']", "_")
+		t.name = "#SANDY_BROWN#"..t.name.." (Race Evolution)"
+	end
 
 	return oldNewTalent(self, t)
 end
@@ -74,7 +79,7 @@ damDesc = function(self, type, dam)
 		dam = dam * 0.5
 	end
 	if self:attr("stunned") then
-		dam = dam * 0.4
+		dam = dam * 0.5
 	end
 	if self:attr("invisible_damage_penalty") then
 		dam = dam * util.bound(1 - (self.invisible_damage_penalty / (self.invisible_damage_penalty_divisor or 1)), 0, 1)
@@ -100,6 +105,7 @@ Talents.is_a_type = {
 	is_nature = "a nature gift",
 	is_antimagic = "an antimagic ability",
 	is_summon = "a summon power",
+	is_necromancy = "necromancy",
 	use_only_arcane = "usable during Aether Avatar",
 }
 

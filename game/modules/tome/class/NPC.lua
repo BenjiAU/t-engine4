@@ -193,12 +193,15 @@ end
 -- @param who = actor acting (updating its FOV info), calling self:seen_by(who)
 -- @see ActorFOV:computeFOV, ActorAI:aiSeeTargetPos, NPC:doAI
 function _M:seen_by(who)
+	if self == who then return end
 	if self:hasEffect(self.EFF_VAULTED) and who and game.party:hasMember(who) then self:removeEffect(self.EFF_VAULTED, true, true) end
 
 	-- Check if we can pass target
 	if self.dont_pass_target then return end -- This means that ghosts can alert other NPC's but not vice versa ;)
 	local who_target = who.ai_target and who.ai_target.actor
 	if not (who_target and who_target.x) then return end
+	if self.ai_target and self.ai_target.actor == who_target then return end
+	if not rng.percent(who:getRankTalkativeAdjust()) then return end
 	-- Only receive (usually) hostile targets from allies
 	if self:reactionToward(who) <= 0 or not who.ai_state._pass_friendly_target and who:reactionToward(who_target) > 0 then return end
 	

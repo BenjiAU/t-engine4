@@ -24,7 +24,10 @@ newTalent{
 	points = 5,
 	cooldown = 2,
 	psi = 5,
-	range = 7,
+	range = function(self, t)
+		if self:isTalentActive(self.T_MIND_STORM) then return 10 end
+		return 7 
+	end,
 	direct_hit = true,
 	requires_target = true,
 	target = function(self, t)
@@ -60,12 +63,15 @@ newTalent{
 	require = psi_wil_req2,
 	points = 5,
 	cooldown = 8,
-	range = 7,
+	range = function(self, t)
+		if self:isTalentActive(self.T_MIND_STORM) then return 10 end
+		return 7 
+	end,
 	psi = 10,
 	direct_hit = true,
 	requires_target = true,
 	tactical = { ATTACK = { MIND = 2 }, DISABLE = { confusion = 2 } },
-	getDamage = function(self, t) return self:combatTalentMindDamage(t, 20, 200) end,
+	getDamage = function(self, t) return self:combatTalentMindDamage(t, 10, 200) end,
 	getPower = function(self, t) return self:combatTalentMindDamage(t, 10, 50) end, --2x cunning damage
 	-- confusion effect implemented in "LOBOTOMIZED" effect in data\timed_effects\mental.lua
 	getConfuse = function(self, t) return self:combatLimit(t.getPower(self,t), 50, 0, 0, 34.7, 34.7) end, -- Limit < 50%
@@ -113,10 +119,10 @@ newTalent{
 	range = 0,
 	direct_hit = true,
 	requires_target = true,
-	radius = function(self, t) return math.min(7, 2 + math.ceil(self:getTalentLevel(t)/2)) end,
-	target = function(self, t) return {type="ball", radius=self:getTalentRadius(t), range=self:getTalentRange(t), talent=t, selffire=false} end,
+	radius = function(self, t) return math.floor(self:combatTalentScale(t, 2, 6)) end,
+	target = function(self, t) return {type="ball", radius=self:getTalentRadius(t), range=self:getTalentRange(t), talent=t, friendlyfire=false, selffire=false} end,
 	tactical = { ATTACKAREA = { MIND = 3 }, DISABLE=1 },
-	getDamage = function(self, t) return self:combatTalentMindDamage(t, 20, 200) end,
+	getDamage = function(self, t) return self:combatTalentMindDamage(t, 10, 250) end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		self:project(tg, self.x, self.y, DamageType.MIND, {dam=self:mindCrit(self:combatTalentMindDamage(t, 20, 200)), crossTierChance=100} )
@@ -140,7 +146,10 @@ newTalent{
 	cooldown = 4,
 	psi = 5,
 	tactical = { ATTACK = { MIND = 2}, DISABLE = 1},
-	range = 7,
+	range = function(self, t)
+		if self:isTalentActive(self.T_MIND_STORM) then return 10 end
+		return 7 
+	end,
 	requires_target = true,
 	getDamage = function(self, t) return self:combatTalentMindDamage(t, 10, 150) end,
 	target = function(self, t)

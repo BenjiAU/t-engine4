@@ -195,9 +195,9 @@ function _M:attackTarget(target, damtype, mult, noenergy, force_unarmed)
 		for i = 1, #oh_weaps do
 			if i == #oh_weaps and double_weapon and offhand then break end
 			local o = oh_weaps[i]
-			local offmult = self:getOffHandMult(o.combat, mult)
 			local combat = self:getObjectCombat(o, "offhand")
-			if o.special_combat and o.subtype == "shield" and self:knowTalent(self.T_STONESHIELD) then combat = o.special_combat end
+			local offmult = self:getOffHandMult(combat, mult)
+			
 			-- no offhand unarmed attacks
 			if combat and not o.archery then
 				if combat.use_resources and not self:useResources(combat.use_resources, true) then
@@ -695,7 +695,7 @@ function _M:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult,
 	if self:attr("unharmed_attack_on_hit") then
 		local v = self:attr("unharmed_attack_on_hit")
 		self:attr("unharmed_attack_on_hit", -v)
-		if rng.percent(30) then self:attackTarget(target, nil, 1, true, true) end
+		if rng.percent(50) then self:attackTarget(target, nil, 1, true, true) end
 		self:attr("unharmed_attack_on_hit", v)
 	end
 
@@ -1344,7 +1344,11 @@ function _M:combatAttack(weapon, ammo)
 	local stats
 	if self:attr("use_psi_combat") then stats = (self:getCun(100, true) - 10) * (0.6 + self:callTalent(self.T_RESONANT_FOCUS, "bonus")/100)
 	elseif weapon and weapon.wil_attack then stats = self:getWil(100, true) - 10
-	else stats = self:getDex(100, true) - 10
+	elseif weapon and weapon.mag_attack then stats = self:getMag(100, true) - 10
+	else
+		local ret = self:fireTalentCheck("callbackOnCombatAttack", weapon, ammo)
+		if ret then stats = ret
+		else stats = self:getDex(100, true) - 10 end
 	end
 	local d = self:combatAttackBase(weapon, ammo) + stats
 	if self:attr("dazed") then d = d / 2 end
@@ -1433,20 +1437,24 @@ function _M:rescaleDamage(dam)
 end
 
 --Diminishing-returns method of scaling combat stats, observing this rule: the first twenty ranks cost 1 point each, the second twenty cost two each, and so on. This is much, much better for players than some logarithmic mess, since they always know exactly what's going on, and there are nice breakpoints to strive for.
-function _M:rescaleCombatStats(raw_combat_stat_value, interval)
+-- raw_combat_stat_value = the value being rescaled
+-- interval = ranks until cost of each effective stat value increases (default 20)
+-- step = increase in cost of raw_combat_stat_value to give 1 effective stat value each interval (default 1)
+function _M:rescaleCombatStats(raw_combat_stat_value, interval, step)
 	local x = raw_combat_stat_value
 	-- the rescaling plot is a convex hull of functions x, 20 + (x - 20) / 2, 40 + (x - 60) / 3, ...
 	-- we find the value just by applying minimum over and over
 	local result = x
 	interval = interval or 20
-	local shift, tier, base = 2, interval, interval
+	step = step or 1
+	local shift, tier, base = 1 + step, interval, interval
 	while true do
 		local nextresult = tier + (x - base) / shift
 		if nextresult < result then
 			result = nextresult
 			base = base + interval * shift
 			tier = tier + interval
-			shift = shift + 1
+			shift = shift + step
 		else
 			return math.floor(result)
 		end
@@ -1662,17 +1670,20 @@ function _M:combatDamage(weapon, adddammod, damage)
 			totstat = totstat + self:getStat(stat) * mod
 		end
 	end
-	if self:knowTalent(self["T_FORM_AND_FUNCTION"]) then totstat = totstat + self:callTalent(self["T_FORM_AND_FUNCTION"], "getDamBoost", weapon) end
+	
 	local talented_mod = 1 + self:combatTrainingPercentInc(weapon)
-	local power = self:combatDamagePower(damage or weapon, totstat)
-	local phys = self:combatPhysicalpower(nil, weapon, totstat)
-	return 0.3 * phys * power * talented_mod
+	local power = self:combatDamagePower(damage or weapon)
+	local phys = self:combatPhysicalpower(nil, weapon)
+	local statmod = self:rescaleCombatStats(totstat, 45, 1/3) -- totstat tends to be lower than values of powers and saves so default interval and step size is too harsh; instead use wider intervals and 1/3 step size
+	return self:rescaleDamage(0.3 * (phys + statmod) * power * talented_mod)
 end
 
 --- Gets the 'power' portion of the damage
 function _M:combatDamagePower(weapon_combat, add)
 	if not weapon_combat then return 1 end
 	local power = math.max((weapon_combat.dam or 1) + (add or 0), 1)
+
+	if self:knowTalent(self["T_FORM_AND_FUNCTION"]) then power = power + self:callTalent(self["T_FORM_AND_FUNCTION"], "getDamBoost", weapon) end
 
 	return (math.sqrt(power / 10) - 1) * 0.5 + 1
 end
@@ -2125,8 +2136,8 @@ end
 
 --- Computes physical resistance
 --- Fake denotes a check not actually being made, used by character sheets etc.
-function _M:combatPhysicalResist(fake)
-	local add = 0
+function _M:combatPhysicalResist(fake, add)
+	add = add or 0
 	if not fake then
 		add = add + (self:checkOnDefenseCall("physical") or 0)
 	end
@@ -2155,8 +2166,8 @@ end
 
 --- Computes spell resistance
 --- Fake denotes a check not actually being made, used by character sheets etc.
-function _M:combatSpellResist(fake)
-	local add = 0
+function _M:combatSpellResist(fake, add)
+	add = add or 0
 	if not fake then
 		add = add + (self:checkOnDefenseCall("spell") or 0)
 	end
@@ -2183,8 +2194,8 @@ end
 
 --- Computes mental resistance
 --- Fake denotes a check not actually being made, used by character sheets etc.
-function _M:combatMentalResist(fake)
-	local add = 0
+function _M:combatMentalResist(fake, add)
+	add = add or 0
 	if not fake then
 		add = add + (self:checkOnDefenseCall("mental") or 0)
 	end
@@ -2241,7 +2252,7 @@ end
 function _M:combatGetResistPen(type, straight)
 	if not self.resists_pen then return 0 end
 	local pen = (self.resists_pen.all or 0) + (self.resists_pen[type] or 0)
-	if straight then return pen end
+	if straight then return math.min(pen, 70) end
 	local add = 0
 
 	if self.auto_highest_resists_pen and self.auto_highest_resists_pen[type] then
@@ -2260,7 +2271,7 @@ function _M:combatGetResistPen(type, straight)
 		add = add + t.getPenetration(self, t)
 	end
 
-	return pen + add
+	return math.min(pen + add, 70)
 end
 
 --- Returns the damage affinity
@@ -2281,7 +2292,7 @@ function _M:combatGetDamageIncrease(type, straight)
 	local inc = a + b
 	if straight then return inc end
 
-	if self.auto_highest_inc_damage and self.auto_highest_inc_damage[type] then
+	if self.auto_highest_inc_damage and self.auto_highest_inc_damage[type] and self.auto_highest_inc_damage[type] > 0 then
 		local highest = self.inc_damage.all or 0
 		for kind, v in pairs(self.inc_damage) do
 			if kind ~= "all" then
@@ -2395,6 +2406,19 @@ function _M:hasWeaponType(type)
 
 	if not self:getInven("MAINHAND") then return end
 	local weapon = self:getInven("MAINHAND")[1]
+	if not weapon then return nil end
+	if type and weapon.combat.talented ~= type then return nil end
+	return weapon
+end
+
+--- Check if the actor has a weapon offhand
+function _M:hasOffWeaponType(type)
+	if self:attr("disarmed") then
+		return nil, "disarmed"
+	end
+
+	if not self:getInven("OFFHAND") then return end
+	local weapon = self:getInven("OFFHAND")[1]
 	if not weapon then return nil end
 	if type and weapon.combat.talented ~= type then return nil end
 	return weapon

@@ -24,7 +24,7 @@ newTalent{
 	points = 5,
 	mode = "passive",
 	getLife = function(self, t) return self:combatTalentStatDamage(t, "wil", 10, 600) end,
-	getRegen = function(self, t) return self:combatTalentStatDamage(t, "wil", 1, 30) end,
+	getRegen = function(self, t) return self:combatTalentStatDamage(t, "wil", 1, 20) end,
 	passives = function(self, t, tmptable)
 		self:talentTemporaryValue(tmptable, "max_life", t.getLife(self, t))
 		self:talentTemporaryValue(tmptable, "life_regen", t.getRegen(self, t))
@@ -75,7 +75,7 @@ newTalent{
 		local heal = (self.life + value) < self.max_life and value or self.max_life - self.life
 		if heal > 0 then
 			local amt = (heal / 100) * (t.getTurn(self, t) * game.energy_to_act)
-			self.energy.value = game.energy_to_act + amt
+			self.energy.value = self.energy.value + amt
 			self.energy.value = math.min(self.energy.value, game.energy_to_act * 2)
 			self.ancestral_healing_display_amt = self.ancestral_healing_display_amt or 0
 			self.ancestral_healing_display_amt = self.ancestral_healing_display_amt + amt
@@ -99,7 +99,7 @@ newTalent{
 		local eq = t.getEq(self, t)
 		local turn = t.getTurn(self, t)
 		return ([[Your fungus reaches into the primordial ages of the world, granting you ancient instincts.
-		Each time you receive a direct heal you gain %d%% of a turn per 100 life healed.  This effect can't add energy past 2 stored turns.
+		Each time you receive non-regeneration healing you gain %d%% of a turn per 100 life healed.  This effect can't add energy past 2 stored turns and overhealing is not counted.
 		Also, regeneration effects on you will decrease your equilibrium by %0.1f each turn.
 		The turn gain increases with your Mindpower.]]):
 		format(turn * 100, eq)
@@ -114,11 +114,13 @@ newTalent{
 	equilibrium = 22,
 	cooldown = 15,
 	tactical = { HEAL = function(self, t, target) return self.life_regen > 0 and math.log(self.life_regen + 1)/2 or nil end },
-	getMult = function(self, t) return util.bound(3 + self:getTalentLevel(t), 3, 12) end,
+	getMult = function(self, t) return self:combatTalentScale(t, 2, 5) end,
 	action = function(self, t)
 		local amt = self:mindCrit(self.life_regen * t.getMult(self, t))
 
+		self:attr("allow_on_heal", 1)
 		self:heal(amt, t)
+		self:attr("allow_on_heal", -1)
 
 		game:playSoundNear(self, "talents/heal")
 		return true
@@ -126,6 +128,6 @@ newTalent{
 	info = function(self, t)
 		local mult = t.getMult(self, t)
 		return ([[A wave of energy passes through your fungus, making it release immediate healing energies on you, healing you for %d%% of your current life regeneration rate (#GREEN#%d#LAST#).]]):
-		format(mult * 100,  self.life_regen * mult)
+		format(mult * 100, self.life_regen * mult)
 	end,
 }

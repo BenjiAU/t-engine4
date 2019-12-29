@@ -104,13 +104,14 @@ newEntity{
 		local tts = {}
 		local p = game:getPlayer(true)
 		for i, def in ipairs(engine.interface.ActorTalents.talents_types_def) do
-            if p and def.allow_random and p:knowTalentType(def.type) or p:knowTalentType(def.type) == false then 
-                if not (e.power_source.antimagic and def.is_spell) or (e.power_source.arcane and def.is_antimagic) then
-                    tts[#tts+1] = def.type
-                end
-            end
-        end
-		local tt = tts[rng.range(1, #tts)]
+			if p and def.allow_random and p:knowTalentType(def.type) or p:knowTalentType(def.type) == false then 
+				if not (e.power_source.antimagic and def.is_spell) or (e.power_source.arcane and def.is_antimagic) then
+					tts[#tts+1] = def.type
+				end
+			end
+		end
+		local tt = rng.table(tts)
+		if not tt then tt = "technique/combat-training" end
 
 		e.wielder.talents_types_mastery = {}
 		local v = (10 + rng.mbonus(math.ceil(30 * e.material_level / 5), resolvers.current_level, 50)) / 100

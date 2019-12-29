@@ -66,9 +66,8 @@ newTalent{
 		local p = self:isTalentActive(self.T_GLYPHS)
 		if not p then return end
 		if p.glyphs_last_turn and ((game.turn - p.glyphs_last_turn) / 10) < t.getGlyphCD(self, t) then return end
-		p.glyphs_last_turn = game.turn
--- find a target
 
+		-- Find a target
 		-- Invalidate any target with a glyph adjacent
 		local valid_for_glyph = function(target)
 			local grids = core.fov.circle_grids(target.x, target.y, 1, true)
@@ -97,6 +96,9 @@ newTalent{
 			target = rng.tableRemove(tgts)
 		end
 
+		-- Set cooldown after we think a glyph can be placed
+		p.glyphs_last_turn = game.turn
+
 --target glyphs
 		local tg = self:getTalentTarget(t)
 		local glyphgrids = {}
@@ -120,7 +122,7 @@ newTalent{
 local function makeSunGlyph()
 	local sun_glyph = Trap.new{
 		name = "glyph of sunlight",
-		is_glyph = true,
+		is_glyph = "sunlight",
 		type = "elemental", id_by_type=true, unided_name = "trap",
 		display = '^', color=colors.GOLD, image = "trap/trap_glyph_explosion_02_64.png",
 		disarmable = false,
@@ -180,7 +182,7 @@ end
 local function makeMoonGlyph()
 	local star_glyph = Trap.new{
 		name = "glyph of moonlight",
-		is_glyph = true,
+		is_glyph = "moonlight",
 		type = "elemental", id_by_type=true, unided_name = "trap",
 		display = '^', color=colors.GOLD, image = "trap/trap_glyph_fatigue_01_64.png",
 		disarmable = false,
@@ -242,6 +244,7 @@ end
 local function makeTwilightGlyph()
 	local twi_glyph = Trap.new{
 		name = "glyph of twilight",
+		is_glyph = "twilight",
 		type = "elemental", id_by_type=true, unided_name = "trap",
 		display = '^', color=colors.GOLD, image = "trap/trap_glyph_repulsion_01_64.png",
 		disarmable = false,
@@ -371,14 +374,14 @@ newTalent{
 	info = function(self, t)
 		local dam = t.getTriggerDam(self, t)
 		return ([[Your glyphs are imbued with celestial fury; they last %d turns longer and when triggered they will deal damage.
-		Glyph of Sunlight: Deals %0.2f light damage.
-		Glyph of Moonlight: Deals %0.2f darkness damage.
-		Glyph of Twilight: Deals %0.2f light and %0.2f darkness damage.]]):format(t.getPersistentDuration(self, t), damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.DARKNESS, dam), damDesc(self, DamageType.LIGHT, dam/2), damDesc(self, DamageType.DARKNESS, dam/2))
+		#ffd700#Glyph of Sunlight#LAST#:  Deals %0.2f light damage.
+		#7f7f7f#Glyph of Moonlight#LAST#:  Deals %0.2f darkness damage.
+		#9D9DC9#Glyph of Twilight#LAST#:  Deals %0.2f light and %0.2f darkness damage.]]):format(t.getPersistentDuration(self, t), damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.DARKNESS, dam), damDesc(self, DamageType.LIGHT, dam/2), damDesc(self, DamageType.DARKNESS, dam/2))
 	end,
 }
 
 newTalent{
-	name = "Divine Glyphs",
+	name = "Empowered Glyphs", short_name = "DIVINE_GLYPHS",
 	type = {"celestial/glyphs", 3},
 	require = divi_req_high3,
 	random_ego = "attack",
@@ -392,66 +395,63 @@ newTalent{
 }
 
 newTalent{
-	name = "Twilight Glyph",
+	short_name = "TWILIGHT_GLYPH", -- for minor release save compatibility
+	name = "Destabilize Glyphs",
 	type = {"celestial/glyphs",4},
 	require = divi_req_high4,
 	points = 5,
 	random_ego = "attack",
-	cooldown = function(self, t) return 6 + (self.consecutive_twilights or 0) * 2 end,
-	negative = 7,
-	positive = 7,
+	cooldown = function(self, t) return 20 end,
+	negative = 10,
+	positive = 10,
 	tactical = { ATTACKAREA = {LIGHT = 1, DARKNESS = 1} },
-	range = 7,
+	range = 10,
+	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 0, 5)) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 0, 70) end,
 	on_pre_use = function(self, t, silent)
-		return self:isTalentActive(self.T_GLYPHS)
-	end,
-	direct_hit = true,
-	getDamage =  function(self, t) return self:combatTalentSpellDamage(t, 10, 170) end,
-	getConsecutiveTurns = function(self, t) return self:combatTalentLimit(t, 15, 4, 10) end,
-	action = function(self, t)
-		local tg = {type="hit", range=self:getTalentRange(t), talent=t}
-		local x, y = self:getTarget(tg)
-		if not x or not y then return nil end
-		--alternate between damage types
-		self.twilightdam = self.twilightdam or false
-		if self.twilightdam == false then
-			self:project(tg, x, y, DamageType.LIGHT, self:spellCrit(t.getDamage(self, t)))
-			self.twilightdam = true
-
-			game.level.map:particleEmitter(x, y, 1, "circle", {base_rot=0, oversize=0.8, a=130, limit_life=5, appear=5, speed=0, img="healcelestial", radius=0})
-
-		else
-			self:project(tg, x, y, DamageType.DARKNESS, self:spellCrit(t.getDamage(self, t)))
-			self.twilightdam = false
-
-			game.level.map:particleEmitter(x, y, 1, "circle", {base_rot=0, oversize=0.8, a=130, limit_life=5, appear=5, speed=0, img="healdark", radius=0})
-
-		end
-		--count casts and cd at limit
-		self.consecutive_twilights = (self.consecutive_twilights or 0) + 1
-		if self.consecutive_twilights < t.getConsecutiveTurns(self, t) then
-			self.twilightproc = 1
-		else
-			self:startTalentCooldown(t)
-			self.consecutive_twilights = 0
-		end
-		return true, {ignore_cd=true}
-	end,
-	--cd if not used consecutively
-	callbackOnAct = function(self, t)
-		self.consecutive_twilights = self.consecutive_twilights or 0
-		self.twilightproc = self.twilightproc or 0
-		if self.consecutive_twilights > 0 then
-			if self.twilightproc == 0 then
-				self:startTalentCooldown(t)
-				self.consecutive_twilights = 0
+		if not game.level then return end
+		for _, e in pairs(game.level.entities) do
+			local trap = e.is_glyph and e.summoner and e.summoner == self and e
+			if trap then
+				local a = e.x and e.y and game.level.map(e.x, e.y, engine.Map.ACTOR)
+				if a and core.fov.distance(self.x, self.y, e.x, e.y) <= 10 and self:reactionToward(a) < 0 then return true end
 			end
 		end
-		self.twilightproc = 0
+		return false
+	end,
+	action = function(self, t)
+		local dam = self:spellCrit(t.getDamage(self, t))
+		local dur = t.getDuration(self, t)
+		-- Search for applicable glyphs
+		for _, e in pairs(game.level.entities) do
+			local trap = e.is_glyph and e.summoner and e.summoner == self and e
+			if trap then
+				local a = e.x and e.y and game.level.map(e.x, e.y, engine.Map.ACTOR)
+				if a and core.fov.distance(self.x, self.y, e.x, e.y) <= 10 and self:reactionToward(a) < 0 then
+					-- Trigger glyph
+					trap:triggered(e.x, e.y, a)
+					game.level.map:remove(e.x, e.y, Map.TRAP)
+					if self:getTalentLevel(t) >= 2 then
+						-- Set map effect
+						if trap.is_glyph == "sunlight" then
+							game.level.map:addEffect(self, e.x, e.y, dur, DamageType.LIGHT, dam, 0, 5, nil, {type="light_zone"}, nil, false, false)
+						elseif trap.is_glyph == "moonlight" then
+							game.level.map:addEffect(self, e.x, e.y, dur, DamageType.DARKNESS, dam, 0, 5, nil, {type="shadow_zone"}, nil, false, false)
+						else
+							game.level.map:addEffect(self, e.x, e.y, dur, DamageType.DARKLIGHT, dam, 0, 5, nil, {type="light_dark_zone"}, nil, false, false)
+						end
+					end
+				end
+			end
+		end
+		return true
 	end,
 	info = function(self, t)
 		local dam = t.getDamage(self, t)
-		return ([[Bind the twilight into a transient glyph that will instantly deal damage alternating between %d light and %d darkness before dissipating.
-		This spell can be used for %d consecutive turns without going on cooldown, however each consecutive cast will increase the cooldown by 2. When the cast limit is reached or a turn is spent not casting this spell, it will go on cooldown.]]):format(damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.DARKNESS, dam), t.getConsecutiveTurns(self, t))
+		return ([[Destabilize your glyphs, triggering every glyph in radius 10 with an enemy standing on it.
+		At talent level 2 glyphs triggered this way will leave a residue of themselves on the ground, dealing damage each turn for %d turns.
+		#ffd700#Sunlight#LAST#:  %0.2f light damage.
+		#7f7f7f#Moonlight#LAST#:  %0.2f darkness damage.
+		#9D9DC9#Twilight#LAST#:  %0.2f light and %0.2f darkness damage]]):format(t.getDuration(self, t), damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.DARKNESS, dam), damDesc(self, DamageType.LIGHT, dam/2), damDesc(self, DamageType.DARKNESS, dam/2))
 	end,
 }

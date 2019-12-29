@@ -213,56 +213,6 @@ tuneParadox = function(self, t, value)
 	end
 end
 
---- Warden weapon functions
--- Checks for weapons in main and quickslot
-doWardenPreUse = function(self, weapon, silent)
-	if weapon == "bow" then
-		local bow, ammo, oh, pf_bow= self:hasArcheryWeapon("bow")
-		if not bow and not pf_bow then
-			bow, ammo, oh, pf_bow= self:hasArcheryWeapon("bow", true)
-		end
-		return bow or pf_bow, ammo
-	end
-	if weapon == "dual" then
-		local mh, oh = self:hasDualWeapon()
-		if not mh then
-			mh, oh = self:hasDualWeaponQS()
-		end
-		return mh, oh
-	end
-end
-
--- Swaps weapons if needed
-doWardenWeaponSwap = function(self, t, type, silent)
-	local swap = false
-	local mainhand, offhand, ammo, pf_weapon
-	
-	if type == "blade" then
-		mainhand, offhand = self:hasDualWeapon()
-		if not mainhand and self:hasDualWeapon(nil, nil, true) then  -- weird but this is lets ogers offhanding daggers still swap
-		
-			swap = true
-		end
-	end
-	if type == "bow" then
-		mainhand, offhand, ammo, pf_weapon = self:hasArcheryWeapon("bow")
-		if not mainhand and not pf_weapon then
-			mainhand, offhand, ammo, pf_weapon = self:hasArcheryWeapon("bow", true)
-			if mainhand or pf_weapon then swap = true end
-		end
-	end
-	
-	if swap == true then
-		local old_inv_access = self.no_inventory_access -- Make sure clones can swap
-		self.no_inventory_access = nil
-		self:attr("no_sound", 1)
-		self:quickSwitchWeapons(true, "warden", silent)
-		self:attr("no_sound", -1)
-		self.no_inventory_access = old_inv_access
-	end
-	return swap
-end
-
 -- Target helper function for focus fire
 checkWardenFocus = function(self)
 	local target

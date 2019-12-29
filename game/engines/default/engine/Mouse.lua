@@ -46,6 +46,18 @@ function _M:allowDownEvent(v)
 	self.allow_down = v
 end
 
+--- Check if we are disabled
+function _M:isEnabled()
+	if not self.disable_until then return true end
+	if core.game.getTime() < self.disable_until then 
+		if game.log then game.log("#LIGHT_RED#Mouse input temporarily disabled.") end
+		return false
+	else
+		self.disable_until = nil
+		return true
+	end
+end
+
 --- Called when a mouse is pressed
 -- @param button
 -- @param x coordinate of the click
@@ -56,6 +68,7 @@ end
 function _M:receiveMouse(button, x, y, isup, force_name, extra)
 	self.last_pos = { x = x, y = y }
 	self.status[button] = not isup
+	if not self:isEnabled() then return end
 	if not self.allow_down and not isup then return end
 
 	if _M.drag and button ~= "drag-start-global" then

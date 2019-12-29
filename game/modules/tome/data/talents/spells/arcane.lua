@@ -144,25 +144,27 @@ newTalent{
 	use_only_arcane = 1,
 	no_energy = true,
 	tactical = { MANA = 3, DEFEND = 2, },
-	getManaRatio = function(self, t) return math.max(3 - self:combatTalentSpellDamage(t, 10, 200) / 100, 0.5) * (100 - util.bound(self:attr("shield_factor") or 0, 0, 70)) / 100 end,
-	getArcaneResist = function(self, t) return 50 + self:combatTalentSpellDamage(t, 10, 500) / 10 end,
+	radius = 5,
+	getMaxAbsorb = function(self, t) return self:combatTalentSpellDamage(t, 50, 450) * (100 + (self:attr("shield_factor") or 0)) / 100 end,
+	getManaRatio = function(self, t) return self:combatTalentLimit(t, 0.2, 1.1, 0.4) end,
 	-- Note: effects handled in mod.class.Actor:onTakeHit function
+	getMaxDamageLimit = function(self, t) return self:combatTalentLimit(t, 1200, 400, 1000) end,
 	getMaxDamage = function(self, t) -- Compute damage limit
 		local max_dam = self.max_mana
 		for i, k in pairs(self.sustain_talents) do -- Add up sustain costs to get total mana pool size
 			max_dam = max_dam + (tonumber(self.talents_def[i].sustain_mana) or 0)
 		end
+		max_dam = math.min(max_dam, t.getMaxDamageLimit(self, t))
 		return max_dam * 2 -- Maximum damage is 2x total mana pool
 	end,
-	on_pre_use = function(self, t) return (self:getMana() / self:getMaxMana() >= 0.25) or self:hasEffect(self.EFF_AETHER_AVATAR) or self:attr("disruption_shield") end,
 	explode = function(self, t, dam)
 		game.logSeen(self, "#VIOLET#%s's disruption shield collapses and then explodes in a powerful manastorm!", self.name:capitalize())
 		dam = math.min(dam, t.getMaxDamage(self, t)) -- Damage cap
 		-- Add a lasting map effect
-		local radius = self:hasEffect(self.EFF_AETHER_AVATAR) and 10 or 3
+		local radius = self:getTalentRadius(t)
 		game.level.map:addEffect(self,
-			self.x, self.y, 10,
-			DamageType.ARCANE, self:spellCrit(dam / 10),
+			self.x, self.y, 5,
+			DamageType.ARCANE, self:spellCrit(dam / 5),
 			radius,
 			5, nil,
 			{type="arcanestorm", only_one=true},
@@ -179,49 +181,102 @@ newTalent{
 		end
 	end,
 	iconOverlay = function(self, t, p)
-		local val = self.disruption_shield_absorb or 0
+		local val = self.disruption_shield_storage or 0
 		if val <= 0 then return "" end
 		local fnt = "buff_font_small"
 		if val >= 1000 then fnt = "buff_font_smaller" end
 		return tostring(math.ceil(val)), fnt
 	end,
-	callbackOnCombat = function(self, t, state)
-		if state == false then
-			self.disruption_shield_absorb = 0
+	callbackOnRest = function(self, t)
+		self.disruption_shield_power = self.disruption_shield_power or 0
+		if self.disruption_shield_power < t.getMaxAbsorb(self, t) then return true end
+	end,
+	callbackOnAct = function(self, t, state)
+		if self.in_combat then return end
+		self.disruption_shield_power = self.disruption_shield_power or 0
+		self.disruption_shield_storage = self.disruption_shield_storage or 0
+		self.disruption_shield_storage = self.disruption_shield_storage / 3
+		if self.disruption_shield_storage < 100 then self.disruption_shield_storage = 0 end
+		local max = t.getMaxAbsorb(self, t)
+		self.disruption_shield_power = math.min(self.disruption_shield_power + max / 10, max)
+	end,
+	doLostMana = function(self, t, mana)
+		if (self:getMana() - mana) / self:getMaxMana() < 0.5 then
+			self:forceUseTalent(self.T_DISRUPTION_SHIELD, {ignore_energy=true})
 		end
 	end,
 	callbackOnHit = function(self, t, cb, src, dt)
 		local p = self:isTalentActive(t.id)
 		if not p then return end
-		if not (cb.value > 0) then return end
-		if self:reactionToward(src) > 0 then return end
+		if cb.value <= 0 then return end
+		if self:getMana() / self:getMaxMana() < 0.5 then
+			self:forceUseTalent(self.T_DISRUPTION_SHIELD, {ignore_energy=true})
+			return
+		end
+		-- if self:reactionToward(src) > 0 then return end
+		self.disruption_shield_power = self.disruption_shield_power or 0
+		self.disruption_shield_storage = self.disruption_shield_storage or 0
 
-		local power = t.getManaRatio(self, t)
-		local max = self:getMana() / power
-		local amt = math.min(cb.value * 0.25, max)
-		local mana = power * amt
-		cb.value = cb.value - amt
-		self.disruption_shield_absorb = (self.disruption_shield_absorb or 0) + amt
-		self:incMana(-mana)
+		if cb.value <= self.disruption_shield_power then
+			game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):format(cb.value), false)
+			self.disruption_shield_power = self.disruption_shield_power - cb.value
+			cb.value = 0
+			return true
+		else
+			game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):format(cb.value), false)
+			self.disruption_shield_power = 0
+			cb.value = cb.value - self.disruption_shield_power
+		end
 
-		if self:getMana() / self:getMaxMana() <= 0.1 then 
-			local dam = self.disruption_shield_absorb
+		local do_explode = false
+		local ratio = t.getManaRatio(self, t)
+		local mana_usage = cb.value * ratio
+		local store = cb.value
 
+		if (self:getMana() - mana_usage) / self:getMaxMana() < 0.5 then
+			do_explode = true
+			local mana_limit = self:getMaxMana() * 0.3
+			mana_usage = self:getMana() - mana_limit
+			cb.value = cb.value - mana_usage / ratio
+			store = mana_usage / ratio
+		else
+			cb.value = 0
+		end
+		self:incMana(-mana_usage)
+		self.disruption_shield_storage = math.min(self.disruption_shield_storage + store, t.getMaxDamage(self, t))
+
+		game:delayedLogDamage(src, self, 0, ("#PURPLE#(%d mana)#LAST#"):format(store), false)
+
+		if do_explode then	
 			-- Deactivate without losing energy
 			self:forceUseTalent(self.T_DISRUPTION_SHIELD, {ignore_energy=true})
 		end
-		game:delayedLogDamage(src, self, 0, ("#PURPLE#(%d mana)#LAST#"):format(amt), false)
 		return true
 	end,
+	doAegis = function(self, t, val)
+		local energy = self.disruption_shield_storage or 0
+		local max = t.getMaxAbsorb(self, t)
+		local eneed = (max - self.disruption_shield_power) * 2
+
+		if eneed < energy then
+			self.disruption_shield_power = max
+			self:incMana((energy - eneed) * val / 100)
+			game.logSeen(self, "%s restores Disruption Shield (+%d) and gains %d mana with Aegis!", self.name, eneed/2, (energy - eneed) * val / 100)
+		else
+			self.disruption_shield_power = self.disruption_shield_power + energy / 2
+			game.logSeen(self, "%s restores Disruption Shield (+%d) with Aegis!", self.name, energy / 2)
+		end
+		self.disruption_shield_storage = 0
+	end,
 	activate = function(self, t)
-		local power = t.getManaRatio(self, t)
-		self.disruption_shield_absorb = 0
+		self.disruption_shield_storage = 0
+		self.disruption_shield_power = t.getMaxAbsorb(self, t)
 		game:playSoundNear(self, "talents/arcane")
 
 		local particle
 		if core.shader.active(4) then
 --			particle = self:addParticles(Particles.new("shader_shield", 1, {size_factor=1.3, img="shield6"}, {type="shield", ellipsoidalFactor=1.05, shieldIntensity=0.1, time_factor=-2500, color={0.8, 0.1, 1.0}, impact_color = {0, 1, 0}, impact_time=800}))
-			particle = self:addParticles(Particles.new("shader_shield", 1, {size_factor=1.4, img="runicshield"}, {type="runicshield", shieldIntensity=0.14, ellipsoidalFactor=1, scrollingSpeed=-1, time_factor=12000, bubbleColor={0.8, 0.1, 1.0, 1.0}, auraColor={0.85, 0.3, 1.0, 1}}))
+			particle = self:addParticles(Particles.new("shader_shield", 1, {size_factor=1.4, img="runicshield"}, {type="runicshield", shieldIntensity=0.1, ellipsoidalFactor=1, scrollingSpeed=-1, time_factor=12000, bubbleColor={0.8, 0.1, 1.0, 0.8}, auraColor={0.85, 0.3, 1.0, 0.8}}))
 		else
 			particle = self:addParticles(Particles.new("disruption_shield", 1))
 		end
@@ -234,22 +289,23 @@ newTalent{
 		self:removeParticles(p.particle)
 		if self:attr("save_cleanup") then return true end
 
-		local dam = self.disruption_shield_absorb
-
 		-- Explode!
-		local t = self:getTalentFromId(self.T_DISRUPTION_SHIELD)
-		t.explode(self, t, dam)
-		self.disruption_shield_absorb = nil
-		self:incMana(100)
+		if self.disruption_shield_storage and self.disruption_shield_storage > 0 then t.explode(self, t, self.disruption_shield_storage) end
+		self.disruption_shield_storage = nil
+		self.disruption_shield_power = nil
 		return true
 	end,
 	info = function(self, t)
-		local radius = self:hasEffect(self.EFF_AETHER_AVATAR) and 10 or 3
-		return ([[Surround yourself with arcane forces, disrupting any attempts to harm you and instead redirecting it to your mana.
-		25%% of all damage taken is redirected to your mana at a ratio of %0.2f mana per damage.  Damage shield bonuses will reduce this cost.
-		On deactivation you will gain 100 mana and release a deadly arcane storm around you with radius %d for 10 turns, dealing 10%% of the damage absorbed each turn, up to a maximum of %d total damage.
-		Dropping below 10%% mana will automatically deactivate this talent.
-		The mana to damage ratio improves with your Spellpower.]]):
-		format(t.getManaRatio(self, t), radius, damDesc(self, DamageType.ARCANE, t.getMaxDamage(self, t)))
+		return ([[Surround yourself with arcane forces, disrupting any attempts to harm you by creating a shield of pure aether which can absorb %d damage.
+		In combat, the mental focus required to maintain and monitor the shield is too much and you let it run on its own. In this state once the shield power is depleted it will start using your mana to absorb hits, at a ratio of %0.2f mana per damage.
+		Whenever mana is used by the shield it stores a remnant of this energy (up to %d max). When the shield is deactivated any stored energy is released in a radius %d arcane storm that lasts 5 turns, dealing 20%% of the total stored damage each turn.
+		Outside of combat the shield regenerates 10%% of its power each turn and stored energy quickly dissipates.
+		Dropping below 50%% mana or reaching max energy storage will automatically deactivate this talent.
+		The shield power improves with your Spellpower.
+		The maximum energy storage is based on your total mana (ignoring sustained spells), with a limit at %d effective mana.
+
+		Current shield power: %d
+		Current stored energy: %d]]):
+		format(t.getMaxAbsorb(self, t), t.getManaRatio(self, t), t.getMaxDamage(self, t), self:getTalentRadius(t), t.getMaxDamageLimit(self, t), self.disruption_shield_power or 0, self.disruption_shield_storage or 0)
 	end,
 }

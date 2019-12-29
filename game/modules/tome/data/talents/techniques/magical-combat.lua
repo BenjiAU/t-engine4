@@ -155,7 +155,7 @@ newTalent{
 		return ([[Allows you to use melee weapons to focus your spells, granting a %d%% chance per melee attack to cast an offensive spell as a free action on the target.
 		Delivering the spell this way will not trigger a spell cooldown.
 		You may select an allowed spell to trigger this way, or choose to have one randomly selected for each attack.
-		While dual wielding or using a shield, the chance is reduced to 50%% for both weapons.
+		While dual wielding or using a shield the chance is halved.
 		The chance increases with your Cunning.
 
 		Allowed spells: %s %s]]):

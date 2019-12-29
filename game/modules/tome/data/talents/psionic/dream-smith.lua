@@ -190,8 +190,8 @@ newTalent{
 	psi = 10,
 	requires_target = true,
 	tactical = { ATTACK = { [hammer_tactical] = 1 }, DISABLE = { stun = 2 } },
-	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1, 1.5) end,
-	getMasteryDamage = function(self, t) return self:getTalentLevel(t) * 10 end,
+	getWeaponDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1, 1.5) end,
+	getDamage = function(self, t) return 30 end,
 	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 2 end,
 	getStun = function(self, t) return math.floor(self:combatTalentScale(t, 3, 7)) end,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
@@ -200,7 +200,7 @@ newTalent{
 		local tg = self:getTalentTarget(t)
 		local x, y, target = self:getTarget(tg)
 		if not target or not self:canProject(tg, x, y) then return nil end
-		local speed, hit = self:attackTargetWith(target, useDreamHammer(self), nil, t.getDamage(self, t))
+		local speed, hit = self:attackTargetWith(target, useDreamHammer(self), nil, t.getWeaponDamage(self, t))
 		game.level.map:particleEmitter(target.x, target.y, 1, "dreamhammer", {tile="shockbolt/object/dream_hammer", tx=target.x, ty=target.y, sx=self.x, sy=self.y})
 
 		-- Try to stun !
@@ -220,8 +220,8 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		local damage = t.getDamage(self, t)
-		local power = t.getMasteryDamage(self, t)
+		local damage = t.getWeaponDamage(self, t)
+		local power = t.getDamage(self, t)
 		local percent = t.getPercentInc(self, t)
 		local stun = t.getStun(self, t)
 		return ([[Crush your enemy with your Dream Hammer, inflicting %d%% weapon damage.  If the attack hits, the target is stunned for %d turns.

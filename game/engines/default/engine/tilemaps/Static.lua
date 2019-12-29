@@ -27,7 +27,8 @@ module(..., package.seeall, class.inherit(Tilemap))
 function _M:init(file)
 	Tilemap.init(self)
 
-	self.data = self:tmxLoad(file)
+	if file:find("%.tmx$") then self.data = self:tmxLoad(file)
+	else self.data = self:mapLoad(file) end
 	self.data_h = #self.data
 	self.data_w = self.data[1] and #self.data[1] or 0
 	self.data_size = self:point(self.data_w, self.data_h)

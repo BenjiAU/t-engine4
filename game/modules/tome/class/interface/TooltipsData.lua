@@ -478,10 +478,12 @@ TOOLTIP_RESISTS_PEN_ALL = [[#GOLD#Damage penetration: all#LAST#
 Reduces the amount of effective resistance of your foes to any damage you deal by this percent.
 If you have 50% penetration against a creature with 50% resistance it will have an effective resistance of 25%.
 This stacks with individual damage type penetrations.
+You can never have more than 70% penetration.
 ]]
 TOOLTIP_RESISTS_PEN = [[#GOLD#Damage penetration: specific#LAST#
 Reduces the effective resistance of your foes to all damage of this type you deal by this percent.
 If you have 50% penetration against a creature with 50% resistance it will have an effective resistance of 25%.
+You can never have more than 70% penetration.
 ]]
 TOOLTIP_FLAT_RESIST = [[#GOLD#Flat resistances#LAST#
 Reduces each hit of a certain damage type (or all) by this amount.

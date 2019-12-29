@@ -188,7 +188,7 @@ newEntity{ define_as = "PALE_DRAKE",
 
 		[Talents.T_PHASE_DOOR]=2,
 
-		[Talents.T_ELEMENTAL_SURGE] = 1,
+		[Talents.T_ADEPT] = 1,
 	},
 	resolvers.sustains_at_birth(),
 
@@ -370,6 +370,7 @@ There is a cunning air to his hollow skull, and his empty sockets reveal nothing
 	size_category = 3,
 	infravision = 10,
 	stats = { str=20, dex=20, cun=10, wil=40 },
+	combat_critical_power = 20,
 
 	body = { INVEN = 10, MAINHAND=1, OFFHAND=1, QUIVER=1  },
 	resolvers.auto_equip_filters{
@@ -400,7 +401,7 @@ There is a cunning air to his hollow skull, and his empty sockets reveal nothing
 
 		[Talents.T_TRAP_MASTERY]={base=1, every=6, max=5},
 		[Talents.T_STEALTH]={base=5, every=6, max=7},
-		[Talents.T_SHADOWSTRIKE]={base=1, every=6, max=7},
+		-- [Talents.T_SHADOWSTRIKE]={base=1, every=6, max=7},
 		[Talents.T_HIDE_IN_PLAIN_SIGHT]={base=1, every=6, max=7},
 
 		[Talents.T_SMOKE_BOMB]={base=2, every=6, max=7},

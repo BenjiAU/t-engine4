@@ -53,7 +53,7 @@ newEntity{ define_as = "ATAMATHON", base = "BASE_NPC_CONSTRUCT",
 	body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1, GEM=4 },
 	resolvers.equip{
 		{type="weapon", subtype="greatmaul", tome_drops="boss", tome_mod="uvault", forbid_power_source={antimagic=true}, autoreq=true },
-		{type="armour", subtype="massive", tome_drops="boss", tome_mod="uvault", forbid_power_source={antimagic=true}, autoreq=true },
+		{type="armor", subtype="massive", tome_drops="boss", tome_mod="uvault", forbid_power_source={antimagic=true}, autoreq=true },
 	},
 	combat_armor = 70,
 	combat_def = 50,
@@ -95,6 +95,9 @@ newEntity{ define_as = "ATAMATHON", base = "BASE_NPC_CONSTRUCT",
 
 	autolevel = "warriormage",
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
+
+	auto_classes={{class="Berserker", start_level=70}},
+	resolvers.auto_equip_filters("Berserker"),
 
 	on_die = function()
 		world:gainAchievement("ATAMATHON", game.player)

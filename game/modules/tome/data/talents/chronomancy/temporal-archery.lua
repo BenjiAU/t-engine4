@@ -17,8 +17,6 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-local archerPreUse = Talents.archerPreUse
-
 newTalent{
 	name = "Phase Shot",
 	type = {"chronomancy/temporal-archery", 1},

@@ -107,6 +107,7 @@ newEntity{ base = "BASE_NPC_SPIDER",
 	life_rating = 13,
 
 	combat_armor = 7, combat_def = 17,
+	combat_critical_power = 20,
 
 	rank = 2,
 
@@ -117,7 +118,7 @@ newEntity{ base = "BASE_NPC_SPIDER",
 		[Talents.T_SPIDER_WEB]={base=4, every=6, max=7},
 		[Talents.T_LAY_WEB]={base=4, every=6, max=7},
 		[Talents.T_STEALTH]={base=4, every=6, max=7},
-		[Talents.T_SHADOWSTRIKE]={base=4, every=6, max=7},
+		-- [Talents.T_SHADOWSTRIKE]={base=4, every=6, max=7},
 		[Talents.T_STUN]={base=2, every=6, max=5},
 	},
 

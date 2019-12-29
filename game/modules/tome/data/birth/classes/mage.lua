@@ -192,7 +192,7 @@ newBirthDescriptor{
 		["spell/water"]={true, 0.3},
 		["spell/air"]={true, 0.3},
 		["spell/phantasm"]={true, 0.3},
-		["spell/temporal"]={false, 0.3},
+		["spell/temporal"]={true, 0.3},
 		["spell/meta"]={false, 0.3},
 		["spell/divination"]={true, 0.3},
 		["spell/conveyance"]={true, 0.3},

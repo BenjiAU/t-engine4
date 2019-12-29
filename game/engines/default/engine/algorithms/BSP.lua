@@ -37,7 +37,7 @@ function _M:init(w, h, min_w, min_h, max_depth)
 	self.splits = { vert={}, hor={} }
 	self.leafs = {}
 	self.bsp = {x=0, y=0, rx=0, ry=0, w=w, h=h, nodes={}, id=0, depth=0}
-	print("[BSP] ", w, h)
+	-- print("[BSP] ", w, h)
 end
 
 --- Partition
@@ -48,7 +48,7 @@ function _M:partition(store)
 	local split_vert, split_hor = false, false
 	if store.w >= self.min_w * 2 then split_hor = true end
 	if store.h >= self.min_h * 2 then split_vert = true end
-	print("[BSP] "..store.id.." partitioning", store.rx, store.ry, "::", store.w, store.h, " splits ", split_hor, split_vert)
+	-- print("[BSP] "..store.id.." partitioning", store.rx, store.ry, "::", store.w, store.h, " splits ", split_hor, split_vert)
 
 	if split_vert and split_hor then
 		local ok = rng.percent(50)

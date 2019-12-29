@@ -301,8 +301,11 @@ newTalent{
 				local tether = target:hasEffect(target.EFF_BEN_TETHER) or target:hasEffect(target.EFF_DET_TETHER)
 				local trigger = rng.percent(self.chance * core.fov.distance(self.x, self.y, target.x, target.y))
 				
+				if game.level and game.level:hasEntity(target) and tether and not target.dead then
+					self.temporary = tether.dur
+				end
+
 				if game.level and game.level:hasEntity(target) and tether and trigger and not target.dead then
-				
 					-- Primary blast, even if the teleport is resisted or fails this triggers
 
 					local tg = self.tg

@@ -186,17 +186,17 @@ newInscription{
 	tactical = {DEFEND = 2, CURE = 2},
 	action = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		self:setEffect(self.EFF_PRIMAL_ATTUNEMENT, data.dur, {power=data.power + data.inc_stat*10, reduce=data.reduce + data.inc_stat})
+		self:setEffect(self.EFF_PRIMAL_ATTUNEMENT, data.dur, {power=data.power + data.inc_stat*10, reduce=math.floor(data.reduce + data.inc_stat * 2)})
 		return true
 	end,
 	info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		return ([[Activate the infusion to heal for %d%% of all damage taken (calculated before resistances) and reduce the duration of a random debuff by %d each turn for %d turns.]]):
-			format(data.power+data.inc_stat*10, (data.reduce or 0) + data.inc_stat, data.dur)
+			format(data.power+data.inc_stat*10, math.floor((data.reduce or 0) + data.inc_stat * 2), data.dur)
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[affinity %d%%; reduction %d; dur %d; cd %d]]):format(data.power + data.inc_stat*10, (data.reduce or 0) + data.inc_stat, data.dur, data.cooldown )
+		return ([[affinity %d%%; reduction %d; dur %d; cd %d]]):format(data.power + data.inc_stat*10, math.floor((data.reduce or 0) + data.inc_stat * 2), data.dur, data.cooldown )
 	end,
 }
 
@@ -234,13 +234,13 @@ newInscription{
 	action = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		local bonus = 1 + (1 - self.life / self.max_life)
-		self:setEffect(self.EFF_HEROISM, math.floor(data.dur * bonus), {die_at=data.die_at + data.inc_stat * 30 * bonus})
+		self:setEffect(self.EFF_HEROISM, math.floor(data.dur * bonus), {die_at=(data.die_at + data.inc_stat * 30) * bonus})
 		return true
 	end,
 	info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		local bonus = 1 + (1 - self.life / self.max_life)
-		local bonus1 = data.die_at + data.inc_stat * 30 * bonus
+		local bonus1 = (data.die_at + data.inc_stat * 30) * bonus
 		local bonus2 = math.floor(data.dur * bonus)
 		return ([[Activate the infusion to endure even the most grievous of wounds for %d turns.
 		While Heroism is active, you will only die when reaching -%d life.
@@ -493,6 +493,7 @@ newInscription{
 	type = {"inscriptions/runes", 1},
 	points = 1,
 	is_spell = true,
+	use_only_arcane = 1,
 	no_break_stealth = true,
 	tactical = { MANA = 1 },
 	on_pre_use = function(self, t)
@@ -886,7 +887,7 @@ newInscription{
 							orders = {},
 						})
 
-						image:forceUseTalent(image.T_TAUNT, {})
+						image:forceUseTalent(image.T_TAUNT, {ignore_cd=true, no_talent_fail = true})
 					end
 				end
 			end
@@ -894,7 +895,7 @@ newInscription{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Activate the rune to create up to 3 images of yourself that taunt nearby enemies.
+		return ([[Activate the rune to create up to 3 images of yourself that taunt nearby enemies each turn and immediately after being summoned.
 			Only one image can be created per enemy in radius 10 with the first being created near the closest enemy.
 			Images inherit all of your life, resistance, armor, defense, and armor hardiness.]])
 				:format(t.getInheritance(self, t)*100 )
@@ -926,22 +927,37 @@ newInscription{
 		local data = self:getInscriptionData(t.short_name)
 		return data.shield + data.inc_stat
 	end,
+	on_pre_use = function(self, t)
+		if next(self:effectsFilter({type="physical", status="detrimental"}, 1)) then return true end
+		if next(self:effectsFilter({type="magical", status="detrimental"}, 1)) then return true end
+		if next(self:effectsFilter({type="mental", status="detrimental"}, 1)) then return true end
+		if next(self:effectsFilter({subtype={["cross tier"] = true}, status="detrimental"}, 3)) then return true end
+		return false
+	end,
 	action = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		
-		self:removeEffectsFilter({subtype={["cross tier"] = true}, status="detrimental"}, 3)
+		local crosstiers = self:removeEffectsFilter({subtype={["cross tier"] = true}, status="detrimental"}, 3)
 		local cleansed = 0
 		cleansed = cleansed + self:removeEffectsFilter({type="physical", status="detrimental"}, 1)
 		cleansed = cleansed + self:removeEffectsFilter({type="magical", status="detrimental"}, 1)
 		cleansed = cleansed + self:removeEffectsFilter({type="mental", status="detrimental"}, 1)
 
-		if cleansed > 0 then self:setEffect(self.EFF_DAMAGE_SHIELD, 3, {power=(data.shield + data.inc_stat) * cleansed}) else return false end
+		if crosstiers == 0 and cleansed == 0 then return nil end
+
+		if cleansed > 0 then
+			self:setEffect(self.EFF_DAMAGE_SHIELD, 3, {power=(data.shield + data.inc_stat) * cleansed})
+		else
+			game:onTickEnd(function() self:alterTalentCoolingdown(t.id, -math.floor((self.talents_cd[t.id] or 0) * 0.75)) end)
+		end
 
 		return true
 	end,
 	info = function(self, t)
 		return ([[Activate the rune to instantly dissipate the energy of your ailments, cleansing all cross tier effects and 1 physical, mental, and magical effect.
-				You use the dissipated energy to create a shield lasting 3 turns and blocking %d damage per debuff cleansed.]]):format(t.getShield(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100)
+		You use the dissipated energy to create a shield lasting 3 turns and blocking %d damage per debuff cleansed (not counting cross-tier ones).
+		If there were only cross-tier effects to cleanse, no shield is created and the rune goes on a 75%% reduced cooldown.]])
+		:format(t.getShield(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100)
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
@@ -955,11 +971,22 @@ newInscription{
 	type = {"inscriptions/runes", 1},
 	points = 1,
 	is_spell = true,
-	no_npc_use = true, -- Quest reward
 	range = 10,
 	direct_hit = true,
+	target = function(self, t) return {default_target=self, type="hit", nowarning=true, range=self:getTalentRange(t)} end,
+	tactical = {
+		DISABLE = function(self, t, aitarget)
+			local nb = 0
+			for tid, act in pairs(aitarget.sustain_talents) do
+				if act then
+					local talent = aitarget:getTalentFromId(tid)
+					if talent.is_spell then nb = nb + 1 end
+				end
+			end
+			return nb^0.5
+	end},
 	action = function(self, t)
-		local tg = {default_target=self, type="hit", nowarning=true, range=self:getTalentRange(t)}
+		local tg = self:getTalentTarget(t)
 		local x, y, target = self:getTarget(tg)
 		if not (x and y) or not target or not self:canProject(tg, x, y) then return nil end
 
@@ -971,7 +998,7 @@ newInscription{
 				end
 				return false
 			end,
-			4)
+			8)
 		else
 			target:removeEffectsFilter({type="magical", status="detrimental"}, 999)
 		end
@@ -981,7 +1008,7 @@ newInscription{
 	end,
 	info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[Activate the rune to remove 4 beneficial magical sustains from an enemy target or all magical debuffs from you.]]):
+		return ([[Activate the rune to remove 8 beneficial magical sustains from an enemy target or all magical debuffs from you.]]):
 		format()
 	end,
 	short_info = function(self, t)
@@ -1373,7 +1400,11 @@ newInscription{
 -- update this to allow for escape tactic (after AI update)
 	action = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		local tg = {type="ball", nolock=true, pass_terrain=true, nowarning=true, range=data.range + data.inc_stat, radius=3, requires_knowledge=false}
+		--copy the block_path function from the engine so that we can call it for normal block_path checks
+		local old_block_path = engine.Target.defaults.block_path
+		--use an adjusted block_path to check if we have a tile in LOS; display targeting in yellow if we don't so we can warn the player their spell may fizzle
+		--note: we only use this if the original block_path would permit targeting 
+		local tg = {type="ball", nolock=true, pass_terrain=true, nowarning=true, range=data.range + data.inc_stat, radius=3, requires_knowledge=false, block_path=function(typ, lx, ly, for_highlights) if not self:hasLOS(lx, ly) and not old_block_path(typ, lx, ly, for_highlights) then return false, "unknown", true else return old_block_path(typ, lx, ly, for_highlights) end end}		
 		local x, y = self:getTarget(tg)
 		if not x then return nil end
 		-- Target code does not restrict the target coordinates to the range, it lets the project function do it

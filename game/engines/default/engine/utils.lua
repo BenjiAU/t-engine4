@@ -20,6 +20,9 @@
 --- Utility functionality used by a lot of the base classes
 -- @script engine.utils
 
+if not core.game.stdout_write then core.game.stdout_write = print end
+if not core.display.breakTextAllCharacter then core.display.breakTextAllCharacter = function()end end
+
 local lpeg = require "lpeg"
 
 math.hpi = math.pi / 2
@@ -63,6 +66,13 @@ function math.sign(v)
 	return v >= 0 and 1 or -1
 end
 
+function math.boundscale(i, imin, imax, dmin, dmax)
+	local bi = i - imin
+	local bm = imax - imin
+	local dm = dmax - dmin
+	return util.bound(bi * dm / bm + dmin, dmin, dmax)
+end
+
 function math.triangle_area(p1, p2, p3)
 	local u = {x=p2.x - p1.x, y=p2.y - p1.y}
 	local v = {x=p3.x - p1.x, y=p3.y - p1.y}
@@ -94,6 +104,21 @@ table.to_strings = function(src, fmt)
 		tt[#tt+1] = (fmt):format(label, tostring(val))
 	end
 	return tt
+end
+
+--- Same as ipairs but first shallow clone the table so that the base table can be altered safely
+function ipairsclone(t)
+	return ipairs(table.clone(t, false))
+end
+
+--- Same as pairs but first shallow clone the table so that the base table can be altered safely
+function pairsclone(t)
+	return pairs(table.clone(t, false))
+end
+
+--- Same as ripairs but first shallow clone the table so that the base table can be altered safely
+function ripairsclone(t)
+	return ripairs(table.clone(t, false))
 end
 
 function ripairs(t)
@@ -2783,6 +2808,12 @@ function rng.rarityTable(t, rarity_field)
 	end
 end
 
+function util.has_upvalues(fct)
+	local n, v = debug.getupvalue(fct, 1)
+	if not n then return false end
+	return true
+end
+
 function util.show_function_calls()
 	debug.sethook(function(event, line)
 		local t = debug.getinfo(2)
@@ -2805,17 +2836,41 @@ end
 
 function util.send_error_backtrace(msg)
 	local level = 2
-	local trace = {}
+	local errs = {}
 
-	trace[#trace+1] = "backtrace:"
+	errs[#errs+1] = "backtrace:"
 	while true do
 		local stacktrace = debug.getinfo(level, "nlS")
 		if stacktrace == nil then break end
-		trace[#trace+1] = (("    function: %s (%s) at %s:%d"):format(stacktrace.name or "???", stacktrace.what, stacktrace.source or stacktrace.short_src or "???", stacktrace.currentline))
+		local src = stacktrace.source or stacktrace.short_src or "???"
+		errs[#errs+1] = (("    function: %s (%s) at %s:%d"):format(stacktrace.name or "???", stacktrace.what, src, stacktrace.currentline))
+		if src:prefix("@") then pcall(function()
+			local rpath = fs.getRealPath(src:sub(2))
+			local sep = fs.getPathSeparator()
+			if rpath then errs[#errs+1] = (("      =from= %s"):format(rpath:gsub("^.*"..sep.."game"..sep, ""))) end
+		end) end
 		level = level + 1
 	end
 
-	profile:sendError(msg, table.concat(trace, "\n"))
+	pcall(function()
+		local beta = engine.version_hasbeta()
+		if game.getPlayer and game:getPlayer(true) and game:getPlayer(true).__created_in_version then
+			table.insert(errs, 1, "Game version (character creation): "..game:getPlayer(true).__created_in_version)
+		end
+		table.insert(errs, 1, "Game version: "..game.__mod_info.version_name..(beta and "-"..beta or ""))
+		local addons = {}
+		for name, data in pairs(game.__mod_info.addons or {}) do
+			local extra = ""
+			-- So ugly!!! :<
+			if data.for_module == "tome" then
+				extra = "["..(data.author[1]=="DarkGod" and "O" or "X")..(engine.version_patch_same(game.__mod_info.version, data.version) and "" or "!").."]"
+			end
+			addons[#addons+1] = name.."-"..data.version_txt..extra
+		end
+		table.insert(errs, 2, "Addons: "..table.concat(addons, ", ").."\n")
+	end)
+
+	profile:sendError(msg, table.concat(errs, "\n"))
 end
 
 function util.uuid()

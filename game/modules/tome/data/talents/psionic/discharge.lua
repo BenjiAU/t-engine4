@@ -24,11 +24,11 @@ newTalent{
 	require = psi_wil_high1,
 	sustain_feedback = 0,
 	mode = "sustained",
-	cooldown = 12,
+	cooldown = 8,
 	tactical = { ATTACKAREA = {MIND = 2}},
 	requires_target = true,
 	proj_speed = 10,
-	range = 7,
+	range = 10,
 	target = function(self, t)
 		return {type="bolt", range=self:getTalentRange(t), talent=t, friendlyfire=false, friendlyblock=false, display={particle="discharge_bolt", trail="lighttrail"}}
 	end,
@@ -102,8 +102,8 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local charge_ratio = t.getOverchargeRatio(self, t)
 		return ([[Unleash your subconscious on the world around you.  While active, you fire up to %d bolts each turn (one per hostile target) that deal %0.2f mind damage.  Each bolt consumes 5 Feedback.
-		Feedback gains beyond your maximum allowed amount may generate extra bolts (one bolt per %d excess Feedback per target), but no more then %d extra bolts per turn.
-		This effect is a psionic channel, and will break if you move.
+		Feedback gains beyond your maximum allowed amount may generate extra bolts (one bolt per %d excess Feedback per target), but no more than %d extra bolts per turn. 
+		This effect is a psionic channel, increasing the range of Mind Sear, Psychic Lobotomy, and Sunder Mind to 10 but will break if you move.
 		The damage will scale with your Mindpower.]]):format(targets, damDesc(self, DamageType.MIND, damage), charge_ratio, targets)
 	end,
 }
@@ -145,7 +145,7 @@ newTalent{
 	points = 5, 
 	require = psi_wil_high3,
 	mode = "passive",
-	range = 7,
+	range = 10,
 	getDamage = function(self, t) return self:combatTalentMindDamage(t, 10, 75) end,
 	target = function(self, t)
 		return {type="hit", range=self:getTalentRange(t), talent=t}
@@ -190,8 +190,9 @@ newTalent{
 	feedback = 25,
 	cooldown = 12,
 	tactical = { ATTACK = {MIND = 2}},
-	range = 7,
+	range = 10,
 	getCritBonus = function(self, t) return self:combatTalentMindDamage(t, 10, 50) end,
+	getResistPenalty = function(self, t) return math.min(60, self:combatTalentScale(t, 15, 45))end, --Limit < 60%
 	target = function(self, t)
 		return {type="hit", range=self:getTalentRange(t)}
 	end,
@@ -206,8 +207,8 @@ newTalent{
 		_, x, y = self:canProject(tg, x, y)
 		local target = x and game.level.map(x, y, engine.Map.ACTOR) or nil
 		if not target or target == self then return nil end
-		
-		self:setEffect(self.EFF_FOCUSED_WRATH, t.getDuration(self, t), {target=target, power=t.getCritBonus(self, t)/100})
+
+		self:setEffect(self.EFF_FOCUSED_WRATH, t.getDuration(self, t), {target=target, pen=t.getResistPenalty(self, t), power=t.getCritBonus(self, t)/100})
 
 		game.level.map:particleEmitter(self.x, self.y, 1, "generic_charge", {rm=255, rM=255, gm=180, gM=255, bm=0, bM=0, am=35, aM=90})
 		game:playSoundNear(self, "talents/fireflash")
@@ -215,9 +216,10 @@ newTalent{
 	end,
 	info = function(self, t)
 		local duration = t.getDuration(self, t)
+		local penetration = t.getResistPenalty(self, t)
 		local crit_bonus = t.getCritBonus(self, t)
-		return ([[Focus your mind on a single target, diverting all offensive Discharge talent effects to it for %d turns.  While this effect is active, all Discharge talents gain %d%% critical power.
+		return ([[Focus your mind on a single target, diverting all offensive Discharge talent effects to it for %d turns.  While this effect is active, all Discharge talents gain %d%% critical power and you ignore %d%% mind resistance of your targets.
 		If the target is killed, the effect will end early.
-		The damage bonus will scale with your Mindpower.]]):format(duration, crit_bonus)
+		The damage bonus will scale with your Mindpower.]]):format(duration, crit_bonus, penetration)
 	end,
 }

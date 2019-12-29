@@ -32,7 +32,6 @@ newTalent{
 	direct_hit = true,
 	requires_target = true,
 	tactical = { ATTACKAREA = { COLD = 2 } },
-	on_pre_use = function(self, t, silent) if not self:hasMHWeapon() then if not silent then game.logPlayer(self, "You require a mainhand weapon to use this talent.") end return false end return true end,
 	is_melee = true,
 	on_learn = function(self, t)
 		self.combat_physresist = self.combat_physresist + 2
@@ -213,8 +212,8 @@ newTalent{
 	require = gifts_req4,
 	points = 5,
 	random_ego = "attack",
-	equilibrium = 12,
-	cooldown = 12,
+	equilibrium = 20,
+	cooldown = 20,
 	message = "@Source@ breathes ice!",
 	tactical = { ATTACKAREA = { COLD = 2 }, DISABLE = { stun = 1 } },
 	range = 0,

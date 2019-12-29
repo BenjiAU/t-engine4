@@ -17,8 +17,6 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-local archerPreUse = Talents.archerPreUse
-
 newTalent{
 	name = "Sling Mastery",
 	type = {"technique/archery-sling", 1},

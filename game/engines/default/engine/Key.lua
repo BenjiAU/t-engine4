@@ -29,6 +29,18 @@ function _M:init()
 	self.status = {}
 end
 
+--- Check if we are disabled
+function _M:isEnabled()
+	if not self.disable_until then return true end
+	if core.game.getTime() < self.disable_until then 
+		if game.log then game.log("#LIGHT_RED#Keyboard input temporarily disabled.") end
+		return false
+	else
+		self.disable_until = nil
+		return true
+	end
+end
+
 --- Called when a key is pressed
 -- @number sym a number representing the key, see all the _FOO fields
 -- @param[type=boolean] ctrl is the control key pressed?
@@ -39,6 +51,7 @@ end
 -- @param[type=boolean] isup true if the key was released, false if pressed
 -- @string key the unicode representation of the key pressed (without accounting for modifiers)
 function _M:receiveKey(sym, ctrl, shift, alt, meta, unicode, isup, key)
+	if not self:isEnabled() then return end
 	self:handleStatus(sym, ctrl, shift, alt, meta, unicode, isup)
 end
 

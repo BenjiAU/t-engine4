@@ -26,7 +26,7 @@ newTalentType{ allow_random=true, type="cursed/rampage", name = "rampage", descr
 newTalentType{ allow_random=false, type="cursed/predator", name = "predator", description = "Track and kill your prey with single-minded focus." }
 
 -- Doomed
-newTalentType{ allow_random=true, is_mind=true, type="cursed/dark-sustenance", name = "dark sustenance", generic = true, description = "Invoke the powerful force of your will." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/dark-sustenance", name = "dark sustenance", generic = true, description = "The powers of your foes feed your dark will." }
 newTalentType{ allow_random=true, is_mind=true, type="cursed/force-of-will", name = "force of will", description = "Invoke the powerful force of your will." }
 newTalentType{ allow_random=true, is_mind=true, type="cursed/darkness", name = "darkness", description = "Harness the power of darkness to envelop your foes." }
 newTalentType{ allow_random=true, is_mind=true, type="cursed/shadows", name = "shadows", description = "Summon shadows from the darkness to aid you." }

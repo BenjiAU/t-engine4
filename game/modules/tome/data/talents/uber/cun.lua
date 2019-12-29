@@ -98,12 +98,12 @@ uberTalent{
 		return self:combatStatScale("cun", 1, 20, 0.75), self:combatStatScale("cun", 5, 30, 0.75)
 	end,
 	getDarkness = function(self, t) return self:combatStatScale("cun", 1, 30, 0.75) end,
-	getAcid = function(self, t) return self:combatStatScale("cun", 10, 70, 0.75) end,
+	getAcid = function(self, t) return self:combatStatScale("cun", 10, 100, 0.75) end,
 	getTemporal = function(self, t) return self:combatStatScale("cun", 1, 40, 0.75) end,
 	getMind = function(self, t) return self:combatStatScale("cun", 1, 40, 0.75) end,
 	range = 10,
 	radius = 3,
-	dts = {TEMPORAL=true, BLIGHT=true, ACID=true, DARKNESS=true, MIND=true,},
+	dts = {TEMPORAL=true, BLIGHT=true, ACID=true, DARKNESS=true, MIND=true, PHYSICAL=true},
 	getThreshold = function(self, t) return 16*self.level end,
 	getDamage = function(self, t) return self:combatStatScale("cun", 10, 350) end,
 	doProject = function(self, t, damtype, effect, part)
@@ -149,27 +149,31 @@ uberTalent{
 		if self.endless_woes[damtype] > t.getThreshold(self, t) then
 			self.endless_woes[damtype] = 0
 			if damtype == DamageType.TEMPORAL and not self:hasProc("endless_woes_temporal") then
-				self:setProc("endless_woes_temporal", true, 12)
+				self:setProc("endless_woes_temporal", true, 10)
 				game.logSeen(self, "You unleash a blast of #LIGHT_STEEL_BLUE#temporal#LAST# energy!", self.name:capitalize())
 				t.doProject(self, t, damtype, {id="EFF_SLOW", dur=5, params={power=0.3}, canbe="slow"}, "ball_temporal")
 			elseif damtype == DamageType.BLIGHT and not self:hasProc("endless_woes_blight") then
-				self:setProc("endless_woes_blight", true, 12)				
+				self:setProc("endless_woes_blight", true, 10)				
 				game.logSeen(self, "You unleash a blast of #DARK_GREEN#virulent blight!#LAST#!", self.name:capitalize())
 				local dam, stat = t.getBlight(self, t)
 				t.doProject(self, t, damtype, {id="EFF_WOEFUL_DISEASE", dur=5, params = {src=self, dam=dam, str=stat, con=stat, dex=stat}, canbe="disease"}, "ball_blight")
 			elseif damtype == DamageType.ACID and not self:hasProc("endless_woes_acid") then
-				self:setProc("endless_woes_acid", true, 12)
+				self:setProc("endless_woes_acid", true, 10)
 				local dam = t.getAcid(self, t)
 				game.logSeen(self, "You unleash a blast of #GREEN#acid#LAST#!", self.name:capitalize())
 				t.doProject(self, t, damtype, {id="EFF_WOEFUL_CORROSION", dur=5, params={src=self, dam=dam}}, "ball_acid")
 			elseif damtype == DamageType.DARKNESS and not self:hasProc("endless_woes_darkness") then
-				self:setProc("endless_woes_darkness", true, 12)
+				self:setProc("endless_woes_darkness", true, 10)
 				game.logSeen(self, "You unleash a blast of numbing #GREY#darkness#LAST#!", self.name:capitalize())
 				t.doProject(self, t, damtype, {id="EFF_WOEFUL_DARKNESS", dur=5, params={reduce=t.getDarkness(self, t)}}, "shadow_flash")
 			elseif damtype == DamageType.MIND and not self:hasProc("endless_woes_mind") then
-				self:setProc("endless_woes_mind", true, 12)
+				self:setProc("endless_woes_mind", true, 10)
 				game.logSeen(self, "You unleash a confusing blast of #YELLOW#mental#LAST# energy!", self.name:capitalize())
 				t.doProject(self, t, damtype, {id="EFF_CONFUSED", dur=5, params={power=50}, canbe="confusion"}, "starfall")
+			elseif damtype == DamageType.PHYSICAL and not self:hasProc("endless_woes_physical") then
+				self:setProc("endless_woes_physical", true, 10)
+				game.logSeen(self, "You unleash a crippling blast of earthen energy!", self.name:capitalize())
+				t.doProject(self, t, damtype, {id="EFF_WOEFUL_CRIPPLE", dur=5, params={power=0.2}}, "ball_earth")
 			end
 		end
 	end,
@@ -188,13 +192,14 @@ uberTalent{
 		return ([[Surround yourself with a malevolent aura that stores damage you deal.
 		Whenever you have stored %d damage of one type you unleash a powerful blast at a random enemy dealing %d damage of that type in radius %d and applying one of the following effects:
 
+		Physical:		Slows combat, mind, and spell speed by 20%%.
 		#GREEN#Acid:#LAST#  Deals %d acid damage each turn for 5 turns.
 		#DARK_GREEN#Blight:#LAST#  Deals %d blight damage each turn for 5 turns and reduces strength, constitution, and dexterity by %d.
 		#GREY#Darkness:#LAST#  Reduces damage dealt by %d%% for 5 turns.
 		#LIGHT_STEEL_BLUE#Temporal:#LAST#  Slows global action speed by %d%% for 5 turns.
-		#YELLOW#Mind:#LAST#  Confuses (power %d%%) for 5 turns.
+		#ORANGE#Mind:#LAST#  Confuses (power %d%%) for 5 turns.
 
-		Each effect can only happen once per 12 player turns.  This does not count as a typical cooldown.
+		Each effect can only happen once per 10 player turns.  This does not count as a typical cooldown.
 		The damage and effect power increase with your Cunning, the threshold with your level, and the apply power is the highest of your mind or spell power.
 		%s]])
 		:format(t.getThreshold(self, t), t.getDamage(self, t), self:getTalentRadius(t), t.getAcid(self, t), blight_dam, blight_disease, t.getDarkness(self, t), t.getTemporal(self, t), t.getMind(self, t), str)
@@ -222,11 +227,11 @@ uberTalent{
 			self:addObject(self.INVEN_INVEN, o)
 
 			local o1, item1, inven1 = self:findInAllInventoriesBy("define_as", "GEM_TELOS")
-			self:removeObject(inven1, item1, true)
+			if item1 and inven1 then self:removeObject(inven1, item1, true) end
 			local o2, item2, inven2 = self:findInAllInventoriesBy("define_as", "TELOS_TOP_HALF")
-			self:removeObject(inven2, item2, true)
+			if item2 and inven2 then self:removeObject(inven2, item2, true) end
 			local o3, item3, inven3 = self:findInAllInventoriesBy("define_as", "TELOS_BOTTOM_HALF")
-			self:removeObject(inven3, item3, true)
+			if item3 and inven3 then self:removeObject(inven3, item3, true) end
 
 			self:sortInven()
 
@@ -371,7 +376,7 @@ eye_of_the_tiger_data = {
 		reduce = 2,
 	},
 	spell = {
-		desc = "All spell criticals reduce the remaining cooldown of a random spell talent by 2.",
+		desc = "All spell criticals reduce the remaining cooldown of a random spell/corruption/celestial/chronomancy talent by 2.",
 		types = { "^spell/", "^corruption/", "^celestial/", "^chronomancy/" },
 		reduce = 2,
 	},
@@ -471,6 +476,12 @@ uberTalent{
 	end,
 	passives = function(self, t, tmptable)
 		self:talentTemporaryValue(tmptable, "talents_mastery_bonus", {all = 0.3})
+		
+		if not self._updating_adept then
+			self._updating_adept = true
+			self:updateAllTalentsPassives()
+			self._updating_adept = nil
+		end
 	end,
 }
 

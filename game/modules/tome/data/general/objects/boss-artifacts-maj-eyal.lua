@@ -182,11 +182,11 @@ It is said the Conclave created this weapon for their warmaster during the dark 
 								self.temporary = self.temporary - 1
 								if self.temporary <= 0 then
 									game.level.map(self.x, self.y, engine.Map.TERRAIN, self.old_feat)
-									game.level:removeEntity(self)
+									game.level:removeEntity(self, true)
 								end
 							end,
 							dig = function(src, x, y, old)
-								game.level:removeEntity(old)
+								game.level:removeEntity(old, true)
 								return nil, old.old_feat
 							end,
 							summoner_gain_exp = true,
@@ -467,14 +467,15 @@ newEntity{ base = "BASE_LIGHT_ARMOR",
 	material_level = 2,
 	wielder = {
 		inc_stats = { [Stats.STAT_DEX] = 2, [Stats.STAT_CUN] = 3,  },
-		poison_immune = 0.3,
-		combat_armor = 1,
-		combat_def = 10,
+		poison_immune = 0.5,
+		pin_immune = 0.5, --it makes you slippery--
+		combat_def = 16,
 		fatigue = 2,
+		resists={[DamageType.LIGHTNING] = 15,},
 	},
 
 	max_power = 50, power_regen = 1,
-	use_talent = { id = Talents.T_CALL_LIGHTNING, level=2, power = 20 },
+	use_talent = { id = Talents.T_CALL_LIGHTNING, level=2, power = 25 },
 	talent_on_wild_gift = { {chance=10, talent=Talents.T_CALL_LIGHTNING, level=2} },
 }
 
@@ -1579,7 +1580,7 @@ Hard to tell if that really helped its former owner, but it's clear that the ski
 }
 
 newEntity{ base = "BASE_TOOL_MISC",
-	power_source = {arcane=true},
+	power_source = {nature=true},
 	define_as = "LUCKY_FOOT",
 	unique = true,
 	name = "Prox's Lucky Halfling Foot", color = colors.WHITE,

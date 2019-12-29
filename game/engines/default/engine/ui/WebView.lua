@@ -65,6 +65,11 @@ function _M:generate()
 	self.key:reset()
 	self.do_container:clear()
 
+	if not core.webview then
+		self.unusable = true
+		return
+	end
+
 	local handlers = {
 		on_title = function(title) if self.on_title then self.on_title(title) end end,
 		on_popup = function(url, w, h) if self.allow_popup then

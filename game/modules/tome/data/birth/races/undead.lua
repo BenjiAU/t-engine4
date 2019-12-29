@@ -59,7 +59,7 @@ newBirthDescriptor{
 		starting_zone = "blighted-ruins",
 		starting_level = 3, starting_level_force_down = true,
 		starting_quest = "start-undead",
-		undead = 1,
+		undead = 1, true_undead = 1,
 		forbid_nature = 1,
 		inscription_forbids = { ["inscriptions/infusions"] = true },
 		resolvers.inscription("RUNE:_SHIELDING", {cooldown=14, dur=5, power=130}, 1),
@@ -99,7 +99,7 @@ newBirthDescriptor
 		"#LIGHT_BLUE# * +3 Strength, +1 Dexterity, +5 Constitution",
 		"#LIGHT_BLUE# * +0 Magic, -2 Willpower, -2 Cunning",
 		"#GOLD#Life per level:#LIGHT_BLUE# 14",
-		"#GOLD#Experience penalty:#LIGHT_BLUE# 25%",
+		"#GOLD#Experience penalty:#LIGHT_BLUE# 12%",
 		"#GOLD#Speed penalty:#LIGHT_BLUE# -20%",
 	},
 	moddable_attachement_spots = "race_ghoul", moddable_attachement_spots_sexless=true,
@@ -131,7 +131,7 @@ newBirthDescriptor
 		moddable_tile = "ghoul",
 		moddable_tile_nude = 1,
 	},
-	experience = 1.25,
+	experience = 1.12,
 
 	cosmetic_options = {
 		skin = {
@@ -195,7 +195,7 @@ newBirthDescriptor
 		"#LIGHT_BLUE# * +3 Strength, +4 Dexterity, +0 Constitution",
 		"#LIGHT_BLUE# * +0 Magic, +0 Willpower, +0 Cunning",
 		"#GOLD#Life per level:#LIGHT_BLUE# 12",
-		"#GOLD#Experience penalty:#LIGHT_BLUE# 40%",
+		"#GOLD#Experience penalty:#LIGHT_BLUE# 20%",
 	},
 	moddable_attachement_spots = "race_skeleton", moddable_attachement_spots_sexless=true,
 	descriptor_choices =
@@ -226,7 +226,7 @@ newBirthDescriptor
 		moddable_tile = "skeleton",
 		moddable_tile_nude = 1,
 	},
-	experience = 1.4,
+	experience = 1.2,
 
 	cosmetic_options = {
 		skin = {

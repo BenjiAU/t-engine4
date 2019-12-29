@@ -35,7 +35,7 @@ newTalent{
 		return 100 - (100 - talentmod)/lifemod, 1-1/lifemod, talentmod
 	end,
 
-	on_learn = function(self, t)
+	on_levelup_close = function(self, t)
 		if self:getTalentLevelRaw(t) == 1 then
 			self.inc_resource_multi.psi = (self.inc_resource_multi.psi or 0) + 0.5
 			self.inc_resource_multi.life = (self.inc_resource_multi.life or 0) - 0.25
@@ -50,15 +50,6 @@ newTalent{
 				self.max_life = self.max_life - (self:getCon()-10) * 0.5
 				if self ~= game.player then self:resetToFull() end
 			end)
-		end
-	end,
-	on_unlearn = function(self, t)
-		if not self:knowTalent(t) then
-			self:incMaxPsi(-(self:getWil()-10) * 0.5)
-			self.max_life = self.max_life + (self:getCon()-10) * 0.25
-			self.inc_resource_multi.psi = self.inc_resource_multi.psi - 0.5
-			self.inc_resource_multi.life = self.inc_resource_multi.life + 0.25
-			self.solipsism_threshold = self.solipsism_threshold - 0.2
 		end
 	end,
 	info = function(self, t)

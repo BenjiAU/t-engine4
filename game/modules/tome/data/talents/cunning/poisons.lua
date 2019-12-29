@@ -340,7 +340,7 @@ newTalent{
 				count = count + 1
 			end		
 		end
-		if self:isTalentActive(self.T_LEECHING_POISON) then self:heal(heal, target) end
+		if self:isTalentActive(self.T_LEECHING_POISON) then self:heal(heal, t) end
 		if self:isTalentActive(self.T_VOLATILE_POISON) then 
 			local tg = {type="ball", radius=nb, friendlyfire=false, x=target.x, y=target.y}
 			self:project(tg, target.x, target.y, DamageType.NATURE, vdam)

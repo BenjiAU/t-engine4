@@ -17,6 +17,27 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
+--- get a list of diseases on a target
+local getTargetDiseases = function(self, target)
+	if not target then return end
+	local diseases = self.turn_procs.target_diseases and self.turn_procs.target_diseases[target.uid]
+	if diseases then return diseases end
+
+	local num, dur = 0, 0
+	diseases = {}
+	for eff_id, p in pairs(target.tmp) do
+		local e = target.tempeffect_def[eff_id]
+		if e.subtype.disease then
+			num, dur = num + 1, dur + p.dur
+			diseases[#diseases+1] = {id=eff_id, params=p}
+		end
+	end
+	diseases.num, diseases.dur = num, dur
+	self.turn_procs.target_diseases = self.turn_procs.target_diseases or {}
+	self.turn_procs.target_diseases[target.uid] = diseases
+	return diseases
+end
+
 newTalent{
 	name = "Blood Spray",
 	type = {"corruption/blood", 1},
@@ -94,7 +115,15 @@ newTalent{
 	points = 5,
 	cooldown = 8,
 	vim = 30,
-	tactical = { ATTACKAREA = {BLIGHT = 0.5} },  -- Needs a better tactical table, setting to low priority for now so it gets used later in the rotation when diseases are up
+	getTargetDiseases = getTargetDiseases,
+	tactical = { DISABLE = function(self, t, target)
+			local diseases = t.getTargetDiseases(self, target)
+			if diseases and diseases.num > 0 then return 3 end
+		end,
+		ATTACKAREA = function(self, t, target)
+			local diseases = t.getTargetDiseases(self, target)
+			if diseases and diseases.num > 0 then return {BLIGHT=1}	end
+		end,},
 	range = 0,
 	radius = function(self, t) return 10 end,
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 10, 250) end,

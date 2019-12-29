@@ -311,6 +311,8 @@ newTalent{
 	getDamage = function(self, t) return self:combatTalentStatDamage(t, "wil", 30, 120) end,
 	getDuration = function(self, t) return 4 end,
 	action = function(self, t)
+		local friendlyfire = true
+		if self.summoner and self.summoner:knowTalent(self.summoner.T_THROUGH_THE_CROWD) then friendlyfire = false end
 		-- Add a lasting map effect
 		game.level.map:addEffect(self,
 			self.x, self.y, t.getDuration(self, t),
@@ -323,7 +325,7 @@ newTalent{
 				e.y = e.src.y
 				return true
 			end,
-			false
+			false, friendlyfire
 		)
 		game:playSoundNear(self, "talents/ice")
 		return true
@@ -616,7 +618,7 @@ newTalent{
 		local incStats = t.incStats(self, t, true)
 		return ([[Summon a 3-headed Hydra for %d turns to destroy your foes. 3-headed hydras are able to breathe poison, acid and lightning.
 		It will get %d Willpower, %d Constitution and 18 Strength.
-		Your summons inherit some of your stats: increased damage%%, stun/pin/confusion/blindness resistance, armour penetration.
+		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		Their Willpower will increase with your Mindpower.]])
 		:format(t.summonTime(self, t), incStats.wil, incStats.con, incStats.str)
 	end,
@@ -733,7 +735,7 @@ newTalent{
 		local incStats = t.incStats(self, t, true)
 		return ([[Summon a Rimebark for %d turns to harass your foes. Rimebarks cannot move, but they have a permanent ice storm around them, damaging and freezing anything coming close in a radius of 3.
 		It will get %d Willpower, %d Cunning and %d Constitution.
-		Your summons inherit some of your stats: increased damage%%, stun/pin/confusion/blindness resistance, armour penetration.
+		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		Their Willpower and Cunning will increase with your Mindpower.]])
 		:format(t.summonTime(self, t), incStats.wil, incStats.cun, incStats.con)
 	end,
@@ -896,7 +898,7 @@ newTalent{
 		local incStats = t.incStats(self, t, true)
 		return ([[Summon a Fire Drake for %d turns to burn and crush your foes to death. Fire Drakes are behemoths that can burn foes from afar with their fiery breath.
 		It will get %d Strength, %d Constitution and 38 Willpower.
-		Your summons inherit some of your stats: increased damage%%, stun/pin/confusion/blindness resistance, armour penetration.
+		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		Their Strength and Constitution will increase with your Mindpower.]])
 		:format(t.summonTime(self, t), incStats.str, incStats.con)
 	end,

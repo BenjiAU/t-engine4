@@ -558,7 +558,7 @@ newTalent{
 			if tk.combat then -- focus gets additional attacks with a larger radius
 				return {attackarea = {[tk.combat.damtype or "PHYSICAL"] = 2}}
 			elseif tk.type == "gem" then -- elemental attack each turn
-				local damType = gem.color_attributes and gem.color_attributes.damage_type or "MIND"
+				local damType = tk.color_attributes and tk.color_attributes.damage_type or "MIND"
 				return {attackarea = {[damType] = 2}}
 			end
 		end

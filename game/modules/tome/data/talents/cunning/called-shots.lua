@@ -13,8 +13,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-local archerPreUse = Talents.archerPreUse
-
 -- calc_all is so the info can show all the effects.
 local sniper_bonuses = function(self, calc_all)
 	local bonuses = {}

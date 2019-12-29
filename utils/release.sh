@@ -198,23 +198,10 @@ echo "https://te4.org/dl/t-engine/t-engine4-linux32-$filever-nomusic.tar.bz2"
 echo "https://te4.org/dl/t-engine/t-engine4-linux64-$filever-nomusic.tar.bz2"
 echo "https://te4.org/dl/t-engine/t-engine4-osx-$filever.zip"
 
-########## MD5
-echo "Computing MD5s..."
-cd t-engine4-linux64-"$filever"
-rm lib64/libopenal.so.1
-rm -f all.md5
-while true; do
-	DISPLAY=:1 ./t-engine -Mtome -n -E'compute_md5_only="all.md5" sleep_on_auth=2' > /dev/null 2>&1
-	if test $? -eq 0; then break; fi
-done
-cd ..
-echo "..done"
-echo
-
 ######### SQL
 echo "*********** Publish release? (Y/n)"
 cd ..
 read ok
 if test "$ok" '!=' 'n'; then
-	sh utils/publish_release.sh "$ver" ~/.t-engine/4.0/tome/all.md5
+	sh utils/publish_release.sh "$filever" "$ver"
 fi

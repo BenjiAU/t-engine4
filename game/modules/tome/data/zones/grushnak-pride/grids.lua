@@ -17,7 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-load("/data/general/grids/basic.lua")
+load("/data/general/grids/basic.lua", function(e) if e.image == "terrain/marble_floor.png" then e.image = "terrain/underground_floor.png" end end)
+load("/data/general/grids/slimy_walls.lua", function(e) if e.image == "terrain/marble_floor.png" then e.image = "terrain/underground_floor.png" end end)
 load("/data/general/grids/underground_slimy.lua")
 load("/data/general/grids/lava.lua")
 load("/data/general/grids/water.lua")
@@ -26,10 +27,20 @@ load("/data/general/grids/forest.lua")
 newEntity{
 	define_as = "SLIME_TUNNELS",
 	name = "entrance to a slimy pit",
-	display = '>', color=colors.LIGHT_GREEN, image = "terrain/underground_floor.png", add_displays = {class.new{image="terrain/slime/slime_stair_down_01.png"}},
+	display = '>', color=colors.LIGHT_GREEN, image = "terrain/underground_floor.png", add_displays = {class.new{z=4, image="terrain/slime/slime_stair_down_01.png"}},
 	always_remember = true,
 	notice = true,
 	change_level = 1,
 	change_zone = "slime-tunnels",
 }
 
+newEntity{
+	define_as = "TRAINING_DUMMY",
+	name = "training dummy",
+	type = "training", subtype = "dummy",
+	display = 't', color=colors.GREY, image = "terrain/underground_floor.png", add_displays = {class.new{z=9, image="npc/lure.png"}},
+	always_remember = true,
+	notice = true,
+	does_block_move = true,
+	pass_projectile = true,
+}

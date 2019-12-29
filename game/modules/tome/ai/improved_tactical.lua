@@ -719,7 +719,7 @@ newAI("use_improved_tactical", function(self, t_filter, t_list)
 		end
 
 		-- add escape by normal movement to the action list, in case it's better than using a talent		
-		if want.escape > 0.1 and not self:attr("never_move") then
+		if want.escape > 0.1 and not self:attr("never_move") and not self.ai_tactic.never_move_escape then
 			local can_flee, fx, fy
 			-- Note: values are <= weight of move_safe_grid if present
 			-- Could use better testing to make sure fleeing is possible (and prevent back and forth movement)
@@ -940,6 +940,9 @@ newAI("use_improved_tactical", function(self, t_filter, t_list)
 			want.closein = util.bound(want.closein - want.escape, -10, 10)
 			if log_detail >= 2 then print("--want.closein adjusted for want.escape:", want.closein) end
 		end
+
+		-- DGDGDGDG; this is a temporary measure (so I suppose it'll stay like that for a few years :/ )
+		if want.escape then want.escape = want.escape * 0.6 end
 
 --		if log_detail > 0 then print("[use_tactical AI] ### Final Wants (ai_tactic applied):") local tt = table.to_strings(want, "[%s]=%0.3f") table.sort(tt) print(table.concat(tt, ", ")) end
 		if log_detail > 0 then print("[use_tactical AI] ### Final Wants (ai_tactic applied):\n\t", (string.fromTable(want, nil, nil, nil, nil, true))) end

@@ -29,7 +29,7 @@ roomCheck(function(room, zone, level, map)
 	return resolvers.current_level >= 30, "too high level"
 end)
 rotates = {"default", "90", "180", "270", "flipx", "flipy"}
-defineTile('%', "WALL")
+defineTile('%', "DOOR")
 defineTile('.', "FLOOR")
 defineTile('#', "HARDWALL")
 defineTile('X', "DOOR_VAULT")
@@ -47,7 +47,7 @@ return {
 [[#..#..#..%..%..#..%..#..#]],
 [[#.c%.c#.c#.c#.c#.c#.c%.c#]],
 [[########%########%#####%#]],
-[[#..%..#..#LL#..%..#..#..#]],
+[[#..%..#..#LL%..%..#..#..#]],
 [[#.c#.c%.c#DD#.c#.c#.c%.c#]],
 [[##%########%##%##########]],
 [[#..%..%..%..#..%..%..#..#]],

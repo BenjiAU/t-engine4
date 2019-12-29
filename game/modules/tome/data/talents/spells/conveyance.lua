@@ -100,7 +100,11 @@ newTalent{
 		local radius = t.getRadius(self, t)
 		if self:getTalentLevel(t) >= 5 or self:attr("phase_door_force_precise") then
 			game.logPlayer(self, "Select a teleport location...")
-			local tg = {type="ball", nolock=true, pass_terrain=true, nowarning=true, range=range, radius=radius, requires_knowledge=false}
+			--copy the block_path function from the engine so that we can call it for normal block_path checks
+			local old_block_path = engine.Target.defaults.block_path
+			--use an adjusted block_path to check if we have a tile in LOS; display targeting in yellow if we don't so we can warn the player their spell may fizzle
+			--note: we only use this if the original block_path would permit targeting 
+			local tg = {type="ball", nolock=true, pass_terrain=true, nowarning=true, range=range, radius=radius, requires_knowledge=false, block_path=function(typ, lx, ly, for_highlights) if not self:hasLOS(lx, ly) and not old_block_path(typ, lx, ly, for_highlights) then return false, "unknown", true else return old_block_path(typ, lx, ly, for_highlights) end end}
 			if self.aiSeeTargetPos then -- ai code for NPCs
 				tx, ty = self:aiSeeTargetPos(aitarget)
 				if self.ai_state.tactic == "closein" then -- NPC trying to close in
@@ -204,7 +208,11 @@ newTalent{
 		local newpos
 		if self:getTalentLevel(t) >= 5 or self:attr("phase_door_force_precise") then
 			game.logPlayer(self, "Select a teleport location...")
-			local tg = {type="ball", nolock=true, pass_terrain=true, nowarning=true, range=range, radius=radius, requires_knowledge=false}
+			--copy the block_path function from the engine so that we can call it for normal block_path checks
+			local old_block_path = engine.Target.defaults.block_path
+			--use an adjusted block_path to check if we have a tile in LOS; display targeting in yellow if we don't so we can warn the player their spell may fizzle
+			--note: we only use this if the original block_path would permit targeting 
+			local tg = {type="ball", nolock=true, pass_terrain=true, nowarning=true, range=range, radius=radius, requires_knowledge=false, block_path=function(typ, lx, ly, for_highlights) if not self:hasLOS(lx, ly) and not old_block_path(typ, lx, ly, for_highlights) then return false, "unknown", true else return old_block_path(typ, lx, ly, for_highlights) end end}
 			if self.aiSeeTargetPos then -- ai code for NPCs
 				tx, ty = self:aiSeeTargetPos(aitarget)
 				if self.ai_state.tactic == "closein" then -- NPC trying to close in
@@ -228,6 +236,7 @@ newTalent{
 			_, _, _, x, y = self:canProject(tg, x, y)
 			range = radius
 			-- Check LOS
+			-- Should this even be able to fizzle? The point of teleport is to go far away, i.e. out of line of sight, and teleport isn't particularly accurate anyway 
 			if not self:hasLOS(x, y) and rng.percent(35 + (game.level.map.attrs(self.x, self.y, "control_teleport_fizzle") or 0)) then
 				game.logPlayer(self, "The targetted teleport fizzles and works randomly!")
 				x, y = self.x, self.y
@@ -261,6 +270,7 @@ newTalent{
 		return ([[Teleports you randomly within a large range (%d).
 		At level 4, it allows you to specify which creature to teleport.
 		At level 5, it allows you to choose the target area (radius %d).
+		If the target area is not in line of sight, there is a chance the spell will partially fail and teleport the target randomly.
 		Random teleports have a minimum range of %d.
 		The range will increase with your Spellpower.]]):format(range, radius, t.minRange)
 	end,
@@ -312,6 +322,7 @@ newTalent{
 	points = 5,
 	cooldown = 40,
 	sustain_mana = 200,
+	no_npc_use = true,
 	tactical = { ESCAPE = 1, CLOSEIN = 1 },
 	getRange = function(self, t) return math.floor(self:combatScale(self:combatSpellpower(0.06) * self:getTalentLevel(t), 4, 0, 20, 16)) end,
 	activate = function(self, t)

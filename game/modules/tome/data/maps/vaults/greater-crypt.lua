@@ -194,7 +194,6 @@ defineTile('5', mod.class.Grid.new{
 )
 startx, starty = 0, 17
 return {
-
 [[###############################MMM#]],
 [[#..+.#..z.S+...#......u....z.,MMMMM]],
 [[#..#.#.~~~.###.#..V....z.....,MMMM#]],

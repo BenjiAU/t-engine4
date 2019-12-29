@@ -35,7 +35,8 @@ newTalent{
 		end)
 	end,
 	info = function(self, t)
-		return ([[Induces a killing rage in all your summons within a radius of 5 when a summon is killed, increasing all their stats by %d for 5 turns.]]):format(t.incStats(self, t))
+		return ([[Induces a killing rage in all your summons within a radius of 5 when a summon is killed, increasing all their stats by %d for 5 turns. 
+		The bonus will increase with your mindpower.]]):format(t.incStats(self, t))
 	end,
 }
 

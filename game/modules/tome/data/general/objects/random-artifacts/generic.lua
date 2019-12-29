@@ -29,7 +29,7 @@ local Talents = require "engine.interface.ActorTalents"
 -- Spell damage
 ----------------------------------------------------------------
 newEntity{ theme={spell=true}, name="generic spellpower", points = 1, rarity = 8, level_range = {1, 50},
-	wielder = { combat_spellpower = resolvers.randartmax(3, 18), },
+	wielder = { combat_spellpower = resolvers.randartmax(5, 30), },
 }
 newEntity{ theme={spell=true}, name="generic spellcrit", points = 1, rarity = 10, level_range = {1, 50},
 	wielder = { combat_spellcrit = resolvers.randartmax(1, 8), },
@@ -72,7 +72,7 @@ newEntity{ theme={spell=true}, name="generic phasing", points = 1, rarity = 16, 
 -- Mental Damage
 ----------------------------------------------------------------
 newEntity{ theme={mental=true}, name="generic mindpower", points = 1, rarity = 8, level_range = {1, 50},
-	wielder = { combat_mindpower = resolvers.randartmax(3, 21), },
+	wielder = { combat_mindpower = resolvers.randartmax(5, 30), },
 }
 newEntity{ theme={mental=true}, name="generic mindcrit", points = 1, rarity = 10, level_range = {1, 50},
 	wielder = { combat_mindcrit = resolvers.randartmax(1, 8), },
@@ -106,7 +106,7 @@ newEntity{ theme={mental=true}, name="generic psi on hit", points = 1, rarity = 
 -- Physical Damage
 ----------------------------------------------------------------
 newEntity{ theme={physical=true}, name="generic phys dam", points = 1, rarity = 8, level_range = {1, 50},
-	wielder = { combat_dam = resolvers.randartmax(2, 20), },
+	wielder = { combat_dam = resolvers.randartmax(5, 30), },
 }
 newEntity{ theme={physical=true}, name="generic phys apr", points = 1, rarity = 10, level_range = {1, 50},
 	wielder = { combat_apr = resolvers.randartmax(1, 15), },
@@ -115,7 +115,7 @@ newEntity{ theme={physical=true}, name="generic phys crit", points = 1, rarity =
 	wielder = { combat_physcrit = resolvers.randartmax(1, 8), },
 }
 newEntity{ theme={physical=true}, name="generic phys atk", points = 1, rarity = 10, level_range = {1, 50},
-	wielder = { combat_atk = resolvers.randartmax(3, 18), },
+	wielder = { combat_atk = resolvers.randartmax(5, 30), },
 }
 newEntity{ theme={physical=true}, name="generic phys crit magnitude", points = 2, rarity = 15, level_range = {1, 50},
 	wielder = { combat_critical_power = resolvers.randartmax(5, 20),   },
@@ -141,7 +141,7 @@ newEntity{ theme={physical=true}, name="generic increased stamina", points = 1, 
 -- Defense
 ----------------------------------------------------------------
 newEntity{ theme={defense=true, physical=true}, name="generic def", points = 1, rarity = 10, level_range = {1, 50},
-	wielder = { combat_def = resolvers.randartmax(3, 18),
+	wielder = { combat_def = resolvers.randartmax(5, 30),
 				},
 }
 newEntity{ theme={defense=true, physical=true}, name="generic armor", points = 1, rarity = 10, level_range = {1, 50},
@@ -404,18 +404,18 @@ newEntity{ theme={misc=true, darkness=true}, name="generic infravision radius", 
 newEntity{ theme={misc=true, light=true}, name="generic lite radius", points = 1, rarity = 14, level_range = {1, 50},
 	wielder = { lite = resolvers.randartmax(1, 3), },
 }
-newEntity{ theme={misc=true, mental=true}, name="generic telepathy", points = 60, rarity = 100, level_range = {1, 50}, unique=1,
-	wielder = { esp_all = 1 },
-}
-newEntity{ theme={misc=true, mental=true}, name="generic orc telepathy", points = 2, rarity = 50, level_range = {1, 50}, unique=1,
-	wielder = { esp = {["humanoid/orc"]=1}, },
-}
-newEntity{ theme={misc=true, mental=true}, name="generic dragon telepathy", points = 2, rarity = 40, level_range = {1, 50}, unique=1,
-	wielder = { esp = {dragon=1}, },
-}
-newEntity{ theme={misc=true, mental=true}, name="generic demon telepathy", points = 2, rarity = 40, level_range = {1, 50}, unique=1,
-	wielder = { esp = {["demon/minor"]=1, ["demon/major"]=1}, },
-}
+-- newEntity{ theme={misc=true}, name="generic telepathy", points = 60, rarity = 130, level_range = {1, 50}, unique=1,
+-- 	wielder = { esp_all = 1 },
+-- }
+-- newEntity{ theme={misc=true, mental=true}, name="generic orc telepathy", points = 2, rarity = 50, level_range = {1, 50}, unique=1,
+-- 	wielder = { esp = {["humanoid/orc"]=1}, },
+-- }
+-- newEntity{ theme={misc=true, mental=true}, name="generic dragon telepathy", points = 2, rarity = 40, level_range = {1, 50}, unique=1,
+-- 	wielder = { esp = {dragon=1}, },
+-- }
+-- newEntity{ theme={misc=true, mental=true}, name="generic demon telepathy", points = 2, rarity = 40, level_range = {1, 50}, unique=1,
+-- 	wielder = { esp = {["demon/minor"]=1, ["demon/major"]=1}, },
+-- }
 
 ----------------------------------------------------------------
 -- Melee damage Projection (rare)

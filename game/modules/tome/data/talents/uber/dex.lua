@@ -29,7 +29,7 @@ uberTalent{
 		self:attr("show_gloves_combat", -1)
 	end,
 	info = function(self, t)
-		return ([[Each time that you make a melee attack you have a 30%% chance to execute an additional unarmed strike.]])
+		return ([[Each time that you make a melee attack you have a 50%% chance to execute an additional unarmed strike.]])
 		:format()
 	end,
 }
@@ -218,7 +218,7 @@ uberTalent{
 	require = { special={desc="Have dealt over 50000 damage with ranged weapons", fct=function(self) return self.damage_log and self.damage_log.weapon.archery and self.damage_log.weapon.archery >= 50000 end} },
 	tactical = { ATTACK = { weapon = 3 }, DISABLE = {2, stun = 2}},
 	requires_target = true,
-	on_pre_use = function(self, t, silent) return Talents.archerPreUse(self, t, silent) end,
+	on_pre_use = function(self, t, silent) return archerPreUse(self, t, silent) end,
 	archery_onhit = function(self, t, target, x, y)
 		if target:canBe("stun") then
 			target:setEffect(target.EFF_STUNNED, 5, {apply_power=self:combatAttack()})

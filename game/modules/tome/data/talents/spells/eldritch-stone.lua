@@ -62,12 +62,12 @@ newTalent{
 			if self:knowTalent(self.T_ELDRITCH_SPIKES) then
 				local st = self:getTalentFromId(self.T_ELDRITCH_SPIKES)
 				DamageType:get(DamageType.ARCANE).projector(self, px, py, DamageType.ARCANE, self:spellCrit(st.getDamage(self, st)))
-				if target:canBe("silence") then target:setEffect(target.EFF_SILENCED, st.getSilence(self, t), {apply_power=math.max(self:combatPhysicalpower(), self:combatSpellpower())}) end
+				if target:canBe("silence") then target:setEffect(target.EFF_SILENCED, st.getSilence(self, st), {apply_power=math.max(self:combatPhysicalpower(), self:combatSpellpower())}) end
 			end
 			if self:knowTalent(self.T_IMPALING_SPIKES) then
 				local st = self:getTalentFromId(self.T_IMPALING_SPIKES)
 				DamageType:get(DamageType.PHYSICAL).projector(self, px, py, DamageType.PHYSICAL, self:spellCrit(st.getDamage(self, st)))
-				if target:canBe("disarm") then target:setEffect(target.EFF_DISARMED, st.getDisarm(self, t), {apply_power=math.max(self:combatPhysicalpower(), self:combatSpellpower())}) end
+				if target:canBe("disarm") then target:setEffect(target.EFF_DISARMED, st.getDisarm(self, st), {apply_power=math.max(self:combatPhysicalpower(), self:combatSpellpower())}) end
 			end
 		end, nil, {type="stone_spikes"})
 

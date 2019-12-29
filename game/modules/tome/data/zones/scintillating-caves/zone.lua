@@ -40,7 +40,8 @@ return {
 		map = {
 			class = "engine.generator.map.Roomer",
 			nb_rooms = 5,
-			rooms = {"random_room", {"money_vault",5}},
+			rooms = {"random_room", {"money_vault",5}, {"lesser_vault",8}},
+			lesser_vaults_list = {"amon-sul-crypt","skeleton-mage-cabal","crystal-cabal","snake-pit"},
 			lite_room_chance = 20,
 			['.'] = "CRYSTAL_FLOOR",
 			['#'] = {"CRYSTAL_WALL","CRYSTAL_WALL2","CRYSTAL_WALL3","CRYSTAL_WALL4","CRYSTAL_WALL5","CRYSTAL_WALL6","CRYSTAL_WALL7","CRYSTAL_WALL8","CRYSTAL_WALL9","CRYSTAL_WALL10","CRYSTAL_WALL11","CRYSTAL_WALL12","CRYSTAL_WALL13","CRYSTAL_WALL14","CRYSTAL_WALL15","CRYSTAL_WALL16","CRYSTAL_WALL17","CRYSTAL_WALL18","CRYSTAL_WALL19","CRYSTAL_WALL20",},

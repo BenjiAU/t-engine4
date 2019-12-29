@@ -254,7 +254,7 @@ newTalent{
 		return 2
 	end,
 	target = function(self, t)
-		return {type="ball", nolock=true, pass_terrain=false, friendly_fire=false, nowarning=true, range=self:getTalentRange(t), radius=self:getTalentRadius(t), talent=t}
+		return {type="ball", can_autoaccept=true, nolock=true, pass_terrain=false, friendly_fire=false, nowarning=true, range=self:getTalentRange(t), radius=self:getTalentRadius(t), talent=t}
 	end,
 	getDazeDuration = function(self, t)
 		return 3

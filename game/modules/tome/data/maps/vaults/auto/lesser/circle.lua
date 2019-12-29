@@ -30,9 +30,10 @@ defineTile('3', "FLOOR", {random_filter={add_levels=5}}, nil)
 
 rotates = {"default", "90", "180", "270", "flipx", "flipy"}
 
---startx = 5
---starty = 0
-
+startx = 5
+starty = 1
+local version = rng.range(1, 5)
+if version == 1 then
 return {
 [[,,,,,,,,,,,]],
 [[,,,XX!XX,,,]],
@@ -51,3 +52,80 @@ return {
 [[,,,XXXXX,,,]],
 [[,,,,,,,,,,,]],
 }
+elseif version == 2 then
+return {
+[[,,,,,,,,,,,]],
+[[,,,XX!XX,,,]],
+[[,,XX.2.XX,,]],
+[[,XXXXDXXXX,]],
+[[,X3X3.3X3X,]],
+[[,X.X...X.X,]],
+[[,XDXXDXXDX,]],
+[[,X2D.2.D2X,]],
+[[,XDXXDXXDX,]],
+[[,X.X...X.X,]],
+[[,X3X3.3X3X,]],
+[[,XXXX.XXXX,]],
+[[,XXXXDXXXX,]],
+[[,,XX.1.XX,,]],
+[[,,,XXXXX,,,]],
+[[,,,,,,,,,,,]],
+}
+elseif version == 3 then
+return {
+[[,,,,,,,,,,,]],
+[[,,,XX!XX,,,]],
+[[,,XXX2XXX,,]],
+[[,XX3D.D3XX,]],
+[[,XXDXXXDXX,]],
+[[,X..3X3..X,]],
+[[,XXDXXXDXX,]],
+[[,X..D2D..X,]],
+[[,XXXXDXXXX,]],
+[[,X32X2X23X,]],
+[[,XXDXDXDXX,]],
+[[,X3.....3X,]],
+[[,XXXXDXXXX,]],
+[[,,XX.1.XX,,]],
+[[,,,XXXXX,,,]],
+[[,,,,,,,,,,,]],
+}
+elseif version == 4 then
+return {
+[[,,,,,,,,,,,]],
+[[,,,XX!XX,,,]],
+[[,,XX...XX,,]],
+[[,XXX.2.XXX,]],
+[[,X2D...D2X,]],
+[[,X.XXDXX.X,]],
+[[,X.X...X.X,]],
+[[,X.X.2.X.X,]],
+[[,X3X...X3X,]],
+[[,X3X...X3X,]],
+[[,X3XXDXX3X,]],
+[[,X3X...X3X,]],
+[[,XXX.1.XXX,]],
+[[,,XX...XX,,]],
+[[,,,XXXXX,,,]],
+[[,,,,,,,,,,,]],
+}
+else
+return {
+[[,,,,,,,,,,,]],
+[[,,,XX!XX,,,]],
+[[,,XXX2XXX,,]],
+[[,XXXX.XXXX,]],
+[[,X33X.X33X,]],
+[[,XDXXDXXDX,]],
+[[,X2D...D2X,]],
+[[,XDXXDXXDX,]],
+[[,X.X...X.X,]],
+[[,X.X.2.X.X,]],
+[[,X.XXDXX.X,]],
+[[,X3.D1D.3X,]],
+[[,XXXX.XXXX,]],
+[[,,XX3.3XX,,]],
+[[,,,XXXXX,,,]],
+[[,,,,,,,,,,,]],
+}
+end

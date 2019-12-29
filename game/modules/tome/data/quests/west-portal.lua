@@ -61,6 +61,7 @@ wyrm_lair = function(self, who)
 		local spot = level:pickSpot{type="zone-pop", subtype="briagh"}
 		game.zone:addEntity(level, g, "terrain", spot.x, spot.y)
 		game.nicer_tiles:updateAround(game.level, spot.x, spot.y)
+		game.state:locationRevealAround(spot.x, spot.y)
 	end)
 
 	game.logPlayer(game.player, "Zemekkys points to the location of Briagh's lair on your map.")

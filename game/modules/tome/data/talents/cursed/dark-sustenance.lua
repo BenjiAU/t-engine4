@@ -36,7 +36,7 @@ newTalent{
 		local range = self:getTalentRange(t)
 		local tg = {type="hit", range=range}
 		local x, y, target = self:getTarget(tg)
-		if not x or not y or not target or core.fov.distance(self.x, self.y, x, y) > range then return nil end
+		if not x or not y or not target or not self:canProject(tg, x, y) then return nil end
 		if target == self then return nil end -- avoid targeting while frozen
 
 		if self:reactionToward(target) >= 0 or target.summoner == self then
@@ -70,7 +70,7 @@ newTalent{
 			lifeRegenGain = devour.getLifeRegen(self, devour, target)
 		end
 
-		self:setEffect(self.EFF_FEED, 40, { target=target, range=range, hateGain=hateGain, constitutionGain=constitutionGain, lifeRegenGain=lifeRegenGain, damageGain=damageGain, resistGain=resistGain })
+		self:setEffect(self.EFF_FEED, 40, { target=target, tg=tg, range=range, hateGain=hateGain, constitutionGain=constitutionGain, lifeRegenGain=lifeRegenGain, damageGain=damageGain, resistGain=resistGain })
 
 		return true
 	end,
@@ -83,7 +83,8 @@ newTalent{
 		local act
 		for i = 1, #self.fov.actors_dist do
 			act = self.fov.actors_dist[i]
-			if act and self:reactionToward(act) < 0 and core.fov.distance(self.x, self.y, act.x, act.y) <= self:getTalentRange(t) and self:canSee(act) and self:hasLOS(act.x, act.y) then 
+			local tg = {type="hit", range=self:getTalentRange(t)}
+			if act and self:reactionToward(act) < 0 and self:canSee(act) and self:canProject(tg, act.x, act.y) then 
 				local hateGain = t.getHateGain(self, t)
 				local constitutionGain = 0
 				local lifeRegenGain = 0
@@ -105,7 +106,7 @@ newTalent{
 					lifeRegenGain = devour.getLifeRegen(self, devour, target)
 				end
 				self:setEffect(self.EFF_FEED, 40, 
-					{ target=act, range=range, hateGain=hateGain, constitutionGain=constitutionGain, lifeRegenGain=lifeRegenGain, damageGain=damageGain, resistGain=resistGain })
+					{ target=act, tg=tg, range=range, hateGain=hateGain, constitutionGain=constitutionGain, lifeRegenGain=lifeRegenGain, damageGain=damageGain, resistGain=resistGain })
 			end
 		end		
 

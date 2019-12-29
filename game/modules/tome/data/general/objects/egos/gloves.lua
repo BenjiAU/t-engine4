@@ -32,7 +32,7 @@ newEntity{
 		melee_project= { [DamageType.FIRE] = resolvers.mbonus_material(10, 5) },
 		combat = {
 			burst_on_crit= { [DamageType.FIRE] = resolvers.mbonus_material(10, 5) },
-			talent_on_hit = { [Talents.T_FIRE_BREATH] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_FIRE_BREATH] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -49,7 +49,7 @@ newEntity{
 		melee_project= { [DamageType.ACID] = resolvers.mbonus_material(10, 5) },
 		combat = {
 			burst_on_crit= { [DamageType.ACID] = resolvers.mbonus_material(10, 5) },
-			talent_on_hit = { [Talents.T_ACID_BREATH] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_CORROSIVE_BREATH] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -66,7 +66,7 @@ newEntity{
 		melee_project= { [DamageType.NATURE] = resolvers.mbonus_material(10, 5) },
 		combat = {
 			burst_on_crit= { [DamageType.NATURE] = resolvers.mbonus_material(10, 5) },
-			talent_on_hit = { [Talents.T_POISON_BREATH] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_VENOMOUS_BREATH] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -83,7 +83,7 @@ newEntity{
 		melee_project= { [DamageType.COLD] = resolvers.mbonus_material(10, 5) },
 		combat = {
 			burst_on_crit= { [DamageType.ICE] = resolvers.mbonus_material(10, 5) },
-			talent_on_hit = { [Talents.T_ICE_BREATH] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_ICE_BREATH] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -100,7 +100,7 @@ newEntity{
 		melee_project= { [DamageType.MIND] = resolvers.mbonus_material(10, 5) },
 		combat = {
 			burst_on_crit= { [DamageType.MIND] = resolvers.mbonus_material(10, 5) },
-			talent_on_hit = { [Talents.T_PSYCHIC_LOBOTOMY] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=20} },
+			talent_on_hit = { [Talents.T_PSYCHIC_LOBOTOMY] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=20} },
 		},
 	},
 }
@@ -118,7 +118,7 @@ newEntity{
 		combat = {
 			burst_on_crit= { [DamageType.PHYSICAL] = resolvers.mbonus_material(10, 5) },
 			burst_on_hit= { [DamageType.PHYSICAL] = resolvers.mbonus_material(10, 5) },
-			talent_on_hit = { [Talents.T_SAND_BREATH] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_SAND_BREATH] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -135,7 +135,7 @@ newEntity{
 		melee_project= { [DamageType.LIGHTNING] = resolvers.mbonus_material(10, 5) },
 		combat = {
 			burst_on_crit= { [DamageType.LIGHTNING] = resolvers.mbonus_material(10, 5) },
-			talent_on_hit = { [Talents.T_LIGHTNING_BREATH] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_LIGHTNING_BREATH] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -153,7 +153,7 @@ newEntity{
 		melee_project= { [DamageType.BLIGHT] = resolvers.mbonus_material(10, 5) },
 		combat = {
 			burst_on_crit= { [DamageType.BLIGHT] = resolvers.mbonus_material(10, 5) },
-			talent_on_hit = { [Talents.T_SOUL_ROT] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=20} },
+			talent_on_hit = { [Talents.T_SOUL_ROT] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=20} },
 		},
 	},
 }
@@ -170,7 +170,7 @@ newEntity{
 		melee_project= { [DamageType.DARKNESS] = resolvers.mbonus_material(15, 5) },
 		combat = {
 			melee_project= { [DamageType.ITEM_DARKNESS_NUMBING] = resolvers.mbonus_material(10, 5) },
-			--talent_on_hit = { [Talents.T_MOONLIGHT_RAY] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=20} },
+			talent_on_hit = { [Talents.T_MOONLIGHT_RAY] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=20} },
 		},
 	},
 }
@@ -186,7 +186,7 @@ newEntity{
 		resists = { [DamageType.LIGHT] = resolvers.mbonus_material(10, 5), },
 		melee_project= { [DamageType.LIGHT] = resolvers.mbonus_material(15, 5) },
 		combat = {
-			talent_on_hit = { [Talents.T_SEARING_LIGHT] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=20} },
+			talent_on_hit = { [Talents.T_SEARING_LIGHT] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=20} },
 		},
 	},
 }
@@ -269,7 +269,7 @@ newEntity{
 		life_regen = resolvers.mbonus_material(10, 1, function(e, v) return 0, v end),
 		stamina_regen = resolvers.mbonus_material(15, 5, function(e, v) v=v/10 return 0, v end),
 		combat = {
-			talent_on_hit = { [Talents.T_SLUMBER] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_NIGHTMARE] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },  -- Breaks on damage but is at least in an AoE.. Maybe just use a mind damage talent?
 		},
 	},
 }
@@ -288,7 +288,7 @@ newEntity{
 		disarm_immune = resolvers.mbonus_material(30, 20, function(e, v) v=v/100 return 0, v end),
 		combat = {
 			atk = resolvers.mbonus_material(5, 5),
-			talent_on_hit = { [Talents.T_PERFECT_CONTROL] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_PERFECT_CONTROL] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -309,7 +309,7 @@ newEntity{
 		combat = {
 			physcrit = resolvers.mbonus_material(10, 4),
 			dam = resolvers.mbonus_material(7, 3),
-			talent_on_crit = { [Talents.T_CRIPPLE] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=20} },
+			talent_on_crit = { [Talents.T_CRIPPLE] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=20} },
 		},
 	},
 }
@@ -331,7 +331,7 @@ newEntity{
 		},
 		disarm_immune = resolvers.mbonus_material(30, 20, function(e, v) v=v/100 return 0, v end),
 		combat = {
-			talent_on_hit = { [Talents.T_DISARM] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_DISARM] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -386,7 +386,7 @@ newEntity{
 		combat = {
 			physcrit = resolvers.mbonus_material(10, 4),
 			atk = resolvers.mbonus_material(10, 2),
-			talent_on_hit = { [Talents.T_SET_UP] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_SET_UP] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -483,7 +483,7 @@ newEntity{
 		infravision = resolvers.mbonus_material(3, 1),
 		combat_atk = resolvers.mbonus_material(10, 5),
 		combat = {
-			talent_on_crit = { [Talents.T_DOMINATE] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_crit = { [Talents.T_DOMINATE] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 			physcrit = resolvers.mbonus_material(10, 3),
 			atk = resolvers.mbonus_material(10, 3),
 			melee_project={
@@ -511,7 +511,7 @@ newEntity{
 		combat_armor = resolvers.mbonus_material(15, 5),
 		combat_armor_hardiness = resolvers.mbonus_material(10, 5),
 		combat = {
-			talent_on_hit = { [Talents.T_STONE_TOUCH] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=5} },
+			talent_on_hit = { [Talents.T_STONE_TOUCH] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=5} },
 		},
 	},
 }
@@ -545,20 +545,19 @@ newEntity{
 	},
 }
 
---[[ Temp disable prior finding something interesting to put here
 newEntity{
 	power_source = {arcane=true},
-	name = " of dispersion", suffix=true, instant_resolve=true,
-	keywords = {dispersion=true},
+	name = " of spellstriking", suffix=true, instant_resolve=true,
+	keywords = {spellstriking=true},
 	level_range = {20, 50},
 	greater_ego = 1,
 	rarity = 35,
 	cost = 70,
-	--resolvers.charmt(Talents.T_DISPERSE_MAGIC, 3, 20),
 	wielder = {
 		resists={
 			[DamageType.ARCANE] = resolvers.mbonus_material(7, 3),
 		},
+		inc_damage= { [DamageType.ARCANE] = resolvers.mbonus_material(7, 3), },
 		inc_stats = {
 			[Stats.STAT_MAG] = resolvers.mbonus_material(7, 3),
 			[Stats.STAT_WIL] = resolvers.mbonus_material(7, 3),
@@ -566,12 +565,13 @@ newEntity{
 		melee_project = {
 			[DamageType.ARCANE] = resolvers.mbonus_material(15, 4),
 		},
+		combat_spellpower = resolvers.mbonus_material(12, 4),
 		combat = {
 			melee_project={  [DamageType.ARCANE] = resolvers.mbonus_material(15, 4), },
 			talent_on_hit = { [Talents.T_MANATHRUST] = {level=3, chance=10} },
 		},
 	},
-}]]
+}
 
 newEntity{
 	power_source = {nature=true},
@@ -609,7 +609,7 @@ newEntity{
 			[DamageType.ITEM_MIND_EXPOSE] = resolvers.mbonus_material(15, 10),
 		},
 		combat = {
-			 talent_on_hit = { [Talents.T_REPROACH] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			 talent_on_hit = { [Talents.T_REPROACH] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -652,7 +652,7 @@ newEntity{
 		combat_spellcrit = resolvers.mbonus_material(7, 3),
 		combat = {
 			melee_project={  [DamageType.ARCANE] = resolvers.mbonus_material(15, 4), },
-			talent_on_hit = { [Talents.T_ELEMENTAL_BOLT] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_ELEMENTAL_BOLT] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -672,7 +672,7 @@ newEntity{
 		combat = {
 			dam = resolvers.mbonus_material(7, 3),
 			atk = resolvers.mbonus_material(10, 2),
-			talent_on_hit = { [Talents.T_BATTLE_SHOUT] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10} },
+			talent_on_hit = { [Talents.T_BATTLE_SHOUT] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=10} },
 		},
 	},
 }
@@ -696,7 +696,7 @@ newEntity{
 		combat = {
 			apr = resolvers.mbonus_material(5, 5),
 			atk = resolvers.mbonus_material(5, 5),
-			talent_on_hit = { [Talents.T_PERFECT_STRIKE] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=15} }, -- this is more for brawlers actually
+			talent_on_hit = { [Talents.T_PERFECT_STRIKE] = {level=resolvers.genericlast(function(e) return e.effective_ego_material_level or e.material_level end), chance=15} }, -- this is more for brawlers actually
 		},
 	},
 }

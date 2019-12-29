@@ -42,6 +42,7 @@ return {
 			class = "engine.generator.map.Roomer",
 			nb_rooms = 10,
 			rooms = {"random_room"},
+			lesser_vaults_list = {"flooded-prison"},
 			lite_room_chance = 0,
 			['.'] = {"WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR_BUBBLE"},
 			['#'] = "WATER_WALL",
@@ -87,6 +88,9 @@ return {
 			underwater = true,
 			effects = {"EFF_ZONE_AURA_UNDERWATER"},
 			generator = {
+				map =  {
+					rooms = {"random_room",{"lesser_vault",7}},
+				},
 				actor = {
 					filters = {{special_rarity="water_rarity"}},
 				},
@@ -96,6 +100,7 @@ return {
 			underwater = is_flooded,
 			generator = is_flooded and {
 				map = {
+					rooms = {"random_room",{"lesser_vault",5}},
 					down = "SHERTUL_FORTRESS_FLOOD",
 					['.'] = {"WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR_BUBBLE"},
 					force_last_stair = true,

@@ -13,8 +13,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-local archerPreUse = Talents.archerPreUse
-
 -- Currently just a copy of Sling Mastery.
 newTalent {
 	short_name = "SKIRMISHER_SLING_SUPREMACY",

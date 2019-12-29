@@ -22,4 +22,5 @@ return { one_per_level=true,
 	{name="fell-aura", minor=true, percent=100, max_repeat=3},
 	{name="spellblaze-scar", minor=true, percent=50},
 	{name="glowing-chest", minor=true, percent=30},
+	{name="sub-vault", minor=true, percent=100, max_repeat=3},
 }

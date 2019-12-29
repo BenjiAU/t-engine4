@@ -41,7 +41,6 @@ newTalent{
 	radius = function(self, t) return 3 end,
 	direct_hit = true,
 	tactical = { DEFEND = { knockback = 2 }, ESCAPE = { knockback = 2 } },
-	on_pre_use = function(self, t, silent) if not self:hasMHWeapon() then if not silent then game.logPlayer(self, "You require a mainhand weapon to use this talent.") end return false end return true end,
 	requires_target = true,
 	target = function(self, t)
 		return {type="cone", range=self:getTalentRange(t), radius=self:getTalentRadius(t), selffire=false, talent=t}
@@ -185,8 +184,8 @@ newTalent{
 	require = gifts_req4,
 	points = 5,
 	random_ego = "attack",
-	equilibrium = 12,
-	cooldown = 12,
+	equilibrium = 20,
+	cooldown = 20,
 	message = "@Source@ breathes fire!",
 	tactical = { ATTACKAREA = { FIRE = 2 }},
 	range = 0,

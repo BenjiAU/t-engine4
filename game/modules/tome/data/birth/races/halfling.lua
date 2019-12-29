@@ -106,10 +106,10 @@ newBirthDescriptor
 		"#LIGHT_BLUE# * +0 Magic, +0 Willpower, +3 Cunning",
 		"#LIGHT_BLUE# * +5 Luck",
 		"#GOLD#Life per level:#LIGHT_BLUE# 12",
-		"#GOLD#Experience penalty:#LIGHT_BLUE# 20%",
+		"#GOLD#Experience penalty:#LIGHT_BLUE# 10%",
 	},
 	inc_stats = { str=-3, dex=3, con=1, cun=3, lck=5, },
-	experience = 1.20,
+	experience = 1.10,
 	talents_types = { ["race/halfling"]={true, 0} },
 	talents = {
 		[ActorTalents.T_HALFLING_LUCK]=1,

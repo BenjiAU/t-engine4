@@ -87,11 +87,19 @@ newEntity{ base="BASE_NPC_ORC_VOR", define_as = "VOR",
 		[Talents.T_STAFF_MASTERY]={base=3, every=8, max=5},
 		
 		[Talents.T_METEORIC_CRASH]=1,
-		[Talents.T_ELEMENTAL_SURGE]=1,
 	},
 
 	resolvers.auto_equip_filters("Archmage"),
-	auto_classes={{class="Archmage", start_level=40, level_rate=100}},
+	auto_classes={
+		{class="Archmage", start_level=40, level_rate=100,
+			max_talent_types = 1,  -- Don't waste points on extra elemental trees or learn 20000 sustains
+			banned_talents = {
+				T_INVISIBILITY=true,  -- Reduces damage dramatically, basically a nerf
+				T_PROBABILITY_TRAVEL=true,  -- Does this even work on AI?  Possibly should kill this on all NPCs
+				T_DISRUPTION_SHIELD=true,  -- Stupid scaling with infinite mana
+			},
+		},
+	},
 
 	resolvers.sustains_at_birth(),
 

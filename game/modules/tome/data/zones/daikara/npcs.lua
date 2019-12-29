@@ -75,7 +75,7 @@ newEntity{ define_as = "RANTHA_THE_WORM",
 		[Talents.T_ICE_BREATH] = 4,
 	},
 	auto_classes={
-		{class="Wyrmic", start_level=20, level_rate=125},-- Autoclasses don't generate gear and neither do the Daikara bosses so we inflate the level instead, more thematic than giving them actual wyrmic gear
+		{class="Wyrmic", start_level=20, level_rate=80},
 	},
 	resolvers.auto_equip_filters("Wyrmic"),
 
@@ -140,7 +140,7 @@ newEntity{ define_as = "VARSHA_THE_WRITHING",
 	
 	resolvers.auto_equip_filters("Wyrmic"),
 	auto_classes={
-		{class="Wyrmic", start_level=20, level_rate=125},  -- Autoclasses don't generate gear and neither do the Daikara bosses so we inflate the level instead, more thematic than giving them actual wyrmic gear
+		{class="Wyrmic", start_level=20, level_rate=80},
 	},
 	ai = "tactical", ai_state = { talent_in=1, ai_move="move_astar", },
 	resolvers.inscriptions(1, "infusion"),

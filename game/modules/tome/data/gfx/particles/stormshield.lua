@@ -17,26 +17,30 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-setStatusAll{no_teleport=true, vault_only_door_open=true, room_map = {can_open=true}}
-specialList("actor", {
-	"/data/general/npcs/snake.lua",
-})
-rotates = {"default", "90", "180", "270", "flipx", "flipy"}
+can_shift = true
+base_size = 32
 
-defineTile(',', "GRASS")
-defineTile(';', "FLOWER")
-defineTile('#', "WALL")
-defineTile('X', "TREE")
-defineTile('x', "DOOR_VAULT")
+return { generator = function()
+	local a = rng.float(0,math.pi*2)
+	local dir = a+math.pi*0.5
+	local r = (engine.Map.tile_w + engine.Map.tile_h) / 5
 
-defineTile('s', "FLOOR", {random_filter={type="scroll", ego_chance=25}}, {random_filter={name="rattlesnake"}})
+	return {
+		life = 14,
+		size = rng.range(1,2), sizev = 0.3, sizea = -0.01,
 
-return {
-[[,,,,,,,,,]],
-[[,#####,,,]],
-[[;#sss#,X,]],
-[[,#sssx,,,]],
-[[,#sss#,,,]],
-[[,#####;,,]],
-[[,,,,,,,,,]],
-}
+		x = r * math.cos(a), xv = 0.01*math.cos(a), xa = -0.25*math.cos(a),
+		y = r * math.sin(a), yv = 0.167*math.cos(a), ya = 0,
+		dir = dir, dirv = 0, dira = 0,
+		vel = 0, velv = 0, vela = 0,
+
+		r = rng.range(160, 180)/255, rv = 0, ra = 0,
+		g = rng.range(180, 200)/255, gv = 0, ga = 0,
+		b = rng.range(195, 225)/255, gv = 0, ga = 0,
+		a = 1, av = 0, aa = 0,
+	}
+end, },
+function(self)
+	self.ps:emit(4)
+end,
+240

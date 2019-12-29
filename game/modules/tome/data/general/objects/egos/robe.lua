@@ -33,7 +33,7 @@ newEntity{
 	rarity = 6,
 	cost = 2,
 	wielder = {
-		inc_damage = { [DamageType.FIRE] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.FIRE] = resolvers.mbonus_material(20, 10) },
 		resists = {},
 	},
 	resolvers.genericlast(function(e, ego) ego.wielder.resists[engine.DamageType.FIRE] = math.floor(ego.wielder.inc_damage[engine.DamageType.FIRE]*1.5) end),
@@ -47,7 +47,7 @@ newEntity{
 	rarity = 6,
 	cost = 2,
 	wielder = {
-		inc_damage = { [DamageType.COLD] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.COLD] = resolvers.mbonus_material(20, 10) },
 		resists = {},
 	},
 	resolvers.genericlast(function(e, ego) ego.wielder.resists[engine.DamageType.COLD] = math.floor(ego.wielder.inc_damage[engine.DamageType.COLD]*1.5) end),
@@ -61,7 +61,7 @@ newEntity{
 	rarity = 6,
 	cost = 2,
 	wielder = {
-		inc_damage = { [DamageType.NATURE] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.NATURE] = resolvers.mbonus_material(20, 10) },
 		resists = {},
 	},
 	resolvers.genericlast(function(e, ego) ego.wielder.resists[engine.DamageType.NATURE] = math.floor(ego.wielder.inc_damage[engine.DamageType.NATURE]*1.5) end),
@@ -75,7 +75,7 @@ newEntity{
 	rarity = 6,
 	cost = 2,
 	wielder = {
-		inc_damage = { [DamageType.LIGHTNING] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.LIGHTNING] = resolvers.mbonus_material(20, 10) },
 		resists = {},
 	},
 	resolvers.genericlast(function(e, ego) ego.wielder.resists[engine.DamageType.LIGHTNING] = math.floor(ego.wielder.inc_damage[engine.DamageType.LIGHTNING]*1.5) end),
@@ -89,7 +89,7 @@ newEntity{
 	rarity = 6,
 	cost = 2,
 	wielder = {
-		inc_damage = { [DamageType.LIGHT] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.LIGHT] = resolvers.mbonus_material(20, 10) },
 		resists = {},
 	},
 	resolvers.genericlast(function(e, ego) ego.wielder.resists[engine.DamageType.LIGHT] = math.floor(ego.wielder.inc_damage[engine.DamageType.LIGHT]*1.5) end),
@@ -103,7 +103,7 @@ newEntity{
 	rarity = 6,
 	cost = 2,
 	wielder = {
-		inc_damage = { [DamageType.DARKNESS] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.DARKNESS] = resolvers.mbonus_material(20, 10) },
 		resists = {},
 	},
 	resolvers.genericlast(function(e, ego) ego.wielder.resists[engine.DamageType.DARKNESS] = math.floor(ego.wielder.inc_damage[engine.DamageType.DARKNESS]*1.5) end),
@@ -117,7 +117,7 @@ newEntity{
 	rarity = 6,
 	cost = 2,
 	wielder = {
-		inc_damage = { [DamageType.ACID] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.ACID] = resolvers.mbonus_material(20, 10) },
 		resists = {},
 	},
 	resolvers.genericlast(function(e, ego) ego.wielder.resists[engine.DamageType.ACID] = math.floor(ego.wielder.inc_damage[engine.DamageType.ACID]*1.5) end),
@@ -132,7 +132,7 @@ newEntity{
 	rarity = 9,
 	cost = 2,
 	wielder = {
-		inc_damage = { [DamageType.BLIGHT] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.BLIGHT] = resolvers.mbonus_material(20, 10) },
 		resists = {},
 	},
 	resolvers.genericlast(function(e, ego) ego.wielder.resists[engine.DamageType.BLIGHT] = (ego.wielder.inc_damage[engine.DamageType.BLIGHT]) end),
@@ -146,7 +146,7 @@ newEntity{
 	rarity = 12,
 	cost = 2,
 	wielder = {
-		inc_damage = { [DamageType.PHYSICAL] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.PHYSICAL] = resolvers.mbonus_material(20, 10) },
 		resists = {},
 	},
 	resolvers.genericlast(function(e, ego) ego.wielder.resists[engine.DamageType.PHYSICAL] = ego.wielder.inc_damage[engine.DamageType.PHYSICAL] end),
@@ -160,7 +160,7 @@ newEntity{
 	rarity = 9,
 	cost = 2,
 	wielder = {
-		inc_damage = { [DamageType.MIND] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.MIND] = resolvers.mbonus_material(20, 10) },
 		resists = {},
 	},
 	resolvers.genericlast(function(e, ego) ego.wielder.resists[engine.DamageType.MIND] = ego.wielder.inc_damage[engine.DamageType.MIND] end),
@@ -174,7 +174,7 @@ newEntity{
 	rarity = 12,
 	cost = 2,
 	wielder = {
-		inc_damage = { [DamageType.TEMPORAL] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.TEMPORAL] = resolvers.mbonus_material(20, 10) },
 		resists = {},
 	},
 	resolvers.genericlast(function(e, ego) ego.wielder.resists[engine.DamageType.TEMPORAL] = ego.wielder.inc_damage[engine.DamageType.TEMPORAL] end),
@@ -188,7 +188,7 @@ newEntity{
 	rarity = 12,
 	cost = 6,
 	wielder = {
-		inc_damage = { [DamageType.ARCANE] = resolvers.mbonus_material(10, 10) },
+		inc_damage = { [DamageType.ARCANE] = resolvers.mbonus_material(20, 10) },
 		max_mana = resolvers.mbonus_material(100, 10),
 	},
 }
@@ -219,8 +219,8 @@ newEntity{
 		lucid_dreamer=1,
 		sleep=1,
 		resists={
-			[DamageType.MIND] = resolvers.mbonus_material(20, 10),
-			[DamageType.DARKNESS] = resolvers.mbonus_material(20, 10),
+			[DamageType.MIND] = resolvers.mbonus_material(10, 10),
+			[DamageType.DARKNESS] = resolvers.mbonus_material(10, 10),
 		},
 		combat_physresist = resolvers.mbonus_material(10, 10),
 		combat_spellresist = resolvers.mbonus_material(10, 10),
@@ -261,10 +261,10 @@ newEntity{
 	cost = 40,
 	wielder = {
 		inc_damage = { 
-			[DamageType.ACID] = resolvers.mbonus_material(10, 5),
-			[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 5),
-			[DamageType.FIRE] = resolvers.mbonus_material(10, 5),
-			[DamageType.COLD] = resolvers.mbonus_material(10, 5),
+			[DamageType.ACID] = resolvers.mbonus_material(20, 5),
+			[DamageType.PHYSICAL] = resolvers.mbonus_material(20, 5),
+			[DamageType.FIRE] = resolvers.mbonus_material(20, 5),
+			[DamageType.COLD] = resolvers.mbonus_material(20, 5),
 		},
 		resists={
 			[DamageType.ACID] = resolvers.mbonus_material(10, 10),
@@ -276,6 +276,30 @@ newEntity{
 		   [Talents.T_REFIT_GOLEM] = resolvers.mbonus_material(4, 2),
 		}
 	},	
+}
+
+-- Arcane Damage doesn't get resist too so we give it +mana instead
+newEntity{
+	power_source = {arcane=true},
+	name = "timebroken ", prefix=true, instant_resolve=true,
+	keywords = {timebroken=true},
+	level_range = {20, 50},
+	rarity = 20,
+	greater_ego = 1,
+	cost = 40,
+	wielder = {
+		inc_damage = {
+			[DamageType.ARCANE] = resolvers.mbonus_material(25, 5),
+			[DamageType.TEMPORAL] = resolvers.mbonus_material(25, 5),
+		},
+		inc_stats = {
+			[Stats.STAT_MAG] = resolvers.mbonus_material(4, 2),
+			[Stats.STAT_WIL] = resolvers.mbonus_material(4, 2),
+		},
+		max_mana = resolvers.mbonus_material(100, 10),
+		combat_spellpower = resolvers.mbonus_material(8, 2),
+		combat_spellcrit = resolvers.mbonus_material(4, 2),
+	},
 }
 
 newEntity{
@@ -338,8 +362,8 @@ newEntity{
 			[Stats.STAT_CUN] = resolvers.mbonus_material(5, 1),
 		},
 		inc_damage = {
-			[DamageType.LIGHT] = resolvers.mbonus_material(15, 5),
-			[DamageType.DARKNESS] = resolvers.mbonus_material(15, 5),
+			[DamageType.LIGHT] = resolvers.mbonus_material(25, 5),
+			[DamageType.DARKNESS] = resolvers.mbonus_material(25, 5),
 		},
 		combat_spellpower = resolvers.mbonus_material(5, 5),
 		combat_spellcrit = resolvers.mbonus_material(5, 5),
@@ -358,8 +382,8 @@ newEntity{
 			[Stats.STAT_MAG] = resolvers.mbonus_material(9, 1),
 		},
 		inc_damage = {
-			[DamageType.TEMPORAL] = resolvers.mbonus_material(15, 5),
-			[DamageType.PHYSICAL] = resolvers.mbonus_material(15, 5),
+			[DamageType.TEMPORAL] = resolvers.mbonus_material(25, 5),
+			[DamageType.PHYSICAL] = resolvers.mbonus_material(25, 5),
 		},
 		resists_pen = { 
 			[DamageType.TEMPORAL] = resolvers.mbonus_material(10, 5),
@@ -397,7 +421,7 @@ newEntity{
 			[DamageType.DARKNESS] = resolvers.mbonus_material(10, 5),
 		},
 		inc_damage = {
-			[DamageType.LIGHT] = resolvers.mbonus_material(15, 5),
+			[DamageType.LIGHT] = resolvers.mbonus_material(25, 5),
 		},
 		inc_stats = {
 			[Stats.STAT_MAG] = resolvers.mbonus_material(7, 3),
@@ -430,7 +454,7 @@ newEntity{
 	power_source = {antimagic=true},
 	name = "slimy ", prefix=true, instant_resolve=true,
 	keywords = {slimy=true},
-	level_range = {1, 50},
+	level_range = {20, 50},
 	rarity = 7,
 	cost = 6,
 	wielder = {
@@ -459,9 +483,9 @@ newEntity{
 			[Stats.STAT_WIL] = resolvers.mbonus_material(4, 4),
 		},
 		inc_damage = {
-			[DamageType.PHYSICAL] = resolvers.mbonus_material(10, 5),
-			[DamageType.COLD] = resolvers.mbonus_material(15, 5),
-			[DamageType.LIGHTNING] = resolvers.mbonus_material(15, 5),
+			[DamageType.PHYSICAL] = resolvers.mbonus_material(20, 5),
+			[DamageType.COLD] = resolvers.mbonus_material(25, 5),
+			[DamageType.LIGHTNING] = resolvers.mbonus_material(25, 5),
 		},
 	},
 }
@@ -478,7 +502,7 @@ newEntity{
 			[Stats.STAT_CON] = resolvers.mbonus_material(8, 2),
 		},
 		inc_damage = {
-			[DamageType.NATURE] = resolvers.mbonus_material(15, 5),
+			[DamageType.NATURE] = resolvers.mbonus_material(25, 5),
 		},
 		disease_immune = resolvers.mbonus_material(30, 20, function(e, v) return 0, v/100 end),
 		poison_immune = resolvers.mbonus_material(30, 20, function(e, v) return 0, v/100 end),
@@ -540,8 +564,8 @@ newEntity{
 	cost = 80,
 	wielder = {
 		inc_damage = {
-			[DamageType.PHYSICAL] = resolvers.mbonus_material(15, 5),
-			[DamageType.DARKNESS] = resolvers.mbonus_material(15, 5),
+			[DamageType.PHYSICAL] = resolvers.mbonus_material(25, 5),
+			[DamageType.DARKNESS] = resolvers.mbonus_material(25, 5),
 		},
 		resists_pen = { 
 			[DamageType.PHYSICAL] = resolvers.mbonus_material(15, 5),
@@ -562,7 +586,7 @@ newEntity{
 	cost = 80,
 	wielder = {
 		inc_damage = {
-			[DamageType.MIND] = resolvers.mbonus_material(15, 5),
+			[DamageType.MIND] = resolvers.mbonus_material(25, 5),
 		},
 		resists_pen = { 
 			[DamageType.MIND] = resolvers.mbonus_material(15, 5),

@@ -199,9 +199,9 @@ newTalent{
 			body = { INVEN = 10, MAINHAND = 1, BODY = 1, QUIVER=1, HANDS = 1, FEET = 1},
 
 			ai = "summoned", ai_real = "tactical",
-			ai_state = { ai_move="move_complex", talent_in=3, ally_compassion=10 },
+			ai_state = { ai_move="move_complex", talent_in=1, ally_compassion=10 },
 			ai_tactic = resolvers.tactic("ranged"),
-			
+			archery_pass_friendly = 1,
 			max_life = resolvers.rngavg(100,110),
 			life_rating = 12,
 			combat_armor = 0, combat_def = 0,

@@ -131,7 +131,7 @@ newTalent{
 	no_energy = true,
 	tactical = { DEFEND = 2 },
 	getShield = function(self, t) return 40 + self:combatTalentSpellDamage(t, 5, 500) / 10 end,
-	getDisruption = function(self, t) return 20 + self:combatTalentSpellDamage(t, 1, 10) end,
+	getDisruption = function(self, t) return 20 + self:combatTalentSpellDamage(t, 1, 40) end,
 	getNumEffects = function(self, t) return math.max(1,math.floor(self:combatTalentScale(t, 3, 7, "log"))) end,
 	on_pre_use = function(self, t)
 		for eff_id, p in pairs(self.tmp) do
@@ -153,17 +153,16 @@ newTalent{
 			end
 		end
 
-		for i = 1, t.getNumEffects(self, t) do
+		local nb_left = t.getNumEffects(self, t)
+		while nb_left > 0 do
 			if #effs == 0 then break end
 			local eff = rng.tableRemove(effs)
 			eff.e.on_aegis(self, eff.p, shield)
+			nb_left = nb_left - 1
 		end
 
-		if self:isTalentActive(self.T_DISRUPTION_SHIELD) then
-			local absorb = self.disruption_shield_absorb or 0
-			local mana = t.getDisruption(self, t) / 100 * absorb + 50
-			self:incMana(mana)
-			game.logSeen(self, "%s gains %d mana from Aegis!", self.name, mana)
+		if nb_left > 0 and self:isTalentActive(self.T_DISRUPTION_SHIELD) then
+			self:callTalent(self.T_DISRUPTION_SHIELD, "doAegis", t.getDisruption(self, t))
 		end
 
 		game:playSoundNear(self, "talents/heal")
@@ -171,12 +170,11 @@ newTalent{
 	end,
 	info = function(self, t)
 		local shield = t.getShield(self, t)
-		local disruption = (self.disruption_shield_absorb or 0) * t.getDisruption(self, t) / 100
 		return ([[Release arcane energies into most magical shields currently protecting you.
 		It will affect at most %d shield effects.
 		Damage Shield, Time Shield, Displacement Shield:  Increase the damage absorption value by %d%%.
-		Disruption Shield:  Gain %d%% of the damage absorbed + 50 as mana (%d).
+		Disruption Shield: Tap into the stored energies to restore the shield (at a rate of 2 energy per 1 shield power). Any leftover energy is converted back into mana at a rate of %0.2f energy per mana.
 		The charging will increase with your Spellpower.]]):
-		format(t.getNumEffects(self, t), shield, t.getDisruption(self, t), disruption + 50)
+		format(t.getNumEffects(self, t), shield, 100 / t.getDisruption(self, t))
 	end,
 }

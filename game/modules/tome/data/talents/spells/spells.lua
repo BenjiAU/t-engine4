@@ -60,13 +60,13 @@ newTalentType{ type="golem/golem", name = "golem", description = "Golem basic ca
 newTalentType{ type="golem/drolem", name = "drolem", description = "Drolem basic capacity." }
 
 -- Necromancer spells
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=true, type="spell/necrotic-minions", name = "necrotic minions", description = "Create and empower dumb undead minions." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=true, type="spell/advanced-necrotic-minions", name = "advanced necrotic minions", min_lev = 10, description = "Create and empower powerful undead minions." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=true, type="spell/nightfall", name = "nightfall", description = "Manipulate darkness itself to slaughter your foes." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=true, type="spell/shades", name = "shades", min_lev = 10, description = "Invoke and control shades." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=true, type="spell/necrosis", name = "necrosis", description = "Gain control over death, eventually turning into a lich." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=true, type="spell/grave", name = "grave", description = "Use the rotting cold doom of the tomb to fell your foes." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=true, type="spell/animus", name = "animus", description = "Crush the souls of your foes to improve yourself." }
+newTalentType{ allow_random=true, no_silence=true, is_necromancy=true, is_spell=true, mana_regen=true, type="spell/necrotic-minions", name = "necrotic minions", description = "Create and empower dumb undead minions." }
+newTalentType{ allow_random=true, no_silence=true, is_necromancy=true, is_spell=true, mana_regen=true, type="spell/advanced-necrotic-minions", name = "advanced necrotic minions", min_lev = 10, description = "Create and empower powerful undead minions." }
+newTalentType{ allow_random=true, no_silence=true, is_necromancy=true, is_spell=true, mana_regen=true, type="spell/nightfall", name = "nightfall", description = "Manipulate darkness itself to slaughter your foes." }
+newTalentType{ allow_random=true, no_silence=true, is_necromancy=true, is_spell=true, mana_regen=true, type="spell/shades", name = "shades", min_lev = 10, description = "Invoke and control shades." }
+newTalentType{ allow_random=true, no_silence=true, is_necromancy=true, is_spell=true, mana_regen=true, type="spell/necrosis", name = "necrosis", description = "Gain control over death, eventually turning into a lich." }
+newTalentType{ allow_random=true, no_silence=true, is_necromancy=true, is_spell=true, mana_regen=true, type="spell/grave", name = "grave", description = "Use the rotting cold doom of the tomb to fell your foes." }
+newTalentType{ allow_random=true, no_silence=true, is_necromancy=true, is_spell=true, mana_regen=true, type="spell/animus", name = "animus", description = "Crush the souls of your foes to improve yourself." }
 
 newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="spell/eldritch-shield", name = "eldritch shield", description = "Infuse arcane forces into your shield." }
 newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="spell/eldritch-stone", name = "eldritch stone", description = "Summon stony spikes imbued with various powers." }

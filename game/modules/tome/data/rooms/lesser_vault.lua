@@ -73,6 +73,7 @@ return function(gen, id, lev, old_lev)
 	if vault then
 		vault:generate(lev, old_lev)
 		print("generated lesser_vault", vaultid)
+		if config.settings.cheat then game.log("#GOLD#PLACED LESSER VAULT: %s", vaultid) end
 	end
 	game.level = old_game_level
 	gen.level.map = old_map

@@ -336,7 +336,7 @@ newTalent{
 	info = function(self, t)
 		local chance = t.getChance(self, t)
 		local mindResistChange = t.getMindResistChange(self, t)
-		return ([[Every time you inflict mental damage, there is a %d%% chance that your foe must save against your Mindpower or go mad. Madness can cause them to become confused, slowed or stunned for 3 turns, and lowers resistance to mental damage by %d%%.]]):format(chance, -mindResistChange)
+		return ([[Every time you inflict mind damage, there is a %d%% chance that your foe must save against your Mindpower or go mad. Madness can cause them to become confused, slowed or stunned for 3 turns, and lowers resistance to mind damage by %d%%.]]):format(chance, -mindResistChange)
 	end,
 }
 

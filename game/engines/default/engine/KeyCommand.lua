@@ -80,6 +80,7 @@ function _M:setupRebootKeys()
 end
 
 function _M:receiveKey(sym, ctrl, shift, alt, meta, unicode, isup, key)
+	if not self:isEnabled() then return end
 	self:handleStatus(sym, ctrl, shift, alt, meta, unicode, isup)
 
 	if self.ignore[sym] then return end

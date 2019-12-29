@@ -23,4 +23,5 @@ return { one_per_level=true,
 	{name="whistling-vortex", minor=true, percent=50},
 	{name="glowing-chest", minor=true, percent=30},
 	{name="glowing-chest", minor=true, percent=30},
+	{name="sub-vault", minor=true, percent=100, max_repeat=3},
 }

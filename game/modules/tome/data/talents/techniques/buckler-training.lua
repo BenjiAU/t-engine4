@@ -13,8 +13,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-local archerPreUse = Talents.archerPreUse
-
 local preUse = function(self, t, silent)
 	if not self:hasShield() or not archerPreUse(self, t, true) then
 		if not silent then game.logPlayer("You require a ranged weapon and a shield to use this talent.") end

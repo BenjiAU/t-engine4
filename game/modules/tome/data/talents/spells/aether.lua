@@ -182,6 +182,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Rupture reality to temporarily open a passage to the aether, triggering %d random arcane explosions in the target area.
 		Each explosion does %0.2f arcane damage in radius 2, and will each trigger at one turn intervals.
+		Subsequent casts will stack but the explosions will still only occur once per turn and will be centered at the last area targeted.
 		The damage will increase with your Spellpower.]]):
 		format(t.getNb(self, t), damDesc(self, DamageType.ARCANE, damage))
 	end,
@@ -208,6 +209,7 @@ newTalent{
 		if not self:hasEffect(self.EFF_AETHER_AVATAR) then return end
 		if ab.mode == "sustained" then return end
 		if ab.use_only_arcane and self:getTalentLevel(t) >= ab.use_only_arcane then return end
+		if self:attr("force_talent_ignore_ressources") then return end
 		if self.turn_procs.aether_avatar_penalty then return end
 		self:incMana(-50)
 		game.logSeen(self, "#VIOLET#%s loses 50 mana from using a non-Arcane talent!#LAST#", self.name:capitalize())
@@ -229,7 +231,7 @@ newTalent{
 
 		for tid, _ in pairs(self.talents) do check(tid) end
 		for tree, _ in pairs(self.talents_types) do
-			for _, checkt in ipairs(self.talents_types_def[tree].talents) do check(checkt.id) end
+			for _, checkt in ipairs(self.talents_types_def[tree] and self.talents_types_def[tree].talents or {}) do check(checkt.id) end
 		end
 
 		local list = {}
@@ -271,7 +273,7 @@ newTalent{
 	tactical = { BUFF = 2 },
 	getNbRemove = function(self, t) return math.floor(self:combatTalentScale(t, 1, 4)) end,
 	getDamageIncrease = function(self, t) return self:combatTalentScale(t, 2.5, 10) end,
-	getResistPenalty = function(self, t) return self:combatTalentLimit(t, 100, 17, 50, true) end, -- Limit < 100%	
+	getResistPenalty = function(self, t) return self:combatTalentLimit(t, 60, 17, 50, true) end, -- Limit < 60%	
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/arcane")
 

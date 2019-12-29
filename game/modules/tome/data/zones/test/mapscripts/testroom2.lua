@@ -63,6 +63,7 @@ for _, edge in pairs(mstrun.mst) do
 end
 
 bsp:applyOnGroups(bsp:findGroupsOf{'.', '+'}, function(room, idx)
+	room:submap(tm)
 	if room.map.data_size:area() < 10 then
 		room.map:carveArea('#', room.map:point(1, 1), room.map.data_size)
 	end

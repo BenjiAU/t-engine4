@@ -47,7 +47,7 @@ newAI("move_dmap", function(self)
 			return self:runAI("move_simple")
 		end
 
-		local c = a:distanceMap(self.x, self.y)
+		local c = a.distanceMap and a:distanceMap(self.x, self.y)
 		local dir = 5
 
 		if c and ax == a.x and ay == a.y then
@@ -109,7 +109,7 @@ newAI("flee_dmap", function(self)
 		local a = self.ai_target.actor
 		local ax, ay = self:aiSeeTargetPos(a)
 
-		local c = a:distanceMap(self.x, self.y)
+		local c = a.distanceMap and a:distanceMap(self.x, self.y)
 		local dir = 5
 		
 		if c and ax == a.x and ay == a.y then

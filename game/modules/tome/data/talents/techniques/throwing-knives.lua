@@ -72,6 +72,9 @@ local function throw(self, range, dam, x, y, dtype, special, fok)
 	local proj = self:projectile(tg, x, y, function(px, py, tg, self)
 		local target = game.level.map(px, py, engine.Map.ACTOR)
 		if target and target ~= self then
+			local hits = table.get(target.turn_procs, "hit_by_throwing_knife") or 0
+			if hits and hits >= 5 then return end
+			table.set(target.turn_procs, "hit_by_throwing_knife", hits + 1)
 			local t = self:getTalentFromId(self.T_THROWING_KNIVES)
 			local t2 = self:getTalentFromId(self.T_PRECISE_AIM)
 			local combat = t.getKnives(self, t)

@@ -685,6 +685,15 @@ You may try to force loading if you are sure the savefile does not use that addo
 		f()
 	end
 	self:setCurrentHookDir(nil)
+
+	local add_check = {}
+	for i, add in ipairs(adds) do
+		if add_check[add.short_name] then
+			util.showMainMenu(false, nil, nil, nil, nil, nil, ("duplicate_addon=%q"):format(add.long_name), nil)
+		end
+		add_check[add.short_name] = add
+	end
+
 	return hashlist
 end
 

@@ -49,6 +49,7 @@ It looks like the horrors you fought when coming inside, only less degenerated.
 The thing looks roughly humanoid, but it has no head and its limbs look like tentacles. It does not seem hostile.#WHITE#*]],
 	answers = {
 		{"[Leave the orb alone]", action=function(npc, player)
+			if not player:hasQuest("shertul-fortress") then player:grantQuest("shertul-fortress") end
 			player:hasQuest("shertul-fortress"):spawn_butler()
 		end,},
 	}

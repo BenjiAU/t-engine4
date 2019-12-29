@@ -17,8 +17,6 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-local archerPreUse = Talents.archerPreUse
-
 newTalent{
 	name = "Guided Shot",
 	type = {"psionic/psi-archery", 1},

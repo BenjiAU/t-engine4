@@ -52,6 +52,7 @@ game.zone.on_turn = function()
 	if game.turn % 10 ~= 0 or not game.zone.meteor_event_levels[game.level.level] then return end
 
 	local p = game:getPlayer(true)
+	if not p.x or not game.level.data.meteor_x then return end
 	if core.fov.distance(p.x, p.y, game.level.data.meteor_x, game.level.data.meteor_y) > 3 then return end
 
 	game.zone.meteor_event_levels[game.level.level] = nil

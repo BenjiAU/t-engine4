@@ -39,7 +39,7 @@ newEntity{
 
 newEntity{ base = "BASE_GAUNTLETS",
 	name = "iron gauntlets", short_name = "iron",
-	level_range = {1, 20},
+	level_range = {1, 10},
 	cost = 5,
 	material_level = 1,
 	wielder = {
@@ -58,9 +58,9 @@ newEntity{ base = "BASE_GAUNTLETS",
 
 newEntity{ base = "BASE_GAUNTLETS",
 	name = "dwarven-steel gauntlets", short_name = "d.steel",
-	level_range = {20, 40},
+	level_range = {10, 30},
 	cost = 7,
-	material_level = 3,
+	material_level = 2, effective_ego_material_level = 3,
 	wielder = {
 		combat_armor = 2,
 		fatigue = 3,
@@ -77,9 +77,9 @@ newEntity{ base = "BASE_GAUNTLETS",
 
 newEntity{ base = "BASE_GAUNTLETS",
 	name = "voratun gauntlets", short_name = "voratun",
-	level_range = {40, 50},
+	level_range = {30, 50},
 	cost = 10,
-	material_level = 5,
+	material_level = 4, effective_ego_material_level = 5,
 	wielder = {
 		combat_armor = 3,
 		fatigue = 5,

@@ -85,6 +85,7 @@ newTalent{
 	tactical = { DEFEND = 1, ATTACK=1 },
 	getPower = function(self, t) return (60 + self:combatTalentSpellDamage(t, 15, 450)) / 7, 7, self:combatTalentLimit(t, 100, 27, 55) end, --Limit life gain < 100%
 	action = function(self, t)
+		if not self.alchemy_golem then return end
 		local regen, dur, hp = t.getPower(self, t)
 
 		-- ressurect the golem

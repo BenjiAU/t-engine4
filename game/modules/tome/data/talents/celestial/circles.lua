@@ -180,8 +180,16 @@ newTalent{
 	positive = 15,
 	negative = 15,
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 10, 75) end,
-	getSlow = function(self, t) return math.max(50, self:combatTalentSpellDamage(t, 10, 40)) end,
+	getSlow = function(self, t) return 50 end,
 	getDuration = function(self, t) return self:combatTalentLimit(t, 15, 1, 10) end,
+	getSlowDur = function(self, t) return self:combatTalentLimit(t, 7, 2, 5) end,
+	on_pre_use = function(self, t, silent)
+		if not game.level then return end
+		for i, e in ipairs(game.level.map.effects) do
+			if e.src and e.src == self and (e.damtype == DamageType.SHIFTINGSHADOWS or e.damtype == DamageType.SANCTITY or e.damtype == DamageType.WARDING or e.damtype == DamageType.BLAZINGLIGHT) then return true end
+		end
+		return false
+	end,
 	action = function(self, t)
 		local dur = t.getDuration(self, t)
 		self:setEffect(self.EFF_SURGING_CIRCLES, dur, {})
@@ -193,17 +201,17 @@ newTalent{
 					local power = t.getSlow(self, t) / 100
 					e.src:project(tg, e.x, e.y, DamageType.LIGHT, dam)
 					e.src:project(tg, e.x, e.y, DamageType.DARKNESS, dam)
-					e.src:project(tg, e.x, e.y, DamageType.SLOW, power)
+					e.src:project(tg, e.x, e.y, DamageType.SLOW, {dam=power, dur=t.getSlowDur(self, t)})
 				end
 			end
 		end
 		return true
 	end,
 	info = function(self, t)
-		return ([[Conjure a surge of celestial power through your circles. Any foe standing within one of your circles will be slowed by %d%% and take %d light and %d darkness damage.
+		return ([[Conjure a surge of celestial power through your circles. Any foe standing within one of your circles will be slowed by %d%% for %d turns and take %d light and %d darkness damage.
 		Residual power from the surge will emanate from your circles for %d turns; each circle you stand in will increase your celestial resources.
 		Shifting Shadows: +1 negative.
 		Sanctity: +1 postive.
-		Warding: +0.5 postive and negative.]]):format(t.getSlow(self, t), damDesc(self, DamageType.LIGHT, t.getDamage(self, t)), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t)), t.getDuration(self, t))
+		Warding: +0.5 postive and negative.]]):format(t.getSlow(self, t), t.getSlowDur(self, t), damDesc(self, DamageType.LIGHT, t.getDamage(self, t)), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t)), t.getDuration(self, t))
 	end,
 }

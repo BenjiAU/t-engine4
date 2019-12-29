@@ -95,6 +95,9 @@ local function createDarkTendrils(summoner, x, y, target, damage, duration, pinD
 				self.target:setEffect(self.target.EFF_PINNED, self.pinDuration, {})
 
 				-- explode
+				if tCreepingDarkness.canCreep(self.x, self.y) then
+					tCreepingDarkness.createDark(self.summoner, self.x, self.y, self.damage, 3, 2, 33, 0)
+				end
 				local dark = game.level.map:checkAllEntities(self.x, self.y, "creepingDark")
 				if dark then
 					dark.duration = math.max(dark.duration, self.pinDuration + 1)
@@ -304,11 +307,12 @@ newTalent{
 		local damage = self:mindCrit(t.getDamage(self, t))
 		local darkCount = t.getDarkCount(self, t)
 
-		local tg = {type="ball", nolock=true, pass_terrain=false, nowarning=true, friendly_fire=true, default_target=self, range=range, radius=radius, talent=t}
+		local tg = {type="ball", can_autoaccept=true, nolock=true, pass_terrain=false, nowarning=true, friendly_fire=true, default_target=self, range=range, radius=radius, talent=t}
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		if t.canCreep(x, y) then t.createDark(self, x, y, damage, rng.range(5, 8), 4, 40, 0) end --creep target
+
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
+		if t.canCreep(x, y) then t.createDark(self, x, y, damage, rng.range(5, 8), 4, 40, 0) end --creep target
 
 		-- get locations in line of movement from center
 		local locations = {}
@@ -382,7 +386,7 @@ newTalent{
 	hate = 8,
 	cooldown = 6,
 	tactical = { ATTACK = { DARKNESS = 2 }, DISABLE = { blind = 1 } },
-	range = 5,
+	range = 7,
 	direct_hit = true,
 	reflectable = true,
 	requires_target = true,

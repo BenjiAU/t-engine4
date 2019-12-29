@@ -19,6 +19,8 @@
 
 load("/data/general/npcs/orc.lua", rarity(3))
 load("/data/general/npcs/orc-grushnak.lua", rarity(0))
+load("/data/general/npcs/jelly.lua", function(e) e.slime_rarity, e.rarity = e.rarity, nil end)
+load("/data/general/npcs/ooze.lua", function(e) e.slime_rarity, e.rarity = e.rarity, nil end)
 
 load("/data/general/npcs/all.lua", rarity(4, 35))
 

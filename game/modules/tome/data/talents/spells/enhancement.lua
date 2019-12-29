@@ -46,7 +46,14 @@ newTalent{
 			if self:attackTargetWith(target, weapon, DamageType.ARCANE, t.getDamage(self, t)) or hit then hit = true end
 		end
 
-		if hit then self:incMana(t.getMana(self, t)) end
+		if hit then 
+			self:incMana(t.getMana(self, t)) 
+			if core.shader.active(4) then
+				self:addParticles(Particles.new("shader_shield_temp", 1, {toback=true, size_factor=1.5, y=-0.3, img="healarcane", life=25}, {type="healing", time_factor=2000, beamsCount=20, noup=2.0, beamColor1={0x8e/255, 0x2f/255, 0xbb/255, 1}, beamColor2={0xe7/255, 0x39/255, 0xde/255, 1}, circleDescendSpeed=4}))
+				self:addParticles(Particles.new("shader_shield_temp", 1, {toback=false, size_factor=1.5, y=-0.3, img="healarcane", life=25}, {type="healing", time_factor=2000, beamsCount=20, noup=1.0, beamColor1={0x8e/255, 0x2f/255, 0xbb/255, 1}, beamColor2={0xe7/255, 0x39/255, 0xde/255, 1}, circleDescendSpeed=4}))
+			end
+			game:playSoundNear(self, "talents/arcane")
+		end
 
 		return true
 	end,

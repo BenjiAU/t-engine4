@@ -353,7 +353,7 @@ newEntity{
 	rarity = 30,
 	cost = 40,
 	wielder = {
-		movement_speed = resolvers.mbonus_material(0.3, 0.2),
+		movement_speed = resolvers.mbonus_material(30, 20, function(e, v) v=v/100 return 0, v end),
 		resists_pen = {
 			[DamageType.COLD] = resolvers.mbonus_material(20, 5),
 			[DamageType.LIGHTNING] = resolvers.mbonus_material(20, 5),

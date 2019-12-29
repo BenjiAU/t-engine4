@@ -191,7 +191,7 @@ newTalent{
 	cooldown = 30,
 	tactical = { BUFF = 2 },
 	getPhysicalDamageIncrease = function(self, t) return self:combatTalentScale(t, 2.5, 10) end,
-	getResistPenalty = function(self, t) return self:combatTalentLimit(t, 100, 17, 50, true) end,  -- Limit to < 100%
+	getResistPenalty = function(self, t) return self:combatTalentLimit(t, 60, 17, 50, true) end,  -- Limit to < 60%
 	getSaves = function(self, t) return self:getTalentLevel(t) * 5 end,
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/earth")
