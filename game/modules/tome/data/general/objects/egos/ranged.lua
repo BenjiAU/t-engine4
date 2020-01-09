@@ -222,7 +222,7 @@ newEntity{
 		},
 	},
 	combat = {
-		talent_on_hit = { [Talents.T_ARCANE_VORTEX] = {level=3, chance=10} },
+		talent_on_hit = { [Talents.T_ARCANE_VORTEX] = {level=resolvers.genericlast(function(e) return e.material_level end), chance=10}, },
 	}
 }
 

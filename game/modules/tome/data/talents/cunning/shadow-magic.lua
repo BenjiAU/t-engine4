@@ -32,7 +32,7 @@ newTalent{
 		if not p then return "" end
 		return tostring(math.floor(damDesc(self, DamageType.DARKNESS, t.getDamage(self, t)))), "buff_font_smaller"
 	end,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 1, 70) end,  -- This doesn't crit or generally scale easily so its safe to be aggressive
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 1, 70)+10 end,  -- This doesn't crit or generally scale easily so its safe to be aggressive
 	getManaCost = function(self, t) return 0 end,
 	activate = function(self, t)
 		local ret = {}

@@ -61,21 +61,25 @@ newTalent{
 			local e = self.tempeffect_def[eff_id]
 			if e.status == "detrimental" then
 				if e.subtype.stun then 
-					effs[#effs+1] = {"effect", eff_id}
+					effs[#effs+1] = {"effect", eff_id, priority=1}
 				elseif e.subtype.blind and self:getTalentLevel(t) >=2 then
-					effs[#effs+1] = {"effect", eff_id}
+					effs[#effs+1] = {"effect", eff_id, priority=2}
 				elseif e.subtype.confusion and self:getTalentLevel(t) >=3 then
-					effs[#effs+1] = {"effect", eff_id}
+					effs[#effs+1] = {"effect", eff_id, priority=3}
 				elseif e.subtype.pin and self:getTalentLevel(t) >=4 then
-					effs[#effs+1] = {"effect", eff_id}
-				elseif (e.subtype.slow or e.subtype.wound) and self:getTalentLevel(t) >=5 then
-					effs[#effs+1] = {"effect", eff_id}
+					effs[#effs+1] = {"effect", eff_id, priority=4}
+				elseif e.subtype.slow and self:getTalentLevel(t) >=5 then
+					effs[#effs+1] = {"effect", eff_id, priority=5}
+				elseif e.subtype.disarm and self:getTalentLevel(t) >=5 then
+					effs[#effs+1] = {"effect", eff_id, priority=6}
 				end
 			end
 		end
+
+		table.sort(effs, "priority")
 		
 		if #effs > 0 then
-			local eff = rng.tableRemove(effs)
+			local eff = effs[1]
 			if eff[1] == "effect" and rng.percent(t.getChance(self, t)) then
 				self:removeEffect(eff[2])
 				game.logSeen(self, "#ORCHID#%s has recovered!#LAST#", self.name:capitalize())
@@ -85,7 +89,8 @@ newTalent{
 	info = function(self, t)
 		local chance = t.getChance(self, t)
 		return ([[You've learned to recover quickly from effects that would disable you. Each turn, you have a %d%% chance to recover from a single stun effect.
-		At talent level 2 you may also recover from blindness, at level 3 confusion, level 4 pins, and level 5 slows and wounds. 
+		At talent level 2 you may also recover from blindness, at level 3 confusion, level 4 pins, and level 5 disarms and slows.
+		Effects will be cleansed with the priority order Stun > Blind > Confusion > Pin > Slow > Disarm.
 		Only one effect may be recovered from each turn, and the chance to recover from an effect scales with your Constitution.]]):
 		format(chance)
 	end,

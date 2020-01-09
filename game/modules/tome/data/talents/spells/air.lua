@@ -244,7 +244,7 @@ newTalent{
 		local targetcount = t.getTargetCount(self, t)
 		local damage = t.getDamage(self, t)
 		return ([[Conjures a furious, raging lightning storm with a radius of 6 that follows you as long as this spell is active.
-		Each turn, a random lightning bolt will hit up to %d of your foes for 1 to %0.2f damage (%0.2f average) in a radius of 1.
+		Each turn, a random lightning bolt will hit up to %d of your foes for 1.00 to %0.2f damage (%0.2f average) in a radius of 1.
 		The damage will increase with your Spellpower.]]):
 		format(targetcount, damDesc(self, DamageType.LIGHTNING, damage), damDesc(self, DamageType.LIGHTNING, damage / 2))
 	end,

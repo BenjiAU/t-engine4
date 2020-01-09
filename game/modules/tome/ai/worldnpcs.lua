@@ -35,7 +35,7 @@ newAI("target_world", function(self)
 		-- find the closest enemy
 		if act and self:reactionToward(act) < 0 and not act.dead and
 				-- Otherwise check if we can see it with our "senses"
-				self.fov.actors[act].sqdist <= sqsense
+				self.fov.actors[act] and self.fov.actors[act].sqdist <= sqsense
 				then
 
 			self.ai_target.actor = act

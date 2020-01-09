@@ -178,6 +178,8 @@ end
 --- Move one step to the given target if possible
 -- This tries the most direct route, if not available it checks sides and always tries to get closer
 function _M:moveDirection(x, y)
+	if self.x == x and self.y == y then self:useEnergy() end
+
 	local l = line.new(self.x, self.y, x, y)
 	local lx, ly = l()
 	if lx and ly then
@@ -235,8 +237,10 @@ function _M:act()
 			self.homing.count = self.homing.count - 1
 			if self.src then self.src.__project_source = self end -- intermediate projector source
 			if self.x == self.homing.target.x and self.y == self.homing.target.y then
-				game.level:removeEntity(self, true)
-				self.dead = true
+				if not self.homing.dont_stop_on_hit then
+					game.level:removeEntity(self, true)
+					self.dead = true
+				end
 				self.homing.on_hit(self, self.src, self.homing.target)
 			elseif self.homing.count <= 0 then
 				game.level:removeEntity(self, true)
@@ -260,8 +264,10 @@ function _M:on_move(x, y, target)
 		self.src:projectDoStop(self.project.def.typ, self.project.def.tg, self.project.def.damtype, self.project.def.dam, self.project.def.particles, self.x, self.y, self.tmp_proj, self.x, self.y, self)
 	elseif self.homing then
 		if (self.x == self.homing.target.x and self.y == self.homing.target.y) then
-			game.level:removeEntity(self, true)
-			self.dead = true
+			if not self.homing.dont_stop_on_hit then
+				game.level:removeEntity(self, true)
+				self.dead = true
+			end
 			self.homing.on_hit(self, self.src, self.homing.target)
 		else
 			self.homing.on_move(self, self.src)
@@ -316,7 +322,7 @@ function _M:makeProject(src, display, def, do_move, do_act, do_stop)
 end
 
 --- Generate a projectile for an homing projectile
-function _M:makeHoming(src, display, def, target, count, on_move, on_hit)
+function _M:makeHoming(src, display, def, target, count, on_move, on_hit, dont_stop_on_hit)
 	display = display or {display='*'}
 	local speed = def.speed
 	local name = def.name
@@ -330,7 +336,7 @@ function _M:makeHoming(src, display, def, target, count, on_move, on_hit)
 		src = src,
 		def = def,
 		start_x = def.start_x or src.x, start_y = def.start_y or src.y,
-		homing = {target=target, count=count, on_move=on_move, on_hit=on_hit},
+		homing = {target=target, count=count, on_move=on_move, on_hit=on_hit, dont_stop_on_hit=dont_stop_on_hit},
 		energy = {mod=speed},
 		tmp_proj = {},
 	}

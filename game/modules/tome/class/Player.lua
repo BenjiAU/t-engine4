@@ -574,6 +574,25 @@ function _M:playerFOV()
 		end, true, true, true)
 	end
 
+	-- See everything and ignore all forms of blocking, dev mode feature
+	if self:attr("omnivision") then
+		self:computeFOV(self:attr("omnivision"), "we_need_useless_string_not_nil", function(x, y)
+			local ok = false
+			if game.level.map(x, y, game.level.map.ACTOR) then ok = true end
+			if game.level.map(x, y, game.level.map.OBJECT) then ok = true end
+			if game.level.map(x, y, game.level.map.TRAP) then
+				game.level.map(x, y, game.level.map.TRAP):setKnown(self, true, x, y)
+				game.level.map.remembers(x, y, true)
+				game.level.map:updateMap(x, y)
+				ok = true
+			end
+
+			if ok then
+				game.level.map.seens(x, y, 0.6)
+			end
+		end, true, true, true)
+	end
+
 	-- Handle arcane eye
 	if self:hasEffect(self.EFF_ARCANE_EYE) then
 		local eff = self:hasEffect(self.EFF_ARCANE_EYE)
@@ -1147,6 +1166,10 @@ function _M:restStep()
 		self:useEnergy()
 		self.resting.cnt = self.resting.cnt + 1
 		self:fireTalentCheck("callbackOnWait")
+
+		-- Disable sustains that deactivate on rest
+		self:checkSustainDeactivate("rest")
+
 		return true
 	end
 end
@@ -1223,8 +1246,11 @@ function _M:runCheck(ignore_memory)
 		if game.level.map:checkAllEntities(x, y, "store") then noticed = "store entrance spotted" ; return false, noticed end
 	end)
 	if noticed then return false, noticed end
-
-	return engine.interface.PlayerRun.runCheck(self)
+	local can, noticed = engine.interface.PlayerRun.runCheck(self)
+	if can then
+		self:checkSustainDeactivate("run")
+	end
+	return can, noticed
 end
 
 --- Move with the mouse

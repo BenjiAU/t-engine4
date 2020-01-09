@@ -278,6 +278,7 @@ newBirthDescriptor{
 		"All enemies have 200% more life",
 		"Rare creatures are far more frequent and random bosses start to appear",
 		"Stairs can not be used for 9 turns after a kill.",
+		"Player starts with 100 more life and 500 gold, but trust us, you'll need it!",
 		"Player is being hunted! Randomly all foes in a radius will get a feeling of where she/he is",
 		"Player can earn Madness version of achievements if also playing in Roguelike or Adventure permadeath mode.",
 	},
@@ -292,6 +293,8 @@ newBirthDescriptor{
 	copy = {
 		instakill_immune = 1,
 		__game_difficulty = 5,
+		money = 500,
+		max_life_bonus = 100,
 	},
 	game_state = {
 		default_random_rare_chance = 3,

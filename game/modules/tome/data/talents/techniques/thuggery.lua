@@ -102,8 +102,8 @@ newTalent{
 	mode = "passive",
 	points = 5,
 	require = techs_req3,
-	critpower = function(self, t) return self:combatTalentScale(t, 6, 25, 0.75) end,
-	getAPR = function(self, t) return self:combatTalentScale(t, 5, 20, 0.75) end,
+	critpower = function(self, t) return self:combatTalentScale(t, 6, 25) end,
+	getAPR = function(self, t) return self:combatTalentScale(t, 5, 20) end,
 	passives = function(self, t, p)
 		self:talentTemporaryValue(p, "combat_critical_power", t.critpower(self, t))
 		self:talentTemporaryValue(p, "combat_apr", t.getAPR(self, t))
@@ -139,8 +139,7 @@ newTalent{
 	getCrit = function(self, t) return self:combatTalentStatDamage(t, "dex", 10, 50) / 1.5 end,
 	getPen = function(self, t) return self:combatLimit(self:combatTalentStatDamage(t, "str", 10, 50), 100, 0, 0, 35.7, 35.7) end, -- Limit to <100%
 	getSpeed = function(self, t) return self:combatTalentScale(t, 0.10, 0.20, 0.75) end,
-	callbackOnRest = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
-	callbackOnRun = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
+	deactivate_on = {no_combat=true, run=true, rest=true},
 	activate = function(self, t)
 		local ret = {
 			crit = self:addTemporaryValue("combat_physcrit", t.getCrit(self, t)),

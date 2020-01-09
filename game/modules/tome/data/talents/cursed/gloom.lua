@@ -121,7 +121,7 @@ newTalent{
 		local chance = t.getChance(self, t)
 		local duration = t.getDuration(self, t)
 		local mindpowerChange = gloomTalentsMindpower(self)
-		return ([[A terrible gloom surrounds you, affecting all those who approach to within radius 3. At the end of each turn, those caught in your gloom must save against your Mindpower, or have a %d%% chance to suffer from slowness (30%%), stun or confusion (30%%) for %d turns.
+		return ([[A terrible gloom surrounds you, affecting all those who approach to within radius 3. At the end of each game turn, those caught in your gloom must save against your Mindpower, or have a %d%% chance to suffer from slowness (30%%), stun or confusion (30%%) for %d turns.
 		The chance increases with your mind speed.
 		This ability is innate, and carries no cost to activate or deactivate.
 		Each point in Gloom talents increases your Mindpower (current total: %d).]]):format(chance, duration, mindpowerChange)

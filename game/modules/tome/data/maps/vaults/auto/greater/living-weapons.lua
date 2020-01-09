@@ -52,15 +52,13 @@ local imbueEgo = function(gem, object)
    if not gem then return end
    if not object then return end
    local Entity = require("engine.Entity")
-   local ego = Entity.new{
-      fake_ego = true,
-      name = "imbued_"..gem.name,
-      keywords = {[gem.name] = true},
-      wielder = table.clone(gem.imbue_powers, true),
-      been_imbued = true,
-      egoed = true,
-   }
-   if gem.talent_on_spell then ego.talent_on_spell = table.clone(gem.talent_on_spell, true) end  -- Its really weird that this table structure is different for one property
+	local ego = Entity.new{
+		name = "imbue "..gem.name,
+		keywords = {[gem.name] = true},
+		wielder = table.clone(gem.imbue_powers),
+		talent_on_spell = gem.talent_on_spell,
+		fake_ego = true, unvault_ego = true,
+	}
    game.zone:applyEgo(object, ego, "object", true)
 end
 -- A lot of elseif
@@ -69,11 +67,14 @@ local make_poltergeist = function(type)
     local filter = nil
     local x_level = nil
     if type == "greater" then
-        filter = {no_tome_drops=true, unique=true, special=function(o) return (o.slot == "MAINHAND") end}
+		filter = {no_tome_drops=true, unique=true, special=function(o) return (o.slot == "MAINHAND") end}
         x_level = math.max(15, resolvers.current_level + 10)
-    else
-        filter = {id=true, add_levels=5, force_tome_drops=true, tome_drops="store", tome_mod="gvault", special=function(o) return (o.slot == "MAINHAND") end}
+    elseif type == "normal" then
+        filter = {id=true, type="weapon", add_levels=5, force_tome_drops=true, tome_drops="store", tome_mod="gvault", special=function(o) return true end}
         x_level = math.max(10, resolvers.current_level + 5)
+    else
+        filter = {id=true, type="weapon", add_levels=0, force_tome_drops=true, tome_drops="store", tome_mod="vault", special=function(o) return true end}
+        x_level = math.max(5, resolvers.current_level)
     end
     o = game.zone:makeEntity(game.level, "object", filter, nil, true)
     o.no_drop = false
@@ -142,6 +143,27 @@ local make_poltergeist = function(type)
             {type="weapon", subtype="greatsword", autoreq=true, force_inven = "PSIONIC_FOCUS", no_drops=true},
         }
         make_req(el, o, "mindstar")
+    elseif o.subtype == "steamgun" then --For Orcs DLC!
+        class = "Gunslinger"
+        e.autolevel = "slinger"
+        e.ai_tactic = resolvers.tactic"ranged"
+        e[#e+1] = resolvers.talents{
+            [Talents.T_STEAMGUN_MASTERY] = {base=1, every=10, max=5},
+            [Talents.T_STRAFE] = {base=1, every=10, max=5},
+            [Talents.T_SHOOT] = 1
+        }
+        e[#e+1] = resolvers.inscription("IMPLANT:_STEAM_GENERATOR", {cooldown=32, power=10}),
+        make_req(el, o, "steamgun")
+        make_req(el, o, "shot", "QUIVER")
+    elseif o.subtype == "steamsaw" then
+        class = "Sawbutcher"
+        e.autolevel = "warrior"
+        e[#e+1] = resolvers.talents{
+            [Talents.T_STEAMSAW_MASTERY]={base=1, every=10, max=5},
+            [Talents.T_TO_THE_ARMS] = {base=1, every=10, max=5},
+        }
+        e[#e+1] = resolvers.inscription("IMPLANT:_STEAM_GENERATOR", {cooldown=32, power=10}),
+        make_req(el, o, "steamsaw")
 	elseif o.subtype == "whip" then
 		class = "Corruptor"
 		e.autolevel = "caster"
@@ -176,20 +198,34 @@ local make_poltergeist = function(type)
     end
     e[#e+1] = resolvers.auto_equip_filters(class)
 
-    if type == "greater"  then
+    if type == "greater" then
         e.name = "Poltergeist " .. o.name
         e.rank = 3.5
+        e.max_life = resolvers.rngavg(100,120)
+        e.life_rating = 20
+        e.resist = {all=20}
         e.auto_classes={
             {class=class, start_level=10, level_rate=80},
-            {class="Cursed", start_level=20, level_rate=40}
+            {class=(rng.percent(65) and "Cursed" or "Doomed"), start_level=20, level_rate=40}
         }
-    else
+    elseif type == "normal" then
         e.name = "Animated " .. o.name
         e.rank = 3
+        e.max_life = resolvers.rngavg(80,100)
+        e.life_rating = 15
         e.auto_classes={
             {class=class, start_level=10, level_rate=50}
         }
+    else
+        e.name = "Moving " .. o.name
+        e.rank = 2
+        e.max_life = resolvers.rngavg(60,80)
+        e.life_rating = 12
+        e.auto_classes={
+            {class=class, start_level=10, level_rate=30}
+        }
     end
+
     if type == "greater" then
         local filter = {type="gem", ignore_material_restriction=true,special=function(ee) return ee.material_level == o.material_level end}
         gem = game.zone:makeEntity(game.level, "object", filter, nil, true)
@@ -213,50 +249,71 @@ specialList("actor", {
 })
 
 
--- Here I use a simple workaround to generate various different animated weapons.
--- Animated weapons at different spots ('p' or 'P') will be replaced to a, b, c, d, ... etc
--- So, I can't use characters at the start of the alphebet, and the number of animated wepons is limitted.
+local p_char = '0'
+local used_char = {}
+local function check_def(def)
+    for x = 1, #(def[1]) do
+        for y = 1, #def do
+            used_char[used_char[y]:sub(x,x)] = true
+        end
+    end
+end
+local function get_next(p_char)
+    while used_char[p_char] == true do
+        p_char = string.char(string.byte(p_char) + 1)
+    end
+    used_char[p_char] = true
+    return p_char
+end
+function make_poltergeist_room(def)
+    for x = 1, #(def[1]) do
+        for y = 1, #def do
+			if def[y]:sub(x, x) == "P" then
+                p_char = get_next(p_char)
+                defineTile(p_char, "FLOOR", nil, make_poltergeist("greater"))
+                def[y] = def[y]:sub(1, x-1)..p_char..def[y]:sub(x+1, #def[y])
+			elseif def[y]:sub(x, x) == "p" then
+                p_char = get_next(p_char)
+                defineTile(p_char, "FLOOR", nil, make_poltergeist("normal"))
+                def[y] = def[y]:sub(1, x-1)..p_char..def[y]:sub(x+1, #def[y])
+			elseif def[y]:sub(x, x) == "a" then
+                p_char = get_next(p_char)
+                defineTile(p_char, "FLOOR", nil, make_poltergeist("smaller"))
+                def[y] = def[y]:sub(1, x-1)..p_char..def[y]:sub(x+1, #def[y])
+            end
+        end
+    end
+    return def
+end
+
+-- It had been updated to detect unused characters on alphabet to be replaced with moving weapons.
+-- Just use make_poltergeist_room(def)
 defineTile('#', "WALL")
 defineTile('+', "DOOR")
 defineTile('.', "FLOOR")
 defineTile('X', "HARDWALL")
 defineTile('!', "DOOR_VAULT")
-defineTile('U', "FLOOR", {random_filter={type="armor", add_levels=5, tome_mod="gvault"}}, nil)
-defineTile('V', "FLOOR", {random_filter={type="weapon", add_levels=5, tome_mod="gvault"}}, nil)
+defineTile('A', "FLOOR", {random_filter={type="armor", add_levels=5, tome_mod="gvault"}}, nil)
+defineTile('W', "FLOOR", {random_filter={type="weapon", add_levels=5, tome_mod="gvault"}}, {random_filter={subtype='wight', add_levels=5}})
 defineTile('Z', "FLOOR", {random_filter={add_levels=10, tome_mod="gvault"}}, nil)
-defineTile('w', "FLOOR", nil, {random_filter={name='blade horror', add_levels=10}})
-defineTile('x', "FLOOR", nil, {random_filter={subtype='wight', add_levels=5}})
-defineTile('y', "FLOOR", {random_filter={add_levels=10, tome_mod="gvault"}}, {random_filter={subtype='eldritch', add_levels=10}})
-defineTile('z', "FLOOR", nil, {random_filter={subtype='skeleton', add_levels=5}})
+defineTile('b', "FLOOR", nil, {random_filter={name='blade horror', add_levels=10}})
+defineTile('h', "FLOOR", {random_filter={add_levels=10, tome_mod="gvault"}}, {random_filter={subtype='eldritch', add_levels=10}})
+defineTile('s', "FLOOR", nil, {random_filter={subtype='skeleton', add_levels=5}})
 
+startx = 12
+starty = 10
 local def = {
     [[XXXXXXXXXXXXXXX]],
-    [[XU#.Vx.#....pZX]],
-    [[XP+.p..+.....pX]],
-    [[XV#.Ux.##z..y.X]],
-    [[X##+######z...X]],
-    [[Xp..#..P.##...X]],
-    [[X...#p...p##+#X]],
-    [[XU.p#.....#z.zX]],
-    [[XU..###+###.p.X]],
-    [[XpZZ+..w###...X]],
+    [[XA#pA.a#...aZZX]],
+    [[XP+....+....hpX]],
+    [[XW#.W.a##.....X]],
+    [[X##+######....X]],
+    [[Xp..#..P.##a..X]],
+    [[X..a#p...p##+#X]],
+    [[XA..#.....#.a.X]],
+    [[X...###+###s.sX]],
+    [[XWpA+..b###...X]],
     [[XXXXXXXXXXXX!XX]],
-   }
-local pd_small = 'a'
-local pd_big = 'A'
-for x = 1, #(def[1]) do
-    for y = 1, #def do
-        if def[y]:sub(x, x) == "p" then
-            defineTile(pd_small, "FLOOR", nil, make_poltergeist("normal"))
-            def[y] = def[y]:sub(1, x-1)..pd_small..def[y]:sub(x+1, #def[y])
-            pd_small = string.char(string.byte(pd_small) + 1)
-            print(def[y])
-        elseif def[y]:sub(x, x) == "P" then
-            defineTile(pd_big, "FLOOR", nil, make_poltergeist("greater"))
-            def[y] = def[y]:sub(1, x-1)..pd_big..def[y]:sub(x+1, #def[y])
-            pd_big = string.char(string.byte(pd_big) + 1)
-            print(def[y])
-        end
-    end
-end
-return def
+}
+	
+return make_poltergeist_room(def)

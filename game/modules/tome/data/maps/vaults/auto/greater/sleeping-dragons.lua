@@ -22,7 +22,7 @@ starty = 7
 
 setStatusAll{no_teleport=true}
 rotates = {"default", "90", "180", "270", "flipx", "flipy"}
-
+unique = "sleeping_dragon_vault"
 defineTile('o', "WALL")
 defineTile('.', "FLOOR")
 defineTile('#', "HARDWALL")
@@ -65,8 +65,9 @@ local check_sleep = function(self)
       game.level.seen_wyrm_awoken = true
       game.log("The dragons here are asleep. You may try to steal their treasure... at your own risk.")
    end
-   if not self:hasEffect(self.EFF_SLEEP) then
-      self:setEffect(self.EFF_SLEEP, 999, {src=self, power=1, waking=0, insomnia=0, contagious=0})
+   if not self:hasEffect(self.EFF_DOZING) then
+      self:setEffect(self.EFF_DOZING, 999, {})
+	  self.energy.value = 0
    end
    return true
 end
@@ -78,7 +79,7 @@ local aggro_wyrm = function()
    game.level.wyrm_awoken = true
    for uid, e in pairs(game.level.entities) do
       if e.sleeping_wyrm == true then
-         e:removeEffect(e.EFF_SLEEP)
+         e:removeEffect(e.EFF_DOZING)
          e:setTarget(game.player)
       end
    end
@@ -104,9 +105,9 @@ local aggro_wyrm_grid = function(chance)
    end
    return g
 end
-defineTile('1', aggro_wyrm_grid(2), {random_filter={add_levels=25, type="money"}})
-defineTile('2', aggro_wyrm_grid(5), {random_filter={add_levels=10, tome_mod="uvault"}})
-defineTile('3', aggro_wyrm_grid(25), {random_filter={add_levels=15, tome_mod="gvault"}})
+defineTile('1', aggro_wyrm_grid(3), {random_filter={add_levels=25, type="money"}})
+defineTile('2', aggro_wyrm_grid(10), {random_filter={add_levels=15, tome_mod="uvault"}})
+defineTile('3', aggro_wyrm_grid(33), {random_filter={add_levels=25, tome_mod="gvault"}})
 defineTile('W', "FLOOR", nil,
    {entity_mod=function(e)
       e.make_escort = nil
@@ -118,8 +119,8 @@ defineTile('W', "FLOOR", nil,
       return e
    end,
    random_filter={special_rarity="wyrm_rarity",
-      add_levels=15,
-      random_boss={name_scheme="Sleeping #rng#", force_classes={Wyrmic=true}, nb_classes=0, loot_quality="store", loot_quantity=1, rank=3.5}
+      add_levels=10,
+      random_boss={name_scheme="Sleeping #rng#", force_classes={Wyrmic=true}, class_filter=function(d) return d.power_source and ((d.power_source.nature or d.power_source.technique) and not d.power_source.arcane) end, loot_quality="store", loot_quantity=1, rank=3.5}
       }
    }
 )
@@ -134,8 +135,7 @@ defineTile('D', "FLOOR", nil,
       return e
    end,
    random_filter={special_rarity="drake_rarity",
-      add_levels=15,
-      random_boss={name_scheme="Dozing #rng#", force_classes={Wyrmic=true}, nb_classes=0, loot_quality="store", loot_quantity=1, rank=3.5}
+      random_boss={name_scheme="Dozing #rng#", force_classes={Wyrmic=true}, class_filter=function(d) return d.power_source and ((d.power_source.nature or d.power_source.technique) and not d.power_source.arcane) end, nb_classes=1, loot_quality="store", loot_quantity=1, rank=3.5}
       }
    }
 )

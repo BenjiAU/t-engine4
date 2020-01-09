@@ -235,6 +235,12 @@ function _M:newGame()
 			self.player.__created_in_version = game.__mod_info.version_name..(beta and "-"..beta or "")
 		end
 
+		if self.player.max_life_bonus then
+			self.player.max_life = self.player.max_life + self.player.max_life_bonus
+			self.player.life = self.player.life + self.player.max_life_bonus
+			self.player.max_life_bonus = nil
+		end
+
 		self.player:recomputeGlobalSpeed()
 		self:rebuildCalendar()
 

@@ -369,7 +369,7 @@ newTalent{
 	range = 10,
 	direct_hit = true,
 	getRad = function(self, t) return self:combatTalentScale(t, 3, 7) end,
-	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 3, 5.5)) end,
+	getDur = function(self, t) return math.floor(self:combatTalentScale(t, 3, 5.5)) end,
 	getDamage = function(self, t) return 10 + self:combatTalentMindDamage(t, 10, 25) end,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
 	action = function(self, t)

@@ -55,6 +55,13 @@ local teleport_tactical = function(self, t, aitarget)
 	return tacs
 end
 
+-- Reduce accuracy when teleporting to the target based on their distance
+local closeinSpread = function(self, t, aitarget)
+	local dist = core.fov.distance(self.x, self.y, aitarget.x, aitarget.y)
+	local tx, ty = self:aiSeeTargetPos(aitarget, dist, 20)  -- Add distance to target to the random spread radius, cap total spread at 20
+	return tx, ty
+end
+
 newTalent{
 	name = "Phase Door",
 	type = {"spell/conveyance",1},
@@ -110,7 +117,7 @@ newTalent{
 				if self.ai_state.tactic == "closein" then -- NPC trying to close in
 					local dx, dy = self.x - tx, self.y - ty
 					if target == self then -- teleport ourselves to target
-						x, y = tx, ty
+						x, y = closeinSpread(self, t, aitarget)
 					else -- teleport target to ourselves
 						x, y = self.x, self.y
 					end
@@ -218,7 +225,7 @@ newTalent{
 				if self.ai_state.tactic == "closein" then -- NPC trying to close in
 					local dx, dy = self.x - tx, self.y - ty
 					if target == self then -- teleport ourselves to target
-						x, y = tx, ty
+						x, y = closeinSpread(self, t, aitarget)
 					else -- teleport target to ourselves
 						x, y = self.x, self.y
 					end

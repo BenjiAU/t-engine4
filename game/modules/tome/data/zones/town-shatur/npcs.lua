@@ -25,7 +25,7 @@ newEntity{
 	display = "p", color=colors.WHITE,
 	faction = "thalore",
 	anger_emote = "Catch @himher@!",
-
+	exp_worth = 0,
 	combat = { dam=resolvers.rngavg(1,2), atk=2, apr=0, dammod={str=0.4} },
 
 	body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1, QUIVER=1 },
@@ -50,7 +50,7 @@ newEntity{
 newEntity{ base = "BASE_NPC_ELVALA_TOWN",
 	name = "thalore hunter", color=colors.LIGHT_UMBER,
 	desc = [[A stern-looking guard, he will not let you disturb the town.]],
-	level_range = {1, nil}, exp_worth = 1,
+	level_range = {1, nil}, exp_worth = 0,
 	rarity = 3,
 	max_life = resolvers.rngavg(70,80),
 	resolvers.talents{
@@ -62,8 +62,8 @@ newEntity{ base = "BASE_NPC_ELVALA_TOWN",
 	autolevel = "archer",
 	resolvers.inscriptions(1, "infusion"),
 	resolvers.equip{
-		{type="weapon", subtype="longbow", autoreq=true},
-		{type="ammo", subtype="arrow", autoreq=true},
+		{type="weapon", subtype="longbow", not_properties={"unique"}, autoreq=true},
+		{type="ammo", subtype="arrow", not_properties={"unique"}, autoreq=true},
 	},
 	resolvers.racial(),
 }
@@ -72,7 +72,7 @@ newEntity{ base = "BASE_NPC_ELVALA_TOWN",
 	name = "thalore wilder", color=colors.GREEN,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/humanoid_thalore_thalore_wilder.png", display_h=2, display_y=-1}}},
 	desc = [[A tall elf, his skin covered in green moss.]],
-	level_range = {1, nil}, exp_worth = 1,
+	level_range = {1, nil}, exp_worth = 0,
 	rarity = 3,
 	max_life = resolvers.rngavg(50,60),
 	ai_state = { talent_in=1, },

@@ -70,7 +70,8 @@ newTalent{
 		self:project(tg, x, y, function(px, py)
 			local target = game.level.map(px, py, Map.ACTOR)
 			if target and self:reactionToward(target) < 0 and target:canBe("poison") then
-				local poison = rng.table{target.EFF_SPYDRIC_POISON, target.EFF_INSIDIOUS_POISON, target.EFF_CRIPPLING_POISON, target.EFF_NUMBING_POISON}
+				local defaults = {target.EFF_SPYDRIC_POISON, target.EFF_INSIDIOUS_POISON, target.EFF_CRIPPLING_POISON, target.EFF_NUMBING_POISON}
+				local poison = rng.table(self.poisonous_spores_list or defaults)
 				target:setEffect(poison, 10, {src=self, power=dam/10, 
 				reduce=self:combatTalentLimit(t, 100, 12, 20), 
 				fail=math.ceil(self:combatTalentLimit(t, 100, 6, 10)),

@@ -105,8 +105,7 @@ newTalent{
 	mode = "sustained",
 	cooldown = 15,
 	sustain_stamina = 10,
-	callbackOnRest = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
-	callbackOnRun = function(self, t) self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_energy=true}) end,
+	deactivate_on = {no_combat=true, run=true, rest=true},
 	tactical = { DEFEND = 2 }, -- AI for this could be better
 	--Note: this can result in > 100% resistancs (before cap) at high talent levels to keep up with opposing resistance lowering talents
 	resistCoeff = function(self, t) return self:combatTalentScale(t, 25, 45) end,

@@ -77,7 +77,7 @@ if not game.zone.pyroclast_event_on_turn then
 
 			for i = x-2, x+2 do for j = y-2, y+2 do
 				local og = game.level.map(i, j, engine.Map.TERRAIN)
-				if (core.fov.distance(x, y, i, j) <= 1 or rng.percent(40)) and og and not og.escort_portal and not og.change_level then
+				if (core.fov.distance(x, y, i, j) <= 1 or rng.percent(40)) and og and not og.escort_portal and not og.change_level and not og.special then
 					local g = game.zone.grid_list.LAVA_FLOOR:clone()
 					g:resolve() g:resolve(nil, true)
 					game.zone:addEntity(game.level, g, "terrain", i, j)

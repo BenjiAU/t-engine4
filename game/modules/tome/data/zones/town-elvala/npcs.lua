@@ -27,7 +27,7 @@ newEntity{
 	display = "p", color=colors.WHITE,
 	faction = "shalore",
 	anger_emote = "Catch @himher@!",
-
+	exp_worth = 0,
 	combat = { dam=resolvers.rngavg(1,2), atk=2, apr=0, dammod={str=0.4} },
 
 	body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1, QUIVER=1 },
@@ -52,12 +52,12 @@ newEntity{
 newEntity{ base = "BASE_NPC_ELVALA_TOWN",
 	name = "elvala guard", color=colors.LIGHT_UMBER,
 	desc = [[A stern-looking guard, he will not let you disturb the town.]],
-	level_range = {1, nil}, exp_worth = 1,
+	level_range = {1, nil}, exp_worth = 0,
 	rarity = 3,
 	max_life = resolvers.rngavg(70,80),
 	resolvers.equip{
-		{type="weapon", subtype="longsword", autoreq=true},
-		{type="armor", subtype="shield", autoreq=true},
+		{type="weapon", subtype="longsword", not_properties={"unique"}, autoreq=true},
+		{type="armor", subtype="shield", not_properties={"unique"}, autoreq=true},
 	},
 	combat_armor = 2, combat_def = 0,
 	resolvers.talents{ [Talents.T_RUSH]=1, [Talents.T_PERFECT_STRIKE]=1, },
@@ -66,7 +66,7 @@ newEntity{ base = "BASE_NPC_ELVALA_TOWN",
 newEntity{ base = "BASE_NPC_ELVALA_TOWN",
 	name = "shalore rune master", color=colors.RED,
 	desc = [[A tall Elf, his skin covered in runes.]],
-	level_range = {1, nil}, exp_worth = 1,
+	level_range = {1, nil}, exp_worth = 0,
 	rarity = 3,
 	max_life = resolvers.rngavg(50,60),
 	ai_state = { talent_in=1, },
@@ -74,14 +74,13 @@ newEntity{ base = "BASE_NPC_ELVALA_TOWN",
 	resolvers.inscriptions(3, {"heat beam rune", "frozen spear rune", "acid wave rune", "lightning rune"}),
 }
 
-
 newEntity{
 	define_as = "BASE_NPC_ELVALA_OGRE_TOWN",
 	type = "giant", subtype = "ogre",
 	display = "O", color=colors.WHITE,
 	faction = "shalore",
 	anger_emote = "Catch @himher@!",
-
+	exp_worth = 0,
 	combat = { dam=resolvers.rngavg(1,2), atk=2, apr=0, dammod={str=0.4} },
 
 	body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1, QUIVER=1 },
@@ -108,14 +107,14 @@ newEntity{ base = "BASE_NPC_ELVALA_OGRE_TOWN",
 	desc = [[A towering ogre guard, her skin covered in runes.]],
 	female = 1,
 	resolvers.nice_tile{tall=1},
-	level_range = {1, nil}, exp_worth = 1,
+	level_range = {1, nil}, exp_worth = 0,
 	rarity = 3,
 
 	resolvers.inscriptions(3, {"shielding rune", "phase door rune", "heat beam rune", "acid wave rune", "lightning rune"}),
 	max_life = resolvers.rngavg(70,80),
 	resolvers.equip{
-		{type="weapon", subtype="longsword", autoreq=true},
-		{type="armor", subtype="shield", autoreq=true},
+		{type="weapon", subtype="longsword", not_properties={"unique"}, autoreq=true},
+		{type="armor", subtype="shield", not_properties={"unique"}, autoreq=true},
 	},
 	combat_armor = 2, combat_def = 0,
 	resolvers.talents{ [Talents.T_RUSH]=1, [Talents.T_PERFECT_STRIKE]=1, },

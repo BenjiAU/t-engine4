@@ -405,10 +405,14 @@ function _M:hasResult()
 end
 
 --- Locate a specific tile
-function _M:locateTile(char, erase)
+function _M:locateTile(char, erase, min_x, min_y, max_x, max_y)
 	local res = {}
-	for i = 1, self.data_w do
-		for j = 1, self.data_h do
+	min_x = min_x or 1
+	min_y = min_y or 1
+	max_x = max_x or self.data_w
+	max_y = max_y or self.data_h
+	for i = min_x, max_x do
+		for j = min_y, max_y do
 			if self.data[j][i] == char then
 				res[#res+1] = self:point(i, j)
 				if erase then self.data[j][i] = erase end
@@ -417,6 +421,22 @@ function _M:locateTile(char, erase)
 	end
 	if #res == 0 then return nil end
 	return rng.table(res), res
+end
+
+--- Find the number of the given tiles in the neighbourhood
+function _M:countNeighbours(where, kind, replace)
+	if type(kind) == "table" then kind = table.reverse(kind)
+	else kind = {[kind]=true} end
+	local pos = {}
+	for i = -1, 1 do for j = -1, 1 do if i ~= 0 or j ~= 0 then
+		local p = where + self:point(i, j)
+		local c = self:get(p)
+		if c and kind[c] then
+			pos[#pos+1] = p
+			if replace then self:put(p, replace) end
+		end
+	end end end
+	return #pos, pos
 end
 
 --- Finds a random location with enough area available
@@ -1467,6 +1487,7 @@ function _M:tunnelAStar(from, to, char, tunnel_through, tunnel_avoid, config)
 			local score = 1
 			if config.weight_erraticness > 0 then score = score + rng.float(0, config.weight_erraticness) end
 			if config.weights[nc] then score = score + config.weights[nc] end
+			if config.weights_fct then score = score + config.weights_fct(nx, ny, nc) end
 			if self.tunnels_map[ny][nx] then score = score + config.weight_tunnel end
 			local tent_g_score = g_score[node] + score -- we can adjust here for difficult passable terrain
 			local tent_is_better = false
@@ -1494,6 +1515,7 @@ function _M:tunnelAStar(from, to, char, tunnel_through, tunnel_avoid, config)
 
 		if node == stop then return self:astarCreatePath(came_from, from, to, stop, id, char, config, tunnel_through) end
 
+		if not node then return end
 		open[node] = nil
 		closed[node] = true
 		local x, y = self:astarToDouble(node)

@@ -3824,7 +3824,8 @@ newEffect{
 	desc = "Feeding",
 	long_desc = function(self, eff) return ("%s is feeding from %s."):format(self.name:capitalize(), eff.target.name) end,
 	type = "other",
-	subtype = { psychic_drain=true },
+	subtype = { },
+	no_stop_enter_worlmap = true, cancel_on_level_change = true,
 	status = "beneficial",
 	parameters = { },
 	activate = function(self, eff, ed)
@@ -3924,6 +3925,7 @@ newEffect{
 	subtype = { psychic_drain=true },
 	status = "detrimental",
 	remove_on_clone = true,
+	no_stop_enter_worlmap = true, cancel_on_level_change = true,
 	no_remove = true,
 	parameters = { },
 	activate = function(self, eff)
@@ -3972,5 +3974,37 @@ newEffect{
 		if eff.dur <= 0 or eff.src.dead then
 			self:removeEffect(eff.src.EFF_FED_UPON, false, true)
 		end
+	end,
+}
+
+newEffect{
+	name = "OMNIVISION", image = "talents/track.png",
+	desc = "Sensing Everything",
+	long_desc = function(self, eff) return "Improves senses, allowing the detection of everything." end,
+	type = "other",
+	subtype = { sense=true },
+	status = "beneficial",
+	parameters = { range=10,},
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "omnivision", eff.range)
+		game.level.map.changed = true
+	end,
+	deactivate = function(self, eff)
+
+	end,
+}
+
+newEffect{
+	name = "DOZING", image = "talents/sleep.png",
+	desc = "Dozing",
+	long_desc = function(self, eff) return "The target is completely asleep, unable to act." end,
+	type = "other",
+	subtype = { sleep=true },
+	status = "detrimental",
+	parameters = { },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "dont_act", 1)
+	end,
+	deactivate = function(self, eff)
 	end,
 }

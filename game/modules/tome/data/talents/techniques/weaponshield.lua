@@ -314,16 +314,7 @@ newTalent{
 	cooldown = 8,
 	sustain_stamina = 30,
 	tactical = { DEFEND = 3 },
-	callbackOnRest = function(self, t)  -- Make sure we've actually started resting/running before disabling the sustain
-		if self.resting.cnt and self.resting.cnt <= 0 then return true end
-		self:forceUseTalent(t.id, {ignore_energy=true}) 
-		return true
-	end,
-	callbackOnRun = function(self, t)
-		if self.running.cnt and self.running.cnt <= 0 then return true end
-		self:forceUseTalent(t.id, {ignore_energy=true})
-		return true
-	end,
+	deactivate_on = {no_combat=true, run=true, rest=true},
 	no_npc_use = true,
 	no_energy = true,
 	on_pre_use = function(self, t, silent) if not self:hasShield() then if not silent then game.logPlayer(self, "You require a weapon and a shield to use this talent.") end return false end return true end,

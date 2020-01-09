@@ -61,12 +61,16 @@ end
 function _M:init(t)
 	self.ai_state = self.ai_state or {}
 	self.ai_target = self.ai_target or {}
+	self.ai_actors_seen = self.ai_actors_seen or {}  -- List of actors the AI has had LOS of at least once (regardless of target)
 	self:autoLoadedAI()
 end
 
 function _M:autoLoadedAI()
 	-- Make the table with weak values, so that threat list does not prevent garbage collection
 	setmetatable(self.ai_target, {__mode='v'})
+
+	self.ai_actors_seen = self.ai_actors_seen or {}
+	setmetatable(self.ai_actors_seen, {__mode='k'})
 end
 
 function _M:aiCanPass(x, y)
@@ -130,6 +134,11 @@ function _M:doAI()
 	-- If we have a target but it is dead (it was not yet garbage collected but it'll come)
 	-- we forget it
 	self:clearAITarget()
+
+	-- Keep track of actors we've actually seen at least once in our own FOV, NPC calls doFOV right before doAI
+	for i,v in ipairs(self.fov.actors_dist) do
+		self.ai_actors_seen[v] = true
+	end
 
 	-- Update the ai_target table
 	local target_pos = self.ai_target.actor and self.fov and self.fov.actors and self.fov.actors[self.ai_target.actor]
@@ -217,12 +226,17 @@ _M.AI_LOCATION_GUESS_ERROR = 3  -- Start position guess errors at ~3 grids
 -- This will usually return the exact coords, but if the target is only partially visible (or not at all)
 -- it will return estimates, to throw the AI a bit off (up to 10 tiles error)
 -- @param [type=Entity, optional] target the target we are tracking, defaults to self
+-- @param [type=number, optional] add_spread the amount to add to the spread, default 0 (cache is not updated if this param exists)
+-- @param [type=number, optional] max_spread the maximum spread used, default 10 (cache is not updated if this param exists)
 -- @return x coord to move/cast to
 -- @return y coord to move/cast to
-function _M:aiSeeTargetPos(target)
+function _M:aiSeeTargetPos(target, add_spread, max_spread)
 	if not target then return self.x, self.y end
 	local tx, ty = target.x, target.y
 	local LSeen = self.ai_state.target_last_seen
+	local do_cache = not (add_spread or max_spread)  -- Don't update our stored guess if we asked for a special spread
+	local add_spread = add_spread or 0
+	local max_spread = max_spread or 10
 	if type(LSeen) ~= "table" then return tx, ty end
 	local spread = 0
 
@@ -241,16 +255,16 @@ function _M:aiSeeTargetPos(target)
 		LSeen.GCknown_turn = game.turn
 		LSeen.GCache_turn = game.turn
 	else
-		if target == self.ai_target.actor and (LSeen.GCache_turn or 0) + 10 <= game.turn and LSeen.x then
+		if target == self.ai_target.actor and (((LSeen.GCache_turn or 0) + 10 <= game.turn and LSeen.x) or not do_cache) then  -- If we haven't updated cache yet this turn or were not using cache
 			if target.last_special_movement and LSeen.GCknown_turn and (target.last_special_movement > LSeen.GCknown_turn) then 
-				spread = 10  -- If the target has done a "special" movement, such as teleporting a long distance or out of LOS, max out our randomness so we don't cheat chasing them with teleports or whatever
+				spread = max_spread  -- If the target has done a "special" movement, such as teleporting a long distance or out of LOS, max out our randomness so we don't cheat chasing them with teleports or whatever
 			else
-				spread = spread + math.min(10, math.floor((game.turn - (LSeen.GCknown_turn or game.turn)) / (game.energy_to_act / game.energy_per_tick))) -- Limit spread to 10 tiles
+				spread = spread + math.min(max_spread, add_spread + (self:attr("ai_spread_add") or 0) + math.floor((game.turn - (LSeen.GCknown_turn or game.turn)) / (game.energy_to_act / game.energy_per_tick))) -- Limit spread to 10 tiles
 			end
 			tx, ty = util.bound(tx + rng.range(-spread, spread), 0, game.level.map.w - 1), util.bound(ty + rng.range(-spread, spread), 0, game.level.map.h - 1)
 			
 			-- Inertial average with last guess: can specify another method here to make the targeting position less random
-			if LSeen.GCache_x then -- update guess with new random position
+			if LSeen.GCache_x and not do_cache then -- update guess with new random position
 				tx = math.floor(LSeen.GCache_x + (tx-LSeen.GCache_x)/2)
 				ty = math.floor(LSeen.GCache_y + (ty-LSeen.GCache_y)/2)
 			end
@@ -272,8 +286,13 @@ function _M:aiSeeTargetPos(target)
 					end
 				end
 			end
-			LSeen.GCache_x, LSeen.GCache_y = tx, ty
-			LSeen.GCache_turn = game.turn
+			if do_cache then
+				LSeen.GCache_x, LSeen.GCache_y = tx, ty
+				LSeen.GCache_turn = game.turn
+			else
+				-- If were not using cache return early
+				return tx, ty
+			end
 		end
 		if LSeen.GCache_x then return LSeen.GCache_x, LSeen.GCache_y end
 	end

@@ -829,7 +829,11 @@ function _M:spawnWorldAmbush(enc, dx, dy, kind)
 		},
 
 		reload_lists = false,
-		npc_list = mod.class.NPC:loadList("/data/general/npcs/all.lua", nil, nil, function(e) e.make_escort=nil end),
+		npc_list = mod.class.NPC:loadList("/data/general/npcs/all.lua", nil, nil, 
+			function(e) 
+				e.make_escort=nil
+				e.instakill_immune = 1
+			end),
 		grid_list = terrains,
 		object_list = mod.class.Object:loadList("/data/general/objects/objects.lua"),
 		trap_list = {},
@@ -978,6 +982,12 @@ function _M:dayNightCycle()
 
 	local hour, minute = game.calendar:getTimeOfDay(game.turn)
 	hour = hour + (minute / 60)
+	
+	local player = game:getPlayer(true)
+	if player and player.visual_force_day_time then
+		hour = player.visual_force_day_time
+	end
+
 	local tint = {r = 0.1, g = 0.1, b = 0.1}
 	local startTint = {r = 0.1, g = 0.1, b = 0.1}
 	local endTint = {r = 0.1, g = 0.1, b = 0.1}

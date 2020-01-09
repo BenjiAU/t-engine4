@@ -28,6 +28,8 @@ local Textbox = require "engine.ui.Textbox"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init(errs)
+	local display_errs = table.concat(errs, "\n")
+
 	local beta = engine.version_hasbeta()
 	if game.getPlayer and game:getPlayer(true) and game:getPlayer(true).__created_in_version then
 		table.insert(errs, 1, "Game version (character creation): "..game:getPlayer(true).__created_in_version)
@@ -53,7 +55,7 @@ function _M:init(errs)
 	self.errmd5 = errmd5
 
 	fs.mkdir("/error-reports")
-	local errdir = "/error-reports/"..game.__mod_info.short_name.."-"..game.__mod_info.version_name
+	local errdir = "/error-reports/"..game.__mod_info.version_name
 	self.errdir = errdir
 	fs.mkdir(errdir)
 	local infos = {}
@@ -63,12 +65,35 @@ function _M:init(errs)
 		if pcall(f) then infos.loaded = true end
 	end
 
+	local realpath_errfile = nil
+
 	local reason = "If you already reported that error, you do not have to do it again (unless you feel the situation is different)."
 	if infos.loaded then
 		if infos.reported then reason = "You #LIGHT_GREEN#already reported#WHITE# that error, you do not have to do it again (unless you feel the situation is different)."
 		else reason = "You have already got this error but #LIGHT_RED#never reported#WHITE# it, please do."
 		end
-	else reason = "You have #LIGHT_RED#never seen#WHITE# that error, please report it."
+	else
+		reason = "You have #LIGHT_RED#never seen#WHITE# that error, please report it."
+
+		print(pcall(function()
+			fs.mkdir("/error-logs")
+			local errlogdir = "/error-logs/"..game.__mod_info.version_name
+			fs.mkdir(errlogdir)
+			local errfile = errlogdir.."/"..os.date("%Y-%m-%d_%H-%M-%S")..".txt"
+			local f = fs.open(errfile, "w")
+			truncate_printlog(5000)
+			local log = get_printlog()
+			for _, line in ipairs(log) do
+				local max = 1
+				for k, _ in pairs(line) do max = math.max(max, k) end
+				local list = {}
+				for i = 1, max do list[i] = tostring(line[i]) end
+				f:write(table.concat(list, "\t").."\n")
+			end
+			f:write("\n\nERROR:\n"..errs.."\n")
+			f:close()
+			realpath_errfile = fs.getRealPath(errfile)
+		end))
 	end
 
 	self:saveError(true, infos.reported)
@@ -78,7 +103,7 @@ The game might still work but this is suspect, please type in your current situa
 If you are not currently connected to the internet, please report this bug when you can on the forums at http://forums.te4.org/
 
 ]]..reason..[[#{normal}#]], width=690, auto_height=true}
-	local errzone = Textzone.new{text=errs, width=690, height=400}
+	local errzone = Textzone.new{text=display_errs, width=690, height=300}
 	self.what = Textbox.new{title="What happened?: ", text="", chars=60, max_len=1000, fct=function(text) self:send() end}
 	local ok = require("engine.ui.Button").new{text="Send", fct=function() self:send() end}
 	local cancel = require("engine.ui.Button").new{text="Close", fct=function() game:unregisterDialog(self) end}
@@ -90,6 +115,7 @@ If you are not currently connected to the internet, please report this bug when 
 			end
 		end
 	end}
+
 
 	local many_errs = false
 	for i = #game.dialogs, 1, -1 do local d = game.dialogs[i] if d.__CLASSNAME == "engine.dialogs.ShowErrorStack" then many_errs = true break end end
@@ -104,6 +130,13 @@ If you are not currently connected to the internet, please report this bug when 
 	if many_errs then
 		table.insert(uis, #uis, {right=cancel.w, bottom=0, ui=cancel_all})
 	end
+
+	if realpath_errfile then
+		local realpath_errfile_t = Textzone.new{text="Log saved to file (click to copy to clipboard):#LIGHT_BLUE#"..realpath_errfile, width=self.iw, auto_height=true, fct=function() core.key.setClipboard(realpath_errfile) game.log("File location copied to clipboard.") end}
+		for i, ui in ipairs(uis) do if ui.bottom then ui.bottom = ui.bottom + realpath_errfile_t.h end end
+		table.insert(uis, 1, {left=0, bottom=0, ui=realpath_errfile_t})
+	end
+
 	self:loadUI(uis)
 	self:setFocus(self.what)
 	self:setupUI(false, true)

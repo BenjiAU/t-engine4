@@ -38,7 +38,7 @@ newEntity{
 		nb={3, 4},
 		filters={{special_rarity="humanoid_random_boss", subtype="human", random_boss={
 			nb_classes=1,
-			rank=3, ai = "tactical",
+			rank=3.2, ai = "tactical",
 			life_rating=function(v) return v * 1.4 + 3 end,
 			loot_quality = "store",
 			loot_quantity = 1,
@@ -67,7 +67,7 @@ newEntity{
 		nb={3, 4},
 		filters={{special_rarity="humanoid_random_boss", subtype="halfling", random_boss={
 			nb_classes=1,
-			rank=3, ai = "tactical",
+			rank=3.2, ai = "tactical",
 			life_rating=function(v) return v * 1.4 + 3 end,
 			loot_quality = "store",
 			loot_quantity = 1,
@@ -94,7 +94,7 @@ newEntity{
 		nb={2, 3},
 		filters={{special_rarity="humanoid_random_boss", random_boss={
 			nb_classes=1,
-			rank=3, ai = "tactical",
+			rank=3.2, ai = "tactical",
 			life_rating=function(v) return v * 1.3 + 2 end,
 			loot_quality = "store",
 			loot_quantity = 1,
@@ -132,7 +132,7 @@ newEntity{
 		nb={2, 3},
 		filters={{special_rarity="zigur_random_boss", random_boss={
 			nb_classes=1,
-			rank=3, ai = "tactical",
+			rank=3.2, ai = "tactical",
 			life_rating=function(v) return v * 1.3 + 2 end,
 			loot_quality = "store",
 			loot_quantity = 1,

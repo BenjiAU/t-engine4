@@ -170,6 +170,8 @@ function _M:attackTarget(target, damtype, mult, noenergy, force_unarmed)
 		break_stealth = true
 	end
 
+	local totaldam = 0
+
 	if not speed and not self:attr("disarmed") and not self:isUnarmed() and not force_unarmed then
 		local double_weapon
 		-- All weapons in main hands
@@ -179,7 +181,8 @@ function _M:attackTarget(target, damtype, mult, noenergy, force_unarmed)
 				if combat and not o.archery then
 					if o.double_weapon and not double_weapon then double_weapon = o end
 					print("[ATTACK] attacking with (mainhand)", o.name)
-					local s, h = self:attackTargetWith(target, combat, damtype, mult)
+					local s, h, _curdam = self:attackTargetWith(target, combat, damtype, mult)
+					if _curdam then totaldam = totaldam + _curdam end
 					speed = math.max(speed or 0, s)
 					hit = hit or h
 					if hit and not sound then sound = combat.sound
@@ -205,7 +208,8 @@ function _M:attackTarget(target, damtype, mult, noenergy, force_unarmed)
 				else
 					offhand = true
 					print("[ATTACK] attacking with (offhand)", o.name)
-					local s, h = self:attackTargetWith(target, combat, damtype, offmult)
+					local s, h, _curdam = self:attackTargetWith(target, combat, damtype, offmult)
+					if _curdam then totaldam = totaldam + _curdam end
 					speed = math.max(speed or 0, s)
 					hit = hit or h
 					if hit and not sound then sound = combat.sound
@@ -220,7 +224,8 @@ function _M:attackTarget(target, damtype, mult, noenergy, force_unarmed)
 	if not speed and self.combat then
 		print("[ATTACK] attacking with innate combat")
 		local combat = self:getObjectCombat(nil, "barehand")
-		local s, h = self:attackTargetWith(target, combat, damtype, mult)
+		local s, h, _curdam = self:attackTargetWith(target, combat, damtype, mult)
+		if _curdam then totaldam = totaldam + _curdam end
 		speed = math.max(speed or 0, s)
 		hit = hit or h
 		if hit and not sound then sound = combat.sound
@@ -249,7 +254,7 @@ function _M:attackTarget(target, damtype, mult, noenergy, force_unarmed)
 	-- Cancel stealth!
 	if break_stealth then self:breakStealth() end
 	self:breakLightningSpeed()
-	return hit
+	return hit, totaldam
 end
 
 --- Determines the combat field to use for this item
@@ -1246,6 +1251,7 @@ end
 
 --- Gets the defense ranged
 function _M:combatDefense(fake, add)
+	if self.combat_precomputed_defense then return self.combat_precomputed_defense end
 	local base_defense = self:combatDefenseBase(true)
 	if not fake then base_defense = self:combatDefenseBase() end
 	local d = math.max(0, base_defense + (add or 0))
@@ -1255,6 +1261,7 @@ end
 
 --- Gets the defense ranged
 function _M:combatDefenseRanged(fake, add)
+	if self.combat_precomputed_defense then return self.combat_precomputed_defense end
 	local base_defense = self:combatDefenseBase(true)
 	if not fake then base_defense = self:combatDefenseBase() end
 	local d = math.max(0, base_defense + (self.combat_def_ranged or 0) + (add or 0))
@@ -1341,6 +1348,7 @@ function _M:combatAttackBase(weapon, ammo)
 	return atk
 end
 function _M:combatAttack(weapon, ammo)
+	if self.combat_precomputed_accuracy then return self.combat_precomputed_accuracy end
 	local stats
 	if self:attr("use_psi_combat") then stats = (self:getCun(100, true) - 10) * (0.6 + self:callTalent(self.T_RESONANT_FOCUS, "bonus")/100)
 	elseif weapon and weapon.wil_attack then stats = self:getWil(100, true) - 10
@@ -1357,6 +1365,7 @@ function _M:combatAttack(weapon, ammo)
 end
 
 function _M:combatAttackRanged(weapon, ammo)
+	if self.combat_precomputed_accuracy then return self.combat_precomputed_accuracy end
 	local stats
 	if self:attr("use_psi_combat") then stats = (self:getCun(100, true) - 10) * (0.6 + self:callTalent(self.T_RESONANT_FOCUS, "bonus")/100)
 	elseif weapon and weapon.wil_attack then stats = self:getWil(100, true) - 10
@@ -1689,6 +1698,7 @@ function _M:combatDamagePower(weapon_combat, add)
 end
 
 function _M:combatPhysicalpower(mod, weapon, add)
+	if self.combat_precomputed_physpower then return self.combat_precomputed_physpower end
 	mod = mod or 1
 	add = add or 0
 
@@ -1744,6 +1754,7 @@ end
 
 --- Gets spellpower
 function _M:combatSpellpower(mod, add)
+	if self.combat_precomputed_spellpower then return self.combat_precomputed_spellpower end
 	mod = mod or 1
 	add = add or 0
 
@@ -2059,6 +2070,8 @@ end
 
 --- Gets mindpower
 function _M:combatMindpower(mod, add)
+	if self.combat_precomputed_mindpower then return self.combat_precomputed_mindpower end
+
 	mod = mod or 1
 	add = add or 0
 

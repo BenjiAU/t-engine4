@@ -97,7 +97,7 @@ return {
 				end
 			end
 		else]] if r <= 60 then
-			g.sumomn_npc = game.zone:makeEntity(game.level, "actor", {properties={"undead"}, add_levels=10, random_boss={nb_classes=1, rank=3, ai = "tactical", loot_quantity = 0, no_loot_randart = true}}, nil, true)
+			g.sumomn_npc = game.zone:makeEntity(game.level, "actor", {properties={"undead"}, add_levels=10, random_boss={nb_classes=1, rank=3.2, ai = "tactical", loot_quantity = 0, no_loot_randart = true}}, nil, true)
 			fct = function(self, x, y, who)
 				local x, y = util.findFreeGrid(who.x, who.y, 5, true, {[engine.Map.ACTOR]=true})
 				if self.sumomn_npc and x and y then
@@ -162,7 +162,7 @@ return {
 			if g.define_as == "COFFIN" then
 				game.zone:addEntity(game.level, coffin_open, "terrain", spot.x, spot.y)
 
-				local m = game.zone:makeEntity(game.level, "actor", {properties={"undead"}, add_levels=10, random_boss={nb_classes=1, rank=3, ai = "tactical", loot_quantity = 0, no_loot_randart = true}}, nil, true)
+				local m = game.zone:makeEntity(game.level, "actor", {properties={"undead"}, add_levels=10, random_boss={nb_classes=1, rank=3.2, ai = "tactical", loot_quantity = 0, no_loot_randart = true}}, nil, true)
 				local x, y = util.findFreeGrid(spot.x, spot.y, 5, true, {[engine.Map.ACTOR]=true})
 				if m and x and y then
 					game.zone:addEntity(game.level, m, "actor", x, y)
