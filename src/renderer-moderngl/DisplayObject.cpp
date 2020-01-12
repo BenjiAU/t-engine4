@@ -219,7 +219,7 @@ DORTweener::~DORTweener() {
 void DORTweener::onKeyframe(float nb_keyframes) {
 	if (!nb_keyframes) return;
 
-	bool mat = false, changed = false;
+	bool mat = false, changed = false, physics = false;
 	int nb_tweening = 0;
 	for (short slot = 0; slot < TweenSlot::MAX; slot++) {
 		auto &t = tweens[slot];
@@ -231,11 +231,13 @@ void DORTweener::onKeyframe(float nb_keyframes) {
 			// printf("=== %f => %f over %f / %f == %f\n", t.from, t.to, t.cur, t.time, val);
 			switch (slot) {
 				case TweenSlot::TX:
-					who->x = val; mat = true;
+					who->x = val;
+					mat = true; physics = true;
 					if (val && who->sort_axis == SortAxis::X) who->setSortingChanged();
 					break;
 				case TweenSlot::TY:
-					who->y = val; mat = true;
+					who->y = val;
+					mat = true; physics = true;
 					if (val && who->sort_axis == SortAxis::Y) who->setSortingChanged();
 					break;
 				case TweenSlot::TZ:
@@ -327,6 +329,11 @@ void DORTweener::onKeyframe(float nb_keyframes) {
 			}
 		}
 	}
+
+	if (physics && who->physics.size()) {
+		for (auto physic : who->physics) physic->setPos(who->x, who->y);
+	}
+
 	if (mat) who->recomputeModelMatrix();
 	if (changed) who->setChanged(true);
 	if (!nb_tweening) {

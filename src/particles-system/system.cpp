@@ -554,6 +554,9 @@ void Ensemble::draw(mat4 model) {
 	if (event_cb_ref != LUA_NOREF && events_triggers.size()) {
 		lua_rawgeti(L, LUA_REGISTRYINDEX, event_cb_ref);
 		for (auto &it : events_triggers) {
+			string name = it.first;
+			fireTrigger(name);
+
 			lua_pushvalue(L, -1);
 			lua_pushstring(L, it.first.c_str());
 			lua_pushnumber(L, it.second);
