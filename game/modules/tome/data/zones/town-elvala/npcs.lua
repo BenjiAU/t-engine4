@@ -26,7 +26,7 @@ newEntity{
 	type = "humanoid", subtype = "shalore",
 	display = "p", color=colors.WHITE,
 	faction = "shalore",
-	anger_emote = "Catch @himher@!",
+	anger_emote = _t"Catch @himher@!",
 	exp_worth = 0,
 	combat = { dam=resolvers.rngavg(1,2), atk=2, apr=0, dammod={str=0.4} },
 
@@ -51,7 +51,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_ELVALA_TOWN",
 	name = "elvala guard", color=colors.LIGHT_UMBER,
-	desc = [[A stern-looking guard, he will not let you disturb the town.]],
+	desc = _t[[A stern-looking guard, he will not let you disturb the town.]],
 	level_range = {1, nil}, exp_worth = 0,
 	rarity = 3,
 	max_life = resolvers.rngavg(70,80),
@@ -65,7 +65,7 @@ newEntity{ base = "BASE_NPC_ELVALA_TOWN",
 
 newEntity{ base = "BASE_NPC_ELVALA_TOWN",
 	name = "shalore rune master", color=colors.RED,
-	desc = [[A tall Elf, his skin covered in runes.]],
+	desc = _t[[A tall Elf, his skin covered in runes.]],
 	level_range = {1, nil}, exp_worth = 0,
 	rarity = 3,
 	max_life = resolvers.rngavg(50,60),
@@ -79,7 +79,7 @@ newEntity{
 	type = "giant", subtype = "ogre",
 	display = "O", color=colors.WHITE,
 	faction = "shalore",
-	anger_emote = "Catch @himher@!",
+	anger_emote = _t"Catch @himher@!",
 	exp_worth = 0,
 	combat = { dam=resolvers.rngavg(1,2), atk=2, apr=0, dammod={str=0.4} },
 
@@ -104,7 +104,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_ELVALA_OGRE_TOWN",
 	name = "ogre rune-spinner", color=colors.LIGHT_UMBER,
-	desc = [[A towering ogre guard, her skin covered in runes.]],
+	desc = _t[[A towering ogre guard, her skin covered in runes.]],
 	female = 1,
 	resolvers.nice_tile{tall=1},
 	level_range = {1, nil}, exp_worth = 0,

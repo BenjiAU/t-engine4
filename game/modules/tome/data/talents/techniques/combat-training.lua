@@ -31,7 +31,7 @@ newTalent{
 	info = function(self, t)
 		local res = t.getRes(self, t)
 		return ([[Your skin becomes more resilient to damage. Increases resistance to all damage by %0.1f%%.]]):
-		format(res)
+		tformat(res)
 	end,
 }
 
@@ -80,7 +80,7 @@ newTalent{
 			for i = #inven, 1, -1 do
 				local o = inven[i]
 				local ok, err = self:canWearObject(o)
-				if not ok and err == "missing dependency" then
+				if not ok then
 					game.logPlayer(self, "You cannot use your %s anymore.", o:getName{do_color=true})
 					local o = self:removeObject(inven, i, true)
 					self:addObject(self.INVEN_INVEN, o)
@@ -98,17 +98,17 @@ newTalent{
 		local criticalreduction = t.getCriticalChanceReduction(self, t)
 		local classrestriction = ""
 		if self.descriptor and self.descriptor.subclass == "Brawler" then
-			classrestriction = "(Note that brawlers will be unable to perform many of their talents in massive armour.)"
+			classrestriction = _t"(Note that brawlers will be unable to perform many of their talents in massive armour.)"
 		end
 		if self:knowTalent(self.T_STEALTH) then
-			classrestriction = "(Note that wearing mail or plate armour will interfere with stealth.)"
+			classrestriction = _t"(Note that wearing mail or plate armour will interfere with stealth.)"
 		end
 		return ([[You become better at using your armour to deflect blows and protect your vital areas. Increases Armour value by %d, Armour hardiness by %d%%, and reduces the chance melee or ranged attacks critically hit you by %d%% with your current body armour.
 		(This talent only provides bonuses for heavy mail or massive plate armour.)
 		At level 1, it allows you to wear heavy mail armour, gauntlets, helms, and heavy boots.
 		At level 2, it allows you to wear shields.
 		At level 3, it allows you to wear massive plate armour.
-		%s]]):format(armor, hardiness, criticalreduction, classrestriction)
+		%s]]):tformat(armor, hardiness, criticalreduction, classrestriction)
 	end,
 }
 
@@ -154,7 +154,7 @@ newTalent{
 		return ([[You learn to maintain your agility and manage your combat posture while wearing light armour.  When wearing armour no heavier than leather in your main body slot, you gain %d Defense, %d%% Armour hardiness, and %d%% reduced Fatigue.
 		In addition, when you step adjacent to a (visible) enemy, you use the juxtaposition to increase your total Defense by %d for 2 turns.
 		The Defense bonus scales with your Dexterity.]]):
-		format(defense, t.getArmorHardiness(self,t), t.getFatigue(self, t, true), defense/2)
+		tformat(defense, t.getArmorHardiness(self,t), t.getFatigue(self, t, true), defense/2)
 	end,
 }
 
@@ -169,7 +169,7 @@ newTalent{
 	info = function(self, t)
 		local attack = t.getAttack(self, t)
 		return ([[Increases the accuracy of unarmed, melee and ranged weapons by %d.]]):
-		format(attack)
+		tformat(attack)
 	end,
 }
 
@@ -186,7 +186,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
 		return ([[Increases weapon damage by %d%% and physical power by 30 when using swords, axes or maces.]]):
-		format(100*inc)
+		tformat(100*inc)
 	end,
 }
 
@@ -204,7 +204,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
 		return ([[Increases weapon damage by %d%% and physical power by 30 when using daggers.]]):
-		format(100*inc)
+		tformat(100*inc)
 	end,
 }
 
@@ -222,6 +222,6 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
 		return ([[Increases weapon damage by %d%% and physical power by 30 when using exotic weapons.]]):
-		format(100*inc)
+		tformat(100*inc)
 	end,
 }

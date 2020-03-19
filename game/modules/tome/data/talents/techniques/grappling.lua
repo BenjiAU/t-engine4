@@ -49,7 +49,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Increases your Physical Save by %d and your Physical Power by %d.
 		The bonuses will scale with your Strength.]])
-		:format(save, damage)
+		:tformat(save, damage)
 	end,
 }
 
@@ -104,7 +104,7 @@ newTalent{
 		return ([[Make a melee attack for %d%% damage and then attempt to grapple a target up to one size category larger than yourself for %d turns. A grappled opponent will be unable to move, take %d damage each turn, and %d%% of the damage you receive from any source will be redirected to them as physical damage.
 		Any movement from the target or you will break the grapple. Maintaining a grapple drains %d stamina per turn.
 		You may only grapple a single target at a time, and using any targeted unarmed talent on a target that you're not grappling will break the grapple.]])
-		:format(damage, duration, power, share, drain)
+		:tformat(damage, duration, power, share, drain)
 	end,
 }
 
@@ -145,7 +145,7 @@ newTalent{
 		#RED#Talent Level 1:  Reduces physical power by %d
 		Talent Level 3:  Silences
 		Talent Level 5:  Reduces global action speed by %d%%]])
-		:format(reduction, slow*100)
+		:tformat(reduction, slow*100)
 	end,
 }
 
@@ -238,7 +238,7 @@ newTalent{
 		local slam = t.getSlam(self, t)
 		return ([[Rushes forward and attempts to take the target to the ground, making a melee attack for %d%% damage then attempting to grapple them. If you're already grappling the target you'll instead slam them into the ground creating a radius 5 shockwave for %d physical damage and breaking your grapple.
 		The grapple effects and duration will be based off your grapple talent, if you have it, and the damage will scale with your Physical Power.]])
-		:format(damDesc(self, DamageType.PHYSICAL, (takedown)), damDesc(self, DamageType.PHYSICAL, (slam)))
+		:tformat(damDesc(self, DamageType.PHYSICAL, (takedown)), damDesc(self, DamageType.PHYSICAL, (slam)))
 	end,
 }
 
@@ -333,6 +333,6 @@ newTalent{
 	info = function(self, t)
 		return ([[In a mighty show of strength you whirl your grappled victim around and throw them into the air causing %d%% damage to them and enemies in radius %d on landing.  
 			If at least 1 other enemy is hit the thrown enemy will be shaken by the impact losing a full turn.
-			You can only throw enemies that could move normally.]]):format(t.getDamage(self, t)*100, self:getTalentRadius(t))
+			You can only throw enemies that could move normally.]]):tformat(t.getDamage(self, t)*100, self:getTalentRadius(t))
 	end,
 }

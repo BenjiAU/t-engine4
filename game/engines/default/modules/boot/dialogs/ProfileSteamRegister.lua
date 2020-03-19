@@ -27,10 +27,10 @@ local Textzone = require "engine.ui.Textzone"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init()
-	Dialog.init(self, "Steam User Account", math.min(800, game.w * 0.9), 400)
+	Dialog.init(self, _t"Steam User Account", math.min(800, game.w * 0.9), 400)
 	self.alpha = 230
 
-	self.c_desc = Textzone.new{width=math.floor(self.iw - 10), auto_height=true, text=[[Welcome to #GOLD#Tales of Maj'Eyal#LAST#.
+	self.c_desc = Textzone.new{width=math.floor(self.iw - 10), auto_height=true, text=_t[[Welcome to #GOLD#Tales of Maj'Eyal#LAST#.
 To enjoy all the features the game has to offer it is #{bold}#highly#{normal}# recommended that you register your steam account.
 Luckily this is very easy to do: you only require a profile name and optionally an email (we send very few email, maybe two a year at most).
 ]]}
@@ -41,13 +41,13 @@ Luckily this is very easy to do: you only require a profile name and optionally 
 		return nil
 	end
 
-	self.c_login = Textbox.new{title="Username: ", text="", chars=30, max_len=20, fct=function(text) self:okclick() end}
-	self.c_email = Textbox.new{title="Email: ", size_title=self.c_login.title, text="", chars=30, max_len=60, fct=function(text) self:okclick() end}
-	self.c_news = Checkbox.new{title="Accept to receive #{bold}#very infrequent#{normal}# (a few per year) mails about important game events from us.", default=false, fct=function() self:okclick() end}
-	self.c_age = Checkbox.new{title="You at least 16 years old, or have parental authorization to play the game.", default=false, fct=function() self:okclick() end}
-	local ok = require("engine.ui.Button").new{text="Register", fct=function() self:okclick() end}
-	local cancel = require("engine.ui.Button").new{text="Cancel", fct=function() self:cancelclick() end}
-	local privacy = require("engine.ui.Button").new{text="Privacy Policy (opens in browser)", fct=function() self:privacypolicy() end}
+	self.c_login = Textbox.new{title=_t"Username: ", text="", chars=30, max_len=20, fct=function(text) self:okclick() end}
+	self.c_email = Textbox.new{title=_t"Email: ", size_title=self.c_login.title, text="", chars=30, max_len=60, fct=function(text) self:okclick() end}
+	self.c_news = Checkbox.new{title=_t"Accept to receive #{bold}#very infrequent#{normal}# (a few per year) mails about important game events from us.", default=false, fct=function() self:okclick() end}
+	self.c_age = Checkbox.new{title=_t"You at least 16 years old, or have parental authorization to play the game.", default=false, fct=function() self:okclick() end}
+	local ok = require("engine.ui.Button").new{text=_t"Register", fct=function() self:okclick() end}
+	local cancel = require("engine.ui.Button").new{text=_t"Cancel", fct=function() self:cancelclick() end}
+	local privacy = require("engine.ui.Button").new{text=_t"Privacy Policy (opens in browser)", fct=function() self:privacypolicy() end}
 	self:loadUI{
 		{left=0, top=0, ui=self.c_desc},
 		{left=0, top=self.c_desc.h, ui=self.c_login},
@@ -69,23 +69,23 @@ end
 
 function _M:okclick()
 	if self.c_login.text:len() < 2 then
-		self:simplePopup("Username", "Your username is too short")
+		self:simplePopup(_t"Username", _t"Your username is too short")
 		return
 	end
 	if self.c_email.text:len() > 0 and not self.c_email.text:find("..@..") then
-		self:simplePopup("Email", "Your email does not look right.")
+		self:simplePopup(_t"Email", _t"Your email does not look right.")
 		return
 	end
 	if not self.c_age.checked then
-		self:simplePopup("Age Check", "You need to be 16 years old or more or to have parental authorization to play this game.")
+		self:simplePopup(_t"Age Check", _t"You need to be 16 years old or more or to have parental authorization to play this game.")
 		return
 	end
 	
-	local d = self:simpleWaiter("Registering...", "Registering on https://te4.org/, please wait...") core.display.forceRedraw()
-	d:timeout(30, function() Dialog:simplePopup("Steam", "Steam client not found.")	end)
+	local d = self:simpleWaiter(_t"Registering...", _t"Registering on https://te4.org/, please wait...") core.display.forceRedraw()
+	d:timeout(30, function() Dialog:simplePopup("Steam", _t"Steam client not found.")	end)
 	core.steam.sessionTicket(function(ticket)
 		if not ticket then
-			Dialog:simplePopup("Steam", "Steam client not found.")
+			Dialog:simplePopup("Steam", _t"Steam client not found.")
 			return
 		end
 
@@ -94,7 +94,7 @@ function _M:okclick()
 		d:done()
 		if not profile.auth and profile.auth_last_error then
 			if profile.auth_last_error == "already exists" then
-				self:simplePopup("Error", "Username or Email already taken, please select an other one.")
+				self:simplePopup(_t"Error", _t"Username or Email already taken, please select an other one.")
 			end
 		elseif profile.auth then
 			game:unregisterDialog(self)

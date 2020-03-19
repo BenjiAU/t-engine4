@@ -23,5 +23,5 @@ newEntity{
 	type = "tool", subtype="misc",
 	display = "\\", color=colors.LIGHT_BLUE,
 	encumber = 2,
-	desc = [[A miscellaneous tool.]],
+	desc = _t[[A miscellaneous tool.]],
 }

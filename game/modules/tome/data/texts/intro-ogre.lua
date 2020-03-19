@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[Welcome #LIGHT_GREEN#@name@#WHITE#.
+return _t[[Welcome #LIGHT_GREEN#@name@#WHITE#.
 You are an Ogre, hailing from Elvala.
 
 You face contempt and fear from a world your kind have never wronged, and the Spellhunt would have eradicated your race entirely, had the Shalore not shown sympathy and granted your ancestors refuge in Elvala.

@@ -23,7 +23,7 @@ for i = 1, 5 do
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE"..i,
 	name = "journal page", lore="kor-pul-note-"..i,
-	desc = [[A journal page, left by an adventurer.]],
+	desc = _t[[A journal page, left by an adventurer.]],
 	rarity = false,
 	encumberance = 0,
 }

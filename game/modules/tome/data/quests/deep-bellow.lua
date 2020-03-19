@@ -17,13 +17,13 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "From bellow, it devours"
+name = _t"From bellow, it devours"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "Your escape from Reknor got your heart pounding and your desire for wealth and power increased tenfold."
-	desc[#desc+1] = "Maybe it is time for you to start an adventurer's career. Deep below the Iron Throne mountains lies the Deep Bellow."
-	desc[#desc+1] = "It has been long sealed away but still, from time to time adventurers go there looking for wealth."
-	desc[#desc+1] = "None that you know of has come back yet, but you did survive Reknor. You are great."
+	desc[#desc+1] = _t"Your escape from Reknor got your heart pounding and your desire for wealth and power increased tenfold."
+	desc[#desc+1] = _t"Maybe it is time for you to start an adventurer's career. Deep below the Iron Throne mountains lies the Deep Bellow."
+	desc[#desc+1] = _t"It has been long sealed away but still, from time to time adventurers go there looking for wealth."
+	desc[#desc+1] = _t"None that you know of has come back yet, but you did survive Reknor. You are great."
 	return table.concat(desc, "\n")
 end
 

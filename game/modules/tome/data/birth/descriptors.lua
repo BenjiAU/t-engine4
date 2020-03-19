@@ -100,11 +100,11 @@ newBirthDescriptor{
 	never_show = true,
 	desc =
 	{
-		"#GOLD##{bold}#Tutorial mode",
-		"#WHITE#Start with a simplified character and discover the game in a simple quest.#{normal}#",
-		"All damage done to the player reduced by 20%",
-		"All healing for the player increased by 10%",
-		"No main game achievements possible.",
+		_t"#GOLD##{bold}#Tutorial mode",
+		_t"#WHITE#Start with a simplified character and discover the game in a simple quest.#{normal}#",
+		_t"All damage done to the player reduced by 20%",
+		_t"All healing for the player increased by 10%",
+		_t"No main game achievements possible.",
 	},
 	descriptor_choices =
 	{
@@ -147,17 +147,17 @@ newBirthDescriptor{
 newBirthDescriptor{
 	type = "difficulty",
 	name = "Easy",
-	display_name = "Easier",
+	display_name = _t"Easier",
 	selection_default = config.settings.tome.default_birth and config.settings.tome.default_birth.difficulty == "Easy",
 	desc =
 	{
-		"#GOLD##{bold}#Easier mode#WHITE##{normal}#",
-		"Provides an easier game experience.",
-		"Use it if you feel uneasy tackling the harder modes.",
-		"All damage done to the player decreased by 30%",
-		"All healing for the player increased by 30%",
-		"All detrimental status effects durations reduced by 50%",
-		"Achievements are not granted.",
+		_t"#GOLD##{bold}#Easier mode#WHITE##{normal}#",
+		_t"Provides an easier game experience.",
+		_t"Use it if you feel uneasy tackling the harder modes.",
+		_t"All damage done to the player decreased by 30%",
+		_t"All healing for the player increased by 30%",
+		_t"All detrimental status effects durations reduced by 50%",
+		_t"Achievements are not granted.",
 	},
 	descriptor_choices =
 	{
@@ -175,9 +175,9 @@ newBirthDescriptor{
 	selection_default = (config.settings.tome.default_birth and config.settings.tome.default_birth.difficulty == "Normal") or (not config.settings.tome.default_birth) or (config.settings.tome.default_birth and not config.settings.tome.default_birth.difficulty),
 	desc =
 	{
-		"#GOLD##{bold}#Normal mode#WHITE##{normal}#",
-		"Provides the normal level of challenges.",
-		"Stairs can not be used for 2 turns after a kill.",
+		_t"#GOLD##{bold}#Normal mode#WHITE##{normal}#",
+		_t"Provides the normal level of challenges.",
+		_t"Stairs can not be used for 2 turns after a kill.",
 	},
 	descriptor_choices =
 	{
@@ -195,14 +195,14 @@ newBirthDescriptor{
 	selection_default = config.settings.tome.default_birth and config.settings.tome.default_birth.difficulty == "Nightmare",
 	desc =
 	{
-		"#GOLD##{bold}#Nightmare mode#WHITE##{normal}#",
-		"Unfair game setting",
-		"All zone levels increased by 50% by the time Player reaches level 10",
-		"All creature talent levels increased by 30%",
-		"Unique (fixed) bosses advance in bonus classes 30% faster",		
-		"Rare creatures are slightly more frequent",
-		"Stairs can not be used for 3 turns after a kill.",
-		"Player can earn Nightmare version of achievements if also playing in Roguelike or Adventure permadeath mode.",
+		_t"#GOLD##{bold}#Nightmare mode#WHITE##{normal}#",
+		_t"Unfair game setting",
+		_t"All zone levels increased by 50% by the time Player reaches level 10",
+		_t"All creature talent levels increased by 30%",
+		_t"Unique (fixed) bosses advance in bonus classes 30% faster",		
+		_t"Rare creatures are slightly more frequent",
+		_t"Stairs can not be used for 3 turns after a kill.",
+		_t"Player can earn Nightmare version of achievements if also playing in Roguelike or Adventure permadeath mode.",
 	},
 	descriptor_choices =
 	{
@@ -228,18 +228,18 @@ newBirthDescriptor{
 	type = "difficulty",
 	name = "Insane",
 	locked = function() return profile.mod.allow_build.difficulty_insane end,
-	locked_desc = "Easy is for the weak! Normal is for the weak! Nightmare is too easy! Bring on the true pain!",
+	locked_desc = _t"Easy is for the weak! Normal is for the weak! Nightmare is too easy! Bring on the true pain!",
 	selection_default = config.settings.tome.default_birth and config.settings.tome.default_birth.difficulty == "Insane",
 	desc =
 	{
-		"#GOLD##{bold}#Insane mode#WHITE##{normal}#",
-		"Similar rules to Nightmare, but with more random bosses!",
-		"All zone levels increased by 50% + 1 by the time Player reaches level 10",
-		"All creature talent levels increased by 80%",
-		"Unique (fixed) bosses advance in bonus classes 80% faster",
-		"Rare creatures are far more frequent and random bosses start to appear",
-		"Stairs can not be used for 5 turns after a kill.",
-		"Player can earn Insane version of achievements if also playing in Roguelike or Adventure permadeath mode.",
+		_t"#GOLD##{bold}#Insane mode#WHITE##{normal}#",
+		_t"Similar rules to Nightmare, but with more random bosses!",
+		_t"All zone levels increased by 50% + 1 by the time Player reaches level 10",
+		_t"All creature talent levels increased by 70%",
+		_t"Unique (fixed) bosses advance in bonus classes 70% faster",
+		_t"Rare creatures are far more frequent and random bosses start to appear",
+		_t"Stairs can not be used for 5 turns after a kill.",
+		_t"Player can earn Insane version of achievements if also playing in Roguelike or Adventure permadeath mode.",
 	},
 	descriptor_choices =
 	{
@@ -257,30 +257,30 @@ newBirthDescriptor{
 		difficulty_level_mult = 1.5,  -- Level multiplier for Zone.level_range, handled in Game.applyDifficulty
 		difficulty_level_add = 1,  -- Flat value added to Zone.level_range, handled in Game.applyDifficulty 
 
-		difficulty_talent_mult = 1.8,  -- Talent level multiplier for non-summoned NPC talents and base (non-autoclass) fixedboss talents, handled in NPC.addedToLevel
+		difficulty_talent_mult = 1.7,  -- Talent level multiplier for non-summoned NPC talents and base (non-autoclass) fixedboss talents, handled in NPC.addedToLevel
 		--difficulty_life_mult = 1.2,  -- Max life multiplier for hostile non-summoned NPCs, handled in NPC.addedToLevel
-		fixedboss_class_level_rate_mult = 1.8,  -- Multiplier for auto_classes level rates, handled in Actor.levelupClass
+		fixedboss_class_level_rate_mult = 1.7,  -- Multiplier for auto_classes level rates, handled in Actor.levelupClass
 	},
 }
 newBirthDescriptor{
 	type = "difficulty",
 	name = "Madness",
 	locked = function() return profile.mod.allow_build.difficulty_madness end,
-	locked_desc = "Insane is for the weak! Bring on the true mind-shattering experience!",
+	locked_desc = _t"Insane is for the weak! Bring on the true mind-shattering experience!",
 	selection_default = config.settings.tome.default_birth and config.settings.tome.default_birth.difficulty == "Madness",
 	desc =
 	{
-		"#GOLD##{bold}#Madness mode#WHITE##{normal}#",
-		"Absolutely unfair game setting.  You are really mentally ill and wish to get worse to play this mode!",
-		"All zone levels increased by 150% + 2 by the time Player reaches level 10",
-		"All creature talent levels increased by 170%",
-		"Unique (fixed) bosses advance in bonus classes 170% faster",
-		"All enemies have 200% more life",
-		"Rare creatures are far more frequent and random bosses start to appear",
-		"Stairs can not be used for 9 turns after a kill.",
-		"Player starts with 100 more life and 500 gold, but trust us, you'll need it!",
-		"Player is being hunted! Randomly all foes in a radius will get a feeling of where she/he is",
-		"Player can earn Madness version of achievements if also playing in Roguelike or Adventure permadeath mode.",
+		_t"#GOLD##{bold}#Madness mode#WHITE##{normal}#",
+		_t"Absolutely unfair game setting.  You are really mentally ill and wish to get worse to play this mode!",
+		_t"All zone levels increased by 150% + 2 by the time Player reaches level 10",
+		_t"All creature talent levels increased by 170%",
+		_t"Unique (fixed) bosses advance in bonus classes 170% faster",
+		_t"All enemies have 200% more life",
+		_t"Rare creatures are far more frequent and random bosses start to appear",
+		_t"Stairs can not be used for 9 turns after a kill.",
+		_t"Player starts with 100 more life and 500 gold, but trust us, you'll need it!",
+		_t"Player is being hunted! Randomly all foes in a radius will get a feeling of where she/he is",
+		_t"Player can earn Madness version of achievements if also playing in Roguelike or Adventure permadeath mode.",
 	},
 	descriptor_choices =
 	{
@@ -314,17 +314,17 @@ newBirthDescriptor{
 	type = "permadeath",
 	name = "Exploration",
 	locked = function(birther) return birther:isDonator() end,
-	locked_desc = "Exploration mode: Infinite lives (donator feature)",
+	locked_desc = _t"Exploration mode: Infinite lives (donator feature)",
 	locked_select = function(birther) birther:selectExplorationNoDonations() end,
 	selection_default = config.settings.tome.default_birth and config.settings.tome.default_birth.permadeath == "Exploration",
 	desc =
 	{
-		"#GOLD##{bold}#Exploration mode#WHITE#",
-		"Provides you with infinite lives.#{normal}#",
-		"This is not the way the game is meant to be played, but it allows you to have a more forgiving experience.",
-		"Remember though that dying is an integral part of the game and helps you become a better player.",
-		"Exploration version of achievements will be granted in this mode.",
-		"Full talent respec is always available.",
+		_t"#GOLD##{bold}#Exploration mode#WHITE#",
+		_t"Provides you with infinite lives.#{normal}#",
+		_t"This is not the way the game is meant to be played, but it allows you to have a more forgiving experience.",
+		_t"Remember though that dying is an integral part of the game and helps you become a better player.",
+		_t"Exploration version of achievements will be granted in this mode.",
+		_t"Full talent respec is always available.",
 	},
 	game_state = {
 		force_town_respec = false,
@@ -340,10 +340,10 @@ newBirthDescriptor{
 	selection_default = (not config.settings.tome.default_birth) or (config.settings.tome.default_birth and config.settings.tome.default_birth.permadeath == "Adventure"),
 	desc =
 	{
-		"#GOLD##{bold}#Adventure mode#WHITE#",
-		"Provides you with limited extra lives.",
-		"Use it if you want normal playing conditions but do not feel ready for just one life.#{normal}#",
-		"At level 1,2,5,7,14,24,35 get one more 'life' that allows you to resurrect at the start of the level.",
+		_t"#GOLD##{bold}#Adventure mode#WHITE#",
+		_t"Provides you with limited extra lives.",
+		_t"Use it if you want normal playing conditions but do not feel ready for just one life.#{normal}#",
+		_t"At level 1,2,5,7,14,24,35 get one more 'life' that allows you to resurrect at the start of the level.",
 	},
 	copy = {
 		easy_mode_lifes = 1,
@@ -355,10 +355,10 @@ newBirthDescriptor{
 	selection_default = config.settings.tome.default_birth and config.settings.tome.default_birth.permadeath == "Roguelike",
 	desc =
 	{
-		"#GOLD##{bold}#Roguelike mode#WHITE#",
-		"Provides the closer experience to 'classic' roguelike games.",
-		"You will only have one life; you *ARE* your character.#{normal}#",
-		"Only one life, unless ways to self-resurrect are found in-game.",
+		_t"#GOLD##{bold}#Roguelike mode#WHITE#",
+		_t"Provides the closer experience to 'classic' roguelike games.",
+		_t"You will only have one life; you *ARE* your character.#{normal}#",
+		_t"Only one life, unless ways to self-resurrect are found in-game.",
 	},
 }
 

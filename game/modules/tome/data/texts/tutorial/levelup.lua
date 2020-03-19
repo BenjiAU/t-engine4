@@ -19,7 +19,7 @@
 
 game.player:forceLevelup(2)
 
-return [[In ToME4 a character's power depends on her/his level: players can get up to level 50.
+return _t[[In ToME4 a character's power depends on her/his level: players can get up to level 50.
 
 Each level brings more life and resources (like stamina, mana, etc.) and different kinds of points that can improve your character:
 * #GOLD#Stat points#WHITE#: They allow you to raise the six main stats: Strength, Dexterity, Magic, Willpower, Cunning and Constitution. You get 3 points per level.

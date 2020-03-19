@@ -18,12 +18,12 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*A tall man, glowing like a star, appears out of nowhere.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*A tall man, glowing like a star, appears out of nowhere.*#WHITE#
 You destroyed *it* both? I am sorry for my harsh tone when we first met, but repairing time threads is stressful.
 I cannot stay. I still have much to do. But take this-- it should help you.
 #LIGHT_GREEN#*He disappears again before you can even reply. A rift opens, to Maj'Eyal... you hope.*#WHITE#]],
 	answers = {
-		{"Ok...", action = function(npc, player) game:onLevelLoad("temporal-rift-4", function()
+		{_t"Ok...", action = function(npc, player) game:onLevelLoad("temporal-rift-4", function()
 			local o = game.zone:makeEntityByName(game.level, "object", "RUNE_RIFT")
 			if o then
 				o:identify(true)

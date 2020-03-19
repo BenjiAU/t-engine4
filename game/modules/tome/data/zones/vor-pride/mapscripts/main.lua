@@ -21,7 +21,7 @@ self:defineTile("-", "BURNT_GROUND", nil, nil, nil, {no_teleport=true})
 self:defineTile("o", "GOTHIC_FLOOR", nil, {entity_mod=function(e) e.make_escort = nil return e end, random_filter={type='humanoid', subtype='orc', special=function(e) return e.pride == mapdata.pride end}})
 if level.level == zone.max_level then self:defineTile(">", 'BURNT_GROUND') else self:defineTile(">", "FLAT_DOWN4", nil, nil, nil, {no_teleport=true}) end
 self:defineTile("O", "GOTHIC_FLOOR", nil, {random_filter={type='humanoid', subtype='orc', special=function(e) return e.pride == mapdata.pride end, random_boss={nb_classes=1, loot_quality="store", loot_quantity=3, ai_move="move_complex", rank=4,}}})
-self:defineTile("X", "BURNT_GROUND", nil, {entity_mod=function(e) e.make_escort = nil return e end, random_filter={type='humanoid', subtype='orc', special=function(e) return e.pride == mapdata.pride end, random_boss={nb_classes=1, loot_quality="store", loot_quantity=1, no_loot_randart=true, ai_move="move_complex", rank=3}}}, nil, {no_teleport=true})
+self:defineTile("X", "BURNT_GROUND", nil, {entity_mod=function(e) e.make_escort = nil return e end, random_filter={type='humanoid', subtype='orc', special=function(e) return e.pride == mapdata.pride end, random_boss={nb_classes=1, loot_quality="store", loot_quantity=1, no_loot_randart=true, ai_move="move_complex", rank=3.2}}}, nil, {no_teleport=true})
 self:defineTile('&', "GOTHIC_GENERIC_LEVER", nil, nil, nil, {lever=1, lever_kind="pride-doors", lever_spot={type="lever", subtype="door", check_connectivity="entrance"}}, {type="lever", subtype="lever", check_connectivity="entrance"})
 self:defineTile('*', "GOTHIC_GENERIC_LEVER_DOOR", nil, nil, nil, {lever_action=2, lever_action_value=0, lever_action_kind="pride-doors"}, {type="lever", subtype="door", check_connectivity="entrance"})
 
@@ -67,6 +67,11 @@ tm:applyOnGroups(rooms, function(room, idx)
 	end
 end)
 
+if rng.percent(15) and not game.state:doneEvent("renegade-pyromancers") then 
+	game.state:doneEvent("renegade-pyromancers",1) -- special vault! can only show once per game and only in vor pride; contains exceptionally difficult foes and exceptional loot
+	game.level.data.generator.map.greater_vaults_list = {"renegade-pyromancers"}
+end
+		
 -- Complete the map by putting wall in all the remaining blank spaces
 tm:fillAll()
 -- if tm:eliminateByFloodfill{'#', 'T'} < 400 then return self:regenerate() end

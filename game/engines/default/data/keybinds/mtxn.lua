@@ -21,7 +21,7 @@ defineAction{
 	default = { "sym:_y:true:false:false:false" },
 	type = "MTXN_PURCHASE",
 	group = "microtransactions - cosmetic",
-	name = "List purchasable",
+	name = _t"List purchasable",
 	check = function() return profile:canMTXN() end,
 }
 
@@ -29,6 +29,6 @@ defineAction{
 	default = { "sym:_y:false:false:true:false" },
 	type = "MTXN_USE",
 	group = "microtransactions - cosmetic",
-	name = "Use purchased",
+	name = _t"Use purchased",
 	check = function() return profile:canMTXN() end,
 }

@@ -17,11 +17,11 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "The Arena"
+name = _t"The Arena"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "Seeking wealth, glory, and a great fight, you challenge the Arena!"
-	desc[#desc+1] = "Can you defeat your foes and become Master of Arena?"
+	desc[#desc+1] = _t"Seeking wealth, glory, and a great fight, you challenge the Arena!"
+	desc[#desc+1] = _t"Can you defeat your foes and become Master of Arena?"
 	return table.concat(desc, "\n")
 end
 
@@ -29,15 +29,15 @@ function win(self)
 	game:playAndStopMusic("Lords of the Sky.ogg")
 
 	game.player.winner = "arena"
-	game:registerDialog(require("engine.dialogs.ShowText").new("Winner", "win", {playername=game.player.name, how="arena"}, game.w * 0.6))
+	game:registerDialog(require("engine.dialogs.ShowText").new(_t"Winner", "win", {playername=game.player.name, how="arena"}, game.w * 0.6))
 end
 
 function onWin(self, who)
 	local desc = {}
 
-	desc[#desc+1] = "#GOLD#Well done! You have won the Arena: Challenge of the Master#WHITE#"
-	desc[#desc+1] = ""
-	desc[#desc+1] = "You valiantly fought every creature the arena could throw at you and you emerged victorious!"
-	desc[#desc+1] = "Glory to you, you are now the new master and your future characters will challenge you."
+	desc[#desc+1] = _t"#GOLD#Well done! You have won the Arena: Challenge of the Master#WHITE#"
+	desc[#desc+1] = _t""
+	desc[#desc+1] = _t"You valiantly fought every creature the arena could throw at you and you emerged victorious!"
+	desc[#desc+1] = _t"Glory to you, you are now the new master and your future characters will challenge you."
 	return 0, desc
 end

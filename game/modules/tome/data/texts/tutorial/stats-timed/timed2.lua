@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 Under what circumstances do you appear to inflict the full-duration bleed effect?
 
 For those targets that didn't receive the full duration, how did their applicable #GOLD#combat stat#WHITE# compare to yours?

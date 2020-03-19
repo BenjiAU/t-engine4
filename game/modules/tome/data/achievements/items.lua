@@ -19,7 +19,7 @@
 
 newAchievement{
 	name = "Deus Ex Machina",
-	desc = [[Found the Blood of Life and the four unique inscriptions: Primal Infusion, Infusion of Wild Growth, Rune of Reflection and Rune of the Rift.]],
+	desc = _t[[Found the Blood of Life and the four unique inscriptions: Primal Infusion, Infusion of Wild Growth, Rune of Reflection and Rune of the Rift.]],
 	mode = "player",
 	can_gain = function(self, who, obj)
 		if obj:getName{force_id=true} == "Blood of Life" then self.blood = true end
@@ -35,7 +35,7 @@ newAchievement{
 	name = "Treasure Hunter",
 	image = "object/money_large.png",
 	show = "name",
-	desc = [[Amassed 1000 gold pieces.]],
+	desc = _t[[Amassed 1000 gold pieces.]],
 	can_gain = function(self, who)
 		return who.money >= 1000
 	end,
@@ -45,7 +45,7 @@ newAchievement{
 	name = "Treasure Hoarder",
 	image = "object/money_large.png",
 	show = "name",
-	desc = [[Amassed 3000 gold pieces.]],
+	desc = _t[[Amassed 3000 gold pieces.]],
 	can_gain = function(self, who)
 		return who.money >= 3000
 	end,
@@ -55,7 +55,7 @@ newAchievement{ id = "DRAGON_GREED",
 	name = "Dragon's Greed",
 	image = "object/money_large.png",
 	show = "name", huge=true,
-	desc = [[Amassed 8000 gold pieces.]],
+	desc = _t[[Amassed 8000 gold pieces.]],
 	can_gain = function(self, who)
 		return who.money >= 8000
 	end,

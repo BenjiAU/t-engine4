@@ -37,7 +37,7 @@ newTalent{
 	info = function(self, t)
 		return ([[You stand between the darkness and the light, allowing you to convert 15 positive energy into %d negative energy.
 		The negative energy gain will increase with your Cunning.]]):
-		format(t.getNegativeGain(self, t))
+		tformat(t.getNegativeGain(self, t))
 	end,
 }
 
@@ -71,7 +71,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Instantly travel to your jumpgate, as long as you are within %d tiles of it.]]):format(t.getRange(self, t))
+		return ([[Instantly travel to your jumpgate, as long as you are within %d tiles of it.]]):tformat(t.getRange(self, t))
  	end,
 }
 
@@ -122,7 +122,7 @@ newTalent{
 		if not oe or oe:attr("temporary") then return false end
 		local e = mod.class.Object.new{
 			old_feat = oe, type = oe.type, subtype = oe.subtype,
-			name = "jumpgate", image = oe.image, add_mos = {{image = "terrain/wormhole.png"}},
+			name = _t"jumpgate", image = oe.image, add_mos = {{image = "terrain/wormhole.png"}},
 			display = '&', color=colors.PURPLE,
 			temporary = 1, -- This prevents overlapping of terrain changing effects; as this talent is a sustain it does nothing else
 		}
@@ -147,7 +147,7 @@ newTalent{
 		local range = jumpgate_teleport.getRange(self, jumpgate_teleport)
 		return ([[Create a shadow jumpgate at your current location. As long as you sustain this spell, you can use 'Jumpgate: Teleport' to instantly travel to the jumpgate, as long as you are within %d tiles of it.
 		Note that any stairs underneath the jumpgate will be unusable while the spell is sustained, and you may need to cancel this sustain in order to leave certain locations.
-		At talent level 4, you learn to create and sustain a second jumpgate.]]):format(range)
+		At talent level 4, you learn to create and sustain a second jumpgate.]]):tformat(range)
  	end,
  }
 
@@ -184,7 +184,7 @@ newTalent{
 		local duration = t.getConfuseDuration(self, t)
 		return ([[Let out a mental cry that shatters the will of your targets within radius %d, dealing %0.2f darkness damage and confusing (%d%% to act randomly) them for %d turns.
 		The damage will improve with your spellpower and the duration will improve with your Cunning.]]):
-		format(self:getTalentRadius(t), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t)), t.getConfuseEfficency(self,t), duration)
+		tformat(self:getTalentRadius(t), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t)), t.getConfuseEfficency(self,t), duration)
 	end,
 }
 
@@ -233,7 +233,7 @@ newTalent{
 
 		local m = target:cloneActor{
 			shader = "shadow_simulacrum",
-			name=target.name.."'s shadow simulacrum",
+			name=("%s's shadow simulacrum"):tformat(target:getName()),
 			faction = self.faction,
 			summoner = self, summoner_gain_exp=true,
 			summon_time = t.getDuration(self, t),
@@ -241,7 +241,7 @@ newTalent{
 			exp_worth=0, forceLevelup=function() end,
 			ai_target = {actor=target},
 			ai = "summoned", ai_real = target.ai,
-			desc = [[A dark, shadowy shape whose form resembles the creature it was copied from. It is not a perfect replica, though, and it makes you feel uneasy to look at it.]],
+			desc = _t[[A dark, shadowy shape whose form resembles the creature it was copied from. It is not a perfect replica, though, and it makes you feel uneasy to look at it.]],
 		}
 		table.mergeAdd(m.resists, {[DamageType.DARKNESS]=50, [DamageType.LIGHT]=- 50})
 		table.mergeAdd(m.inc_damage, {all = -50})
@@ -262,7 +262,7 @@ newTalent{
 		return ([[Creates a shadowy copy of a hostile target. The copy will attack its progenitor immediately and lasts for %d turns.
 		The duplicate has %d%% of the target's life, +50%% darkness resistance, -50%% light resistance, and deals 50%% less damage.
 		The duration and life scale with your Cunning.]]):
-		format(duration, t.getPercent(self, t))
+		tformat(duration, t.getPercent(self, t))
 	end,
 }
 
@@ -307,7 +307,7 @@ newTalent{
 		if not oe or oe:attr("temporary") then return false end
 		local e = mod.class.Object.new{
 			old_feat = oe, type = oe.type, subtype = oe.subtype,
-			name = "jumpgate", image = oe.image, add_mos = {{image = "terrain/wormhole.png"}},
+			name = _t"jumpgate", image = oe.image, add_mos = {{image = "terrain/wormhole.png"}},
 			display = '&', color=colors.PURPLE,
 			temporary = 1, -- This prevents overlapping of terrain changing effects; as this talent is a sustain it does nothing else
 		}
@@ -330,7 +330,7 @@ newTalent{
 	info = function(self, t)
 		local jumpgate_teleport = self:getTalentFromId(self.T_JUMPGATE_TELEPORT_TWO)
 		local range = jumpgate_teleport.getRange(self, jumpgate_teleport)
-		return ([[Create a second shadow jumpgate at your location. As long as you sustain this spell, you can use 'Jumpgate: Teleport' to instantly travel to the jumpgate, as long as you are within %d tiles of it.]]):format(range)
+		return ([[Create a second shadow jumpgate at your location. As long as you sustain this spell, you can use 'Jumpgate: Teleport' to instantly travel to the jumpgate, as long as you are within %d tiles of it.]]):tformat(range)
 	end,
 }
 
@@ -364,6 +364,6 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Instantly travel to your second jumpgate, as long as you are within %d tiles of it.]]):format(t.getRange(self, t))
+		return ([[Instantly travel to your second jumpgate, as long as you are within %d tiles of it.]]):tformat(t.getRange(self, t))
 	end,
 }

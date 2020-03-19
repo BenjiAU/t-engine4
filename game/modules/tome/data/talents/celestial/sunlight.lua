@@ -60,7 +60,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Calls the power of the Sun into a searing lance, doing %d damage to the target and leaving a radius 1 area of searing light on the ground for 4 turns that does %d light damage to all foes within it.
 		The damage dealt will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHT, damage), damDesc(self, DamageType.LIGHT, damage/2))
+		tformat(damDesc(self, DamageType.LIGHT, damage), damDesc(self, DamageType.LIGHT, damage/2))
 	end,
 }
 
@@ -114,7 +114,7 @@ newTalent{
 		All enemies effected will take %0.2f light damage.
 		At talent level 3 you gain %d%% light, darkness, and fire resistance for %d turns.
 		The damage done and resistances will increase with your Spellpower.]]):
-		format(radius, duration, damDesc(self, DamageType.LIGHT, damage), res, resdur )
+		tformat(radius, duration, damDesc(self, DamageType.LIGHT, damage), res, resdur )
    end,
 }
 
@@ -182,7 +182,7 @@ newTalent{
 		This spell will automatically cast again at the start of your next two turns.
 		You will gain %0.2f positive energy each time firebeam or an instant damage proc caused by firebeam deals damage.
 		The damage done will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.FIRE, damage), t.getPositive(self, t))
+		tformat(damDesc(self, DamageType.FIRE, damage), t.getPositive(self, t))
 	end,
 }
 
@@ -235,6 +235,6 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Release a burst of sunlight beams at %d random foes in radius %d, dealing %d damage to all foes hit and increasing your bonus light damage by %d%% of your bonus darkness damage for %d turns.]]):format(t.getTargetCount(self, t), self:getTalentRadius(t), damDesc(self, DamageType.LIGHT, t.getDamage(self, t)), t.getPower(self, t)*100, t.getDuration(self, t))
+		return ([[Release a burst of sunlight beams at %d random foes in radius %d, dealing %d damage to all foes hit and increasing your bonus light damage by %d%% of your bonus darkness damage for %d turns.]]):tformat(t.getTargetCount(self, t), self:getTalentRadius(t), damDesc(self, DamageType.LIGHT, t.getDamage(self, t)), t.getPower(self, t)*100, t.getDuration(self, t))
 	end,
 }

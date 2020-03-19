@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Mark of the Spellblaze",
+	name = _t"Mark of the Spellblaze",
 	level_range = {15, 25},
 	level_scheme = "player",
 	max_level = 2,

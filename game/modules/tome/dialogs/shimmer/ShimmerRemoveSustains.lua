@@ -31,17 +31,17 @@ function _M:init(player)
 	self.actor = player
 	self.actor.shimmer_sustains_hide = self.actor.shimmer_sustains_hide or {}
 
-	Dialog.init(self, "Shimmer: Remove Sustains Effects", 680, 500)
+	Dialog.init(self, _t"Shimmer: Remove Sustains Effects", 680, 500)
 
 	self:generateList()
 
 	self.c_list = ListColumns.new{columns={
-		{name="Name", width=80, display_prop="name", sort="sortname"},
-		{name="Active", width=20, display_prop="active", sort="active"},
+		{name=_t"Name", width=80, display_prop="name", sort="sortname"},
+		{name=_t"Active", width=20, display_prop="active", sort="active"},
 	}, hide_columns=true, scrollbar=true, width=300, height=self.ih - 5, list=self.list, fct=function(item) self:use(item) end, select=function(item) self:select(item) end}
 	local donatortext = ""
-	if not profile:isDonator(1) then donatortext = "\n#{italic}##CRIMSON#This cosmetic feature is only available to donators/buyers. You can only preview.#WHITE##{normal}#" end
-	local help = Textzone.new{width=math.floor(self.iw - self.c_list.w - 20), height=self.ih, no_color_bleed=true, auto_height=true, text=[[#{bold}##CRIMSON#WARNING: this is an EXPERIMENTAL feature. It may explode!#LAST##{normal}#
+	if not profile:isDonator(1) then donatortext = _t"\n#{italic}##CRIMSON#This cosmetic feature is only available to donators/buyers. You can only preview.#WHITE##{normal}#" end
+	local help = Textzone.new{width=math.floor(self.iw - self.c_list.w - 20), height=self.ih, no_color_bleed=true, auto_height=true, text=_t[[#{bold}##CRIMSON#WARNING: this is an EXPERIMENTAL feature. It may explode!#LAST##{normal}#
 Sustains auras with name in #YELLOW#yellow#LAST# can not be automatically turned back on if disabled. After turning them on here, you need to unsustain and resustain them manually.
 
 #{bold}#This is a purely cosmetic change.#{normal}#]]..donatortext}
@@ -134,9 +134,9 @@ function _M:use(item)
 	if profile:isDonator(1) then
 		self:toggleAura(item.tid)
 	else
-		Dialog:yesnoPopup("Donator Cosmetic Feature", "This cosmetic feature is only available to donators/buyers.", function(ret) if ret then
-			game:registerDialog(require("mod.dialogs.Donation").new("shimmer ingame"))
-		end end, "Donate", "Cancel")
+		Dialog:yesnoPopup(_t"Donator Cosmetic Feature", _t"This cosmetic feature is only available to donators/buyers.", function(ret) if ret then
+			game:registerDialog(require("mod.dialogs.Donation").new(_t"shimmer ingame"))
+		end end, _t"Donate", _t"Cancel")
 	end
 end
 
@@ -154,7 +154,7 @@ function _M:generateList()
 				tid = tid,
 				name = (t.no_sustain_autoreset and "#YELLOW#" or "")..self.actor:getTalentFromId(tid).name,
 				sortname = self.actor:getTalentFromId(tid).name,
-				active = self.actor.shimmer_sustains_hide[tid] and "#LIGHT_RED#no" or "#LIGHT_GREEN#yes",
+				active = self.actor.shimmer_sustains_hide[tid] and _t"#LIGHT_RED#no" or _t"#LIGHT_GREEN#yes",
 			}
 			list[#list+1] = d
 		end

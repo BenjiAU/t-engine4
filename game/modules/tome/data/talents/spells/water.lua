@@ -63,7 +63,7 @@ newTalent{
 		If the target is wet the damage increases by 30%% and the ice freeze chance increases to 50%%.
 		This spell will never hit the caster.
 		The damage will increase with your Spellpower.]]):
-		format(necroEssenceDead(self, true) and "affects all foes on its path" or "travels slowly", damDesc(self, DamageType.COLD, damage))
+		tformat(necroEssenceDead(self, true) and _t"affects all foes on its path" or _t"travels slowly", damDesc(self, DamageType.COLD, damage))
 	end,
 }
 
@@ -107,7 +107,7 @@ newTalent{
 		return ([[Glacial fumes rise from the ground, doing %0.2f cold damage in a radius of 3 each turn for %d turns.
 		Creatures that are wet will take 30%% more damage and have 15%% chance to get frozen.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.COLD, damage), duration)
+		tformat(damDesc(self, DamageType.COLD, damage), duration)
 	end,
 }
 
@@ -157,7 +157,7 @@ newTalent{
 		The tidal wave lasts for %d turns.
 		All creatures hit gain the wet effect, which reduces their stun/freeze immunity by half and interacts with other cold spells.
 		The damage and duration will increase with your Spellpower.]]):
-		format(radius, damDesc(self, DamageType.COLD, damage/2), damDesc(self, DamageType.PHYSICAL, damage/2), duration)
+		tformat(radius, damDesc(self, DamageType.COLD, damage/2), damDesc(self, DamageType.PHYSICAL, damage/2), duration)
 	end,
 }
 
@@ -200,7 +200,7 @@ newTalent{
 
 		#AQUAMARINE#Ice storm:#LAST#
 		%s]]):
-		format(dur, self:getTalentLevelRaw(t), power * 100, power * 100 / 2, 50 + power * 100, tostring(icestorm or ""))
+		tformat(dur, self:getTalentLevelRaw(t), power * 100, power * 100 / 2, 50 + power * 100, tostring(icestorm or ""))
 	end,
 }
 
@@ -245,6 +245,6 @@ newTalent{
 		return ([[A furious ice storm rages around the caster, doing %0.2f cold damage in a radius of 3 each turn for %d turns.
 		It has a 25%% chance to freeze damaged targets.
 		If the target is wet the damage increases by 30%% and the freeze chance increases to 50%%.
-		The damage and duration will increase with your Spellpower.]]):format(damDesc(self, DamageType.COLD, damage), duration)
+		The damage and duration will increase with your Spellpower.]]):tformat(damDesc(self, DamageType.COLD, damage), duration)
 	end,
 }

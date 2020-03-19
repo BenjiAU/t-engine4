@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Grushnak Pride",
+	name = _t"Grushnak Pride",
 	level_range = {35, 60},
 	level_scheme = "player",
 	max_level = 3,

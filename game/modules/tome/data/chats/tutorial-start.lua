@@ -19,22 +19,22 @@
 local q = game.player:hasQuest("tutorial")
 
 newChat{ id="welcome",
-	text = [[Hello there. What subject interests you?]],
+	text = _t[[Hello there. What subject interests you?]],
 	answers = {
-		{"Basic gameplay", 
+		{_t"Basic gameplay", 
 			action = function(npc, player) 
 				game:changeLevel(2, "tutorial") 
 				q:choose_basic_gameplay()
 				player:setQuestStatus("tutorial", engine.Quest.COMPLETED, "started-basic-gameplay")
 			end},
-		{"Combat stat mechanics", 
+		{_t"Combat stat mechanics", 
 			action = function(npc, player)
 				game:changeLevel(3, "tutorial")
 				q:choose_combat_stats()
 				player:setQuestStatus("tutorial", engine.Quest.COMPLETED, "started-combat-stats")
 			end},
-		{"Never mind."},
-		{"Is there nothing more for me to learn here?", 
+		{_t"Never mind."},
+		{_t"Is there nothing more for me to learn here?", 
 			jump = "done",
 			cond = function(npc, player) return q and q:isCompleted("finished-basic-gameplay") and q:isCompleted("finished-combat-stats") end, 
 		},
@@ -43,7 +43,7 @@ newChat{ id="welcome",
 
 
 newChat{ id="done",
-	text = [[
+	text = _t[[
 
 You have completed all the tutorials, and should now know the basics of ToME4. You are ready to step forward into the world to find glory, treasures and be mercilessly slaughtered by hordes of creatures you thought you could handle!
 
@@ -56,7 +56,7 @@ If this is your first time with the game, you will find the selection of races a
 Now go boldly and remember: #GOLD#have fun!#WHITE#
 Press #GOLD#Escape#WHITE#, then select #GOLD#Save and Exit#WHITE#, and create a new character!]],
 	answers = {
-		{"Thank you."},
+		{_t"Thank you."},
 	}
 }
 

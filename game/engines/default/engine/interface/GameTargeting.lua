@@ -112,7 +112,7 @@ function _M:targetMode(v, msg, co, typ)
 
 	if not v then
 		Map:setViewerFaction((self.always_target == true or self.always_target == "old") and self.player.faction or nil)
-		if msg then self.log(type(msg) == "string" and msg or "Tactical display disabled. Press shift+'t' to enable.") end
+		if msg then self.log(type(msg) == "string" and msg or _t"Tactical display disabled. Press shift+'t' to enable.") end
 		self.level.map.changed = true
 		self.targetmode_trigger_hotkey = nil
 		self.target:setActive(false)
@@ -138,14 +138,14 @@ function _M:targetMode(v, msg, co, typ)
 				end
 			end
 			if self.target_warning and self.target.target.x == self.player.x and self.target.target.y == self.player.y then
-				Dialog:yesnoPopup(type(self.target_warning) == "string" and self.target_warning or "Target yourself?", "Are you sure you want to target yourself?", fct, "No", "Yes", nil, true)
+				Dialog:yesnoPopup(type(self.target_warning) == "string" and self.target_warning or _t"Target yourself?", _t"Are you sure you want to target yourself?", fct, _t"No", _t"Yes", nil, true)
 			else
 				fct(false)
 			end
 		end
 	else
 		Map:setViewerFaction(self.player.faction)
-		if msg then self.log(type(msg) == "string" and msg or "Tactical display enabled. Press shift+'t' to disable.") end
+		if msg then self.log(type(msg) == "string" and msg or _t"Tactical display enabled. Press shift+'t' to disable.") end
 		self.level.map.changed = true
 		self.target:setActive(true, typ)
 		self.target_style = "lock"

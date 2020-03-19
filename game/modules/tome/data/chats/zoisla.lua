@@ -18,17 +18,17 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*A naga steps through the portal, she seems to be a high ranked one.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*A naga steps through the portal, she seems to be a high ranked one.*#WHITE#
 NO! You fool, the portal is breaking down!]],
 	answers = {
-		{"And thus my task is done, serpent!", jump="fool"},
+		{_t"And thus my task is done, serpent!", jump="fool"},
 	}
 }
 
 newChat{ id="fool",
-	text = [[You do not understand: it will explode!]],
+	text = _t[[You do not understand: it will explode!]],
 	answers = {
-		{"...", action = function(npc, player)
+		{_t"...", action = function(npc, player)
 			game:onTickEnd(function()
 				game.level:removeEntity(npc)
 				game:changeLevel(2, (rng.table{"trollmire","ruins-kor-pul","scintillating-caves","rhaloren-camp","norgos-lair","heart-gloom"}), {direct_switch=true})
@@ -66,11 +66,11 @@ newChat{ id="fool",
 }
 
 newChat{ id="kill",
-	text = [[The portal randomly teleported us before exploding.
+	text = _t[[The portal randomly teleported us before exploding.
 You fool! You have doomed us, we could be #{bold}#anywhere!#{normal}#
 DIE !]],
 	answers = {
-		{"...", action=function(npc, player) world:gainAchievement("SUNWALL_LOST", player) end},
+		{_t"...", action=function(npc, player) world:gainAchievement("SUNWALL_LOST", player) end},
 	}
 }
 

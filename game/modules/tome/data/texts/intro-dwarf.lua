@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[Welcome #LIGHT_GREEN#@name@#WHITE#.
+return _t[[Welcome #LIGHT_GREEN#@name@#WHITE#.
 You are a member of the proud, but secretive, race of the Dwarves.
 Hailing from the Dwarven Empire of the Iron Throne, you have been sent to investigate the old fortress of Reknor which has been overrun by orcs.
 

@@ -25,12 +25,12 @@ newEntity{ define_as = "CLOAK_DECEPTION",
 	unique = true, quest=true,
 	slot = "CLOAK",
 	type = "armor", subtype="cloak",
-	unided_name = "black cloak", image = "object/artifact/black_cloak.png",
+	unided_name = _t"black cloak", image = "object/artifact/black_cloak.png",
 	moddable_tile = "cloak_%s_05", moddable_tile_hood = true,
 	name = "Cloak of Deception",
 	display = ")", color=colors.DARK_GREY,
 	encumber = 1,
-	desc = [[A black cloak, with subtle illusion enchantments woven into its very fabric.]],
+	desc = _t[[A black cloak, with subtle illusion enchantments woven into its very fabric.]],
 
 	wielder = {
 		combat_spellpower = 5,
@@ -64,7 +64,7 @@ for i = 1, 4 do
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE"..i,
 	name = "journal page", lore="blighted-ruins-note-"..i,
-	desc = [[A paper scrap, left by the Necromancer.]],
+	desc = _t[[A paper scrap, left by the Necromancer.]],
 	rarity = false,
 	encumberance = 0,
 }

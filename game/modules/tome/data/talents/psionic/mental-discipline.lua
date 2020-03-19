@@ -32,7 +32,7 @@ newTalent{
 		local cooldown = t.cooldownred(self,t)
 		local mast = t.getMastery(self, t)
 		return ([[Your expertise in the art of energy projection grows.
-		Aura cooldowns are all reduced by %d turns. Aura damage drains energy more slowly (+%0.2f damage required to lose a point of energy).]]):format(cooldown, mast)
+		Aura cooldowns are all reduced by %d turns. Aura damage drains energy more slowly (+%0.2f damage required to lose a point of energy).]]):tformat(cooldown, mast)
 	end,
 }
 
@@ -49,7 +49,7 @@ newTalent{
 		local cooldown = t.cooldownred(self,t)
 		local mast = t.mastery(self,t)
 		return ([[Your expertise in the art of energy absorption grows. Shield cooldowns are all reduced by %d turns, the amount of damage absorption required to gain a point of energy is reduced by %0.1f, and the maximum energy you can gain from each shield is increased by %0.1f per turn.]]):
-		format(cooldown, mast, t.absorbLimit(self, t))
+		tformat(cooldown, mast, t.absorbLimit(self, t))
 	end,
 }
 
@@ -71,7 +71,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Improves Mental Saves by %d, and stun immunity by %d%%.]]):
-		format(self:getTalentLevelRaw(t)*6, t.stunImmune(self, t)*100)
+		tformat(self:getTalentLevelRaw(t)*6, t.stunImmune(self, t)*100)
 	end,
 }
 
@@ -95,6 +95,6 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[A life of the mind has had predictably good effects on your Willpower and Cunning.
-		Increases Willpower and Cunning by %d.]]):format(2*self:getTalentLevelRaw(t))
+		Increases Willpower and Cunning by %d.]]):tformat(2*self:getTalentLevelRaw(t))
 	end,
 }

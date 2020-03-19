@@ -34,13 +34,13 @@ for i = 1, player.max_inscriptions do
 			player:removeObject(inven, item)
 		end, on_select=function(npc, player)
 			game.tooltip_x, game.tooltip_y = 1, 1
-			game:tooltipDisplayAtMap(game.w, game.h, "#GOLD#"..t.name.."#LAST#\n"..tostring(player:getTalentFullDescription(t)))
+			game:tooltipDisplayAtMap(game.w, game.h, ("#GOLD#%s#LAST#\n%s"):tformat(t.name,tostring(player:getTalentFullDescription(t))))
 		end, }
 	end
 end
 
 if not replace_same and player.inscriptions_slots_added < 2 and player.unused_talents_types > 0 then
-	answers[#answers+1] = {"Buy a new slot with one #{bold}#talent category point#{normal}#.", action=function(npc, player)
+	answers[#answers+1] = {_t"Buy a new slot with one #{bold}#talent category point#{normal}#.", action=function(npc, player)
 		player.unused_talents_types = player.unused_talents_types - 1
 		player.max_inscriptions = player.max_inscriptions + 1
 		player.inscriptions_slots_added = player.inscriptions_slots_added + 1
@@ -49,11 +49,11 @@ if not replace_same and player.inscriptions_slots_added < 2 and player.unused_ta
 	end}
 end
 
-answers[#answers+1] = {"Cancel"}
+answers[#answers+1] = {_t"Cancel"}
 
 newChat{ id="welcome",
-	text = replace_same and [[You have too many of this type of inscription. You can only override an existing one. The old inscription will be lost.]]
-	or [[You have reached your maximum number of inscriptions (infusions/runes).
+	text = replace_same and _t[[You have too many of this type of inscription. You can only override an existing one. The old inscription will be lost.]]
+	or _t[[You have reached your maximum number of inscriptions (infusions/runes).
 If you have unassigned #{bold}#talent category points#{normal}# you can use one to create a new slot (up to 5).
 You can replace an existing one or cancel.
 The old inscription will be lost.]],

@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New Talent Category: #LIGHT_GREEN#Ice",
-[[Since the dawn of time mages have experimented with the elements.
+return _t"New Talent Category: #LIGHT_GREEN#Ice",
+_t[[Since the dawn of time mages have experimented with the elements.
 While most mages are content using the Water school, a few of them took their research deeper and created Ice magic.
 At its core lies the Uttercold, a cold so cold it can even damage creatures normally immune.
 

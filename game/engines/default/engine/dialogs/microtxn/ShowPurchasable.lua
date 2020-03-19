@@ -33,11 +33,11 @@ local WebView = require "engine.ui.WebView"
 
 module(..., package.seeall, class.inherit(Dialog))
 
-local bonus_vault_slots_text = "#{italic}##UMBER#Bonus vault slots from this order: #ROYAL_BLUE#%d#{normal}#"
-local bonus_vault_slots_tooltip = "For every purchase of #{italic}##GREY#%s#LAST##{normal}# you gain a permanent additional vault slot.\n#GOLD##{italic}#Because why not!#{normal}#"
+local bonus_vault_slots_text = _t"#{italic}##UMBER#Bonus vault slots from this order: #ROYAL_BLUE#%d#{normal}#"
+local bonus_vault_slots_tooltip = _t"For every purchase of #{italic}##GREY#%s#LAST##{normal}# you gain a permanent additional vault slot.\n#GOLD##{italic}#Because why not!#{normal}#"
 
-local coins_balance_text = "#{italic}##UMBER#Voratun Coins available from your donations: #ROYAL_BLUE#%d#{normal}#"
-local coins_balance_tooltip = "For every donations you've ever made you have earned voratun coins. These can be spent purchasing expansions or options on the online store. This is the amount you have left, if your purchase total is below this number you'll instantly get your purchase validated, if not you'll need to donate some more first.\n#GOLD##{italic}#Thanks for your support, every little bit helps the game survive for years on!#{normal}#"
+local coins_balance_text = _t"#{italic}##UMBER#Voratun Coins available from your donations: #ROYAL_BLUE#%d#{normal}#"
+local coins_balance_tooltip = _t"For every donations you've ever made you have earned voratun coins. These can be spent purchasing expansions or options on the online store. This is the amount you have left, if your purchase total is below this number you'll instantly get your purchase validated, if not you'll need to donate some more first.\n#GOLD##{italic}#Thanks for your support, every little bit helps the game survive for years on!#{normal}#"
 
 _M.force_ui_inside = "microtxn"
 
@@ -48,7 +48,7 @@ function _M:init(mode)
 	self.cart = {}
 
 
-	self.base_title_text = game.__mod_info.long_name.." #GOLD#Online Store#LAST#"
+	self.base_title_text = ("%s #GOLD#Online Store#LAST#"):tformat(_t(game.__mod_info.long_name))
 	Dialog.init(self, self.base_title_text, game.w * 0.8, game.h * 0.8)
 
 	game.tooltip:generate()
@@ -70,7 +70,7 @@ function _M:init(mode)
 
 	local vsep = Separator.new{dir="horizontal", size=self.ih - 10}
 
-	self.c_waiter = Textzone.new{auto_width=1, auto_height=1, text="#YELLOW#-- connecting to server... --"}
+	self.c_waiter = Textzone.new{auto_width=1, auto_height=1, text=_t"#YELLOW#-- connecting to server... --"}
 
 	local last_displayed_item = nil
 	self.c_list = VariableList.new{width=self.iw - 350 - vsep.w, max_height=self.ih, scrollbar=true, sortable=true,
@@ -127,12 +127,12 @@ function _M:init(mode)
 		end
 	end
 
-	self.c_do_purchase = Button.new{text="Purchase", fct=function() self:doPurchase() end}
+	self.c_do_purchase = Button.new{text=_t"Purchase", fct=function() self:doPurchase() end}
 
 	self.c_recap = ListColumns.new{width=350, height=self.ih - self.c_do_purchase.h - 15 - math.max(self.c_bonus_vault_slots.h, self.c_coins_available.h), scrollbar=true, columns={
-		{name="Name", width=50, display_prop="recap_name"},
-		{name="Price", width=35, display_prop="recap_price"},
-		{name="Qty", width=15, display_prop="recap_qty"},
+		{name=_t"Name", width=50, display_prop="recap_name"},
+		{name=_t"Price", width=35, display_prop="recap_price"},
+		{name=_t"Qty", width=15, display_prop="recap_qty"},
 	}, list=self.recap, all_clicks=true, fct=function(item, _, button)
 		if item.total then return end
 		if button == "left" then button = "right"
@@ -185,24 +185,24 @@ end
 function _M:checks() game:onTickEnd(function()
 	if not profile.auth then
 		game:unregisterDialog(self)
-		Dialog:simplePopup("Online Store", "You need to be logged in before using the store. Please go back to the main menu and login.")
+		Dialog:simplePopup(_t"Online Store", _t"You need to be logged in before using the store. Please go back to the main menu and login.")
 		return
 	end
 
 	if self.mode == "steam" then
 		if not profile.auth.steamid then
 			game:unregisterDialog(self)
-			Dialog:yesnoPopup("Online Store", "Steam users need to link their profiles to their steam account. This is very easy in just a few clicks. Once this is done, simply restart the game.", function(ret) if ret then
+			Dialog:yesnoPopup(_t"Online Store", _t"Steam users need to link their profiles to their steam account. This is very easy in just a few clicks. Once this is done, simply restart the game.", function(ret) if ret then
 				util.browserOpenUrl("https://te4.org/user/"..profile.auth.drupid.."/steam", {is_external=true})
-			end end, "Let's do it! (Opens in your browser)", "Not now")
+			end end, _t"Let's do it! (Opens in your browser)", _t"Not now")
 		end
 	elseif self.mode == "te4" then
 		-- Handle me more smoothly
 		if profile.auth.donated < 6 then
 			game:unregisterDialog(self)
-			Dialog:yesnoPopup("Online Store", "The Online Store (and expansions) are only purchasable by players that bought the game. Plaese go have a look at the donation page for more explanations.", function(ret) if ret then
+			Dialog:yesnoPopup(_t"Online Store", _t"The Online Store (and expansions) are only purchasable by players that bought the game. Plaese go have a look at the donation page for more explanations.", function(ret) if ret then
 				util.browserOpenUrl("https://te4.org/donate", {is_external=true})
-			end end, "Let's go! (Opens in your browser)", "Not now")
+			end end, _t"Let's go! (Opens in your browser)", _t"Not now")
 		end
 	end
 end) end
@@ -242,9 +242,9 @@ end
 
 function _M:currencyDisplay(v)
 	if self.user_currency then
-		return ("%0.2f %s"):format(v, self.user_currency)
+		return ("%0.2f %s"):tformat(v, self.user_currency)
 	else
-		return ("%d coins"):format(v)
+		return ("%d coins"):tformat(v)
 	end
 end
 
@@ -276,14 +276,14 @@ function _M:updateCart()
 	end end
 	table.sort(self.recap, "sort_name")
 	self.recap[#self.recap+1] = {
-		recap_name = "#{bold}#TOTAL#{normal}#",
+		recap_name = _t"#{bold}#TOTAL#{normal}#",
 		recap_price = self:currencyDisplay(total_sum),
 		recap_qty = nb_items,
 		total = true,
 	}
 
 	self.c_recap:setList(self.recap, true)
-	self:updateTitle(self.base_title_text..("  (%d items in cart, %s)"):format(nb_items, self:currencyDisplay(total_sum)))
+	self:updateTitle(self.base_title_text..("  (%d items in cart, %s)"):tformat(nb_items, self:currencyDisplay(total_sum)))
 
 	self:toggleDisplay(self.c_do_purchase, nb_items > 0)
 
@@ -292,7 +292,7 @@ function _M:updateCart()
 end
 
 function _M:doPurchase()
-	if table.count(self.cart) == 0 then self:simplePopup("Cart", "Cart is empty!") return end
+	if table.count(self.cart) == 0 then self:simplePopup(_t"Cart", _t"Cart is empty!") return end
 
 	self.in_paying_ui = true
 	if core.steam then self:doPurchaseSteam()
@@ -302,7 +302,7 @@ end
 
 function _M:installShimmer(item)
 	if not core.webview then
-		Dialog:simpleLongPopup(item.name, "In-game browser is inoperant or disabled, impossible to auto-install shimmer pack.\nPlease go to https://te4.org/ to download it manually.", 600)
+		Dialog:simpleLongPopup(item.name, _t"In-game browser is inoperant or disabled, impossible to auto-install shimmer pack.\nPlease go to https://te4.org/ to download it manually.", 600)
 		return
 	end
 
@@ -318,12 +318,12 @@ function _M:installShimmer(item)
 
 			dofile("/data/gfx/mtx-shimmers/"..item.effect..".lua")
 
-			Dialog:simplePopup(item.name, [[Shimmer pack installed!]])
+			Dialog:simplePopup(item.name, _t[[Shimmer pack installed!]])
 			break
 		end end
 
 		if not found then
-			Dialog:simpleLongPopup(item.name, [[Could not dynamically link addon to current character, maybe the installation weng wrong.
+			Dialog:simpleLongPopup(item.name, _t[[Could not dynamically link addon to current character, maybe the installation weng wrong.
 You can fix that by manually downloading the shimmer addon from https://te4.org/ and placing it in game/addons/ folder.]], 600)
 		end
 	end
@@ -331,7 +331,7 @@ You can fix that by manually downloading the shimmer addon from https://te4.org/
 	local co co = coroutine.create(function()
 		local filename = ("/addons/%s-cosmetic-%s.teaa"):format(game.__mod_info.short_name, item.effect)
 		print("==> downloading", "https://te4.org/download-mtx/"..item.id_purchasable, filename)
-		local d = Downloader.new{title="Downloading cosmetic pack: #LIGHT_GREEN#"..item.name, co=co, dest=filename..".tmp", url="https://te4.org/download-mtx/"..item.id_purchasable, allow_downloads={addons=true}}
+		local d = Downloader.new{title=("Downloading cosmetic pack: #LIGHT_GREEN#%s"):tformat(item.name), co=co, dest=filename..".tmp", url="https://te4.org/download-mtx/"..item.id_purchasable, allow_downloads={addons=true}}
 		local ok = d:start()
 		if ok then
 			local wdir = fs.getWritePath()
@@ -357,16 +357,16 @@ function _M:paymentSuccess()
 		local item = self.purchasables[id]
 		if item.is_shimmer then
 			self:installShimmer(item)
-			list[#list+1] = ("- #{bold}##ROYAL_BLUE#%s #SLATE#x%d#WHITE##{normal}#: The pack should be downloading or even finished by now."):format(item.name, item.nb_purchase)
+			list[#list+1] = ("- #{bold}##ROYAL_BLUE#%s #SLATE#x%d#WHITE##{normal}#: The pack should be downloading or even finished by now."):tformat(item.name, item.nb_purchase)
 		elseif item.self_event or item.community_event then
-			list[#list+1] = ("- #{bold}##ROYAL_BLUE#%s #SLATE#x%d#WHITE##{normal}#: You can now trigger it whenever you are ready."):format(item.name, item.nb_purchase)
+			list[#list+1] = ("- #{bold}##ROYAL_BLUE#%s #SLATE#x%d#WHITE##{normal}#: You can now trigger it whenever you are ready."):tformat(item.name, item.nb_purchase)
 		elseif item.effect == "vaultspace" then
-			list[#list+1] = ("- #{bold}##ROYAL_BLUE#%s #SLATE#x%d#WHITE##{normal}#: Your available vault space has increased."):format(item.name, item.nb_purchase)
+			list[#list+1] = ("- #{bold}##ROYAL_BLUE#%s #SLATE#x%d#WHITE##{normal}#: Your available vault space has increased."):tformat(item.name, item.nb_purchase)
 		end
 	end end
 
 	game:unregisterDialog(self)
-	Dialog:simpleLongPopup("Payment", "Payment accepted.\n"..table.concat(list, "\n"), 700)
+	Dialog:simpleLongPopup(_t"Payment", ("Payment accepted.\n%s"):tformat(table.concat(list, "\n")), 700)
 end
 
 function _M:paymentFailure()
@@ -378,7 +378,7 @@ function _M:paymentCancel()
 end
 
 function _M:doPurchaseSteam()
-	local popup = Dialog:simplePopup("Connecting to Steam", "Steam Overlay should appear, if it does not please make sure it you have not disabled it.", nil, true)
+	local popup = Dialog:simplePopup(_t"Connecting to Steam", _t"Steam Overlay should appear, if it does not please make sure it you have not disabled it.", nil, true)
 
 	local cart = {}
 	for id, ok in pairs(self.cart) do if ok then
@@ -390,14 +390,14 @@ function _M:doPurchaseSteam()
 	end end
 
 	local function onMTXResult(id_cart, ok)
-		local finalpopup = Dialog:simplePopup("Connecting to Steam", "Finalizing transaction with Steam servers...", nil, true)
+		local finalpopup = Dialog:simplePopup(_t"Connecting to Steam", _t"Finalizing transaction with Steam servers...", nil, true)
 		profile:registerTemporaryEventHandler("MicroTxnSteamFinalizeCartResult", function(e)
 			game:unregisterDialog(finalpopup)
 			if e.success then
 				if e.new_donated then profile.auth.donated = e.new_donated end
 				self:paymentSuccess()
 			else
-				Dialog:simplePopup("Payment", "Payment refused, you have not been billed.")
+				Dialog:simplePopup(_t"Payment", _t"Payment refused, you have not been billed.")
 				self:paymentFailure()
 			end
 		end)
@@ -409,7 +409,7 @@ function _M:doPurchaseSteam()
 		if e.success then
 			core.steam.waitMTXResult(onMTXResult)
 		else
-			Dialog:simplePopup("Payment", "Payment refused, you have not been billed.")
+			Dialog:simplePopup(_t"Payment", _t"Payment refused, you have not been billed.")
 			self:paymentFailure()
 		end
 	end)
@@ -417,7 +417,7 @@ function _M:doPurchaseSteam()
 end
 
 function _M:doPurchaseTE4()
-	local popup = Dialog:simplePopup("Connecting to server", "Please wait...", nil, true)
+	local popup = Dialog:simplePopup(_t"Connecting to server", _t"Please wait...", nil, true)
 
 	local cart = {}
 	for id, ok in pairs(self.cart) do if ok then
@@ -429,14 +429,14 @@ function _M:doPurchaseTE4()
 	end end
 
 	local function finalizePurchase(id_cart)
-		local finalpopup = Dialog:simplePopup("Connecting to server", "Please wait...", nil, true)
+		local finalpopup = Dialog:simplePopup(_t"Connecting to server", _t"Please wait...", nil, true)
 		profile:registerTemporaryEventHandler("MicroTxnTE4FinalizeCartResult", function(e)
 			game:unregisterDialog(finalpopup)
 			if e.success then
 				if e.new_donated then profile.auth.donated = e.new_donated end
 				self:paymentSuccess()
 			else
-				Dialog:simplePopup("Payment", "Payment refused, you have not been billed.")
+				Dialog:simplePopup(_t"Payment", _t"Payment refused, you have not been billed.")
 				self:paymentFailure()
 			end
 		end)
@@ -448,18 +448,18 @@ function _M:doPurchaseTE4()
 		if e.success and e.info then
 			if e.info:prefix("instant_buy:") then
 				local id_cart = tonumber(e.info:sub(13))
-				Dialog:yesnoPopup("Online Store", "You have enough coins to instantly purchase those options. Confirm?", function(ret) if ret then
+				Dialog:yesnoPopup(_t"Online Store", _t"You have enough coins to instantly purchase those options. Confirm?", function(ret) if ret then
 					finalizePurchase(id_cart)
-				end end, "Purchase", "Cancel")
+				end end, _t"Purchase", _t"Cancel")
 			elseif e.info:prefix("requires:") then
 				local more = tonumber(e.info:sub(10))
-				Dialog:yesnoPopup("Online Store", "You need "..more.." more coins to purchase those options. Do you want to go to the donation page now?", function(ret) if ret then
+				Dialog:yesnoPopup(_t"Online Store", ("You need %s more coins to purchase those options. Do you want to go to the donation page now?"):tformat(more), function(ret) if ret then
 					util.browserOpenUrl("https://te4.org/donate", {is_external=true})
-				end end, "Let's go! (Opens in your browser)", "Not now")
+				end end, _t"Let's go! (Opens in your browser)", _t"Not now")
 				self:paymentCancel()
 			end
 		else
-			Dialog:simplePopup("Payment", "Payment refused, you have not been billed.")
+			Dialog:simplePopup(_t"Payment", _t"Payment refused, you have not been billed.")
 			self:paymentFailure()
 		end
 	end)
@@ -469,26 +469,26 @@ end
 function _M:buildTooltip(item)
 	local text = {}
 	if item.community_event then
-		text[#text+1] = [[#{bold}##GOLD#Community Online Event#WHITE##{normal}#: Once you have purchased a community event you will be able to trigger it at any later date, on whichever character you choose.
+		text[#text+1] = _t[[#{bold}##GOLD#Community Online Event#WHITE##{normal}#: Once you have purchased a community event you will be able to trigger it at any later date, on whichever character you choose.
 Community events once triggered will activate for #{bold}#every player currently logged on#{normal}# including yourself. Every player receiving it will know you sent it and thus that you are to thank for it.
 To activate it you will need to have your online events option set to "all" (which is the default value).]]
 	end
 	if item.self_event then
-		text[#text+1] = [[#{bold}##GOLD#Event#WHITE##{normal}#: Once you have purchased an event you will be able to trigger it at any later date, on whichever character you choose.
+		text[#text+1] = _t[[#{bold}##GOLD#Event#WHITE##{normal}#: Once you have purchased an event you will be able to trigger it at any later date, on whichever character you choose.
 To activate it you will need to have your online events option set to "all" (which is the default value).]]
 	end
 	if item.non_immediate then
-		text[#text+1] = [[#{bold}##GOLD#Non Immediate#WHITE##{normal}#: This events adds new content that you have to find by exploration. If you die before finding it, there can be no refunds.]]
+		text[#text+1] = _t[[#{bold}##GOLD#Non Immediate#WHITE##{normal}#: This events adds new content that you have to find by exploration. If you die before finding it, there can be no refunds.]]
 	end
 	if item.once_per_character then
-		text[#text+1] = [[#{bold}##GOLD#Once per Character#WHITE##{normal}#: This event can only be received #{bold}#once per character#{normal}#. Usualy because it adds a new zone or effect to the game that would not make sense to duplicate.]]
+		text[#text+1] = _t[[#{bold}##GOLD#Once per Character#WHITE##{normal}#: This event can only be received #{bold}#once per character#{normal}#. Usualy because it adds a new zone or effect to the game that would not make sense to duplicate.]]
 	end
 	if item.is_shimmer then
-		text[#text+1] = [[#{bold}##GOLD#Shimmer Pack#WHITE##{normal}#: Once purchased the game will automatically install the shimmer pack to your game and enable it for your current character too (you will still need to use the Mirror of Reflection to switch them on).
+		text[#text+1] = _t[[#{bold}##GOLD#Shimmer Pack#WHITE##{normal}#: Once purchased the game will automatically install the shimmer pack to your game and enable it for your current character too (you will still need to use the Mirror of Reflection to switch them on).
 #LIGHT_GREEN#Bonus perk:#LAST# purchasing any shimmer pack will also give your characters a portable Mirror of Reflection to be able to change your appearance anywhere, anytime!]]
 	end
 	if item.effect == "vaultspace" then
-		text[#text+1] = [[#{bold}##GOLD#Vault Space#WHITE##{normal}#: Once purchased your vault space is permanently increased.]]
+		text[#text+1] = _t[[#{bold}##GOLD#Vault Space#WHITE##{normal}#: Once purchased your vault space is permanently increased.]]
 	end
 	return table.concat(text, '\n')
 end
@@ -496,7 +496,7 @@ end
 function _M:generateList()
 	profile:registerTemporaryEventHandler("MicroTxnListPurchasables", function(e)
 		if e.error then
-			Dialog:simplePopup("Online Store", e.error:capitalize())
+			Dialog:simplePopup(_t"Online Store", e.error:capitalize())
 			game:unregisterDialog(self)
 			return
 		end

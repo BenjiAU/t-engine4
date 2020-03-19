@@ -52,7 +52,7 @@ newEntity{
 		"npc/humanoid_yeek_yeek_commoner_08.png",
 	},
 	display = "p", color=colors.WHITE,
-	desc = [[What?!]],
+	desc = _t[[What?!]],
 	faction = "neutral",
 
 	combat = { dam=resolvers.rngavg(1,2), atk=2, apr=0, dammod={str=0.4} },
@@ -61,7 +61,7 @@ newEntity{
 	lite = 3,
 
 	life_rating = 10, max_life = 15,
-	emote_random = {chance=10, "Who are you?", "What do you want?", "Why are you here?", "Where are you going?", "Do you have anything worth living for?"},
+	emote_random = {chance=10, _t"Who are you?", _t"What do you want?", _t"Why are you here?", _t"Where are you going?", _t"Do you have anything worth living for?"},
 	level_range = {1, 1}, exp_worth = 1,
 	rarity = 1,
 
@@ -89,7 +89,7 @@ newEntity{
 			m.inc_damage.all = -50
 			m.life = 30
 			game.zone:addEntity(game.level, m, "actor", self.x, self.y)
-			m:doEmote("GRrrrrrllllll!", 60)
+			m:doEmote(_t"GRrrrrrllllll!", 60)
 		elseif nb <= 1 then
 			local g = game.zone.grid_list.DREAM2_END:clone()
 			game.zone:addEntity(game.level, g, "terrain", self.x, self.y)
@@ -100,7 +100,7 @@ newEntity{
 newEntity{ base = "BASE_NPC_ORC", define_as = "WIFE",
 	name = "lost wife", color=colors.YELLOW,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/humanoid_orc_orc_mother.png", display_h=2, display_y=-1}}},
-	desc = [[Your wife has been turned into a giant, bloated form that towers above you. Mucus and slime ooze from every orifice, dripping onto the floor. The sight and the smell make you retch.]],
+	desc = _t[[Your wife has been turned into a giant, bloated form that towers above you. Mucus and slime ooze from every orifice, dripping onto the floor. The sight and the smell make you retch.]],
 	level_range = {10, 10}, exp_worth = 0,
 	female = true,
 	never_move = 1,

@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 Ideally, you thought your way through that challenge instead of just using trial-and-error.
 
 Every five points of #LIGHT_GREEN#Physical Save#WHITE#, #LIGHT_GREEN#Spell Save#WHITE#, and #LIGHT_GREEN#Mental Save#WHITE# knocks a turn off the duration of appropriate timed effects.

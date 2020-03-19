@@ -65,7 +65,7 @@ newTalent{
 				if target:canBe("sleep") then
 					target:setEffect(target.EFF_NIGHTMARE, t.getDuration(self, t), {src=self, power=power, waking=is_waking, dam=damage, insomnia=t.getInsomniaPower(self, t), no_ct_effect=true, apply_power=self:combatMindpower()})
 				else
-					game.logSeen(self, "%s resists the nightmare!", target.name:capitalize())
+					game.logSeen(self, "%s resists the nightmare!", target:getName():capitalize())
 				end
 			end
 		end)
@@ -83,7 +83,7 @@ newTalent{
 		return([[Puts targets in a radius %d cone into a nightmarish sleep for %d turns, rendering them unable to act.  Every %d points of damage the target suffers will reduce the effect duration by one turn.
 		Each turn, they'll suffer %0.2f darkness damage.  This damage will not reduce the duration of the effect.
 		When Nightmare ends, the target will suffer from Insomnia for a number of turns equal to the amount of time it was asleep (up to ten turns max), granting it %d%% sleep immunity for each turn of the Insomnia effect.
-		The damage threshold and mind damage will scale with your Mindpower.]]):format(radius, duration, power, damDesc(self, DamageType.DARKNESS, (damage)), insomnia)
+		The damage threshold and mind damage will scale with your Mindpower.]]):tformat(radius, duration, power, damDesc(self, DamageType.DARKNESS, (damage)), insomnia)
 	end,
 }
 
@@ -123,8 +123,8 @@ newTalent{
 			ai_target = {actor=target},
 			ai = "summoned", ai_real = "tactical",
 			ai_tactic={escape=0}, -- never flee
-			name = ""..target.name.."'s Inner Demon",
-			desc = [[A hideous, demonic entity that resembles the creature it came from.]],
+			name = ("%s's Inner Demon"):tformat(target:getName()),
+			desc = _t[[A hideous, demonic entity that resembles the creature it came from.]],
 		}
 		mod.class.NPC.castAs(m)
 		engine.interface.ActorAI.init(m, m)
@@ -152,7 +152,7 @@ newTalent{
 		game.zone:addEntity(game.level, m, "actor", x, y)
 		game.level.map:particleEmitter(x, y, 1, "generic_teleport", {rm=60, rM=130, gm=20, gM=110, bm=90, bM=130, am=70, aM=180})
 
-		game.logSeen(target, "#F53CBE#%s's Inner Demon manifests!", target.name:capitalize())
+		game.logSeen(target, "#F53CBE#%s's Inner Demon manifests!", target:getName():capitalize())
 
 	end,
 	action = function(self, t)
@@ -173,7 +173,7 @@ newTalent{
 		if target:canBe("fear") or target:attr("sleep") then
 			target:setEffect(target.EFF_INNER_DEMONS, t.getDuration(self, t), {src = self, chance=chance, apply_power=self:combatMindpower()})
 		else
-			game.logSeen(target, "%s resists the demons!", target.name:capitalize())
+			game.logSeen(target, "%s resists the demons!", target:getName():capitalize())
 		end
 		
 		game:playSoundNear(self, "talents/arcane")
@@ -185,7 +185,7 @@ newTalent{
 		return ([[Brings the target's inner demons to the surface.  Each turn, for %d turns, there's a %d%% chance that a demon will surface, requiring the target to make a Mental Save to keep it from manifesting.
 		If the target is sleeping, the chance to save will be halved, and fear immunity will be ignored.  Otherwise, if the summoning is resisted, the effect will end early.
 		The summon chance will scale with your Mindpower and the demon's life will scale with the target's rank.
-		If a demon manifests the sheer terror will remove all sleep effects from the victim, but not the Inner Demons.]]):format(duration, chance)
+		If a demon manifests the sheer terror will remove all sleep effects from the victim, but not the Inner Demons.]]):tformat(duration, chance)
 	end,
 }
 
@@ -222,7 +222,7 @@ newTalent{
 			target:setEffect(target.EFF_WAKING_NIGHTMARE, t.getDuration(self, t), {src = self, chance=t.getChance(self, t), dam=self:mindCrit(t.getDamage(self, t)), apply_power=self:combatMindpower()})
 			game.level.map:particleEmitter(target.x, target.y, 1, "generic_charge", {rm=60, rM=130, gm=20, gM=110, bm=90, bM=130, am=70, aM=180})
 		else
-			game.logSeen(target, "%s resists the nightmare!", target.name:capitalize())
+			game.logSeen(target, "%s resists the nightmare!", target:getName():capitalize())
 		end
 
 		game:playSoundNear(self, "talents/arcane")
@@ -235,7 +235,7 @@ newTalent{
 		return ([[Inflicts %0.2f darkness damage each turn for %d turns, and has a %d%% chance to randomly cause blindness, stun, or confusion (lasting 3 turns).
 		If the target is sleeping, the chance of avoiding a negative effect will be halved and fear immunity will be ignored.
 		The damage will scale with your Mindpower.]]):
-		format(damDesc(self, DamageType.DARKNESS, (damage)), duration, chance)
+		tformat(damDesc(self, DamageType.DARKNESS, (damage)), duration, chance)
 	end,
 }
 
@@ -266,10 +266,10 @@ newTalent{
 		local stats = 10 + self:combatTalentMindDamage(t, 10, 50)
 		local NPC = require "mod.class.NPC"
 		local m = NPC.new{
-			name = "terror",
+			name = _t"terror",
 			display = "h", color=colors.DARK_GREY, image="npc/horror_eldritch_nightmare_horror.png",
 			blood_color = colors.BLUE,
-			desc = "A formless terror that seems to cut through the air, and its victims, like a knife.",
+			desc = _t"A formless terror that seems to cut through the air, and its victims, like a knife.",
 			type = "horror", subtype = "eldritch",
 			rank = 2,
 			size_category = 2,
@@ -315,7 +315,7 @@ newTalent{
 			game.party:addMember(m, {
 				control="no",
 				type="terror",
-				title="Night Terror",
+				title=_t"Night Terror",
 				orders = {target=true},
 			})
 		end
@@ -338,6 +338,6 @@ newTalent{
 		local damage = t.getDamageBonus(self, t)
 		local summon = t.getSummonTime(self, t)
 		return ([[Increases your damage and resistance penetration on sleeping targets by %d%%.  Additionally, every time you slay a sleeping target, a Night Terror will be summoned for %d turns.
-		The Night Terror's stats will scale with your Mindpower, as will the damage bonus to sleeping targets.]]):format(damage, summon)
+		The Night Terror's stats will scale with your Mindpower, as will the damage bonus to sleeping targets.]]):tformat(damage, summon)
 	end,
 }

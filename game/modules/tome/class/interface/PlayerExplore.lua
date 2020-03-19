@@ -2450,7 +2450,7 @@ function _M:autoExplore()
 					local terrain = game.level.map(x, y, Map.TERRAIN)
 					if target_type == "door" then
 						if #path == 1 then
-							self:runStop("at door")
+							self:runStop(_t"at door")
 							if terrain and (terrain.door_player_check or terrain.door_player_stop) then game.level.map.attrs(x, y, "autoexplore_ignore", true) end
 							return false
 						else
@@ -2460,7 +2460,7 @@ function _M:autoExplore()
 					-- don't bump into special terrain if we've already been running
 					if target_type == "special" then
 						if #path == 1 then
-							self:runStop("something interesting")
+							self:runStop(_t"something interesting")
 							game.level.map.attrs(x, y, "autoexplore_ignore", true)
 							return false
 						end
@@ -2472,7 +2472,7 @@ function _M:autoExplore()
 							self.running.busy = { type = "opening door", do_move = true, no_energy = true }
 						elseif not game.level.map.attrs(x, y, "noticed") then
 							if terrain.change_level or terrain.orb_portal or terrain.escort_portal then game.level.map.attrs(x, y, "noticed", true) end
-							self:runStop("interesting terrain")
+							self:runStop(_t"interesting terrain")
 							return false
 						end
 					end
@@ -2511,7 +2511,7 @@ function _M:autoExplore()
 					self.running = {
 						path = path,
 						cnt = 1,
-						dialog = Dialog:simplePopup("Running...", "You are exploring, press any key to stop.", function()
+						dialog = Dialog:simplePopup(_t"Running...", _t"You are exploring, press any key to stop.", function()
 							self:runStop()
 						end, false, true),
 						explore = target_type,
@@ -2555,7 +2555,7 @@ function _M:checkAutoExplore()
 	if terrain and terrain.door_opened then
 		-- we already tried to open the door but failed (always fails on vault doors)
 		if self.running.busy and self.running.busy.type == "opening door" then
-			self:runStop("checked door")
+			self:runStop(_t"checked door")
 			return false
 		-- we didn't know this was a door at the time, so explore a new path
 		elseif self.running.explore == "unseen" and self.running.cnt == #self.running.path and game.level.map.has_seens(cx, cy) then
@@ -2591,7 +2591,7 @@ function _M:checkAutoExplore()
 					end
 				end
 			end
-			self:runStop("at " .. self.running.explore)
+			self:runStop(("at %s"):tformat(_t(self.running.explore)))
 			return false
 		end
 	end
@@ -2601,16 +2601,16 @@ function _M:checkAutoExplore()
 	-- game.level.map:checkAllEntities(cx, cy, "block_move", self) then
 		if terrain.notice then
 			if terrain.change_level or terrain.orb_portal or terrain.escort_portal then game.level.map.attrs(cx, cy, "noticed", true) end
-			self:runStop("interesting terrain")
+			self:runStop(_t"interesting terrain")
 			return false
 		elseif self.running.explore == "unseen" or self.running.explore == "object" and self.running.cnt ~= #self.running.path then
 			return self:autoExplore()
 		else
 			if self.running.explore == "object" and self.running.cnt == #self.running.path then
 				game.level.map.attrs(cx, cy, "obj_seen", true)
-				self:runStop("at object (diggable)")
+				self:runStop(_t"at object (diggable)")
 			else
-				self:runStop("the path is blocked")
+				self:runStop(_t"the path is blocked")
 			end
 			return false
 		end

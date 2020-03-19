@@ -337,7 +337,7 @@ newEntity{
 	on_block = {
 		desc=function(self, who, special)
 			local dam = special.shield_wintry(who)
-			return ("Deals #YELLOW#%d#LAST# cold damage and freezes enemies in radius 4 to the ground for 3 turns (1/turn)"):format(dam)
+			return ("Deals #YELLOW#%d#LAST# cold damage and freezes enemies in radius 4 to the ground for 3 turns (1/turn)"):tformat(dam)
 		end,
 		shield_wintry=function(who)
 			local dam = math.max(15, math.floor(who:combatStatScale(who:combatMindpower(), 1, 300)))
@@ -477,7 +477,7 @@ newEntity{
 	greater_ego = 1,
 	cost = 5,
 	special_combat = {
-		special_on_hit = {desc="reduce the cooldown of your ward talent by 1", fct=function(combat, who, target)
+		special_on_hit = {desc=_t"reduce the cooldown of your ward talent by 1", fct=function(combat, who, target)
 		if who.talents_cd[who.T_WARD] then
 			who.talents_cd[who.T_WARD] = who.talents_cd[who.T_WARD] - 1
 		end
@@ -525,7 +525,7 @@ newEntity{
 	on_block = {
 		desc=function(self, who, special)
 			local dam = special.shield_wrathful(who)
-			return ("Deals #VIOLET#%d#LAST# light and fire damage to each enemy blocked"):format(dam)
+			return ("Deals #VIOLET#%d#LAST# light and fire damage to each enemy blocked"):tformat(dam)
 		end,
 		shield_wrathful=function(who)
 			local dam = math.max(15, math.floor(who:combatStatScale(who:combatSpellpower(), 1, 450) / 2))
@@ -669,7 +669,7 @@ newEntity{
 	special_combat = {
 		dam = resolvers.mbonus_material(5, 5),
 		special_on_crit = {
-			desc="Smash the target reducing mind, spell, and combat action speeds by 30%", 
+			desc=_t"Smash the target reducing mind, spell, and combat action speeds by 30%", 
 			fct=function(combat, who, target)
 				target:setEffect(target.EFF_CRIPPLE, 4, {src=who, apply_power=who:combatAttack(combat)})
 			end
@@ -694,7 +694,7 @@ newEntity{
 	on_block = {
 		desc=function(self, who, special)
 			local dam = special.shield_shrapnel(who)
-			return ("Cause enemies within radius 6 to bleed for #RED#%d#LAST# physical damage over 5 turns (1/turn)"):format(dam)
+			return ("Cause enemies within radius 6 to bleed for #RED#%d#LAST# physical damage over 5 turns (1/turn)"):tformat(dam)
 		end,
 		shield_shrapnel=function(who)
 			local dam = math.max(15, math.floor(who:combatStatScale(who:combatPhysicalpower(), 1, 350)))
@@ -703,7 +703,7 @@ newEntity{
 		fct=function(self, who, target, type, dam, eff, special)
 			if who.turn_procs and who.turn_procs.shield_shrapnel then return end
 			who.turn_procs.shield_shrapnel = true
-			game.logSeen(who, "Shards of metal explode from %s's shield!", who.name:capitalize())
+			game.logSeen(who, "Shards of metal explode from %s's shield!", who:getName():capitalize())
 			local tg = {type="ball", friendlyfire=false, radius=6}
 			local dam = special.shield_shrapnel(who)
 			local damage = who:physicalCrit(dam)
@@ -725,7 +725,7 @@ newEntity{
 		special_on_hit = {
 		desc=function(self, who, special)
 			local dam = who:combatArmor()
-			return ("Deal physical damage equal to your armor (%d)"):format(dam)
+			return ("Deal physical damage equal to your armor (%d)"):tformat(dam)
 		end,
 		fct=function(combat, who, target)
 			local tg = {type="hit", range=1}

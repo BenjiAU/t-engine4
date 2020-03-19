@@ -18,10 +18,10 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[*#LIGHT_GREEN#This orb is used to control the gladium arena.#WHITE#*]],
+	text = _t[[*#LIGHT_GREEN#This orb is used to control the gladium arena.#WHITE#*]],
 	answers = {
-		{"[Go back to the Fortress]", action=function() game:changeLevel(1, "shertul-fortress") end},
-		{"[Leave the orb alone]"},
+		{_t"[Go back to the Fortress]", action=function() game:changeLevel(1, "shertul-fortress") end},
+		{_t"[Leave the orb alone]"},
 	}
 }
 

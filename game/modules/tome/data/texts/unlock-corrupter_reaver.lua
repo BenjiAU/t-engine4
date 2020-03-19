@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New Class: #LIGHT_GREEN#Reaver (Defiler)",
-[[Under a veil of darkness and blight come the Reavers.
+return _t"New Class: #LIGHT_GREEN#Reaver (Defiler)",
+_t[[Under a veil of darkness and blight come the Reavers.
 The foot soldiers of evil forces, Reavers are found everywhere.
 Very rarely a Reaver will realise the wrongness of her way and use her powers to atone for her crimes.
 

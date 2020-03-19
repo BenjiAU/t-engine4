@@ -145,7 +145,7 @@ newEntity{ theme={defense=true, physical=true}, name="generic def", points = 1, 
 				},
 }
 newEntity{ theme={defense=true, physical=true}, name="generic armor", points = 1, rarity = 10, level_range = {1, 50},
-	wielder = { combat_armor = resolvers.randartmax(2, 8), },
+	wielder = { combat_armor = resolvers.randartmax(2, 16), },
 }
 newEntity{ theme={defense=true}, name="generic life regeneration", points = 1, rarity = 11, level_range = {1, 50},
 	wielder = { life_regen = resolvers.randartmax(2, 4), },

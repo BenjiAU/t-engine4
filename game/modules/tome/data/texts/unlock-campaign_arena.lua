@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New game campaign: #LIGHT_GREEN#The Arena: Challenge of the Master",
-[[
+return _t"New game campaign: #LIGHT_GREEN#The Arena: Challenge of the Master",
+_t[[
 The arena, a way of violent entertainment. 
 A delight for the audience, a source of wealth and glory. A place where aspiring fighters, former adventurers and those cursed to fight
 eternally gather to hack away at each other.

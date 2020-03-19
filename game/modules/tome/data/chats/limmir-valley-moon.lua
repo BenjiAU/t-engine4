@@ -18,10 +18,10 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[I do not have time to talk. This ritual is intense, and we are not alone here. Stop them!]],
+	text = _t[[I do not have time to talk. This ritual is intense, and we are not alone here. Stop them!]],
 	answers = {
-		{"I will not let you down!"},
-		{"[leave]"},
+		{_t"I will not let you down!"},
+		{_t"[leave]"},
 	}
 }
 

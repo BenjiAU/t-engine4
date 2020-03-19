@@ -54,7 +54,7 @@ newTalent{
 		local power = t.getPower(self,t)
 		return ([[You make a low blow against a sensitive point on the target, dealing %d%% unarmed damage. If your attack hits, the target is left reeling and vulnerable, reducing their physical save by %d and their stun, blind, confusion and pin immunities to 50%% of normal for %d turns.
 This effect bypasses saves.]]):
-		format(100 * damage, power, duration)
+		tformat(100 * damage, power, duration)
 	end,
 }
 
@@ -106,7 +106,7 @@ newTalent{
 For this purpose, disabling effects are stun, blind, daze, confuse, pin, disarm, cripple and silence.
 In addition, for each disabling effect the target is under, your melee attacks have a %d%% (to a maximum of %d%%) chance to inflict a new effect on them (that they do not already have): either disarm, cripple (25%% power) or pin for 2 turns.
 The chance to further disable the target increases with your Accuracy.]]):
-		format(dam, dam*3, chance, chance*3)
+		tformat(dam, dam*3, chance, chance*3)
 	end,
 }
 
@@ -143,7 +143,7 @@ newTalent{
 		local speed = t.getSlow(self,t)
 		local duration = t.getDuration(self, t)
 		return ([[Throw a cloud of blinding dust in a radius %d cone. Enemies within will be blinded, as well as having their accuracy reduced by %d and movement speed decreased by %d%% for %d turns.
-		The chance to inflict these effects increase with your Accuracy.]]):format(self:getTalentRadius(t), accuracy, speed, duration)
+		The chance to inflict these effects increase with your Accuracy.]]):tformat(self:getTalentRadius(t), accuracy, speed, duration)
 	end,
 }
 
@@ -180,7 +180,7 @@ newTalent{
 			if e.status == "detrimental" and e.type ~= "other" and e.decrease ~= 0 then
 				p.dur = p.dur + dur
 				nb = nb + 1
-				game.logSeen(target, "#CRIMSON#%s's %s was extended!#LAST#", target.name:capitalize(), util.getval(p.getName, p) or e.desc)
+				game.logSeen(target, "#CRIMSON#%s's %s was extended!#LAST#", target:getName():capitalize(), util.getval(p.getName, p) or e.desc)
 				if nb >= max_nb then break end
 			end
 		end
@@ -202,9 +202,9 @@ newTalent{
 					p.dur = p.dur - dur
 					if p.dur <= 0 then
 						target:removeEffect(eff[1])
-						game.logSeen(target, "#CRIMSON#%s's %s was stripped!#LAST#", target.name:capitalize(), util.getval(p.getName, p) or eff[2].desc)
+						game.logSeen(target, "#CRIMSON#%s's %s was stripped!#LAST#", target:getName():capitalize(), util.getval(p.getName, p) or eff[2].desc)
 					else
-						game.logSeen(target, "#CRIMSON#%s's %s was disrupted!#LAST#", target.name:capitalize(), util.getval(p.getName, p) or eff[2].desc)
+						game.logSeen(target, "#CRIMSON#%s's %s was disrupted!#LAST#", target:getName():capitalize(), util.getval(p.getName, p) or eff[2].desc)
 					end
 				else break
 				end
@@ -218,6 +218,6 @@ newTalent{
 		local dur = t.getDuration(self, t)
 		local nb = t.getDebuffs(self, t)
 		return ([[Make a painful strike dealing %d%% weapon damage that increases the duration of up to %d negative effect(s) on the target by %d turns. For each negative effect extended this way, the duration of a beneficial effect is reduced by the same amount, possibly canceling it.]]):
-		format(100 * damage, nb, dur)
+		tformat(100 * damage, nb, dur)
 	end,
 }

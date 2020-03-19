@@ -49,8 +49,8 @@ newEntity{ define_as = "TROLL_PROX",
 	name = "Prox the Mighty",
 	display = "T", color=colors.VIOLET, image="npc/giant_troll_prox_the_mighty.png",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/giant_troll_prox_the_mighty.png", display_h=2, display_y=-1}}},
-	desc = [[A huge troll, he might move slowly but he does look dangerous nonetheless.]],
-	killer_message = "and eaten raw",
+	desc = _t[[A huge troll, he might move slowly but he does look dangerous nonetheless.]],
+	killer_message = _t"and eaten raw",
 	level_range = {7, nil}, exp_worth = 2,
 	max_life = 150, life_rating = 15, fixed_rating = true,
 	max_stamina = 85,
@@ -104,7 +104,7 @@ newEntity{ define_as = "TROLL_PROX",
 				game.zone:addEntity(game.level, n, "object", self.x, self.y)
 			end
 		end
-		game.state:activateBackupGuardian("ALUIN", 2, 35, "... and we thought the trollmire was safer now!")
+		game.state:activateBackupGuardian("ALUIN", 2, 35, _t"... and we thought the trollmire was safer now!")
 		game.player:resolveSource():setQuestStatus("start-allied", engine.Quest.COMPLETED, "trollmire")
 	end,
 }
@@ -115,8 +115,8 @@ newEntity{ define_as = "TROLL_SHAX",
 	name = "Shax the Slimy",
 	display = "T", color=colors.VIOLET, image="npc/giant_troll_prox_the_mighty.png",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/giant_troll_shax_the_slimy.png", display_h=2, display_y=-1}}},
-	desc = [[A huge troll, he seems to be adapted to aquatic life.]],
-	killer_message = "and eaten raw",
+	desc = _t[[A huge troll, he seems to be adapted to aquatic life.]],
+	killer_message = _t"and eaten raw",
 	level_range = {7, nil}, exp_worth = 2,
 	max_life = 150, life_rating = 15, fixed_rating = true,
 	max_stamina = 85,
@@ -170,7 +170,7 @@ newEntity{ define_as = "TROLL_SHAX",
 				game.zone:addEntity(game.level, n, "object", self.x, self.y)
 			end
 		end
-		game.state:activateBackupGuardian("ALUIN", 2, 35, "... and we thought the trollmire was safer now!")
+		game.state:activateBackupGuardian("ALUIN", 2, 35, _t"... and we thought the trollmire was safer now!")
 		game.player:resolveSource():setQuestStatus("start-allied", engine.Quest.COMPLETED, "trollmire")
 		game.player:resolveSource():setQuestStatus("start-allied", engine.Quest.COMPLETED, "trollmire-flooded")
 	end,
@@ -182,10 +182,10 @@ newEntity{ define_as = "TROLL_BILL",
 	name = "Bill the Stone Troll",
 	display = "T", color=colors.VIOLET, image="npc/troll_bill.png",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/troll_bill.png", display_h=2, display_y=-1}}},
-	desc = [[Big, brawny, powerful and with a taste for Halfling.
+	desc = _t[[Big, brawny, powerful and with a taste for Halfling.
 He is wielding a small tree trunk and lumbering toward you.
 This is the troll the notes spoke about, no doubt.]],
-	killer_message = "and clobbered into soup",
+	killer_message = _t"and clobbered into soup",
 	level_range = {7, nil}, exp_worth = 2,
 	max_life = 250, life_rating = 18, fixed_rating = true,
 	max_stamina = 85,
@@ -225,7 +225,7 @@ newEntity{ define_as = "ALUIN",
 	type = "humanoid", subtype = "human", unique = true,
 	name = "Aluin the Fallen",
 	display = "p", color=colors.VIOLET,
-	desc = [[His once-shining armour now dull and bloodstained, this Sun Paladin has given in to despair.]],
+	desc = _t[[His once-shining armour now dull and bloodstained, this Sun Paladin has given in to despair.]],
 	level_range = {35, nil}, exp_worth = 3,
 	max_life = 350, life_rating = 23, fixed_rating = true,
 	hate_regen = 100,

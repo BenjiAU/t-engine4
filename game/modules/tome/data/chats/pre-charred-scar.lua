@@ -18,20 +18,20 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[*#LIGHT_GREEN#Suddenly a voice appears in your head.#WHITE#*
+	text = _t[[*#LIGHT_GREEN#Suddenly a voice appears in your head.#WHITE#*
 @playername@, this is High Sun Paladin Aeryn of the Sunwall. I am communicating with you by the power of the Anorithil.
 I have some urgent information for you: the staff you were looking for has been located.]],
 	answers = {
-		{"Where?!", jump="where"},
+		{_t"Where?!", jump="where"},
 	}
 }
 
 newChat{ id="where",
-	text = [[One of our patrols noticed some strange orc movements around the southern part of the continent, in the desert of Erúan.
+	text = _t[[One of our patrols noticed some strange orc movements around the southern part of the continent, in the desert of Erúan.
 A group of orcs were guarding something that looked like the staff you asked about.
 You should go there to investigate. This might be your only chance.]],
 	answers = {
-		{"I will, right now!"},
+		{_t"I will, right now!"},
 	}
 }
 return "welcome"

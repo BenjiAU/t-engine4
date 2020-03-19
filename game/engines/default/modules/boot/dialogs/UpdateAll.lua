@@ -28,17 +28,17 @@ local DownloadDialog = require "engine.dialogs.DownloadDialog"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init()
-	Dialog.init(self, "Update all game modules", game.w / 3, game.h * 0.5)
+	Dialog.init(self, _t"Update all game modules", game.w / 3, game.h * 0.5)
 
 	self:generateList()
 
-	self.c_desc = Textzone.new{width=self.iw, auto_height=1, text=[[
+	self.c_desc = Textzone.new{width=self.iw, auto_height=1, text=_t[[
 All those components will be updated:
 ]]}
 
 	self.c_list = ListColumns.new{width=self.iw, height=self.ih - self.c_desc.h, scrollbar=true, columns={
-		{name="Component", width=80, display_prop="name"},
-		{name="Version", width=20, display_prop="version_string"},
+		{name=_t"Component", width=80, display_prop="name"},
+		{name=_t"Version", width=20, display_prop="version_string"},
 	}, list=self.list or {}, fct=function(item) end, select=function(item, sel) end}
 
 	self.c_ok = Button.new{width=self.iw - 20, text="Update All", fct=function() self:updateAll() end}
@@ -77,14 +77,14 @@ do return end
 	end
 
 	if #dllist == 0 then
-		Dialog:simplePopup("Nothing to update", "All your game modules are up to date.")
+		Dialog:simplePopup(_t"Nothing to update", _t"All your game modules are up to date.")
 		return
 	end
 
 	local engs = {}
 	local list = {}
 	for i, mod in ipairs(dllist) do
-		list[#list+1] = { name="Game: #{bold}##GOLD#"..mod.name.."#{normal}##WHITE#", mod=mod, version_string=("%d.%d.%d"):format(mod.version[1], mod.version[2], mod.version[3]) }
+		list[#list+1] = { name=_t"Game: #{bold}##GOLD#"..mod.name.."#{normal}##WHITE#", mod=mod, version_string=("%d.%d.%d"):format(mod.version[1], mod.version[2], mod.version[3]) }
 
 		-- Check for the required engine
 		local ename, ev1, ev2, ev3 = mod.engine[4] or "te4", mod.engine[1], mod.engine[2], mod.engine[3]
@@ -104,7 +104,7 @@ do return end
 	end
 
 	for name, eng in pairs(engs) do
-		list[#list+1] = { name="Engine: #{italic}##LIGHT_BLUE#"..eng[4].."#{normal}##WHITE#", eng=eng, version_string=("%d.%d.%d"):format(eng[1], eng[2], eng[3]) }
+		list[#list+1] = { name=_t"Engine: #{italic}##LIGHT_BLUE#"..eng[4].."#{normal}##WHITE#", eng=eng, version_string=("%d.%d.%d"):format(eng[1], eng[2], eng[3]) }
 	end
 	self.list = list
 end
@@ -149,7 +149,7 @@ function _M:updateAll()
 					files[#files+1] = fname
 					do_next()
 				end, function(error)
-					Dialog:simplePopup("Error!", "There was an error while downloading:\n"..error)
+					Dialog:simplePopup(_t"Error!", _t"There was an error while downloading:\n"..error)
 					game:unregisterDialog(self)
 				end)
 
@@ -157,7 +157,7 @@ function _M:updateAll()
 				d:startDownload()
 
 			end, function(error)
-				Dialog:simplePopup("Error!", "There was an error while downloading:\n"..error)
+				Dialog:simplePopup(_t"Error!", _t"There was an error while downloading:\n"..error)
 				game:unregisterDialog(self)
 			end)
 
@@ -171,14 +171,14 @@ function _M:updateAll()
 			local fname = ("/tmp-dl/modules/%s-%d.%d.%d.team"):format(mod.short_name, mod.version[1], mod.version[2], mod.version[3])
 			local f = fs.open(fname, "w")
 
-			local d = DownloadDialog.new("Downloading: "..next.name, mod.download, function(chunk)
+			local d = DownloadDialog.new(_t"Downloading: "..next.name, mod.download, function(chunk)
 				f:write(chunk)
 			end, function(di, data)
 				f:close()
 				files[#files+1] = fname
 				do_next()
 			end, function(error)
-				Dialog:simplePopup("Error!", "There was an error while downloading:\n"..error)
+				Dialog:simplePopup(_t"Error!", _t"There was an error while downloading:\n"..error)
 				game:unregisterDialog(self)
 			end)
 			game:registerDialog(d)
@@ -194,7 +194,7 @@ function _M:updateAll()
 		end
 		if restore then fs.setWritePath(restore) end
 
-		Dialog:simplePopup("Update", "All updates installed, the game will now restart", function()
+		Dialog:simplePopup(_t"Update", _t"All updates installed, the game will now restart", function()
 			util.showMainMenu()
 		end)
 	end

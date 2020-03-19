@@ -24,7 +24,7 @@ load("/data/general/objects/lore/orc-prides.lua")
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE_LORE",
 	name = "draft note", lore="grushnak-pride-note",
-	desc = [[A note.]],
+	desc = _t[[A note.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -33,7 +33,7 @@ for i = 1, 5 do
 newEntity{ base = "BASE_LORE",
 	define_as = "GARKUL_HISTORY"..i,
 	name = "The Legend of Garkul", lore="garkul-history-"..i,
-	desc = [[The Legend of Garkul the Devourer, mightiest of all orcs.]],
+	desc = _t[[The Legend of Garkul the Devourer, mightiest of all orcs.]],
 	rarity = false,
 }
 end

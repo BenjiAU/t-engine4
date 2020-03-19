@@ -43,7 +43,7 @@ newTalent{
 			self:setEffect(self.EFF_RESOLVE, 7, {damtype=damtype, res=eff.res, max_types = max})
 		end
 
-		--game.logSeen(self, "%s is invigorated by the attack!", self.name:capitalize())  Too spammy, delayedLog maybe?
+		--game.logSeen(self, "%s is invigorated by the attack!", self:getName():capitalize())  Too spammy, delayedLog maybe?
 
 	end,
 	info = function(self, t)
@@ -54,7 +54,7 @@ newTalent{
 		At talent level 3, the bonus resistance may apply to 3 elements, refreshing the duration with each element added.
 		Additionally, each time you take non-physical, non-mind damage, your equilibrium will decrease and stamina increase by %0.2f.
 		The effects will increase with the greater of your Mindpower or Physical power and the bonus resistance can be a mental crit.]]):
-		format(	resist, regen )
+		tformat(	resist, regen )
 	end,
 }
 
@@ -79,9 +79,10 @@ newTalent{
 	end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
-		local x, y, target = self:getTarget(tg)
+		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		if not self:canProject(tg, x, y) then return end
+		local _ _, _, _, x, y = self:canProject(tg, x, y)
+
 		local nb = 0
 		self:project(tg, x, y, function(px, py)
 			local target = game.level.map(px, py, Map.ACTOR)
@@ -90,7 +91,7 @@ newTalent{
 					target:setEffect(target.EFF_SILENCED, math.ceil(t.getduration(self,t)), {apply_power=math.max(self:combatMindpower(), self:combatPhysicalpower())})
 					if target:hasEffect(target.EFF_SILENCED) then nb = nb + 1 end
 				else
-					game.logSeen(target, "%s resists the silence!", target.name:capitalize())
+					game.logSeen(target, "%s resists the silence!", target:getName():capitalize())
 				end
 			end
 		end)
@@ -110,7 +111,7 @@ newTalent{
 		The damage and apply power will increase with the greater of your Mindpower or Physical power.
 
 		Learning this talent will let your Nature damage and penetration bonuses apply to all Manaburn damage regardless of source.]]):
-		format(t.getduration(self,t), rad, t.getFloorDuration(self,t), t.getDamage(self, t), t.getEquiRegen(self, t))
+		tformat(t.getduration(self,t), rad, t.getFloorDuration(self,t), t.getDamage(self, t), t.getEquiRegen(self, t))
 	end,
 }
 
@@ -143,7 +144,7 @@ newTalent{
 
 		if not self:equilibriumChance() then
 			self:forceUseTalent(self.T_ANTIMAGIC_SHIELD, {ignore_energy=true})
-			game.logSeen(self, "#GREEN#The antimagic shield of %s crumbles.", self.name)
+			game.logSeen(self, "#GREEN#The antimagic shield of %s crumbles.", self:getName())
 		end
 		return dam
 	end,
@@ -166,7 +167,7 @@ newTalent{
 		return ([[Surround yourself with a shield that will absorb at most %d non-physical, non-mind element damage per attack.
 		Each time damage is absorbed by the shield, your equilibrium increases by 1 for every 30 points of damage and a standard Equilibrium check is made. If the check fails, the shield will crumble and Antimagic Shield will go on cooldown.
 		The damage the shield can absorb will increase with your Mindpower or Physical power (whichever is greater).]]):
-		format(t.getMax(self, t))
+		tformat(t.getMax(self, t))
 	end,
 }
 
@@ -212,12 +213,12 @@ newTalent{
 		local vim = base / 2
 		local positive = base / 4
 		local negative = base / 4
-		local is_adept = self:knowTalent(self.T_ANTIMAGIC_ADEPT) and "\n#GREEN#Antimagic Adept:  #LAST#4 magical sustains from the target will be removed." or ""
+		local is_adept = self:knowTalent(self.T_ANTIMAGIC_ADEPT) and _t"\n#GREEN#Antimagic Adept:  #LAST#4 magical sustains from the target will be removed." or ""
 		return ([[Drain %d mana, %d vim, %d positive and negative energies from your target, triggering a chain reaction that explodes in a burst of arcane damage.
 		The damage done is equal to 100%% of the mana drained, 200%% of the vim drained, or 400%% of the positive or negative energy drained, whichever is higher. This effect is called a manaburn.
 		The effect will increase with your Mindpower or Physical power (whichever is greater).
 		%s]]):
-		format(mana, vim, positive, is_adept)
+		tformat(mana, vim, positive, is_adept)
 	end,
 }
 
@@ -229,6 +230,6 @@ newTalent{
 	points = 1,
 	info = function(self, t)
 		return ([[Your Mana Clash talent also removes 4 magical sustains from the target.]]):
-		format()
+		tformat()
 	end,
 }

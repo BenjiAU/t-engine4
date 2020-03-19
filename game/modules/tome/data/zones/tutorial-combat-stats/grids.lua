@@ -32,11 +32,11 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[This portal will bring you back to the Tutorial Lobby.]],
+	desc=_t[[This portal will bring you back to the Tutorial Lobby.]],
 
 	on_move = function(self, x, y, who)
 		if who == game.player then
-			require("engine.ui.Dialog"):yesnoPopup("Tutorial Lobby Portal", "Enter the portal back to the lobby?", function(ret)
+			require("engine.ui.Dialog"):yesnoPopup(_t"Tutorial Lobby Portal", _t"Enter the portal back to the lobby?", function(ret)
 				if not ret then
 					--game:onLevelLoad("wilderness-1", function(zone, level)
 					--	local spot = level:pickSpot{type="farportal-end", subtype="demon-plane-arrival"}
@@ -45,7 +45,7 @@ newEntity{
 					game:changeLevel(1, "tutorial")
 					game.logPlayer(who, "#VIOLET#You enter the swirling portal and in the blink of an eye you are back in the lobby.")
 				end
-			end, "Stay", "Enter")
+			end, _t"Stay", _t"Enter")
 		end
 	end,
 }
@@ -57,11 +57,11 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[This portal will bring you back to the Tutorial Lobby.]],
+	desc=_t[[This portal will bring you back to the Tutorial Lobby.]],
 
 	on_move = function(self, x, y, who)
 		if who == game.player then
-			require("engine.ui.Dialog"):yesnoPopup("Tutorial Lobby Portal", "Enter the portal back to the lobby?", function(ret)
+			require("engine.ui.Dialog"):yesnoPopup(_t"Tutorial Lobby Portal", _t"Enter the portal back to the lobby?", function(ret)
 				if not ret then
 					--game:onLevelLoad("wilderness-1", function(zone, level)
 					--	local spot = level:pickSpot{type="farportal-end", subtype="demon-plane-arrival"}
@@ -70,7 +70,7 @@ newEntity{
 					game:changeLevel(1, "tutorial")
 					game.logPlayer(who, "#VIOLET#You enter the swirling portal and in the blink of an eye you are back in the lobby.")
 				end
-			end, "Stay", "Enter")
+			end, _t"Stay", _t"Enter")
 		end
 	end,
 }
@@ -96,7 +96,7 @@ newEntity{ base="WATER_BASE",
 newEntity{
 	define_as = "SIGN",
 	name = "Sign",
-	desc = [[Contains a snippet of ToME wisdom.]],
+	desc=_t[[Contains a snippet of ToME wisdom.]],
 	image = "terrain/grass.png",
 	display = '_', color=colors.UMBER, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image="terrain/signpost.png"}},
@@ -107,7 +107,7 @@ newEntity{
 newEntity{
 	define_as = "SIGN_FLOOR",
 	name = "Sign",
-	desc = [[Contains a snippet of ToME wisdom.]],
+	desc=_t[[Contains a snippet of ToME wisdom.]],
 	image = "terrain/marble_floor.png",
 	display = '_', color=colors.UMBER, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image="terrain/signpost.png"}},
@@ -117,7 +117,7 @@ newEntity{
 newEntity{
 	define_as = "SIGN_CAVE",
 	name = "Sign",
-	desc = [[Contains a snippet of ToME wisdom.]],
+	desc=_t[[Contains a snippet of ToME wisdom.]],
 	image = "terrain/cave/cave_floor_1_01.png",
 	display = '_', color=colors.UMBER, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image="terrain/signpost.png"}},
@@ -127,7 +127,7 @@ newEntity{
 newEntity{
 	define_as = "SIGN_SOLID_FLOOR",
 	name = "Sign",
-	desc = [[Contains a snippet of ToME wisdom.]],
+	desc=_t[[Contains a snippet of ToME wisdom.]],
 	image = "terrain/solidwall/solid_floor1.png",
 	display = '_', color=colors.UMBER, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image="terrain/signpost.png"}},
@@ -137,7 +137,7 @@ newEntity{
 newEntity{
 	define_as = "UNLEARN_ALL",
 	name = "Rune of Enlightenment: Summer Vacation",
-	desc = [[Causes the player's brain to jettison all recently-acquired knowledge.]],
+	desc=_t[[Causes the player's brain to jettison all recently-acquired knowledge.]],
 	image = "terrain/cave/cave_floor_1_01.png",
 	display = '*', color=colors.VIOLET, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image = "trap/trap_lethargy_rune_01.png"}},
@@ -172,7 +172,7 @@ newEntity{
 newEntity{
 	define_as = "LEARN_PHYS_KB",
 	name = "Rune of Enlightenment: Shove",
-	desc = [[Teaches the player 'Shove'.]],
+	desc=_t[[Teaches the player 'Shove'.]],
 	image = "terrain/cave/cave_floor_1_01.png",
 	display = '*', color=colors.VIOLET, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image = "trap/blast_acid01.png"}},
@@ -211,7 +211,7 @@ newEntity{
 newEntity{
 	define_as = "LEARN_SPELL_KB",
 	name = "Rune of Enlightenment: Mana Gale",
-	desc = [[Teaches the player 'Mana Gale'.]],
+	desc=_t[[Teaches the player 'Mana Gale'.]],
 	image = "terrain/cave/cave_floor_1_01.png",
 	display = '*', color=colors.VIOLET, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image = "trap/blast_fire01.png"}},
@@ -243,7 +243,7 @@ newEntity{
 newEntity{
 	define_as = "LEARN_SPELL_KB3",
 	name = "Rune of Enlightenment: Mana Gale",
-	desc = [[Teaches the player 'Mana Gale'.]],
+	desc=_t[[Teaches the player 'Mana Gale'.]],
 	image = "terrain/cave/cave_floor_1_01.png",
 	display = '*', color=colors.VIOLET, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image = "trap/blast_fire01.png"}},
@@ -275,7 +275,7 @@ newEntity{
 newEntity{
 	define_as = "LEARN_MIND_KB",
 	name = "Rune of Enlightenment: Telekinetic Punt",
-	desc = [[Teaches the player 'Telekinetic Punt'.]],
+	desc=_t[[Teaches the player 'Telekinetic Punt'.]],
 	image = "terrain/cave/cave_floor_1_01.png",
 	display = '*', color=colors.VIOLET, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image = "trap/blast_ice01.png"}},
@@ -308,7 +308,7 @@ newEntity{
 newEntity{
 	define_as = "LEARN_SPELL_BLINK",
 	name = "Rune of Enlightenment: Blink",
-	desc = [[Teaches the player 'Blink'.]],
+	desc=_t[[Teaches the player 'Blink'.]],
 	image = "terrain/cave/cave_floor_1_01.png",
 	display = '*', color=colors.VIOLET, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image = "trap/blast_lightning01.png"}},
@@ -340,7 +340,7 @@ newEntity{
 newEntity{
 	define_as = "LEARN_MIND_FEAR",
 	name = "Rune of Enlightenment: Fear",
-	desc = [[Teaches the player 'Fear'.]],
+	desc=_t[[Teaches the player 'Fear'.]],
 	image = "terrain/cave/cave_floor_1_01.png",
 	display = '*', color=colors.VIOLET, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image = "trap/trap_poison_burst_01.png"}},
@@ -372,7 +372,7 @@ newEntity{
 newEntity{
 	define_as = "LEARN_SPELL_BLEED",
 	name = "Rune of Enlightenment: Bleed",
-	desc = [[Teaches the player 'Bleed'.]],
+	desc=_t[[Teaches the player 'Bleed'.]],
 	image = "terrain/cave/cave_floor_1_01.png",
 	display = '*', color=colors.VIOLET, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image = "trap/trap_magical_disarm_01_64.png"}},
@@ -394,7 +394,7 @@ newEntity{
 newEntity{
 	define_as = "LEARN_MIND_CONFUSION",
 	name = "Rune of Enlightenment: Confusion",
-	desc = [[Teaches the player 'Confusion'.]],
+	desc=_t[[Teaches the player 'Confusion'.]],
 	image = "terrain/cave/cave_floor_1_01.png",
 	display = '*', color=colors.VIOLET, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image = "trap/trap_teleport_01.png"}},
@@ -462,7 +462,7 @@ newEntity{
 newEntity{
 	define_as = "FINAL_LESSON",
 	name = "Sign",
-	desc = [[Contains a snippet of ToME wisdom.]],
+	desc=_t[[Contains a snippet of ToME wisdom.]],
 	image = "terrain/cave/cave_floor_1_01.png",
 	display = '_', color=colors.UMBER, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image="terrain/signpost.png"}},
@@ -480,7 +480,7 @@ newEntity{
 newEntity{
 	define_as = "COMBAT_STATS_DONE",
 	name = "Sign",
-	desc = [[Contains a snippet of ToME wisdom.]],
+	desc=_t[[Contains a snippet of ToME wisdom.]],
 	image = "terrain/solidwall/solid_floor1.png",
 	display = '_', color=colors.UMBER, back_color=colors.DARK_GREEN,
 	add_displays = {class.new{image="terrain/signpost.png"}},

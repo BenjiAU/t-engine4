@@ -32,7 +32,7 @@ newTalent{
 		return	self:combatTalentLimit(t, 1, 0.65, 0.85)-- limit <100%
 	end,
 	info = function(self, t)
-		return ([[Increases the damage of your off-hand weapon to %d%%.]]):format(100 * t.getoffmult(self,t))
+		return ([[Increases the damage of your off-hand weapon to %d%%.]]):tformat(100 * t.getoffmult(self,t))
 	end,
 }
 
@@ -85,7 +85,7 @@ newTalent{ -- Note: classes: Temporal Warden, Rogue, Shadowblade, Marauder
 		When dual wielding, your defense is increased by %d.
 		Up to %0.1f times a turn, you have a %d%% chance to parry up to %d damage (based on your your offhand weapon damage) from a melee attack.
 		A successful parry reduces damage like armour (before any attack multipliers) and prevents critical strikes.  Partial parries have a proportionally reduced chance to succeed.  It is difficult to parry attacks from unseen attackers and you cannot parry with a mindstar.
-		The defense and chance to parry improve with Dexterity.  The number of parries increases with Cunning.]]):format(t.getDefense(self, t), t.getDeflects(self, t, true), t.getDeflectChance(self,t), t.getDamageChange(self, t, true))
+		The defense and chance to parry improve with Dexterity.  The number of parries increases with Cunning.]]):tformat(t.getDefense(self, t), t.getDeflects(self, t, true), t.getDeflectChance(self,t), t.getDamageChange(self, t, true))
 	end,
 }
 
@@ -147,7 +147,7 @@ newTalent{
 		return ([[You have learned how to carefully manage contact between you and your opponent.
 		When striking in melee with your dual wielded weapons, you automatically avoid up to %d damage dealt to you from each of your target's on hit effects.  This improves with your Dexterity, but is not possible with mindstars.
 		In addition, while this talent is active, you redirect %d%% of the damage you avoid this way back to your target.]]):
-		format(t.getReflectArmour(self, t), t.getPercent(self, t))
+		tformat(t.getReflectArmour(self, t), t.getPercent(self, t))
 	end,
 }
 
@@ -195,7 +195,7 @@ newTalent{
 			if target:canBe("confusion") then
 				target:setEffect(target.EFF_CONFUSED, t.getConfuseDuration(self, t), {apply_power=self:combatAttack(), power=t.getConfusePower(self, t)})
 			else
-				game.logSeen(target, "%s resists the surprise strike!", target.name:capitalize())
+				game.logSeen(target, "%s resists the surprise strike!", target:getName():capitalize())
 			end
 		end
 		return true
@@ -205,7 +205,7 @@ newTalent{
 		return ([[With a quick shift of your momentum, you execute a surprise unarmed strike in place of your normal offhand attack.
 		This allows you to attack with your mainhand weapon for %d%% damage and unarmed for %d%% damage.  If the unarmed attack hits, the target is confused (%d%% power) for %d turns.
 		The chance to confuse increases with your Accuracy.]])
-		:format(dam, dam*1.25, t.getConfusePower(self, t), t.getConfuseDuration(self, t))
+		:tformat(dam, dam*1.25, t.getConfusePower(self, t), t.getConfuseDuration(self, t))
 	end,
 }
 
@@ -245,7 +245,7 @@ newTalent{
 			if target:canBe("stun") then
 				target:setEffect(target.EFF_STUNNED, t.getStunDuration(self, t), {apply_power=self:combatAttack()})
 			else
-				game.logSeen(target, "%s resists the stunning strike!", target.name:capitalize())
+				game.logSeen(target, "%s resists the stunning strike!", target:getName():capitalize())
 			end
 
 			-- Attack after the stun, to benefit from backstabs
@@ -257,7 +257,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Attack with your offhand weapon for %d%% damage. If the attack hits, the target is stunned for %d turns, and you hit it with your mainhand weapon doing %d%% damage.
 		The stun chance increases with your Accuracy.]])
-		:format(100 * self:combatTalentWeaponDamage(t, 0.7, 1.5), t.getStunDuration(self, t), 100 * self:combatTalentWeaponDamage(t, 0.7, 1.5))
+		:tformat(100 * self:combatTalentWeaponDamage(t, 0.7, 1.5), t.getStunDuration(self, t), 100 * self:combatTalentWeaponDamage(t, 0.7, 1.5))
 	end,
 }
 
@@ -291,7 +291,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Lashes out with a flurry of blows, hitting your target three times with each weapon for %d%% damage.]]):format(100 * self:combatTalentWeaponDamage(t, 0.4, 1.0))
+		return ([[Lashes out with a flurry of blows, hitting your target three times with each weapon for %d%% damage.]]):tformat(100 * self:combatTalentWeaponDamage(t, 0.4, 1.0))
 	end,
 }
 
@@ -359,7 +359,7 @@ newTalent{
 		dam = t.getDamage(self,t)*100
 		crit = t.getCrit(self,t)
 		return ([[Swiftly leap to your target and strike at their vital points with both weapons, dealing %d%% weapon damage. This attack deals %d%% increased critical strike damage.]]):
-		format(dam, crit)
+		tformat(dam, crit)
 	end,
 }
 
@@ -421,7 +421,7 @@ newTalent{
 			return nil 
 		end
 
-		game.logSeen(self, "%s becomes a whirlwind of weapons!", self.name:capitalize())
+		game.logSeen(self, "%s becomes a whirlwind of weapons!", self:getName():capitalize())
 
 		local seen_targets = {}
 		for px, py in core.fov.lineIterator(self.x, self.y, mx, my, "block_NOTHINGLOL") do
@@ -451,7 +451,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local range = self:getTalentRange(t)
 		return ([[You quickly move up to %d tiles to arrive adjacent to a target location you can see, leaping around or over anyone in your way.  During your movement, you attack all foes within one grid of your path with both weapons for %d%% weapon damage, causing those struck to bleed for 50%% of the damage dealt over 5 turns.]]):
-		format(range, damage*100)
+		tformat(range, damage*100)
 	end,
 }
 

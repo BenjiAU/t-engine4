@@ -38,7 +38,7 @@ end
 ---------------------------------------------------------------------
 -- Maj'Eyal
 ---------------------------------------------------------------------
-if zone == "Maj'Eyal" then
+if zone == _t"Maj'Eyal" then
 	wda.cur_patrols = wda.cur_patrols or 0
 	wda.cur_hostiles = wda.cur_hostiles or 0
 	game.state.gone_west = true
@@ -91,7 +91,7 @@ if zone == "Maj'Eyal" then
 ---------------------------------------------------------------------
 -- Var'Eyal (Far East)
 ---------------------------------------------------------------------
-elseif zone == "Far East" then
+elseif zone == _t"Far East" then
 	wda.cur_patrols = wda.cur_patrols or 0
 	wda.cur_orc_patrols = wda.cur_orc_patrols or 0
 	wda.cur_hostiles = wda.cur_hostiles or 0

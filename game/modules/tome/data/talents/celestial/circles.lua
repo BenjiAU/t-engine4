@@ -54,7 +54,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[Creates a circle of radius %d at your feet; the circle increases your defense and all saves by %d while dealing %0.2f darkness damage per turn to everyone else within its radius. The circle lasts %d turns.
 		The damage will increase with your Spellpower.]]):
-		format(radius, damage, (damDesc (self, DamageType.DARKNESS, damage)), duration)
+		tformat(radius, damage, (damDesc (self, DamageType.DARKNESS, damage)), duration)
 	end,
 }
 
@@ -126,7 +126,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		local damage = t.getDamage(self, t)
 		return ([[Creates a circle of radius %d at your feet; the circle protects you from silence effects while you remain in its radius while silencing and dealing %d light damage to everyone else who enters. The circle lasts %d turns.]]):
-		format(radius, damDesc(self, DamageType.LIGHT, damage), duration)
+		tformat(radius, damDesc(self, DamageType.LIGHT, damage), duration)
 	end,
 }
 
@@ -167,7 +167,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[Creates a circle of radius %d at your feet; the circle slows incoming projectiles by %d%% and attempts to push all creatures other than yourself out of its radius, inflicting %0.2f light damage and %0.2f darkness damage per turn as it does so.  The circle lasts %d turns.
 		The effects will increase with your Spellpower.]]):
-		format(radius, damage*5, (damDesc (self, DamageType.LIGHT, damage)), (damDesc (self, DamageType.DARKNESS, damage)), duration)
+		tformat(radius, damage*5, (damDesc (self, DamageType.LIGHT, damage)), (damDesc (self, DamageType.DARKNESS, damage)), duration)
 	end,
 }
 
@@ -212,6 +212,6 @@ newTalent{
 		Residual power from the surge will emanate from your circles for %d turns; each circle you stand in will increase your celestial resources.
 		Shifting Shadows: +1 negative.
 		Sanctity: +1 postive.
-		Warding: +0.5 postive and negative.]]):format(t.getSlow(self, t), t.getSlowDur(self, t), damDesc(self, DamageType.LIGHT, t.getDamage(self, t)), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t)), t.getDuration(self, t))
+		Warding: +0.5 postive and negative.]]):tformat(t.getSlow(self, t), t.getSlowDur(self, t), damDesc(self, DamageType.LIGHT, t.getDamage(self, t)), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t)), t.getDuration(self, t))
 	end,
 }

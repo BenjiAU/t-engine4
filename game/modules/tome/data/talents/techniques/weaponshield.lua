@@ -55,7 +55,7 @@ newTalent{
 			if target:canBe("stun") then
 				target:setEffect(target.EFF_STUNNED, t.getStunDuration(self, t), {apply_power=self:combatAttackStr()})
 			else
-				game.logSeen(target, "%s resists the shield bash!", target.name:capitalize())
+				game.logSeen(target, "%s resists the shield bash!", target:getName():capitalize())
 			end
 		end
 
@@ -64,7 +64,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Hits the target with two shield strikes, doing %d%% and %d%% shield damage. If it hits a second time, it stuns the target for %d turns.
 		The stun chance increases with your Accuracy and your Strength.]])
-		:format(100 * self:combatTalentWeaponDamage(t, 1, 1.7, self:getTalentLevel(self.T_SHIELD_EXPERTISE)),
+		:tformat(100 * self:combatTalentWeaponDamage(t, 1, 1.7, self:getTalentLevel(self.T_SHIELD_EXPERTISE)),
 		100 * self:combatTalentWeaponDamage(t, 1.2, 2.1, self:getTalentLevel(self.T_SHIELD_EXPERTISE)),
 		t.getStunDuration(self, t))
 	end,
@@ -89,9 +89,9 @@ newTalent{
 		local inc = t.getDurInc(self, t)
 		return ([[Improves your ability to perform counterstrikes after blocks in the following ways:
 		Allows counterstrikes after incomplete blocks.
-		Increases the duration of the counterstrike debuff on attackers by %d turn%s.
+		Increases the duration of the counterstrike debuff on attackers by %d %s.
 		Increases the number of counterstrikes you can perform on a target while they're vulnerable by %d.
-		Increases the crit chance of counterstrikes by %d%%. This increase scales with your Dexterity.]]):format(inc, (inc > 1 and "s" or ""), inc, t.getCritInc(self, t))
+		Increases the crit chance of counterstrikes by %d%%. This increase scales with your Dexterity.]]):tformat(inc, (inc > 1 and _t"turns" or _t"turn"), inc, t.getCritInc(self, t))
 	end,
 }
 
@@ -122,18 +122,19 @@ newTalent{
 		if not target or not self:canProject(tg, x, y) then return nil end
 
 		local damage = t.getShieldDamage(self, t)
-		self:forceUseTalent(self.T_BLOCK, {ignore_energy=true, ignore_cd = true, silent = true})
 
 		self:attackTargetWith(target, shield_combat, nil, damage)
 		self:attackTargetWith(target, shield_combat, nil, damage)
 		self:attackTargetWith(target, shield_combat, nil, damage)
+
+		self:forceUseTalent(self.T_BLOCK, {ignore_energy=true, ignore_cd = true, silent = true})
 
 		return true
 	end,
 	info = function(self, t)
 		local damage = t.getShieldDamage(self, t)*100
 		return ([[Hit your target with your shield 3 times for %d%% damage then quickly return to a blocking position.  The bonus block will not check or trigger Block cooldown.]])
-		:format(damage)
+		:tformat(damage)
 	end,
 }
 
@@ -179,7 +180,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Hits the target with your shield, doing %d%% damage. If it hits, you follow up with two automatic critical hits with your weapon, doing %d%% base damage each.]]):
-		format(100 * self:combatTalentWeaponDamage(t, 0.8, 1.3, self:getTalentLevel(self.T_SHIELD_EXPERTISE)), 100 * self:combatTalentWeaponDamage(t, 0.8, 1.3))
+		tformat(100 * self:combatTalentWeaponDamage(t, 0.8, 1.3, self:getTalentLevel(self.T_SHIELD_EXPERTISE)), 100 * self:combatTalentWeaponDamage(t, 0.8, 1.3))
 	end,
 }
 
@@ -232,7 +233,7 @@ newTalent{
 		Increases Armour by %d, Block value by %d, and reduces Block cooldown by 2.
 		Increases stun and knockback resistance by %d%%.
 		The Armor and Block bonuses increase equally with your Dexterity and Strength.]]):
-		format(t.getArmor(self, t), t.getBlock(self, t), 100*t.stunKBresist(self, t))
+		tformat(t.getArmor(self, t), t.getBlock(self, t), 100*t.stunKBresist(self, t))
 	end,
 }
 
@@ -273,7 +274,7 @@ newTalent{
 					target:knockback(self.x, self.y, t.getDist(self, t))
 					if target:canBe("stun") then target:setEffect(target.EFF_DAZED, t.getDuration(self, t), {}) end
 				else
-					game.logSeen(target, "%s resists the knockback!", target.name:capitalize())
+					game.logSeen(target, "%s resists the knockback!", target:getName():capitalize())
 				end
 			end
 		end)
@@ -284,7 +285,7 @@ newTalent{
 		return ([[Smash your shield into the face of all adjacent foes dealing %d%% shield damage and knocking them back %d grids.
 		In addition, all creatures knocked back will also be dazed for %d turns.
 		If known, activating this talent will refresh your Rush cooldown if the attack hits.
-		The distance increases with your talent level, and the Daze duration with your Strength.]]):format(t.getShieldDamage(self, t)*100, t.getDist(self, t), t.getDuration(self, t))
+		The distance increases with your talent level, and the Daze duration with your Strength.]]):tformat(t.getShieldDamage(self, t)*100, t.getDist(self, t), t.getDuration(self, t))
 	end,
 }
 
@@ -301,7 +302,7 @@ newTalent{
 		self:talentTemporaryValue(p, "combat_spellresist", t.getSpell(self, t))
 	end,
 	info = function(self, t)
-		return ([[Improves your damage with shield-based skills, and increases your Spell (+%d) and Physical (+%d) Saves.]]):format(t.getSpell(self, t), t.getPhysical(self, t))
+		return ([[Improves your damage with shield-based skills, and increases your Spell (+%d) and Physical (+%d) Saves.]]):tformat(t.getSpell(self, t), t.getPhysical(self, t))
 	end,
 }
 
@@ -362,6 +363,6 @@ newTalent{
 		Your stand lets you concentrate on every blow, allowing you to avoid death from normally fatal wounds. You can only die when reaching -%d life.
 		If your life is below 0 when Last Stand ends it will be set to 1.
 		The increase in Defense and Armor is based on your Dexterity, and the increase in life is based on your Constitution and normal maximum life.]]):
-		format(t.getDefense(self, t), hp, hp)
+		tformat(t.getDefense(self, t), hp, hp)
 	end,
 }

@@ -121,7 +121,7 @@ newTalent{
 		The wardens are out of phase with normal reality and deal %d%% less damage but shoot through friendly targets. All your arrows, including arrows from Shoot and other talents, now phase through friendly targets without causing them harm.
 		
 		Bow Threading talents will freely swap to your bow when activated if you have one in your secondary slot. You may use the Shoot talent in a similar manner.]])
-		:format(damage, penalty)
+		:tformat(damage, penalty)
 	end
 }
 
@@ -165,13 +165,13 @@ newTalent{
 						if target:checkHit(getParadoxSpellpower(self, t), target:combatPhysicalResist(), 0, 95) and target:canBe("knockback") then -- Deprecated Checkhit call
 							return true
 						else
-							game.logSeen(target, "%s resists the knockback!", target.name:capitalize())
+							game.logSeen(target, "%s resists the knockback!", target:getName():capitalize())
 						end
 					end
 					if can(target) then
 						target:pull(x, y, tg.radius, can)
 						tgts[#tgts+1] = target
-						game.logSeen(target, "%s is drawn in by the singularity!", target.name:capitalize())
+						game.logSeen(target, "%s is drawn in by the singularity!", target:getName():capitalize())
 						target:crossTierEffect(target.EFF_OFFBALANCE, getParadoxSpellpower(self, t))
 					end
 				end
@@ -219,7 +219,7 @@ newTalent{
 		Each target moved beyond the first increases the damage %0.2f (up to %0.2f bonus damage).
 		Targets take reduced damage the further they are from the epicenter (20%% less per tile).
 		The additional damage scales with your Spellpower.]])
-		:format(damage, radius, damDesc(self, DamageType.PHYSICAL, aoe), damDesc(self, DamageType.PHYSICAL, aoe/8), damDesc(self, DamageType.PHYSICAL, aoe/2))
+		:tformat(damage, radius, damDesc(self, DamageType.PHYSICAL, aoe), damDesc(self, DamageType.PHYSICAL, aoe/8), damDesc(self, DamageType.PHYSICAL, aoe/2))
 	end
 }
 
@@ -277,7 +277,7 @@ newTalent{
 		local damage = t.getDamage(self, t) * 100
 		return ([[Over the next %d turns you'll fire up to %d arrows at this target from this location, each dealing %d%% weapon damage to the target. 
 		These shots do not consume ammo.]])
-		:format(duration, duration, damage)
+		:tformat(duration, duration, damage)
 	end
 }
 
@@ -296,7 +296,7 @@ newTalent{
 	info = function(self, t)
 		local tune = t.getTuning(self, t)
 		return ([[Your arrows now tune your Paradox %0.2f points towards your preferred Paradox on hit.]])
-		:format(tune)
+		:tformat(tune)
 	end
 
 }

@@ -58,12 +58,12 @@ end
 if version == "yeek" then
 
 newChat{ id="welcome",
-	text = [[You immerse your mind in the Way and let knowledge flow in.]],
+	text = _t[[You immerse your mind in the Way and let knowledge flow in.]],
 	answers = {
-		{"[Images and knowledge flow in.]", cond=can_auto_id,
+		{_t"[Images and knowledge flow in.]", cond=can_auto_id,
 			action=auto_id("", "", "[You mentally thank the Way.]")
 		},
-		{"[You do not gain any knowledge.]", cond=can_not_auto_id},
+		{_t"[You do not gain any knowledge.]", cond=can_not_auto_id},
 	}
 }
 return "welcome"
@@ -74,12 +74,12 @@ return "welcome"
 elseif version == "undead" then
 
 newChat{ id="welcome",
-	text = [[You pause and recall past memories.]],
+	text = _t[[You pause and recall past memories.]],
 	answers = {
-		{"[Images and knowledge flow in.]", cond=can_auto_id,
+		{_t"[Images and knowledge flow in.]", cond=can_auto_id,
 			action=auto_id("", "", "[done]")
 		},
-		{"[You do not recognize anything new.]", cond=can_not_auto_id},
+		{_t"[You do not recognize anything new.]", cond=can_not_auto_id},
 	}
 }
 return "welcome"
@@ -90,21 +90,21 @@ return "welcome"
 else
 
 newChat{ id="welcome",
-	text = [[Oh, hi @playername@, have you got something new to show me?]],
+	text = _t[[Oh, hi @playername@, have you got something new to show me?]],
 	answers = {
-		{"Yes, Elisa, could you have a look at these objects please? [show her the items the orb could not identify]", cond=can_auto_id,
+		{_t"Yes, Elisa, could you have a look at these objects please? [show her the items the orb could not identify]", cond=can_auto_id,
 			action=auto_id("Let's see what have you got here...\n", "\n\nThat is very nice, @playername@!", "Thank you, Elisa!")
 		},
-		{"Err, no... sorry, I just wanted to hear a friendly voice.", jump="friend"},
-		{"Not yet sorry!"},
+		{_t"Err, no... sorry, I just wanted to hear a friendly voice.", jump="friend"},
+		{_t"Not yet sorry!"},
 	}
 }
 
 newChat{ id="friend",
-	text = [[#LIGHT_GREEN#*You hear something akin to a muffled giggle*#WHITE#
+	text = _t[[#LIGHT_GREEN#*You hear something akin to a muffled giggle*#WHITE#
 Oh, you are #{bold}#SOOOO#{normal}# cute!]],
 	answers = {
-		{"Goodbye, Elisa!"},
+		{_t"Goodbye, Elisa!"},
 	}
 }
 return "welcome"

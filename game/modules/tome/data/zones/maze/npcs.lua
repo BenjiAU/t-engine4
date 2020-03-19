@@ -50,8 +50,8 @@ newEntity{ define_as = "HORNED_HORROR",
 	name = "Horned Horror",
 	display = "h", color=colors.VIOLET,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_corrupted_horner_horror.png", display_h=2, display_y=-1}}},
-	desc = [[Some horrible power has twisted this brutish minotaur into something altogether more terrifying. Huge tentacles undulate from its back as it clenches and unclenches its powerful fists.]],
-	killer_message = "and revived as a mindless horror",
+	desc = _t[[Some horrible power has twisted this brutish minotaur into something altogether more terrifying. Huge tentacles undulate from its back as it clenches and unclenches its powerful fists.]],
+	killer_message = _t"and revived as a mindless horror",
 	level_range = {12, nil}, exp_worth = 2,
 	max_life = 250, life_rating = 17, fixed_rating = true,
 	stats = { str=20, dex=20, cun=20, mag=10, wil=10, con=20 },
@@ -90,7 +90,7 @@ newEntity{ define_as = "HORNED_HORROR",
 	resolvers.inscriptions(1, {"invisibility rune"}),
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("NIMISIL", 2, 40, "Have you hard about the patrol that disappeared in the maze in the west?")
+		game.state:activateBackupGuardian("NIMISIL", 2, 40, _t"Have you hard about the patrol that disappeared in the maze in the west?")
 		game.player:resolveSource():grantQuest("starter-zones")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "maze")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "maze-horror")
@@ -104,8 +104,8 @@ newEntity{ define_as = "MINOTAUR_MAZE",
 	name = "Minotaur of the Labyrinth",
 	display = "H", color=colors.VIOLET,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/giant_minotaur_minotaur_of_the_labyrinth.png", display_h=2, display_y=-1}}},
-	desc = [[A fearsome bull-headed monster, he swings a mighty axe as he curses all who defy him.]],
-	killer_message = "and hung on a wall-spike",
+	desc = _t[[A fearsome bull-headed monster, he swings a mighty axe as he curses all who defy him.]],
+	killer_message = _t"and hung on a wall-spike",
 	level_range = {12, nil}, exp_worth = 2,
 	max_life = 250, life_rating = 17, fixed_rating = true,
 	max_stamina = 200,
@@ -143,7 +143,7 @@ newEntity{ define_as = "MINOTAUR_MAZE",
 	resolvers.inscriptions(2, "infusion"),
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("NIMISIL", 2, 40, "Have you hard about the patrol that disappeared in the maze in the west?")
+		game.state:activateBackupGuardian("NIMISIL", 2, 40, _t"Have you hard about the patrol that disappeared in the maze in the west?")
 		game.player:resolveSource():grantQuest("starter-zones")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "maze")
 	end,
@@ -153,7 +153,7 @@ newEntity{ base = "BASE_NPC_SPIDER", define_as = "NIMISIL",
 	unique = true,
 	allow_infinite_dungeon = true,
 	name = "Nimisil", color=colors.VIOLET,
-	desc = [[Covered by eerie luminescent growths and protuberances, this spider now haunts the maze's silent passageways.]],
+	desc = _t[[Covered by eerie luminescent growths and protuberances, this spider now haunts the maze's silent passageways.]],
 	level_range = {43, nil}, exp_worth = 3,
 	max_life = 520, life_rating = 21, fixed_rating = true,
 	rank = 4,

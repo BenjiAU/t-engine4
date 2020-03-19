@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New Class: #LIGHT_GREEN#Archmage",
-[[
+return _t"New Class: #LIGHT_GREEN#Archmage",
+_t[[
 Magic has not disappeared from Maj'Eyal with the end of the Spellhunt.
 
 During the Age of Dusk, as the Spellhunt was nearing its end, a powerful mage of the Kar'Krul, Linaniil, created a safe haven for the few remaining mages of all races.

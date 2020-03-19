@@ -22,7 +22,7 @@ local layout = game.state:alternateZoneTier1(short_name, {"FLOODED", 1})
 if layout == "FLOODED" then
 
 return {
-	name = "Trollmire",
+	name = _t"Trollmire",
 	level_range = {1, 7},
 	level_scheme = "player",
 	max_level = 3,
@@ -152,7 +152,7 @@ return {
 elseif layout == "DEFAULT" then
 
 return {
-	name = "Trollmire",
+	name = _t"Trollmire",
 	level_range = {1, 5},
 	level_scheme = "player",
 	max_level = 3,

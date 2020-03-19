@@ -197,7 +197,7 @@ newTalent{
 		You must disengage in a nearly straight line directly away from your target (which you must be able to see).
 		After moving, you gain %d%% increased movement speed for 3 turns (which ends if you take any actions other than movement), and you may reload your ammo (if any).
 		The extra speed and maximum distance you can move are reduced by your Fatigue level.]]):
-		format(t.getDist(self, t), t.getSpeed(self,t), t.getNb(self,t))
+		tformat(t.getDist(self, t), t.getSpeed(self,t), t.getNb(self,t))
 	end,
 }
 
@@ -230,7 +230,7 @@ newTalent{
 		local chance, def = t.getChanceDef(self,t)
 		return ([[Your quick wit and reflexes allow you to anticipate attacks against you, granting you a %d%% chance to evade melee and ranged attacks and %d increased defense for %d turns.
 		The chance to evade and defense bonus increase with your Dexterity.]]):
-		format(chance, def,t.getDur(self,t))
+		tformat(chance, def,t.getDur(self,t))
 	end,
 }
 
@@ -277,7 +277,7 @@ newTalent {
 	end,
 	info = function(self, t)
 		return ([[In an extreme feat of agility, you move to a spot you can see within range, bounding around, over, or through any enemies in the way.
-		This talent cannot be used while wearing heavy armor, and leaves you exhausted.  The exhaustion increases the cost of your activated Mobility talents by %d%% (stacking), but fades over %d turns.]]):format(t.getExhaustion(self, t), t.getDuration(self, t))
+		This talent cannot be used while wearing heavy armor, and leaves you exhausted.  The exhaustion increases the cost of your activated Mobility talents by %d%% (stacking), but fades over %d turns.]]):tformat(t.getExhaustion(self, t), t.getDuration(self, t))
 	end
 }
 
@@ -330,17 +330,17 @@ newTalent {
 			stam, stam_cost = self:getStamina(), stam_cost or t.getStamina(self, t)
 			local lt = t.getLifeTrigger(self, t)/100
 			if stam_cost == 0 or dam > self.max_life*lt then
-				--print(("[PROJECTOR: Trained Reactions] PASSED life/stam test for %s: %s %s damage (%s) (%0.1f/%0.1f stam) from %s (state:%s)"):format(self.name, dam, type, is_attk, stam_cost, stam, src.name, state)) -- debugging
+				--print(("[PROJECTOR: Trained Reactions] PASSED life/stam test for %s: %s %s damage (%s) (%0.1f/%0.1f stam) from %s (state:%s)"):tformat(self.name, dam, type, is_attk, stam_cost, stam, src.name, state)) -- debugging
 				self.turn_procs[t.id] = state
 				self:incStamina(-stam_cost) -- Note: force_talent_ignore_ressources has no effect on this
 
 				local reduce = t.getReduction(self, t)*dam
-				if src.logCombat then src:logCombat(self, "#FIREBRICK##Target# reacts to %s from #Source#, mitigating the blow!#LAST#.", is_attk and "an attack" or "damage") end
+				if src.logCombat then src:logCombat(self, "#FIREBRICK##Target# reacts to %s from #Source#, mitigating the blow!#LAST#.", is_attk and _t"an attack" or _t"damage") end
 				dam = dam - reduce
 				print("[PROJECTOR] dam after callbackOnTakeDamage", t.id, dam)
 				local d_color = DamageType:get(type).text_color or "#FIREBRICK#"
-				local stam_txt = stam_cost > 0 and (" #ffcc80#, -%d stam#LAST#"):format(stam_cost) or ""
-				game:delayedLogDamage(src, self, 0, ("%s(%d reacted#LAST#%s%s)#LAST#"):format(d_color, reduce, stam_txt, d_color), false)
+				local stam_txt = stam_cost > 0 and (" #ffcc80#, -%d stam#LAST#"):tformat(stam_cost) or ""
+				game:delayedLogDamage(src, self, 0, ("%s(%d reacted#LAST#%s%s)#LAST#"):tformat(d_color, reduce, stam_txt, d_color), false)
 				if not is_attk then self.turn_procs.gen_trained_reactions = true end
 				return {dam = dam}
 			end
@@ -363,7 +363,7 @@ newTalent {
 		This requires %0.1f stamina and reduces the damage by %d%%.
 		Your reactions are too slow for this if you are wearing heavy armour.
 		The damage reduction improves with your Defense.]])
-		:format(trigger, stam, reduce)
+		:tformat(trigger, stam, reduce)
 	end,
 }
 

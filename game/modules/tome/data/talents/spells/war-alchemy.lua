@@ -43,6 +43,6 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		return ([[Turn part of your target into fire, burning the rest for %0.2f fire damage over 8 turns.
-		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.FIRE, damage))
+		The damage will increase with your Spellpower.]]):tformat(damDesc(self, DamageType.FIRE, damage))
 	end,
 }

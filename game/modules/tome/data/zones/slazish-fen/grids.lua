@@ -88,7 +88,7 @@ newEntity{ base="BOGWATER",
 			return true
 		end
 
-		who:restInit(20, "destroying the portal", "destroyed the portal", function(cnt, max)
+		who:restInit(20, _t"destroying the portal", _t"destroyed the portal", function(cnt, max)
 			if cnt > max then
 				game.log("#VIOLET#The portal starts to break down, run!")
 				self.broken = true

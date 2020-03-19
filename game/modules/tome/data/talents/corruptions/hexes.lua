@@ -51,7 +51,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Hexes your target, dazing it and everything in a 2 radius ball around it for 3 turns and giving a %d%% chance to daze affected targets again each turn for 20 turns.
-		The chance will increase with your Spellpower.]]):format(t.getchance(self,t))
+		The chance will increase with your Spellpower.]]):tformat(t.getchance(self,t))
 	end,
 }
 
@@ -89,7 +89,7 @@ newTalent{
 		return ([[Hexes your target and everything within a radius 2 ball around it for 20 turns. Each time an affected target uses a resource (stamina, mana, vim, ...), it takes %0.2f fire damage.
 		In addition, the cooldown of any talent used while so hexed is increased by %d%% + 1 turn.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.FIRE, self:combatTalentSpellDamage(t, 4, 90)), t.getCDincrease(self, t)*100)
+		tformat(damDesc(self, DamageType.FIRE, self:combatTalentSpellDamage(t, 4, 90)), t.getCDincrease(self, t)*100)
 	end,
 }
 
@@ -125,7 +125,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Hexes your target and everything within a radius 2 ball around it. Each time they do damage, they take %d%% of the same damage for 20 turns.
-		The damage will increase with your Spellpower.]]):format(t.recoil(self,t))
+		The damage will increase with your Spellpower.]]):tformat(t.recoil(self,t))
 	end,
 }
 
@@ -162,6 +162,6 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Hexes your target, forcing it to be your thrall for %d turns.
-		If you damage the target, it will be freed from the hex.]]):format(t.getDuration(self, t))
+		If you damage the target, it will be freed from the hex.]]):tformat(t.getDuration(self, t))
 	end,
 }

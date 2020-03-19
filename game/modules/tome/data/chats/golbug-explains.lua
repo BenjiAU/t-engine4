@@ -18,19 +18,19 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[#VIOLET#*As you open the door you notice a huge orc in the distance, covered in both flames and ice.*#LAST#
+	text = _t[[#VIOLET#*As you open the door you notice a huge orc in the distance, covered in both flames and ice.*#LAST#
 @playerdescriptor.race@! You should never have come! Your doom awaits!
 The Orc Pride will never yield to anybody! They have their precious and there is nothing you can do.]],
 	answers = {
-		{"The Orc Pride obeys a master? I see... 'pride' indeed!", jump="mock"},
-		{"#LIGHT_GREEN#[Attack]"},
+		{_t"The Orc Pride obeys a master? I see... 'pride' indeed!", jump="mock"},
+		{_t"#LIGHT_GREEN#[Attack]"},
 	}
 }
 
 newChat{ id="mock",
-	text = [[The Pride chooses its allies. It has no master! ATTACK!]],
+	text = _t[[The Pride chooses its allies. It has no master! ATTACK!]],
 	answers = {
-		{"#LIGHT_GREEN#[Attack]"},
+		{_t"#LIGHT_GREEN#[Attack]"},
 	}
 }
 

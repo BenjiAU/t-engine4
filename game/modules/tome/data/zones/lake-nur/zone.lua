@@ -21,7 +21,7 @@ local layout = game.state:alternateZone(short_name, {"FLOODED", 2})
 local is_flooded = layout == "FLOODED"
 
 return {
-	name = "Lake of Nur",
+	name = _t"Lake of Nur",
 	level_range = {15, 25},
 	level_scheme = "player",
 	max_level = 3,
@@ -42,7 +42,6 @@ return {
 			class = "engine.generator.map.Roomer",
 			nb_rooms = 10,
 			rooms = {"random_room"},
-			lesser_vaults_list = {"flooded-prison"},
 			lite_room_chance = 0,
 			['.'] = {"WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR_BUBBLE"},
 			['#'] = "WATER_WALL",
@@ -90,6 +89,7 @@ return {
 			generator = {
 				map =  {
 					rooms = {"random_room",{"lesser_vault",7}},
+					lesser_vaults_list = {"flooded-prison"},
 				},
 				actor = {
 					filters = {{special_rarity="water_rarity"}},
@@ -101,6 +101,7 @@ return {
 			generator = is_flooded and {
 				map = {
 					rooms = {"random_room",{"lesser_vault",5}},
+					lesser_vaults_list = {"flooded-prison"},
 					down = "SHERTUL_FORTRESS_FLOOD",
 					['.'] = {"WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR","WATER_FLOOR_BUBBLE"},
 					force_last_stair = true,
@@ -112,6 +113,8 @@ return {
 				},
 			} or {
 				map = {
+					rooms = {"random_room",{"lesser_vault",5}},
+					lesser_vaults_list = {"worms"},
 					['.'] = "FLOOR",
 					['#'] = "WALL",
 					up = "UP",
@@ -137,13 +140,13 @@ return {
 	on_enter = function(lev, old_lev, newzone)
 		local Dialog = require("engine.ui.Dialog")
 		if lev == 2 and not game.level.shown_warning then
-			Dialog:simplePopup("Lake of Nur", "You descend into the submerged ruins. The walls look extremely ancient, yet you feel power within this place.")
+			Dialog:simplePopup(_t"Lake of Nur", _t"You descend into the submerged ruins. The walls look extremely ancient, yet you feel power within this place.")
 			game.level.shown_warning = true
 		elseif lev == 3 and not game.level.shown_warning and not game.level.data.is_flooded then
 			game.level.shown_warning = true
 			game.party:learnLore("lake-nur-not-flooded")
 		elseif lev == 3 and not game.level.shown_warning and game.level.data.is_flooded then
-			Dialog:simpleLongPopup("Lake of Nur", "As you descend to the next level you traverse a kind of magical barrier keeping the water away. The barrier seems to be failing however and the next level is flooded too.", 400)
+			Dialog:simpleLongPopup(_t"Lake of Nur", _t"As you descend to the next level you traverse a kind of magical barrier keeping the water away. The barrier seems to be failing however and the next level is flooded too.", 400)
 			game.level.shown_warning = true
 		end
 	end,

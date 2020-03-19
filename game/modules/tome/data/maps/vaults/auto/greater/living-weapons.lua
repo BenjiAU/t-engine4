@@ -199,7 +199,7 @@ local make_poltergeist = function(type)
     e[#e+1] = resolvers.auto_equip_filters(class)
 
     if type == "greater" then
-        e.name = "Poltergeist " .. o.name
+        e.name = ("Poltergeist %s"):tformat(_t(o.name))
         e.rank = 3.5
         e.max_life = resolvers.rngavg(100,120)
         e.life_rating = 20
@@ -209,7 +209,7 @@ local make_poltergeist = function(type)
             {class=(rng.percent(65) and "Cursed" or "Doomed"), start_level=20, level_rate=40}
         }
     elseif type == "normal" then
-        e.name = "Animated " .. o.name
+        e.name = ("Animated %s"):tformat(_t(o.name))
         e.rank = 3
         e.max_life = resolvers.rngavg(80,100)
         e.life_rating = 15
@@ -217,7 +217,7 @@ local make_poltergeist = function(type)
             {class=class, start_level=10, level_rate=50}
         }
     else
-        e.name = "Moving " .. o.name
+        e.name = ("Moving %s"):tformat(_t(o.name))
         e.rank = 2
         e.max_life = resolvers.rngavg(60,80)
         e.life_rating = 12
@@ -230,7 +230,7 @@ local make_poltergeist = function(type)
         local filter = {type="gem", ignore_material_restriction=true,special=function(ee) return ee.material_level == o.material_level end}
         gem = game.zone:makeEntity(game.level, "object", filter, nil, true)
         imbueEgo(gem, o)
-        o.name = "Poltergeist's " .. o.name
+        o.name = ("Poltergeist's %s"):tformat(_t(o.name))
     end
     local qo = nil
     --if class ==

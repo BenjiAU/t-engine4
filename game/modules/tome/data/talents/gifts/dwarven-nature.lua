@@ -63,7 +63,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Conjures %d missile-shaped rocks that you target individually at any target or targets in range.  Each missile deals %0.2f physical damage, and an additional %0.2f bleeding damage every turn for 5 turns.
 		At talent level 5, you can conjure one additional missile.
-		The damage will increase with your Spellpower.]]):format(count,damDesc(self, DamageType.PHYSICAL, damage/2), damDesc(self, DamageType.PHYSICAL, damage/12))
+		The damage will increase with your Spellpower.]]):tformat(count,damDesc(self, DamageType.PHYSICAL, damage/2), damDesc(self, DamageType.PHYSICAL, damage/12))
 	end,
 }
 
@@ -96,8 +96,8 @@ newTalent{
 				summon_time=t.getDuration(self, t),
 				ai_target={actor=nil},
 				ai="summoned", ai_real="tactical",
-				name="Crystaline Half ("..self.name..")",
-				desc=([[A crystaline structure that has taken the form of %s.]]):format(self.name),
+				name=("Crystaline Half (%s)"):tformat(self:getName()),
+				desc=([[A crystaline structure that has taken the form of %s.]]):tformat(self:getName()),
 			})
 			local tids = table.keys(m.talents)
 			for i, tid in ipairs(tids) do
@@ -123,7 +123,7 @@ newTalent{
 				game.party:addMember(m, {
 					control="no",
 					type="dwarven nature crystaline half",
-					title="Crystaline Half",
+					title=_t"Crystaline Half",
 					orders = {target=true},
 				})
 			end
@@ -139,8 +139,8 @@ newTalent{
 				summon_time=t.getDuration(self, t),
 				ai_target={actor=nil},
 				ai="summoned", ai_real="tactical",
-				name="Stone Half ("..self.name..")",
-				desc=([[A stone structure that has taken the form of %s.]]):format(self.name),
+				name=("Stone Half (%s)"):tformat(self:getName()),
+				desc=([[A stone structure that has taken the form of %s.]]):tformat(self:getName()),
 			})
 			local tids = table.keys(m.talents)
 			for i, tid in ipairs(tids) do
@@ -166,7 +166,7 @@ newTalent{
 				game.party:addMember(m, {
 					control="no",
 					type="dwarven nature stone half",
-					title="Stone Half",
+					title=_t"Stone Half",
 					orders = {target=true},
 				})
 			end
@@ -182,7 +182,7 @@ newTalent{
 		Your Crystaline Half will attack your foes with earthen missiles.
 		Your Stone Half will taunt your foes to protect you.
 		This power can not be called upon while under the effect of Deeprock Form.
-		]]):format(t.getDuration(self, t))
+		]]):tformat(t.getDuration(self, t))
 	end,
 }
 
@@ -197,7 +197,7 @@ newTalent{
 		Crystaline Half: Rain of Spikes - A massive effect that makes all nearby foes bleed.
 		Stone Half: Stone Link - A protective shield that will redirect all damage against nearby allies to your Stone Half.
 		The level of those talents is %d.]]):
-		format(math.floor(self:getTalentLevel(t)))
+		tformat(math.floor(self:getTalentLevel(t)))
 	end,
 }
 
@@ -255,7 +255,7 @@ newTalent{
 		Your Stone Half will trade places (if in sight) with you and all creatures currently targetting you in a radius of %d will target it instead.
 		Your Crystaline Half will instantly fire a volley of level %d earthen missiles at all foes near the stone half (or you if the stone half is dead) in radius %d.
 		In addition, as passive effect, your halves now also learn your level of Combat Accuracy.]]):
-		format(self:getTalentRadius(t), self:getTalentLevelRaw(t), self:getTalentRadius(t))
+		tformat(self:getTalentRadius(t), self:getTalentLevelRaw(t), self:getTalentRadius(t))
 	end,
 }
 
@@ -319,7 +319,7 @@ newTalent{
 		local heal = t.getHeal(self, t)
 		return ([[Merges your halves back into you, cleansing your body of %d detrimental magical, mental or physical effects.
 		Each half also heals you for %d and releases a shockwave dealing %0.2f Nature damage in a radius 3.]]):
-		format(nb, heal, damDesc(self, DamageType.NATURE, dam))
+		tformat(nb, heal, damDesc(self, DamageType.NATURE, dam))
 	end,
 }
 
@@ -343,7 +343,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		local radius = self:getTalentRadius(t)
-		return ([[Creates a shield of radius %d that redirects all damage done to friends inside it to you for 5 turns.]]):format(radius)
+		return ([[Creates a shield of radius %d that redirects all damage done to friends inside it to you for 5 turns.]]):tformat(radius)
 	end,
 }
 
@@ -374,6 +374,6 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		local dam = t.getDamage(self, t)
 		return ([[Fires spikes all around you, making your foes within radius %d bleed for %0.2f damage over 6 turns.
-		Damage and chance to apply the effect increase with Willpower.]]):format(radius, damDesc(self, DamageType.PHYSICAL, dam))
+		Damage and chance to apply the effect increase with Willpower.]]):tformat(radius, damDesc(self, DamageType.PHYSICAL, dam))
 	end,
 }

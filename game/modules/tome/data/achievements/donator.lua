@@ -19,26 +19,26 @@
 
 newAchievement{
 	name = "Bronze Donator", id = "BRONZE_DONATOR",
-	desc = [[Donated up to 5 euros to Tales of Maj'Eyal.]],
+	desc = _t[[Donated up to 5 euros to Tales of Maj'Eyal.]],
 	no_difficulty_duplicate = true, no_chat_broadcast = true,
 }
 newAchievement{
 	name = "Silver Donator", id = "SILVER_DONATOR",
-	desc = [[Donated at least 6 euros to Tales of Maj'Eyal.]],
+	desc = _t[[Donated at least 6 euros to Tales of Maj'Eyal.]],
 	no_difficulty_duplicate = true, no_chat_broadcast = true,
 }
 newAchievement{
 	name = "Gold Donator", id = "GOLD_DONATOR",
-	desc = [[Donated at least 16 euros to Tales of Maj'Eyal.]],
+	desc = _t[[Donated at least 16 euros to Tales of Maj'Eyal.]],
 	no_difficulty_duplicate = true, no_chat_broadcast = true,
 }
 newAchievement{
 	name = "Stralite Donator", id = "STRALITE_DONATOR",
-	desc = [[Donated at least 31 euros to Tales of Maj'Eyal.]],
+	desc = _t[[Donated at least 31 euros to Tales of Maj'Eyal.]],
 	no_difficulty_duplicate = true, no_chat_broadcast = true,
 }
 newAchievement{
 	name = "Voratun Donator", id = "VORATUN_DONATOR",
-	desc = [[Donated more than 60 euros to Tales of Maj'Eyal.]],
+	desc = _t[[Donated more than 60 euros to Tales of Maj'Eyal.]],
 	no_difficulty_duplicate = true, no_chat_broadcast = true,
 }

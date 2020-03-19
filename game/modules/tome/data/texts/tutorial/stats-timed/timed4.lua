@@ -17,6 +17,6 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 See what the rune in the next room has to teach you! Hopefully you can use it to get past the troublesome elves ahead.
 ]]

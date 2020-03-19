@@ -38,7 +38,7 @@ newTalent{
 		return ([[Surround yourself with a myriad of tiny, nearly invisible, reinforcing fungi.
 		You gain %d maximum life and %d life regeneration.
 		The effects will increase with your Willpower.]]):
-		format(t.getLife(self, t), t.getRegen(self, t))
+		tformat(t.getLife(self, t), t.getRegen(self, t))
 	end,
 }
 
@@ -59,7 +59,7 @@ newTalent{
 		return ([[The fungus on your body allows regeneration effects to last longer.
 		Each time you gain a beneficial effect with the regeneration subtype you increase its duration by %d%% + 1 rounded up.
 		The effect will increase with your Mindpower.]]):
-		format(t.getDurationBonus(self, t) * 100)
+		tformat(t.getDurationBonus(self, t) * 100)
 	end,
 }
 
@@ -99,10 +99,10 @@ newTalent{
 		local eq = t.getEq(self, t)
 		local turn = t.getTurn(self, t)
 		return ([[Your fungus reaches into the primordial ages of the world, granting you ancient instincts.
-		Each time you receive non-regeneration healing you gain %d%% of a turn per 100 life healed.  This effect can't add energy past 2 stored turns and overhealing is not counted.
+		Each time you receive non-regeneration healing you gain %0.1f%% of a turn per 100 life healed.  This effect can't add energy past 2 stored turns and overhealing is not counted.
 		Also, regeneration effects on you will decrease your equilibrium by %0.1f each turn.
 		The turn gain increases with your Mindpower.]]):
-		format(turn * 100, eq)
+		tformat(turn * 100, eq)
 	end,
 }
 
@@ -128,6 +128,6 @@ newTalent{
 	info = function(self, t)
 		local mult = t.getMult(self, t)
 		return ([[A wave of energy passes through your fungus, making it release immediate healing energies on you, healing you for %d%% of your current life regeneration rate (#GREEN#%d#LAST#).]]):
-		format(mult * 100, self.life_regen * mult)
+		tformat(mult * 100, self.life_regen * mult)
 	end,
 }

@@ -24,8 +24,8 @@
 newLore{
 	id = "sandworm-note-1",
 	category = "sandworm lair",
-	name = "song of the sands",
-	lore = [[I have stared in the mouths of crimson wyrms
+	name = _t"song of the sands",
+	lore = _t[[I have stared in the mouths of crimson wyrms
 And felt the claws of drakes so sleek
 But through deserts dry and sandy storms
 There is something else I seek
@@ -38,8 +38,8 @@ It's on the wyrmic path I go!]],
 newLore{
 	id = "sandworm-note-2",
 	category = "sandworm lair",
-	name = "song of the sands",
-	lore = [[The dragon's breath corrodes my eyes
+	name = _t"song of the sands",
+	lore = _t[[The dragon's breath corrodes my eyes
 It tears flesh from my skin
 But onward I search to see what lies
 Amidst the sandy depths within
@@ -52,8 +52,8 @@ For my quest I must survive!]],
 newLore{
 	id = "sandworm-note-3",
 	category = "sandworm lair",
-	name = "song of the sands",
-	lore = [[The sandworms go from strength to strength
+	name = _t"song of the sands",
+	lore = _t[[The sandworms go from strength to strength
 Ever greater do they seem
 Of towering height and massive length
 It is all as if a dream...
@@ -66,8 +66,8 @@ Of the legendary worm so great!]],
 newLore{
 	id = "sandworm-note-4",
 	category = "sandworm lair",
-	name = "song of the sands",
-	lore = [[I have seen the Queen in glory true
+	name = _t"song of the sands",
+	lore = _t[[I have seen the Queen in glory true
 And she has moved me to my soul
 Oh Queen! Let me be a part of you!
 Please devour me! Swallow me whole!!]],

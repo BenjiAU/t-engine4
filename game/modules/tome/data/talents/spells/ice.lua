@@ -53,7 +53,7 @@ newTalent{
 
 		local dam = self:spellCrit(t.getDamage(self, t))
 		self:project(tg, x, y, DamageType.COLD, dam, {type="freeze"})
-		self:project(tg, x, y, DamageType.FREEZE, {dur=t.getDuration(self, t), hp=70 + dam * 1.5})
+		self:project(tg, x, y, DamageType.FREEZE, {dur=t.getDuration(self, t), hp=70 + dam * 0.7})
 
 		tg.type = "hit"
 		self:projectApply(tg, x, y, Map.ACTOR, function(target)
@@ -69,7 +69,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Condenses ambient water on a target, freezing it for %d turns and damaging it for %0.2f.
 		If this is used on a friendly target the cooldown is reduced by 33%%.%s
-		The damage will increase with your Spellpower.]]):format(t.getDuration(self, t), damDesc(self, DamageType.COLD, damage), necroEssenceDead(self, true) and "\nAffects all creatures in radius 2." or "")
+		The damage will increase with your Spellpower.]]):tformat(t.getDuration(self, t), damDesc(self, DamageType.COLD, damage), necroEssenceDead(self, true) and _t"\nAffects all creatures in radius 2." or "")
 	end,
 }
 
@@ -102,7 +102,7 @@ newTalent{
 		return ([[Blast a wave of cold all around you with a radius of %d, doing %0.2f cold damage and freezing creatures to the ground for 4 turns.
 		Affected creatures can still act, but cannot move.
 		For each affected creature that is also wet the cooldown of Shatter decreases by 2.
-		The damage will increase with your Spellpower.]]):format(radius, damDesc(self, DamageType.COLD, damage))
+		The damage will increase with your Spellpower.]]):tformat(radius, damDesc(self, DamageType.COLD, damage))
 	end,
 }
 
@@ -164,7 +164,7 @@ newTalent{
 		At most, it will affect %d foes.
 		If you are yourself Frozen, it will instantly be destroyed.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.COLD, damage), targetcount)
+		tformat(damDesc(self, DamageType.COLD, damage), targetcount)
 	end,
 }
 
@@ -212,6 +212,6 @@ newTalent{
 		local pierce = t.getPierce(self, t)
 		return ([[Surround yourself with Uttercold, increasing all your cold damage by %0.1f%% and ignoring %d%% cold resistance of your targets
 		In addition you pierce through iceblocks easily, reducing damage absorbed from your attacks by iceblocks by %d%%.]])
-		:format(damageinc, ressistpen, pierce)
+		:tformat(damageinc, ressistpen, pierce)
 	end,
 }

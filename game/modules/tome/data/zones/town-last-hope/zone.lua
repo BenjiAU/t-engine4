@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Last Hope",
+	name = _t"Last Hope",
 	level_range = {15, 35},
 	level_scheme = "player",
 	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(-1,2) end,

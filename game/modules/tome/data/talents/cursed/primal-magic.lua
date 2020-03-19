@@ -93,7 +93,7 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		return ([[Each turn for 4 turns you fire a bolt of arcane energy at your nearest enemy inflicting %d damage.
-		The damage will increase with the Magic stat.]]):format(damDesc(self, DamageType.ARCANE, damage))
+		The damage will increase with the Magic stat.]]):tformat(damDesc(self, DamageType.ARCANE, damage))
 	end,
 }
 
@@ -136,7 +136,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Instantaneously displace yourself within line of sight up to 3 squares away.]])
+		return ([[Instantaneously displace yourself within line of sight up to 3 squares away.]]):tformat()
 	end,
 }
 
@@ -151,7 +151,7 @@ newTalent{
 	info = function(self, t)
 		local armor = t.getArmor(self, t)
 		return ([[Years of magic have permeated your skin leaving it resistant to the physical world. Your armor is increased by %d.
-		The bonus will increase with the Magic stat.]]):format(armor)
+		The bonus will increase with the Magic stat.]]):tformat(armor)
 	end,
 }
 
@@ -204,6 +204,6 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Bathes the target in raw magic inflicting %d damage. Such wild magic is difficult to control and if you fail to keep your wits you will be confused for 4 turns.
 		The damage will increase with the Magic stat.]]):
-		format(damDesc(self, DamageType.ARCANE, damage))
+		tformat(damDesc(self, DamageType.ARCANE, damage))
 	end,
 }

@@ -25,36 +25,36 @@ local trap = p:knowTalentType("cunning/trapping") and not game.state:unlockTalen
 local poison = p:getTalentFromId(p.T_STONING_POISON)
 local poison = poison and p:knowTalentType("cunning/poisons") and not p:knowTalent(poison) and p:canLearnTalent(poison)
 newChat{ id="welcome",
-	text = [[Ah, my #{italic}#good#{normal}# friend @playername@!
+	text = _t[[Ah, my #{italic}#good#{normal}# friend @playername@!
 Thanks to you I made it safely to this great city! I am planning to open my most excellent boutique soon, but since I am in your debt, perhaps I could open early for you if you are in need of rare goods.]]
-..((trap or poison) and ("\nBy the way, "..((trap and "during our escape I found the plans for an #YELLOW#Ambush Trap#LAST#" or "")
-..(poison and (trap and " and while" or "while").. " organizing my inventory, I came across some #YELLOW#Smelly Toxin#LAST# that a colleague claimed could actually turn creatures to stone.  Truly exotic!" or ".")).."\nYou would not happen to be interested, by any chance?") or "")
-..((game.state:isAdvanced() and "\nOh my friend, good news! As I told you I can now request a truly #{italic}#unique#{normal}# object to be crafted just for you. For a truly unique price..." or "\nI eventually plan to arrange a truly unique service for the most discerning of customers. If you come back later when I'm fully set up I shall be able to order for you something quite marvellous. For a perfectly #{italic}#suitable#{normal}# price, of course.")),
+..((trap or poison) and (_t"\nBy the way, "..((trap and _t"during our escape I found the plans for an #YELLOW#Ambush Trap#LAST#" or "")
+..(poison and (trap and _t" and while" or _t"while").. _t" organizing my inventory, I came across some #YELLOW#Smelly Toxin#LAST# that a colleague claimed could actually turn creatures to stone.  Truly exotic!" or _t".")).._t"\nYou would not happen to be interested, by any chance?") or "")
+..((game.state:isAdvanced() and _t"\nOh my friend, good news! As I told you I can now request a truly #{italic}#unique#{normal}# object to be crafted just for you. For a truly unique price..." or _t"\nI eventually plan to arrange a truly unique service for the most discerning of customers. If you come back later when I'm fully set up I shall be able to order for you something quite marvellous. For a perfectly #{italic}#suitable#{normal}# price, of course.")),
 	answers = {
-		{"Yes please, let me see your wares.", action=function(npc, player)
+		{_t"Yes please, let me see your wares.", action=function(npc, player)
 			npc.store:loadup(game.level, game.zone)
 			npc.store:interact(player)
 		end},
-		{"What about the unique object?", cond=function(npc, player) return game.state:isAdvanced() end, jump="unique1"},
-		{"Ambush Trap?  Sounds useful.", cond=function(npc, player) return trap end, jump="trap"},
-		{"Smelly Toxin?  What kind of smell?", cond=function(npc, player) return poison end, jump="poison"},
-		{"Sorry, I have to go!"},
+		{_t"What about the unique object?", cond=function(npc, player) return game.state:isAdvanced() end, jump="unique1"},
+		{_t"Ambush Trap?  Sounds useful.", cond=function(npc, player) return trap end, jump="trap"},
+		{_t"Smelly Toxin?  What kind of smell?", cond=function(npc, player) return poison end, jump="poison"},
+		{_t"Sorry, I have to go!"},
 	}
 }
 
 newChat{ id="trap",
-	text = [[You know, I have asked here and there and it happens to be a very rare thing this contraption...
+	text = _t[[You know, I have asked here and there and it happens to be a very rare thing this contraption...
 But since you have saved me, I'm willing to part from it for only 3000 gold pieces, a real bargain!]],
 	answers = {
-		{"Expensive, but I will take it.", cond=function(npc, player) return player.money >= 3000 end, jump="traplearn"},
-		{"..."},
+		{_t"Expensive, but I will take it.", cond=function(npc, player) return player.money >= 3000 end, jump="traplearn"},
+		{_t"..."},
 	}
 }
 
 newChat{ id="traplearn",
-	text = [[Nice doing business with you my friend. There you go!]],
+	text = _t[[Nice doing business with you my friend. There you go!]],
 	answers = {
-		{"Thanks.", action=function(npc, player)
+		{_t"Thanks.", action=function(npc, player)
 			game.state:unlockTalent(player.T_AMBUSH_TRAP, player)
 			player:incMoney(-3000)
 		end},
@@ -62,18 +62,18 @@ newChat{ id="traplearn",
 }
 
 newChat{ id="poison",
-	text = [[Ungrol told me this substance contains some exceedingly rare components.
+	text = _t[[Ungrol told me this substance contains some exceedingly rare components.
 "More Toxin than Medicine" he said.  Allas, he had not the funds to buy it.  On the other hand, because of our special relationship, I'm willing to let you have it #{italic}#at cost#{normal}# -- only 1500 gold pieces!]],
 	answers = {
-		{"Fairly pricey, but seems useful.  We have a deal!", cond=function(npc, player) return player.money >= 1500 end, jump="poisonlearn"},
-		{"That price ... er stuff really stinks ..."},
+		{_t"Fairly pricey, but seems useful.  We have a deal!", cond=function(npc, player) return player.money >= 1500 end, jump="poisonlearn"},
+		{_t"That price ... er stuff really stinks ..."},
 	}
 }
 
 newChat{ id="poisonlearn",
-	text = [[Here you are.  Just be sure not to get any on yourself!]],
+	text = _t[[Here you are.  Just be sure not to get any on yourself!]],
 	answers = {
-		{"Thanks.", action=function(npc, player)
+		{_t"Thanks.", action=function(npc, player)
 			player:incMoney(-1500)
 			player:learnTalent(player.T_STONING_POISON, true, 1)
 		end},
@@ -81,12 +81,12 @@ newChat{ id="poisonlearn",
 }
 
 newChat{ id="unique1",
-	text = [[I normally offer this service only for a truly deserved price, but for you my friend I am willing to offer a 20% discount - #{italic}#only#{normal}# 4000 gold to make an utterly unique item of your choice.  What do you say?]],
+	text = _t[[I normally offer this service only for a truly deserved price, but for you my friend I am willing to offer a 20% discount - #{italic}#only#{normal}# 4000 gold to make an utterly unique item of your choice.  What do you say?]],
 	answers = {
-		{"Why, 'tis a paltry sum - take my order, man, and be quick about it!", cond=function(npc, player) return player.money >= 10000 end, jump="make"},
-		{"Yes, please!", cond=function(npc, player) return player.money >= 4000 end, jump="make"},
-		{"HOW MUCH?! Please, excuse me, I- I need some fresh air...", cond=function(npc, player) return player.money < 500 end},
-		{"Not now, thank you."},
+		{_t"Why, 'tis a paltry sum - take my order, man, and be quick about it!", cond=function(npc, player) return player.money >= 10000 end, jump="make"},
+		{_t"Yes, please!", cond=function(npc, player) return player.money >= 4000 end, jump="make"},
+		{_t"HOW MUCH?! Please, excuse me, I- I need some fresh air...", cond=function(npc, player) return player.money < 500 end},
+		{_t"Not now, thank you."},
 	}
 }
 
@@ -128,17 +128,17 @@ local maker_list = function()
 			"voratun amulet",
 			"dwarven lantern",
 			"voratun pickaxe",
-			{"dragonbone wand", "dragonbone wand"},
-			{"dragonbone totem", "dragonbone totem"},
-			{"voratun torque", "voratun torque"},
+			{"dragonbone wand", _t"dragonbone wand"},
+			{"dragonbone totem", _t"dragonbone totem"},
+			{"voratun torque", _t"voratun torque"},
 		},
 	}
-	local l = {{"I've changed my mind.", jump = "welcome"}}
+	local l = {{_t"I've changed my mind.", jump = "welcome"}}
 	for kind, bases in pairs(mainbases) do
-		l[#l+1] = {kind:capitalize(), action=function(npc, player)
-			local l = {{"I've changed my mind.", jump = "welcome"}}
+		l[#l+1] = {_t(kind):capitalize(), action=function(npc, player)
+			local l = {{_t"I've changed my mind.", jump = "welcome"}}
 			newChat{ id="makereal",
-				text = [[Which kind of item would you like ?]],
+				text = _t[[Which kind of item would you like ?]],
 				answers = l,
 			}
 
@@ -186,25 +186,25 @@ local maker_list = function()
 							if not config.settings.cheat then game:saveGame() end
 
 							newChat{ id="naming",
-								text = "Do you want to name your item?\n"..tostring(art:getTextualDesc()),
+								text = ("Do you want to name your item?\n%s"):tformat(tostring(art:getTextualDesc())),
 								answers = {
-									{"Yes, please.", action=function(npc, player)
-										local d = require("engine.dialogs.GetText").new("Name your item", "Name", 2, 40, function(txt)
+									{_t"Yes, please.", action=function(npc, player)
+										local d = require("engine.dialogs.GetText").new(_t"Name your item", _t"Name", 2, 40, function(txt)
 											art.name = txt:removeColorCodes():gsub("#", " ")
 											game.log("#LIGHT_BLUE#The merchant carefully hands you: %s", art:getName{do_color=true})
 										end, function() game.log("#LIGHT_BLUE#The merchant carefully hands you: %s", art:getName{do_color=true}) end)
 										game:registerDialog(d)
 									end},
-									{"No thanks.", action=function() game.log("#LIGHT_BLUE#The merchant carefully hands you: %s", art:getName{do_color=true}) end},
+									{_t"No thanks.", action=function() game.log("#LIGHT_BLUE#The merchant carefully hands you: %s", art:getName{do_color=true}) end},
 								},
 							}
 							return "naming"
 						else
 							newChat{ id="oups",
-								text = "Oh I am sorry, it seems we could not make the item your require.",
+								text = _t"Oh I am sorry, it seems we could not make the item your require.",
 								answers = {
-									{"Oh, let's try something else then.", jump="make"},
-									{"Oh well, maybe later then."},
+									{_t"Oh, let's try something else then.", jump="make"},
+									{_t"Oh well, maybe later then."},
 								},
 							}
 							return "oups"
@@ -220,16 +220,16 @@ local maker_list = function()
 end
 
 newChat{ id="make",
-	text = [[Which kind of item would you like ?]],
+	text = _t[[Which kind of item would you like ?]],
 	answers = maker_list(),
 }
 
 else
 
 newChat{ id="welcome",
-	text = [[*This store does not appear to be open yet*]],
+	text = _t[[*This store does not appear to be open yet*]],
 	answers = {
-		{"[leave]"},
+		{_t"[leave]"},
 	}
 }
 

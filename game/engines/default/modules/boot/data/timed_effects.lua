@@ -22,12 +22,12 @@ local Particles = require "engine.Particles"
 
 newEffect{
 	name = "ACIDBURN",
-	desc = "Burning from acid",
+	desc = _t"Burning from acid",
 	type = "physical",
 	status = "detrimental",
 	parameters = { power=1 },
-	on_gain = function(self, err) return "#Target# is covered in acid!", "+Acid" end,
-	on_lose = function(self, err) return "#Target# is free from the acid.", "-Acid" end,
+	on_gain = function(self, err) return _t"#Target# is covered in acid!", _t"+Acid" end,
+	on_lose = function(self, err) return _t"#Target# is free from the acid.", _t"-Acid" end,
 	on_timeout = function(self, eff)
 		DamageType:get(DamageType.ACID).projector(eff.src or self, self.x, self.y, DamageType.ACID, eff.power)
 	end,
@@ -35,7 +35,7 @@ newEffect{
 
 newEffect{
 	name = "SUNSHIELD",
-	desc = "Sunshield",
+	desc = _t"Sunshield",
 	type = "magical",
 	status = "beneficial",
 	activate = function(self, eff)

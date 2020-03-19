@@ -21,7 +21,7 @@ local layout = game.state:alternateZone(short_name, {"VOLCANO", 2})
 local is_volcano = layout == "VOLCANO"
 
 return {
-	name = "Daikara",
+	name = _t"Daikara",
 	level_range = {7, 16},
 	level_scheme = "player",
 	max_level = 4,
@@ -132,7 +132,7 @@ return {
 	on_enter = function(lev)
 		if lev == 1 and not game.level.data.warned and game.zone.is_volcano then
 			game.level.data.warned = true
-			require("engine.ui.Dialog"):simpleLongPopup("BOOM!", "As you walk toward the Daikara you can not fail to notice the huge volcano that erupts in the center of it, right where the path is taking you.\nYou see pyroclasts ejected from the heart of the volcano, they look relatively harmless but very impressive.", 400)
+			require("engine.ui.Dialog"):simpleLongPopup(_t"BOOM!", _t"As you walk toward the Daikara you can not fail to notice the huge volcano that erupts in the center of it, right where the path is taking you.\nYou see pyroclasts ejected from the heart of the volcano, they look relatively harmless but very impressive.", 400)
 		end
 	end,
 }

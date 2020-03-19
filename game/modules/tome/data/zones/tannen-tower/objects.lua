@@ -43,12 +43,12 @@ newEntity{ base = "BASE_GEM",
 newEntity{ define_as = "ATHAME_WEST2",
 	quest=true, unique="Blood-Runed Athame West2", identified=true, no_unique_lore=true,
 	type = "misc", subtype="misc",
-	unided_name = "athame",
+	unided_name = _t"athame",
 	name = "Blood-Runed Athame", image = "object/artifact/blood_runed_athame.png",
 	level_range = {50, 50},
 	display = "|", color=colors.VIOLET,
 	encumber = 1,
-	desc = [[An athame, covered in blood runes. It radiates power.]],
+	desc = _t[[An athame, covered in blood runes. It radiates power.]],
 
 	on_drop = function(self, who)
 		if who == game.player then
@@ -68,16 +68,16 @@ newEntity{ define_as = "ORB_MANY_WAYS2",
 	power_source = {unknown=true},
 	unique = "Orb of Many Ways2", quest=true, no_unique_lore=true,
 	type = "jewelry", subtype="orb",
-	unided_name = "swirling orb",
+	unided_name = _t"swirling orb",
 	name = "Orb of Many Ways",
 	level_range = {30, 30},
 	display = "*", color=colors.VIOLET, image = "object/artifact/orb_many_ways.png",
 	encumber = 1,
-	desc = [[The orb projects images of distant places, some that seem not to be of this world, switching rapidly.
+	desc = _t[[The orb projects images of distant places, some that seem not to be of this world, switching rapidly.
 If used near a portal, it could probably activate it.]],
 
 	max_power = 30, power_regen = 1,
-	use_power = { name = "activate a portal", power = 10,
+	use_power = { name = _t"activate a portal", power = 10,
 		use = function(self, who)
 			self:identify(true)
 			local g = game.level.map(who.x, who.y, game.level.map.TERRAIN)
@@ -108,7 +108,7 @@ for i = 1, 4 do
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE"..i,
 	name = "tattered paper scrap", lore="tannen-level"..i,
-	desc = [[A paper scrap, left by Tannen.]],
+	desc = _t[[A paper scrap, left by Tannen.]],
 	rarity = false,
 	encumberance = 0,
 }

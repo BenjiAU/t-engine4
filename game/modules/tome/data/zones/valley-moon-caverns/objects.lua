@@ -24,7 +24,7 @@ for i = 1, 3 do
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE"..i,
 	name = "tattered paper scrap", lore="valley-moon-"..i,
-	desc = [[A paper scrap, left by somebody named Rassir.]],
+	desc = _t[[A paper scrap, left by somebody named Rassir.]],
 	rarity = false,
 	encumberance = 0,
 }

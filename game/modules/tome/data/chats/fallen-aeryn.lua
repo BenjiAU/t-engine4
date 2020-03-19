@@ -27,27 +27,27 @@ local function spare(npc, player)
 	player:setQuestStatus("high-peak", engine.Quest.COMPLETED, "spared-aeryn")
 	npc.die = nil
 	game.level:removeEntity(npc)
-	game.logPlayer(player, "%s grabs her amulet and disappears in a whirl of arcane energies.", npc.name:capitalize())
+	game.logPlayer(player, "%s grabs her amulet and disappears in a whirl of arcane energies.", npc:getName():capitalize())
 end
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*She lies nearly dead at your feet*#WHITE#
+	text = _t[[#LIGHT_GREEN#*She lies nearly dead at your feet*#WHITE#
 So, now you will kill me and complete the cycle of destruction?]],
 	answers = {
-		{"What are you talking about? Why did you attack me?", jump="what"},
-		{"Speak and I might spare you. Why did you attack me?", jump="what"},
-		{"[kill her]", action=kill},
+		{_t"What are you talking about? Why did you attack me?", jump="what"},
+		{_t"Speak and I might spare you. Why did you attack me?", jump="what"},
+		{_t"[kill her]", action=kill},
 	}
 }
 
 newChat{ id="what",
-	text = [[You.. you do not know?
+	text = _t[[You.. you do not know?
 A few hours after you entered this place a raid of orcs fell upon us. They were not alone -- demons walked among them. We were overwhelmed! Utterly destroyed!
 My land is no more! All because you could not stop them at the Charred Scar! You failed us! People died to protect you, and you failed!
 #LIGHT_GREEN#*She starts to weep...*#WHITE#]],
 	answers = {
-		{"I know my mistakes and I intend to correct them. Please let me pass. I cannot save your people, but I can make their deaths mean something!", action=spare},
-		{"[kill her]", action=kill},
+		{_t"I know my mistakes and I intend to correct them. Please let me pass. I cannot save your people, but I can make their deaths mean something!", action=spare},
+		{_t"[kill her]", action=kill},
 	}
 }
 

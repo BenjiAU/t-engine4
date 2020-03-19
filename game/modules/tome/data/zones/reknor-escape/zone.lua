@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Escape from Reknor",
+	name = _t"Escape from Reknor",
 	level_range = {1, 5},
 	level_scheme = "player",
 	max_level = 3,

@@ -17,20 +17,20 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Echoes of the Spellblaze"
+name = _t"Echoes of the Spellblaze"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You have heard that within the scintillating caves lie strange crystals imbued with Spellblaze energies.\n"
-	desc[#desc+1] = "There are also rumours of a renegade Shaloren camp to the west.\n"
+	desc[#desc+1] = _t"You have heard that within the scintillating caves lie strange crystals imbued with Spellblaze energies.\n"
+	desc[#desc+1] = _t"There are also rumours of a renegade Shaloren camp to the west.\n"
 	if self:isCompleted("spellblaze") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have explored the scintillating caves and destroyed the Spellblaze Crystal.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have explored the scintillating caves and destroyed the Spellblaze Crystal.#WHITE#"
 	else
-		desc[#desc+1] = "#SLATE#* You must explore the scintillating caves.#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* You must explore the scintillating caves.#WHITE#"
 	end
 	if self:isCompleted("rhaloren") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have explored the Rhaloren camp and killed the Inquisitor.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have explored the Rhaloren camp and killed the Inquisitor.#WHITE#"
 	else
-		desc[#desc+1] = "#SLATE#* You must explore the renegade Shaloren camp.#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* You must explore the renegade Shaloren camp.#WHITE#"
 	end
 	return table.concat(desc, "\n")
 end

@@ -282,9 +282,9 @@ function _M:describeFloor(x, y, force)
 
 	local g = game.level.map(x, y, game.level.map.TERRAIN)
 	if g and g.change_level then
-		game.logPlayer(self, "#YELLOW_GREEN#There is "..g.name:a_an().." here (press '<', '>' or right click to use).")
+		game.logPlayer(self, "#YELLOW_GREEN#There is %s here (press '<', '>' or right click to use).", g:getName():a_an())
 		local sx, sy = game.level.map:getTileToScreen(x, y, true)
-		game.flyers:add(sx, sy, 60, 0, -1.5, ("Level change (%s)!"):format(g.name), colors.simple(colors.YELLOW_GREEN), true)
+		game.flyers:add(sx, sy, 60, 0, -1.5, ("Level change (%s)!"):tformat(g:getName()), colors.simple(colors.YELLOW_GREEN), true)
 	end
 end
 
@@ -367,7 +367,7 @@ function _M:actBase()
 	if self.summon_time then
 		self.summon_time = self.summon_time - 1
 		if self.summon_time <= 0 then
-			game.logPlayer(self, "#PINK#Your summoned %s disappears.", self.name)
+			game.logPlayer(self, "#PINK#Your summoned %s disappears.", self:getName())
 			self:die()
 			return true
 		end
@@ -540,6 +540,9 @@ for i = 0, 10 * 10 do
 end
 
 function _M:playerFOV()
+	-- Safety
+	if not self.x or not game.level then return end
+
 	-- Clean FOV before computing it
 	game.level.map:cleanFOV()
 
@@ -751,12 +754,12 @@ end
 
 --- Called before taking a hit, overload mod.class.Actor:onTakeHit() to stop resting and running
 function _M:onTakeHit(value, src, death_note)
-	self:runStop("taken damage")
-	self:restStop("taken damage")
+	self:runStop(_t"taken damage")
+	self:restStop(_t"taken damage")
 	local ret = mod.class.Actor.onTakeHit(self, value, src, death_note)
 	if self.life < self.max_life * 0.3 then
 		local sx, sy = game.level.map:getTileToScreen(self.x, self.y, true)
-		game.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, 2, "LOW HEALTH!", {255,0,0}, true)
+		game.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, 2, _t"LOW HEALTH!", {255,0,0}, true)
 	end
 
 	-- Hit direction warning
@@ -790,8 +793,8 @@ function _M:on_set_temporary_effect(eff_id, e, p)
 	local ret = mod.class.Actor.on_set_temporary_effect(self, eff_id, e, p)
 
 	if e.status == "detrimental" and not e.no_stop_resting and p.dur > 0 then
-		self:runStop("detrimental status effect")
-		self:restStop("detrimental status effect")
+		self:runStop(_t"detrimental status effect")
+		self:restStop(_t"detrimental status effect")
 	end
 
 	return ret
@@ -807,8 +810,8 @@ function _M:heal(value, src)
 end
 
 function _M:die(src, death_note)
-	if self.runStop then self:runStop("died") end
-	if self.restStop then self:restStop("died") end
+	if self.runStop then self:runStop(_t"died") end
+	if self.restStop then self:restStop(_t"died") end
 
 	return self:onPartyDeath(src, death_note)
 end
@@ -819,16 +822,16 @@ function _M:suffocate(value, src, death_msg)
 	if affected and value > 0 and self.runStop then
 		-- only stop autoexplore when air is less than 75% of max.
 		if self.air < 0.75 * self.max_air and self.air < 100 then
-			self:runStop("suffocating")
-			self:restStop("suffocating")
+			self:runStop(_t"suffocating")
+			self:restStop(_t"suffocating")
 		end
 	end
 	return dead, affected
 end
 
 function _M:onChat()
-	self:runStop("chat started")
-	self:restStop("chat started")
+	self:runStop(_t"chat started")
+	self:restStop(_t"chat started")
 end
 
 function _M:setName(name)
@@ -842,7 +845,7 @@ function _M:onTalentCooledDown(tid)
 	local t = self:getTalentFromId(tid)
 
 	local x, y = game.level.map:getTileToScreen(self.x, self.y, true)
-	game.flyers:add(x, y, 30, -0.3, -3.5, ("%s available"):format(t.name:capitalize()), {0,255,00})
+	game.flyers:add(x, y, 30, -0.3, -3.5, ("%s available"):tformat(t.name:capitalize()), {0,255,00})
 	game.log("#00ff00#%sTalent %s is ready to use.", (t.display_entity and t.display_entity:getDisplayString() or ""), t.name)
 end
 
@@ -900,7 +903,7 @@ local function spotHostiles(self, actors_only)
 	core.fov.calc_circle(self.x, self.y, game.level.map.w, game.level.map.h, self.sight or 10, function(_, x, y) return game.level.map:opaque(x, y) end, function(_, x, y)
 		local actor = game.level.map(x, y, game.level.map.ACTOR)
 		if actor and self:reactionToward(actor) < 0 and self:canSee(actor) and game.level.map.seens(x, y) then
-			seen[#seen + 1] = {x=x,y=y,actor=actor, entity=actor, name=actor.name}
+			seen[#seen + 1] = {x=x,y=y,actor=actor, entity=actor, name=actor:getName()}
 		end
 	end, nil)
 
@@ -1015,7 +1018,7 @@ end
 -- We can rest if no hostiles are in sight, and if we need life/mana/stamina/psi (and their regen rates allows them to fully regen)
 -- The "callbackOnRest" callback for any talent that defines it must return true to allow further resting
 function _M:restCheck()
-	if game:hasDialogUp(1) then return false, "dialog is displayed" end
+	if game:hasDialogUp(1) then return false, _t"dialog is displayed" end
 
 	local spotted = spotHostiles(self)
 	if #spotted > 0 then
@@ -1023,7 +1026,7 @@ function _M:restCheck()
 			node.entity:addParticles(Particles.new("notice_enemy", 1))
 		end
 		local dir = game.level.map:compassDirection(spotted[1].x - self.x, spotted[1].y - self.y)
-		return false, ("hostile spotted to the %s (%s%s)"):format(dir or "???", spotted[1].name, game.level.map:isOnScreen(spotted[1].x, spotted[1].y) and "" or " - offscreen")
+		return false, ("hostile spotted to the %s (%s%s)"):tformat(dir or "???", spotted[1].name, game.level.map:isOnScreen(spotted[1].x, spotted[1].y) and "" or _t" - offscreen")
 	end
 
 	-- Resting improves regen
@@ -1049,8 +1052,8 @@ function _M:restCheck()
 	
 	-- Check resources, make sure they CAN go up, otherwise we will never stop
 	if not self.resting.rest_turns then
-		if self.air_regen < 0 then return false, "losing breath!" end
-		if self.life_regen <= 0 then return false, "losing health!" end
+		if self.air_regen < 0 then return false, _t"losing breath!" end
+		if self.life_regen <= 0 then return false, _t"losing health!" end
 		if self.life < self.max_life and self.life_regen > 0 and not self:attr("no_life_regen") then return true end
 		if self.air < self.max_air and self.air_regen > 0 and not self.is_suffocating then return true end
 		for act, def in pairs(game.party.members) do if game.level:hasEntity(act) and not act.dead then
@@ -1146,7 +1149,7 @@ function _M:restCheck()
 
 	self.resting.rested_fully = true
 
-	return false, "all resources and life at maximum"
+	return false, _t"all resources and life at maximum"
 end
 
 --- The Player rests a turn
@@ -1179,21 +1182,21 @@ end
 -- Known traps aren't interesting.  We let the engine run around traps, or stop if it can't.
 -- 'ignore_memory' is only used when checking for paths around traps.  This ensures we don't remember items "obj_seen" that we aren't supposed to
 function _M:runCheck(ignore_memory)
-	if game:hasDialogUp(1) then return false, "dialog is displayed" end
+	if game:hasDialogUp(1) then return false, _t"dialog is displayed" end
 	local is_main_player = self == game:getPlayer(true)
 
 	local spotted = spotHostiles(self)
 	if #spotted > 0 then
 		local dir = game.level.map:compassDirection(spotted[1].x - self.x, spotted[1].y - self.y)
-		return false, ("hostile spotted to the %s (%s%s)"):format(dir or "???", spotted[1].name, game.level.map:isOnScreen(spotted[1].x, spotted[1].y) and "" or " - offscreen")
+		return false, ("hostile spotted to the %s (%s%s)"):tformat(dir or "???", spotted[1].name, game.level.map:isOnScreen(spotted[1].x, spotted[1].y) and "" or _t" - offscreen")
 	end
 
-	if self:fireTalentCheck("callbackOnRun") then return false, "talent prevented" end
+	if self:fireTalentCheck("callbackOnRun") then return false, _t"talent prevented" end
 
-	if self.air_regen < 0 and self.air < 0.75 * self.max_air then return false, "losing breath!" end
+	if self.air_regen < 0 and self.air < 0.75 * self.max_air then return false, _t"losing breath!" end
 
 	-- Notice any noticeable terrain
-	local noticed = false
+	local noticed = _tfalse
 	self:runScan(function(x, y, what)
 		-- Objects are always interesting, only on curent spot
 		local obj_seen = game.level.map.attrs(x, y, "obj_seen")
@@ -1201,7 +1204,7 @@ function _M:runCheck(ignore_memory)
 			local obj = game.level.map:getObject(x, y, 1)
 			if obj then
 				if not ignore_memory then game.level.map.attrs(x, y, "obj_seen", is_main_player and true or self) end
-				noticed = "object seen"
+				noticed = _t"object seen"
 				return false, noticed
 			end
 		end
@@ -1209,7 +1212,7 @@ function _M:runCheck(ignore_memory)
 		local grid = game.level.map(x, y, Map.TERRAIN)
 		if grid and grid.special and not grid.autoexplore_ignore and not game.level.map.attrs(x, y, "autoexplore_ignore") and self.running and self.running.path then
 			game.level.map.attrs(x, y, "autoexplore_ignore", true)
-			noticed = "something interesting"
+			noticed = _t"something interesting"
 			return false, noticed
 		end
 
@@ -1226,24 +1229,24 @@ function _M:runCheck(ignore_memory)
 		then
 			if grid and grid.special then
 				game.level.map.attrs(x, y, "autoexplore_ignore", true)
-				noticed = "something interesting"
+				noticed = _t"something interesting"
 			elseif self.running and self.running.explore and self.running.path and self.running.explore ~= "unseen" and self.running.cnt == #self.running.path + 1 then
-				noticed = "at " .. self.running.explore
+				noticed = ("at %s"):tformat(_t(self.running.explore))
 			else
-				noticed = "interesting terrain"
+				noticed = _t"interesting terrain"
 			end
 			-- let's only remember and ignore standard interesting terrain
 			if not ignore_memory and (grid.change_level or grid.orb_portal or grid.escort_portal) then game.level.map.attrs(x, y, "noticed", true) end
 			return false, noticed
 		end
-		if grid and grid.type and grid.type == "store" then noticed = "store entrance spotted" ; return false, noticed end
+		if grid and grid.type and grid.type == "store" then noticed = _t"store entrance spotted" ; return false, noticed end
 
 		-- Only notice interesting characters
 		local actor = game.level.map(x, y, Map.ACTOR)
-		if actor and actor.can_talk then noticed = "interesting character" ; return false, noticed end
+		if actor and actor.can_talk then noticed = _t"interesting character" ; return false, noticed end
 
 		-- We let the engine take care of traps, but we should still notice "trap" stores.
-		if game.level.map:checkAllEntities(x, y, "store") then noticed = "store entrance spotted" ; return false, noticed end
+		if game.level.map:checkAllEntities(x, y, "store") then noticed = _t"store entrance spotted" ; return false, noticed end
 	end)
 	if noticed then return false, noticed end
 	local can, noticed = engine.interface.PlayerRun.runCheck(self)
@@ -1334,7 +1337,7 @@ function _M:hotkeyInventory(name)
 
 	local o, item, inven = find(name)
 	if not o then
-		Dialog:simplePopup("Item not found", "You do not have any "..name..".")
+		Dialog:simplePopup(_t"Item not found", ("You do not have any %s."):tformat(name))
 	else
 		-- Wear it ??
 		if o:wornInven() and not o.wielded and inven == self.INVEN_INVEN then
@@ -1350,7 +1353,7 @@ end
 function _M:playerPickup()
 	-- If 2 or more objects, display a pickup dialog, otherwise just picks up
 	if game.level.map:getObject(self.x, self.y, 2) then
-		local titleupdator = self:getEncumberTitleUpdator("Pickup")
+		local titleupdator = self:getEncumberTitleUpdator(_t"Pickup")
 		local d d = self:showPickupFloor(titleupdator(), nil, function(o, item)
 			if self:attr("sleep") and not self:attr("lucid_dreamer") then
 				game:delayedLogMessage(self, nil, "sleep pickup", "You cannot pick up items from the floor while asleep!")
@@ -1378,7 +1381,7 @@ end
 function _M:playerDrop()
 	if self.no_inventory_access then return end
 	local inven = self:getInven(self.INVEN_INVEN)
-	local titleupdator = self:getEncumberTitleUpdator("Drop object")
+	local titleupdator = self:getEncumberTitleUpdator(_t"Drop object")
 	local d d = self:showInventory(titleupdator(), inven, nil, function(o, item)
 		self:doDrop(inven, item, function() d:updateList() end)
 		d:updateTitle(titleupdator())
@@ -1389,7 +1392,7 @@ end
 function _M:playerWear()
 	if self.no_inventory_access then return end
 	local inven = self:getInven(self.INVEN_INVEN)
-	local titleupdator = self:getEncumberTitleUpdator("Wield/wear object")
+	local titleupdator = self:getEncumberTitleUpdator(_t"Wield/wear object")
 	local d d = self:showInventory(titleupdator(), inven, function(o)
 		return o:wornInven() and self:getInven(o:wornInven()) and true or false
 	end, function(o, item)
@@ -1401,7 +1404,7 @@ end
 
 function _M:playerTakeoff()
 	if self.no_inventory_access then return end
-	local titleupdator = self:getEncumberTitleUpdator("Take off object")
+	local titleupdator = self:getEncumberTitleUpdator(_t"Take off object")
 	local d d = self:showEquipment(titleupdator(), nil, function(o, inven, item)
 		self:doTakeoff(inven, item, o)
 		d:updateTitle(titleupdator())
@@ -1452,7 +1455,7 @@ function _M:playerUseItem(object, item, inven)
 
 	if object and item then return use_fct(object, inven, item) end
 
-	local titleupdator = self:getEncumberTitleUpdator("Use object")
+	local titleupdator = self:getEncumberTitleUpdator(_t"Use object")
 	self:showEquipInven(titleupdator(),
 		function(o)
 			return o:canUseObject()
@@ -1556,7 +1559,7 @@ function _M:useOrbPortal(portal)
 	local spotted = spotHostiles(self, true)
 	if #spotted > 0 then
 		local dir = game.level.map:compassDirection(spotted[1].x - self.x, spotted[1].y - self.y)
-		self:logCombat(spotted[1].actor, "You can not use the Orb with foes watching (#Target# to the %s%s)",dir, game.level.map:isOnScreen(spotted[1].x, spotted[1].y) and "" or " - offscreen")
+		self:logCombat(spotted[1].actor, "You can not use the Orb with foes watching (#Target# to the %s%s)",dir, game.level.map:isOnScreen(spotted[1].x, spotted[1].y) and "" or _t" - offscreen")
 		return
 	end
 	if portal.on_preuse then portal:on_preuse(self) end
@@ -1634,7 +1637,7 @@ end
 function _M:on_targeted(act)
 	if self:attr("invisible") or self:attr("stealth") then
 		if self:canSee(act) and game.level.map.seens(act.x, act.y) then
-			game.logPlayer(self, "#LIGHT_RED#%s briefly catches sight of you!", act.name:capitalize())
+			game.logPlayer(self, "#LIGHT_RED#%s briefly catches sight of you!", act:getName():capitalize())
 		else
 			game.logPlayer(self, "#LIGHT_RED#You sense that Something has taken notice of you ...")
 		end

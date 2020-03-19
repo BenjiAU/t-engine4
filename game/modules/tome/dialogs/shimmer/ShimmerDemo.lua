@@ -44,7 +44,7 @@ function _M:init(player, what)
 		self.allowed_types[o.type] = true
 	end
 
-	Dialog.init(self, "Shimmer Demo", 680, 500)
+	Dialog.init(self, _t"Shimmer Demo", 680, 500)
 
 	self:generateList()
 
@@ -79,7 +79,7 @@ function _M:generateList()
 		if def.slot ~= "BODY" then
 			list[#list+1] = {
 				moddables = {},
-				name = "#GREY#[Invisible]",
+				name = _t"#GREY#[Invisible]",
 				sortname = "--",
 				slot = def.slot,
 				object = def.o,

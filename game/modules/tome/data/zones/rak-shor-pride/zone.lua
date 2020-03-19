@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Rak'shor Pride",
+	name = _t"Rak'shor Pride",
 	level_range = {30, 60},
 	level_scheme = "player",
 	max_level = 3,

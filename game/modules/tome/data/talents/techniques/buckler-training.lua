@@ -65,7 +65,7 @@ newTalent {
 			When you are attacked in melee, you have a %d%% chance to deflect the attack with your shield, completely evading it.
 			In addition, as long as you are wearing armour no heavier than leather, you gain %d Armour and %d%% Armour hardiness.
 			The chance to deflect increases with your Cunning.]])
-			:format(block, armour, hardiness)
+			:tformat(block, armour, hardiness)
 	end,
 }
 
@@ -147,14 +147,14 @@ newTalent {
 				local dist = t.getDist(self, t)
 				target:knockback(self.x, self.y, dist)
 			else
-				game.logSeen(target, "%s resists the knockback!", target.name:capitalize())
+				game.logSeen(target, "%s resists the knockback!", target:getName():capitalize())
 			end
 		end
 
 		-- Ranged attack
 		local targets = self:archeryAcquireTargets(nil, {one_shot=true, x=target.x, y=target.y, no_energy = true})
 		if targets then
-			--game.logSeen(self, "%s follows up with a shot from %s!", self.name:capitalize(), sling:getName())
+			--game.logSeen(self, "%s follows up with a shot from %s!", self:getName():capitalize(), sling:getName())
 			self:archeryShoot(targets, t, nil, {mult=t.getSlingMult(self, t)})
 		end
 
@@ -165,7 +165,7 @@ newTalent {
 		local tiles = t.getDist(self, t)
 		local slingMult = t.getSlingMult(self, t) * 100
 		return ([[Bash an enemy in melee range with your shield (twice for talent level 5 or more), doing %d%% damage and knocking them back %d squares. You may then follow with a deadly short-range sling attack, dealing %d%% damage. The shield bash will use Dexterity instead of Strength for the shield's bonus damage.]])
-		:format(shieldMult, tiles, slingMult)
+		:tformat(shieldMult, tiles, slingMult)
 	end,
 }
 
@@ -189,13 +189,13 @@ newTalent {
 		local t2 = self:getTalentFromId(self.T_SKIRMISHER_BASH_AND_SMASH)
 		if t2 then
 			if self:getTalentLevelRaw(t2) >= 5 then
-				crit = " At talent level 5, your Bash and Smash shield hits are guaranteed criticals."
+				crit = _t" At talent level 5, your Bash and Smash shield hits are guaranteed criticals."
 			else
-				crit = " At talent level 5, your Bash and Smash shield hit is a guaranteed critical."
+				crit = _t" At talent level 5, your Bash and Smash shield hit is a guaranteed critical."
 			end
 		end
 		return ([[When you are hit by a projectile, physical or otherwise, you have a %d%% chance to deflect it up to %d squares away.%s]])
-			:format(chance, range, crit)
+			:tformat(chance, range, crit)
 	end,
 }
 
@@ -251,6 +251,6 @@ newTalent {
 		--local stamina = t.getStaminaPerShot(self, t)
 		return ([[Any time you block an attack with Buckler Expertise or Buckler Mastery you instantly counterattack with your sling for %d%% damage  This can only occur up to %d time(s) per turn.
 			]])
-			:format(mult, blocks)
+			:tformat(mult, blocks)
 	end,
 }

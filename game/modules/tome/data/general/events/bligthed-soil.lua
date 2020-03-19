@@ -23,7 +23,7 @@ if not x then return false end
 
 local on_stand = function(self, x, y, who) who:setEffect(who.EFF_BLIGHTED_SOIL, 1, {}) end
 local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
-g.name = "blighted soil"
+g.name = _t"blighted soil"
 g.display='~' g.color_r=0 g.color_g=255 g.color_b=0 g.notice = true
 g.special_minimap = colors.OLIVE_DRAB
 g.on_stand = on_stand
@@ -46,7 +46,7 @@ for x, yy in pairs(grids) do for y, _ in pairs(yy) do
 	local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
 	g.on_stand = g.on_stand or on_stand
 	if g.on_stand == on_stand and g.type == "floor" then
-		g.name = g.name .. " (blighted aura)"
+		g.name = ("%s (blighted aura)"):tformat(_t(g.name))
 		if not g.special_minimap then g.special_minimap = colors.DARK_SLATE_GRAY end
 	end
 	g.always_remember = true

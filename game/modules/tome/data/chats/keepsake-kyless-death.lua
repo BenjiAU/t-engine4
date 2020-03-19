@@ -18,18 +18,18 @@
 -- darkgod@te4.org
 
 newChat{ id="kyless",
-	text = [[#VIOLET#*Kyless lies dying on the floor. In his hand he holds a book.*#LAST#
+	text = _t[[#VIOLET#*Kyless lies dying on the floor. In his hand he holds a book.*#LAST#
 Please! Before I die I have one request. Destroy the book. It wasn't me. The book brought this on us. It must be destoyed!]],
 	answers = {
 		{
-			"I will. #LIGHT_GREEN#[destroy the book]#LAST#",
+			_t"I will. #LIGHT_GREEN#[destroy the book]#LAST#",
 			action=function(npc, player)
 				player:hasQuest("keepsake"):on_good_choice(player)
 			end,
 			jump="destroy_book"
 		},
 		{
-			"I'm sorry but I need it. #LIGHT_GREEN#[keep the book]#LAST#",
+			_t"I'm sorry but I need it. #LIGHT_GREEN#[keep the book]#LAST#",
 			action=function(npc, player)
 				player:hasQuest("keepsake"):on_evil_choice(player)
 				player:hasQuest("keepsake"):on_keep_book(player)
@@ -40,16 +40,16 @@ Please! Before I die I have one request. Destroy the book. It wasn't me. The boo
 }
 
 newChat{ id="destroy_book",
-	text = [[#VIOLET#*You destroy the book. When you finish you look up and see that Kyless is already dead.*#LAST#]],
+	text = _t[[#VIOLET#*You destroy the book. When you finish you look up and see that Kyless is already dead.*#LAST#]],
 	answers = {
-		{"Goodbye, Kyless."},
+		{_t"Goodbye, Kyless."},
 	}
 }
 
 newChat{ id="keep_book",
-	text = [[#VIOLET#*You place the book in your pack. When you finish you look up and see that Kyless is already dead.*#LAST#]],
+	text = _t[[#VIOLET#*You place the book in your pack. When you finish you look up and see that Kyless is already dead.*#LAST#]],
 	answers = {
-		{"Goodbye, Kyless."},
+		{_t"Goodbye, Kyless."},
 	}
 }
 

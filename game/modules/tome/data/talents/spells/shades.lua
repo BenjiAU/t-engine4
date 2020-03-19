@@ -66,7 +66,7 @@ newTalent{
 		local chance = t.getChance(self, t)
 		return ([[Surround your minions in a veil of darkness. The darkness will teleport them to you, and grant them %d%% evasion for 5 turns.
 		The evasion chance will increase with your Spellpower.]]):
-		format(chance)
+		tformat(chance)
 	end,
 }
 
@@ -114,29 +114,29 @@ newTalent{
 				m.level = 1
 				local race = 5 -- rng.range(1, 5)
 				if race == 1 then
-					m.name = "human farmer"
+					m.name = _t"human farmer"
 					m.subtype = "human"
 					m.image = "npc/humanoid_human_human_farmer.png"
-					m.desc = [[A weather-worn human farmer, looking at a loss as to what's going on.]]
+					m.desc=_t[[A weather-worn human farmer, looking at a loss as to what's going on.]]
 				elseif race == 2 then
-					m.name = "halfling gardener"
+					m.name = _t"halfling gardener"
 					m.subtype = "halfling"
-					m.desc = [[A rugged halfling gardener, looking quite confused as to what he's doing here.]]
+					m.desc=_t[[A rugged halfling gardener, looking quite confused as to what he's doing here.]]
 					m.image = "npc/humanoid_halfling_halfling_gardener.png"
 				elseif race == 3 then
-					m.name = "shalore scribe"
+					m.name = _t"shalore scribe"
 					m.subtype = "shalore"
-					m.desc = [[A scrawny elven scribe, looking bewildered at his surroundings.]]
+					m.desc=_t[[A scrawny elven scribe, looking bewildered at his surroundings.]]
 					m.image = "npc/humanoid_shalore_shalore_rune_master.png"
 				elseif race == 4 then
-					m.name = "dwarven lumberjack"
+					m.name = _t"dwarven lumberjack"
 					m.subtype = "dwarf"
-					m.desc = [[A brawny dwarven lumberjack, looking a bit upset at his current situation.]]
+					m.desc=_t[[A brawny dwarven lumberjack, looking a bit upset at his current situation.]]
 					m.image = "npc/humanoid_dwarf_lumberjack.png"
 				elseif race == 5 then
-					m.name = "cute bunny"
+					m.name = _t"cute bunny"
 					m.type = "vermin" m.subtype = "rodent"
-					m.desc = [[It is so cute!]]
+					m.desc=_t[[It is so cute!]]
 					m.image = "npc/vermin_rodent_cute_little_bunny.png"
 				end
 				m.faction = self.faction
@@ -163,7 +163,7 @@ newTalent{
 		return ([[Reaches through the shadows into quieter places, summoning %d harmless creatures.
 		Those creatures are then cursed with a Curse of Hate, making all hostile foes try to kill them.
 		If the summoned creatures are killed by hostile foes, you have 70%% chance to gain a soul.]]):
-		format(math.ceil(self:getTalentLevel(t)))
+		tformat(math.ceil(self:getTalentLevel(t)))
 	end,
 }
 
@@ -199,8 +199,8 @@ newTalent{
 			
 			ai_target = {actor=table.NIL_MERGE},
 			ai = "summoned", ai_real = "tactical",
-			name = "Forgery of Haze ("..self.name..")",
-			desc = ([[A dark shadowy shape whose form resembles %s.]]):format(self.name),
+			name = ("Forgery of Haze (%s)"):tformat(self:getName()),
+			desc = ([[A dark shadowy shape whose form resembles %s.]]):tformat(self:getName()),
 		})
 
 		m:removeTimedEffectsOnClone()
@@ -215,7 +215,7 @@ newTalent{
 			game.party:addMember(m, {
 				control="no",
 				type="minion",
-				title="Forgery of Haze",
+				title=_t"Forgery of Haze",
 				orders = {target=true},
 			})
 		end
@@ -226,7 +226,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Through the shadows, you forge a temporary copy of yourself, existing for %d turns.
 		The copy possesses your exact talents and stats, has %d%% life and deals %d%% damage.]]):
-		format(t.getDuration(self, t), t.getHealth(self, t) * 100, t.getDam(self, t) * 100)
+		tformat(t.getDuration(self, t), t.getHealth(self, t) * 100, t.getDam(self, t) * 100)
 	end,
 }
 
@@ -273,6 +273,6 @@ newTalent{
 		local affinity = t.getAffinity(self, t)
 		return ([[Surround yourself with Frostdusk, increasing all your darkness and cold damage by %0.1f%%, and ignoring %d%% of the darkness resistance of your targets.
 		In addition, all darkness damage you take heals you for %d%% of the damage.]])
-		:format(damageinc, ressistpen, affinity)
+		:tformat(damageinc, ressistpen, affinity)
 	end,
 }

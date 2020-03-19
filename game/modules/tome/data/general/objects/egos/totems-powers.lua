@@ -29,12 +29,12 @@ newEntity{
 		function(self, who) 
 			local heal = self.use_power.heal(self, who)
 			return ("heal yourself and all friendly characters within 10 spaces for %d"):
-				format(heal) end,
+				tformat(heal) end,
 		15,
 		function(self, who)
 			local tg = self.use_power.target(self, who)
 			local heal = self.use_power.heal(self, who)
-			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
+			game.logSeen(who, "%s activates %s %s!", who:getName():capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
 			who:project(tg, who.x, who.y, function(px, py)
 				local target = game.level.map(px, py, engine.Map.ACTOR)
 				if not target then return end
@@ -64,7 +64,7 @@ newEntity{
 	charm_power_def = {add=50, max=600, floor=true},  -- Higher damage because the damage can be cleansed and is delayed
 	resolvers.charm(function(self, who)
 			local dam = who:damDesc(engine.DamageType.NATURE, self.use_power.damage(self, who))
-			return ("sting an enemy dealing %d nature damage over 7 turns and reducing their healing by 50%%%%"):format(dam, 50)
+			return ("sting an enemy dealing %d nature damage over 7 turns and reducing their healing by 50%%%%"):tformat(dam, 50)
 		end,
 		15,
 		function(self, who)
@@ -72,7 +72,7 @@ newEntity{
 			local x, y = who:getTarget(tg)
 			if not x or not y then return nil end
 			local dam = {dam = self.use_power.damage(self, who), heal_factor = 50, dur = 7}
-			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
+			game.logSeen(who, "%s activates %s %s!", who:getName():capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
 			who:project(tg, x, y, engine.DamageType.INSIDIOUS_POISON, dam, {type="slime"})
 			return {id=true, used=true}
 		end,
@@ -92,8 +92,8 @@ newEntity{
 	rarity = 16,
 
 	charm_power_def = {add=5, max=100, floor=true},
-	resolvers.charm(function(self) return ("harden the skin for 7 turns increasing armour by %d and armour hardiness by %d%%%%"):format(self:getCharmPower(who), 20 + self.material_level * 10) end, 20, function(self, who)
-		game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
+	resolvers.charm(function(self) return ("harden the skin for 7 turns increasing armour by %d and armour hardiness by %d%%%%"):tformat(self:getCharmPower(who), 20 + self.material_level * 10) end, 20, function(self, who)
+		game.logSeen(who, "%s activates %s %s!", who:getName():capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
 		who:setEffect(who.EFF_THORNY_SKIN, 7, {ac=self:getCharmPower(who), hard=20 + self.material_level * 10})
 		game:playSoundNear(who, "talents/heal")
 		return {id=true, used=true}
@@ -114,9 +114,9 @@ newEntity{
 	charm_power_def = {add=45, max=500, floor=true},
 	resolvers.charm(function(self, who)
 		local stats = self.use_power.tentacleStats(self, who)
-		local str = ("(Tentacle Stats)\nLife:  %d\nBase Damage:  %d\nArmor:  %d\nAll Resist:  %d"):format(stats.max_life, stats.combat.dam, stats.combat_armor, stats.resists.all)
+		local str = ("(Tentacle Stats)\nLife:  %d\nBase Damage:  %d\nArmor:  %d\nAll Resist:  %d"):tformat(stats.max_life, stats.combat.dam, stats.combat_armor, stats.resists.all)
 		return	("summon a resilient tentacle up to %d spaces away for %d turns.  Each turn the tentacle will strike a random enemy in range 3 dealing physical damage and attempting to pin them.\n\n%s"):
-			format(5, stats.summon_time, str) 
+			tformat(5, stats.summon_time, str) 
 		end,
 		 20, 
 		 function(self, who)
@@ -136,9 +136,9 @@ newEntity{
 			local NPC = require "mod.class.NPC"
 			local m = NPC.new{
 				resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_eldritch_grgglck_s_tentacle.png", display_h=1, display_y=0}}},
-				name = "Lashing Tentacle",
+				name = _t"Lashing Tentacle",
 				type = "horror", subtype = "tentacle",
-				desc = "A lashing tentacle.",
+				desc = _t"A lashing tentacle.",
 				rank = 1,
 				display = "T", color = colors.GREY,
 				life_rating=1,
@@ -183,21 +183,21 @@ newEntity{
 			}
 
 			m:resolve()
-			who:logCombat(target or {name = "a spot nearby"}, "#Source# points %s %s at #target#, releasing a writhing tentacle!", who:his_her(), self:getName({do_color = true, no_add_name = true}))
+			who:logCombat(target or {name = _t"a spot nearby"}, "#Source# points %s %s at #target#, releasing a writhing tentacle!", who:his_her(), self:getName({do_color = true, no_add_name = true}))
 			game.zone:addEntity(game.level, m, "actor", x, y)
 			m.remove_from_party_on_death = true
 			if game.party:hasMember(who) then
 				game.party:addMember(m, {
 					control=false,
 					type="summon",
-					title="Summon",
+					title=_t"Summon",
 				})
 			end
 			local stats = self.use_power.tentacleStats(self, who)
 			table.mergeAdd(m, stats, true)
 			m.life = m.max_life
 
-		game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
+		game.logSeen(who, "%s activates %s %s!", who:getName():capitalize(), who:his_her(), self:getName{no_add_name = true, do_color = true})
 		return {id=true, used=true}
 	end,
 	"T_GLOBAL_CD",

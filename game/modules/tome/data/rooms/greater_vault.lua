@@ -115,7 +115,9 @@ return function(gen, id, lev, old_lev)
 				end end
 			end end
 			if vault.gen_map.startx and vault.gen_map.starty then
-				gen.spots[#gen.spots+1] = {x=vault.gen_map.startx + x, y=vault.gen_map.starty + y, check_connectivity=not vault.no_tunnels and "entrance", type="vault", subtype="greater"}
+				if not gen.dont_add_vault_check then
+					gen.spots[#gen.spots+1] = {x=vault.gen_map.startx + x, y=vault.gen_map.starty + y, check_connectivity=not vault.no_tunnels and "entrance", type="vault", subtype="greater"}
+				end
 				return vault.gen_map.startx + x, vault.gen_map.starty + y
 			end
 		end,

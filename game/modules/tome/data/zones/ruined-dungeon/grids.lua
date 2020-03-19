@@ -62,13 +62,13 @@ newEntity{
 		if not who.player then return end
 		local p = game:getPlayer(true)
 		if p.winner then
-			require("engine.ui.Dialog"):yesnoLongPopup("Infinite Dungeon", "You have accomplished great deads, but if you enter the infinite dungeon there will be no way back you will go on and on until you meet your glorious death.", 400, function(ret)
+			require("engine.ui.Dialog"):yesnoLongPopup(_t"Infinite Dungeon", _t"You have accomplished great deads, but if you enter the infinite dungeon there will be no way back you will go on and on until you meet your glorious death.", 400, function(ret)
 				if ret then
 					game:changeLevel(math.ceil(game.player.level * 1.5), "infinite-dungeon")
 				end
 			end)
 		else
-			require("engine.ui.Dialog"):simplePopup("Infinite Dungeon", "You should not go there. There is no way back. Ever. Maybe later when you have done all you must do.")
+			require("engine.ui.Dialog"):simplePopup(_t"Infinite Dungeon", _t"You should not go there. There is no way back. Ever. Maybe later when you have done all you must do.")
 		end
 	end,
 }
@@ -95,26 +95,26 @@ newEntity{
 		if not game.level.data.touch_orb then return true end
 
 		if not self.orb_allowed then
-			require("engine.ui.Dialog"):simplePopup("Strange Orb", "The orb looks inactive.")
+			require("engine.ui.Dialog"):simplePopup(_t"Strange Orb", _t"The orb looks inactive.")
 			return true
 		end
 
 		local text = "???"
-		if self.portal_type == "water" then text = "The orb seems to drip water."
-		elseif self.portal_type == "earth" then text = "The orb is covered in dust."
-		elseif self.portal_type == "wind" then text = "The orb is floating in the air."
-		elseif self.portal_type == "nature" then text = "Small seeds seem to be growing inside the orb."
-		elseif self.portal_type == "arcane" then text = "The orb swirls with magical energies."
-		elseif self.portal_type == "fire" then text = "Flames burst out of the orb."
+		if self.portal_type == "water" then text = _t"The orb seems to drip water."
+		elseif self.portal_type == "earth" then text = _t"The orb is covered in dust."
+		elseif self.portal_type == "wind" then text = _t"The orb is floating in the air."
+		elseif self.portal_type == "nature" then text = _t"Small seeds seem to be growing inside the orb."
+		elseif self.portal_type == "arcane" then text = _t"The orb swirls with magical energies."
+		elseif self.portal_type == "fire" then text = _t"Flames burst out of the orb."
 
-		elseif self.portal_type == "darkness" then text = "The orb seems to absorb all light."
-		elseif self.portal_type == "blood" then text = "The orb is drips with thick blood."
-		elseif self.portal_type == "ice" then text = "The orb is icy to the touch."
-		elseif self.portal_type == "time" then text = "Time seems to slow down around the orb."
-		elseif self.portal_type == "mind" then text = "Your mind is filled with strange thoughts as you approach the orb."
-		elseif self.portal_type == "blight" then text = "The orb seems to corrupt all it touches."
+		elseif self.portal_type == "darkness" then text = _t"The orb seems to absorb all light."
+		elseif self.portal_type == "blood" then text = _t"The orb is drips with thick blood."
+		elseif self.portal_type == "ice" then text = _t"The orb is icy to the touch."
+		elseif self.portal_type == "time" then text = _t"Time seems to slow down around the orb."
+		elseif self.portal_type == "mind" then text = _t"Your mind is filled with strange thoughts as you approach the orb."
+		elseif self.portal_type == "blight" then text = _t"The orb seems to corrupt all it touches."
 		end
-		require("engine.ui.Dialog"):yesnoLongPopup("Strange Orb", text.."\nDo you touch it?", 400, function(ret)
+		require("engine.ui.Dialog"):yesnoLongPopup(_t"Strange Orb", text.._t"\nDo you touch it?", 400, function(ret)
 			if ret then
 				game.level.data.touch_orb(self.portal_type, x, y)
 			end

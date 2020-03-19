@@ -29,7 +29,7 @@ local Button = require "engine.ui.Button"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init()
-	Dialog.init(self, "Configure Addons", game.w * 0.8, game.h * 0.8)
+	Dialog.init(self, _t"Configure Addons", game.w * 0.8, game.h * 0.8)
 
 	local webaddonload = function()
 		local method, d = util.browserOpenUrl("https://te4.org/addons/tome", {steam=true})
@@ -40,40 +40,42 @@ function _M:init()
 		if method == "webview" and d then d.unload = function() self:regen() end end
 	end
 
-	local url1 = Textzone.new{text="You can get new addons at #LIGHT_BLUE##{underline}#Te4.org Addons#{normal}#", auto_height=true, auto_width=true, fct=webaddonload}
-	local url2 = Textzone.new{text=" and #LIGHT_BLUE##{underline}#Te4.org DLCs#{normal}#", auto_height=true, auto_width=true, fct=webdlcload}
+	local url1 = Textzone.new{text=_t"You can get new addons at #LIGHT_BLUE##{underline}#Te4.org Addons#{normal}#", auto_height=true, auto_width=true, fct=webaddonload}
+	local url2 = Textzone.new{text=_t" and #LIGHT_BLUE##{underline}#Te4.org DLCs#{normal}#", auto_height=true, auto_width=true, fct=webdlcload}
 	local url3 = Textzone.new{text=" ", auto_height=true, auto_width=true, fct=function()end}
 	if core.steam then
-		url1 = Textzone.new{text="You can get new addons on #LIGHT_BLUE##{underline}#Steam Workshop#{normal}#", auto_height=true, auto_width=true, fct=function() util.browserOpenUrl("http://steamcommunity.com/app/"..core.steam.appid().."/workshop/", {webview=true}) end}
-		url2 = Textzone.new{text=", #LIGHT_BLUE##{underline}#Te4.org Addons#{normal}#", auto_height=true, auto_width=true, fct=webaddonload}
-		url3 = Textzone.new{text=" and #LIGHT_BLUE##{underline}#Te4.org DLCs#{normal}#", auto_height=true, auto_width=true, fct=webdlcload}
+		url1 = Textzone.new{text=_t"You can get new addons on #LIGHT_BLUE##{underline}#Steam Workshop#{normal}#", auto_height=true, auto_width=true, fct=function() util.browserOpenUrl("http://steamcommunity.com/app/"..core.steam.appid().."/workshop/", {webview=true}) end}
+		url2 = Textzone.new{text=_t", #LIGHT_BLUE##{underline}#Te4.org Addons#{normal}#", auto_height=true, auto_width=true, fct=webaddonload}
+		url3 = Textzone.new{text=_t" and #LIGHT_BLUE##{underline}#Te4.org DLCs#{normal}#", auto_height=true, auto_width=true, fct=webdlcload}
 	end
 
-	self.c_compat = Checkbox.new{default=false, width=math.floor(self.iw / 3 - 40), title="Show incompatible", on_change=function() self:switch() end}
-	self.c_auto_update = Checkbox.new{default=not config.settings.no_auto_update_addons, width=math.floor(self.iw / 3 - 40), title="Auto-update on start", on_change=function() self:switchAuto() end}
+	self.c_compat = Checkbox.new{default=false, width=math.floor(self.iw / 3 - 40), title=_t"Show incompatible", on_change=function() self:switch() end}
+	self.c_auto_update = Checkbox.new{default=not config.settings.no_auto_update_addons, width=math.floor(self.iw / 3 - 40), title=_t"Auto-update on start", on_change=function() self:switchAuto() end}
 
 	self:generateList()
 
 	self.c_list = ListColumns.new{width=math.floor(self.iw / 3 - 10), height=self.ih - 10 - self.c_compat.h, scrollbar=true, columns={
-		{name="Game Module", width=75, display_prop="name"},
-		{name="Version", width=25, display_prop="version_txt"},
+		{name=_t"Game Module", width=75, display_prop="name"},
+		{name=_t"Version", width=25, display_prop="version_txt"},
 	}, list=self.list, fct=function(item) end, select=function(item, sel) self:select(item) end}
 
 	self.c_adds = ListColumns.new{width=math.floor(self.iw * 2 / 3 - 10), height=self.ih - 10 - self.c_compat.h, scrollbar=true, columns={
-		{name="Addon", width=50, display_prop="long_name"},
-		{name="Active", width=20, display_prop=function(item)
+		{name=_t"Addon", width=50, display_prop=function(item)
+			return _t(item.long_name)
+		end},
+		{name=_t"Active", width=20, display_prop=function(item)
 			if item.cheat_only and not config.settings.cheat then
-				return "#GREY#Developer tool"
+				return _t"#GREY#Developer tool"
 			elseif item.dlc == "no" then
-				return "#LIGHT_RED#Donator Status: Disabled"
+				return _t"#LIGHT_RED#Donator Status: Disabled"
 			elseif config.settings.addons[item.for_module] and config.settings.addons[item.for_module][item.short_name] ~= nil then
-				return (config.settings.addons[item.for_module][item.short_name] and "#LIGHT_GREEN#Manual: Active" or "#LIGHT_RED#Manual: Disabled"):toTString()
+				return (config.settings.addons[item.for_module][item.short_name] and _t"#LIGHT_GREEN#Manual: Active" or _t"#LIGHT_RED#Manual: Disabled"):toTString()
 			else
-				return (item.natural_compatible and "#LIGHT_GREEN#Auto: Active" or "#LIGHT_RED#Auto: Incompatible"):toTString()
+				return (item.natural_compatible and _t"#LIGHT_GREEN#Auto: Active" or _t"#LIGHT_RED#Auto: Incompatible"):toTString()
 			end
 		end},
-		{name="Addon Version", width=15, display_prop="addon_version_txt"},
-		{name="Game Version", width=15, display_prop="version_txt"},
+		{name=_t"Addon Version", width=15, display_prop="addon_version_txt"},
+		{name=_t"Game Version", width=15, display_prop="version_txt"},
 	}, list={}, fct=function(item) self:switchAddon(item) end, select=function(item, sel) self:select(item) end}
 
 	local sep = Separator.new{dir="horizontal", size=self.ih - 10}

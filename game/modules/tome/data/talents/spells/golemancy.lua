@@ -48,10 +48,10 @@ function makeAlchemistGolem(self)
 		body = { INVEN = 1000, QS_MAINHAND = 1, QS_OFFHAND = 1, MAINHAND = 1, OFFHAND = 1, BODY=1, GEM={max = 2, stack_limit = 1} },
 		canWearObjectCustom = function(self, o)
 			if o.type ~= "gem" then return end
-			if not self.summoner then return "Golem has no master" end
-			if not self.summoner:knowTalent(self.summoner.T_GEM_GOLEM) then return "Master must know the Gem Golem talent" end
-			if not o.material_level then return "impossible to use this gem" end
-			if o.material_level > self.summoner:getTalentLevelRaw(self.summoner.T_GEM_GOLEM) then return "Master's Gem Golem talent too low for this gem" end
+			if not self.summoner then return _t"Golem has no master" end
+			if not self.summoner:knowTalent(self.summoner.T_GEM_GOLEM) then return _t"Master must know the Gem Golem talent" end
+			if not o.material_level then return _t"impossible to use this gem" end
+			if o.material_level > self.summoner:getTalentLevelRaw(self.summoner.T_GEM_GOLEM) then return _t"Master's Gem Golem talent too low for this gem" end
 		end,
 		equipdoll = "alchemist_golem",
 		is_alchemist_golem = 1,
@@ -148,7 +148,7 @@ function makeAlchemistGolem(self)
 	}
 
 	if self.alchemist_golem_is_drolem then
-		g.name = "drolem"
+		g.name = _t"drolem"
 		g.image="invis.png"
 		g.add_mos = {{image="npc/construct_golem_drolem.png", display_h=2, display_y=-1}}
 		g.moddable_tile = nil
@@ -189,7 +189,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Interact with your golem to check its inventory, talents, ...
 		Note: You can also do that while taking direct control of the golem.]]):
-		format()
+		tformat()
 	end,
 }
 
@@ -229,13 +229,13 @@ newTalent{
 		self.alchemy_golem = game.zone:finishEntity(game.level, "actor", makeAlchemistGolem(self))
 		if game.party:hasMember(self) then
 			game.party:addMember(self.alchemy_golem, {
-				control="full", type="golem", title="Golem", important=true,
+				control="full", type="golem", title=_t"Golem", important=true,
 				orders = {target=true, leash=true, anchor=true, talents=true, behavior=true},
 			})
 		end
 		if not self.alchemy_golem then return end
 		self.alchemy_golem.faction = self.faction
-		self.alchemy_golem.name = self.alchemy_golem.name.." (servant of "..self.name..")"
+		self.alchemy_golem.name = ("%s (servant of %s)"):tformat(_t(self.alchemy_golem.name),self:getName())
 		self.alchemy_golem.summoner = self
 		self.alchemy_golem.summoner_gain_exp = true
 
@@ -256,7 +256,7 @@ newTalent{
 		local wait = function()
 			local co = coroutine.running()
 			local ok = false
-			self:restInit(20, "refitting", "refitted", function(cnt, max)
+			self:restInit(20, _t"refitting", _t"refitted", function(cnt, max)
 				if cnt > max then ok = true end
 				coroutine.resume(co)
 			end)
@@ -337,7 +337,7 @@ newTalent{
 		return ([[Take care of your golem:
 		- If it is destroyed, you will take some time to reconstruct it (this takes 15 alchemist gems and 20 turns).
 		- If it is alive but hurt, you will be able to repair it for %d (takes 2 alchemist gems). Spellpower, alchemist gem and Golem Power talent all influence the healing done.]]):
-		format(heal)
+		tformat(heal)
 	end,
 }
 
@@ -382,7 +382,7 @@ newTalent{
 		local damage = td.getPercentInc(self.alchemy_golem, td)
 		self.alchemy_golem.talents[Talents.T_WEAPON_COMBAT], self.alchemy_golem.talents[Talents.T_WEAPONS_MASTERY] = olda, oldd
 		return ([[Improves your golem's proficiency with weapons, increasing its Accuracy by %d, Physical Power by %d and damage by %d%%.]]):
-		format(attack, power, 100 * damage)
+		tformat(attack, power, 100 * damage)
 	end,
 }
 
@@ -423,7 +423,7 @@ newTalent{
 		return ([[Improves your golem's armour training, damage resistance, and healing efficiency.
 		Increases all damage resistance by %d%%; increases Armour value by %d, Armour hardiness by %d%%, reduces chance to be critically hit by %d%% when wearing heavy mail or massive plate armour, and increases healing factor by %d%%.
 		The golem can always use any kind of armour, including massive armours.]]):
-		format(res, heavyarmor, hardiness, crit, t.getHealingFactor(self, t)*100)
+		tformat(res, heavyarmor, hardiness, crit, t.getHealingFactor(self, t)*100)
 	end,
 }
 
@@ -461,7 +461,7 @@ newTalent{
 	info = function(self, t)
 		local power=t.getPower(self, t)
 		return ([[You invoke your golem to your side, granting it a temporary melee power increase of %d for 5 turns.]]):
-		format(power)
+		tformat(power)
 	end,
 }
 
@@ -505,6 +505,6 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Teleport to your golem, while your golem teleports to your location. Your foes will be confused, and those that were attacking you will have a %d%% chance to target your golem instead.]]):
-		format(math.min(100, self:getTalentLevelRaw(t) * 15 + 25))
+		tformat(math.min(100, self:getTalentLevelRaw(t) * 15 + 25))
 	end,
 }

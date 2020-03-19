@@ -21,19 +21,19 @@ defineAction{
 	default = { "sym:_SPACE:false:false:false:false" },
 	type = "USERCHAT_TALK",
 	group = "user chat",
-	name = "Talk to people",
+	name = _t"Talk to people",
 }
 
 defineAction{
 	default = { "sym:_SPACE:true:false:false:false" },
 	type = "USERCHAT_SHOW_TALK",
 	group = "user chat",
-	name = "Display chat log",
+	name = _t"Display chat log",
 }
 
 defineAction{
 	default = { "sym:_SPACE:false:true:false:false" },
 	type = "USERCHAT_SWITCH_CHANNEL",
 	group = "user chat",
-	name = "Cycle chat channels",
+	name = _t"Cycle chat channels",
 }

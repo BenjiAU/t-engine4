@@ -94,7 +94,7 @@ newEntity{
 	block_sight = true,
 	block_sense = true,
 	block_esp = true,
-	door_player_stop = "This door seems to be sealed.",
+	door_player_stop = _t"This door seems to be sealed.",
 	is_door = true,
 	door_sound = "ambient/door_creaks/scifi_door",
 	door_opened = "SOLID_DOOR_OPEN",

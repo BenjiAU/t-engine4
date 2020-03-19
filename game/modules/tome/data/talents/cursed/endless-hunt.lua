@@ -85,7 +85,7 @@ newTalent{
 		Bonus level 1: +%d Accuracy, +%d%% melee damage, +%0.2f hate/turn prey was hit
 		Bonus level 2: +%d Accuracy, +%d%% melee damage, +%0.2f hate/turn prey was hit
 		Bonus level 3: +%d Accuracy, +%d%% melee damage, +%0.2f hate/turn prey was hit
-		The accuracy bonus improves with your Willpower, and the melee damage bonus with your Strength.]]):format(duration,
+		The accuracy bonus improves with your Willpower, and the melee damage bonus with your Strength.]]):tformat(duration,
 		t.getAttackChange(self, t, 1), t.getStalkedDamageMultiplier(self, t, 1) * 100 - 100, t.getHitHateChange(self, t, 1),
 		t.getAttackChange(self, t, 2), t.getStalkedDamageMultiplier(self, t, 2) * 100 - 100, t.getHitHateChange(self, t, 2),
 		t.getAttackChange(self, t, 3), t.getStalkedDamageMultiplier(self, t, 3) * 100 - 100, t.getHitHateChange(self, t, 3))
@@ -149,7 +149,7 @@ newTalent{
 				local t = rng.tableRemove(tids)
 				if t then
 					target.talents_cd[t.id] = getCooldownDuration
-					game.logSeen(target, "#F53CBE#%s's %s is disrupted!", target.name:capitalize(), t.name)
+					game.logSeen(target, "#F53CBE#%s's %s is disrupted!", target:getName():capitalize(), t.name)
 				end
 			end
 		end
@@ -164,7 +164,7 @@ newTalent{
 		return ([[Harass your stalked victim with two quick attacks for %d%% (at 0 Hate) to %d%% (at 100+ Hate) damage each. Each attack that scores a hit disrupts one talent, rune or infusion for %d turns. Your opponent will be unnerved by the attacks, reducing the damage they deal by %d%% for %d turns.
 		Damage reduction increases with the Willpower stat.
 
-		This talent will also attack with your shield, if you have one equipped.]]):format(t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100, cooldownDuration, -targetDamageChange, duration)
+		This talent will also attack with your shield, if you have one equipped.]]):tformat(t.getDamageMultiplier(self, t, 0) * 100, t.getDamageMultiplier(self, t, 100) * 100, cooldownDuration, -targetDamageChange, duration)
 	end,
 }
 
@@ -212,7 +212,7 @@ newTalent{
 		local spellpowerChange = t.getSpellpowerChange(self, t)
 		local mindpowerChange = t.getMindpowerChange(self, t)
 		return ([[The connection between predator and prey allows you to speak to the mind of your target and beckon them closer. For %d turns, they will try to come to you, even pushing others aside to do so. They will move towards you instead of acting %d%% of the time, but can save verses Mindpower to slow the effect. If they take significant damage, the beckoning may be overcome altogether. The effect makes concentration difficult for your target, reducing Spellpower and Mindpower by %d until they reach you.
-		The Spellpower and Mindpower reduction increases with your Willpower.]]):format(duration, chance, -spellpowerChange)
+		The Spellpower and Mindpower reduction increases with your Willpower.]]):tformat(duration, chance, -spellpowerChange)
 	end,
 }
 
@@ -268,6 +268,6 @@ newTalent{
 		return ([[Let hate fuel your movements. While active, you gain %d%% movement speed. The recklessness of your movement brings you bad luck (Luck -3).
 		Cleave, Repel and Surge cannot be active simultaneously, and activating one will place the others in cooldown.
 		Sustaining Surge while Dual Wielding grants %d additional Defense.
-		Movement speed and dual-wielding Defense both increase with the Willpower stat.]]):format(movementSpeedChange * 100, defenseChange)
+		Movement speed and dual-wielding Defense both increase with the Willpower stat.]]):tformat(movementSpeedChange * 100, defenseChange)
 	end,
 }

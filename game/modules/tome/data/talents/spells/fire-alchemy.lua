@@ -43,7 +43,7 @@ newTalent{
 		return ([[When you throw your alchemist bombs, you infuse them with flames that burn for a few turns.
 		In addition all fire damage you do is increased by %d%%.
 		You cannot have more than one alchemist infusion sustain active at once.]]):
-		format(daminc)
+		tformat(daminc)
 	end,
 }
 
@@ -109,7 +109,7 @@ newTalent{
 		return ([[Throw a smoke bomb, blocking everyone's line of sight. The smoke dissipates after %d turns.
 		If a creature inside is victim of fire burns the smoke will consume instantly, replicating the burns on all foes and increasing its duration by %d turns.
 		Duration will increase with your Spellpower.]]):
-		format(duration, math.ceil(duration / 3))
+		tformat(duration, math.ceil(duration / 3))
 	end,
 }
 
@@ -144,7 +144,7 @@ newTalent{
 			end,
 			0, 0
 		)
-		ef.name = "firestorm"
+		ef.name = _t"firestorm"
 		game:playSoundNear(self, "talents/fire")
 		return true
 	end,
@@ -154,7 +154,7 @@ newTalent{
 		return ([[A furious fire storm rages around the caster, doing %0.2f fire damage in a radius of 3 each turn for %d turns.
 		You closely control the firestorm, preventing it from harming your party members.
 		The damage and duration will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.FIRE, damage), duration)
+		tformat(damDesc(self, DamageType.FIRE, damage), duration)
 	end,
 }
 
@@ -217,7 +217,7 @@ newTalent{
 	end,
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/fireflash")
-		game.logSeen(self, "#FF8000#%s turns into pure flame!", self.name:capitalize())
+		game.logSeen(self, "#FF8000#%s turns into pure flame!", self:getName():capitalize())
 		self:addShaderAura("body_of_fire", "awesomeaura", {time_factor=3500, alpha=1, flame_scale=1.1}, "particles_images/wings.png")
 		return {
 			onhit = self:addTemporaryValue("on_melee_hit", {[DamageType.FIRE]=t.getFireDamageOnHit(self, t)}),
@@ -226,7 +226,7 @@ newTalent{
 	end,
 	deactivate = function(self, t, p)
 		self:removeShaderAura("body_of_fire")
-		game.logSeen(self, "#FF8000#The raging fire around %s calms down and disappears.", self.name)
+		game.logSeen(self, "#FF8000#The raging fire around %s calms down and disappears.", self:getName())
 		self:removeTemporaryValue("on_melee_hit", p.onhit)
 		self:removeTemporaryValue("resists", p.res)
 		return true
@@ -238,6 +238,6 @@ newTalent{
 		return ([[Turn your body into pure flame, increasing your fire resistance by %d%%, burning any creatures striking you in melee for %0.2f fire damage, and randomly launching up to %d slow-moving fire bolt(s) per turn at targets in sight, each dealing %0.2f fire damage.
 		The projectiles safely go through your friends without harming them.
 		The damage and resistance will increase with your Spellpower.]]):
-		format(res,onhitdam, t.getNumber(self, t), insightdam)
+		tformat(res,onhitdam, t.getNumber(self, t), insightdam)
 	end,
 }

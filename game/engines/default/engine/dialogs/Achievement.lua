@@ -22,7 +22,7 @@ local Shader = require "engine.Shader"
 local Dialog = require "engine.ui.Dialog"
 local Image = require "engine.ui.Image"
 local Textzone = require "engine.ui.Textzone"
-
+local FontPackage = require "engine.FontPackage"
 --- A sub dialog for defining an achievement
 --
 -- See also: @{ShowAchievements}
@@ -33,7 +33,7 @@ function _M:init(title, a)
 	local c_frame = Image.new{file="achievement-ui/runes_inner.png", width=154, height=154}
 	local c_image = Image.new{file=a.image or "trophy_gold.png", width=128, height=128}
 	local color = a.huge and "#GOLD#" or "#LIGHT_GREEN#"
-	local c_desc = Textzone.new{width=500, auto_height=true, text=color..a.name.."#LAST#\n"..a.desc, font={"/data/font/DroidSans-Bold.ttf", 26}}
+	local c_desc = Textzone.new{width=500, auto_height=true, text=color..a.name.."#LAST#\n"..a.desc, font={FontPackage:getFont("bold"), 26}}
 	c_desc:setTextShadow(1)
 	self.ui = "achievement"
 

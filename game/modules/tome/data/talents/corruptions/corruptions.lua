@@ -18,20 +18,20 @@
 -- darkgod@te4.org
 
 -- Corruptions
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/sanguisuge", name = "sanguisuge", description = "Manipulate life force to feed your own dark powers." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/torment", name = "torment", generic = true, description = "All the tools to torment your foes." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/vim", name = "vim", description = "Touch the very essence of your victims." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/bone", name = "bone", description = "Harness the power of bones." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/hexes", name = "hexes", generic = true, description = "Hex your foes, hindering and crippling them." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/curses", name = "curses", generic = true, description = "Curse your foes, hindering and crippling them." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/vile-life", name = "vile life", generic = true, description = "Manipulate life for your vile needs." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/plague", name = "plague", description = "Spread diseases to your foes." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/scourge", name = "scourge", description = "Bring pain and destruction to the world." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/reaving-combat", name = "reaving combat", description = "Enhanced melee combat through the dark arts." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/blood", name = "blood", description = "Harness the power of blood, both your own and your foes'." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/blight", name = "blight", description = "Bring corruption and decay to all who oppose you." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/shadowflame", name = "Shadowflame", description = "Harness the power of the demonic shadowflame." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, min_lev = 10, type="corruption/rot", name = "rot", description = "Become one with rot and decay." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/sanguisuge", name = _t"sanguisuge", description = _t"Manipulate life force to feed your own dark powers." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/torment", name = _t"torment", generic = true, description = _t"All the tools to torment your foes." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/vim", name = _t"vim", description = _t"Touch the very essence of your victims." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/bone", name = _t"bone", description = _t"Harness the power of bones." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/hexes", name = _t"hexes", generic = true, description = _t"Hex your foes, hindering and crippling them." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/curses", name = _t"curses", generic = true, description = _t"Curse your foes, hindering and crippling them." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/vile-life", name = _t"vile life", generic = true, description = _t"Manipulate life for your vile needs." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/plague", name = _t"plague", description = _t"Spread diseases to your foes." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/scourge", name = _t"scourge", description = _t"Bring pain and destruction to the world." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/reaving-combat", name = _t"reaving combat", description = _t"Enhanced melee combat through the dark arts." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/blood", name = _t"blood", description = _t"Harness the power of blood, both your own and your foes'." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/blight", name = _t"blight", description = _t"Bring corruption and decay to all who oppose you." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="corruption/shadowflame", name = _t"Shadowflame", description = _t"Harness the power of the demonic shadowflame." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, min_lev = 10, type="corruption/rot", name = _t"rot", description = _t"Become one with rot and decay." }
 
 -- Generic requires for corruptions based on talent level
 corrs_req1 = {

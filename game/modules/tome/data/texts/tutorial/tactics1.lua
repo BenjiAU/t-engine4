@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[You have found a nest of snakes! If you let them surround you, you might be in trouble!
+return _t[[You have found a nest of snakes! If you let them surround you, you might be in trouble!
 A basic tactic is to never get surrounded, do not hesitate to backtrack a bit to a safer spot.
 
 #GOLD#Always control the fight.#WHITE#

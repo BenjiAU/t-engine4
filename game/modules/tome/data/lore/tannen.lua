@@ -24,8 +24,8 @@
 newLore{
 	id = "tannen-level1",
 	category = "tannen's tower",
-	name = "Welcome to your cell",
-	lore = [[A Note to the Adventurer:
+	name = _t"Welcome to your cell",
+	lore = _t[[A Note to the Adventurer:
 
 I am truly sorry about this; had circumstances been different, we could've been allies, my weapons and magic letting you fight the hordes of threats to Maj'Eyal.  As it stands, however, your continued existence is highly inconvenient to me.
 
@@ -43,8 +43,8 @@ Oh, and I can't risk this note getting into anyone else's hands, can I?  It's go
 newLore{
 	id = "tannen-level2",
 	category = "tannen's tower",
-	name = "Personal note (1)",
-	lore = [[Angolwen is too timid.  Too paranoid about repeating the mistakes of the past.  Too cautious and infuriatingly non-pragmatic.  Too prone to avoiding the "little sins," ignoring the big picture.  I've told them again and again that our ancestors' mistake wasn't trying to use the Sher'Tul portals, it was trying to weaponize them before we understood how they worked - couldn't we have plundered the Nargol facility for more data, or started kidnapping orc scouting parties as experimental subjects?  Couldn't we have tried to learn more about the Sher'Tul _before_ desperation pushed us into blowing up half of the world?  No, that was "forbidden" magic, "too powerful for mortals to tamper with," right up until we realized we needed all that power after all.  Like a pacifist finally picking up a flail to defend himself, only to bash himself in the head with it, our lack of familiarity led to catastrophe.
+	name = _t"Personal note (1)",
+	lore = _t[[Angolwen is too timid.  Too paranoid about repeating the mistakes of the past.  Too cautious and infuriatingly non-pragmatic.  Too prone to avoiding the "little sins," ignoring the big picture.  I've told them again and again that our ancestors' mistake wasn't trying to use the Sher'Tul portals, it was trying to weaponize them before we understood how they worked - couldn't we have plundered the Nargol facility for more data, or started kidnapping orc scouting parties as experimental subjects?  Couldn't we have tried to learn more about the Sher'Tul _before_ desperation pushed us into blowing up half of the world?  No, that was "forbidden" magic, "too powerful for mortals to tamper with," right up until we realized we needed all that power after all.  Like a pacifist finally picking up a flail to defend himself, only to bash himself in the head with it, our lack of familiarity led to catastrophe.
 
 My arguments have just gotten me blank stares and an increasing amount of whispering behind my back (aside from a young couple whose abrupt departure might've been inspired by a particularly passionate rant in response to a lecture on "ethics").  Some of them have even resorted to deflecting my arguments, blaming them on my lack of magical power and saying I've spent too much time working on my drolem!  They think they can inspire the world and protect it from danger without getting their hands dirty; the orc invasions proved that, no, they can't, and I fear that if the demons ever start arriving in full force, we'll be even more woefully unprepared for it.  We even cower from the Ziguranth, no matter how many people die from diseases our healers could cure if they could roam freely, and no matter how easily we could find a way around their defenses if we started capturing a few of their agents.
 
@@ -55,8 +55,8 @@ Well, I won't have it.  I've been selling potions and inscriptions on the side f
 newLore{
 	id = "tannen-level3",
 	category = "tannen's tower",
-	name = "Personal note (2)",
-	lore = [[
+	name = _t"Personal note (2)",
+	lore = _t[[
 Well...  that was interesting.
 
 Setting up a portal took surprisingly little effort - conjured replicas of a Blood-Runed Athame and a Resonating Diamond work perfectly for setting up a portal, as it turns out, even if it burns them out after making just one.  This solution wouldn't work for the Orb of Many Ways, given that if it shorts out after one use, that means you're trapped on the other side of the portal, so I started working on a more tangible replica.  I noticed that most of them were disrupted by some form of interference, maybe echoes from the Spellblaze; my latest attempt at a more permanent orb was more of a curiosity than anything, an attempt to use those waves as constructive interference to lock onto their source.  I tossed a bandit through (my drolem's flight and relative silence have proven to be very convenient for securing test subjects!) with it tied to him, expecting him to pop into some magical maelstrom, quickly teleport back, and promptly die of terrible burn wounds (like the last four).
@@ -73,8 +73,8 @@ Now, I just need to get a genuine orb before the demons catch on...]],
 newLore{
 	id = "tannen-level4",
 	category = "tannen's tower",
-	name = "Demon Orders",
-	lore = [[Order to the Portal Excursion Team:
+	name = _t"Demon Orders",
+	lore = _t[[Order to the Portal Excursion Team:
 
 This egotistical human has proven to be very valuable.  We gave him only a very limited amount of data, and yet he still thinks he has the upper hand, thinking he could trick us by giving us faulty information.  No matter - the plans we gave him for a portal altar are feeding their measurements straight to us every time he uses them.  Every time he runs an experiment, we get much closer to devising a way to penetrate Eyal's shield; even the data we already have is enough to take us through one at a time, with the prohibitive limitation of creating a new Orb of Many Ways for each prospective invader.
 

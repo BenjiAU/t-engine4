@@ -128,7 +128,7 @@ function _M:tryBuy(who, o, item, nb)
 	if who.money >= price then
 		return nb, price
 	else
-		Dialog:simplePopup("Not enough gold", ("You do not have the %0.2f gold needed!"):format(price))
+		Dialog:simplePopup(_t"Not enough gold", ("You do not have the %0.2f gold needed!"):tformat(price))
 	end
 end
 
@@ -183,8 +183,8 @@ function _M:doBuy(who, o, item, nb, store_dialog)
 	local price
 	nb, price = self:tryBuy(who, o, item, nb)
 	if nb then
-		local avg = nb > 1 and (" (%0.2f each)"):format(price/nb) or ""
-		Dialog:yesnoPopup("Buy", ("Buy %d %s for %0.2f gold%s?"):format(nb, o:getName{do_color=true, no_count=true}, price, avg), function(ok) if ok then
+		local avg = nb > 1 and (" (%0.2f each)"):tformat(price/nb) or ""
+		Dialog:yesnoPopup(_t"Buy", ("Buy %d %s for %0.2f gold%s?"):tformat(nb, o:getName{do_color=true, no_count=true}, price, avg), function(ok) if ok then
 			self:onBuy(who, o, item, nb, true)
 			-- Learn lore ?
 			if who.player and o.lore then
@@ -202,7 +202,7 @@ function _M:doBuy(who, o, item, nb, store_dialog)
 				self:onBuy(who, o, item, nb, false)
 			end
 			if store_dialog then store_dialog:updateStore() end
-		end end, "Buy", "Cancel")
+		end end, _t"Buy", _t"Cancel")
 	end
 end
 
@@ -212,8 +212,8 @@ function _M:doSell(who, o, item, nb, store_dialog)
 	local price
 	nb, price = self:trySell(who, o, item, nb)
 	if nb then
-		local avg = nb > 1 and (" (%0.2f each)"):format(price/nb) or ""
-		Dialog:yesnoPopup("Sell", ("Sell %d %s for %0.2f gold%s?"):format(nb, o:getName{do_color=true, no_count=true}, price, avg), function(ok) if ok then
+		local avg = nb > 1 and (" (%0.2f each)"):tformat(price/nb) or ""
+		Dialog:yesnoPopup(_t"Sell", ("Sell %d %s for %0.2f gold%s?"):tformat(nb, o:getName{do_color=true, no_count=true}, price, avg), function(ok) if ok then
 			self:onSell(who, o, item, nb, true)
 			self:transfer(who, self, item, nb)
 			local o, item = self:findInInventory(self:getInven("INVEN"), o:getName()) or o
@@ -223,7 +223,7 @@ function _M:doSell(who, o, item, nb, store_dialog)
 				game.log("Sold: %s %s for %0.2f gold.", nb>1 and nb or "", o:getName{do_color=true, no_count = true}, price)
 			end
 			if store_dialog then store_dialog:updateStore() end
-		end end, "Sell", "Cancel")
+		end end, _t"Sell", _t"Cancel")
 	end
 end
 
@@ -234,11 +234,11 @@ end
 -- @return a string (possibly multiline) describing the object
 function _M:descObject(who, what, o)
 	if what == "buy" then
-		local desc = tstring({"font", "bold"}, {"color", "GOLD"}, ("Buy for: %0.2f gold (You have %0.2f gold)"):format(self:getObjectPrice(o, "buy"), who.money), {"font", "normal"}, {"color", "LAST"}, true, true)
+		local desc = tstring({"font", "bold"}, {"color", "GOLD"}, ("Buy for: %0.2f gold (You have %0.2f gold)"):tformat(self:getObjectPrice(o, "buy"), who.money), {"font", "normal"}, {"color", "LAST"}, true, true)
 		desc:merge(o:getDesc())
 		return desc
 	else
-		local desc = tstring({"font", "bold"}, {"color", "GOLD"}, ("Sell for: %0.2f gold (You have %0.2f gold)"):format(self:getObjectPrice(o, "sell"), who.money), {"font", "normal"}, {"color", "LAST"}, true, true)
+		local desc = tstring({"font", "bold"}, {"color", "GOLD"}, ("Sell for: %0.2f gold (You have %0.2f gold)"):tformat(self:getObjectPrice(o, "sell"), who.money), {"font", "normal"}, {"color", "LAST"}, true, true)
 		desc:merge(o:getDesc())
 		return desc
 	end

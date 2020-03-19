@@ -55,7 +55,7 @@ function _M:addMember(actor, def)
 	end
 
 	if type(def.control) == "nil" then def.control = "no" end
-	def.title = def.title or "Party member"
+	def.title = def.title or _t"Party member"
 	self.members[actor] = def
 	self.m_list[#self.m_list+1] = actor
 	def.index = #self.m_list
@@ -243,8 +243,8 @@ function _M:setPlayer(actor, bypass)
 	if actor == game.player then return true end
 
 	-- Stop!!
-	if game.player and game.player.runStop then game.player:runStop("Switching control") end
-	if game.player and game.player.restStop then game.player:restStop("Switching control") end
+	if game.player and game.player.runStop then game.player:runStop(_t"Switching control") end
+	if game.player and game.player.restStop then game.player:restStop(_t"Switching control") end
 
 	local def = self.members[actor]
 	local oldp = self.player
@@ -298,7 +298,7 @@ function _M:setPlayer(actor, bypass)
 
 	if not actor.hotkeys_sorted then actor:sortHotkeys() end
 
-	game.logPlayer(actor, "#MOCCASIN#Character control switched to %s.", actor.name)
+	game.logPlayer(actor, "#MOCCASIN#Character control switched to %s.", actor:getName())
 
 	if game.player.resetMainShader then game.player:resetMainShader() end
 
@@ -368,9 +368,9 @@ function _M:giveOrder(actor, order)
 	local def = self.members[actor]
 
 	if order == "leash" then
-		game:registerDialog(GetQuantity.new("Set action radius: "..actor.name, "Set the maximum distance this creature can go from the party master", actor.ai_state.tactic_leash, actor.ai_state.tactic_leash_max or 100, function(qty)
+		game:registerDialog(GetQuantity.new(("Set action radius: %s"):tformat(actor:getName()), _t"Set the maximum distance this creature can go from the party master", actor.ai_state.tactic_leash, actor.ai_state.tactic_leash_max or 100, function(qty)
 			actor.ai_state.tactic_leash = util.bound(qty, 1, actor.ai_state.tactic_leash_max or 100)
-			game.logPlayer(game.player, "%s maximum action radius set to %d.", actor.name:capitalize(), actor.ai_state.tactic_leash)
+			game.logPlayer(game.player, "%s maximum action radius set to %d.", actor:getName():capitalize(), actor.ai_state.tactic_leash)
 		end), 1)
 	elseif order == "anchor" then
 		local co = coroutine.create(function()
@@ -380,10 +380,10 @@ function _M:giveOrder(actor, order)
 				if act then
 					anchor = act
 				else
-					anchor = {x=x, y=y, name="that location"}
+					anchor = {x=x, y=y, name=_t"that location"}
 				end
 				actor.ai_state.tactic_leash_anchor = anchor
-				game.logPlayer(game.player, "%s will stay near %s.", actor.name:capitalize(), anchor.name)
+				game.logPlayer(game.player, "%s will stay near %s.", actor:getName():capitalize(), _t(anchor.name))
 			end
 		end)
 		local ok, err = coroutine.resume(co)
@@ -393,14 +393,14 @@ function _M:giveOrder(actor, order)
 			local x, y, act = game.player:getTarget({type="hit", range=10})
 			if act then
 				actor:setTarget(act)
-				game.player:logCombat(act, "%s targets #Target#.", actor.name:capitalize())
+				game.player:logCombat(act, "%s targets #Target#.", actor:getName():capitalize())
 			end
 		end)
 		local ok, err = coroutine.resume(co)
 		if not ok and err then print(debug.traceback(co)) error(err) end
 	elseif order == "rename" then
 		local scheme = self.members[actor].orders[order]
-		local d = require("engine.dialogs.GetText").new(("Change name of: %s"):format(actor.name), "Name", 2, 25, function(name) if name then
+		local d = require("engine.dialogs.GetText").new(("Change name of: %s"):tformat(actor:getName()), _t"Name", 2, 25, function(name) if name then
 				actor.name = scheme(actor, name)
 		end end)
 		game:registerDialog(d)
@@ -414,18 +414,18 @@ function _M:giveOrder(actor, order)
 	-------------------------------------------
 	elseif order == "escort_rest" then
 		-- Rest for a few turns
-		if actor.ai_state.tactic_escort_rest then actor:doEmote("No, we must hurry!", 40) return true end
+		if actor.ai_state.tactic_escort_rest then actor:doEmote(_t"No, we must hurry!", 40) return true end
 		actor.ai_state.tactic_escort_rest = rng.range(6, 10)
-		actor:doEmote("Ok, but not for long.", 40)
+		actor:doEmote(_t"Ok, but not for long.", 40)
 	elseif order == "escort_portal" then
 		local dist = core.fov.distance(actor.escort_target.x, actor.escort_target.y, actor.x, actor.y)
-		if dist < 8 then dist = "very close"
-		elseif dist < 16 then dist = "close"
-		else dist = "still far away"
+		if dist < 8 then dist = _t"very close"
+		elseif dist < 16 then dist = _t"close"
+		else dist = _t"still far away"
 		end
 
 		local dir = game.level.map:compassDirection(actor.escort_target.x - actor.x, actor.escort_target.y - actor.y)
-		actor:doEmote(("The portal is %s, to the %s."):format(dist, dir or "???"), 45)
+		actor:doEmote(("The portal is %s, to the %s."):tformat(dist, dir or "???"), 45)
 	end
 
 	return true

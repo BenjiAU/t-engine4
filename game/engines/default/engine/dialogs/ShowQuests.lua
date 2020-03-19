@@ -29,15 +29,15 @@ module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init(actor, select_id)
 	self.actor = actor
-	Dialog.init(self, "Quest Log for "..actor.name, game.w * 0.8, game.h * 0.8)
+	Dialog.init(self, ("Quest Log for %s"):tformat(actor:getName()), game.w * 0.8, game.h * 0.8)
 
 	self.c_desc = TextzoneList.new{scrollbar=true, width=math.floor(self.iw / 2 - 10), height=self.ih}
 
 	self:generateList()
 
 	self.c_list = ListColumns.new{width=math.floor(self.iw / 2 - 10), height=self.ih - 10, scrollbar=true, sortable=true, columns={
-		{name="Quest", width=70, display_prop="name", sort="name"},
-		{name="Status", width=30, display_prop="status", sort="status_order"},
+		{name=_t"Quest", width=70, display_prop="name", sort="name"},
+		{name=_t"Status", width=30, display_prop="status", sort="status_order"},
 	}, list=self.list, fct=function(item) end, select=function(item, sel) self:select(item) end}
 
 	self:loadUI{

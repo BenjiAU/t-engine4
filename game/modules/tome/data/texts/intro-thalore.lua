@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[Welcome #LIGHT_GREEN#@name@#WHITE#.
+return _t[[Welcome #LIGHT_GREEN#@name@#WHITE#.
 You are of the Thaloren, the Elven race closest to nature. Your people have lived for thousands of years in their forest, rarely taking part in the events of the outside world.
 Yet when their home is threatened, the Thaloren Elves can prove to be fearsome combatants.
 You lived a peaceful life deep in the forest for many years, but lately you have grown restless and have decided to step into the world.

@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Tutorial",
+	name = _t"Tutorial",
 	level_range = {1, 1},
 	level_scheme = "player",
 	max_level = 5,

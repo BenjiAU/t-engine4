@@ -18,11 +18,11 @@
 -- darkgod@te4.org
 
 return {
-	name = "Yiilkgur, the Sher'Tul Fortress",
+	name = _t"Yiilkgur, the Sher'Tul Fortress",
 	display_name = function(x, y)
 		local zn = game.level.map.attrs(x or game.player.x, y or game.player.y, "zonename")
-		if zn then return zn.." (Yiilkgur)"
-		else return "Yiilkgur, the Sher'Tul Fortress" end
+		if zn then return ("%s (Yiilkgur, the Sher'Tul Fortress)"):tformat(_t(zn))
+		else return _t"Yiilkgur, the Sher'Tul Fortress" end
 	end,
 	variable_zone_name = true,
 	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(-1,2) end,
@@ -83,7 +83,7 @@ return {
 
 		local Dialog = require("engine.ui.Dialog")
 		if not game.level.shown_warning then
-			Dialog:simpleLongPopup("Yiilkgur", "This level seems to be removed from the rest of the ruins. The air is fresh and the level is lighted. You hear the distant crackling of magical energies.", 400)
+			Dialog:simpleLongPopup(_t"Yiilkgur", _t"This level seems to be removed from the rest of the ruins. The air is fresh and the level is lighted. You hear the distant crackling of magical energies.", 400)
 			game.level.shown_warning = true
 		end
 
@@ -96,7 +96,7 @@ return {
 				game.zone:addEntity(game.level, kitty, "actor", x, y)
 				kitty.faction = game.player.faction
 				game.state.kitty_summoned = true
-				Dialog:simpleLongPopup("Yiilkgur", "As you enter the familiar Fortress you notice a small orange cat has followed you somehow.\nIt looks like the kitty you fed earlier.", 400)
+				Dialog:simpleLongPopup(_t"Yiilkgur", _t"As you enter the familiar Fortress you notice a small orange cat has followed you somehow.\nIt looks like the kitty you fed earlier.", 400)
 			end
 		end
 	end,

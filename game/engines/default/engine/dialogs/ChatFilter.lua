@@ -27,20 +27,20 @@ local Textzone = require "engine.ui.Textzone"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init(adds)
-	Dialog.init(self, "Chat filters", 500, 400)
+	Dialog.init(self, _t"Chat filters", 500, 400)
 
 	local list = {
-		{name = "Public chat", kind = "talk"},
-		{name = "Private whispers", kind = "whisper"},
-		{name = "Join/part messages", kind = "join"},
-		{name = "First time achievements (recommended to keep them on)", kind = "achievement_first"},
-		{name = "Important achievements (recommended to keep them on)", kind = "achievement_huge"},
-		{name = "Other achievements", kind = "achievement_other"},
+		{name = _t"Public chat", kind = "talk"},
+		{name = _t"Private whispers", kind = "whisper"},
+		{name = _t"Join/part messages", kind = "join"},
+		{name = _t"First time achievements (recommended to keep them on)", kind = "achievement_first"},
+		{name = _t"Important achievements (recommended to keep them on)", kind = "achievement_huge"},
+		{name = _t"Other achievements", kind = "achievement_other"},
 	}
 	for i, l in ipairs(adds or {}) do list[#list+1] = l end
 	self:triggerHook{"ChatFilters:list", list=list}
 
-	local c_desc = Textzone.new{width=self.iw - 10, height=1, auto_height=true, text="Select which types of chat events to see or not."}
+	local c_desc = Textzone.new{width=self.iw - 10, height=1, auto_height=true, text=_t"Select which types of chat events to see or not."}
 	local uis = { {left=0, top=0, ui=c_desc} }
 	for i, l in ipairs(list) do
 		local l = l

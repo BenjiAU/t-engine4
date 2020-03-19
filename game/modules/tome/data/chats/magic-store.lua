@@ -18,10 +18,10 @@
 -- darkgod@te4.org
 
 local function recharge(npc, player)
-	player:showEquipInven("Select the item to recharge", function(o) return o.recharge_cost and o.power and o.max_power and o.power < o.max_power end, function(o, inven, item)
+	player:showEquipInven(_t"Select the item to recharge", function(o) return o.recharge_cost and o.power and o.max_power and o.power < o.max_power end, function(o, inven, item)
 		local cost = math.ceil(o.recharge_cost * (o.max_power / (o.use_talent and o.use_talent.power or o.use_power.power)))
-		if cost > player.money then require("engine.ui.Dialog"):simplePopup("Not enough money", "This costs "..cost.." gold.") return true end
-		require("engine.ui.Dialog"):yesnoPopup("Recharge?", "This will cost you "..cost.." gold.", function(ok) if ok then
+		if cost > player.money then require("engine.ui.Dialog"):simplePopup(_t"Not enough money", ("This costs %d gold."):tformat(cost)) return true end
+		require("engine.ui.Dialog"):yesnoPopup(_t"Recharge?", ("This will cost you %d gold."):tformat(cost), function(ok) if ok then
 			o.power = o.max_power
 			player:incMoney(-cost)
 			player.changed = true
@@ -32,14 +32,14 @@ local function recharge(npc, player)
 end
 
 newChat{ id="welcome",
-	text = [[Welcome, @playername@, to my shop.]],
+	text = _t[[Welcome, @playername@, to my shop.]],
 	answers = {
-		{"Let me see your wares.", action=function(npc, player)
+		{_t"Let me see your wares.", action=function(npc, player)
 			npc.store:loadup(game.level, game.zone)
 			npc.store:interact(player)
 		end},
-		{"I want to recharge some of my equipment.", action=recharge},
-		{"Sorry, I have to go!"},
+		{_t"I want to recharge some of my equipment.", action=recharge},
+		{_t"Sorry, I have to go!"},
 	}
 }
 

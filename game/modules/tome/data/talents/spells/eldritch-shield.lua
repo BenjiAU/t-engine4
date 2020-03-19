@@ -47,7 +47,7 @@ newTalent{
 			if target:canBe("stun") then
 				target:setEffect(target.EFF_STUNNED, t.getDuration(self, t), {apply_power=self:combatPhysicalpower(), apply_save="combatSpellResist"})
 			else
-				game.logSeen(target, "%s resists the stun!", target.name:capitalize())
+				game.logSeen(target, "%s resists the stun!", target:getName():capitalize())
 			end
 			self:forceUseTalent(self.T_BLOCK, {ignore_cooldown=true, ignore_energy=true})
 		end
@@ -59,7 +59,7 @@ newTalent{
 		If either attack hits, the target will be stunned for %d turns and you automatically Block.
 		The chance for the attack to stun increases with your Physical Power, but it is considered a magical attack and thus is resisted with spell save, rather than physical save.
 		Damage increases with Spellpower.]])
-		:format(100 * self:combatTalentWeaponDamage(t, 0.6, (100 + self:combatTalentSpellDamage(t, 50, 300)) / 100), t.getDuration(self, t))
+		:tformat(100 * self:combatTalentWeaponDamage(t, 0.6, (100 + self:combatTalentSpellDamage(t, 50, 300)) / 100), t.getDuration(self, t))
 	end,
 }
 
@@ -98,7 +98,7 @@ newTalent{
 		return ([[Imbues your shields with arcane power, dealing %0.2f arcane damage with each melee strike and %0.2f arcane damage when hit.
 		Allows counterstrikes after incomplete blocks and the cooldown of Block is reduced by %d turns.
 		The damage will increase with Spellpower.]]):
-		format(damDesc(self, DamageType.ARCANE, dam), damDesc(self, DamageType.ARCANE, dam * 0.7), t.getBlockCD(self, t))
+		tformat(damDesc(self, DamageType.ARCANE, dam), damDesc(self, DamageType.ARCANE, dam * 0.7), t.getBlockCD(self, t))
 	end,
 }
 
@@ -131,7 +131,7 @@ newTalent{
 			if target:canBe("stun") then
 				target:setEffect(target.EFF_DAZED, t.getDuration(self, t), {apply_power=self:combatPhysicalpower(), apply_save="combatSpellResist"})
 			else
-				game.logSeen(target, "%s resists the dazing blows!", target.name:capitalize())
+				game.logSeen(target, "%s resists the dazing blows!", target:getName():capitalize())
 			end
 			self:alterTalentCoolingdown(self.T_BLOCK, -1000)
 		end
@@ -142,7 +142,7 @@ newTalent{
 		return ([[Channel eldritch forces into a ferocious melee attack, hitting the target three times with your shields doing %d%% Nature damage.
 		If any of the attacks hit, the target will be dazed for %d turns and your Block cooldown is reset.
 		The chance for the attack to daze increases with you Physical Power, but it is considered a magical attack and thus is resisted with spell save, rather than physical save.]])
-		:format(100 * self:combatTalentWeaponDamage(t, 0.6, 1.6), t.getDuration(self, t))
+		:tformat(100 * self:combatTalentWeaponDamage(t, 0.6, 1.6), t.getDuration(self, t))
 	end,
 }
 
@@ -184,7 +184,7 @@ newTalent{
 		You perform a melee attack for %d%% arcane damage against everyone within radius %d.
 		Any creature hit by the attack will be submitted to a Counterstrike effect for 3 turns, as if you had blocked against them.
 		At level 5 your Block cooldown is reset.]])
-		:format(100 * self:combatTalentWeaponDamage(t, 1.3, 2.6), self:getTalentRadius(t))
+		:tformat(100 * self:combatTalentWeaponDamage(t, 1.3, 2.6), self:getTalentRadius(t))
 	end,
 }
 

@@ -20,9 +20,9 @@
 use_ui = "quest-main"
 
 -- Explore the far east
-name = "The wild wild east"
+name = _t"The wild wild east"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "There must be a way to go into the far east from the lair of Golbug. Find it and explore the unknown far east, looking for clues."
+	desc[#desc+1] = _t"There must be a way to go into the far east from the lair of Golbug. Find it and explore the unknown far east, looking for clues."
 	return table.concat(desc, "\n")
 end

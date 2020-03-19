@@ -36,7 +36,7 @@ newTalent{
 	info = function(self, t)
 		local speed = t.getSpeed(self, t) * 100
 		local duration = t.getDuration(self, t)
-		return ([[When you move you gain %d%% movement speed for %d turns.  This effect stacks up to three times but can only occur once per turn.]]):format(speed, duration)
+		return ([[When you move you gain %d%% movement speed for %d turns.  This effect stacks up to three times but can only occur once per turn.]]):tformat(speed, duration)
 	end,
 }
 
@@ -60,7 +60,7 @@ newTalent{
 		local speed = t.getSpeed(self, t) * 100
 		local duration = t.getDuration(self, t)
 		return ([[When you use a non-instant chronomancy spell you gain %d%% attack, spell, and mind speed for %d turns.  This effect stacks up to three times but can only occur once per turn.
-		]]):format(speed, duration)
+		]]):tformat(speed, duration)
 	end,
 }
 
@@ -84,7 +84,7 @@ newTalent{
 	info = function(self, t)
 		local duration = t.getDuration(self, t)
 		local speed = t.getSpeed(self, t) * 100
-		return ([[Increases your global speed by %d%% for %d game turns.]]):format(speed, duration)
+		return ([[Increases your global speed by %d%% for %d game turns.]]):tformat(speed, duration)
 	end,
 }
 
@@ -105,7 +105,7 @@ newTalent{
 			self.energy.value = self.energy.value + (t.getDuration(self, t) * 1000)
 			self:setEffect(self.EFF_TIME_STOP, 1, {power=100})
 			
-			game.logSeen(self, "#STEEL_BLUE#%s has stopped time!#LAST#", self.name:capitalize())
+			game.logSeen(self, "#STEEL_BLUE#%s has stopped time!#LAST#", self:getName():capitalize())
 			game:playSoundNear(self, "talents/heal")
 		end)
 		return true
@@ -113,6 +113,6 @@ newTalent{
 	info = function(self, t)
 		local duration = t.getDuration(self, t)
 		local reduction = t.getReduction(self, t)
-		return ([[Gain %d turns.  During this time your damage will be reduced by %d%%.]]):format(duration, reduction)
+		return ([[Gain %d turns.  During this time your damage will be reduced by %d%%.]]):tformat(duration, reduction)
 	end,
 }

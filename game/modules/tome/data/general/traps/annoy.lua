@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 newEntity{ define_as = "TRAP_ANNOY",
-	type = "annoy", subtype="annoy", id_by_type=true, unided_name = "trap",
+	type = "annoy", subtype="annoy", id_by_type=true, unided_name = _t"trap",
 	display = '^',
 	triggered = function() end,
 }
@@ -29,9 +29,9 @@ newEntity{ base = "TRAP_ANNOY",
 	disarm_power = resolvers.clscale(36,25,10,0.5),
 	rarity = 3, level_range = {5, nil},
 	color=colors.BLUE,
-	message = "@Target@ seems less active.",
-	unided_name = "pattern of glyphs",
-	desc = function(self) return "Disrupts activated talents." end,
+	message = _t"@Target@ seems less active.",
+	unided_name = _t"pattern of glyphs",
+	desc = function(self) return _t"Disrupts activated talents." end,
 	triggered = function(self, x, y, who)
 		local tids = {}
 		for tid, lev in pairs(who.talents) do
@@ -54,9 +54,9 @@ newEntity{ base = "TRAP_ANNOY",
 	disarm_power = resolvers.clscale(40,30,15,0.5),
 	rarity = 3, level_range = {30, nil},
 	color=colors.ORCHID,
-	message = "@Target@ triggers a burning curse!",
-	unided_name = "dark pentagram",
-	desc = function(self) return ("Afflicts the target with a curse: talents inflict %d fire damage and have increased cooldowns."):format(self.dam) end,
+	message = _t"@Target@ triggers a burning curse!",
+	unided_name = _t"dark pentagram",
+	desc = function(self) return (_t"Afflicts the target with a curse: talents inflict %d fire damage and have increased cooldowns."):tformat(self.dam) end,
 	dam = resolvers.clscale(60, 50, 15, 0.75, 25),
 	pressure_trap = true,
 	triggered = function(self, x, y, who)

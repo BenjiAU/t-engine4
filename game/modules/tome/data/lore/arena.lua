@@ -1,8 +1,8 @@
 newLore{
 	id = "arena-scoring",
 	category = "arena",
-	name = "Arena for dummies",
-	lore = [[#{italic}#You find a note with some highlighted words...
+	name = _t"Arena for dummies",
+	lore = _t[[#{italic}#You find a note with some highlighted words...
 #{bold}#SCORING IN THE ARENA
 
 #{normal}#The rules of the arena are simple.

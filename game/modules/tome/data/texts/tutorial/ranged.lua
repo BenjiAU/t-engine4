@@ -22,7 +22,7 @@ if not game.player.tutored_levels2 then
 	game.player.tutored_levels2 = true
 end
 
-return [[Ranged combat typically revolves around firing arrows, slinging stones, or casting spells.
+return _t[[Ranged combat typically revolves around firing arrows, slinging stones, or casting spells.
 You have been given a bow, which you wield with both hands.
 Arrows are infinite but need reloading from time to time, by waiting, resting or walking around. You can add special arrows to your quiver for extra damage and/or effects.
 To fire an arrow, use the Shoot talent. The target interface will pop-up, just like for other talents.

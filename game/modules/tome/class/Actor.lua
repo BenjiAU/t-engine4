@@ -610,7 +610,7 @@ function _M:actBase()
 	if air_level then
 		if not air_condition or not self.can_breath[air_condition] or self.can_breath[air_condition] <= 0 then
 			self.is_suffocating = true
-			self:suffocate(-air_level, self, air_condition == "water" and "drowned to death" or nil)
+			self:suffocate(-air_level, self, air_condition == "water" and _t"drowned to death" or nil)
 			self.force_suffocate = nil
 		end
 	end
@@ -724,7 +724,7 @@ function _M:act()
 		else
 			-- We are saved for this turn
 			self.paralyzed_counter = self.paralyzed_counter - 100
-			game.logSeen(self, "%s temporarily fights the paralyzation.", self.name:capitalize())
+			game.logSeen(self, "%s temporarily fights the paralyzation.", self:getName():capitalize())
 		end
 	end
 	if self:attr("stoned") then self.energy.value = 0 end
@@ -1352,8 +1352,8 @@ function _M:teleportRandom(x, y, dist, min_dist)
 		self:move(pos[1], pos[2], true)
 		teleported = true
 
-		if self.runStop then self:runStop("teleported") end
-		if self.restStop then self:restStop("teleported") end
+		if self.runStop then self:runStop(_t"teleported") end
+		if self.restStop then self:restStop(_t"teleported") end
 
 		-- after moving
 		if self:attr("defense_on_teleport") or self:attr("resist_all_on_teleport") or self:attr("effect_reduction_on_teleport") then
@@ -1559,27 +1559,27 @@ function _M:allowedRanks()
 end
 
 function _M:TextRank()
-	local rank, color = "normal", "#ANTIQUE_WHITE#"
-	if self.rank == 1 then rank, color = "critter", "#C0C0C0#"
-	elseif self.rank == 2 then rank, color = "normal", "#ANTIQUE_WHITE#"
-	elseif self.rank == 3 then rank, color = "elite", "#YELLOW#"
-	elseif self.rank == 3.2 then rank, color = "rare", "#SALMON#"
-	elseif self.rank == 3.5 then rank, color = "unique", "#SANDY_BROWN#"
-	elseif self.rank == 4 then rank, color = "boss", "#ORANGE#"
-	elseif self.rank == 5 then rank, color = "elite boss", "#GOLD#"
-	elseif self.rank >= 10 then rank, color = "god", "#FF4000#"
+	local rank, color = _t"normal", "#ANTIQUE_WHITE#"
+	if self.rank == 1 then rank, color = _t"critter", "#C0C0C0#"
+	elseif self.rank == 2 then rank, color = _t"normal", "#ANTIQUE_WHITE#"
+	elseif self.rank == 3 then rank, color = _t"elite", "#YELLOW#"
+	elseif self.rank == 3.2 then rank, color = _t"rare", "#SALMON#"
+	elseif self.rank == 3.5 then rank, color = _t"unique", "#SANDY_BROWN#"
+	elseif self.rank == 4 then rank, color = _t"boss", "#ORANGE#"
+	elseif self.rank == 5 then rank, color = _t"elite boss", "#GOLD#"
+	elseif self.rank >= 10 then rank, color = _t"god", "#FF4000#"
 	end
 	return rank, color
 end
 
 function _M:TextSizeCategory()
-	local sizecat = "medium"
-	if self.size_category <= 1 then sizecat = "tiny"
-	elseif self.size_category == 2 then sizecat = "small"
-	elseif self.size_category == 3 then sizecat = "medium"
-	elseif self.size_category == 4 then sizecat = "big"
-	elseif self.size_category == 5 then sizecat = "huge"
-	elseif self.size_category >= 6 then sizecat = "gargantuan"
+	local sizecat = _t"medium"
+	if self.size_category <= 1 then sizecat = _t"tiny"
+	elseif self.size_category == 2 then sizecat = _t"small"
+	elseif self.size_category == 3 then sizecat = _t"medium"
+	elseif self.size_category == 4 then sizecat = _t"big"
+	elseif self.size_category == 5 then sizecat = _t"huge"
+	elseif self.size_category >= 6 then sizecat = _t"gargantuan"
 	end
 	return sizecat
 end
@@ -1661,12 +1661,17 @@ function _M:getCombatStats(type, inven_id, item)
 	if type == "psionic" then self:attr("use_psi_combat", -1) end
 	return {obj=o, atk=atk, dmg=dmg, apr=apr, crit=crit, crit_power=crit_power or 0, aspeed=aspeed, range=range, mspeed=mspeed, archery=archery, mean=mean, ammo=ammo, block=mean.block, talented=mean.talented}
 end
-
+-- Gets the full name of the Actor
+function _M:getName()
+	-- I18N actor names.
+	local name = _t(self.name) or _t"actor"
+	return name
+end
 function _M:tooltip(x, y, seen_by)
 	if seen_by and not seen_by:canSee(self) then return end
-	local factcolor, factstate, factlevel = "#ANTIQUE_WHITE#", "neutral", Faction:factionReaction(self.faction, game.player.faction)
-	if factlevel < 0 then factcolor, factstate = "#LIGHT_RED#", "hostile"
-	elseif factlevel > 0 then factcolor, factstate = "#LIGHT_GREEN#", "friendly"
+	local factcolor, factstate, factlevel = "#ANTIQUE_WHITE#", _t"neutral", Faction:factionReaction(self.faction, game.player.faction)
+	if factlevel < 0 then factcolor, factstate = "#LIGHT_RED#", _t"hostile"
+	elseif factlevel > 0 then factcolor, factstate = "#LIGHT_GREEN#", _t"friendly"
 	end
 
 	-- Debug feature, mousing over with ctrl pressed will give detailed FOV info
@@ -1681,57 +1686,57 @@ function _M:tooltip(x, y, seen_by)
 		print("==============================================")
 	end
 
-	local pfactcolor, pfactstate, pfactlevel = "#ANTIQUE_WHITE#", "neutral", self:reactionToward(game.player)
-	if pfactlevel < 0 then pfactcolor, pfactstate = "#LIGHT_RED#", "hostile"
-	elseif pfactlevel > 0 then pfactcolor, pfactstate = "#LIGHT_GREEN#", "friendly"
+	local pfactcolor, pfactstate, pfactlevel = "#ANTIQUE_WHITE#", _t"neutral", self:reactionToward(game.player)
+	if pfactlevel < 0 then pfactcolor, pfactstate = "#LIGHT_RED#", _t"hostile"
+	elseif pfactlevel > 0 then pfactcolor, pfactstate = "#LIGHT_GREEN#", _t"friendly"
 	end
 
 	local rank, rank_color = self:TextRank()
 
 	local ts = tstring{}
-	ts:add({"uid",self.uid}) ts:merge(rank_color:toTString()) ts:add(self.name, {"color", "WHITE"})
-	if self.type == "humanoid" or self.type == "giant" then ts:add({"font","italic"}, "(", self.female and "female" or "male", ")", {"font","normal"}, true) else ts:add(true) end
-	ts:add(self.type:capitalize(), " / ", self.subtype:capitalize(), true)
-	ts:add("Rank: ") ts:merge(rank_color:toTString()) ts:add(rank, {"color", "WHITE"}, true)
-	if self.hide_level_tooltip then ts:add({"color", 0, 255, 255}, "Level: unknown", {"color", "WHITE"}, true)
-	else ts:add({"color", 0, 255, 255}, ("Level: %d"):format(self.level), {"color", "WHITE"}, true) end
-	if self:attr("invulnerable") then ts:add({"color", "PURPLE"}, "INVULNERABLE!", true) end
-	ts:add({"color", 255, 0, 0}, ("HP: %d (%d%%) #GREEN#+%0.2f#LAST#"):format(self.life, self.life * 100 / self.max_life, self.life_regen * util.bound(self.healing_factor or 1)), {"color", "WHITE"})
+	ts:add({"uid",self.uid}) ts:merge(rank_color:toTString()) ts:add(self:getName(), {"color", "WHITE"})
+	if self.type == "humanoid" or self.type == "giant" then ts:add({"font","italic"}, "(", self.female and _t"female" or _t"male", ")", {"font","normal"}, true) else ts:add(true) end
+	ts:add(_t(self.type):capitalize(), " / ", _t(self.subtype):capitalize(), true)
+	ts:add(_t"Rank: ") ts:merge(rank_color:toTString()) ts:add(rank, {"color", "WHITE"}, true)
+	if self.hide_level_tooltip then ts:add({"color", 0, 255, 255}, _t"Level: unknown", {"color", "WHITE"}, true)
+	else ts:add({"color", 0, 255, 255}, ("Level: %d"):tformat(self.level), {"color", "WHITE"}, true) end
+	if self:attr("invulnerable") then ts:add({"color", "PURPLE"}, _t"INVULNERABLE!", true) end
+	ts:add({"color", 255, 0, 0}, ("HP: %d (%d%%) #GREEN#+%0.2f#LAST#"):tformat(self.life, self.life * 100 / self.max_life, self.life_regen * util.bound(self.healing_factor or 1)), {"color", "WHITE"})
 
 	-- Avoid cluttering tooltip if resources aren't relevant (add menu option?)
 	if game.player:knowTalentType("wild-gift/antimagic") then
 		if self:knowTalent(self.T_MANA_POOL) then
-			ts:add(("\nMana:  "..self.resources_def.mana.color.."%d / %d#LAST#"):format(self.mana, self.max_mana, true))
+			ts:add(("\nMana:  %s%d / %d#LAST#"):tformat(self.resources_def.mana.color, self.mana, self.max_mana, true))
 		end
 		if self:knowTalent(self.T_VIM_POOL) then
-			ts:add(("\nVim:  "..self.resources_def.vim.color.."%d / %d#LAST#"):format(self.vim, self.max_vim, true))
+			ts:add(("\nVim:  %s%d / %d#LAST#"):tformat(self.resources_def.vim.color, self.vim, self.max_vim, true))
 		end
 		if self:knowTalent(self.T_POSITIVE_POOL) then
-			ts:add(("\nPositive:  "..self.resources_def.positive.color.."%d / %d#LAST#"):format(self.positive, self.max_positive, true))
+			ts:add(("\nPositive:  %s%d / %d#LAST#"):tformat(self.resources_def.positive.color, self.positive, self.max_positive, true))
 		end
 		if self:knowTalent(self.T_NEGATIVE_POOL) then
-			ts:add(("\nNegative:  "..self.resources_def.negative.color.."%d / %d#LAST#"):format(self.negative, self.max_negative, true))
+			ts:add(("\nNegative:  %s%d / %d#LAST#"):tformat(self.resources_def.negative.color,self.negative, self.max_negative, true))
 		end
 	end
 
 	if self:knowTalent(self.T_SOLIPSISM) then
 		local psi_percent = 100*self.psi/self.max_psi
-		ts:add((("#7fffd4# / %d")):format(self.psi), (" (%d%%)"):format(psi_percent),{"color", "WHITE"})
+		ts:add((("#7fffd4# / %d")):format(self.psi), (" (%d%%)"):tformat(psi_percent),{"color", "WHITE"})
 	end
 	ts:add(true)
 	if self:attr("encased_in_ice") then
 		local eff = self:hasEffect(self.EFF_FROZEN)
-		ts:add({"color", 0, 255, 128}, ("Iceblock: %d"):format(eff.hp), {"color", "WHITE"}, true)
+		ts:add({"color", 0, 255, 128}, ("Iceblock: %d"):tformat(eff.hp), {"color", "WHITE"}, true)
 	end
 	if game.player:knowTalent(self.T_VIM_POOL) then
-		ts:add({"color", 0, 255, 128}, ("%sVim Value: %d#LAST#"):format(self.resources_def.vim.color, (game.player:getWil() * 0.5 + 1) * self.rank), {"color", "WHITE"}, true)
+		ts:add({"color", 0, 255, 128}, ("%sVim Value: %d#LAST#"):tformat(self.resources_def.vim.color, (game.player:getWil() * 0.5 + 1) * self.rank), {"color", "WHITE"}, true)
 	end
 	if game.player:knowTalent(self.T_PREDATOR) then
 		local predatorcount = game.player.predator_type_history and game.player.predator_type_history[self.type] or 0
 		local tp = game.player:getTalentFromId(game.player.T_PREDATOR)
 		local predatorATK = tp.getATK(game.player, tp) * predatorcount
 		local predatorAPR = tp.getAPR(game.player, tp) * predatorcount
-		ts:add({"color", 0, 255, 128}, ("#ffa0ff#Predator: +%d acc, +%d apr#LAST#"):format(predatorATK, predatorAPR), {"color", "WHITE"}, true)
+		ts:add({"color", 0, 255, 128}, ("#ffa0ff#Predator: +%d acc, +%d apr#LAST#"):tformat(predatorATK, predatorAPR), {"color", "WHITE"}, true)
 	end
 
 	--ts:add(("Stats: %d / %d / %d / %d / %d / %d"):format(self:getStr(), self:getDex(), self:getCon(), self:getMag(), self:getWil(), self:getCun()), true)
@@ -1745,11 +1750,11 @@ function _M:tooltip(x, y, seen_by)
 
 	local resists = tstring{}
 	local first = true
-	ts:add({"color", "ANTIQUE_WHITE"}, "Resists: ")
+	ts:add({"color", "ANTIQUE_WHITE"}, _t"Resists: ")
 	for t, _ in table.orderedPairs2(self.resists or {}, dt_order) do
 		local v = self:combatGetResist(t)
 		if t == "all" or t == "absolute" then
-			ts:add({"color", "LIGHT_BLUE"}, tostring(math.floor(v)) .. "%", " ", {"color", "LAST"}, t..", ")
+			ts:add({"color", "LIGHT_BLUE"}, tostring(math.floor(v)) .. "%", " ", {"color", "LAST"}, _t(t)..", ")
 		elseif type(t) == "string" and math.abs(v) >= 20 then
 			local res = tostring(math.floor(v)) .. "%"
 			if first then first = false else ts:add(", ") end
@@ -1770,65 +1775,65 @@ function _M:tooltip(x, y, seen_by)
 	if ts[#ts] == ", " then table.remove(ts) end
 	ts:add(true)
 
-	ts:add("Hardiness/Armour: ", tostring(math.floor(self:combatArmorHardiness())), '% / ', tostring(math.floor(self:combatArmor())), true)
-	ts:add("Size: ", {"color", "ANTIQUE_WHITE"}, self:TextSizeCategory(), {"color", "WHITE"}, true)
+	ts:add(_t"Hardiness/Armour: ", tostring(math.floor(self:combatArmorHardiness())), '% / ', tostring(math.floor(self:combatArmor())), true)
+	ts:add(_t"Size: ", {"color", "ANTIQUE_WHITE"}, self:TextSizeCategory(), {"color", "WHITE"}, true)
 
-	ts:add("#FFD700#Accuracy#FFFFFF#: ", self:colorStats("combatAttack"), "  ")
-	ts:add("#0080FF#Defense#FFFFFF#:  ", self:colorStats("combatDefense"), true)
-	ts:add("#FFD700#P. power#FFFFFF#: ", self:colorStats("combatPhysicalpower"), "  ")
-	ts:add("#0080FF#P. save#FFFFFF#:  ", self:colorStats("combatPhysicalResist"), true)
-	ts:add("#FFD700#S. power#FFFFFF#: ", self:colorStats("combatSpellpower"), "  ")
-	ts:add("#0080FF#S. save#FFFFFF#:  ", self:colorStats("combatSpellResist"), true)
-	ts:add("#FFD700#M. power#FFFFFF#: ", self:colorStats("combatMindpower"), "  ")
-	ts:add("#0080FF#M. save#FFFFFF#:  ", self:colorStats("combatMentalResist"), true)
+	ts:add(_t"#FFD700#Accuracy#FFFFFF#: ", self:colorStats("combatAttack"), "  ")
+	ts:add(_t"#0080FF#Defense#FFFFFF#:  ", self:colorStats("combatDefense"), true)
+	ts:add(_t"#FFD700#P. power#FFFFFF#: ", self:colorStats("combatPhysicalpower"), "  ")
+	ts:add(_t"#0080FF#P. save#FFFFFF#:  ", self:colorStats("combatPhysicalResist"), true)
+	ts:add(_t"#FFD700#S. power#FFFFFF#: ", self:colorStats("combatSpellpower"), "  ")
+	ts:add(_t"#0080FF#S. save#FFFFFF#:  ", self:colorStats("combatSpellResist"), true)
+	ts:add(_t"#FFD700#M. power#FFFFFF#: ", self:colorStats("combatMindpower"), "  ")
+	ts:add(_t"#0080FF#M. save#FFFFFF#:  ", self:colorStats("combatMentalResist"), true)
 	self:triggerHook{"Actor:tooltip", ts=ts, x=x, y=y, seen_by=seen_by}
 
 	ts:add({"color", "WHITE"})
 
 	if (150 + (self.combat_critical_power or 0) ) > 150 then
-		ts:add("Critical Mult: ", ("%d%%"):format(150 + (self.combat_critical_power or 0) ), true )
+		ts:add(_t"Critical Mult: ", ("%d%%"):format(150 + (self.combat_critical_power or 0) ), true )
 	end
 
 	if self.summon_time then
-		ts:add("Time left: ", {"color", "ANTIQUE_WHITE"}, ("%d"):format(self.summon_time), {"color", "WHITE"}, true)
+		ts:add(_t"Time left: ", {"color", "ANTIQUE_WHITE"}, ("%d"):format(self.summon_time), {"color", "WHITE"}, true)
 	end
 	-- Short names of wielded weapons/ammo
 	if self:getInven("MAINHAND") then
 		for i, o in ipairs(self:getInven("MAINHAND")) do
-			local tst = ("#LIGHT_BLUE#Main:#LAST#"..o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
+			local tst = ("#LIGHT_BLUE#Main:#LAST#%s"):tformat(o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
 			tst = tst:splitLines(game.tooltip.max-1, game.tooltip.font, 2)
 			tst = tst:extractLines(true)[1]
 			local stats = self:getCombatStats("mainhand", self.INVEN_MAINHAND, i )
-			tst:add(" (#RED#"..math.floor(stats.dmg).."#LAST#)")
+			if stats then tst:add(" (#RED#"..math.floor(stats.dmg).."#LAST#)") end
 			table.append(ts, tst)
 			ts:add(true)
 		end
 	end
 	if self:getInven("OFFHAND") then
 		for i, o in ipairs(self:getInven("OFFHAND")) do
-			local tst = ("#LIGHT_BLUE#Off :#LAST#"..o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
+			local tst = ("#LIGHT_BLUE#Off :#LAST#%s"):tformat(o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
 			tst = tst:splitLines(game.tooltip.max-1, game.tooltip.font, 2)
 			tst = tst:extractLines(true)[1]			
 			local stats = self:getCombatStats("offhand", self.INVEN_OFFHAND, i)
-			tst:add(" (#RED#"..math.floor(stats.dmg).."#LAST#)")
+			if stats then tst:add(" (#RED#"..math.floor(stats.dmg).."#LAST#)") end
 			table.append(ts, tst)
 			ts:add(true)
 		end
 	end
 	if self:getInven("PSIONIC_FOCUS") and self:attr("psi_focus_combat") then
 		for i, o in ipairs(self:getInven("PSIONIC_FOCUS")) do
-			local tst = ("#LIGHT_BLUE#Psi :#LAST#"..o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
+			local tst = ("#LIGHT_BLUE#Psi :#LAST#%s"):tformat(o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
 			tst = tst:splitLines(game.tooltip.max-1, game.tooltip.font, 2)
 			tst = tst:extractLines(true)[1]
 			local stats = self:getCombatStats("psionic", self.INVEN_PSIONIC_FOCUS, i)
-			tst:add(" (#RED#"..math.floor(stats.dmg).."#LAST#)")
+			if stats then tst:add(" (#RED#"..math.floor(stats.dmg).."#LAST#)") end
 			table.append(ts, tst)
 			ts:add(true)
 		end
 	end
 	if self:getInven("QUIVER") then
 		for i, o in ipairs(self:getInven("QUIVER")) do
-			local tst = ("#LIGHT_BLUE#Ammo:#LAST#"..o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
+			local tst = ("#LIGHT_BLUE#Ammo:#LAST#%s"):tformat(o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
 			tst = tst:splitLines(game.tooltip.max-1, game.tooltip.font, 2)
 			tst = tst:extractLines(true)[1]
 			table.append(ts, tst)
@@ -1839,7 +1844,7 @@ function _M:tooltip(x, y, seen_by)
 		if self:getInven("HANDS") then
 			-- Gloves merge to the Actor.combat table so we have to special case this to display the object but look at self.combat for the damage
 			for i, o in ipairs(self:getInven("HANDS")) do
-				local tst = ("#LIGHT_BLUE#Unarmed:#LAST#"..o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
+				local tst = ("#LIGHT_BLUE#Unarmed:#LAST#%s"):tformat(o:getShortName({force_id=true, do_color=true, no_add_name=true})):toTString()
 				tst = tst:splitLines(game.tooltip.max-1, game.tooltip.font, 2)
 				tst = tst:extractLines(true)[1]
 				local stats = self:getCombatStats("barehand", self.INVEN_MAINHAND, i)
@@ -1849,7 +1854,7 @@ function _M:tooltip(x, y, seen_by)
 			end
 		else
 			-- We have no gloves, just list the damage
-			local tst = ("#LIGHT_BLUE#Unarmed:#LAST#"):toTString()
+			local tst = (_t"#LIGHT_BLUE#Unarmed:#LAST#"):toTString()
 			tst = tst:splitLines(game.tooltip.max-1, game.tooltip.font, 2)
 			tst = tst:extractLines(true)[1]
 			local stats = self:getCombatStats("barehand", self.INVEN_MAINHAND, i)
@@ -1867,11 +1872,11 @@ function _M:tooltip(x, y, seen_by)
 		end
 	end
 
-	if retal > 0 then ts:add("Melee Retaliation: ", {"color", "RED"}, tostring(math.floor(retal)), {"color", "WHITE"}, true ) end
+	if retal > 0 then ts:add(_t"Melee Retaliation: ", {"color", "RED"}, tostring(math.floor(retal)), {"color", "WHITE"}, true ) end
 
 	if self.desc then ts:add(self.desc, true) end
 	if self.descriptor and self.descriptor.classes then
-		ts:add("Classes: ", table.concat(self.descriptor.classes or {}, ","), true)
+		ts:add(_t"Classes: ", table.concat(table.ts(self.descriptor.classes or {}, "birth descriptor name"), ","), true)
 	end
 
 	if self.custom_tooltip then
@@ -1882,16 +1887,16 @@ function _M:tooltip(x, y, seen_by)
 		end
 	end
 
-	if self.faction and Faction.factions[self.faction] then ts:add("Faction: ") ts:merge(factcolor:toTString()) ts:add(("%s (%s, %d)"):format(Faction.factions[self.faction].name, factstate, factlevel), {"color", "WHITE"}, true) end
-	if game.player ~= self then ts:add("Personal reaction: ") ts:merge(pfactcolor:toTString()) ts:add(("%s, %d"):format(pfactstate, pfactlevel), {"color", "WHITE"} ) end
+	if self.faction and Faction.factions[self.faction] then ts:add(_t"Faction: ") ts:merge(factcolor:toTString()) ts:add(("%s (%s, %d)"):format(Faction.factions[self.faction].name, factstate, factlevel), {"color", "WHITE"}, true) end
+	if game.player ~= self then ts:add(_t"Personal reaction: ") ts:merge(pfactcolor:toTString()) ts:add(("%s, %d"):format(pfactstate, pfactlevel), {"color", "WHITE"} ) end
 
-	ts:add(true, {"color", "ORANGE"}, "Sustained Talents: ",{"color", "WHITE"})
+	ts:add(true, {"color", "ORANGE"}, _t"Sustained Talents: ",{"color", "WHITE"})
 	for tid, act in pairs(self.sustain_talents) do
 		if act then ts:add(true, "- ", {"color", "LIGHT_GREEN"}, self:getTalentFromId(tid) and self:getTalentFromId(tid).name or "???", {"color", "WHITE"} ) end
 	end
-	if ts[#ts-1] == "Sustained Talents: " then table.remove(ts) table.remove(ts) table.remove(ts) table.remove(ts) end
+	if ts[#ts-1] == _t"Sustained Talents: " then table.remove(ts) table.remove(ts) table.remove(ts) table.remove(ts) end
 
-	ts:add(true, {"color", "ORANGE"}, "Temporary Status Effects: ",{"color", "WHITE"})
+	ts:add(true, {"color", "ORANGE"}, _t"Temporary Status Effects: ",{"color", "WHITE"})
 
 	local effmental = tstring{}
 	local effphysical = tstring{}
@@ -2026,9 +2031,9 @@ function _M:onHeal(value, src)
 			game.flyers:add(sx, sy, 30, rng.float(-3, -2), (rng.range(0,2)-1) * 0.5, tostring(math.ceil(value)), {255,255,0})
 		end
 		if psi_heal > 0 then
-			game:delayedLogDamage(src or self, self, -value-psi_heal, ("#LIGHT_GREEN#%d healing #LAST##AQUAMARINE#(%d psi heal)#LAST#"):format(value, psi_heal), false)
+			game:delayedLogDamage(src or self, self, -value-psi_heal, ("#LIGHT_GREEN#%d healing #LAST##AQUAMARINE#(%d psi heal)#LAST#"):tformat(value, psi_heal), false)
 		else
-			game:delayedLogDamage(src or self, self, -value, ("#LIGHT_GREEN#%d healing#LAST#"):format(value), false)
+			game:delayedLogDamage(src or self, self, -value, ("#LIGHT_GREEN#%d healing#LAST#"):tformat(value), false)
 		end
 	end
 	return value
@@ -2093,7 +2098,7 @@ function _M:onTakeHit(value, src, death_note)
 			local ox, oy = self.x, self.y
 			self:move(nx, ny, true)
 			game.level.map:particleEmitter(ox, oy, math.max(math.abs(nx-ox), math.abs(ny-oy)), "lightning", {tx=nx-ox, ty=ny-oy})
-			game:delayedLogDamage(src or {}, self, 0, ("#STEEL_BLUE#(%d shifted)#LAST#"):format(value), nil)
+			game:delayedLogDamage(src or {}, self, 0, ("#STEEL_BLUE#(%d shifted)#LAST#"):tformat(value), nil)
 			return 0
 		end
 	end
@@ -2101,7 +2106,7 @@ function _M:onTakeHit(value, src, death_note)
 	if self:attr("retribution") then
 	-- Absorb damage into the retribution
 		local absorb = math.min(value/2, self.retribution_absorb)
-		game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):format(absorb), false)
+		game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):tformat(absorb), false)
 		if absorb < self.retribution_absorb then
 			self.retribution_absorb = self.retribution_absorb - absorb
 			value = value - absorb
@@ -2115,7 +2120,7 @@ function _M:onTakeHit(value, src, death_note)
 			self:startTalentCooldown(self.T_RETRIBUTION)
 
 			-- Explode!
-			game.logSeen(self, "%s unleashes the stored damage in retribution!", self.name:capitalize())
+			game.logSeen(self, "%s unleashes the stored damage in retribution!", self:getName():capitalize())
 			local tg = {type="ball", range=0, radius=self:getTalentRange(self:getTalentFromId(self.T_RETRIBUTION)), selffire=false, talent=t}
 			local grids = self:project(tg, self.x, self.y, DamageType.LIGHT, dam)
 			game.level.map:particleEmitter(self.x, self.y, tg.radius, "sunburst", {radius=tg.radius, grids=grids, tx=self.x, ty=self.y})
@@ -2174,8 +2179,8 @@ function _M:onTakeHit(value, src, death_note)
 			game:delayedLogMessage(self, src,  "displacement_shield"..(self.displacement_shield_target.uid or ""), "#CRIMSON##Source# teleports some damage to #Target#!")
 			local displaced = math.min(value, self.displacement_shield)
 			self.displacement_shield_target:takeHit(displaced, src)
-			game:delayedLogDamage(src, self, 0, ("#CRIMSON#(%d teleported)#LAST#"):format(displaced), false)
-			game:delayedLogDamage(src, self.displacement_shield_target, displaced, ("#CRIMSON#%d teleported#LAST#"):format(displaced), false)
+			game:delayedLogDamage(src, self, 0, ("#CRIMSON#(%d teleported)#LAST#"):tformat(displaced), false)
+			game:delayedLogDamage(src, self.displacement_shield_target, displaced, ("#CRIMSON#%d teleported#LAST#"):tformat(displaced), false)
 			if self.displacement_shield and displaced < self.displacement_shield then
 				self.displacement_shield = self.displacement_shield - displaced
 				value = 0
@@ -2189,7 +2194,7 @@ function _M:onTakeHit(value, src, death_note)
 	if value > 0 and self:attr("time_shield") then
 		-- Absorb damage into the time shield
 		self.time_shield_absorb = self.time_shield_absorb or 0
-		game:delayedLogDamage(src, self, 0, ("#STEEL_BLUE#(%d to time)#LAST#"):format(math.min(value, self.time_shield_absorb)), false)
+		game:delayedLogDamage(src, self, 0, ("#STEEL_BLUE#(%d to time)#LAST#"):tformat(math.min(value, self.time_shield_absorb)), false)
 		if value < self.time_shield_absorb then
 			self.time_shield_absorb = self.time_shield_absorb - value
 			value = 0
@@ -2228,7 +2233,7 @@ function _M:onTakeHit(value, src, death_note)
 			adjusted_value = self.damage_shield_absorb
 			self.damage_shield_absorb = 0
 		end
-		game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):format(adjusted_value), false)
+		game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):tformat(adjusted_value), false)
 		if reflection and reflect_damage and reflection > 0 and reflect_damage > 0 and src.y and src.x and not src.dead and not self.__damage_shield_reflect_running then
 			local a = game.level.map(src.x, src.y, Map.ACTOR)
 			if a and self:reactionToward(a) < 0 then
@@ -2236,7 +2241,7 @@ function _M:onTakeHit(value, src, death_note)
 				self.__damage_shield_reflect_running = true
 				a:takeHit(reflected, self)
 				self.__damage_shield_reflect_running = nil
-				game:delayedLogDamage(self, src, reflected, ("#SLATE#%d reflected#LAST#"):format(reflected), false)
+				game:delayedLogDamage(self, src, reflected, ("#SLATE#%d reflected#LAST#"):tformat(reflected), false)
 				game:delayedLogMessage(self, src, "reflection" ,"#CRIMSON##Source# reflects damage back to #Target#!#LAST#")
 			end
 		end
@@ -2261,8 +2266,8 @@ function _M:onTakeHit(value, src, death_note)
 			game:delayedLogMessage(self, src,  "displacement_shield"..(shadow.uid or ""), "#CRIMSON##Source# shares some damage with a shadow!")
 			local displaced = math.min(value * self.shadow_empathy / 100, shadow.life)
 			shadow:takeHit(displaced, src)
-			game:delayedLogDamage(src, self, 0, ("#PINK#(%d linked)#LAST#"):format(displaced), false)
-			game:delayedLogDamage(src, shadow, displaced, ("#PINK#%d linked#LAST#"):format(displaced), false)
+			game:delayedLogDamage(src, self, 0, ("#PINK#(%d linked)#LAST#"):tformat(displaced), false)
+			game:delayedLogDamage(src, shadow, displaced, ("#PINK#%d linked#LAST#"):tformat(displaced), false)
 			value = value - displaced
 		end
 	end
@@ -2282,7 +2287,7 @@ function _M:onTakeHit(value, src, death_note)
 			local oldval = value
 			value = self:callTalent(self.T_DEFLECTION, "do_onTakeHit", tal, value)
 			if value ~= oldval then
-				game:delayedLogDamage(src, self, 0, ("#SLATE#(%d deflected)#LAST#"):format(oldval - value), false)
+				game:delayedLogDamage(src, self, 0, ("#SLATE#(%d deflected)#LAST#"):tformat(oldval - value), false)
 			end
 		end
 	end
@@ -2314,7 +2319,7 @@ function _M:onTakeHit(value, src, death_note)
 			absorb = absorb - absorb * (util.bound(src:attr("iceblock_pierce") or 0, 0, 100)) / 100
 		end
 		eff.hp = eff.hp - value * absorb
-		game:delayedLogDamage(src or {}, self, 0, ("#STEEL_BLUE#(%d to ice)#LAST#"):format(value*absorb), nil)
+		game:delayedLogDamage(src or {}, self, 0, ("#STEEL_BLUE#(%d to ice)#LAST#"):tformat(value*absorb), nil)
 		value = value * (1 - absorb)
 		if eff.hp < 0 and not eff.begone then
 			game:onTickEnd(function() self:removeEffect(self.EFF_FROZEN) end)
@@ -2351,7 +2356,7 @@ function _M:onTakeHit(value, src, death_note)
 	-- Resonance Field, must be called after Feedback gains
 	if self:attr("resonance_field") then
 		local absorb = math.min(value/2, self.resonance_field_absorb)
-		game:delayedLogDamage(src, self, 0, ("#SLATE#(%d resonance)#LAST#"):format(absorb), false)
+		game:delayedLogDamage(src, self, 0, ("#SLATE#(%d resonance)#LAST#"):tformat(absorb), false)
 		if absorb < self.resonance_field_absorb then
 			self.resonance_field_absorb = self.resonance_field_absorb - absorb
 		else
@@ -2409,7 +2414,7 @@ function _M:onTakeHit(value, src, death_note)
 	if self:attr("stoned") and value >= self.max_life * 0.3 then
 		-- Make the damage high enough to kill it
 		value = self.max_life + 1
-		game.logSeen(self, "%s shatters into pieces!", self.name:capitalize())
+		game.logSeen(self, "%s shatters into pieces!", self:getName():capitalize())
 	end
 
 	-- Adds hate
@@ -2420,19 +2425,19 @@ function _M:onTakeHit(value, src, death_note)
 		if value / self.max_life >= 0.15 then
 			-- you take a big hit..adds 2 + 2 for each 5% over 15%
 			hateGain = hateGain + 2 + (((value / self.max_life) - 0.15) * 100 * 0.5)
-			hateMessage = "#F53CBE#You fight through the pain!"
+			hatemessage = _t"#F53CBE#You fight through the pain!"
 		end
 
 		if value / self.max_life >= 0.05 and (self.life - value) / self.max_life < 0.25 then
 			-- you take a hit with low health
 			hateGain = hateGain + 4
-			hateMessage = "#F53CBE#Your hatred grows even as your life fades!"
+			hatemessage = _t"#F53CBE#Your hatred grows even as your life fades!"
 		end
 
 		if hateGain >= 1 then
 			self:incHate(hateGain)
 			if hateMessage then
-				game.logPlayer(self, hateMessage.." (+%d hate)", hateGain)
+				game.logPlayer(self, ("%s (+%d hate)"):tformat(hateMessage), hateGain)
 			end
 		end
 	end
@@ -2444,13 +2449,13 @@ function _M:onTakeHit(value, src, death_note)
 		if value / src.max_life > 0.33 then
 			-- you deliver a big hit
 			hateGain = hateGain + src.hate_per_powerful_hit
-			hateMessage = "#F53CBE#Your powerful attack feeds your madness!"
+			hatemessage = _t"#F53CBE#Your powerful attack feeds your madness!"
 		end
 
 		if hateGain >= 0.1 then
 			src.hate = math.min(src.max_hate, src.hate + hateGain)
 			if hateMessage then
-				game.logPlayer(src, hateMessage.." (+%d hate)", hateGain)
+				game.logPlayer(src, ("%s (+%d hate)"):tformat(hateMessage), hateGain)
 			end
 		end
 	end
@@ -2476,7 +2481,7 @@ function _M:onTakeHit(value, src, death_note)
 			a:removeAllMOs()
 			a.x, a.y = nil, nil
 			game.zone:addEntity(game.level, a, "actor", x, y)
-			game.logSeen(self, "%s splits in two!", self.name:capitalize())
+			game.logSeen(self, "%s splits in two!", self:getName():capitalize())
 			value = value / 2
 		end
 	end
@@ -2493,8 +2498,8 @@ function _M:onTakeHit(value, src, death_note)
 			self:incPsi(-damage_to_psi)
 		end
 		local mindcolor = DamageType:get(DamageType.MIND).text_color or "#aaaaaa#"
-		game:delayedLogMessage(self, nil, "Solipsism hit", mindcolor.."#Source# converts some damage to Psi!")
-		game:delayedLogDamage(src, self, damage_to_psi*psi_damage_resist, ("%s%d %s#LAST#"):format(mindcolor, damage_to_psi*psi_damage_resist, "to psi"), false)
+		game:delayedLogMessage(self, nil, "Solipsism hit", ("%s#Source# converts some damage to Psi!"):tformat(mindcolor))
+		game:delayedLogDamage(src, self, damage_to_psi*psi_damage_resist, ("%s%d %s#LAST#"):tformat(mindcolor, damage_to_psi*psi_damage_resist, _t"to psi"), false)
 
 		value = value - damage_to_psi
 	end
@@ -2528,15 +2533,6 @@ function _M:onTakeHit(value, src, death_note)
 		end
 	end
 
-	if self:attr("unstoppable") then
-		if value > self.life - 1 then
-			game:delayedLogDamage(src, self, 0, ("#RED#(%d refused)#LAST#"):format(value - (self.life - 1)), false)
-			value = self.life - 1
-			if self.life <= 1 then value = 0 end
-			game:delayedLogMessage(self, nil, "unstoppable", "#RED##Source# is unstoppable!")
-		end
-	end
-
 	if value >= self.life then
 		local tal = self:isTalentActive(self.T_SECOND_LIFE)
 		if tal then
@@ -2545,7 +2541,7 @@ function _M:onTakeHit(value, src, death_note)
 			self.life = 1
 			self:forceUseTalent(self.T_SECOND_LIFE, {ignore_energy=true})
 			local value = self:heal(sl, self)
-			game.logSeen(self, "#YELLOW#%s has been healed by a blast of positive energy!#LAST#", self.name:capitalize())
+			game.logSeen(self, "#YELLOW#%s has been healed by a blast of positive energy!#LAST#", self:getName():capitalize())
 			if value > 0 then
 				if self.player then
 					self:setEmote(require("engine.Emote").new("The Sun Protects!", 45))
@@ -2566,7 +2562,7 @@ function _M:onTakeHit(value, src, death_note)
 		if rng.percent(t.getChance(self, t)) then
 			value = 0
 			self.life = self.max_life
-			game.logSeen(self, "%s fades for a moment and then reforms whole again!", self.name:capitalize())
+			game.logSeen(self, "%s fades for a moment and then reforms whole again!", self:getName():capitalize())
 			game.level.map:particleEmitter(self.x, self.y, 1, "teleport_out")
 			game:playSoundNear(self, "talents/heal")
 			game.level.map:particleEmitter(self.x, self.y, 1, "teleport_in")
@@ -2656,7 +2652,7 @@ function _M:onTakeHit(value, src, death_note)
 			value = value - abs
 			self:removeEffect(self.EFF_ELDRITCH_STONE)
 		end
-		game:delayedLogDamage(src, self, 0, ("#SLATE#(%d to stone)#LAST#"):format(abs), false)
+		game:delayedLogDamage(src, self, 0, ("#SLATE#(%d to stone)#LAST#"):tformat(abs), false)
 	end
 
 	if self:knowTalent(self.T_STONESHIELD) and not self.turn_procs.stoneshield then
@@ -2673,9 +2669,9 @@ function _M:onTakeHit(value, src, death_note)
 			self:removeEffect(self.EFF_STONE_LINK)
 		else
 			game:delayedLogMessage(eff.src, self, "stone_link"..(self.uid or ""), "#OLIVE_DRAB##Source# redirects damage from #Target# to %s!#LAST#", string.his_her_self(eff.src))
-			game:delayedLogDamage(src, self, 0, ("#OLIVE_DRAB#(%d redirected)#LAST#"):format(value), false)
+			game:delayedLogDamage(src, self, 0, ("#OLIVE_DRAB#(%d redirected)#LAST#"):tformat(value), false)
 			eff.src:takeHit(value, src)
-			game:delayedLogDamage(src, eff.src, value, ("#OLIVE_DRAB#%d redirected#LAST#"):format(value), false)
+			game:delayedLogDamage(src, eff.src, value, ("#OLIVE_DRAB#%d redirected#LAST#"):tformat(value), false)
 			value = 0
 		end
 	end
@@ -2705,6 +2701,16 @@ function _M:onTakeHit(value, src, death_note)
 	if self:knowTalent(self.T_DRACONIC_BODY) then
 		local t = self:getTalentFromId(self.T_DRACONIC_BODY)
 		t.trigger(self, t, value)
+	end
+
+	-- Needs to be done last, will break if any damage is taken between doing this and updating the actor's life
+	if self:attr("unstoppable") then
+		if value > self.life - 1 then
+			game:delayedLogDamage(src, self, 0, ("#RED#(%d refused)#LAST#"):tformat(value - (self.life - 1)), false)
+			value = self.life - 1
+			if self.life <= 1 then value = 0 end
+			game:delayedLogMessage(self, nil, "unstoppable", "#RED##Source# is unstoppable!")
+		end
 	end
 
 	return value
@@ -2809,9 +2815,9 @@ function _M:die(src, death_note)
 	if self:attr("self_resurrect") and not self.no_resurrect then
 		self.in_resurrect = true
 		self:attr("self_resurrect", -1)
-		game.logSeen(self, self.self_resurrect_msg or "#LIGHT_RED#%s rises from the dead!", self.name:capitalize()) -- src, not self as the source, to make sure the player knows his doom ;>
+		game.logSeen(self, self.self_resurrect_msg or "#LIGHT_RED#%s rises from the dead!", self:getName():capitalize()) -- src, not self as the source, to make sure the player knows his doom ;>
 		local sx, sy = game.level.map:getTileToScreen(self.x, self.y, true)
-		game.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, -3, "RESURRECT!", {255,120,0})
+		game.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, -3, _t"RESURRECT!", {255,120,0})
 
 		local effs = {}
 
@@ -2984,7 +2990,7 @@ function _M:die(src, death_note)
 	if src and src.summoner and src.summoner_hate_per_kill then
 		if src.summoner.knowTalent and src.summoner:knowTalent(src.summoner.T_HATE_POOL) then
 			src.summoner.hate = math.min(src.summoner.max_hate, src.summoner.hate + src.summoner_hate_per_kill)
-			game.logPlayer(src.summoner, "%s feeds you hate from its latest victim. (+%d hate)", src.name:capitalize(), src.summoner_hate_per_kill)
+			game.logPlayer(src.summoner, "%s feeds you hate from its latest victim. (+%d hate)", src:getName():capitalize(), src.summoner_hate_per_kill)
 		end
 	end
 
@@ -3615,7 +3621,7 @@ function _M:levelup()
 		if self.level == 25 or self.level == 42 then
 			self.unused_prodigies = self.unused_prodigies + 1
 			if self.player and not config.settings.cheat and not self.silent_levelup then
-				Dialog:simpleLongPopup("Prodigy!", ("You have achieved #LIGHT_GREEN#level %d#WHITE# and gained a #LIGHT_GREEN#prodigy point#LAST#!\n\nProdigies are powerful talents with unique requirements that cannot be unlearned."):format(self.level), 400)
+				Dialog:simpleLongPopup(_t"Prodigy!", ("You have achieved #LIGHT_GREEN#level %d#WHITE# and gained a #LIGHT_GREEN#prodigy point#LAST#!\n\nProdigies are powerful talents with unique requirements that cannot be unlearned."):tformat(self.level), 400)
 			end
 		end
 		if self.level == 50 then
@@ -3623,7 +3629,7 @@ function _M:levelup()
 			self.unused_talents = self.unused_talents + 3
 			self.unused_generics = self.unused_generics + 3
 			if self.player and not config.settings.cheat and not self.silent_levelup then
-				Dialog:simpleLongPopup("Level 50!", "You have achieved #LIGHT_GREEN#level 50#WHITE#, congratulations!\n\nThis level is special, it granted you #LIGHT_GREEN#10#WHITE# more stat points, #LIGHT_GREEN#3#WHITE# more class talent points and #LIGHT_GREEN#3#WHITE# more generic talent points.\nNow go forward boldly and triumph!", 400)
+				Dialog:simpleLongPopup(_t"Level 50!", _t"You have achieved #LIGHT_GREEN#level 50#WHITE#, congratulations!\n\nThis level is special, it granted you #LIGHT_GREEN#10#WHITE# more stat points, #LIGHT_GREEN#3#WHITE# more class talent points and #LIGHT_GREEN#3#WHITE# more generic talent points.\nNow go forward boldly and triumph!", 400)
 			end
 		end
 	elseif type(self.no_points_on_levelup) == "function" then
@@ -3695,17 +3701,17 @@ function _M:levelup()
 	-- Notify party levelups
 	if self.x and self.y and game.party:hasMember(self) and not self.silent_levelup then
 		local x, y = game.level.map:getTileToScreen(self.x, self.y, true)
-		game.flyers:add(x, y, 80, 0.5, -2, "LEVEL UP!", {0,255,255})
-		game.log("#00ffff#Welcome to level %d [%s].", self.level, self.name:capitalize())
-		local more = "Press p to use them."
-		if game.player ~= self then more = "Select "..self.name.. " in the party list and press G to use them." end
+		game.flyers:add(x, y, 80, 0.5, -2, _t"LEVEL UP!", {0,255,255})
+		game.log("#00ffff#Welcome to level %d [%s].", self.level, self:getName():capitalize())
+		local more = _t"Press p to use them."
+		if game.player ~= self then more = ("Select %s in the party list and press G to use them."):tformat(self.name) end
 		local points = {}
-		if self.unused_stats > 0 then points[#points+1] = ("%d stat point(s)"):format(self.unused_stats) end
-		if self.unused_talents > 0 then points[#points+1] = ("%d class talent point(s)"):format(self.unused_talents) end
-		if self.unused_generics > 0 then points[#points+1] = ("%d generic talent point(s)"):format(self.unused_generics) end
-		if self.unused_talents_types > 0 then points[#points+1] = ("%d category point(s)"):format(self.unused_talents_types) end
-		if self.unused_prodigies > 0 then points[#points+1] = ("#VIOLET#%d prodigies point(s)#WHITE#"):format(self.unused_prodigies) end
-		if #points > 0 then game.log("%s has %s to spend. %s", self.name:capitalize(), table.concat(points, ", "), more) end
+		if self.unused_stats > 0 then points[#points+1] = ("%d stat point(s)"):tformat(self.unused_stats) end
+		if self.unused_talents > 0 then points[#points+1] = ("%d class talent point(s)"):tformat(self.unused_talents) end
+		if self.unused_generics > 0 then points[#points+1] = ("%d generic talent point(s)"):tformat(self.unused_generics) end
+		if self.unused_talents_types > 0 then points[#points+1] = ("%d category point(s)"):tformat(self.unused_talents_types) end
+		if self.unused_prodigies > 0 then points[#points+1] = ("#VIOLET#%d prodigies point(s)#WHITE#"):tformat(self.unused_prodigies) end
+		if #points > 0 then game.log("%s has %s to spend. %s", self:getName():capitalize(), table.concat(points, ", "), more) end
 
 		if self.level == 10 then world:gainAchievement("LEVEL_10", self) end
 		if self.level == 20 then world:gainAchievement("LEVEL_20", self) end
@@ -3840,7 +3846,7 @@ function _M:checkEncumbrance()
 
 		if self.x and self.y then
 			local sx, sy = game.level.map:getTileToScreen(self.x, self.y, true)
-			game.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, rng.float(-2.5, -1.5), "+ENCUMBERED!", {255,0,0}, true)
+			game.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, rng.float(-2.5, -1.5), _t"+ENCUMBERED!", {255,0,0}, true)
 		end
 	elseif self.encumbered and enc <= max then
 		self:removeTemporaryValue("never_move", self.encumbered)
@@ -3849,7 +3855,7 @@ function _M:checkEncumbrance()
 
 		if self.x and self.y then
 			local sx, sy = game.level.map:getTileToScreen(self.x, self.y, true)
-			game.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, rng.float(-2.5, -1.5), "-ENCUMBERED!", {255,0,0}, true)
+			game.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, rng.float(-2.5, -1.5), _t"-ENCUMBERED!", {255,0,0}, true)
 		end
 	end
 end
@@ -4153,11 +4159,11 @@ function _M:quickSwitchWeapons(free_swap, message, silent)
 			end
 		end
 		-- Special Messages
-		if #names == 0 then names = "unarmed" end
+		if #names == 0 then names = _t"unarmed" end
 		if message == "warden" then
-			game.logSeen(self, "%s warps space-time to equip: %s.", self.name:capitalize(), names)
+			game.logSeen(self, "%s warps space-time to equip: %s.", self:getName():capitalize(), names)
 		else
-			game.logSeen(self, "%s switches %s weapons to: %s.", self.name:capitalize(), self:his_her(), names)
+			game.logSeen(self, "%s switches %s weapons to: %s.", self:getName():capitalize(), self:his_her(), names)
 		end
 	end
 	-- Make sure sustains are still active
@@ -4619,7 +4625,7 @@ function _M:wearAllInventory(force, ...)
 								self:addObject(self.INVEN_INVEN, worn)
 							end
 							if party then
-								game.logSeen(self, "%s wears %s%s.", self.name:capitalize(), o:getName({do_color=true, no_add_name=true}), type(worn) == "table" and (" (replacing %s)"):format(worn:getName({no_add_name=true})) or "")
+								game.logSeen(self, "%s wears %s%s.", self:getName():capitalize(), o:getName({do_color=true, no_add_name=true}), type(worn) == "table" and (" (replacing %s)"):format(worn:getName({no_add_name=true})) or "")
 							end
 							break
 						end
@@ -4666,7 +4672,7 @@ end
 --- Can we wear this item?
 function _M:canWearObject(o, try_slot)
 	if self:attr("forbid_arcane") and o.power_source and o.power_source.arcane then
-		return nil, "antimagic"
+		return nil, _t"antimagic"
 	end
 
 	local oldreq
@@ -5041,7 +5047,7 @@ function _M:paradoxDoAnomaly(chance, paradox, def)
 			-- Be sure we found an anomaly first
 			if ts[1] then
 				local anom = rng.table(ts)
-				game.logSeen(self, "%s #LIGHT_STEEL_BLUE#Triggers an Anomaly! (%s).", self.name:capitalize(), self:getTalentDisplayName(self:getTalentFromId(anom)))
+				game.logSeen(self, "%s #LIGHT_STEEL_BLUE#Triggers an Anomaly! (%s).", self:getName():capitalize(), self:getTalentDisplayName(self:getTalentFromId(anom)))
 				if anomaly_type ~= "major" then
 					if self:attr("no_minor_anomalies") then
 						anomaly_triggered = false
@@ -5053,8 +5059,9 @@ function _M:paradoxDoAnomaly(chance, paradox, def)
 							game.bignews:saySimple(180, "#STEEL_BLUE#Targeting %s", anom.name)
 						end
 
-						-- targeted talents don't work well with no_energy, so we call the action directly
-						anom.action(self, anom)
+						-- Targeted talents don't work well with no_energy, so we call the action directly.
+						-- In addition, prevent targeting from being cancelled by the player.
+						anom.doAction(self, anom, false)
 					elseif def.ignore_energy then
 						self:forceUseTalent(anom, {force_target=def.target or self, ignore_energy=true})
 					elseif self:knowTalent(self.T_TWIST_FATE) and not self:isTalentCoolingDown(self.T_TWIST_FATE) then
@@ -5331,7 +5338,7 @@ function _M:preUseTalent(ab, silent, fake)
 	end
 
 	if self.forbid_talents and self.forbid_talents[ab.id] then
-		if not silent then game.logSeen(self, self.forbid_talents[ab.id] or "%s can not use %s.", self.name:capitalize(), ab.name) end
+		if not silent then game.logSeen(self, self.forbid_talents[ab.id] or "%s can not use %s.", self:getName():capitalize(), ab.name) end
 		return false
 	end
 
@@ -5342,12 +5349,12 @@ function _M:preUseTalent(ab, silent, fake)
 		return false
 	end
 	if not ab.never_fail and self:attr("feared") and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) then
-		if not silent then game.logSeen(self, "%s is too afraid to use %s.", self.name:capitalize(), ab.name) end
+		if not silent then game.logSeen(self, "%s is too afraid to use %s.", self:getName():capitalize(), ab.name) end
 		return false
 	end
 	-- When silenced you can deactivate spells but not activate them
 	if ab.no_silence and self:attr("silence") and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) then
-		if not silent then game.logSeen(self, "%s is silenced and cannot use %s.", self.name:capitalize(), ab.name) end
+		if not silent then game.logSeen(self, "%s is silenced and cannot use %s.", self:getName():capitalize(), ab.name) end
 		return false
 	end
 	if ab.is_spell and self:attr("forbid_arcane") and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) then
@@ -5356,16 +5363,16 @@ function _M:preUseTalent(ab, silent, fake)
 	end
 	-- Nature is forbidden to undead (just wild-gifts for now)
 	if ab.is_nature and self:attr("forbid_nature") and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) then
-		if not silent then game.logSeen(self, "%s is too disconnected from Nature to use %s.", self.name:capitalize(), ab.name) end
+		if not silent then game.logSeen(self, "%s is too disconnected from Nature to use %s.", self:getName():capitalize(), ab.name) end
 		return false
 	end
 
 	if ab.is_inscription and self.inscription_restrictions and not self.inscription_restrictions[ab.type[1]] then
-		if not silent then game.logSeen(self, "%s is unable to use this kind of inscription.", self.name:capitalize()) end
+		if not silent then game.logSeen(self, "%s is unable to use this kind of inscription.", self:getName():capitalize()) end
 		return false
 	end
 	if ab.is_inscription and self.inscription_forbids and self.inscription_forbids[ab.type[1]] then
-		if not silent then game.logSeen(self, "%s is unable to use this kind of inscription.", self.name:capitalize()) end
+		if not silent then game.logSeen(self, "%s is unable to use this kind of inscription.", self:getName():capitalize()) end
 		return false
 	end
 
@@ -5373,18 +5380,18 @@ function _M:preUseTalent(ab, silent, fake)
 	if ab.is_unarmed and not (ab.mode == "sustained" and self:isTalentActive(ab.id)) then
 		-- first check for heavy and massive armor
 		if self:hasMassiveArmor() then
-			if not silent then game.logSeen(self, "%s is too heavily armoured to use this talent.", self.name:capitalize()) end
+			if not silent then game.logSeen(self, "%s is too heavily armoured to use this talent.", self:getName():capitalize()) end
 			return false
 		-- next make sure we're unarmed
 		elseif not self:isUnarmed() then
-			if not silent then game.logSeen(self, "%s can't use this talent while holding a weapon or shield.", self.name:capitalize()) end
+			if not silent then game.logSeen(self, "%s can't use this talent while holding a weapon or shield.", self:getName():capitalize()) end
 			return false
 		end
 	end
 
 	-- Sleeping prevents the use of all non-instant talents
 	if self:attr("sleep") and not self:attr("lucid_dreamer") and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) and util.getval(ab.no_energy, self, ab) ~= (true or "fake") then
-		if not silent then game.logPlayer(self, "%s is sleeping and unable to do this.", self.name:capitalize(), ab.name) end
+		if not silent then game.logPlayer(self, "%s is sleeping and unable to do this.", self:getName():capitalize(), ab.name) end
 		return false
 	end
 
@@ -5401,7 +5408,7 @@ function _M:preUseTalent(ab, silent, fake)
 					cost = self:alterTalentCost(ab, res_def.sustain_prop, cost)
 					rmin, rmax = self[res_def.getMinFunction](self), self[res_def.getMaxFunction](self)
 					if cost ~= 0 and self[res_def.minname] and self[res_def.maxname] and self[res_def.minname] + cost > self[res_def.maxname] then
-						if not silent then game.logPlayer(self, "You %s %s to activate %s.", res_def.invert_values and "have too much committed" or "do not have enough uncommitted", res_def.name, ab.name) end
+						if not silent then game.logPlayer(self, "You %s %s to activate %s.", res_def.invert_values and _t"have too much committed" or _t"do not have enough uncommitted", res_def.name, ab.name) end
 						return false
 					end
 				end
@@ -5471,7 +5478,7 @@ function _M:preUseTalent(ab, silent, fake)
 		-- Spells can fail
 		if (ab.is_spell and not self:isTalentActive(ab.id)) and not fake and self:attr("spell_failure") then
 			if rng.percent(self:attr("spell_failure")) then
-				if not silent then game.logSeen(self, "%s's %s has been disrupted by #ORCHID#anti-magic forces#LAST#!", self.name:capitalize(), ab.name) end
+				if not silent then game.logSeen(self, "%s's %s has been disrupted by #ORCHID#anti-magic forces#LAST#!", self:getName():capitalize(), ab.name) end
 				if not util.getval(ab.no_energy, self, ab) then
 				if self:attr("scoundrel_failure") then
 					local eff = self:hasEffect(self.EFF_FUMBLE)
@@ -5490,7 +5497,7 @@ function _M:preUseTalent(ab, silent, fake)
 		-- Nature can fail
 		if (ab.is_nature and not self:isTalentActive(ab.id)) and not fake and self:attr("nature_failure") then
 			if rng.percent(self:attr("nature_failure")) then
-				if not silent then game.logSeen(self, "%s's %s has been disrupted by #ORCHID#anti-nature forces#LAST#!", self.name:capitalize(), ab.name) end
+				if not silent then game.logSeen(self, "%s's %s has been disrupted by #ORCHID#anti-nature forces#LAST#!", self:getName():capitalize(), ab.name) end
 				if not util.getval(ab.no_energy, self, ab) then
 					self:useEnergy()
 				else
@@ -5522,7 +5529,7 @@ function _M:preUseTalent(ab, silent, fake)
 		-- Confused ? lose a turn!
 		if self:attr("confused") and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) and util.getval(ab.no_energy, self, ab) ~= true and not fake and not self:attr("force_talent_ignore_ressources") then
 			if rng.percent(util.bound(self:attr("confused"), 0, 50)) then
-				if not silent then game.logSeen(self, "%s is confused and fails to use %s.", self.name:capitalize(), ab.name) end
+				if not silent then game.logSeen(self, "%s is confused and fails to use %s.", self:getName():capitalize(), ab.name) end
 				if self:attr("scoundrel_failure") then
 					local eff = self:hasEffect(self.EFF_FUMBLE)
 					if eff then self:callEffect(self.EFF_FUMBLE, "do_Fumble") end
@@ -5536,7 +5543,7 @@ function _M:preUseTalent(ab, silent, fake)
 		if self:attr("talent_fail_chance") and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) and util.getval(ab.no_energy, self, ab) ~= true and not fake and not self:attr("force_talent_ignore_ressources") and not ab.innate then
 			if rng.percent(self:attr("talent_fail_chance")) then
 				-- Should this trigger callbackOnTalentDisturbed?
-				if not silent then game.logSeen(self, "%s fails to use %s.", self.name:capitalize(), ab.name) end
+				if not silent then game.logSeen(self, "%s fails to use %s.", self:getName():capitalize(), ab.name) end
 				if self:attr("scoundrel_failure") then
 					local eff = self:hasEffect(self.EFF_FUMBLE)
 					if eff then self:callEffect(self.EFF_FUMBLE, "do_Fumble") end
@@ -5550,7 +5557,7 @@ function _M:preUseTalent(ab, silent, fake)
 		if self:attr("scoundrel_failure") and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) and util.getval(ab.no_energy, self, ab) ~= true and not fake and not self:attr("force_talent_ignore_ressources") then
 			local eff = self:hasEffect(self.EFF_FUMBLE)
 			if rng.percent(self:attr("scoundrel_failure")) then
-				if not silent then game.logSeen(self, "%s fumbles and fails to use %s, injuring %s!", self.name:capitalize(), ab.name, self:his_her_self()) end
+				if not silent then game.logSeen(self, "%s fumbles and fails to use %s, injuring %s!", self:getName():capitalize(), ab.name, self:his_her_self()) end
 				self:useEnergy()
 				self:fireTalentCheck("callbackOnTalentDisturbed", ab, eff)
 				return false
@@ -5558,7 +5565,7 @@ function _M:preUseTalent(ab, silent, fake)
 		end
 
 		if self:hasEffect(self.EFF_SENTINEL) and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) and util.getval(ab.no_energy, self, ab) ~= true and not fake and not self:attr("force_talent_ignore_ressources") then
-			if not silent then game.logSeen(self, "%s's %s is interrupted by the shot!", self.name:capitalize(), ab.name) end
+			if not silent then game.logSeen(self, "%s's %s is interrupted by the shot!", self:getName():capitalize(), ab.name) end
 			self.tempeffect_def[self.EFF_SENTINEL].do_proc(self, self:hasEffect(self.EFF_SENTINEL))
 			self:useEnergy()
 			self:fireTalentCheck("callbackOnTalentDisturbed", t)
@@ -5595,18 +5602,18 @@ function _M:logTalentMessage(ab)
 			end
 			game.logSeen(self, color.."#{bold}#%s#{normal}##LAST#", self:useTalentMessage(ab))
 		elseif ab.mode == "sustained" then
-			game.logSeen(self, "%s %s #{bold}##ORANGE#%s#LAST#.", self.name:capitalize(), self:isTalentActive(ab.id) and "deactivates" or "activates", ab.name)
+			game.logSeen(self, "%s %s #{bold}##ORANGE#%s#LAST#.#{normal}#", self:getName():capitalize(), self:isTalentActive(ab.id) and _t"deactivates" or _t"activates", ab.name)
 		elseif ab.is_spell then
 			if ab.is_inscription then color = "#GREEN#"
 			else color = "#PURPLE#"
 			end
-			game.logSeen(self, "%s casts #{bold}#"..color.."%s.#{normal}##LAST#", self.name:capitalize(), ab.name)
+			game.logSeen(self, "%s casts #{bold}#%s%s.#{normal}##LAST#", self:getName():capitalize(), color, ab.name)
 		else
 			if ab.is_mind then color = "#YELLOW#"
 			elseif ab.is_melee then color = "#RED#"
 			elseif ab.is_inscription then color = "#GREEN#"
 			end
-			game.logSeen(self, "%s uses #{bold}#"..color.."%s.#{normal}##LAST#", self.name:capitalize(), ab.name)
+			game.logSeen(self, "%s uses #{bold}#%s%s.#{normal}##LAST#", self:getName():capitalize(), color, ab.name)
 		end
 	end
 end
@@ -5906,9 +5913,11 @@ function _M:postUseTalent(ab, ret, silent)
 		-- Free melee blow
 		if ab.is_spell and ab.mode ~= "sustained" and self:knowTalent(self.T_CORRUPTED_STRENGTH) and not self:attr("forbid_corrupted_strength_blow") and not self.turn_procs.corrupted_strength then
 			local tgts = {}
-			for _, c in pairs(util.adjacentCoords(self.x, self.y)) do
-				local target = game.level.map(c[1], c[2], Map.ACTOR)
-				if target and self:reactionToward(target) < 0 then tgts[#tgts+1] = target end
+			if game.level:hasEntity(self) and self.x and self.y then
+				for _, c in pairs(util.adjacentCoords(self.x, self.y)) do
+					local target = game.level.map(c[1], c[2], Map.ACTOR)
+					if target and self:reactionToward(target) < 0 then tgts[#tgts+1] = target end
+				end
 			end
 			if #tgts > 0 then
 				self.turn_procs.corrupted_strength = true
@@ -6104,7 +6113,7 @@ function _M:postUseTalent(ab, ret, silent)
 		end
 		for t in rng.tableSampleIterator(tids, self:attr("random_talent_cooldown_on_use_nb")) do
 			self:startTalentCooldown(t.id, self:attr("random_talent_cooldown_on_use_turns"))
-			game.logSeen(self, "%s talent '%s%s' is disrupted by the mind parasite.", self.name:capitalize(), (t.display_entity and t.display_entity:getDisplayString() or ""), t.name)
+			game.logSeen(self, "%s talent '%s%s' is disrupted by the mind parasite.", self:getName():capitalize(), (t.display_entity and t.display_entity:getDisplayString() or ""), t.name)
 		end
 	end
 
@@ -6260,12 +6269,12 @@ function _M:getTalentFullDescription(t, addlevel, config, fake_mastery)
 	end
 
 	local d = tstring{}
-	d:add({"color",0x6f,0xff,0x83}, "Effective talent level: ", {"color",0x00,0xFF,0x00}, ("%.1f"):format(self:getTalentLevel(t)), true)
+	d:add({"color",0x6f,0xff,0x83}, _t"Effective talent level: ", {"color",0x00,0xFF,0x00}, ("%.1f"):format(self:getTalentLevel(t)), true)
 
 	if not config.ignore_mode then
-		if t.mode == "passive" then d:add({"color",0x6f,0xff,0x83}, "Use mode: ", {"color",0x00,0xFF,0x00}, "Passive", true)
-		elseif t.mode == "sustained" then d:add({"color",0x6f,0xff,0x83}, "Use mode: ", {"color",0x00,0xFF,0x00}, "Sustained", true)
-		else d:add({"color",0x6f,0xff,0x83}, "Use mode: ", {"color",0x00,0xFF,0x00}, "Activated", true)
+		if t.mode == "passive" then d:add({"color",0x6f,0xff,0x83}, _t"Use mode: ", {"color",0x00,0xFF,0x00}, _t"Passive", true)
+		elseif t.mode == "sustained" then d:add({"color",0x6f,0xff,0x83}, _t"Use mode: ", {"color",0x00,0xFF,0x00}, _t"Sustained", true)
+		else d:add({"color",0x6f,0xff,0x83}, _t"Use mode: ", {"color",0x00,0xFF,0x00}, _t"Activated", true)
 		end
 	end
 
@@ -6274,9 +6283,9 @@ function _M:getTalentFullDescription(t, addlevel, config, fake_mastery)
 		d:add(true)
 	end
 	if not config.ignore_ressources then
-		if t.feedback then d:add({"color",0x6f,0xff,0x83}, "Feedback cost: ", {"color",0xFF, 0xFF, 0x00}, ""..math.round(util.getval(t.feedback, self, t) * (100 + 2 * self:combatFatigue()) / 100, 0.1), true) end
-		if t.fortress_energy then d:add({"color",0x6f,0xff,0x83}, "Fortress Energy cost: ", {"color",0x00,0xff,0xa0}, ""..math.round(t.fortress_energy, 0.1), true) end
-		if t.sustain_feedback then d:add({"color",0x6f,0xff,0x83}, "Sustain feedback cost: ", {"color",0xFF, 0xFF, 0x00}, ""..(util.getval(t.sustain_feedback, self, t)), true) end
+		if t.feedback then d:add({"color",0x6f,0xff,0x83}, _t"Feedback cost: ", {"color",0xFF, 0xFF, 0x00}, ""..math.round(util.getval(t.feedback, self, t) * (100 + 2 * self:combatFatigue()) / 100, 0.1), true) end
+		if t.fortress_energy then d:add({"color",0x6f,0xff,0x83}, _t"Fortress Energy cost: ", {"color",0x00,0xff,0xa0}, ""..math.round(t.fortress_energy, 0.1), true) end
+		if t.sustain_feedback then d:add({"color",0x6f,0xff,0x83}, _t"Sustain feedback cost: ", {"color",0xFF, 0xFF, 0x00}, ""..(util.getval(t.sustain_feedback, self, t)), true) end
 
 		-- resource costs?
 		for res, res_def in ipairs(_M.resources_def) do
@@ -6286,22 +6295,22 @@ function _M:getTalentFullDescription(t, addlevel, config, fake_mastery)
 				cost = self:alterTalentCost(t, res_def.short_name, cost)
 				if cost ~= 0 then
 					cost = cost * (util.getval(res_def.cost_factor, self, t, false, cost) or 1)
-					d:add({"color",0x6f,0xff,0x83}, ("%s %s: "):format(res_def.name:capitalize(), cost >= 0 and "cost" or "gain"), res_def.color or {"color",0xff,0xa8,0xa8}, ""..math.round(math.abs(cost), .1), true)
+					d:add({"color",0x6f,0xff,0x83}, ("%s %s: "):tformat(res_def.name:capitalize(), cost >= 0 and _t"cost" or _t"gain"), res_def.color or {"color",0xff,0xa8,0xa8}, ""..math.round(math.abs(cost), .1), true)
 				end
 				-- list sustain cost
 				cost = t[res_def.sustain_prop] and util.getval(t[res_def.sustain_prop], self, t) or 0
 				cost = self:alterTalentCost(t, res_def.sustain_prop, cost)
 				if cost ~= 0 then
-					d:add({"color",0x6f,0xff,0x83}, ("Sustain %s cost: "):format(res_def.name:lower()), res_def.color or {"color",0xff,0xa8,0xa8}, ""..math.round(cost, .1), true)
+					d:add({"color",0x6f,0xff,0x83}, ("Sustain %s cost: "):tformat(res_def.name:lower()), res_def.color or {"color",0xff,0xa8,0xa8}, ""..math.round(cost, .1), true)
 				end
 				-- list drain cost
 				cost = t[res_def.drain_prop] and util.getval(t[res_def.drain_prop], self, t) or 0
 				cost = self:alterTalentCost(t, res_def.drain_prop, cost)
 				if cost ~= 0 then
 					if res_def.invert_values then
-						d:add({"color",0x6f,0xff,0x83}, ("%s %s: "):format(cost > 0 and "Generates" or "Removes", res_def.name:lower()), res_def.color or {"color",0xff,0xa8,0xa8}, ""..math.round(math.abs(cost), .1), true)
+						d:add({"color",0x6f,0xff,0x83}, ("%s %s: "):tformat(cost > 0 and _t"Generates" or _t"Removes", res_def.name:lower()), res_def.color or {"color",0xff,0xa8,0xa8}, ""..math.round(math.abs(cost), .1), true)
 					else
-						d:add({"color",0x6f,0xff,0x83}, ("%s %s: "):format(cost > 0 and "Drains" or "Replenishes", res_def.name:lower()), res_def.color or {"color",0xff,0xa8,0xa8}, ""..math.round(math.abs(cost), .1), true)
+						d:add({"color",0x6f,0xff,0x83}, ("%s %s: "):tformat(cost > 0 and _t"Drains" or _t"Replenishes", res_def.name:lower()), res_def.color or {"color",0xff,0xa8,0xa8}, ""..math.round(math.abs(cost), .1), true)
 					end
 				end
 			end
@@ -6309,35 +6318,35 @@ function _M:getTalentFullDescription(t, addlevel, config, fake_mastery)
 		self:triggerHook{"Actor:getTalentFullDescription:ressources", str=d, t=t, addlevel=addlevel, config=config, fake_mastery=fake_mastery}
 	end
 	if t.mode ~= "passive" then
-		if self:getTalentRange(t) > 1 then d:add({"color",0x6f,0xff,0x83}, "Range: ", {"color",0xFF,0xFF,0xFF}, ("%d"):format(self:getTalentRange(t)), true)
-		else d:add({"color",0x6f,0xff,0x83}, "Range: ", {"color",0xFF,0xFF,0xFF}, "melee/personal", true)
+		if self:getTalentRange(t) > 1 then d:add({"color",0x6f,0xff,0x83}, _t"Range: ", {"color",0xFF,0xFF,0xFF}, ("%d"):format(self:getTalentRange(t)), true)
+		else d:add({"color",0x6f,0xff,0x83}, _t"Range: ", {"color",0xFF,0xFF,0xFF}, _t"melee/personal", true)
 		end
 		if not config.ignore_ressources then
-			if self:getTalentCooldown(t) then d:add({"color",0x6f,0xff,0x83}, ("%sCooldown: "):format(t.fixed_cooldown and "Fixed " or ""), {"color",0xFF,0xFF,0xFF}, ""..self:getTalentCooldown(t), true) end
+			if self:getTalentCooldown(t) then d:add({"color",0x6f,0xff,0x83}, ("%sCooldown: "):tformat(t.fixed_cooldown and _t"Fixed " or ""), {"color",0xFF,0xFF,0xFF}, ""..self:getTalentCooldown(t), true) end
 		end
 		local speed = self:getTalentProjectileSpeed(t)
-		if speed then d:add({"color",0x6f,0xff,0x83}, "Travel Speed: ", {"color",0xFF,0xFF,0xFF}, ""..(speed * 100).."% of base", true)
-		else d:add({"color",0x6f,0xff,0x83}, "Travel Speed: ", {"color",0xFF,0xFF,0xFF}, "instantaneous", true)
+		if speed then d:add({"color",0x6f,0xff,0x83}, _t"Travel Speed: ", {"color",0xFF,0xFF,0xFF}, ("%d%% of base"):tformat(speed * 100), true)
+		else d:add({"color",0x6f,0xff,0x83}, _t"Travel Speed: ", {"color",0xFF,0xFF,0xFF}, _t"instantaneous", true)
 		end
 		if not config.ignore_use_time then
-			local uspeed = "Full Turn"
+			local uspeed = _t"Full Turn"
 			local no_energy = util.getval(t.no_energy, self, t)
 			local display_speed = util.getval(t.display_speed, self, t)
 			if display_speed then
 				uspeed = display_speed
 			elseif no_energy and type(no_energy) == "boolean" and no_energy == true then
-				uspeed = "Instant (#LIGHT_GREEN#0%#LAST# of a turn)"
+				uspeed = _t"Instant (#LIGHT_GREEN#0%#LAST# of a turn)"
 			else
 				local speed = self:getTalentSpeed(t)
 				local speed_type = self:getTalentSpeedType(t)
 				if type(speed_type) == "string" then
-					speed_type = speed_type:capitalize()
+					speed_type = _t(speed_type):capitalize()
 				else
-					speed_type = 'Special'
+					speed_type = _t'Special'
 				end
-				uspeed = ("%s (#LIGHT_GREEN#%d%%#LAST# of a turn)"):format(speed_type, speed * 100)
+				uspeed = ("%s (#LIGHT_GREEN#%d%%#LAST# of a turn)"):tformat(speed_type, speed * 100)
 			end
-			d:add({"color",0x6f,0xff,0x83}, "Usage Speed: ", {"color",0xFF,0xFF,0xFF}, uspeed, true)
+			d:add({"color",0x6f,0xff,0x83}, _t"Usage Speed: ", {"color",0xFF,0xFF,0xFF}, uspeed, true)
 			if t.no_break_stealth ~= nil and no_energy ~= true and self:knowTalent(self.T_STEALTH) then
 				local nbs, chance = t.no_break_stealth
 				if type(t.no_break_stealth) == "function" then
@@ -6348,13 +6357,13 @@ function _M:getTalentFullDescription(t, addlevel, config, fake_mastery)
 				else chance = nbs and 100 or 0
 				end
 				if chance > 0 then
-					d:add({"color",0x6f,0xff,0x83}, "Won't Break Stealth:  ", {"color",0xFF,0xFF,0xFF}, ("%d%%"):format(chance), true)
+					d:add({"color",0x6f,0xff,0x83}, _t"Won't Break Stealth:  ", {"color",0xFF,0xFF,0xFF}, ("%d%%"):format(chance), true)
 				end
 			end
 		end
 	else
 		if not config.ignore_ressources then
-			if self:getTalentCooldown(t) then d:add({"color",0x6f,0xff,0x83}, ("%sCooldown: "):format(t.fixed_cooldown and "Fixed " or ""), {"color",0xFF,0xFF,0xFF}, ""..self:getTalentCooldown(t), true) end
+			if self:getTalentCooldown(t) then d:add({"color",0x6f,0xff,0x83}, ("%sCooldown: "):tformat(t.fixed_cooldown and _t"Fixed " or ""), {"color",0xFF,0xFF,0xFF}, ""..self:getTalentCooldown(t), true) end
 		end
 	end
 	
@@ -6363,20 +6372,20 @@ function _M:getTalentFullDescription(t, addlevel, config, fake_mastery)
 		if t[is] then is_a[#is_a+1] = desc end
 	end
 	if #is_a > 0 then
-		d:add({"color",0x6f,0xff,0x83}, "Is: ", {"color",0xFF,0xFF,0xFF}, table.concatNice(is_a, ", ", " and "), true)
+		d:add({"color",0x6f,0xff,0x83}, _t"Is: ", {"color",0xFF,0xFF,0xFF}, table.concatNice(is_a, ", ", _t" and "), true)
 	end
 
 	if t.mode == 'sustained' then
 		local replaces = self:getReplacedSustains(t)
 		if #replaces > 0 then
 			for k, v in pairs(replaces) do replaces[k] = self:getTalentFromId(v).name end
-			d:add({"color",0x6f,0xff,0x83}, "Will Deactivate: ", {"color",0xFF,0xFF,0xFF}, table.concat(replaces, ', '), true)
+			d:add({"color",0x6f,0xff,0x83}, _t"Will Deactivate: ", {"color",0xFF,0xFF,0xFF}, table.concat(replaces, ', '), true)
 		end
 	end
 
 	self:triggerHook{"Actor:getTalentFullDescription", str=d, t=t, addlevel=addlevel, config=config, fake_mastery=fake_mastery}
 
-	d:add({"color",0x6f,0xff,0x83}, "Description: ", {"color",0xFF,0xFF,0xFF})
+	d:add({"color",0x6f,0xff,0x83}, _t"Description: ", {"color",0xFF,0xFF,0xFF})
 	d:merge(t.info(self, t):toTString():tokenize(" ()[]"))
 
 	self.talents[t.id] = old
@@ -6498,31 +6507,31 @@ function _M:checkSetTalentAuto(tid, v, opt)
 	if v then
 		local doit = function()
 			self:setTalentAuto(tid, true, opt)
-			Dialog:simplePopup("Automatic use enabled", t.name:capitalize().." will now be used as often as possible automatically.")
+			Dialog:simplePopup(_t"Automatic use enabled", ("%s will now be used as often as possible automatically."):tformat(t.name:capitalize()))
 		end
 
 		local list = {}
-		if util.getval(t.no_energy, self, t) ~= true then list[#list+1] = "- requires a turn to use" end
-		if self:getTalentRequiresTarget(t) then list[#list+1] = "- requires a target, your last hostile one will be automatically used" end
+		if util.getval(t.no_energy, self, t) ~= true then list[#list+1] = _t"- requires a turn to use" end
+		if self:getTalentRequiresTarget(t) then list[#list+1] = _t"- requires a target, your last hostile one will be automatically used" end
 		if t.auto_use_warning then list[#list+1] = t.auto_use_warning end
 		if opt == 2 then
-			list[#list+1] = "- will only trigger if no enemies are visible"
-			list[#list+1] = "- will automatically target you if a target is required"
+			list[#list+1] = _t"- will only trigger if no enemies are visible"
+			list[#list+1] = _t"- will automatically target you if a target is required"
 		end
-		if opt == 3 then list[#list+1] = "- will only trigger if enemies are visible" end
-		if opt == 4 then list[#list+1] = "- will only trigger if enemies are visible and adjacent" end
-		if opt == 5 then list[#list+1] = "- will only trigger if you are not in combat" end
+		if opt == 3 then list[#list+1] = _t"- will only trigger if enemies are visible" end
+		if opt == 4 then list[#list+1] = _t"- will only trigger if enemies are visible and adjacent" end
+		if opt == 5 then list[#list+1] = _t"- will only trigger if you are not in combat" end
 
 		if #list == 0 then
 			doit()
 		else
-			Dialog:yesnoLongPopup("Automatic use", t.name:capitalize()..":\n"..table.concat(list, "\n").."\n Are you sure?", 500, function(ret)
+			Dialog:yesnoLongPopup(_t"Automatic use", ("%s:\n%s\n Are you sure?"):tformat(t.name:capitalize(), table.concat(list, "\n")), 500, function(ret)
 				if ret then doit() end
 			end)
 		end
 	else
 		self:setTalentAuto(tid, false)
-		Dialog:simplePopup("Automatic use disabled", t.name:capitalize().." will not be automatically used.")
+		Dialog:simplePopup(_t"Automatic use disabled", ("%s will not be automatically used."):tformat(t.name:capitalize()))
 	end
 end
 
@@ -6786,7 +6795,7 @@ function _M:suffocate(value, src, death_message)
 	if self.air <= 0 then
 		self.air = 0
 		if not self:hasEffect(self.EFF_SUFFOCATING) then
-			game.logSeen(self, "#LIGHT_RED#%s starts suffocating to death!", self.name:capitalize())
+			game.logSeen(self, "#LIGHT_RED#%s starts suffocating to death!", self:getName():capitalize())
 			self:setEffect(self.EFF_SUFFOCATING, 1, {dam=20})
 		end
 		return false, true
@@ -6926,7 +6935,7 @@ function _M:hasLOS(x, y, what, range, source_x, source_y)
 			break
 		end
 		last_x, last_y = lx, ly
-		if game.level.map:checkAllEntities(lx, ly, what) then break end
+		if game.level.map:checkAllEntities(lx, ly, what, self) then break end
 
 		lx, ly, is_corner_blocked = l:step()
 	end
@@ -7049,9 +7058,9 @@ function _M:on_set_temporary_effect(eff_id, e, p)
 		local save_type = nil
 
 		if p.apply_save then save_type = p.apply_save else save_type = save_for_effects[e.type] end
-		if save_type == "combatPhysicalResist" then p.save_string = "Physical save"
-		elseif save_type == "combatMentalResist" then p.save_string = "Mental save"
-		elseif save_type == "combatSpellResist" then p.save_string = "Spell save"
+		if save_type == "combatPhysicalResist" then p.save_string = _t"Physical save"
+		elseif save_type == "combatMentalResist" then p.save_string = _t"Mental save"
+		elseif save_type == "combatSpellResist" then p.save_string = _t"Spell save"
 		end
 
 		if e.status == "detrimental" then
@@ -7065,11 +7074,11 @@ function _M:on_set_temporary_effect(eff_id, e, p)
 				self:fireTalentCheck("callbackOnEffectSave", hd)
 				saved, eff_id, e, p = hd.saved, hd.eff_id, hd.e, hd.p
 				if saved then
-					self:logCombat(p.src, "#ORANGE#%s shrugs off %s '%s'!", self.name:capitalize(), p.src and "#Target#'s" or "the effect", e.desc)
+					self:logCombat(p.src, "#ORANGE#%s shrugs off %s '%s'!", self:getName():capitalize(), p.src and _t"#Target#'s" or _t"the effect", e.desc)
 					return true
 				end
 			else
-				self:logCombat(p.src, "#LIGHT_UMBER#%s resists %s '%s'!", self.name:capitalize(), p.src and "#Target#'s" or "the effect", e.desc)
+				self:logCombat(p.src, "#LIGHT_UMBER#%s resists %s '%s'!", self:getName():capitalize(), p.src and _t"#Target#'s" or _t"the effect", e.desc)
 				return true
 			end
 		end
@@ -7177,9 +7186,9 @@ function _M:on_project_acquire(tx, ty, who, t, x, y, damtype, dam, particles, is
 
 		local dir = game.level.map:compassDirection(mods.x-x, mods.y-y)
 		if not dir then
-			dir = "but fumbles!"
+			dir = _t"but fumbles!"
 		else
-			dir = "to the "..dir.."!"
+			dir = ("to the %s!"):tformat(dir)
 		end
 		self:logCombat(who, "#Source# deflects the projectile from #Target# %s", dir)
 		return true
@@ -7191,7 +7200,7 @@ end
 function _M:on_project(tx, ty, who, t, x, y, damtype, dam, particles)
 	-- Spell reflect
 	if self:attr("spell_reflect") and (t.talent and t.talent.reflectable and t.talent.is_spell) and rng.percent(self:attr("spell_reflect")) then
-		game.logSeen(self, "%s reflects the spell!", self.name:capitalize())
+		game.logSeen(self, "%s reflects the spell!", self:getName():capitalize())
 		-- Setup the bypass so it does not eternally reflect between two actors
 		t.bypass = true
 		who:project(t, x, y, damtype, dam, particles)
@@ -7200,7 +7209,7 @@ function _M:on_project(tx, ty, who, t, x, y, damtype, dam, particles)
 
 	-- Spell absorb
 	if self:attr("spell_absorb") and (t.talent and t.talent.is_spell) and rng.percent(self:attr("spell_absorb")) then
-		game.logSeen(self, "%s ignores the spell!", self.name:capitalize())
+		game.logSeen(self, "%s ignores the spell!", self:getName():capitalize())
 		return true
 	end
 
@@ -7340,7 +7349,7 @@ function _M:doDrop(inven, item, on_done, nb)
 	end
 
 	if game.zone.wilderness then
-		Dialog:yesnoLongPopup("Warning", "Any item dropped on the world map will be lost forever.", 300, function(ret)
+		Dialog:yesnoLongPopup(_t"Warning", _t"Any item dropped on the world map will be lost forever.", 300, function(ret)
 			-- The test is reversed because the buttons are reversed, to prevent mistakes
 			if not ret then
 				local o = self:getInven(inven) and self:getInven(inven)[item]
@@ -7355,14 +7364,14 @@ function _M:doDrop(inven, item, on_done, nb)
 					game.logPlayer(self, "You can not destroy %s.", o:getName{do_colour=true})
 				end
 			end
-		end, "Cancel", "Destroy", true)
+		end, _t"Cancel", _t"Destroy", true)
 		return
 	end
 	if nb == nil or nb >= self:getInven(inven)[item]:getNumber() then
 		self:dropFloor(inven, item, true, true)
 	else
 		local stack = self:removeObject(inven, item, nb)
-		game.logSeen(self, "%s drops on the floor: %s.", self.name:capitalize(), stack:getName{do_color=true, do_count=true})
+		game.logSeen(self, "%s drops on the floor: %s.", self:getName():capitalize(), stack:getName{do_color=true, do_count=true})
 		game.level.map:addObject(self.x, self.y, stack)
 	end
 	self:sortInven(inven)
@@ -7481,7 +7490,7 @@ function _M:getEncumberTitleUpdator(title)
 		elseif enc > max * 0.9 then color = "#ff8a00#"
 		elseif enc > max * 0.75 then color = "#fcff00#"
 		end
-		return ("%s - %sEncumbrance %d/%d"):format(title, color, enc, max)
+		return ("%s - %sEncumbrance %d/%d"):tformat(title, color, enc, max)
 	end
 end
 
@@ -7524,15 +7533,15 @@ function _M:transmoGetNumberItems()
 end
 
 function _M:transmoHelpPopup()
-	Dialog:simplePopup("Transmogrification Chest", "When you close the inventory window, all items in the chest will be transmogrified.")
+	Dialog:simplePopup(_t"Transmogrification Chest", _t"When you close the inventory window, all items in the chest will be transmogrified.")
 end
 
 function _M:transmoGetName()
-	return "Transmogrification Chest"
+	return _t"Transmogrification Chest"
 end
 
 function _M:transmoGetWord()
-	return "transmogrify"
+	return _t"transmogrify"
 end
 
 function _M:canUseTinker(tinker)

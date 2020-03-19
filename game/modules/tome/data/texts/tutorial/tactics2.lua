@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[A skeleton mage just fired a spell at you.
+return _t[[A skeleton mage just fired a spell at you.
 While the fireworks look nice, you don't want to get hit too much.
 When under the fire of archers or spell casters always try to break line of sight with them, they will be forced to come to you (unless they are smart).
 #GOLD#Take cover: Never let them get a clean shot!#WHITE#

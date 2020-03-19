@@ -68,14 +68,14 @@ newTalent{
 
 		dam = math.max(dam - reduce, 0)
 		print("[PROJECTOR] after static reduction dam", dam)
-		game:delayedLogDamage(src or self, self, 0, ("%s(%d deflected)#LAST#"):format(DamageType:get(type).text_color or "#aaaaaa#", lastdam - dam), false)
+		game:delayedLogDamage(src or self, self, 0, ("%s(%d deflected)#LAST#"):tformat(DamageType:get(type).text_color or "#aaaaaa#", lastdam - dam), false)
 		return {dam=dam}
 	end,
 	info = function(self, t)
 		local chance = t.getChance(self, t)
 		return ([[You are trained in an agile, mobile fighting technique combining sling and shield. This allows shields to be equipped, using Dexterity instead of Strength as a requirement.
 While you have a shield equip and your Block talent is not on cooldown, you have a %d%% chance to deflect any incoming damage, reducing it by 50%% of your shield’s block value.]])
-			:format(chance)
+			:tformat(chance)
 	end,
 }
 
@@ -136,7 +136,7 @@ newTalent{
 			if target:canBe("stun") then
 				target:setEffect(target.EFF_DAZED, 2, {apply_power=self:combatPhysicalpower()})
 			else
-				game.logSeen(target, "%s resists the daze!", target.name:capitalize())
+				game.logSeen(target, "%s resists the daze!", target:getName():capitalize())
 			end
 		end
 		
@@ -160,7 +160,7 @@ newTalent{
 		return ([[Leap onto an adjacent target with your shield, striking them for %d%% damage and dazing them for 2 turns, then using them as a springboard to leap to a tile within range %d.
 The shield bash will use Dexterity instead of Strength for the shield's bonus damage.
 At talent level 5, you will immediately enter a blocking stance on landing.]])
-		:format(dam, range)
+		:tformat(dam, range)
 	end,
 }
 
@@ -235,7 +235,7 @@ newTalent{
 		The shot does %d%% weapon damage and knocks back your target by %d.
 		The cooldown of this talent is reduced by 1 each time you move.
 		This requires a sling to use.]]):
-		format(t.getDamage(self,t)*100, t.getDist(self, t))
+		tformat(t.getDamage(self,t)*100, t.getDist(self, t))
 	end,
 }
 
@@ -297,6 +297,6 @@ newTalent{
 		return ([[Enter a fluid, mobile shooting stance that excels at close combat. Your ranged attack speed is increased by %d%% and each time you shoot you gain %d%% increased movement speed for 2 turns.
 Ranged attacks against targets will also grant you up to %d%% of a turn. This is 100%% effective against targets within 3 tiles, and decreases by 20%% for each tile beyond that (to 0%% at 8 tiles). This cannot occur more than once per turn.
 Requires a sling to use.]]):
-		format(atk, move, turn)
+		tformat(atk, move, turn)
 	end,
 }

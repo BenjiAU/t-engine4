@@ -27,7 +27,7 @@ function _M:init(actor, def)
 	self.actor = actor
 	self.def = def
 	self:generateList()
-	engine.ui.Dialog.init(self, "Set behavior: "..actor.name, 1, 1)
+	engine.ui.Dialog.init(self, ("Set behavior: %s"):tformat(actor:getName()), 1, 1)
 
 	local list = List.new{width=400, nb_items=#self.list, list=self.list, fct=function(item) self:use(item) end}
 
@@ -49,16 +49,16 @@ function _M:use(item)
 	game:unregisterDialog(self)
 
 	self.actor.ai_tactic = resolvers.calc.tactic({item.set}, self.actor)
-	game.logPlayer(game.player, "%s behavior set to %s.", self.actor.name:capitalize(), item.set)
+	game.logPlayer(game.player, "%s behavior set to %s.", self.actor:getName():capitalize(), _t(item.set))
 end
 
 function _M:generateList()
 	local list = {
-		{name="Default", set="default"},
-		{name="Melee", set="melee"},
-		{name="Ranged", set="ranged"},
-		{name="Tank", set="tank"},
-		{name="Standby", set="standby"},
+		{name=_t"Default", set="default"},
+		{name=_t"Melee", set="melee"},
+		{name=_t"Ranged", set="ranged"},
+		{name=_t"Tank", set="tank"},
+		{name=_t"Standby", set="standby"},
 	}
 
 	local chars = {}

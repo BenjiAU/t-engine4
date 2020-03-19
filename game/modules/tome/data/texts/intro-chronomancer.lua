@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[Welcome #LIGHT_GREEN#@name@#WHITE#.
+return _t[[Welcome #LIGHT_GREEN#@name@#WHITE#.
 You are a chronomancer, a Keeper of Reality.
 The Keepers of Reality are a group of chronomancers who took upon the self-assigned task of preserving the timelines around Eyal.
 

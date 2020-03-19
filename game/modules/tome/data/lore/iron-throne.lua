@@ -24,8 +24,8 @@
 newLore{
 	id = "iron-throne-profits-1",
 	category = "iron throne",
-	name = "Iron Throne Profits History: Age of Allure",
-	lore = [[#{bold}#3800: #{normal}#Gold accepted as standard unit of currency amongst all races after heavy lobbying. This is greatly to our favour, as our vein resources are high and the material otherwise has no practical usage. Must continue to stockpile more.
+	name = _t"Iron Throne Profits History: Age of Allure",
+	lore = _t[[#{bold}#3800: #{normal}#Gold accepted as standard unit of currency amongst all races after heavy lobbying. This is greatly to our favour, as our vein resources are high and the material otherwise has no practical usage. Must continue to stockpile more.
 #{bold}#4200: #{normal}#New smelting techniques developed allow more stralite to be recovered from existing veins. Techniques must be kept hidden from other races.
 #{bold}#4362: #{normal}#Grand Smith Dakhtun has discovered new methods of infusing magical effects in weapons and armour. Potential for profit growth in this area very high.
 #{bold}#4550: #{normal}#First special meeting of Iron Throne Profits Committee. War with humans and halflings worrying, as it is reducing potential market size. Threat of complete market elimination forces us to drastic action - all weapons trade must cease. Increase stockpiles of construction materials in hope of eventual reconciliation.
@@ -40,8 +40,8 @@ newLore{
 newLore{
 	id = "iron-throne-profits-2",
 	category = "iron throne",
-	name = "Iron Throne Profits History: Age of Dusk",
-	lore = [[#{bold}#412: #{normal}#Diseases and food shortages force increased trade with other races. For the first time in our great history we are in the red. Morale amongst the people is at an all-time low, and is badly affecting productivity.
+	name = _t"Iron Throne Profits History: Age of Dusk",
+	lore = _t[[#{bold}#412: #{normal}#Diseases and food shortages force increased trade with other races. For the first time in our great history we are in the red. Morale amongst the people is at an all-time low, and is badly affecting productivity.
 #{bold}#1430: #{normal}#Several mages visited and used their arts to cure many of the plagues we have suffered for centuries. When offered payment they refused. How very odd...
 #{bold}#1490: #{normal}#Production now nearing pre-Spellblaze levels. Profits high, and commerce with other races increasing.
 #{bold}#1567: #{normal}#Gigantic earthquakes have completely destroyed many of our major production facilities. Loss of personnel resources is also very tragic, especially key production experts. This is having a very negative effect on our forecasts.]],
@@ -50,8 +50,8 @@ newLore{
 newLore{
 	id = "iron-throne-profits-3",
 	category = "iron throne",
-	name = "Iron Throne Profits History: Age of Pyre",
-	lore = [[#{bold}#240: #{normal}#Market forecasts recovering better than expected. Increasing expansion in external trade areas.
+	name = _t"Iron Throne Profits History: Age of Pyre",
+	lore = _t[[#{bold}#240: #{normal}#Market forecasts recovering better than expected. Increasing expansion in external trade areas.
 #{bold}#490: #{normal}#Orcish attacks have become much worse - seem to be using higher magic and some demonic forces. Potential threat to resources.
 #{bold}#581: #{normal}#Several key cities overwhelmed from underground by attacks from orcs and strange horrors. Have collapsed lower caverns to prevent further penetration. Working on continued resource protection measures.
 #{bold}#711: #{normal}#Developed key strategic agreements with outside races to help contain orcish threat to resources and infrastructure. Relations with Toknor of the humans are seen to be especially important - have sent him some of our best armour and weapons to ensure a good return on our investments. In hindsight we should have charged more for these.
@@ -62,8 +62,8 @@ newLore{
 newLore{
 	id = "iron-throne-profits-4",
 	category = "iron throne",
-	name = "Iron Throne Profits History: Age of Ascendancy",
-	lore = [[#{bold}#28: #{normal}#Mutual defence treaty signed with newly formed Allied Kingdom, and further trade routes opened. Highest ever recorded profit in final quarter of this year.
+	name = _t"Iron Throne Profits History: Age of Ascendancy",
+	lore = _t[[#{bold}#28: #{normal}#Mutual defence treaty signed with newly formed Allied Kingdom, and further trade routes opened. Highest ever recorded profit in final quarter of this year.
 #{bold}#115: #{normal}#Noted a return of an orcish presence in the collapsed caverns beneath the Iron Throne. Also increased reports of horrors and demons affecting mining operations. Key strategic decision taken: these must be kept hidden from the other races. Uncertainty will only destabilise the markets. Increase stockpiles of weapons and armour, especially voratun and stralite materials, in case of new war trade.
 #{bold}#120: #{normal}#Orcish raid has stolen many of our stockpiled weapons. Pressures on mining operations have increased, cutting off key stralite veins. Resource protection measures need increasing, whilst threat must be contained beneath us. Profits are stable, but under heavy threat.]],
 }
@@ -71,8 +71,8 @@ newLore{
 newLore{
 	id = "iron-throne-reknor-edict",
 	category = "iron throne",
-	name = "Iron Throne Edict",
-	lore = [[#{bold}#AN EDICT TO ALL CITIZENS OF THE IRON THRONE. LONG MAY OUR EMPIRE ENDURE.#{normal}#
+	name = _t"Iron Throne Edict",
+	lore = _t[[#{bold}#AN EDICT TO ALL CITIZENS OF THE IRON THRONE. LONG MAY OUR EMPIRE ENDURE.#{normal}#
 
 The rumours you have heard are true. It is with a heavy heart that I confirm one of our mines, Reknor, has been overtaken and inhabited by a large and organised orcish force. How there could be such a decisive and total failure on our part to stop this threat remains a mystery - the source of the orcish invasion remains unknown. A battalion of soldiers will form a defensive perimeter around Reknor until a force to retake the mine and exterminate the orcs can be mustered. All civilians residing within the surrounding halls are to be evacuated.
 
@@ -82,8 +82,8 @@ This is a grave and unprecedented issue, so I decree an oath of silence to be la
 newLore{
 	id = "iron-throne-trade-ledger",
 	category = "iron throne",
-	name = "Iron Throne trade ledger",
-	lore = [[#{bold}#IRON THRONE TRADE LEDGER - Allied Kingdom#{normal}#
+	name = _t"Iron Throne trade ledger",
+	lore = _t[[#{bold}#IRON THRONE TRADE LEDGER - Allied Kingdom#{normal}#
 #{italic}#Age of Ascendancy, 121#{normal}#
 
 #{bold}#Last Hope - Exports#{normal}#
@@ -116,8 +116,8 @@ yes to diamonds. arm our merchants in the caravan, no extra guards. profits are 
 newLore{
 	id = "iron-throne-last-words",
 	category = "iron throne",
-	name = "Iron Throne Reknor expedition, last words",
-	lore = [[...We are lost. The orcish forces are too great. No matter how many our squad slays, yet more surge from the depths. Where are the cursed creatures coming from?! We have spied their leader, but have had no hope in killing him; he is a beast, a destroyer, burning with fire infernal and ice cruel and chilling. The power these orcs wield now fills me with dread... perhaps they have found new, mighty allies? This news must reach our ruler. My comrades... I am sorry. I will flee once the opportunity arises, but know that your sacrifices will not be in vain. Long may our empire endure.]]
+	name = _t"Iron Throne Reknor expedition, last words",
+	lore = _t[[...We are lost. The orcish forces are too great. No matter how many our squad slays, yet more surge from the depths. Where are the cursed creatures coming from?! We have spied their leader, but have had no hope in killing him; he is a beast, a destroyer, burning with fire infernal and ice cruel and chilling. The power these orcs wield now fills me with dread... perhaps they have found new, mighty allies? This news must reach our ruler. My comrades... I am sorry. I will flee once the opportunity arises, but know that your sacrifices will not be in vain. Long may our empire endure.]]
 }
 
 --------------------------------------------------------------------------
@@ -127,8 +127,8 @@ newLore{
 newLore{
 	id = "deep-bellow-1",
 	category = "iron throne",
-	name = "Deep Bellow excavation report 1",
-	lore = [[10 days into initial site survey, hmm! Recent tremors have opened deep new chasms, but we must work cautiously to ensure they're stable before conducting major operations, oh yes! Proceeding well at start, with supports being put in place and no flammable gases detected, hmm hmm.
+	name = _t"Deep Bellow excavation report 1",
+	lore = _t[[10 days into initial site survey, hmm! Recent tremors have opened deep new chasms, but we must work cautiously to ensure they're stable before conducting major operations, oh yes! Proceeding well at start, with supports being put in place and no flammable gases detected, hmm hmm.
 
 Some Sher'Tul relics have been found. Perhaps great profit to be had here! High margins on Shaloren market, yes yes.
 
@@ -140,9 +140,9 @@ Some miners saying they feel ill, hrm hrm. The drem fools have likely been gorgi
 newLore{
 	id = "deep-bellow-2",
 	category = "iron throne",
-	name = "Deep Bellow excavation report 2",
+	name = _t"Deep Bellow excavation report 2",
 	bloodstains = 3,
-	lore = [[Chasms go deep, yes yes. More relics found, oh yes. Will be mighty profitable! But ah, my secret treasure is even better, indeed! Gold! Beautiful lovely gold, buried deep, so deep... Have kept it hidden, sealed, yes. Looks like the remains of a giant throne. I touched it, yes, I even put my lips to it - ahhh, the taste!
+	lore = _t[[Chasms go deep, yes yes. More relics found, oh yes. Will be mighty profitable! But ah, my secret treasure is even better, indeed! Gold! Beautiful lovely gold, buried deep, so deep... Have kept it hidden, sealed, yes. Looks like the remains of a giant throne. I touched it, yes, I even put my lips to it - ahhh, the taste!
 
 But must stay focussed, much work to be done. Miners are rowdy, hrm! One of the drem fools went mad and killed himself with a pickaxe - messy business. Must restore order, yes yes! More Sher'Tul artifacts found, possibly even remains of weapons. Imagine the profit! Will keep them hidden yes, the dreams say yes, in the darkness, secret, waiting waiting, for the right time...
 
@@ -154,9 +154,9 @@ Hmm, that fellow's blood was so red, spilling on the cavernous floor. I wonder w
 newLore{
 	id = "deep-bellow-3",
 	category = "iron throne",
-	name = "Deep Bellow excavation report 3",
+	name = _t"Deep Bellow excavation report 3",
 	bloodstains = 12,
-	lore = [[Hah, my mouth, it tastes, it feels, hmm hmm. It grows, yes yes! The others are changing, flying, screaming, squelching, warping. Bad for profit, hmm hmm. My teeth, they grow, they hunger, yes. They want to escape!
+	lore = _t[[Hah, my mouth, it tastes, it feels, hmm hmm. It grows, yes yes! The others are changing, flying, screaming, squelching, warping. Bad for profit, hmm hmm. My teeth, they grow, they hunger, yes. They want to escape!
 
 I can feel in my dreams, the dark depths. Bound, buried, forgotten. My mouth wants to open, to scream, to destroy! Hmm hmm, deep below, yes... Want to get out!
 

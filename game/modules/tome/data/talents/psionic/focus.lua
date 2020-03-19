@@ -60,7 +60,7 @@ newTalent{
 		local dam = t.getDamage(self, t)
 		return ([[Focus energies into a beam to lash all creatures in a line with physical force, doing %d Physical damage and knocking them off balance (-15%% damage penalty) for 2 turns.
 		The damage will scale with your Mindpower.]]):
-		format(damDesc(self, DamageType.PHYSICAL, dam))
+		tformat(damDesc(self, DamageType.PHYSICAL, dam))
 	end,
 }
 
@@ -97,7 +97,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		local dam = t.getDamage(self, t)
 		return ([[Telekinetically energize the matter of all foes within %d squares at the molecular level, setting them ablaze. This does %0.1f fire damage over six turns.]]):
-		format(radius, damDesc(self, DamageType.FIRE, dam))
+		tformat(radius, damDesc(self, DamageType.FIRE, dam))
 	end,
 }
 
@@ -143,7 +143,7 @@ newTalent{
 		The plasma will explode on impact, dealing %0.1f Lightning damage within radius %d.
 		This talent will apply cross tier Brainlock.
 		The damage will increase with your Mindpower.]]):
-		format(damDesc(self, DamageType.LIGHTNING, dam), self:getTalentRadius(t))
+		tformat(damDesc(self, DamageType.LIGHTNING, dam), self:getTalentRadius(t))
 	end,
 }
 
@@ -173,11 +173,11 @@ newTalent{
 		if #effs > 0 then
 			local eff = rng.tableRemove(effs)
 			self:removeEffect(eff[2])
-			game.logSeen(self, "#ORCHID#%s has recovered!", self.name:capitalize())
+			game.logSeen(self, "#ORCHID#%s has recovered!", self:getName():capitalize())
 		end
 	end,
 	info = function(self, t)
 		return ([[Your Iron Will improves your stun immunity by %d%% and gives you a %d%% chance of recovering from a random mental effect each turn.]]):
-		format(t.stunImmune(self, t)*100, t.cureChance(self, t)*100)
+		tformat(t.stunImmune(self, t)*100, t.cureChance(self, t)*100)
 	end,
 }

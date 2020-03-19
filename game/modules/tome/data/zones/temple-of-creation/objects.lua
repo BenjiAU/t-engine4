@@ -27,10 +27,10 @@ local DamageType = require "engine.DamageType"
 newEntity{ base = "BASE_LITE",
 	power_source = {arcane=true},
 	define_as = "ELDRITCH_PEARL",
-	unided_name = "bright pearl",
+	unided_name = _t"bright pearl",
 	name = "Eldritch Pearl", unique=true, image = "object/artifact/eldritch_pearl.png",
 	display ='*', color = colors.AQUAMARINE,
-	desc = [[Thousands of years spent inside the temple of creation have infused this pearl with the fury of rushing water. It pulses light.]],
+	desc = _t[[Thousands of years spent inside the temple of creation have infused this pearl with the fury of rushing water. It pulses light.]],
 
 	-- No cost, it's invaluable
 	wielder = {
@@ -57,7 +57,7 @@ for i = 1, 3 do
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE"..i,
 	name = "tract", lore="temple-creation-note-"..i,
-	desc = [[A tract revealing the history of the Nagas.]],
+	desc = _t[[A tract revealing the history of the Nagas.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -66,7 +66,7 @@ end
 newEntity{ base = "BASE_LORE",
 	define_as = "SLASUL_NOTE",
 	name = "note", lore="temple-creation-note-4",
-	desc = [[A note.]],
+	desc = _t[[A note.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -74,9 +74,9 @@ newEntity{ base = "BASE_LORE",
 newEntity{ base = "BASE_TRIDENT",
 	power_source = {nature=true, psionic=true},
 	define_as = "LEGACY_NALOREN",
-	unided_name = "ornate orichalcum trident",
+	unided_name = _t"ornate orichalcum trident",
 	name = "Legacy of the Naloren", unique=true, image = "object/artifact/legacy_of_the_naloren.png",
-	desc = [[This incredibly beautiful -- and powerful -- trident is made of the rare metal orichalcum. An amazing pearl is seated in head of the trident, as it spreads into three razor sharp prongs.
+	desc = _t[[This incredibly beautiful -- and powerful -- trident is made of the rare metal orichalcum. An amazing pearl is seated in head of the trident, as it spreads into three razor sharp prongs.
 It is imbued with the greatest strengths of all of the most powerful Naga warriors.
 Slasul gave it to you as a sign of his faith in you. It is a sign of hope for all of the Naloren race, that one outside of their tribe could be so trusted.]],
 	require = { stat = { str=35 }, },

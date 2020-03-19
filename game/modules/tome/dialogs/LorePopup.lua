@@ -34,7 +34,7 @@ function _M:init(l, w, force_height)
 	self.font = FontPackage:get("lore")
 	self.font_h = self.font:height()
 
-	Dialog.init(self, "Lore found: #0080FF#"..l.name, 1, 1)
+	Dialog.init(self, ("Lore found: #0080FF#%s"):tformat(l.name), 1, 1)
 
 	local text = util.getval(l.lore, true).."\n"
 	local list = text:splitLines(w - 10, self.font)

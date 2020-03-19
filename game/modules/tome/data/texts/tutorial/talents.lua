@@ -23,7 +23,7 @@ if not game.player.tutored_levels then
 	game.player.tutored_levels = true
 end
 
-return [[You now possess the Shield Pummel and Shield Wall talents.
+return _t[[You now possess the Shield Pummel and Shield Wall talents.
 Talents show up in the lower left part of the screen with their assigned hotkey.
 You can right-click on a talent to remove it from the list, or you can add talents by pressing 'M' to get the talents list and then pressing a hotkey.
 Hotkeys by default are the 1 to 0 keys, and can also be assigned to items.

@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 Onward! The #GOLD#Dungeon of Adventurer Enlightenment#WHITE# awaits you!
 ]]
 

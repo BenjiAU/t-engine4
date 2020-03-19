@@ -192,7 +192,7 @@ newTalent{
 		At talent level 3, when you de-activate the shield twice the absorbed damage (if any) in the last 3 turns is released as a full psionic shield (absorbing all damage).
 		The maximum amount of damage your shield can absorb and the efficiency of the psi gain scale with your mindpower.
 		You can only have two of these shields active at once.]]):
-		format(absorb, s_str, shieldMastery(self, t), maxPsiAbsorb(self,t))
+		tformat(absorb, s_str, shieldMastery(self, t), maxPsiAbsorb(self,t))
 	end,
 }
 
@@ -257,7 +257,7 @@ newTalent{
 		At talent level 3, when you de-activate the shield twice the absorbed damage (if any) in the last 3 turns is released as a full psionic shield (absorbing all damage).
 		The maximum amount of damage your shield can absorb and the efficiency of the psi gain scale with your mindpower.
 		You can only have two of these shields active at once.]]):
-		format(absorb, s_str, shieldMastery(self, t), maxPsiAbsorb(self,t))
+		tformat(absorb, s_str, shieldMastery(self, t), maxPsiAbsorb(self,t))
 	end,
 }
 
@@ -322,7 +322,7 @@ newTalent{
 		At talent level 3, when you de-activate the shield twice the absorbed damage (if any) in the last 3 turns is released as a full psionic shield (absorbing all damage).
 		The maximum amount of damage your shield can absorb and the efficiency of the psi gain scale with your mindpower.
 		You can only have two of these shields active at once.]]):
-		format(absorb, s_str, shieldMastery(self, t), maxPsiAbsorb(self,t))
+		tformat(absorb, s_str, shieldMastery(self, t), maxPsiAbsorb(self,t))
 	end,
 }
 
@@ -388,6 +388,6 @@ newTalent{
 		return ([[Surround yourself with a forcefield, reducing all incoming damage by %d%%.
 		Such a shield is very expensive to maintain, draining 5%% of your maximum psi per turn initially plus an addition 5%% for each turn it has been maintained. For example, on turn 2 it will drain 10%%.
 		Current drain rate: %0.1f psi/turn]]):
-		format(t.getResist(self,t), drain)
+		tformat(t.getResist(self,t), drain)
 	end,
 }

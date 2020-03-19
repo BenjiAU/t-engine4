@@ -23,7 +23,7 @@ local is_bigworm = layout == "BIGWORM"
 if layout == "DEFAULT" then
 
 return {
-	name = "Sandworm lair",
+	name = _t"Sandworm lair",
 	level_range = {7, 16},
 	level_scheme = "player",
 	max_level = 4,
@@ -87,7 +87,7 @@ return {
 elseif layout == "BIGWORM" then
 
 return {
-	name = "Sandworm lair",
+	name = _t"Sandworm lair",
 	level_range = {7, 16},
 	level_scheme = "player",
 	max_level = 2,

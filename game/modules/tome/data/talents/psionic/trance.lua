@@ -84,7 +84,7 @@ newTalent{
 		local saves = t.getSavingThrows(self, t)
 		return ([[Activate to purge negative status effects (100%% chance for the first effect, -%d%% less chance for each subsequent effect).  While this talent is sustained all your saving throws are increased by %d.
 		The chance to purge and saving throw bonus will scale with your mindpower.
-		Only one trance may be active at a time.]]):format(purge, saves)
+		Only one trance may be active at a time.]]):tformat(purge, saves)
 	end,
 }
 
@@ -135,7 +135,7 @@ newTalent{
 		local regen = t.getLifeRegen(self, t)
 		return ([[Activate to heal yourself for %0.2f life.  While this talent is sustained your healing modifier will be increased by %d%% and your life regen by %0.2f.
 		The effects will scale with your mindpower.
-		Only one trance may be active at a time.]]):format(heal, healing_modifier, regen)
+		Only one trance may be active at a time.]]):tformat(heal, healing_modifier, regen)
 	end,
 }
 
@@ -175,7 +175,7 @@ newTalent{
 		local chance = t.getCriticalChance(self, t)
 		return ([[Activate to increase your critical strike damage by %d%% for 10 turns.  While this talent is sustained your critical strike chance is improved by +%d%%.
 		The effects will scale with your mindpower.
-		Only one trance may be active at a time.]]):format(power, chance)
+		Only one trance may be active at a time.]]):tformat(power, chance)
 	end,
 }
 
@@ -187,6 +187,6 @@ newTalent{
 	mode = "passive",
 	info = function(self, t)
 		return ([[When you wield or wear an item infused by psionic, nature, or arcane-disrupting forces you improve all values under its 'when wielded/worn' field %d%%.
-		Note this doesn't change the item itself, but rather the effects it has on your person (the item description will not reflect the improved values).]]):format(1)
+		Note this doesn't change the item itself, but rather the effects it has on your person (the item description will not reflect the improved values).]]):tformat(1)
 	end,
 }

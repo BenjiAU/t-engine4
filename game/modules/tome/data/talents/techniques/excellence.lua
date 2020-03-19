@@ -63,7 +63,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Your reflexes are lightning-fast, if you spot a projectile (arrow, shot, spell, ...) you can instantly shoot at it without taking a turn to take it down.
 		You can shoot down up to %d projectiles.]]):
-		format(t.getNb(self, t))
+		tformat(t.getNb(self, t))
 	end,
 }
 
@@ -127,7 +127,7 @@ newTalent{
 	info = function(self, t)
 		return ([[You rush toward your foe, readying your shot. If you reach the enemy, you release the shot, imbuing it with great power.
 		The shot does %d%% weapon damage and knocks back your target by %d.]]):
-		format(self:combatTalentWeaponDamage(t, 1.5, 2.8) * 100, t.getDist(self, t))
+		tformat(self:combatTalentWeaponDamage(t, 1.5, 2.8) * 100, t.getDist(self, t))
 	end,
 }
 
@@ -162,7 +162,7 @@ newTalent{
 		if not self:checkHit(self:combatAttackRanged(weapon, ammo), target:combatDefenseRanged()) or target:checkEvasion(self) then 
 			xatk, ret = -1e6, false
 		end
-		game.logSeen(self, "%s %s the attack!", self.name:capitalize(), ret and "intercepts" or "fails to intercept")
+		game.logSeen(self, "%s %s the attack!", self:getName():capitalize(), ret and _t"intercepts" or _t"fails to intercept")
 		self:archeryShoot(targets, t, nil, {atk = xatk, mult=self:combatTalentWeaponDamage(t, 0.4, 0.9)})
 		return ret
 	end,
@@ -176,7 +176,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Activating this talent enhances your reflexes to incredible levels.  Each time you are attacked in melee, you have a %d%% chance get a defensive shot off in time to intercept the attack, fully disrupting it (including extra blows from certain talents), dealing %d%% archery damage, and knocking the attacker back %d tiles.
 		Activating this talent will not interrupt reloading.]])
-		:format(t.getChance(self, t), self:combatTalentWeaponDamage(t, 0.4, 0.9) * 100, t.getDist(self, t))
+		:tformat(t.getChance(self, t), self:combatTalentWeaponDamage(t, 0.4, 0.9) * 100, t.getDist(self, t))
 	end,
 }
 
@@ -202,7 +202,7 @@ newTalent{
 		if target:canBe("silence") then
 			target:setEffect(target.EFF_SILENCED, t.getDur(self, t), {apply_power=self:combatAttack()})
 		else
-			game.logSeen(target, "%s resists the strangling shot!", target.name:capitalize())
+			game.logSeen(target, "%s resists the strangling shot!", target:getName():capitalize())
 		end
 	end,
 	action = function(self, t)
@@ -215,6 +215,6 @@ newTalent{
 	info = function(self, t)
 		return ([[You fire a shot at your target's throat, mouth, or equivalent body part, doing %d%% damage and silencing it for %d turns.
 		The silence chance increases with your Accuracy.]])
-		:format(self:combatTalentWeaponDamage(t, 0.9, 1.7) * 100, t.getDur(self,t))
+		:tformat(self:combatTalentWeaponDamage(t, 0.9, 1.7) * 100, t.getDur(self,t))
 	end,
 }

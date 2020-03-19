@@ -20,12 +20,12 @@
 use_ui = "quest-main"
 
 -- Orc Hunting
-name = "Let's hunt some Orc"
+name = _t"Let's hunt some Orc"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "The elder in Last Hope sent you to the old Dwarven kingdom of Reknor, deep under the Iron Throne, to investigate the orc presence."
-	desc[#desc+1] = "Find out if they are in any way linked to the lost staff."
-	desc[#desc+1] = "But be careful -- even the Dwarves have not ventured in these old halls for many years."
+	desc[#desc+1] = _t"The elder in Last Hope sent you to the old Dwarven kingdom of Reknor, deep under the Iron Throne, to investigate the orc presence."
+	desc[#desc+1] = _t"Find out if they are in any way linked to the lost staff."
+	desc[#desc+1] = _t"But be careful -- even the Dwarves have not ventured in these old halls for many years."
 	return table.concat(desc, "\n")
 end
 

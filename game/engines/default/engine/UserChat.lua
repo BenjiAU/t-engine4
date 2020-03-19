@@ -253,15 +253,15 @@ Your Item Vault has #TEAL#%d slots#WHITE#.
 
 Again, thank you, and enjoy Eyal!
 
-#{italic}#Your malevolent local god of darkness, #GOLD#DarkGod#{normal}#]]):format(data.donated, data.donated * 10, data.items_vault_slots)
-			Dialog:simpleLongPopup("Thank you!", text, 600)
+#{italic}#Your malevolent local god of darkness, #GOLD#DarkGod#{normal}#]]):tformat(data.donated, data.donated * 10, data.items_vault_slots)
+			Dialog:simpleLongPopup(_t"Thank you!", text, 600)
 		end
 	elseif e.se == "SelfJoin" then
-		self:addMessage("join", e.channel, profile.auth.login, e.channel, "#{italic}#Joined channel#{normal}#", nil, true)
+		self:addMessage("join", e.channel, profile.auth.login, e.channel, _t"#{italic}#Joined channel#{normal}#", nil, true)
 		self:updateChanList()
 		self:saveChannels()
 	elseif e.se == "SelfPart" then
-		self:addMessage("join", e.channel, profile.auth.login, e.channel, "#{italic}#Left channel#{normal}#", nil, true)
+		self:addMessage("join", e.channel, profile.auth.login, e.channel, _t"#{italic}#Left channel#{normal}#", nil, true)
 		self.channels[e.channel] = nil
 		self:updateChanList()
 		self:saveChannels()
@@ -271,7 +271,7 @@ Again, thank you, and enjoy Eyal!
 		self.channels[e.channel] = self.channels[e.channel] or {users={}, log={}}
 		self.channels[e.channel].users[e.login] = {name=e.name, donator=e.donator, status=e.status, login=e.login}
 		self.channels_changed = true
-		self:addMessage("join", e.channel, e.login, {uname, color}, "#{italic}##FIREBRICK#has joined the channel#{normal}#", nil, true)
+		self:addMessage("join", e.channel, e.login, {uname, color}, _t"#{italic}##FIREBRICK#has joined the channel#{normal}#", nil, true)
 		if type(game) == "table" and game.logChat and e.channel == self.cur_channel then
 			game.logChat("#{italic}##FIREBRICK#%s has joined channel %s (press space to talk).#{normal}#", e.login, e.channel)
 		end
@@ -282,7 +282,7 @@ Again, thank you, and enjoy Eyal!
 		self.channels[e.channel] = self.channels[e.channel] or {users={}, log={}}
 		self.channels[e.channel].users[e.login] = nil
 		self.channels_changed = true
-		self:addMessage("join", e.channel, e.login, {uname, color}, "#{italic}##FIREBRICK#has left the channel#{normal}#", nil, true)
+		self:addMessage("join", e.channel, e.login, {uname, color}, _t"#{italic}##FIREBRICK#has left the channel#{normal}#", nil, true)
 		if type(game) == "table" and game.logChat and e.channel == self.cur_channel then
 			game.logChat("#{italic}##FIREBRICK#%s has left channel %s.#{normal}#", e.login, e.channel)
 		end
@@ -475,7 +475,7 @@ end
 function _M:showUserInfo(login)
 	if not profile.auth then return end
 
-	local popup = Dialog:simpleWaiter("Requesting...", "Requesting user info...")
+	local popup = Dialog:simpleWaiter(_t"Requesting...", _t"Requesting user info...")
 	core.display.forceRedraw()
 
 	core.profile.pushOrder(string.format("o='ChatUserInfo' login=%q", login))
@@ -485,7 +485,7 @@ function _M:showUserInfo(login)
 	popup:done()
 
 	if not data then
-		Dialog:simplePopup("Error", "The server does not know about this player.")
+		Dialog:simplePopup(_t"Error", _t"The server does not know about this player.")
 		return
 	end
 	data = zlib.decompress(data):unserialize()
@@ -498,7 +498,7 @@ end
 function _M:getUserInfo(login)
 	if not profile.auth then return end
 
-	local popup = Dialog:simpleWaiter("Requesting...", "Requesting user info...")
+	local popup = Dialog:simpleWaiter(_t"Requesting...", _t"Requesting user info...")
 	core.display.forceRedraw()
 
 	core.profile.pushOrder(string.format("o='ChatUserInfo' login=%q", login))

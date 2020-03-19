@@ -18,11 +18,11 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[Thank you, @playername@! We both survived for the wealth of the Empire. I will bring them the news and then rest.
+	text = _t[[Thank you, @playername@! We both survived for the wealth of the Empire. I will bring them the news and then rest.
 I do not think I want to see death so closely for some time now.
 Farewell.]],
 	answers = {
-		{"For the Empire! Take care.", action=function(npc, player)
+		{_t"For the Empire! Take care.", action=function(npc, player)
 			npc:disappear()
 			world:gainAchievement("NORGAN_SAVED", player)
 		end},

@@ -34,7 +34,7 @@ newTalent{
 		local power = t.critpower(self, t)
 		return ([[You have learned to find and hit weak spots. All your strikes have a %0.1f%% greater chance to be critical hits, and your critical hits do %0.1f%% more damage.
 		Also, when using knives and throwing knives, you now use your Cunning instead of your Strength for bonus damage.]]):
-		format(critchance, power)
+		tformat(critchance, power)
 	end,
 }
 
@@ -79,7 +79,7 @@ newTalent{
 		For %d turns thereafter, you gain %d armor penetration, %d accuracy, and %d%% all damage peneration.
 		Learning this technique allows you to permanently gain %d armour penetration with all melee and archery attacks.
 		The temporary armor penetration and accuracy bonuses increase with Cunning.]]):
-		format(100 * damage, duration, t.getAPRBuff(self, t), t.getAccuracy(self, t), t.getPenetration(self, t), t.getAPR(self, t))
+		tformat(100 * damage, duration, t.getAPRBuff(self, t), t.getAccuracy(self, t), t.getPenetration(self, t), t.getAPR(self, t))
 	end,
 }
 
@@ -97,7 +97,7 @@ newTalent{
 	no_break_stealth = true,
 	no_energy = true,
 	deactivate_on = {no_combat=true, run=true, rest=true},
-	getSpeed = function(self, t) return self:combatTalentScale(t, 0.10, 0.30, 0.75) end,
+	getSpeed = function(self, t) return self:combatTalentScale(t, 0.10, 0.30) end,
 	getDamage = function(self, t) return 1 end,
 	activate = function(self, t)
 		local ret = {
@@ -136,7 +136,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Become a whirling storm of blades, increasing attack speed by %d%% and causing melee attacks to strike an additional adjacent target other than your primary target for %d%% weapon damage. 
-This talent is exhausting to use, draining 4 stamina each turn.]]):format(t.getSpeed(self, t)*100, t.getDamage(self,t)*100)
+This talent is exhausting to use, draining 4 stamina each turn.]]):tformat(t.getSpeed(self, t)*100, t.getDamage(self,t)*100)
 	end,
 }
 
@@ -174,6 +174,6 @@ newTalent{
 		local talentcount = t.getTalentCount(self, t)
 		local maxlevel = t.getMaxLevel(self, t)
 		return ([[Your quick wits allow you to reset the cooldown of up to %d of your combat talents (cunning or technique) of tier %d or less.]]):
-		format(talentcount, maxlevel)
+		tformat(talentcount, maxlevel)
 	end,
 }

@@ -53,7 +53,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Conjures up mana into a powerful beam of lightning, doing %0.2f to %0.2f damage (%0.2f average)
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHTNING, damage / 3),
+		tformat(damDesc(self, DamageType.LIGHTNING, damage / 3),
 		damDesc(self, DamageType.LIGHTNING, damage),
 		damDesc(self, DamageType.LIGHTNING, (damage + damage / 3) / 2))
 
@@ -135,7 +135,7 @@ newTalent{
 		return ([[Invokes a forking beam of lightning doing %0.2f to %0.2f damage (%0.2f average) and forking to another target.
 		It can hit up to %d targets up to 10 grids apart, and will never hit the same one twice; nor will it hit the caster.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHTNING, damage / 3),
+		tformat(damDesc(self, DamageType.LIGHTNING, damage / 3),
 			damDesc(self, DamageType.LIGHTNING, damage),
 			damDesc(self, DamageType.LIGHTNING, (damage + damage / 3) / 2),
 			targets)
@@ -190,7 +190,7 @@ newTalent{
 		return ([[A gentle wind circles around the caster, increasing carrying capacity by %d, defense against projectiles by %d, pin immunity by %d%% and stun immunity by %d%%.
 		At level 4 it also makes you levitate slightly above the ground, allowing you to ignore some traps.
 		At level 5 it also grants %d%% movement speed and removes %d fatigue.]]):
-		format(encumberance, rangedef, pin*100, stun*100, t.getSpeed(self, t) * 100, t.getFatigue(self, t))
+		tformat(encumberance, rangedef, pin*100, stun*100, t.getSpeed(self, t) * 100, t.getFatigue(self, t))
 	end,
 }
 
@@ -232,12 +232,12 @@ newTalent{
 	end,
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/thunderstorm")
-		game.logSeen(self, "#0080FF#A furious lightning storm forms around %s!", self.name)
+		game.logSeen(self, "#0080FF#A furious lightning storm forms around %s!", self:getName())
 		return {
 		}
 	end,
 	deactivate = function(self, t, p)
-		game.logSeen(self, "#0080FF#The furious lightning storm around %s calms down and disappears.", self.name)
+		game.logSeen(self, "#0080FF#The furious lightning storm around %s calms down and disappears.", self:getName())
 		return true
 	end,
 	info = function(self, t)
@@ -246,6 +246,6 @@ newTalent{
 		return ([[Conjures a furious, raging lightning storm with a radius of 6 that follows you as long as this spell is active.
 		Each turn, a random lightning bolt will hit up to %d of your foes for 1.00 to %0.2f damage (%0.2f average) in a radius of 1.
 		The damage will increase with your Spellpower.]]):
-		format(targetcount, damDesc(self, DamageType.LIGHTNING, damage), damDesc(self, DamageType.LIGHTNING, damage / 2))
+		tformat(targetcount, damDesc(self, DamageType.LIGHTNING, damage), damDesc(self, DamageType.LIGHTNING, damage / 2))
 	end,
 }

@@ -44,7 +44,7 @@ function _M:init(title, actor, text, dialog_talent, max_traps, trap_tids)
 	for tid, level in pairs(trap_tids or Talents.trap_mastery_tids) do
 		if game.state:unlockTalentCheck(tid, actor) or actor:knowTalent(tid) then self.trap_tids[tid] = level end
 	end
-	Dialog.init(self, title or "Select Traps", math.max(900, game.w * 0.8), math.max(700, game.h * 0.8))
+	Dialog.init(self, title or _t"Select Traps", math.max(900, game.w * 0.8), math.max(700, game.h * 0.8))
 	
 	-- keep track of traps selected
 	self.traps_selected = {}
@@ -56,13 +56,13 @@ function _M:init(title, actor, text, dialog_talent, max_traps, trap_tids)
 --table.set(game, "debug", "TrapsSelect", self) -- debugging
 	self:generateList()
 	local text_w, text_h = self.font:size(text)
-	local c_desc = Textzone.new{width=400, auto_height=true, text=self.text or "Select traps to prepare:"}
+	local c_desc = Textzone.new{width=400, auto_height=true, text=self.text or _t"Select traps to prepare:"}
 	local c_list = List.new{width=400, height=math.min(game.h*.75, (text_h+5)*(#self.list+1)), nb_items=#self.list, list=self.list, scrollbar=true, fct=function(item) self:use(item) end}
 	-- tooltips
 	c_list.on_select = function(item)
 		if item.talent then
 			actor.turn_procs.trap_mastery_tid = dialog_talent.id
-			game:tooltipDisplayAtMap(game.w, game.h, "#GOLD#"..item.talent.name.."#LAST#\n"..tostring(actor:getTalentFullDescription(item.talent, 1, {force_level=1})))
+			game:tooltipDisplayAtMap(game.w, game.h, ("#GOLD#%s#LAST#\n%s"):tformat(item.talent.name, tostring(actor:getTalentFullDescription(item.talent, 1, {force_level=1}))))
 			actor.turn_procs.trap_mastery_tid = nil
 		end
 	end
@@ -102,32 +102,32 @@ function _M:formatItem(item)
 		if self.actor.trap_primed == item.tid then
 			if self.traps_selected[item.tid] then
 				item.color = colors_simple.AQUAMARINE
-				add_text = " (replacing instant trigger)"
+				add_text = _t" (replacing instant trigger)"
 			else
 				item.color = colors_simple.SALMON
-				add_text = " (primed trigger)"
+				add_text = _t" (primed trigger)"
 			end
 		elseif self.traps_selected[item.tid] then
 			if self.starting_traps[item.tid] then
 				item.color = colors_simple.LIGHT_BLUE
-				add_text = " (prepared)"
+				add_text = _t" (prepared)"
 			else
 				item.color = colors_simple.LIGHT_GREEN
-				add_text = " (preparing)"
+				add_text = _t" (preparing)"
 			end
 		else
 			if self.starting_traps[item.tid] then
 				item.color = colors_simple.LIGHT_RED
-				add_text = " (dismantling)"
+				add_text = _t" (dismantling)"
 			elseif item.tier > self.mastery_level then
 				item.color = colors_simple.GREY
-				add_text = " (need more skill)"
+				add_text = _t" (need more skill)"
 			elseif item.unlearnable then
 				item.color = colors_simple.GREY
-				add_text = (" (%s)"):format(item.unlearnable)
+				add_text = (" (%s)"):tformat(item.unlearnable)
 			end
 		end
-		item.name = ("%s) Tier %d: %s%s"):format(item.char or "  ", item.tier, item.talent.name, add_text)
+		item.name = ("%s) Tier %d: %s%s"):tformat(item.char or "  ", item.tier, item.talent.name, add_text)
 	end
 end
 
@@ -155,7 +155,7 @@ function _M:use(item)
 end
 
 function _M:generateList()
-	local list = {{label="Accept these selections", tier=0, color = colors_simple.GOLD,
+	local list = {{label=_t"Accept these selections", tier=0, color = colors_simple.GOLD,
 		action=function()
 			if self.num_sel <= self.max_traps then
 				self.actor:talentDialogReturn(self.traps_selected, self.starting_traps)

@@ -58,7 +58,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_XORN",
 	name = "umber hulk", color=colors.LIGHT_UMBER,
-	desc = [[This bizarre creature has glaring eyes and large mandibles capable of slicing through rock.]],
+	desc = _t[[This bizarre creature has glaring eyes and large mandibles capable of slicing through rock.]],
 	level_range = {10, nil}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(100,120),
@@ -69,7 +69,7 @@ newEntity{ base = "BASE_NPC_XORN",
 
 newEntity{ base = "BASE_NPC_XORN",
 	name = "xorn", color=colors.UMBER,
-	desc = [[A huge creature of the element Earth. Able to merge with its element, it has four huge arms protruding from its enormous torso.]],
+	desc = _t[[A huge creature of the element Earth. Able to merge with its element, it has four huge arms protruding from its enormous torso.]],
 	level_range = {15, nil}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(130,140),
@@ -80,7 +80,7 @@ newEntity{ base = "BASE_NPC_XORN",
 
 newEntity{ base = "BASE_NPC_XORN",
 	name = "xaren", color=colors.SLATE,
-	desc = [[It is a tougher relative of the Xorn. Its hide glitters with metal ores.]],
+	desc = _t[[It is a tougher relative of the Xorn. Its hide glitters with metal ores.]],
 	level_range = {15, nil}, exp_worth = 1,
 	rarity = 3,
 	max_life = resolvers.rngavg(130,140),
@@ -92,7 +92,7 @@ newEntity{ base = "BASE_NPC_XORN",
 newEntity{ base = "BASE_NPC_XORN",
 	name = "The Fragmented Essence of Harkor'Zun", color=colors.VIOLET, unique=true,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/elemental_xorn_fragmented_harkor_zun.png", display_h=2, display_y=-1}}},
-	desc = [[Fragmented essence... maybe it'd be best if it stayed fragmented.]],
+	desc = _t[[Fragmented essence... maybe it'd be best if it stayed fragmented.]],
 	level_range = {17, nil}, exp_worth = 0,
 	rank = 3.5,
 	size_category = 4,
@@ -138,7 +138,7 @@ newEntity{ base = "BASE_NPC_XORN",
 		for _, m in ipairs(self.all_fragments) do
 			if not m.dead then
 				nb_alive = nb_alive + 1
-				game.logSeen(self, "#AQUAMARINE#%s absorbs the energy of the destroyed fragment!", self.name)
+				game.logSeen(self, "#AQUAMARINE#%s absorbs the energy of the destroyed fragment!", self:getName())
 				m.max_life = m.max_life + m.add_max_life
 				m:heal(m.add_max_life)
 				m.inc_damage.all = (m.inc_damage.all or 0) + 20
@@ -166,7 +166,7 @@ newEntity{ base = "BASE_NPC_XORN",
 newEntity{ base = "BASE_NPC_XORN", define_as = "FULL_HARKOR_ZUN",
 	name = "Harkor'Zun", color=colors.VIOLET, unique=true,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/elemental_xorn_harkor_zun.png", display_h=2, display_y=-1}}},
-	desc = [[A gigantic demon composed of elemental Earth, resembling a twisted Xaren but much, much larger.  It doesn't seem pleased with your presence.]],
+	desc = _t[[A gigantic demon composed of elemental Earth, resembling a twisted Xaren but much, much larger.  It doesn't seem pleased with your presence.]],
 	level_range = {23, nil}, exp_worth = 2,
 	rank = 3.5,
 	size_category = 5,

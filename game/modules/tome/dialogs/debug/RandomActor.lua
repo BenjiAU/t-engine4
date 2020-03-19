@@ -34,7 +34,7 @@ _M._boss_data = _M._default_boss_data
 
 --- formats function help for dialog output
 local function formatHelp(f_lines, f_name, f_lnum)
-	local help = ("#LIGHT_GREEN#(From %s, line %s):#LAST#"):format(f_name or "unknown", f_lnum or "unknown")
+	local help = ("#LIGHT_GREEN#(From %s, line %s):#LAST#"):tformat(f_name or "unknown", f_lnum or "unknown")
 	for _, line in ipairs(f_lines) do
 		line = line:gsub("#", "_")
 		help = help.."\n    "..line:gsub("\t", "    ")
@@ -56,14 +56,14 @@ lines, fname, lnum = DebugConsole:functionHelp(mod.class.Actor.levelupClass)
 _M.data_help = _M.data_help.."\n#GOLD#DATA HELP#LAST# "..formatHelp(lines, fname, lnum)
 
 function _M:init()
-	engine.ui.Dialog.init(self, "DEBUG -- Create Random Actor", 1, 1)
+	engine.ui.Dialog.init(self, _t"DEBUG -- Create Random Actor", 1, 1)
 
 	local tops={0}	self.tops = tops
 	
 --	if not _M._base_actor then self:generateBase() end
 	
 	local dialog_txt = Textzone.new{auto_width=true, auto_height=true, no_color_bleed=true, font=self.font,
-	text=([[Randomly generate actors subject to a filter and/or create random bosses according to a data table.
+	text=(_t[[Randomly generate actors subject to a filter and/or create random bosses according to a data table.
 Filters are interpreted by game.zone:checkFilter.
 #ORANGE#Boss Data:#LAST# is interpreted by game.state:createRandomBoss, game.state:applyRandomClass, and Actor.levelupClass.
 Generation is performed within the _G environment (used by the Lua Console) using the current zone's #LIGHT_GREEN#npc_list#LAST#.
@@ -79,11 +79,11 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 		local txt
 		if _M._base_actor then
 			local r, rc = _M._base_actor:TextRank()
-			txt = (rc or "#WHITE#").._M._base_actor.name.."#LAST#"
+			txt = (rc or "#WHITE#").._M._base_actor:getName().."#LAST#"
 		else
-			txt = "#GREY#None#LAST#"
+			txt = _t"#GREY#None#LAST#"
 		end
-		return ([[Current Base Actor: %s]]):format(txt)
+		return ([[Current Base Actor: %s]]):tformat(txt)
 	end
 	local base_txt = Textzone.new{auto_width=true, auto_height=true, no_color_bleed=true, font=self.font,
 	text = base_text(), can_focus=true}
@@ -94,10 +94,10 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 	base_txt.on_focus = function() _M.tooltip(_M._base_actor) _M.help_display = "filter_help" end
 	self.base_txt = base_txt
 	
-	local base_refresh = self.newButton{text="Generate", _actor_field="_base_actor",
+	local base_refresh = self.newButton{text=_t"Generate", _actor_field="_base_actor",
 		fct=function()
 			self:generateBase()
-			game.log("#LIGHT_BLUE# Current base actor: %s", _M._base_actor and _M._base_actor.name or "none")
+			game.log("#LIGHT_BLUE# Current base actor: %s", _M._base_actor and _M._base_actor:getName() or "none")
 			self.base_txt:refresh(_M._base_actor)
 			self.base_refresh.on_select()
 		end,
@@ -106,7 +106,7 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 	self.base_refresh = base_refresh
 	tops[#tops+1]=tops[#tops] + base_refresh.h + 5
 	
-	local base_make = self.newButton{text="Place", _actor_field="_base_actor",
+	local base_make = self.newButton{text=_t"Place", _actor_field="_base_actor",
 		fct=function()
 			self:placeActor(_M._base_actor)
 		end,
@@ -114,7 +114,7 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 	}
 	self.base_make = base_make
 	
-	local base_reset_filter = self.newButton{text="Default Filter", _actor_field="_base_actor",
+	local base_reset_filter = self.newButton{text=_t"Default Filter", _actor_field="_base_actor",
 		fct=function()
 			game.log("#LIGHT_BLUE# Reset base filter")
 			_M._base_filter = _M._default_base_filter
@@ -124,9 +124,9 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 	}
 	self.base_reset_filter = base_reset_filter
 	
-	local base_clear = self.newButton{text="Clear", _actor_field="_base_actor",
+	local base_clear = self.newButton{text=_t"Clear", _actor_field="_base_actor",
 		fct=function()
-			game.log("#LIGHT_BLUE# Clear base actor: %s", _M._base_actor and _M._base_actor.name or "none")
+			game.log("#LIGHT_BLUE# Clear base actor: %s", _M._base_actor and _M._base_actor:getName() or "none")
 			if _M._base_actor then
 				_M._base_actor:removed()
 				_M._base_actor = nil
@@ -138,7 +138,7 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 	}
 	self.base_clear = base_clear
 	
-	local bf_box = _M.newTextbox{title="#LIGHT_BLUE#Base Filter:#LAST# ", text=_M._base_filter or "{}", chars=120, max_len=500,
+	local bf_box = _M.newTextbox{title=_t"#LIGHT_BLUE#Base Filter:#LAST# ", text=_M._base_filter or "{}", chars=120, max_len=500,
 		fct=function(text)
 			_M._base_filter = text
 			self:generateBase()
@@ -154,7 +154,7 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 	tops[#tops+1]=tops[#tops] + bf_box.h + 10
 	
 	local boss_info = Textzone.new{auto_width=true, auto_height=true, no_color_bleed=true, font=self.font,
-	text=[[The #ORANGE#Boss Data#LAST# is used to transform the base actor into a random boss (which will use a random actor if needed).]]}
+	text=_t[[The #ORANGE#Boss Data#LAST# is used to transform the base actor into a random boss (which will use a random actor if needed).]]}
 	self.boss_info = boss_info
 	tops[#tops+1]=tops[#tops] + boss_info.h + 5
 	
@@ -162,11 +162,11 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 		local txt
 		if _M._boss_actor then
 			local r, rc = _M._boss_actor:TextRank()
-			txt = (rc or "#ORANGE#").._M._boss_actor.name.."#LAST#"
+			txt = (rc or "#ORANGE#").._M._boss_actor:getName().."#LAST#"
 		else
-			txt = "#GREY#None#LAST#"
+			txt = _t"#GREY#None#LAST#"
 		end
-		return ([[Current Boss Actor: %s]]):format(txt)
+		return ([[Current Boss Actor: %s]]):tformat(txt)
 	end
 	local boss_txt = Textzone.new{auto_width=true, auto_height=true, no_color_bleed=true, font=self.font,
 	text=boss_text(), can_focus=true}
@@ -177,7 +177,7 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 	boss_txt.on_focus = function() _M.tooltip(_M._boss_actor) _M.help_display = "data_help" end
 	self.boss_txt = boss_txt
 	
-	local boss_refresh = self.newButton{text="Generate", _actor_field="_boss_actor",
+	local boss_refresh = self.newButton{text=_t"Generate", _actor_field="_boss_actor",
 		fct=function()
 			self:generateBoss()
 			boss_txt:refresh()
@@ -188,7 +188,7 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 	self.boss_refresh = boss_refresh
 	tops[#tops+1]=tops[#tops] + boss_refresh.h + 5
 	
-	local boss_reset_data = self.newButton{text="Default Data", _actor_field="_boss_actor",
+	local boss_reset_data = self.newButton{text=_t"Default Data", _actor_field="_boss_actor",
 		fct=function()
 			game.log("#LIGHT_BLUE# Reset Randboss Data")
 			_M._boss_data = _M._default_boss_data
@@ -198,7 +198,7 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 	}
 	self.boss_reset_data = boss_reset_data
 	
-	local boss_make = self.newButton{text="Place", _actor_field="_boss_actor",
+	local boss_make = self.newButton{text=_t"Place", _actor_field="_boss_actor",
 		fct=function()
 			boss_txt:refresh()
 			self:placeActor(_M._boss_actor)
@@ -207,7 +207,7 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 	}
 	self.boss_make = boss_make
 	
-	local boss_data_box = _M.newTextbox{title="#ORANGE#Boss Data:#LAST# ", text=_M._boss_data or "{}", chars=120, max_len=500,
+	local boss_data_box = _M.newTextbox{title=_t"#ORANGE#Boss Data:#LAST# ", text=_M._boss_data or "{}", chars=120, max_len=500,
 		fct=function(text)
 			_M._boss_data = text
 			self:generateBoss()
@@ -250,7 +250,7 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 		end,}
 	self.key:addCommands{ 
 		_F1 = function() -- Help for filters and data (at upper left)
-			local d = Dialog:simpleLongPopup("Filter and Data Help", 
+			local d = Dialog:simpleLongPopup(_t"Filter and Data Help", 
 ([[%s]]):format(_M[_M.help_display] or _M.filter_help), math.max(500, game.w/2)
 		)
 		engine.Dialog.resize(d, d.w, d.h, 25, 25)
@@ -264,7 +264,7 @@ function _M.tooltip(act)
 		local plr = game.player
 		game:tooltipDisplayAtMap(game.w, game.h, act:tooltip(plr.x, plr.y, plr), nil, true)
 	else
-		game:tooltipDisplayAtMap(game.w, game.h, "#GREY#No Actor to Display#LAST#", nil, true)
+		game:tooltipDisplayAtMap(game.w, game.h, _t"#GREY#No Actor to Display#LAST#", nil, true)
 	end
 end
 

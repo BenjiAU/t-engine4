@@ -34,7 +34,7 @@ racial_req4 = {
 ------------------------------------------------------------------
 -- Highers' powers
 ------------------------------------------------------------------
-newTalentType{ type="race/higher", name = "higher", generic = true, description = "The various racial bonuses a character can have." }
+newTalentType{ type="race/higher", name = _t"higher", generic = true, description = _t"The various racial bonuses a character can have." }
 
 newTalent{
 	short_name = "HIGHER_HEAL",  -- Backwards compatibility, two tier 1 racials were swapped
@@ -53,7 +53,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Call upon the power of the Highborn, increasing all damage by %d%% and reducing all damage taken by %d%% for 5 turns.
 		The bonus will increase with your Magic.]]):
-		format(t.getPower(self, t), t.getPower(self, t))
+		tformat(t.getPower(self, t), t.getPower(self, t))
 	end,
 }
 
@@ -82,7 +82,7 @@ newTalent{
 		Their nature grants them better senses than other humans.
 		Increase blindness immunity by %d%%, maximum sight range by %d, and increases existing infravision, and heightened senses range by %d.
 		At talent level 5, each time you hit a target you gain telepathy to all similar creatures in radius 15 for 5 turns.]]):
-		format(t.getImmune(self, t) * 100, t.getSight(self, t), t.getESight(self, t))
+		tformat(t.getImmune(self, t) * 100, t.getSight(self, t), t.getESight(self, t))
 	end,
 }
 
@@ -108,7 +108,7 @@ newTalent{
 		return ([[Highers were originally created during the Age of Allure by the human Conclave. They are imbued with magic at the very core of their being.
 		Increase spell save by %d and arcane resistance by %d%%.
 		Also, when you cast a spell dealing damage, you gain a 20%% bonus to the damage type for 5 turns. (This effect has a cooldown.)]]):
-		format(t.getSave(self, t), netpower)
+		tformat(t.getSave(self, t), netpower)
 	end,
 }
 
@@ -154,14 +154,14 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[Activate some of your inner magic, using it to power your abilities.  For the next %d turns all active talents will be used without resource cost.
 		Your resources must still be high enough to initially power the talent and failure rates (etc.) still apply.
-		]]):format(duration)
+		]]):tformat(duration)
 	end,
 }
 
 ------------------------------------------------------------------
 -- Shaloren's powers
 ------------------------------------------------------------------
-newTalentType{ type="race/shalore", name = "shalore", generic = true, is_spell=true, description = "The various racial bonuses a character can have." }
+newTalentType{ type="race/shalore", name = _t"shalore", generic = true, is_spell=true, description = _t"The various racial bonuses a character can have." }
 newTalent{
 	short_name = "SHALOREN_SPEED",
 	name = "Grace of the Eternals",
@@ -170,7 +170,7 @@ newTalent{
 	points = 5,
 	no_energy = true,
 	cooldown = function(self, t) return math.ceil(self:combatTalentLimit(t, 10, 46, 30)) end,  -- Limit to >10 turns
-	getSpeed = function(self, t) return self:combatStatScale(math.max(self:getDex(), self:getMag()), 0.1, 0.476, 0.75) end,
+	getSpeed = function(self, t) return self:combatStatScale(math.max(self:getDex(), self:getMag()), 0.1, 0.476) end,
 	tactical = { DEFEND = 1 },
 	action = function(self, t)
 		self:setEffect(self.EFF_SPEED, 5, {power=t.getSpeed(self, t)})
@@ -179,7 +179,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Call upon the grace of the Eternals to increase your global speed by %d%% for 5 turns.
 		The speed bonus will increase with your Dexterity or Magic (whichever is higher).]]):
-		format(t.getSpeed(self, t) * 100)
+		tformat(t.getSpeed(self, t) * 100)
 	end,
 }
 
@@ -198,7 +198,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Reality bends slightly in the presence of a Shaloren due to their inherent magical nature.
 		Increases critical chance by %d%% and critical strike power by %d%%.]]):
-		format(t.critChance(self, t), t.critPower(self, t))
+		tformat(t.critChance(self, t), t.critPower(self, t))
 	end,
 }
 
@@ -231,7 +231,7 @@ newTalent{
 	info = function(self, t)
 		return ([[As the only immortal race of Eyal, Shaloren have learnt over the long years to use their innate inner magic to protect themselves.
 		%d%% chance to become invisible (power %d) for 5 turns when hit by a blow doing at least 10%% of your total life.]]):
-		format(t.getChance(self, t), t.getInvis(self, t))
+		tformat(t.getChance(self, t), t.getInvis(self, t))
 	end,
 }
 
@@ -299,14 +299,14 @@ newTalent{
 	info = function(self, t)
 		return ([[The world grows old as you stand through the ages. To you, time is different.
 		Reduces the time remaining on detrimental effects by %d, most cooling down talents by %d, and increases the time remaining on beneficial effects by %d (up to 2 times the current duration).]]):
-		format(t.getEffectBad(self, t), t.getEffectGood(self, t), t.getEffectGood(self, t))
+		tformat(t.getEffectBad(self, t), t.getEffectGood(self, t), t.getEffectGood(self, t))
 	end,
 }
 
 ------------------------------------------------------------------
 -- Thaloren's powers
 ------------------------------------------------------------------
-newTalentType{ type="race/thalore", name = "thalore", generic = true, is_nature=true, description = "The various racial bonuses a character can have." }
+newTalentType{ type="race/thalore", name = _t"thalore", generic = true, is_nature=true, description = _t"The various racial bonuses a character can have." }
 newTalent{
 	short_name = "THALOREN_WRATH",  -- Backwards compatibility..
 	name = "Gift of the Woods",
@@ -326,7 +326,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Call upon nature to regenerate your body for %d life every turn and increase healing mod by %d%% for 8 turns.
-		The life healed will increase with your Willpower or Constitution (whichever is higher).]]):format(t.getHealing(self,  t), t.getHealMod(self, t))
+		The life healed will increase with your Willpower or Constitution (whichever is higher).]]):tformat(t.getHealing(self,  t), t.getHealMod(self, t))
 	end,
 }
 
@@ -347,7 +347,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Thaloren have an affinity for natural elements, allowing them to heal for a portion of damage taken from them.
 		You gain %d%% Nature and Acid damage affinity.]]):
-		format(t.getAffinity(self, t))
+		tformat(t.getAffinity(self, t))
 	end,
 }
 
@@ -368,7 +368,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Thaloren are part of the wood; it shields them from corruption.
 		Increase disease immunity by %d%%, blight resistance by %0.1f%%, and all resistances by %0.1f%%.]]):
-		format(t.getDiseaseImmune(self, t)*100, t.getBResist(self, t), t.getAllResist(self, t))
+		tformat(t.getDiseaseImmune(self, t)*100, t.getBResist(self, t), t.getAllResist(self, t))
 	end,
 }
 
@@ -401,9 +401,9 @@ newTalent{
 			local m = NPC.new{
 				type = "immovable", subtype = "plants",
 				display = "#",
-				name = "treant", color=colors.GREEN,
+				name = _t"treant", color=colors.GREEN,
 				resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/immovable_plants_treant.png", display_h=2, display_y=-1}}},
-				desc = "A very strong near-sentient tree.",
+				desc = _t"A very strong near-sentient tree.",
 
 				body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1 },
 
@@ -451,14 +451,14 @@ newTalent{
 		Summons two elite Treants to your side for 8 turns.
 		The treants have a global resistance equal to your blight resistance and can stun, knockback, and taunt foes.
 		Your Willpower (%d) will be added to all of their non-Magic primary stats and their talent levels will increase with your Nature's Pride talent level.
-		Your increased damage, damage penetration, and many other stats will be inherited.]]):format(self:getWil())
+		Your increased damage, damage penetration, and many other stats will be inherited.]]):tformat(self:getWil())
 	end,
 }
 
 ------------------------------------------------------------------
 -- Dwarves' powers
 ------------------------------------------------------------------
-newTalentType{ type="race/dwarf", name = "dwarf", generic = true, description = "The various racial bonuses a character can have." }
+newTalentType{ type="race/dwarf", name = _t"dwarf", generic = true, description = _t"The various racial bonuses a character can have." }
 newTalent{
 	short_name = "DWARF_RESILIENCE",
 	name = "Resilience of the Dwarves",
@@ -484,7 +484,7 @@ newTalent{
 		local params = t.getParams(self, t)
 		return ([[Call upon the legendary resilience of the Dwarven race to increase armour (+%d), armour hardiness (+%d%%), spell (+%d) and physical (+%d) saves for 8 turns.
 		The bonuses will increase with your Constitution.]]):
-		format(params.armor, params.armor_hardiness, params.physical, params.spell)
+		tformat(params.armor, params.armor_hardiness, params.physical, params.spell)
 	end,
 }
 
@@ -502,7 +502,7 @@ newTalent{
 		return ([[Dwarf skin is a complex structure; it can automatically react to physical blows and harden itself.
 		When you are hit in melee, you have a 15%% chance to increase your armour total by %d for 5 turns and fully ignore the attack triggering it.
 		There is no cooldown to this effect; it can happen while already active.]]):
-		format(t.armor(self, t))
+		tformat(t.armor(self, t))
 	end,
 }
 
@@ -522,7 +522,7 @@ newTalent{
 		return ([[Money is the heart of the Dwarven Empire; it rules over all other considerations.
 		Increases Physical, Mental and Spell Saves based on the amount of gold you possess.
 		+1 save every %d gold, up to +%d. (currently +%d)]]):
-		format(t.getGold(self, t), t.getMaxSaves(self, t), t.getSaves(self, t))
+		tformat(t.getGold(self, t), t.getMaxSaves(self, t), t.getSaves(self, t))
 	end,
 }
 
@@ -560,14 +560,14 @@ newTalent{
 		return ([[While the origins of the dwarves remain clouded in mystery to the other races, it is obvious that they share strong ties to the stone.
 		You can target any wall and immediately enter it, appearing on the other side.
 		This can pass through up to %d tiles (increases with Constitution and talent level).]]):
-		format(range)
+		tformat(range)
 	end,
 }
 
 ------------------------------------------------------------------
 -- Halflings' powers
 ------------------------------------------------------------------
-newTalentType{ type="race/halfling", name = "halfling", generic = true, description = "The various racial bonuses a character can have." }
+newTalentType{ type="race/halfling", name = _t"halfling", generic = true, description = _t"The various racial bonuses a character can have." }
 newTalent{
 	short_name = "HALFLING_LUCK",
 	name = "Luck of the Little Folk",
@@ -591,7 +591,7 @@ newTalent{
 		local params = t.getParams(self, t)
 		return ([[Call upon the luck and cunning of the Little Folk to increase your critical strike chance by %d%% and your saves by %d for 5 turns.
 		The bonus will increase with your Cunning.]]):
-		format(params.crit, params.save)
+		tformat(params.crit, params.save)
 	end,
 }
 
@@ -615,7 +615,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[Halfling's incredible luck always kicks in at just the right moment to save their skin.
 		Whenever you take %d%% or more of your life from a single attack, you gain %d%% Evasion and %d additional defense for the next %d turns. The defense increases based on your luck and other defensive stats.]]):
-		format(threshold * 100, evasion, t.getDefense(self), duration)
+		tformat(threshold * 100, evasion, t.getDefense(self), duration)
 	end,
 }
 
@@ -628,7 +628,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Halflings have always been a very organised and methodical race; the more foes they face, the more organised they are.
 		If two or more foes are in sight your Physical Power, Physical Save, Spellpower, Spell Save, Mental Save, and Mindpower are increased by %0.1f per foe (up to 5 foes).]]):
-		format(self:getTalentLevel(t) * 2)
+		tformat(self:getTalentLevel(t) * 2)
 	end,
 }
 
@@ -689,14 +689,14 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		local count = t.getRemoveCount(self, t)
 		return ([[Halflings have one of the most powerful military forces in the known world and have been at war with most other races for thousands of years.
-		Removes %d stun, daze, or pin effects and grants immunity to stuns, dazes and pins for %d turns.]]):format(duration, count)
+		Removes %d stun, daze, or pin effects and grants immunity to stuns, dazes and pins for %d turns.]]):tformat(duration, count)
 	end,
 }
 
 ------------------------------------------------------------------
 -- Orcs' powers
 ------------------------------------------------------------------
-newTalentType{ type="race/orc", name = "orc", generic = true, description = "The various racial bonuses a character can have." }
+newTalentType{ type="race/orc", name = _t"orc", generic = true, description = _t"The various racial bonuses a character can have." }
 newTalent{
 	short_name = "ORC_FURY",
 	name = "Orcish Fury",
@@ -735,7 +735,7 @@ newTalent{
 		return ([[Summons your lust for blood and destruction; especially when the odds are against you.  
 		You increase your damage by 10%% + %0.1f%% per enemy you can see in line of sight of you (maximum 5 enemies, %0.1f%% bonus) for 3 turns.
 		The damage bonus will increase with your Constitution.]]):
-		format(t.getPower(self, t), 10 + t.getPower(self, t) * 5)
+		tformat(t.getPower(self, t), 10 + t.getPower(self, t) * 5)
 	end,
 }
 
@@ -757,15 +757,15 @@ newTalent{
 		
 		local nb = self:removeEffectsFilter({status = "detrimental", type = "mental"}, t.getDebuff(self, t))
 		if nb > 0 then
-			game.logSeen(self, "#CRIMSON#%s roars with rage shaking off %d mental debuffs!", self.name:capitalize(), nb)
+			game.logSeen(self, "#CRIMSON#%s roars with rage shaking off %d mental debuffs!", self:getName():capitalize(), nb)
 			self:startTalentCooldown(t)
 		end
 	end,
 	info = function(self, t)
 		return ([[Orcs have been the prey of the other races for thousands of years, with or without justification. They have learnt to withstand things that would break weaker races.
 		When your life goes below 50%% your sheer determination cleanses you of %d mental debuff(s) based on talent level and Willpower.  This can only happen once every %d turns.
-		Also increases physical save by +%d.]]):
-		format(t.getDebuff(self, t), t.getSaves(self, t), self:getTalentCooldown(t))
+		Also increases physical save by %d.]]):
+		tformat(t.getDebuff(self, t), self:getTalentCooldown(t), t.getSaves(self, t))
 	end,
 }
 
@@ -789,7 +789,7 @@ newTalent{
 		You revel in the defeat of your foes, gaining %d%% damage resistance for 2 turns each time you kill an enemy.
 		The resistance will scale with talent level and your Constitution.
 		Additionally, passively increase all damage penetration by %d%%.]]):
-		format(t.getResist(self, t), t.getPen(self, t))
+		tformat(t.getResist(self, t), t.getPen(self, t))
 	end,
 }
 
@@ -848,7 +848,7 @@ newTalent{
 		return ([[Call upon the will of all of the Orc Prides to survive this battle.
 		You remove up to %d detrimental effect(s) then heal for %d life.
 		The healing will increase with talent level and your Willpower.]]):
-		format(t.remcount(self,t), t.heal(self, t))
+		tformat(t.remcount(self,t), t.heal(self, t))
 	end,
 }
 
@@ -856,7 +856,7 @@ newTalent{
 -- Yeeks' powers
 ------------------------------------------------------------------
 -- We check for max life on boss targets to avoid people using this to engage thus ensuring all their allies target them first
-newTalentType{ type="race/yeek", name = "yeek", is_mind=true, generic = true, description = "The various racial bonuses a character can have." }
+newTalentType{ type="race/yeek", name = _t"yeek", is_mind=true, generic = true, description = _t"The various racial bonuses a character can have." }
 newTalent{
 	short_name = "YEEK_WILL",
 	name = "Dominant Will",
@@ -878,11 +878,11 @@ newTalent{
 		if not target or target.dead or target == self then return end
 		if game.party:hasMember(target) then return end
 		if target.instakill_immune and target.instakill_immune >= 1 then  -- We special case this instead of letting the canBe check waste the talent because instakill is at present always binary
-			game.logSeen(target, "%s is immune to instakill and mind control effects!", target.name:capitalize())
+			game.logSeen(target, "%s is immune to instakill and mind control effects!", target:getName():capitalize())
 			return
 		end
 		if target.rank > 3 and ((target.life / target.max_life) >= 0.8) then
-			game.logSeen(target, "%s must be below 80%% of their max life to be controlled!", target.name:capitalize())
+			game.logSeen(target, "%s must be below 80%% of their max life to be controlled!", target:getName():capitalize())
 			return
 		end
 		self:project(tg, x, y, function(px, py)
@@ -897,7 +897,7 @@ newTalent{
 					target:setEffect(target.EFF_DOMINANT_WILL, t.getduration(self), {src=self})
 				end
 			else
-				game.logSeen(target, "%s resists the mental assault!", target.name:capitalize())
+				game.logSeen(target, "%s resists the mental assault!", target:getName():capitalize())
 			end
 
 		end)
@@ -907,7 +907,7 @@ newTalent{
 	return ([[Shatter the mind of your victim, giving you full control of its actions for %s turns (based on your Willpower).
 	When the effect ends, you pull out your mind and the victim's body collapses, dead.
 	Targets with ranks at or above rare must be below 80%% of their maximum life to be controlled, will be invulnerable for the duration, and will break free of the effect without dying after 3 turns.
-	This effect cannot be saved against but checks instakill immunity.]]):format(t.getduration(self))
+	This effect cannot be saved against but checks instakill immunity.]]):tformat(t.getduration(self))
 	end,
 }
 
@@ -927,7 +927,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Your mind becomes more attuned to the Way, and is shielded from outside effects.
 		Increase confusion and silence immunities by %d%% and Mental Save by %d.]]):
-		format(100*t.getImmune(self, t), t.getSave(self, t))
+		tformat(100*t.getImmune(self, t), t.getSave(self, t))
 	end,
 }
 
@@ -947,14 +947,14 @@ newTalent{
 		if self:isTalentCoolingDown(t) then return end
 		if (self.life / self.max_life) >= 0.3 then return end
 
-		game.logSeen(self, "#RED#%s reacts immediately after taking severe wounds!#LAST#", self.name:capitalize())
+		game.logSeen(self, "#RED#%s reacts immediately after taking severe wounds!#LAST#", self:getName():capitalize())
 		self.energy.value = self.energy.value + game.energy_to_act * 1.5
 		self:startTalentCooldown(t)
 	end,
 	info = function(self, t)
 		return ([[Yeeks live fast, think fast, and sacrifice fast for the Way.
 		Your global speed is increased by %0.1f%%.
-		If your life drops below 30%% you gain 1.5 turns.  This effect can only happen once every %d turns.]]):format(100*t.speedup(self, t), self:getTalentCooldown(t))
+		If your life drops below 30%% you gain 1.5 turns.  This effect can only happen once every %d turns.]]):tformat(100*t.speedup(self, t), self:getTalentCooldown(t))
 	end,
 }
 
@@ -987,9 +987,9 @@ newTalent{
 			local m = NPC.new{
 				type = "humanoid", subtype = "yeek",
 				display = "y",
-				name = "yeek mindslayer", color=colors.YELLOW,
+				name = _t"yeek mindslayer", color=colors.YELLOW,
 				resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/humanoid_yeek_yeek_mindslayer.png", display_h=2, display_y=-1}}},
-				desc = "A wayist that came to help.",
+				desc = _t"A wayist that came to help.",
 
 				body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1, PSIONIC_FOCUS=1 },
 
@@ -1046,7 +1046,7 @@ newTalent{
 		return ([[Reach through the collective psionic gestalt of the yeeks, the Way, to call for immediate help.
 		Summons up to 3 yeek mindslayers to your side for 6 turns.
 		All their primary stats will be set to %d (based on your Willpower and Talent Level).
-		Your increased damage, damage penetration, and many other stats will be inherited.]]):format(base_stats)
+		Your increased damage, damage penetration, and many other stats will be inherited.]]):tformat(base_stats)
 	end,
 }
 
@@ -1061,14 +1061,14 @@ newTalent{
 	on_learn = function(self, t) self.auto_id = 100 end,
 	info = function(self, t)
 		return ([[You merge your mind with the rest of the Way for a brief moment; the sum of all yeek knowledge gathers in your mind
-		and allows you to identify any item you could not recognize yourself.]])
+		and allows you to identify any item you could not recognize yourself.]]):tformat()
 	end,
 }
 
 ------------------------------------------------------------------
 -- Ogre' powers
 ------------------------------------------------------------------
-newTalentType{ type="race/ogre", name = "ogre", is_spell=true, generic = true, description = "The various racial bonuses a character can have." }
+newTalentType{ type="race/ogre", name = _t"ogre", is_spell=true, generic = true, description = _t"The various racial bonuses a character can have." }
 newTalent{
 	short_name = "OGRE_WRATH",
 	name = "Ogric Wrath",
@@ -1092,7 +1092,7 @@ newTalent{
 		In addition, whenever you use an infusion or rune, miss a melee attack, or any damage you deal is reduced by a damage shield (or similar effect) you gain a charge of Ogre Fury (up to 5 charges total, each lasting 7 turns).
 		Each charge grants 20%% critical damage power and 5%% critical strike chance.
 		You lose a charge each time you deal a critical strike.
-		The duration will increase with your Strength.]]):format(t.getduration(self))
+		The duration will increase with your Strength.]]):tformat(t.getduration(self))
 	end,
 }
 
@@ -1120,7 +1120,7 @@ newTalent{
 		Increases spell save by %d and improves the contribution of primary stats on infusions and runes by %d%%.
 		At level 5 your body is so strong you can use a two handed weapon in your main hand while still using an offhand item.
 		When using a two handed weapon this way you suffer a 20%% accuracy, physical power, spellpower and mindpower penalty, decreasing by 5%% per size category above #{italic}#big#{normal}#; further, all damage procs from your weapons are reduced by 50%%.]]):
-		format(t.getSave(self, t), t.getMult(self, t) * 100)
+		tformat(t.getSave(self, t), t.getMult(self, t) * 100)
 	end,
 }
 
@@ -1153,7 +1153,7 @@ newTalent{
 	info = function(self, t)
 		return ([[When you crit you have a %d%% chance to reduce by 1 the remaining cooldown of one of your inscriptions and of any saturations effects.
 		This effect can only happen once per turn.]]):
-		format(t.getChance(self, t))
+		tformat(t.getChance(self, t))
 	end,
 }
 
@@ -1183,6 +1183,6 @@ newTalent{
 		return ([[Instantly removes runic and infusion saturations.
 		For %d turns your inscriptions cool down twice as fast.
 		At level 5 your command over inscriptions is so good that you can use one more (you still need a category point to unlock it; you need to exit the levelup screen to validate it).]]):
-		format(t.getDuration(self, t))
+		tformat(t.getDuration(self, t))
 	end,
 }

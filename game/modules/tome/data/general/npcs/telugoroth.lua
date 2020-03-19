@@ -55,7 +55,7 @@ local function doTeluvortaSwap(self)
 				game.logSeen(self, "The spell fizzles!")
 			end
 		else
-			game.logSeen(target, "%s resists the swap!", target.name:capitalize())
+			game.logSeen(target, "%s resists the swap!", target:getName():capitalize())
 		end
 		game:playSoundNear(self, "talents/teleport")
 	end
@@ -64,7 +64,7 @@ end
 newEntity{
 	define_as = "BASE_NPC_TELUGOROTH", -- telu goroth = time terror
 	type = "elemental", subtype = "temporal",
-	killer_message = "and lost outside time",
+	killer_message = _t"and lost outside time",
 	blood_color = colors.PURPLE,
 	display = "E", color=colors.YELLOW,
 
@@ -100,7 +100,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_TELUGOROTH",
 	name = "telugoroth", color=colors.KHAKI,
-	desc = [[A temporal elemental, rarely encountered except by those who travel through time itself.  Its blurred form constantly shifts before your eyes.]],
+	desc = _t[[A temporal elemental, rarely encountered except by those who travel through time itself.  Its blurred form constantly shifts before your eyes.]],
 	level_range = {10, nil}, exp_worth = 1,
 	rarity = 2,
 	max_life = resolvers.rngavg(70,80),
@@ -114,7 +114,7 @@ newEntity{ base = "BASE_NPC_TELUGOROTH",
 
 newEntity{ base = "BASE_NPC_TELUGOROTH",
 	name = "greater telugoroth", color=colors.YELLOW,
-	desc = [[A temporal elemental, rarely encountered except by those who travel through time itself.  Its blurred form constantly shifts before your eyes.]],
+	desc = _t[[A temporal elemental, rarely encountered except by those who travel through time itself.  Its blurred form constantly shifts before your eyes.]],
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/elemental_temporal_greater_telugoroth.png", display_h=2, display_y=-1}}},
 	level_range = {12, nil}, exp_worth = 1,
 	rarity = 4,
@@ -131,7 +131,7 @@ newEntity{ base = "BASE_NPC_TELUGOROTH",
 
 newEntity{ base = "BASE_NPC_TELUGOROTH",
 	name = "ultimate telugoroth", color=colors.GOLD,
-	desc = [[A temporal elemental, rarely encountered except by those who travel through time itself.  Its blurred form constantly shifts before your eyes.]],
+	desc = _t[[A temporal elemental, rarely encountered except by those who travel through time itself.  Its blurred form constantly shifts before your eyes.]],
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/elemental_temporal_ultimate_telugoroth.png", display_h=2, display_y=-1}}},
 	level_range = {15, nil}, exp_worth = 1,
 	rarity = 6,
@@ -153,7 +153,7 @@ newEntity{ base = "BASE_NPC_TELUGOROTH",
 -- telu vorta = time storm
 newEntity{ base = "BASE_NPC_TELUGOROTH",
 	name = "teluvorta", color=colors.DARK_KHAKI,
-	desc = [[Time and space collapse in upon this erratically-moving time elemental.]],
+	desc = _t[[Time and space collapse in upon this erratically-moving time elemental.]],
 	level_range = {12, nil}, exp_worth = 1,
 	rarity = 4,
 	max_life = resolvers.rngavg(50,70),
@@ -179,7 +179,7 @@ newEntity{ base = "BASE_NPC_TELUGOROTH",
 
 newEntity{ base = "BASE_NPC_TELUGOROTH",
 	name = "greater teluvorta", color=colors.TAN,
-	desc = [[Time and space collapse in upon this erratically-moving time elemental.]],
+	desc = _t[[Time and space collapse in upon this erratically-moving time elemental.]],
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/elemental_temporal_greater_teluvorta.png", display_h=2, display_y=-1}}},
 	level_range = {15, nil}, exp_worth = 1,
 	rarity = 6,
@@ -206,7 +206,7 @@ newEntity{ base = "BASE_NPC_TELUGOROTH",
 
 newEntity{ base = "BASE_NPC_TELUGOROTH",
 	name = "ultimate teluvorta", color=colors.DARK_TAN,
-	desc = [[Time and space collapse in upon this erratically-moving time elemental.]],
+	desc = _t[[Time and space collapse in upon this erratically-moving time elemental.]],
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/elemental_temporal_ultimate_teluvorta.png", display_h=2, display_y=-1}}},
 	level_range = {18, nil}, exp_worth = 1,
 	rarity = 8,

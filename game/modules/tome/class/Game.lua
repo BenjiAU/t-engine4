@@ -102,7 +102,7 @@ end
 function _M:runReal()
 	self.delayed_log_damage = {}
 	self.delayed_log_messages = {}
-	self.calendar = Calendar.new("/data/calendar_allied.lua", "Today is the % %s of the %s year of the Age of Ascendancy of Maj'Eyal.\nThe time is %02d:%02d.", 122, 167, 11)
+	self.calendar = Calendar.new("/data/calendar_allied.lua", "Today is the %s %s of the %s year of the Age of Ascendancy of Maj'Eyal.\nThe time is %02d:%02d.", 122, 167, 11)
 
 	self.uiset:activate()
 
@@ -158,7 +158,7 @@ function _M:runReal()
 	-- Create the map scroll text overlay
 	self.caps_scroll = core.renderer.renderer("static"):color(1, 1, 1, 0.7)
 	local lfont = FontPackage:get("bignews", true)
-	local txt = core.renderer.text(lfont):outline(1):text("#GOLD#<Scroll mode, press direction keys to scroll, press again to exit>"):center()
+	local txt = core.renderer.text(lfont):outline(1):text(_t"#GOLD#<Scroll mode, press direction keys to scroll, press again to exit>"):center()
 	self.caps_scroll:add(txt)
 
 	self.shake_time = nil
@@ -204,7 +204,7 @@ function _M:newGame()
 	self.party:addMember(player, {
 		control="full",
 		type="player",
-		title="Main character",
+		title=_t"Main character",
 		main=true,
 		orders = {target=true, anchor=true, behavior=true, leash=true, talents=true},
 	})
@@ -260,12 +260,12 @@ function _M:newGame()
 	local nb_unlocks, max_unlocks, categories = self:countBirthUnlocks()
 	local unlocks_order = { class=1, race=2, cometic=3, other=4 }
 	local unlocks = {}
-	for cat, d in pairs(categories) do unlocks[#unlocks+1] = {desc=d.nb.."/"..d.max.." "..cat, order=unlocks_order[cat] or 99} end
+	for cat, d in pairs(categories) do unlocks[#unlocks+1] = {desc=d.nb.."/"..d.max.." ".._t(cat), order=unlocks_order[cat] or 99} end
 	table.sort(unlocks, "order")
 	self.creating_player = true
 	self.extra_birth_option_defs = {}
 	self:triggerHook{"ToME:extraBirthOptions", options = self.extra_birth_option_defs}
-	local birth; birth = Birther.new("Character Creation ("..table.concat(table.extract_field(unlocks, "desc", ipairs), ", ").." unlocked options)", self.player, {"base", "world", "difficulty", "permadeath", "race", "subrace", "sex", "class", "subclass" }, function(loaded)
+	local birth; birth = Birther.new(("Character Creation ( %s unlocked options)"):tformat(table.concat(table.extract_field(unlocks, "desc", ipairs), ", ")), self.player, {"base", "world", "difficulty", "permadeath", "race", "subrace", "sex", "class", "subclass" }, function(loaded)
 		if not loaded then
 			self.calendar = Calendar.new("/data/calendar_"..(self.player.calendar or "allied")..".lua", "Today is the %s %s of the %s year of the Age of Ascendancy of Maj'Eyal.\nThe time is %02d:%02d.", 122, 167, 11)
 			self.player:check("make_tile")
@@ -307,7 +307,7 @@ function _M:newGame()
 			self.paused = true
 			print("[PLAYER BIRTH] resolved!")
 			local birthend = function()
-				local d = require("engine.dialogs.ShowText").new("Welcome to #LIGHT_BLUE#Tales of Maj'Eyal", "intro-"..self.player.starting_intro, {name=self.player.name}, nil, nil, function()
+				local d = require("engine.dialogs.ShowText").new(_t"Welcome to #LIGHT_BLUE#Tales of Maj'Eyal", "intro-"..self.player.starting_intro, {name=self.player.name}, nil, nil, function()
 					self.player:resetToFull()
 					self.player:registerCharacterPlayed()
 					self.player:onBirth(birth)
@@ -744,10 +744,10 @@ function _M:getSaveDescription()
 		description = ([[%s the level %d %s %s.
 Difficulty: %s / %s
 Campaign: %s
-Exploring level %s of %s.]]):format(
-		player.name, player.level, player.descriptor.subrace, player.descriptor.subclass,
-		player.descriptor.difficulty, player.descriptor.permadeath,
-		player.descriptor.world,
+Exploring level %s of %s.]]):tformat(
+		player.name, player.level, _t(player.descriptor.subrace), _t(player.descriptor.subclass),
+		_t(player.descriptor.difficulty), _t(player.descriptor.permadeath),
+		_t(player.descriptor.world),
 		self.level and self.level.level or "--", self.zone and self.zone.name or "--"
 		),
 	}
@@ -756,14 +756,14 @@ end
 function _M:getVaultDescription(e)
 	e = e:findMember{main=true} -- Because vault "chars" are actualy parties for tome
 	return {
-		name = ([[%s the %s %s]]):format(e.name, e.descriptor.subrace, e.descriptor.subclass),
+		name = ([[%s the %s %s]]):tformat(e.name, _t(e.descriptor.subrace), _t(e.descriptor.subclass)),
 		descriptors = e.descriptor,
 		description = ([[%s the %s %s.
 Difficulty: %s / %s
-Campaign: %s]]):format(
-		e.name, e.descriptor.subrace, e.descriptor.subclass,
-		e.descriptor.difficulty, e.descriptor.permadeath,
-		e.descriptor.world
+Campaign: %s]]):tformat(
+		e.name, _t(e.descriptor.subrace), _t(e.descriptor.subclass),
+		_t(e.descriptor.difficulty), _t(e.descriptor.permadeath),
+		_t(e.descriptor.world)
 		),
 	}
 end
@@ -924,11 +924,11 @@ function _M:changeLevelFailure(lev, zone, params, level, old_zone, old_level)
 	local to_re_add_actors = self.to_re_add_actors
 	print("=====Level Generation Failure: Unable to create level", lev, "of zone:", failed_zone.short_name, "===")
 
-	local choices = {{name=("Stay: level %s of %s"):format(old_level.level, old_zone.name), choice="stay"},
-	{name=("Keep Trying: level %s of %s"):format(lev, failed_zone.name), choice="try"},
-	{name=("Log the problem, Stay: level %s of %s"):format(old_level.level, old_zone.name), choice="log"}}
+	local choices = {{name=("Stay: level %s of %s"):tformat(old_level.level, old_zone.name), choice="stay"},
+	{name=("Keep Trying: level %s of %s"):tformat(lev, failed_zone.name), choice="try"},
+	{name=("Log the problem, Stay: level %s of %s"):tformat(old_level.level, old_zone.name), choice="log"}}
 	if config.settings.cheat then
-		table.insert(choices, {name="Debug the problem (move to the failed zone/level)", choice="debug"})
+		table.insert(choices, {name=_t"Debug the problem (move to the failed zone/level)", choice="debug"})
 	end
 	local function generation_dump()
 		print("\n=====START Level Generation Failure Log=====\n")
@@ -951,7 +951,7 @@ function _M:changeLevelFailure(lev, zone, params, level, old_zone, old_level)
 
 			print("[changeLevelFailure]", sel.name)
 			generation_dump()
-			Dialog:simplePopup("Information logged", "Information on the failed zone and level dumped to the log file.")
+			Dialog:simplePopup(_t"Information logged", _t"Information on the failed zone and level dumped to the log file.")
 		elseif sel.choice == "debug" then
 			print("[changeLevelFailure]", sel.name)
 			generation_dump()
@@ -965,8 +965,8 @@ function _M:changeLevelFailure(lev, zone, params, level, old_zone, old_level)
 			print("[changeLevelFailure]", sel.name)
 		end
 	end
-	local text = ("The game could not generate level %s of %s after %s attempts. What do you want to do?"):format(lev, failed_zone.name, failed_zone._level_generation_count-1)
-	Dialog:multiButtonPopup("Level Generation Failure", text,
+	local text = ("The game could not generate level %s of %s after %s attempts. What do you want to do?"):tformat(lev, failed_zone.name, failed_zone._level_generation_count-1)
+	Dialog:multiButtonPopup(_t"Level Generation Failure", text,
 		choices, math.max(500, game.w/2), nil, choice_handler,
 		false,
 		1 -- default to stay on the previous level
@@ -1048,7 +1048,7 @@ function _M:changeLevelReal(lev, zone, params)
 			end
 		end
 	elseif params.temporary_zone_shift_back then -- We switch back
-		popup = Dialog:simpleWaiter("Loading level", "Please wait while loading the level...", nil, 10000)
+		popup = Dialog:simpleWaiter(_t"Loading level", _t"Please wait while loading the level...", nil, 10000)
 		core.display.forceRedraw()
 
 		if self.zone.zone_party then self.change_level_party_back = true end
@@ -1098,9 +1098,9 @@ function _M:changeLevelReal(lev, zone, params)
 			if self.zone.tier1 then
 				if lev == 1 and game.state:tier1Killed(game.state.birth.start_tier1_skip or 3) then
 					self.zone.tier1 = nil
-					Dialog:yesnoPopup("Easy!", "This zone is so easy for you that you can stroll to the last area with ease.", function(ret) if ret then
+					Dialog:yesnoPopup(_t"Easy!", _t"This zone is so easy for you that you can stroll to the last area with ease.", function(ret) if ret then
 						game:changeLevel(self.zone.max_level)
-					end end, "Stroll", "Stay there")
+					end end, _t"Stroll", _t"Stay there")
 				end
 			end
 			if type(self.zone.save_per_level) == "nil" then self.zone.save_per_level = config.settings.tome.save_zone_levels and true or false end
@@ -1316,11 +1316,11 @@ function _M:changeLevelReal(lev, zone, params)
 		local lev = self.zone.base_level + self.level.level - 1
 		if self.zone.level_adjust_level then lev = self.zone:level_adjust_level(self.level) end
 		local diff = lev - self.player.level
-		if diff >= 5 then feeling = "You feel a thrill of terror and your heart begins to pound in your chest. You feel terribly threatened upon entering this area."
-		elseif diff >= 2 then feeling = "You feel mildly anxious, and walk with caution."
+		if diff >= 5 then feeling = _t"You feel a thrill of terror and your heart begins to pound in your chest. You feel terribly threatened upon entering this area."
+		elseif diff >= 2 then feeling = _t"You feel mildly anxious, and walk with caution."
 		elseif diff >= -2 then feeling = nil
-		elseif diff >= -5 then feeling = "You feel very confident walking into this place."
-		else feeling = "You stride into this area without a second thought, while stifling a yawn. You feel your time might be better spent elsewhere."
+		elseif diff >= -5 then feeling = _t"You feel very confident walking into this place."
+		else feeling = _t"You stride into this area without a second thought, while stifling a yawn. You feel your time might be better spent elsewhere."
 		end
 	end
 	if feeling then self.log("#TEAL#%s", feeling) end
@@ -1343,7 +1343,7 @@ function _M:changeLevelReal(lev, zone, params)
 	if self.level.last_turn and self.level.last_turn < self.turn then
 		local perc = util.bound(math.floor((self.turn - self.level.last_turn) / 10), 0, 10)
 		for uid, target in pairs(self.level.entities) do
-			if target.life and target.max_life and self.player:reactionToward(target) < 0 then
+			if target.life and target.max_life and ((self.player:reactionToward(target) < 0) or target:attr("hostile_for_level_change")) then
 				target.life = util.bound(target.life + target.max_life * perc / 10, 0, target.max_life)
 				target.changed = true
 				target.talents_cd = {}
@@ -1403,7 +1403,7 @@ end
 function _M:chronoClone(name)
 	self:getPlayer(true):attr("time_travel_times", 1)
 
-	local d = Dialog:simpleWaiter("Chronomancy", "Folding the space time structure...")
+	local d = Dialog:simpleWaiter(_t"Chronomancy", _t"Folding the space time structure...")
 
 	local to_reload = {}
 	for uid, e in pairs(self.level.entities) do
@@ -1435,7 +1435,7 @@ function _M:chronoRestore(name, remove)
 	else ngame = name end
 	if not ngame then return false end
 
-	local d = Dialog:simpleWaiter("Chronomancy", "Unfolding the space time structure...")
+	local d = Dialog:simpleWaiter(_t"Chronomancy", _t"Unfolding the space time structure...")
 
 	_G.game = ngame
 	ngame:cloneReloaded()
@@ -1502,7 +1502,7 @@ function _M:tick()
 	end
 
 	if savefile_pipe.saving then self.player.changed = true end
-	if self.on_tick_end and #self.on_tick_end > 0 then return false end -- Force a new tick
+	if self:onTickEndExists() then return false end -- Force a new tick
 	if self.creating_player then return true end
 	if self.paused and not savefile_pipe.saving then return true end
 end
@@ -1576,30 +1576,31 @@ end
 -- @param style the message to display
 -- @param ... arguments to be passed to format for style
 -- @return the string with certain fields replaced:
--- #source#|#Source# -> <displayString>..self.name|self.name:capitalize()
--- #target#|#Target# -> target.name|target.name:capitalize()
+-- #source#|#Source# -> <displayString>..self.name|self:getName():capitalize()
+-- #target#|#Target# -> target.name|target:getName():capitalize()
 function _M:logMessage(source, srcSeen, target, tgtSeen, style, ...)
-	style = style:format(...)
-	local srcname = "something"
+	-- I18N
+	style = style:tformat(...)
+	local srcname = _t"something"
 	local Dstring
 		if source.player then
 			srcname = "#fbd578#"..source.name.."#LAST#"
 		elseif srcSeen then
-			srcname = engine.Entity.check(source, "getName") or source.name or "unknown"
+			srcname = engine.Entity.check(source, "getName") or source.name or _t"unknown"
 		end
-		if srcname ~= "something" then Dstring = source.__is_actor and source.getDisplayString and source:getDisplayString() end
-	style = style:gsub("#source#", srcname)
-	style = style:gsub("#Source#", (Dstring or "")..srcname:capitalize())
-	local tgtname = "something"
+		if srcname ~= _t"something" then Dstring = source.__is_actor and source.getDisplayString and source:getDisplayString() end
+	style = style:noun_sub("#source#", srcname)
+	style = style:noun_sub("#Source#", (Dstring or "")..srcname:capitalize())
+	local tgtname = _t"something"
 	if target then
 		if target.player then
 			tgtname = "#fbd578#"..target.name.."#LAST#"
 		elseif tgtSeen then
-			tgtname = engine.Entity.check(target, "getName") or target.name or "unknown"
+			tgtname = engine.Entity.check(target, "getName") or target.name or _t"unknown"
 		end
 	end
-	style = style:gsub("#target#", tgtname)
-	style = style:gsub("#Target#", tgtname:capitalize())
+	style = style:noun_sub("#target#", tgtname)
+	style = style:noun_sub("#Target#", tgtname:capitalize())
 	return style
 end
 
@@ -1640,7 +1641,7 @@ function _M:displayDelayedLogDamage()
 		for src, tgts in pairs(psrcs) do
 			for target, dams in pairs(tgts) do
 				if #dams.descs > 1 then
-					game.uiset.logdisplay(self:logMessage(src, dams.srcSeen, target, dams.tgtSeen, "#Source# hits #Target# for %s (#RED##{bold}#%0.0f#LAST##{normal}# total damage)%s.", table.concat(dams.descs, ", "), dams.total, dams.healing<0 and (" #LIGHT_GREEN#[%0.0f healing]#LAST#"):format(-dams.healing) or ""))
+					game.uiset.logdisplay(self:logMessage(src, dams.srcSeen, target, dams.tgtSeen, "#Source# hits #Target# for %s (#RED##{bold}#%0.0f#LAST##{normal}# total damage)%s.", table.concat(dams.descs, ", "), dams.total, dams.healing<0 and (" #LIGHT_GREEN#[%0.0f healing]#LAST#"):tformat(-dams.healing) or ""))
 				else
 					if dams.healing >= 0 then
 						game.uiset.logdisplay(self:logMessage(src, dams.srcSeen, target, dams.tgtSeen, "#Source# hits #Target# for %s damage.", table.concat(dams.descs, ", ")))
@@ -1656,8 +1657,8 @@ function _M:displayDelayedLogDamage()
 				local sx, sy = self.level.map:getTileToScreen(x, y, true)
 				if target.dead then
 					if dams.tgtSeen and (rsrc == self.player or rtarget == self.player or self.party:hasMember(rsrc) or self.party:hasMember(rtarget)) then
-						self.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, rng.float(-2.5, -1.5), ("Kill (%d)!"):format(dams.total), {255,0,255}, true)
-						self:delayedLogMessage(target, nil,  "death", self:logMessage(src, dams.srcSeen, target, dams.tgtSeen, "#{bold}##Source# killed #Target#!#{normal}#"))
+						self.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, rng.float(-2.5, -1.5), ("Kill (%d)!"):tformat(dams.total), {255,0,255}, true)
+						self:delayedLogMessage(target, nil,  "death", self:logMessage(src, dams.srcSeen, target, dams.tgtSeen, _t"#{bold}##Source# killed #Target#!#{normal}#"))
 					end
 				elseif dams.total > 0 or dams.healing == 0 then
 					if dams.tgtSeen and (rsrc == self.player or self.party:hasMember(rsrc)) then
@@ -1932,8 +1933,8 @@ function _M:onRegisterDialog(d)
 	self.tooltip2_x, self.tooltip2_y = nil, nil
 	if self.player then self.player:updateMainShader() end
 
---	if self.player and self.player.runStop then self.player:runStop("dialog poping up") end
---	if self.player and self.player.restStop then self.player:restStop("dialog poping up") end
+--	if self.player and self.player.runStop then self.player:runStop(_t"dialog poping up") end
+--	if self.player and self.player.restStop then self.player:restStop(_t"dialog poping up") end
 end
 function _M:onUnregisterDialog(d)
 	-- Clean up tooltip
@@ -2115,7 +2116,7 @@ do return end
 					self.log("You may not auto-explore this level.")
 				elseif #seen > 0 then
 					local dir = game.level.map:compassDirection(seen[1].x - self.player.x, seen[1].y - self.player.y)
-					self.log("You may not auto-explore with enemies in sight (%s to the %s%s)!", seen[1].actor.name, dir, self.level.map:isOnScreen(seen[1].x, seen[1].y) and "" or " - offscreen")
+					self.log("You may not auto-explore with enemies in sight (%s to the %s%s)!", seen[1].actor:getName(), dir, self.level.map:isOnScreen(seen[1].x, seen[1].y) and "" or " - offscreen")
 					for _, node in ipairs(seen) do
 						node.actor:addParticles(engine.Particles.new("notice_enemy", 1))
 					end
@@ -2216,7 +2217,7 @@ do return end
 		SHOW_INVENTORY = function()
 			if self.player.no_inventory_access then return end
 			local d
-			local titleupdator = self.player:getEncumberTitleUpdator("Inventory")
+			local titleupdator = self.player:getEncumberTitleUpdator(_t"Inventory")
 			d = self.player:showEquipInven(titleupdator(), nil, function(o, inven, item, button, event)
 				if not o then return end
 				local ud = require("mod.dialogs.UseItemDialog").new(event == "button", self.player, o, item, inven, function(_, _, _, stop)
@@ -2264,13 +2265,13 @@ do return end
 
 		TOGGLE_AUTOTALENT = function()
 			self.player.no_automatic_talents = not self.player.no_automatic_talents
-			game.log("#GOLD#Automatic talent usage: %s", not self.player.no_automatic_talents and "#LIGHT_GREEN#enabled" or "#LIGHT_RED#disabled")
+			game.log("#GOLD#Automatic talent usage: %s", not self.player.no_automatic_talents and _t"#LIGHT_GREEN#enabled" or _t"#LIGHT_RED#disabled")
 		end,
 
 		TOGGLE_AUTOACCEPT_TARGET = function()
 			config.settings.auto_accept_target = not config.settings.auto_accept_target
 			game:saveSettings("auto_accept_target", ("auto_accept_target = %s\n"):format(tostring(config.settings.auto_accept_target)))
-			game.log("#GOLD#Automatic accept target mode: %s", config.settings.auto_accept_target and "#LIGHT_GREEN#enabled" or "#LIGHT_RED#disabled")			
+			game.log("#GOLD#Automatic accept target mode: %s", config.settings.auto_accept_target and _t"#LIGHT_GREEN#enabled" or _t"#LIGHT_RED#disabled")			
 		end,
 
 		SAVE_GAME = function()
@@ -2297,7 +2298,7 @@ do return end
 		end,
 
 		SHOW_MESSAGE_LOG = function()
-			self:registerDialog(require("mod.dialogs.ShowChatLog").new("Message Log", 0.6, self.uiset.logdisplay, profile.chat))
+			self:registerDialog(require("mod.dialogs.ShowChatLog").new(_t"Message Log", 0.6, self.uiset.logdisplay, profile.chat))
 		end,
 
 		-- Show time
@@ -2346,14 +2347,15 @@ do return end
 			local menu
 			local l = {
 				"resume",
-				{ "Show Achievements", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.ShowAchievements").new("Tales of Maj'Eyal Achievements", self.player)) end },
-				{ "Show known Lore", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.ShowLore").new("Tales of Maj'Eyal Lore", self.party)) end },
-				{ "Show ingredients", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.ShowIngredients").new(self.party)) end },
+				{ _t"Show Achievements", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.ShowAchievements").new(_t"Tales of Maj'Eyal Achievements", self.player)) end },
+				{ _t"Show known Lore", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.ShowLore").new(_t"Tales of Maj'Eyal Lore", self.party)) end },
+				{ _t"Show ingredients", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.ShowIngredients").new(self.party)) end },
 				"highscores",
-				{ "Inventory", function() self:unregisterDialog(menu) self.key:triggerVirtual("SHOW_INVENTORY") end },
-				{ "Character Sheet", function() self:unregisterDialog(menu) self.key:triggerVirtual("SHOW_CHARACTER_SHEET") end },
+				{ _t"Inventory", function() self:unregisterDialog(menu) self.key:triggerVirtual("SHOW_INVENTORY") end },
+				{ _t"Character Sheet", function() self:unregisterDialog(menu) self.key:triggerVirtual("SHOW_CHARACTER_SHEET") end },
 				"keybinds",
-				{"Game Options", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.GameOptions").new()) end},
+				"language",
+				{_t"Game Options", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.GameOptions").new()) end},
 				"video",
 				"sound",
 				"save",
@@ -2549,7 +2551,7 @@ function _M:setupMouse(reset)
 		if config.settings.cheat then
 			if button == "right" and core.key.modState("ctrl") and core.key.modState("shift") and core.key.modState("alt") and not xrel and not yrel and event == "button" and self.zone and not self.zone.wilderness then
 				local target = game.level.map(tmx, tmy, Map.ACTOR)
-				if target then game._cheat_move_actor = target game.log("#GOLD#CHEAT MOVE ACTOR %s: ctrl+shift+alt+right click on an empty map spot to move it", target.name)
+				if target then game._cheat_move_actor = target game.log("#GOLD#CHEAT MOVE ACTOR %s: ctrl+shift+alt+right click on an empty map spot to move it", target:getName())
 				elseif game._cheat_move_actor then game._cheat_move_actor:move(tmx, tmy, true) end
 				return
 			elseif button == "right" and core.key.modState("ctrl") and core.key.modState("shift") and not xrel and not yrel and event == "button" and self.zone and not self.zone.wilderness then
@@ -2641,11 +2643,11 @@ end
 
 --- Ask if we really want to close, if so, save the game first
 function _M:onQuit()
-	self.player:runStop("quitting")
-	self.player:restStop("quitting")
+	self.player:runStop(_t"quitting")
+	self.player:restStop(_t"quitting")
 
 	if not self.quit_dialog and not self.player.dead and not self:hasDialogUp() then
-		self.quit_dialog = Dialog:yesnoPopup("Save and go back to main menu?", "Save and go back to main menu?", function(ok)
+		self.quit_dialog = Dialog:yesnoPopup(_t"Save and go back to main menu?", _t"Save and go back to main menu?", function(ok)
 			if ok then
 				-- savefile_pipe is created as a global by the engine
 				self:saveGame()
@@ -2657,11 +2659,11 @@ function _M:onQuit()
 end
 
 function _M:onExit()
-	self.player:runStop("quitting")
-	self.player:restStop("quitting")
+	self.player:runStop(_t"quitting")
+	self.player:restStop(_t"quitting")
 
 	if not self.quit_dialog and not self.player.dead and not self:hasDialogUp() then
-		self.quit_dialog = Dialog:yesnoPopup("Save and exit game?", "Save and exit game?", function(ok)
+		self.quit_dialog = Dialog:yesnoPopup(_t"Save and exit game?", _t"Save and exit game?", function(ok)
 			if ok then
 				-- savefile_pipe is created as a global by the engine
 				self:saveGame()
@@ -2696,8 +2698,8 @@ end
 
 --- When a save is being made, stop running/resting
 function _M:onSavefilePush()
-	self.player:runStop("saving")
-	self.player:restStop("saving")
+	self.player:runStop(_t"saving")
+	self.player:restStop(_t"saving")
 end
 
 --- When a save has been done, if it's a zone or level, also save the main game
@@ -2809,7 +2811,7 @@ end
 
 function _M:unlockBackground(kind, name)
 	if not config.settings['unlock_background_'..kind] then
-		game.log("#ANTIQUE_WHITE#Splash screen unlocked: #GOLD#"..name)
+		game.log("#ANTIQUE_WHITE#Splash screen unlocked: #GOLD#%s", name)
 	end
 	config.settings['unlock_background_'..kind] = true
 	local save = {}

@@ -47,12 +47,12 @@ newTalent{
 	end,
 	info = function(self, t)
 		local power = t.getPower(self, t) * 100
-		local talent = self:isTalentActive(t.id) and self:getTalentFromId(self:isTalentActive(t.id).talent).name or "None"
+		local talent = self:isTalentActive(t.id) and self:getTalentFromId(self:isTalentActive(t.id).talent).name or _t"None"
 		return ([[Empowers the selected chronomancy spell, increasing spellpower when casting it by %d%%.
 		Each spell can only be spellbound in one way at a time.
 		
 		Current Empowered Spell: %s]]):
-		format(power, talent)
+		tformat(power, talent)
 	end,
 }
 
@@ -84,12 +84,12 @@ newTalent{
 	end,
 	info = function(self, t)
 		local power = t.getPower(self, t) * 100
-		local talent = self:isTalentActive(t.id) and self:getTalentFromId(self:isTalentActive(t.id).talent).name or "None"
+		local talent = self:isTalentActive(t.id) and self:getTalentFromId(self:isTalentActive(t.id).talent).name or _t"None"
 		return ([[Extends the duration of the selected chronomancy spell by %d%%.
 		Each spell can only be spellbound in one way at a time.
 		
 		Current Extended Spell: %s]]):
-		format(power, talent)
+		tformat(power, talent)
 	end,
 }
 
@@ -121,12 +121,12 @@ newTalent{
 	end,
 	info = function(self, t)
 		local power = t.getPower(self, t) * 100
-		local talent = self:isTalentActive(t.id) and self:getTalentFromId(self:isTalentActive(t.id).talent).name or "None"
+		local talent = self:isTalentActive(t.id) and self:getTalentFromId(self:isTalentActive(t.id).talent).name or _t"None"
 		return ([[Reduces the cooldown of the selected chronomancy spell by %d%%.
 		Each spell can only be spellbound in one way at a time.
 		
 		Current Matrix Spell: %s]]):
-		format(power, talent)
+		tformat(power, talent)
 	end,
 }
 
@@ -158,11 +158,11 @@ newTalent{
 	end,
 	info = function(self, t)
 		local power = t.getPower(self, t) * 100
-		local talent = self:isTalentActive(t.id) and self:getTalentFromId(self:isTalentActive(t.id).talent).name or "None"
+		local talent = self:isTalentActive(t.id) and self:getTalentFromId(self:isTalentActive(t.id).talent).name or _t"None"
 		return ([[Reduces the casting speed of the selected chronomancy spell by %d%%.
 		Each spell can only be spellbound in one way at a time.
 		
 		Current Quickened Spell: %s]]):
-		format(power, talent)
+		tformat(power, talent)
 	end,
 }

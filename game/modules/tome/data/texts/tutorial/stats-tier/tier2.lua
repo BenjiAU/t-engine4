@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 Can you explain the difference in the durations for that "Off-balance" timed effect you're inflicting?
 
 Why is one of the spiders unaffected?

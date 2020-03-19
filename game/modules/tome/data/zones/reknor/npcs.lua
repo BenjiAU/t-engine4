@@ -32,7 +32,7 @@ newEntity{ define_as = "GOLBUG",
 	name = "Golbug the Destroyer",
 	display = "o", color=colors.VIOLET,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/humanoid_orc_golbug_the_destroyer.png", display_h=2, display_y=-1}}},
-	desc = [[A huge and muscular orc of unknown breed. He looks both menacing and cunning...]],
+	desc = _t[[A huge and muscular orc of unknown breed. He looks both menacing and cunning...]],
 	level_range = {28, nil}, exp_worth = 2,
 	max_life = 350, life_rating = 16, fixed_rating = true,
 	max_stamina = 245,
@@ -99,8 +99,8 @@ newEntity{ define_as = "GOLBUG",
 	end,
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("LITHFENGEL", 4, 35, "They say that after it has been confirmed orcs still inhabited Reknor, they found a mighty demon there.", function(gen)
-			if gen then require("engine.ui.Dialog"):simpleLongPopup("Danger...", "When last you saw it, this cavern was littered with the corpses of orcs that you had slain. Now many, many more corpses carpet the floor, all charred and reeking of sulfur. An orange glow dimly illuminates the far reaches of the cavern to the east.", 400) end
+		game.state:activateBackupGuardian("LITHFENGEL", 4, 35, _t"They say that after it has been confirmed orcs still inhabited Reknor, they found a mighty demon there.", function(gen)
+			if gen then require("engine.ui.Dialog"):simpleLongPopup(_t"Danger...", _t"When last you saw it, this cavern was littered with the corpses of orcs that you had slain. Now many, many more corpses carpet the floor, all charred and reeking of sulfur. An orange glow dimly illuminates the far reaches of the cavern to the east.", 400) end
 		end)
 
 		world:gainAchievement("DESTROYER_BANE", game.player:resolveSource())
@@ -121,7 +121,7 @@ newEntity{ define_as = "HARNO",
 	faction = "allied-kingdoms",
 	name = "Harno, Herald of Last Hope",
 	display = "@", color=colors.LIGHT_BLUE,
-	desc = [[This is one of the heralds of Last Hope. He seems to be looking for you.]],
+	desc = _t[[This is one of the heralds of Last Hope. He seems to be looking for you.]],
 	global_speed_base = 2,
 	level_range = {40, 40}, exp_worth = 0,
 	max_life = 150, life_rating = 12,
@@ -158,7 +158,7 @@ newEntity{ define_as = "LITHFENGEL", -- Lord of Ash; backup guardian
 	type = "demon", subtype = "major", unique = true,
 	name = "Lithfengel",
 	display = "U", color=colors.VIOLET,
-	desc = [[A terrible demon of decay and atrophy, drawn to the energy of the farportal. A beast of blight!]],
+	desc = _t[[A terrible demon of decay and atrophy, drawn to the energy of the farportal. A beast of blight!]],
 	level_range = {35, nil}, exp_worth = 3,
 	max_life = 400, life_rating = 25, fixed_rating = true,
 	rank = 4,
@@ -203,7 +203,7 @@ newEntity{ define_as = "LITHFENGEL", -- Lord of Ash; backup guardian
 
 	on_die = function(self, who)
 		if who.resolveSource and who:resolveSource().player and who:resolveSource():hasQuest("east-portal") then
-			require("engine.ui.Dialog"):simpleLongPopup("Back and there again", "A careful examination of the demon's body turns up a Blood-Runed Athame and a Resonating Diamond, both covered in soot and gore but otherwise in good condition.", 400)
+			require("engine.ui.Dialog"):simpleLongPopup(_t"Back and there again", _t"A careful examination of the demon's body turns up a Blood-Runed Athame and a Resonating Diamond, both covered in soot and gore but otherwise in good condition.", 400)
 		end
 	end,
 }

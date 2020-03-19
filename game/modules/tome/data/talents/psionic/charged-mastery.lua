@@ -50,7 +50,7 @@ newTalent{
 		Charge Leech will also inflict confusion (%d%% effect).
 		Charged Strike will have its secondary lightning burst chain to up to 3 targets in a radius of 3.
 		The damage bonus and resistance penetration scale with your Mindpower.
-		Only one Transcendent talent may be in effect at a time.]]):format(t.getDuration(self, t), t.getPower(self, t), t.getPenetration(self, t), t.getConfuse(self, t))
+		Only one Transcendent talent may be in effect at a time.]]):tformat(t.getDuration(self, t), t.getPower(self, t), t.getPenetration(self, t), t.getConfuse(self, t))
 	end,
 }
 
@@ -72,7 +72,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Detect the mental activity of creatures in a radius of %d for %d turns.
 		This reveals their location and boosts your defense by %d.
-		The defense scales with you Mindpower and the range with your Willpower.]]):format(t.radius(self, t), t.getDuration(self, t), t.getDefense(self, t))
+		The defense scales with you Mindpower and the range with your Willpower.]]):tformat(t.radius(self, t), t.getDuration(self, t), t.getDefense(self, t))
 	end,
 }
 
@@ -120,7 +120,7 @@ newTalent{
 		Enemies standing in the net will take %0.1f Lightning damage and be slowed by %d%%.
 		When you move through the net, a static charge will accumulate on your weapon which will add %0.1f additional Lightning damage to your next attack for each turn you spend within its area.
 		These effects scale with your Mindpower.]]):
-		format(self:getTalentRadius(t), duration, damDesc(self, DamageType.LIGHTNING, damage), t.getSlow(self, t), damDesc(self, DamageType.LIGHTNING, t.getWeaponDamage(self, t)))
+		tformat(self:getTalentRadius(t), duration, damDesc(self, DamageType.LIGHTNING, damage), t.getSlow(self, t), damDesc(self, DamageType.LIGHTNING, t.getWeaponDamage(self, t)))
 	end,
 }
 
@@ -157,7 +157,7 @@ newTalent{
 		return ([[Store an electric charge for saving your life at a later time.
 		If you are reduced to less than zero life while this is active, it will deactivate, cure you of all stun/daze/freeze effects and allow you to survive with up to %d negative health for %d turns.
 		The negative health limit scales with your Mindpower and maxium life.]]):
-		format(t.getPower(self, t), t.getDuration(self, t))
+		tformat(t.getPower(self, t), t.getDuration(self, t))
 	end,
 }
 

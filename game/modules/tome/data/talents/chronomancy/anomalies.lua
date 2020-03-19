@@ -121,12 +121,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ causes a spacetime hiccup.",
-	action = function(self, t)
+	message = _t"@Source@ causes a spacetime hiccup.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
@@ -136,7 +138,7 @@ newTalent{
 			local a, id = rng.table(tgts)
 			table.remove(tgts, id)
 			checkAnomalyTriggers(self, a)
-			
+
 			if a:canBe("teleport") and a:canBe("anomaly") then
 				game.level.map:particleEmitter(a.x, a.y, 1, "temporal_teleport")
 				a:teleportRandom(a.x, a.y, 10, 1)
@@ -145,9 +147,12 @@ newTalent{
 		end
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		local radius = self:getTalentRadius(t)
-		return ([[Teleports up to five targets in a radius of %d up to ten tiles away.]]):format(radius)
+		return ([[Teleports up to five targets in a radius of %d up to ten tiles away.]]):tformat(radius)
 	end,
 }
 
@@ -167,12 +172,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=10, radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ shifts reality.",
-	action = function(self, t)
+	message = _t"@Source@ shifts reality.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		-- Randomly take targets
@@ -190,10 +197,13 @@ newTalent{
 		end
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		local range = self:getTalentRange(t)
 		local radius = self:getTalentRadius(t)
-		return ([[Teleports up to five targets in a radius of %d up to %d tiles away.]]):format(radius, range)
+		return ([[Teleports up to five targets in a radius of %d up to %d tiles away.]]):tformat(radius, range)
 	end,
 }
 
@@ -213,12 +223,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ swaps places with a nearby target.",
-	action = function(self, t)
+	message = _t"@Source@ swaps places with a nearby target.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRange(t), true)
 
 		-- Randomly take targets
@@ -248,8 +260,11 @@ newTalent{
 
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[You swap locations with a random target.]]):format()
+		return ([[You swap locations with a random target.]]):tformat()
 	end,
 }
 
@@ -269,12 +284,14 @@ newTalent{
 	target = function(self, t)
 		return {type="hit", range=self:getTalentRange(t), nowarning=true}
 	end,
-	message = "@Source@ transfers damage to a nearby target.",
-	action = function(self, t)
+	message = _t"@Source@ transfers damage to a nearby target.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t), true)
 
 		-- Randomly take targets
@@ -293,9 +310,12 @@ newTalent{
 
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[50%% chance that damage the caster takes will be warped to a set target.
-		Once the maximum damage (%d) is absorbed, the time runs out, or the target dies, the shield will crumble.]]):format(getAnomalyDamage(self, t)*2)
+		Once the maximum damage (%d) is absorbed, the time runs out, or the target dies, the shield will crumble.]]):tformat(getAnomalyDamage(self, t)*2)
 	end,
 }
 
@@ -314,12 +334,14 @@ newTalent{
 	target = function(self, t)
 		return {type="bolt", nowarning=true, range=10, nolock=true, simple_dir_request=true, talent=t}
 	end,
-	message = "@Source@ folds the space between two points.",
-	action = function(self, t)
+	message = _t"@Source@ folds the space between two points.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		if (x == self.x and y == self.y) or game.level.map:checkEntity(x, y, Map.TERRAIN, "block_move")then
 			x, y = getAnomalyPosition(self, self:getTalentRange(t))
 		end
@@ -328,11 +350,11 @@ newTalent{
 		
 		-- Adding the entrance wormhole
 		local entrance = mod.class.Trap.new{
-			name = "wormhole",
-			type = "annoy", subtype="teleport", id_by_type=true, unided_name = "trap",
+			name = _t"wormhole",
+			type = "annoy", subtype="teleport", id_by_type=true, unided_name = _t"trap",
 			image = "terrain/wormhole.png",
 			display = '&', color_r=255, color_g=255, color_b=255, back_color=colors.STEEL_BLUE,
-			message = "@Target@ moves onto the wormhole.",
+			message = _t"@Target@ moves onto the wormhole.",
 			temporary = getAnomalyDuration(self, t),
 			x = start_x, y = start_y,
 			canAct = false,
@@ -343,13 +365,13 @@ newTalent{
 				if who == self.summoned or who:canBe("teleport") then
 					game.level.map:particleEmitter(who.x, who.y, 1, "temporal_teleport")
 					if not who:teleportRandom(self.dest.x, self.dest.y, 3, 1) then
-						game.logSeen(who, "%s tries to enter the wormhole but a violent force pushes it back.", who.name:capitalize())
+						game.logSeen(who, "%s tries to enter the wormhole but a violent force pushes it back.", who:getName():capitalize())
 					elseif who ~= self.summoned_by then
 						who:setEffect(who.EFF_CONTINUUM_DESTABILIZATION, 100, {power=self.dest_power})
 						game.level.map:particleEmitter(who.x, who.y, 1, "temporal_teleport")
 					end
 				else
-					game.logSeen(who, "%s ignores the wormhole.", who.name:capitalize())
+					game.logSeen(who, "%s ignores the wormhole.", who:getName():capitalize())
 				end
 				return true
 			end,
@@ -387,8 +409,11 @@ newTalent{
 
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Creates a wormhole nearby and a second wormhole up to ten tiles away.]]):format()
+		return ([[Creates a wormhole nearby and a second wormhole up to ten tiles away.]]):tformat()
 	end,
 }
 
@@ -408,12 +433,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), nowarning=true}
 	end,
-	message = "@Source@ places several targets out of phase.",
-	action = function(self, t)
+	message = _t"@Source@ places several targets out of phase.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		for i = 1, rng.avg(1, 5, 3) do
@@ -430,9 +457,12 @@ newTalent{
 		
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Allows up to five targets in a radius of %d to travel up to %d tiles through walls.]]):
-		format(getAnomalyDuration(self, t)*2, getAnomalyDuration(self, t))
+		tformat(getAnomalyDuration(self, t)*2, getAnomalyDuration(self, t))
 	end,
 }
 
@@ -452,12 +482,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ makes several targets blink uncontrollably.",
-	action = function(self, t)
+	message = _t"@Source@ makes several targets blink uncontrollably.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		for i = 1, rng.avg(1, 5, 3) do
@@ -474,9 +506,12 @@ newTalent{
 		
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Up to five targets in a radius of %d are teleporting %d tiles every turn.]]):
-		format(self:getTalentRadius(t), getAnomalyDuration(self, t))
+		tformat(self:getTalentRadius(t), getAnomalyDuration(self, t))
 	end,
 }
 
@@ -497,12 +532,14 @@ newTalent{
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
 	getSummonTime = function(self, t) return math.ceil(getAnomalyDuration(self, t)*2) end,
-	message = "Some innocent bystanders have been teleported into the fight.",
-	action = function(self, t)
+	message = _t"Some innocent bystanders have been teleported into the fight.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		
 		-- Randomly pick a race
 		local race = rng.range(1, 4)
@@ -546,30 +583,30 @@ newTalent{
 			m.level = 1
 
 			if race == 1 then
-				m.name = "human farmer"
+				m.name = _t"human farmer"
 				m.subtype = "human"
 				m.image = "npc/humanoid_human_human_farmer.png"
-				m.desc = [[A weather-worn Human farmer, looking at a loss as to what's going on.]]
+				m.desc=_t[[A weather-worn Human farmer, looking at a loss as to what's going on.]]
 				m.faction = "allied-kingdoms"
 				m[#m+1] = resolvers.inscriptions(1, "infusion")
 			elseif race == 2 then
-				m.name = "halfling gardener"
+				m.name = _t"halfling gardener"
 				m.subtype = "halfling"
-				m.desc = [[A rugged Halfling gardener, looking quite confused as to what he's doing here.]]
+				m.desc=_t[[A rugged Halfling gardener, looking quite confused as to what he's doing here.]]
 				m.faction = "allied-kingdoms"
 				m.image = "npc/humanoid_halfling_halfling_gardener.png"
 				m[#m+1] = resolvers.inscriptions(1, "infusion")
 			elseif race == 3 then
-				m.name = "shalore scribe"
+				m.name = _t"shalore scribe"
 				m.subtype = "shalore"
-				m.desc = [[A scrawny Elven scribe, looking bewildered at his surroundings.]]
+				m.desc=_t[[A scrawny Elven scribe, looking bewildered at his surroundings.]]
 				m.faction = "shalore"
 				m.image = "npc/humanoid_shalore_shalore_rune_master.png"
 				m[#m+1] = resolvers.inscriptions(1, "rune")
 			elseif race == 4 then
-				m.name = "dwarven lumberjack"
+				m.name = _t"dwarven lumberjack"
 				m.subtype = "dwarf"
-				m.desc = [[A brawny Dwarven lumberjack, looking a bit upset at his current situation.]]
+				m.desc=_t[[A brawny Dwarven lumberjack, looking a bit upset at his current situation.]]
 				m.faction = "iron-throne"
 				m.image = "npc/humanoid_dwarf_lumberjack.png"
 				m[#m+1] = resolvers.inscriptions(1, "rune")
@@ -584,8 +621,11 @@ newTalent{
 		game:playSoundNear(self, "talents/spell_generic")
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Pulls innocent people into the fight.]])
+		return ([[Pulls innocent people into the fight.]]):tformat()
 	end,
 }
 
@@ -607,12 +647,14 @@ newTalent{
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
 	getSlow = function(self, t) return 1 - 1 / (1 + (getAnomalyEffectPower(self, t)) / 100) end,
-	message = "@Source@ creates a bubble of slow time.",
-	action = function(self, t)
+	message = _t"@Source@ creates a bubble of slow time.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		for i = 1, rng.avg(1, 5, 3) do
@@ -629,9 +671,12 @@ newTalent{
 		end
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Slows up to five targets in a radius %d ball by %d%%.]]):
-		format(self:getTalentRadius(t), t.getSlow(self, t)*100)
+		tformat(self:getTalentRadius(t), t.getSlow(self, t)*100)
 	end,
 }
 
@@ -652,12 +697,14 @@ newTalent{
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), nowarning=true}
 	end,
 	getHaste = function(self, t) return 1 - 1 / (1 + (getAnomalyEffectPower(self, t)) / 100) end,
-	message = "@Source@ creates a bubble of fast time.",
-	action = function(self, t)
+	message = _t"@Source@ creates a bubble of fast time.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		for i = 1, rng.avg(1, 5, 3) do
@@ -673,9 +720,12 @@ newTalent{
 		
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Increases global speed of up to five targets in a radius %d ball by %d%%.]]):
-		format(self:getTalentRadius(t), t.getHaste(self, t)*100)
+		tformat(self:getTalentRadius(t), t.getHaste(self, t)*100)
 	end,
 }
 
@@ -695,12 +745,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ creates a bubble of nul time.",
-	action = function(self, t)
+	message = _t"@Source@ creates a bubble of nul time.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		for i = 1, rng.avg(1, 5, 3) do
@@ -718,9 +770,12 @@ newTalent{
 		
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Stuns up to five targets in a radius %d ball.]]):
-		format(self:getTalentRadius(t))
+		tformat(self:getTalentRadius(t))
 	end,
 }
 
@@ -740,12 +795,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ removes several targets from time.",
-	action = function(self, t)
+	message = _t"@Source@ removes several targets from time.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		for i = 1, rng.avg(1, 5, 3) do
@@ -763,9 +820,12 @@ newTalent{
 		
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Time Prisons up to five targets in a radius %d ball.]]):
-		format(self:getTalentRadius(t))
+		tformat(self:getTalentRadius(t))
 	end,
 }
 
@@ -785,12 +845,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), nowarning=true}
 	end,
-	message = "@Source@ creates a temporal shield around several targets.",
-	action = function(self, t)
+	message = _t"@Source@ creates a temporal shield around several targets.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		for i = 1, rng.avg(1, 5, 3) do
@@ -806,9 +868,12 @@ newTalent{
 		
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Time Shields up to five targets in a radius of %d.]]):
-		format(self:getTalentRadius(t))
+		tformat(self:getTalentRadius(t))
 	end,
 }
 
@@ -828,12 +893,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), nowarning=true}
 	end,
-	message = "@Source@ energizes several targets.",
-	action = function(self, t)
+	message = _t"@Source@ energizes several targets.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		for i = 1, rng.avg(1, 5, 3) do
@@ -849,9 +916,12 @@ newTalent{
 		
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Invigorates up to five targets in a radius of %d.]]):
-		format(self:getTalentRadius(t))
+		tformat(self:getTalentRadius(t))
 	end,
 }
 
@@ -871,12 +941,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), nowarning=true}
 	end,
-	message = "@Source@ clones a nearby creature.",
-	action = function(self, t)
+	message = _t"@Source@ clones a nearby creature.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		-- Randomly take targets
@@ -897,8 +969,11 @@ newTalent{
 		
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Clones a random creature within range.]]):format()
+		return ([[Clones a random creature within range.]]):tformat()
 	end,
 }
 
@@ -918,12 +993,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ creates a temporal storm.",
-	action = function(self, t)
+	message = _t"@Source@ creates a temporal storm.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		
 		-- Add a lasting map effect
 		game.level.map:addEffect(self,
@@ -936,11 +1013,14 @@ newTalent{
 		)
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		local duration = self:combatScale(getParadoxSpellpower(self, t), 4, 10, 12, 100, 0.75)/2
 		local damage = self:combatScale(getParadoxSpellpower(self, t), 10, 10, 50, 100, 0.75)
 		return ([[Creates a temporal storm for %d to %d turns that deals between %0.2f and %0.2f temporal damage each turn.]])
-		:format(duration/2, duration, damDesc(self, DamageType.TEMPORAL, damage/3),  damDesc(self, DamageType.TEMPORAL, damage))
+		:tformat(duration/2, duration, damDesc(self, DamageType.TEMPORAL, damage/3),  damDesc(self, DamageType.TEMPORAL, damage))
 	end,
 }
 
@@ -961,12 +1041,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ increases local gravity.",
-	action = function(self, t)
+	message = _t"@Source@ increases local gravity.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 
 		self:project(tg, x, y, function(px, py)
 			local target = game.level.map(px, py, Map.ACTOR)
@@ -976,7 +1058,7 @@ newTalent{
 			
 			if tx and ty and target:canBe("knockback") and target:canBe("anomaly") then
 				target:move(tx, ty, true)
-				game.logSeen(target, "%s is drawn in by gravity!", target.name:capitalize())
+				game.logSeen(target, "%s is drawn in by gravity!", target:getName():capitalize())
 			end
 		end)
 
@@ -985,8 +1067,11 @@ newTalent{
 
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Increases localized gravity, pulling in targets in a radius of %d.]]):format(self:getTalentRadius(t))
+		return ([[Increases localized gravity, pulling in targets in a radius of %d.]]):tformat(self:getTalentRadius(t))
 	end,
 }
 
@@ -1006,20 +1091,25 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ turns matter to dust.",
-	action = function(self, t)
+	message = _t"@Source@ turns matter to dust.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 
 		self:project(tg, x, y, DamageType.DIG, 1)
 		game.level.map:particleEmitter(x, y, tg.radius, "ball_earth", {radius=tg.radius})
 		game:playSoundNear(self, "talents/breath")
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Digs out all terrain in a radius %d ball.]]):format(self:getTalentRadius(t))
+		return ([[Digs out all terrain in a radius %d ball.]]):tformat(self:getTalentRadius(t))
 	end,
 }
 
@@ -1039,12 +1129,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), nowarning=true}
 	end,
-	message = "@Source@ creates a stone wall.",
-	action = function(self, t)
+	message = _t"@Source@ creates a stone wall.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		
 		for i = -1, 1 do for j = -1, 1 do if game.level.map:isBound(x + i, y + j) then
 			local oe = game.level.map(x + i, y + j, Map.TERRAIN)
@@ -1055,9 +1147,9 @@ newTalent{
 
 				local e = Object.new{
 					old_feat = oe,
-					name = "stone wall", image = "terrain/granite_wall1.png",
+					name = _t"stone wall", image = "terrain/granite_wall1.png",
 					display = '#', color_r=255, color_g=255, color_b=255, back_color=colors.GREY,
-					desc = "a summoned wall of stone",
+					desc = _t"a summoned wall of stone",
 					type = "wall", --subtype = "floor",
 					always_remember = true,
 					can_pass = {pass_wall=1},
@@ -1095,8 +1187,11 @@ newTalent{
 		game:playSoundNear(self, "talents/earth")
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Entombs a single target in a wall of stone.]]):format()
+		return ([[Entombs a single target in a wall of stone.]]):tformat()
 	end,
 }
 
@@ -1116,12 +1211,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ increases local entropy.",
-	action = function(self, t)
+	message = _t"@Source@ increases local entropy.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		-- Randomly take targets
@@ -1146,7 +1243,7 @@ newTalent{
 						local t = rng.tableRemove(tids)
 						if not t then break end
 						target.talents_cd[t.id] = rng.range(2, power)
-						game.logSeen(target, "%s's %s is disrupted!", target.name:capitalize(), t.name)
+						game.logSeen(target, "%s's %s is disrupted!", target:getName():capitalize(), t.name)
 					end
 					target.changed = true
 				end, nil)
@@ -1154,9 +1251,12 @@ newTalent{
 		end
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Places between three and six talents of up to 5 targets in a radius %d ball on cooldown for up to %d turns.]]):
-		format(getAnomalyRadius(self, t), getAnomalyDuration(self, t))
+		tformat(getAnomalyRadius(self, t), getAnomalyDuration(self, t))
 	end,
 }
 
@@ -1172,17 +1272,18 @@ newTalent{
 	range = 10,
 	radius = function(self, t) return getAnomalyRadius(self, t) end,
 	direct_hit = true,
-
-requires_target = true,
+	requires_target = true,
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ increases local gravity.",
-	action = function(self, t)
+	message = _t"@Source@ increases local gravity.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		-- Randomly take targets
@@ -1201,8 +1302,11 @@ requires_target = true,
 		game:playSoundNear(self, "talents/earth")
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Creates a gravity well in a radius %d ball, pinning up to five targets.]]):format(self:getTalentRadius(t))
+		return ([[Creates a gravity well in a radius %d ball, pinning up to five targets.]]):tformat(self:getTalentRadius(t))
 	end,
 }
 
@@ -1222,12 +1326,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ causes an earthquake.",
-	action = function(self, t)
+	message = _t"@Source@ causes an earthquake.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		
 		-- Don't bury the player
 		if not game.player:knowTalent(game.player.T_DIG_OBJECT) then
@@ -1237,9 +1343,12 @@ newTalent{
 		self:doQuake(tg, x, y)
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Causes an earthquake in a radius of %d.]]):
-		format(getAnomalyRadius(self, t))
+		tformat(getAnomalyRadius(self, t))
 	end,
 }
 
@@ -1259,12 +1368,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ crumbles the resistances of several targets.",
-	action = function(self, t)
+	message = _t"@Source@ crumbles the resistances of several targets.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
 
 		-- Randomly take targets
@@ -1280,8 +1391,11 @@ newTalent{
 		end
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Reduces the resistances of up to five targets in a ball of radius %d by %d%%.]]):format(self:getTalentRadius(t), getAnomalyEffectPower(self, t))
+		return ([[Reduces the resistances of up to five targets in a ball of radius %d by %d%%.]]):tformat(self:getTalentRadius(t), getAnomalyEffectPower(self, t))
 	end,
 }
 
@@ -1301,12 +1415,14 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ causes a dust storm.",
-	action = function(self, t)
+	message = _t"@Source@ causes a dust storm.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then x, y = self.x, self.y end
+		if not x or not y then
+			if cancellable then return nil else x, y = self.x, self.y end
+		end
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRange(t))
 		
 		local dam = getAnomalyRadius(self, t) -- not a typo, very low damage since this isn't a major anomaly
@@ -1322,7 +1438,7 @@ newTalent{
 			local proj = require("mod.class.Projectile"):makeHoming(
 				self,
 				{particle="bolt_earth", trail="lightningtrail"},
-				{speed=2, name="Dust Storm", start_x=orig_x, start_y=orig_y, dam=dam, movedam=dam},
+				{speed=2, name=_t"Dust Storm", start_x=orig_x, start_y=orig_y, dam=dam, movedam=dam},
 				target,
 				self:getTalentRange(t),
 				function(self, src)
@@ -1342,8 +1458,11 @@ newTalent{
 		end
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Summons three to six dust storms.]]):format()
+		return ([[Summons three to six dust storms.]]):tformat()
 	end,
 }
 
@@ -1365,8 +1484,8 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ causes a fire.",
-	action = function(self, t)
+	message = _t"@Source@ causes a fire.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local tgts = getAnomalyTargets(self, t, self.x, self.y, "ACTOR", self:getTalentRange(t))
 		
@@ -1383,7 +1502,7 @@ newTalent{
 			local proj = require("mod.class.Projectile"):makeHoming(
 				self,
 				{particle="inferno"},
-				{speed=1, name="Blazing Fire", start_x=orig_x, start_y=orig_y, dam=movedam, movedam=movedam},
+				{speed=1, name=_t"Blazing Fire", start_x=orig_x, start_y=orig_y, dam=movedam, movedam=movedam},
 				target,
 				self:getTalentRange(t),
 				function(self, src)
@@ -1401,8 +1520,11 @@ newTalent{
 		end
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Summons three to six blazing fires.]]):format()
+		return ([[Summons three to six blazing fires.]]):tformat()
 	end,
 }
 
@@ -1422,8 +1544,8 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ calcifies several targets.",
-	action = function(self, t)
+	message = _t"@Source@ calcifies several targets.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		local tgts = getAnomalyTargets(self, t, x, y, "ACTOR", self:getTalentRadius(t))
@@ -1442,9 +1564,12 @@ newTalent{
 		end
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Turns up to 5 targets in a radius %d ball to stone for %d turns.]]):
-		format(getAnomalyRadius(self, t), getAnomalyDuration(self, t))
+		tformat(getAnomalyRadius(self, t), getAnomalyDuration(self, t))
 	end,
 }
 
@@ -1464,8 +1589,8 @@ newTalent{
 	target = function(self, t)
 		return {type="hit", range=self:getTalentRange(t), talent=t}
 	end,
-	message = "@Source@ teleports several targets to @Source@'s location.",
-	action = function(self, t)
+	message = _t"@Source@ teleports several targets to @Source@'s location.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local tgts = getAnomalyTargets(self, t, self.x, self.y, "ACTOR", self:getTalentRange(t), true)
 
@@ -1484,9 +1609,12 @@ newTalent{
 		end
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Teleports between 3 and 6 targets to the caster.]]):
-		format()
+		tformat()
 	end,
 }
 
@@ -1507,8 +1635,8 @@ newTalent{
 		return {type="hit", range=self:getTalentRange(t), talent=t}
 	end,
 	getHaste = function(self, t) return 1 - 1 / (1 + (getAnomalyEffectPower(self, t)) / 100) end,
-	message = "The odds have tilted.",
-	action = function(self, t)
+	message = _t"The odds have tilted.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local tgts = getAnomalyTargets(self, t, self.x, self.y, "ACTOR", self:getTalentRange(t))
 
@@ -1525,8 +1653,11 @@ newTalent{
 		game:playSoundNear(self, "talents/spell_generic")
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Substantially toughens and hastes one target for %d turns.]]):format(getAnomalyDuration(self, t))
+		return ([[Substantially toughens and hastes one target for %d turns.]]):tformat(getAnomalyDuration(self, t))
 	end,
 }
 
@@ -1546,8 +1677,8 @@ newTalent{
 	target = function(self, t)
 		return {type="hit", range=self:getTalentRange(t), talent=t}
 	end,
-	message = "@Source@'s evil twin has come from another timeline.",
-	action = function(self, t)
+	message = _t"@Source@'s evil twin has come from another timeline.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 
 		local x, y = util.findFreeGrid(self.x, self.y, 3, true, {[Map.ACTOR]=true})
@@ -1565,8 +1696,11 @@ newTalent{
 
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Clones the caster.]]):format(getAnomalyDuration(self, t))
+		return ([[Clones the caster.]]):tformat(getAnomalyDuration(self, t))
 	end,
 }
 
@@ -1586,8 +1720,8 @@ newTalent{
 	target = function(self, t)
 		return {type="hit", range=self:getTalentRange(t), talent=t}
 	end,
-	message = "@Source@ has caused two threads to merge.",
-	action = function(self, t)
+	message = _t"@Source@ has caused two threads to merge.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local tgts = getAnomalyTargets(self, t, self.x, self.y, "ACTOR", self:getTalentRange(t))
 
@@ -1611,8 +1745,11 @@ newTalent{
 
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Clones all creatures in a radius of 10.]]):format(getAnomalyDuration(self, t))
+		return ([[Clones all creatures in a radius of 10.]]):tformat(getAnomalyDuration(self, t))
 	end,
 }
 
@@ -1628,13 +1765,12 @@ newTalent{
 	range = 10,
 	radius = function(self, t) return getAnomalyRadius(self, t) end,
 	direct_hit = true,
-
-requires_target = true,
+	requires_target = true,
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ digs out a huge area.",
-	action = function(self, t)
+	message = _t"@Source@ digs out a huge area.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		for i = 1, rng.avg(3, 6, 3) do
 			local orig_x, orig_y = getAnomalyPosition(self, self:getTalentRange(t))
@@ -1645,8 +1781,11 @@ requires_target = true,
 		game:playSoundNear(self, "talents/breath")
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Digs out all terrain in between three and six radius %d balls.]]):format(self:getTalentRadius(t))
+		return ([[Digs out all terrain in between three and six radius %d balls.]]):tformat(self:getTalentRadius(t))
 	end,
 }
 
@@ -1666,8 +1805,8 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ creates a sphere of destruction.",
-	action = function(self, t)
+	message = _t"@Source@ creates a sphere of destruction.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local tgts = getAnomalyTargets(self, t, self.x, self.y, "ACTOR", self:getTalentRange(t))
 		
@@ -1683,7 +1822,7 @@ newTalent{
 		local proj = require("mod.class.Projectile"):makeHoming(
 			self,
 			{particle = "bolt_dark", trail = "darktrail"},
-			{speed=1, name="Sphere of Destruction", start_x=orig_x, start_y=orig_y, dam=movedam, movedam=movedam},
+			{speed=1, name=_t"Sphere of Destruction", start_x=orig_x, start_y=orig_y, dam=movedam, movedam=movedam},
 			target,
 			self:getTalentRange(t),
 			function(self, src)
@@ -1702,8 +1841,11 @@ newTalent{
 		game:playSoundNear(self, "talents/distortion")
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Summons a sphere of destruction.]]):format()
+		return ([[Summons a sphere of destruction.]]):tformat()
 	end,
 }
 
@@ -1723,8 +1865,8 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ causes a tornado storm.",
-	action = function(self, t)
+	message = _t"@Source@ causes a tornado storm.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local tgts = getAnomalyTargets(self, t, self.x, self.y, "ACTOR", self:getTalentRange(t))
 
@@ -1743,7 +1885,7 @@ newTalent{
 			local proj = require("mod.class.Projectile"):makeHoming(
 				self,
 				{particle="bolt_lightning", trail="lightningtrail"},
-				{speed=2, name="Tornado", dam=dam, movedam=movedam, start_x=orig_x, start_y=orig_y, apply=apply_power},
+				{speed=2, name=_t"Tornado", dam=dam, movedam=movedam, start_x=orig_x, start_y=orig_y, apply=apply_power},
 				target,
 				self:getTalentRange(t),
 				function(self, src)
@@ -1757,7 +1899,7 @@ newTalent{
 					if target:canBe("stun") then
 						target:setEffect(target.EFF_STUNNED, 4, {apply_power=self.def.apply})
 					else
-						game.logSeen(target, "%s resists the tornado!", target.name:capitalize())
+						game.logSeen(target, "%s resists the tornado!", target:getName():capitalize())
 					end
 
 					-- Lightning ball gets a special treatment to make it look neat
@@ -1778,8 +1920,11 @@ newTalent{
 		end
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
-		return ([[Summons three to six tornados.]]):format()
+		return ([[Summons three to six tornados.]]):tformat()
 	end,
 }
 
@@ -1799,8 +1944,8 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ causes a meteor to fall from the sky.",
-	action = function(self, t)
+	message = _t"@Source@ causes a meteor to fall from the sky.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local x, y = getAnomalyPosition(self, self:getTalentRange(t))
 
@@ -1850,15 +1995,14 @@ newTalent{
 					game.level:addEntity(g)
 				end
 
-				src:project({type="ball", radius=radius}, x, y, engine.DamageType.FIRE, dam/2)
-				src:project({type="ball", radius=radius}, x, y, engine.DamageType.PHYSICAL, dam/2)
+				src:project({type="ball", radius=radius}, x, y, engine.DamageType.METEOR, dam)
 				src:project({type="ball", radius=radius}, x, y, function(px, py)
 					local target = game.level.map(px, py, engine.Map.ACTOR)
 					if target then
 						if target:canBe("stun") then
 							target:setEffect(target.EFF_STUNNED, 3, {apply_power=getParadoxSpellpower(src, t)})
 						else
-							game.logSeen(target, "%s resists the stun!", target.name:capitalize())
+							game.logSeen(target, "%s resists the stun!", target:getName():capitalize())
 						end
 					end
 				end)
@@ -1872,9 +2016,12 @@ newTalent{
 
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Causes a meteor to fall from the sky.]]):
-		format()
+		tformat()
 	end,
 }
 
@@ -1894,16 +2041,16 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "@Source@ tears a hole in the fabric of spacetime.",
-	action = function(self, t)
+	message = _t"@Source@ tears a hole in the fabric of spacetime.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local tx, ty = getAnomalyPosition(self, self:getTalentRange(t))
 
 		-- Make a trap so the player can shut it
 		local npcs = mod.class.NPC:loadList{"/data/general/npcs/horror_temporal.lua"}
 		local trap = Trap.new{
-			name = "Spacetime Tear",
-			type = "time", id_by_type=true, unided_name = "trap",
+			name = _t"Spacetime Tear",
+			type = "time", id_by_type=true, unided_name = _t"trap",
 			display = '^', color=colors.GOLD, image = "object/temporal_instability.png",
 			npc_type = npcs,
 			canTrigger = function(self, x, y, who)
@@ -1914,7 +2061,7 @@ newTalent{
 				if who == self.summoned_by then
 					if game.level.map(self.x, self.y, engine.Map.TRAP) == self then game.level.map:remove(self.x, self.y, engine.Map.TRAP) end
 					game.level:removeEntity(self)
-					game.logPlayer(who, "%s forces the tear shut!", who.name:capitalize())
+					game.logPlayer(who, "%s forces the tear shut!", who:getName():capitalize())
 				end
 				return true
 			end,
@@ -1953,9 +2100,12 @@ newTalent{
 		
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Tears a hole in the fabric of spacetime.]]):
-		format()
+		tformat()
 	end,
 }
 
@@ -1975,8 +2125,8 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	message = "Some Time Elementals have been attracted by @Source@'s meddling.",
-	action = function(self, t)
+	message = _t"Some Time Elementals have been attracted by @Source@'s meddling.",
+	doAction = function(self, t, cancellable)
 		local tg = self:getTalentTarget(t)
 		local tgts = getAnomalyTargets(self, t, self.x, self.y, "ACTOR", self:getTalentRadius(t))
 
@@ -2002,9 +2152,12 @@ newTalent{
 
 		return true
 	end,
+	action = function(self, t, cancellable)
+		t.doAction(self, t, true)
+	end,
 	info = function(self, t)
 		return ([[Time elementals have been attracted to the timeline.]]):
-		format()
+		tformat()
 	end,
 }
 

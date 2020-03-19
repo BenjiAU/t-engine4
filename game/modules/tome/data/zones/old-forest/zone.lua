@@ -21,7 +21,7 @@ local layout = game.state:alternateZone(short_name, {"CRYSTALINE", 2})
 local is_crystaline = layout == "CRYSTALINE"
 
 return {
-	name = "Old Forest",
+	name = _t"Old Forest",
 	level_range = {7, 16},
 	level_scheme = "player",
 	max_level = 4,
@@ -46,7 +46,7 @@ return {
 			edge_entrances = {4,6},
 			rooms = {"forest_clearing", {"lesser_vault",8}},
 			rooms_config = {forest_clearing={pit_chance=5, filters={{type="insect", subtype="ant"}, {type="insect"}, {type="animal", subtype="snake"}, {type="animal", subtype="canine"}}}},
-			lesser_vaults_list = {"honey_glade", "troll-hideout", "mage-hideout", "thief-hideout", "plantlife", "mold-path", "bandit-fortress","loot-vault","worms"},
+			lesser_vaults_list = {"honey_glade", "troll-hideout", "mage-hideout", "thief-hideout", "plantlife", "mold-path", "loot-vault","worms"},
 			['.'] = "GRASS",
 			['#'] = "TREE",
 			up = "GRASS_UP4",

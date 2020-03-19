@@ -45,7 +45,7 @@ function _M:init()
 
 	local t_per_w, t_per_h = math.floor(mw / self.bsize), math.floor(mh / self.bsize)
 
-	Dialog.init(self, "Map: #0080FF#"..game.zone_name, 1, 1)
+	Dialog.init(self, ("Map: #0080FF#%s"):tformat(game.zone_name), 1, 1)
 
 	local mmdo = game.level.map:getMinimapDO(true)
 	local mc = DisplayObject.new{width=mw, height=mh, DO=mmdo}

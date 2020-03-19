@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Orc breeding pits",
+	name = _t"Orc breeding pits",
 	level_range = {30, 60},
 	level_scheme = "player",
 	max_level = 3,
@@ -66,7 +66,7 @@ return {
 	end,
 	on_enter = function(lev, old_lev, newzone)
 		if newzone and not game.level.shown_warning then
-			require("engine.ui.Dialog"):simplePopup("Orc Breeding Pit", "You arrive in a small underground structure. There are orcs there and as soon as they notice you they scream 'Protect the mothers!'.")
+			require("engine.ui.Dialog"):simplePopup(_t"Orc Breeding Pit", _t"You arrive in a small underground structure. There are orcs there and as soon as they notice you they scream 'Protect the mothers!'.")
 			game.level.shown_warning = true
 		end
 	end,

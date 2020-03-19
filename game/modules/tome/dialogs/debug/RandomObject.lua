@@ -42,7 +42,7 @@ _M._randart_data = config.settings.tome.cheat_create_object_default_randart_data
 
 --- formats function help for dialog output
 local function formatHelp(f_lines, f_name, f_lnum)
-	local help = ("#LIGHT_GREEN#(From %-10.60s, line: %s):#LAST#"):format(f_name or "unknown", f_lnum or "unknown")
+	local help = ("#LIGHT_GREEN#(From %-10.60s, line: %s):#LAST#"):tformat(f_name or _t"unknown", f_lnum or _t"unknown")
 	for _, line in ipairs(f_lines or {}) do
 		line = line:gsub("#", "_")
 		help = help.."\n    "..line:gsub("\t", "    ")
@@ -67,8 +67,8 @@ lines, fname, lnum = DebugConsole:functionHelp(resolvers.resolveObject)
 _M.resolver_genObj_help = "#GOLD#resolvers.resolveObject#LAST# "..formatHelp(lines, fname, lnum)
 
 --- configure resolvers that can be used
-_M.resolver_choices = {{name="None", resolver=nil, desc="Don't apply a resolver"},
-	{name="Equipment", resolver="equip", desc="Object will be equipped if possible, otherwise added to main inventory",
+_M.resolver_choices = {{name=_t"None", resolver=nil, desc=_t"Don't apply a resolver"},
+	{name=_t"Equipment", resolver="equip", desc=_t"Object will be equipped if possible, otherwise added to main inventory",
 	generate=function(dialog) -- generate an object, forcing antimagic check
 		local res_input, ok, t
 		if dialog._random_filter then
@@ -82,10 +82,10 @@ _M.resolver_choices = {{name="None", resolver=nil, desc="Don't apply a resolver"
 		return resolvers.resolveObject(_M.actor, res_input, false, 5)
 	end,
 	},
-	{name="Inventory", resolver="inventory", desc="Object added to main inventory"},
-	{name="Drops", resolver="drops", desc="Object added to main inventory (dropped on death)"},
-	{name="Attach Tinker", resolver="attachtinker", desc="Tinker will be attached to a worn object"},
-	{name="Drop Randart (auto data)", resolver="drop_randart", desc="Random Artifact (dropped on death) added to main inventory, uses the Base Object or Base Filter plus Randart Data as input",
+	{name=_t"Inventory", resolver="inventory", desc=_t"Object added to main inventory"},
+	{name=_t"Drops", resolver="drops", desc=_t"Object added to main inventory (dropped on death)"},
+	{name=_t"Attach Tinker", resolver="attachtinker", desc=_t"Tinker will be attached to a worn object"},
+	{name=_t"Drop Randart (auto data)", resolver="drop_randart", desc=_t"Random Artifact (dropped on death) added to main inventory, uses the Base Object or Base Filter plus Randart Data as input",
 	generate=function(dialog) -- build input from Randart Data and the base object filter
 		local res_input, ok, t = {}
 		if dialog._randart_data then
@@ -112,7 +112,7 @@ _M.resolver_choices = {{name="None", resolver=nil, desc="Don't apply a resolver"
 		return resolvers.calc.drop_randart(res, dialog.actor)
 	end
 	},
-	{name="Drop Randart", resolver="drop_randart", desc="Random Artifact (dropped on death) added to main inventory",
+	{name=_t"Drop Randart", resolver="drop_randart", desc=_t"Random Artifact (dropped on death) added to main inventory",
 	generate=function(dialog) -- drop_randart using the random filter as its input
 		local res_input, ok, t
 		if dialog._random_filter then
@@ -152,12 +152,12 @@ _M.resolver_num = 1 -- default to no resolver
 function _M:init(actor)
 	_M.actor = actor or _M.actor or game.player
 	if not game.level:hasEntity(_M.actor) then _M.actor = game.player end
-	engine.ui.Dialog.init(self, "DEBUG -- Create Random Object", 1, 1)
+	engine.ui.Dialog.init(self, _t"DEBUG -- Create Random Object", 1, 1)
 
 	local tops={0} self.tops = tops
 	
 	local dialog_txt = Textzone.new{auto_width=true, auto_height=true, no_color_bleed=true, font=self.font,
-	text=([[Generate objects randomly subject to filters and create Random Artifacts.
+	text=(_t[[Generate objects randomly subject to filters and create Random Artifacts.
 Use "Generate" to create objects for preview and inspection.
 Use "Add Object" to choose where to put the object and add it to the game.
 (Mouse over controls for a preview of the generated object/working Actor. (Press #GOLD#'L'#LAST# to lua inspect.)
@@ -171,7 +171,7 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 	self.dialog_txt = dialog_txt
 	
 	local random_info = Textzone.new{auto_width=true, auto_height=true, no_color_bleed=true, font=self.font,
-	text=([[The #LIGHT_GREEN#Random Filter#LAST# controls random generation of a normal object.]]):format()}
+	text=([[The #LIGHT_GREEN#Random Filter#LAST# controls random generation of a normal object.]]):tformat()}
 	self.random_info = random_info
 	tops[#tops+1]=tops[#tops] + dialog_txt.h + random_info.h + 10
 	
@@ -182,12 +182,12 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 		if obj then
 			txt = obj:getName({do_color=true})
 		else
-			txt = "#GREY#None#LAST#"
+			txt = _t"#GREY#None#LAST#"
 		end
-		return ([[%s: %s]]):format(prefix or "Object", txt)
+		return ([[%s: %s]]):tformat(prefix or _t"Object", txt)
 	end
 	
-	local random_refresh = self.newButton{text="Generate", _object_field="_random_object",
+	local random_refresh = self.newButton{text=_t"Generate", _object_field="_random_object",
 		fct=function()
 			self:generateRandom()
 			self.random_txt:refresh(_M._random_object)
@@ -198,7 +198,7 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 	self.random_refresh = random_refresh
 	tops[#tops+1]=tops[#tops] + random_refresh.h + 5
 	
-	local random_make = self.newButton{text="Add Object", _object_field="_random_object",
+	local random_make = self.newButton{text=_t"Add Object", _object_field="_random_object",
 		fct=function()
 			self:acceptObject(_M._random_object, true, _M._random_filter_table)
 		end,
@@ -206,7 +206,7 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 	}
 	self.random_make = random_make
 	
-	local random_reset_filter = self.newButton{text="Default Filter", _object_field="_random_object",
+	local random_reset_filter = self.newButton{text=_t"Default Filter", _object_field="_random_object",
 		fct=function()
 			_M._random_filter = _M._default_random_filter
 			self.rf_box:setText(_M._random_filter)
@@ -215,7 +215,7 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 	}
 	self.random_reset_filter = random_reset_filter
 	
-	local random_clear = self.newButton{text="Clear Object", _object_field="_random_object",
+	local random_clear = self.newButton{text=_t"Clear Object", _object_field="_random_object",
 		fct=function()
 			if _M._random_object then
 				_M._random_object = nil
@@ -229,15 +229,15 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 	self.random_clear = random_clear
 	
 	local random_txt = Textzone.new{width=500, auto_height=true, height=random_refresh.h, no_color_bleed=true, font=self.font,
-	text=object_text("#LIGHT_GREEN#Random Object#LAST#", _M._random_object), can_focus=true}
+	text=object_text(_t"#LIGHT_GREEN#Random Object#LAST#", _M._random_object), can_focus=true}
 	random_txt.refresh = function(self, object)
-		self.text = object_text("#LIGHT_GREEN#Random Object#LAST#", object)
+		self.text = object_text(_t"#LIGHT_GREEN#Random Object#LAST#", object)
 		self:generate()
 	end
 	random_txt.on_focus = function() _M:tooltip(_M._random_object) _M.help_display = "filter_help" end
 	self.random_txt = random_txt
 	
-	local rf_box = _M.newTextbox{title="#LIGHT_GREEN#Random Filter:#LAST# ", text=_M._random_filter or "{}", chars=120, max_len=1000,
+	local rf_box = _M.newTextbox{title=_t"#LIGHT_GREEN#Random Filter:#LAST# ", text=_M._random_filter or "{}", chars=120, max_len=1000,
 		fct=function(text)
 			_M._random_filter = text
 			self:generateRandom()
@@ -252,21 +252,21 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 	tops[#tops+1]=tops[#tops] + rf_box.h + 10
 
 	local base_info = Textzone.new{auto_width=true, auto_height=true, no_color_bleed=true, font=self.font,
-	text=([[The #LIGHT_BLUE#Base Filter#LAST# is to generate a base object for building a Randart.]]):format()}
+	text=([[The #LIGHT_BLUE#Base Filter#LAST# is to generate a base object for building a Randart.]]):tformat()}
 	self.base_info = base_info
 	tops[#tops+1]=tops[#tops] + base_info.h + 5
 	
 	
 	local base_txt = Textzone.new{width=500, auto_height=true, height=random_refresh.h, no_color_bleed=true, font=self.font,
-	text = object_text("#LIGHT_BLUE#Base Object#LAST#", _M._base_object), can_focus=true}
+	text = object_text(_t"#LIGHT_BLUE#Base Object#LAST#", _M._base_object), can_focus=true}
 	base_txt.refresh = function(self, object)
-		self.text = object_text("#LIGHT_BLUE#Base Object#LAST#", _M._base_object)
+		self.text = object_text(_t"#LIGHT_BLUE#Base Object#LAST#", _M._base_object)
 		self:generate()
 	end
 	base_txt.on_focus = function() _M:tooltip(_M._base_object) _M.help_display = "filter_help" end
 	self.base_txt = base_txt
 
-	local base_refresh = self.newButton{text="Generate", _object_field="_base_object", no_finish=true,
+	local base_refresh = self.newButton{text=_t"Generate", _object_field="_base_object", no_finish=true,
 		fct=function()
 			self:generateBase()
 			self.base_txt:refresh(_M._base_object)
@@ -277,7 +277,7 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 	self.base_refresh = base_refresh
 	tops[#tops+1]=tops[#tops] + base_refresh.h + 5
 	
-	local base_make = self.newButton{text="Add Object", _object_field="_base_object",
+	local base_make = self.newButton{text=_t"Add Object", _object_field="_base_object",
 		fct=function()
 			self:acceptObject(_M._base_object, false, _M._base_filter_table)
 		end,
@@ -285,7 +285,7 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 	}
 	self.base_make = base_make
 	
-	local base_reset_filter = self.newButton{text="Default Filter", _object_field="_base_object",
+	local base_reset_filter = self.newButton{text=_t"Default Filter", _object_field="_base_object",
 		fct=function()
 			_M._base_filter = _M._default_base_filter
 			self.bf_box:setText(_M._base_filter)
@@ -294,7 +294,7 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 	}
 	self.base_reset_filter = base_reset_filter
 
-	local base_clear = self.newButton{text="Clear Object", _object_field="_base_object",
+	local base_clear = self.newButton{text=_t"Clear Object", _object_field="_base_object",
 		fct=function()
 			if _M._base_object then
 				_M._base_object = nil
@@ -307,7 +307,7 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 	}
 	self.base_clear = base_clear
 	
-	local bf_box = _M.newTextbox{title="#LIGHT_BLUE#Base Filter:#LAST# ", text=_M._base_filter or "{}", chars=120, max_len=1000,
+	local bf_box = _M.newTextbox{title=_t"#LIGHT_BLUE#Base Filter:#LAST# ", text=_M._base_filter or "{}", chars=120, max_len=1000,
 		fct=function(text)
 			_M._base_filter = text
 			self:generateBase()
@@ -324,38 +324,38 @@ Hotkeys: #GOLD#'F1'#LAST# :: context sensitive help, #GOLD#'C'#LAST# :: Working 
 	tops[#tops+1]=tops[#tops] + bf_box.h + 10
 
 	local resolver_info = Textzone.new{auto_width=true, auto_height=true, no_color_bleed=true, font=self.font,
-	text=([[#SALMON#Resolver selected:#LAST# ]]):format()}
+	text=([[#SALMON#Resolver selected:#LAST# ]]):tformat()}
 	resolver_info.on_focus = function(id, ui)
 		_M.help_display = "resolver_genObj_help"
-		game:tooltipDisplayAtMap(game.w, game.h, "An object resolver interprets additional filter fields to generate an object and determine where it will go.", nil, true)
+		game:tooltipDisplayAtMap(game.w, game.h, _t"An object resolver interprets additional filter fields to generate an object and determine where it will go.", nil, true)
 	end
 	self.resolver_info = resolver_info
 	
-	local resolver_sel = Dropdown.new{text="Dropdown text", width=200, nb_items=#_M.resolver_choices,
+	local resolver_sel = Dropdown.new{text=_t"Dropdown text", width=200, nb_items=#_M.resolver_choices,
 		list = _M.resolver_choices,
 		fct=function(item)
 			_M.resolver_num = item.resolver_num
 		end,
 		on_select=function(item, sel)
 			_M.help_display = item.help
-			game:tooltipDisplayAtMap(game.w, game.h, item.desc or "No Tooltip", nil, true)
+			game:tooltipDisplayAtMap(game.w, game.h, item.desc or _t"No Tooltip", nil, true)
 		end,
 	}
 	resolver_sel.on_focus = function(r_sel, ui)
 		_M.help_display = "resolver_genObj_help"
 		local sel = r_sel.c_list and r_sel.c_list.sel
 		if sel then _M.help_display = r_sel.c_list.list[sel].help end
-		game:tooltipDisplayAtMap(game.w, game.h, "Use this selector to choose which resolver to use", nil, true)
+		game:tooltipDisplayAtMap(game.w, game.h, _t"Use this selector to choose which resolver to use", nil, true)
 	end
 	self.resolver_sel = resolver_sel
 	
 	local randart_info = Textzone.new{auto_width=true, auto_height=true, no_color_bleed=true, font=self.font,
 	text=([[#ORANGE#Randart Data#LAST# contains parameters used to generate a Randart (interpreted by game.state:generateRandart).
-The #LIGHT_BLUE#Base Object#LAST# will be used if possible.]]):format()}
+The #LIGHT_BLUE#Base Object#LAST# will be used if possible.]]):tformat()}
 	self.randart_info = randart_info
 	tops[#tops+1]=tops[#tops] + randart_info.h + 5
 
-	local randart_refresh = self.newButton{text="Generate", _object_field="_randart",
+	local randart_refresh = self.newButton{text=_t"Generate", _object_field="_randart",
 		fct=function()
 			self:generateRandart()
 			self.randart_txt:refresh(_M._randart)
@@ -366,7 +366,7 @@ The #LIGHT_BLUE#Base Object#LAST# will be used if possible.]]):format()}
 	self.randart_refresh = randart_refresh
 	tops[#tops+1]=tops[#tops] + randart_refresh.h + 5
 	
-	local randart_make = self.newButton{text="Add Object", _object_field="_randart",
+	local randart_make = self.newButton{text=_t"Add Object", _object_field="_randart",
 		fct=function()
 			self.randart_txt:refresh(_M._randart)
 			self:acceptObject(_M._randart)
@@ -375,7 +375,7 @@ The #LIGHT_BLUE#Base Object#LAST# will be used if possible.]]):format()}
 	}
 	self.randart_make = randart_make
 	
-	local randart_reset_data = self.newButton{text="Default Data", _object_field="_randart",
+	local randart_reset_data = self.newButton{text=_t"Default Data", _object_field="_randart",
 		fct=function()
 			_M._randart_data = _M._default_randart_data
 			self.randart_data_box:setText(_M._randart_data)
@@ -384,7 +384,7 @@ The #LIGHT_BLUE#Base Object#LAST# will be used if possible.]]):format()}
 	}
 	self.randart_reset_data = randart_reset_data
 	
-	local randart_data_box = _M.newTextbox{title="#ORANGE#Randart Data:#LAST# ", text=_M._randart_data or "{}", chars=120, max_len=1000,
+	local randart_data_box = _M.newTextbox{title=_t"#ORANGE#Randart Data:#LAST# ", text=_M._randart_data or "{}", chars=120, max_len=1000,
 		fct=function(text)
 			_M._randart_data = text
 			self:generateRandart()
@@ -401,29 +401,29 @@ The #LIGHT_BLUE#Base Object#LAST# will be used if possible.]]):format()}
 	tops[#tops+1]=tops[#tops] + randart_data_box.h + 5
 	
 	local randart_txt = Textzone.new{width=600, auto_height=true, height=random_refresh.h, no_color_bleed=true, font=self.font,
-	text=object_text("#ORANGE#Randart#LAST#", _M._randart), can_focus=true}
+	text=object_text(_t"#ORANGE#Randart#LAST#", _M._randart), can_focus=true}
 	randart_txt.refresh = function(self, object)
-		self.text = object_text("#ORANGE#Randart#LAST#", object)
+		self.text = object_text(_t"#ORANGE#Randart#LAST#", object)
 		self:generate()
 	end
 	randart_txt.on_focus = function() _M:tooltip(_M._randart) _M.help_display = "data_help" end
 	self.randart_txt = randart_txt
 
-	local show_inventory = _M.newButton{text="Show #GOLD#I#LAST#nventory", _object_field="actor",
+	local show_inventory = _M.newButton{text=_t"Show #GOLD#I#LAST#nventory", _object_field="actor",
 		fct=function() self:showInventory()	end,
 	}
 	self.show_inventory = show_inventory
 	
-	local show_character_sheet = _M.newButton{text="Show #GOLD#C#LAST#haracter Sheet", _object_field="actor",
+	local show_character_sheet = _M.newButton{text=_t"Show #GOLD#C#LAST#haracter Sheet", _object_field="actor",
 		fct=function() self:characterSheet() end,
 	}
 	self.show_character_sheet = show_character_sheet
 
-	local set_actor = _M.newButton{text="Set working actor: "..("[%s] %s"):format(_M.actor.uid, _M.actor.name), _object_field="actor",
+	local set_actor = _M.newButton{text=("Set working actor: [%s] %s"):tformat(_M.actor.uid, _M.actor:getName()), _object_field="actor",
 		fct=function() self:setWorkingActor() end,
 	}
 	set_actor.update = function(ui)
-		ui.text = "Set working actor: "..("[%s] %s%s"):format(_M.actor.uid, _M.actor.name, _M.actor.player and " #LIGHT_GREEN#(player)#LAST#" or "")
+		ui.text = ("Set working actor: [%s] %s%s"):tformat(_M.actor.uid, _M.actor:getName(), _M.actor.player and _t" #LIGHT_GREEN#(player)#LAST#" or "")
 		ui:generate()
 	end
 	set_actor:update()
@@ -501,13 +501,13 @@ function _M:tooltip(what)
 			game:tooltipDisplayAtMap(game.w, game.h, what:tooltip(what.x, what.y, what), nil, true)
 		end
 	else
-		game:tooltipDisplayAtMap(game.w, game.h, "#GREY#No Tooltip to Display#LAST#", nil, true)
+		game:tooltipDisplayAtMap(game.w, game.h, _t"#GREY#No Tooltip to Display#LAST#", nil, true)
 	end
 end
 
 --- Display context sensitive help (at upper left)
 function _M:help()
-	local d = Dialog:simpleLongPopup("Filter/Data/Resolver Reference", 
+	local d = Dialog:simpleLongPopup(_t"Filter/Data/Resolver Reference", 
 ([[%s]]):format(_M[_M.help_display] or _M.filter_help), math.max(500, game.w/2)
 		)
 	engine.Dialog.resize(d, d.w, d.h, 25, 25)
@@ -567,7 +567,7 @@ function _M:interpretTable(text, label)
 		ok, t = pcall(fx)
 	end
 	if not ok or t and type(t) ~= "table" then
-		game.log("#LIGHT_BLUE#Bad %s: %s", label or "table definition", text)
+		game.log("#LIGHT_BLUE#Bad %s: %s", label or _t"table definition", text)
 		return ok
 	end
 	return ok, t
@@ -593,7 +593,7 @@ function _M:generateRandom()
 	end
 	if ok then
 		if o then
-			game.log("#LIGHT_BLUE# New random%s object: %s", r_name and (" (resolver: %s)"):format(r_name) or "", o:getName({do_color=true}))
+			game.log("#LIGHT_BLUE# New random%s object: %s", r_name and (" (resolver: %s)"):tformat(r_name) or "", o:getName({do_color=true}))
 			_M._random_object = _M:finishObject(o)
 		else
 			game.log("#LIGHT_BLUE#Could not generate a random object with filter: %s", _M._random_filter)
@@ -714,7 +714,7 @@ end
 --- show the inventory screen for the working actor
 function _M:showInventory()
 	local d
-	local titleupdator = _M.actor:getEncumberTitleUpdator("Inventory")
+	local titleupdator = _M.actor:getEncumberTitleUpdator(_t"Inventory")
 	d = require("mod.dialogs.ShowEquipInven").new(titleupdator(), _M.actor, nil,
 		function(o, inven, item, button, event)
 			if not o then return end

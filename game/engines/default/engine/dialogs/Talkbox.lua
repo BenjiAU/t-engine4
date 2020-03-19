@@ -41,13 +41,13 @@ function _M:init(chat, on_end, only_friends)
 
 	Dialog.init(self, self:getTitle(), 320, 110, nil, nil, nil, nil, false)
 
-	local c_box = Textbox.new{title="Say: ", text="", chars=60, max_len=max,
+	local c_box = Textbox.new{title=_t"Say: ", text=_t"", chars=60, max_len=max,
 		fct=function(text) self:okclick() end,
 		on_change = function(text) self:checkTarget(text) end,
 	}
 	self.c_box = c_box
-	local ok = Button.new{text="Accept", fct=function() self:okclick() end}
-	local cancel = Button.new{text="Cancel", fct=function() self:cancelclick() end}
+	local ok = Button.new{text=_t"Accept", fct=function() self:okclick() end}
+	local cancel = Button.new{text=_t"Cancel", fct=function() self:cancelclick() end}
 
 	local list = self:getTargets(only_friends)
 	if #list == 0 then self.nobody = true end
@@ -59,7 +59,7 @@ function _M:init(chat, on_end, only_friends)
 		end
 	end
 
-	self.c_list_text = Textzone.new{auto_width=true, auto_height=true, text="Target: "}
+	self.c_list_text = Textzone.new{auto_width=true, auto_height=true, text=_t"Target: "}
 	self.c_list = Dropdown.new{width=250, fct=function(item) if not item then return end self:checkTarget(item.id..":") self:setFocus(c_box) end, list=list, nb_items=math.min(#list, 10), scrollbar=true}
 
 	self:loadUI{
@@ -103,14 +103,14 @@ end
 function _M:getTargets(only_friends)
 	local list = {}
 	if not only_friends then
-		for name, _ in pairs(self.chat.channels) do list[#list+1] = {name="Channel: "..name, id=name} end
+		for name, _ in pairs(self.chat.channels) do list[#list+1] = {name=("Channel: %s"):tformat(name), id=name} end
 	end
 
 	local name_added = {}
-	for login, data in pairs(self.chat.friends) do list[#list+1] = {name="Friend: "..data.name, id=data.name} name_added[data.name] = true end
+	for login, data in pairs(self.chat.friends) do list[#list+1] = {name=("Friend: %s"):tformat(data.name), id=data.name} name_added[data.name] = true end
 
 	if not only_friends and self.chat.channels[self.chat.cur_channel] then
-		for login, data in pairs(self.chat.channels[self.chat.cur_channel].users) do if not name_added[data.name] then list[#list+1] = {name="User: "..data.name, id=data.name} name_added[data.name] = true end end
+		for login, data in pairs(self.chat.channels[self.chat.cur_channel].users) do if not name_added[data.name] then list[#list+1] = {name=("User: %s"):tformat(data.name), id=data.name} name_added[data.name] = true end end
 	end
 	return list
 end

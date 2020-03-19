@@ -213,14 +213,14 @@ function _M:getRequirementDesc(who)
 	local req = rawget(self, "require")
 	if not req then return nil end
 
-	local str = tstring{"Requires:", true}
+	local str = tstring{_t"Requires:", true}
 
 	if req.flag then
 		for _, flag in ipairs(req.flag) do
 			if type(flag) == "table" then
 				local name = self.requirement_flags_names[flag[1]] or flag[1]
 				local c = (who:attr(flag[1]) and who:attr(flag[1]) >= flag[2]) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
-				str:add(c, "- ", ("%s (level %d)"):format(name, flag[2]), {"color", "LAST"}, true)
+				str:add(c, "- ", ("%s (level %d)"):tformat(name, flag[2]), {"color", "LAST"}, true)
 			else
 				local name = self.requirement_flags_names[flag] or flag
 				local c = who:attr(flag) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
@@ -236,16 +236,16 @@ function _M:getRequirementDesc(who)
 	end
 	if req.level then
 		local c = (who.level >= req.level) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
-		str:add(c, "- ", ("Level %d"):format(req.level), {"color", "LAST"}, true)
+		str:add(c, "- ", ("Level %d"):tformat(req.level), {"color", "LAST"}, true)
 	end
 	if req.talent then
 		for _, tid in ipairs(req.talent) do
 			if type(tid) == "table" then
 				local c = (who:getTalentLevelRaw(tid[1]) >= tid[2]) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
-				str:add(c, "- ", ("Talent %s (level %d)"):format(who:getTalentFromId(tid[1]).name, tid[2]), {"color", "LAST"}, true)
+				str:add(c, "- ", ("Talent %s (level %d)"):tformat(who:getTalentFromId(tid[1]).name, tid[2]), {"color", "LAST"}, true)
 			else
 				local c = who:knowTalent(tid) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
-				str:add(c, "- ", ("Talent %s"):format(who:getTalentFromId(tid).name), {"color", "LAST"}, true)
+				str:add(c, "- ", ("Talent %s"):tformat(who:getTalentFromId(tid).name), {"color", "LAST"}, true)
 			end
 		end
 	end

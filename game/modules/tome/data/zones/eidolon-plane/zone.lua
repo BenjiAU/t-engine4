@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Eidolon Plane",
+	name = _t"Eidolon Plane",
 	level_range = {1, 1},
 	level_scheme = "player",
 	max_level = 1,

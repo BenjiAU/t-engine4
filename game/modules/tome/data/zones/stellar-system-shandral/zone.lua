@@ -18,9 +18,9 @@
 -- darkgod@te4.org
 
 return {
-	name = "Stellar System: Shandral",
+	name = _t"Stellar System: Shandral",
 	display_name = function(x, y)
-		return "Stellar System: Shandral"
+		return _t"Stellar System: Shandral"
 	end,
 	variable_zone_name = true,
 	level_range = {1, 1},

@@ -65,13 +65,13 @@ newTalent{
 	info = function(self, t)
 		local rad = self:getTalentRadius(t)
 		local turns, dam, arcanedam = t.getValues(self, t)
-		local xs = arcanedam and (" and %0.1f Arcane"):format(damDesc(self, DamageType.ARCANE, arcanedam)) or ""
+		local xs = arcanedam and (" and %0.1f Arcane"):tformat(damDesc(self, DamageType.ARCANE, arcanedam)) or ""
 		return ([[From the ground around you, you form living stone vines extending from your feet.
 		Each turn, the vines will attempt to seize a random target within radius %d.
 		Affected creatures are pinned to the ground and take %0.1f nature%s damage each turn for %d turns.
 		A creature entangled by the vines will have a chance to break free each turn, and will automatically succeed if it is more than %d grids away from you.
 		The chance to affect targets and damage increase with talent level and Willpower.]]):
-		format(rad, damDesc(self, DamageType.NATURE, dam), xs, turns, rad+4)
+		tformat(rad, damDesc(self, DamageType.NATURE, dam), xs, turns, rad+4)
 	end,
 }
 
@@ -88,7 +88,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Each time one of your stone vines deals damage to a creature it will restore %0.1f equilibrium and %0.1f mana.
 		Your vines also become infused with eldritch energies, dealing an additional %0.1f arcane damage.]])
-		:format(t.getEquilibrium(self, t), t.getMana(self, t), damDesc(self, DamageType.ARCANE, t.getDamage(self, t)))
+		:tformat(t.getEquilibrium(self, t), t.getMana(self, t), damDesc(self, DamageType.ARCANE, t.getDamage(self, t)))
 	end,
 }
 
@@ -134,7 +134,7 @@ newTalent{
 		return ([[Merge with one of your stone vines, traversing it to emerge near an entangled creature (maximum range %d).
 		Merging with the stone is beneficial for you, healing %0.2f life (increases with Willpower).
 		This will not break Body of Stone.]])
-		:format(self:getTalentRange(t) ,100 + self:combatTalentStatDamage(t, "wil", 40, 630))
+		:tformat(self:getTalentRange(t) ,100 + self:combatTalentStatDamage(t, "wil", 40, 630))
 	end,
 }
 
@@ -174,6 +174,6 @@ newTalent{
 		return ([[Merge your target (within range %d) with one of your stone vines that has seized it, forcing it to traverse the vine and reappear near you.
 		Merging with the stone is detrimental for the target, dealing %0.1f nature damage.
 		The damage will increases with your Willpower.]])
-		:format(self:getTalentRange(t), 80 + self:combatTalentStatDamage(t, "wil", 40, 330))
+		:tformat(self:getTalentRange(t), 80 + self:combatTalentStatDamage(t, "wil", 40, 330))
 	end,
 }

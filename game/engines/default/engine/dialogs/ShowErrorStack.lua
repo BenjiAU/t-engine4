@@ -48,7 +48,7 @@ function _M:init(errs)
 	self.errs_t = errs
 	errs = table.concat(errs, "\n")
 	self.errs = errs
-	Dialog.init(self, "Lua Error", 700, 500)
+	Dialog.init(self, _t"Lua Error", 700, 500)
 
 	local md5 = require "md5"
 	local errmd5 = md5.sumhexa(errs)
@@ -67,13 +67,13 @@ function _M:init(errs)
 
 	local realpath_errfile = nil
 
-	local reason = "If you already reported that error, you do not have to do it again (unless you feel the situation is different)."
+	local reason = _t"If you already reported that error, you do not have to do it again (unless you feel the situation is different)."
 	if infos.loaded then
-		if infos.reported then reason = "You #LIGHT_GREEN#already reported#WHITE# that error, you do not have to do it again (unless you feel the situation is different)."
-		else reason = "You have already got this error but #LIGHT_RED#never reported#WHITE# it, please do."
+		if infos.reported then reason = _t"You #LIGHT_GREEN#already reported#WHITE# that error, you do not have to do it again (unless you feel the situation is different)."
+		else reason = _t"You have already got this error but #LIGHT_RED#never reported#WHITE# it, please do."
 		end
 	else
-		reason = "You have #LIGHT_RED#never seen#WHITE# that error, please report it."
+		reason = _t"You have #LIGHT_RED#never seen#WHITE# that error, please report it."
 
 		print(pcall(function()
 			fs.mkdir("/error-logs")
@@ -98,16 +98,16 @@ function _M:init(errs)
 
 	self:saveError(true, infos.reported)
 
-	local errmsg = Textzone.new{text=[[#{bold}#Oh my! It seems there was an error!
+	local errmsg = Textzone.new{text=_t[[#{bold}#Oh my! It seems there was an error!
 The game might still work but this is suspect, please type in your current situation and click on "Send" to send an error report to the game creator.
 If you are not currently connected to the internet, please report this bug when you can on the forums at http://forums.te4.org/
 
 ]]..reason..[[#{normal}#]], width=690, auto_height=true}
 	local errzone = Textzone.new{text=display_errs, width=690, height=300}
-	self.what = Textbox.new{title="What happened?: ", text="", chars=60, max_len=1000, fct=function(text) self:send() end}
-	local ok = require("engine.ui.Button").new{text="Send", fct=function() self:send() end}
-	local cancel = require("engine.ui.Button").new{text="Close", fct=function() game:unregisterDialog(self) end}
-	local cancel_all = require("engine.ui.Button").new{text="Close All", fct=function()
+	self.what = Textbox.new{title=_t"What happened?: ", text=_t"", chars=60, max_len=1000, fct=function(text) self:send() end}
+	local ok = require("engine.ui.Button").new{text=_t"Send", fct=function() self:send() end}
+	local cancel = require("engine.ui.Button").new{text=_t"Close", fct=function() game:unregisterDialog(self) end}
+	local cancel_all = require("engine.ui.Button").new{text=_t"Close All", fct=function()
 		for i = #game.dialogs, 1, -1 do
 			local d = game.dialogs[i]
 			if d.__CLASSNAME == "engine.dialogs.ShowErrorStack" then
@@ -132,7 +132,7 @@ If you are not currently connected to the internet, please report this bug when 
 	end
 
 	if realpath_errfile then
-		local realpath_errfile_t = Textzone.new{text="Log saved to file (click to copy to clipboard):#LIGHT_BLUE#"..realpath_errfile, width=self.iw, auto_height=true, fct=function() core.key.setClipboard(realpath_errfile) game.log("File location copied to clipboard.") end}
+		local realpath_errfile_t = Textzone.new{text=("Log saved to file (click to copy to clipboard):#LIGHT_BLUE#%s"):tformat(realpath_errfile), width=self.iw, auto_height=true, fct=function() core.key.setClipboard(realpath_errfile) game.log("File location copied to clipboard.") end}
 		for i, ui in ipairs(uis) do if ui.bottom then ui.bottom = ui.bottom + realpath_errfile_t.h end end
 		table.insert(uis, 1, {left=0, bottom=0, ui=realpath_errfile_t})
 	end

@@ -27,3 +27,11 @@ game/modules/tome/data/gfx/ts-gfx*
 game/modules/tome/data/gfx/ts-ui*
 game/engines/default/modules/boot/data/gfx/ts-gfx*
 game/engines/default/data/gfx/ts-ui*
+debug-recompile.sh
+profiling-recompile.sh
+recompile.sh
+*.exe
+*.dll
+te4_log.txt
+debug.log
+/.idea/

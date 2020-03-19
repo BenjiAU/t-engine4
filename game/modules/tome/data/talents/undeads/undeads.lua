@@ -18,11 +18,11 @@
 -- darkgod@te4.org
 
 -- Undead talents
-newTalentType{ type="undead/base", name = "base", generic = true, description = "Undead's innate abilities." }
-newTalentType{ type="undead/ghoul", name = "ghoul", generic = true, description = "Ghoul's innate abilities." }
-newTalentType{ type="undead/skeleton", name = "skeleton", generic = true, description = "Skeleton's innate abilities." }
-newTalentType{ type="undead/vampire", name = "vampire", generic = true, description = "Vampire's innate abilities." }
-newTalentType{ type="undead/lich", name = "lich", generic = true, description = "Liches innate abilities." }
+newTalentType{ type="undead/base", name = _t"base", generic = true, description = _t"Undead's innate abilities." }
+newTalentType{ type="undead/ghoul", name = _t"ghoul", generic = true, description = _t"Ghoul's innate abilities." }
+newTalentType{ type="undead/skeleton", name = _t"skeleton", generic = true, description = _t"Skeleton's innate abilities." }
+newTalentType{ type="undead/vampire", name = _t"vampire", generic = true, description = _t"Vampire's innate abilities." }
+newTalentType{ type="undead/lich", name = _t"lich", generic = true, description = _t"Liches innate abilities." }
 
 -- Generic requires for undeads based on talent level
 undeads_req1 = {
@@ -55,6 +55,6 @@ newTalent{
 	no_unlearn_last = true,
 	on_learn = function(self, t) self.auto_id = 100 end,
 	info = function(self)
-		return ([[You concentrate for a moment to recall some of your memories as a living being and look for knowledge to identify rare objects.]])
+		return ([[You concentrate for a moment to recall some of your memories as a living being and look for knowledge to identify rare objects.]]):tformat()
 	end,
 }

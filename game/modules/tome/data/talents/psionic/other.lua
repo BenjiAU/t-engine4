@@ -29,7 +29,7 @@ newTalent{
 	filter = function(o) return (o.type == "weapon" or o.type == "gem") end,
 	action = function(self, t)
 		local inven = self:getInven("INVEN")
-		local ret = self:talentDialog(self:showInventory("Telekinetically grasp which item?", inven, t.filter, function(o, item)
+		local ret = self:talentDialog(self:showInventory(_t"Telekinetically grasp which item?", inven, t.filter, function(o, item)
 			local pf = self:getInven("PSIONIC_FOCUS")
 			if not pf then return end
 			-- Put back the old one in inventory
@@ -67,7 +67,7 @@ newTalent{
 			o = self:removeObject(inven, item)
 			-- Force "wield"
 			self:addObject(pf, o)
-			game.logSeen(self, "%s telekinetically seizes: %s.", self.name:capitalize(), o:getName{do_color=true})
+			game.logSeen(self, "%s telekinetically seizes: %s.", self:getName():capitalize(), o:getName{do_color=true})
 			
 			self:sortInven()
 			self:talentDialogReturn(true)
@@ -77,7 +77,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Telekinetically grasp a weapon or gem using mentally-directed forces, holding it aloft and bringing it to bear with the power of your mind alone.
-		Note: The normal restrictions on worn equipment do not apply to this item.]])
+		Note: The normal restrictions on worn equipment do not apply to this item.]]):tformat()
 	end,
 }
 
@@ -199,7 +199,7 @@ newTalent{
 		local tx, ty = util.findFreeGrid(self.x, self.y, 5, true, {[Map.ACTOR]=true})
 		if tx and ty and a:canBe("knockback") then
 			a:move(tx, ty, true)
-			game.logSeen(a, "%s telekinetically grabs %s!", self.name:capitalize(), a.name)
+			game.logSeen(a, "%s telekinetically grabs %s!", self:getName():capitalize(), a.name)
 		end
 	end,
 	callbackOnActBase = function(self, t)
@@ -240,7 +240,7 @@ newTalent{
 		local tk = self:getInven("PSIONIC_FOCUS") and self:getInven("PSIONIC_FOCUS")[1]
 		if not tk then return false end
 
-		local ret = {name = self.name:capitalize().."'s "..t.name}
+		local ret = {name = ("%s's %s"):tformat(self:getName():capitalize(), t.name)}
 		if tk.type == "gem" then
 			local power = (tk.material_level or 1) * 3 + math.ceil(self:callTalent(self.T_RESONANT_FOCUS, "bonus") / 5)
 			self:talentTemporaryValue(ret, "inc_stats", {
@@ -272,7 +272,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		local base = [[Allows you to wield a physical melee or ranged weapon, a mindstar or a gem telekinetically, gaining a special effect for each.
+		local base = _t[[Allows you to wield a physical melee or ranged weapon, a mindstar or a gem telekinetically, gaining a special effect for each.
 		A gem will provide a +3 bonus to all primary stats per tier of the gem.
 		A mindstar will randomly try to telekinetically grab a far away foe (10% chance and range 3 for a tier 1 mindstar, +1 range and +5% chance for each tier above 1) and pull it into melee range.
 		A physical melee weapon will act as a semi independant entity, automatically attacking adjacent foes each turn, while a ranged weapon will fire at your target whenever you perform a ranged attack.
@@ -295,10 +295,10 @@ newTalent{
 		if ammo and ammo.archery_ammo ~= o.archery then ammo = nil end
 		if o.type == "gem" then
 			local ml = o.material_level or 1
-			base = base..([[The telekinetically-wielded gem grants you +%d stats.]]):format(ml * 3)
+			base = base..([[The telekinetically-wielded gem grants you +%d stats.]]):tformat(ml * 3)
 		elseif o.subtype == "mindstar" then
 			local ml = o.material_level or 1
-			base = base..([[The telekinetically-wielded mindstar has a %d%% chance to grab a foe up to %d range away.]]):format((ml + 1) * 5, ml + 2)
+			base = base..([[The telekinetically-wielded mindstar has a %d%% chance to grab a foe up to %d range away.]]):tformat((ml + 1) * 5, ml + 2)
 		elseif o.archery and ammo then
 			self:attr("use_psi_combat", 1)
 			range = math.max(math.min(o.combat.range or 6), self:attr("archery_range_override") or 1)
@@ -316,7 +316,7 @@ newTalent{
 			APR: %d
 			Crit: %0.1f%%
 			Speed: %0.1f%%]]):
-			format(range, atk, dam, apr, crit, speed*100)
+			tformat(range, atk, dam, apr, crit, speed*100)
 		else
 			self:attr("use_psi_combat", 1)
 			atk = self:combatAttack(o.combat)
@@ -332,7 +332,7 @@ newTalent{
 			APR: %d
 			Crit: %0.2f
 			Speed: %0.2f]]):
-			format(atk, dam, apr, crit, speed)
+			tformat(atk, dam, apr, crit, speed)
 		end
 		return base
 	end,

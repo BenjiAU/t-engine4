@@ -18,11 +18,11 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[@playername@, you are called to serve. The nearby unhallowed morass inhabitants are growing restless.
+	text = _t[[@playername@, you are called to serve. The nearby unhallowed morass inhabitants are growing restless.
 You must go there and find the source.]],
 	answers = {
-		{"I will, Grand Keeper.", action=function() game:changeLevel(1, "unhallowed-morass") end},
-		{"I am sorry, but I cannot do that.", action=function(npc, player) player:setQuestStatus("start-point-zero", engine.Quest.FAILED) end},
+		{_t"I will, Grand Keeper.", action=function() game:changeLevel(1, "unhallowed-morass") end},
+		{_t"I am sorry, but I cannot do that.", action=function(npc, player) player:setQuestStatus("start-point-zero", engine.Quest.FAILED) end},
 	}
 }
 

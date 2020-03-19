@@ -31,7 +31,7 @@ newEntity{
 	encumber = 17,
 	rarity = 5,
 	metallic = true,
-	desc = [[A suit of armour made of metal plates.]],
+	desc = _t[[A suit of armour made of metal plates.]],
 	randart_able = "/data/general/objects/random-artifacts/generic.lua",
 	egos = "/data/general/objects/egos/massive-armor.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 }

@@ -42,7 +42,7 @@ print("[Resources] Defining Actor Resources")
 -- Minimalist = table of parameters to be used with the Minimalist uiset (see uiset.Minimalist.lua)
 
 -- == Resource Definitions ==
-ActorResource:defineResource("Air", "air", nil, "air_regen", "Air capacity in your lungs. Entities that need not breathe are not affected.", nil, nil, {
+ActorResource:defineResource(_t"Air", "air", nil, "air_regen", _t"Air capacity in your lungs. Entities that need not breathe are not affected.", nil, nil, {
 	color = "#LIGHT_STEEL_BLUE#",
 	-- wait_on_rest = true,
 	display = {
@@ -67,26 +67,26 @@ ActorResource:defineResource("Air", "air", nil, "air_regen", "Air capacity in yo
 	}
 })
 
-ActorResource:defineResource("Stamina", "stamina", ActorTalents.T_STAMINA_POOL, "stamina_regen", "Stamina represents your physical fatigue.  Most physical abilities consume it.", nil, nil, {
+ActorResource:defineResource(_t"Stamina", "stamina", ActorTalents.T_STAMINA_POOL, "stamina_regen", _t"Stamina represents your physical fatigue.  Most physical abilities consume it.", nil, nil, {
 	color = "#ffcc80#",
 	cost_factor = function(self, t, check) return (check and self:hasEffect(self.EFF_ADRENALINE_SURGE)) and 0 or (100 + self:combatFatigue()) / 100 end,
 	wait_on_rest = true,
 	randomboss_enhanced = true,
 })
-ActorResource:defineResource("Mana", "mana", ActorTalents.T_MANA_POOL, "mana_regen", "Mana represents your reserve of magical energies. Most spells cast consume mana and each sustained spell reduces your maximum mana.", nil, nil, {
+ActorResource:defineResource(_t"Mana", "mana", ActorTalents.T_MANA_POOL, "mana_regen", _t"Mana represents your reserve of magical energies. Most spells cast consume mana and each sustained spell reduces your maximum mana.", nil, nil, {
 	color = "#7fffd4#",
 	cost_factor = function(self, t) return (100 + 2 * self:combatFatigue()) / 100 end,
 	wait_on_rest = true,
 	randomboss_enhanced = true,
 })
-ActorResource:defineResource("Equilibrium", "equilibrium", ActorTalents.T_EQUILIBRIUM_POOL, "equilibrium_regen", "Equilibrium represents your standing in the grand balance of nature. The closer it is to 0 the more balanced you are. Being out of equilibrium will adversely affect your ability to use Wild Gifts.", 0, false, {
+ActorResource:defineResource(_t"Equilibrium", "equilibrium", ActorTalents.T_EQUILIBRIUM_POOL, "equilibrium_regen", _t"Equilibrium represents your standing in the grand balance of nature. The closer it is to 0 the more balanced you are. Being out of equilibrium will adversely affect your ability to use Wild Gifts.", 0, false, {
 	color = "#00ff74#", invert_values = true,
 	wait_on_rest = true,
 	randomboss_enhanced = true,
 	display = {
 		status_text = function(act)
 			local _, chance = act:equilibriumChance()
-			return ("%d (%d%%%% fail)"):format(act:getEquilibrium(), 100 - chance)
+			return ("%d (%d%%%% fail)"):tformat(act:getEquilibrium(), 100 - chance)
 		end,
 		highlight = function(player, vc, vn, vm, vr) -- dim the resource display if fail chance <= 15%
 			local _, chance = player:equilibriumChance()
@@ -131,7 +131,7 @@ ActorResource:defineResource("Equilibrium", "equilibrium", ActorTalents.T_EQUILI
 	CharacterSheet = { -- special params for the character sheet
 		status_text = function(act1, act2, compare_fields)
 			local text = compare_fields(act1, act2, function(act) local _, chance = act:equilibriumChance() return 100-chance end, "%d%%", "%+d%%", 1, true)
-			return ("%d(fail: %s)"):format(act1:getEquilibrium(),text)
+			return ("%d(fail: %s)"):tformat(act1:getEquilibrium(),text)
 		end,
 	},
 	Minimalist = { --parameters for the Minimalist uiset
@@ -139,37 +139,37 @@ ActorResource:defineResource("Equilibrium", "equilibrium", ActorTalents.T_EQUILI
 	}
 })
 
-ActorResource:defineResource("Vim", "vim", ActorTalents.T_VIM_POOL, "vim_regen", "Vim represents the amount of life energy/souls you have stolen. Each corruption talent requires some.", nil, nil, {
+ActorResource:defineResource(_t"Vim", "vim", ActorTalents.T_VIM_POOL, "vim_regen", _t"Vim represents the amount of life energy/souls you have stolen. Each corruption talent requires some.", nil, nil, {
 	color = "#904010#",
 	wait_on_rest = true,
 	randomboss_enhanced = true,
 	-- Minimalist = {shader_params = {color = {0x90/255, 0x40/255, 0x10/255}}} --parameters for the Minimalist uiset
 })
-ActorResource:defineResource("Positive energy", "positive", ActorTalents.T_POSITIVE_POOL, "positive_regen", "Positive energy represents your reserve of positive power. It slowly increases.", nil, nil, {
+ActorResource:defineResource(_t"Positive energy", "positive", ActorTalents.T_POSITIVE_POOL, "positive_regen", _t"Positive energy represents your reserve of positive power. It slowly increases.", nil, nil, {
 	color = "#ffd700#",
 	wait_on_rest = true,
 	randomboss_enhanced = true,
 	cost_factor = function(self, t, check, value) if value < 0 then return 1 else return (100 + self:combatFatigue()) / 100 end end,
 	Minimalist = {highlight = function(player, vc, vn, vm, vr) return vc >=0.7*vm end},
 })
-ActorResource:defineResource("Negative energy", "negative", ActorTalents.T_NEGATIVE_POOL, "negative_regen", "Negative energy represents your reserve of negative power. It slowly increases.", nil, nil, {
+ActorResource:defineResource(_t"Negative energy", "negative", ActorTalents.T_NEGATIVE_POOL, "negative_regen", _t"Negative energy represents your reserve of negative power. It slowly increases.", nil, nil, {
 	color = "#7f7f7f#",
 	randomboss_enhanced = true,
 	wait_on_rest = true,
 	cost_factor = function(self, t, check, value) if value < 0 then return 1 else return (100 + self:combatFatigue()) / 100 end end,
 	Minimalist = {highlight = function(player, vc, vn, vm, vr) return vc >=0.7*vm end},
 })
-ActorResource:defineResource("Hate", "hate", ActorTalents.T_HATE_POOL, "hate_regen", "Hate represents your soul's primal antipathy towards others.  It generally decreases whenever you have no outlet for your rage, and increases when you are damaged or destroy others.", nil, nil, {
+ActorResource:defineResource(_t"Hate", "hate", ActorTalents.T_HATE_POOL, "hate_regen", _t"Hate represents your soul's primal antipathy towards others.  It generally decreases whenever you have no outlet for your rage, and increases when you are damaged or destroy others.", nil, nil, {
 	color = "#ffa0ff#",
 	cost_factor = function(self, t) return (100 + self:combatFatigue()) / 100 end,
 	Minimalist = {highlight = function(player, vc, vn, vm, vr) return vc >=100 end},
 })
-ActorResource:defineResource("Paradox", "paradox", ActorTalents.T_PARADOX_POOL, "paradox_regen", "Paradox represents how much damage you've done to the space-time continuum. A high Paradox score makes Chronomancy less reliable and more dangerous to use but also amplifies its effects.", 0, false, {
+ActorResource:defineResource(_t"Paradox", "paradox", ActorTalents.T_PARADOX_POOL, "paradox_regen", _t"Paradox represents how much damage you've done to the space-time continuum. A high Paradox score makes Chronomancy less reliable and more dangerous to use but also amplifies its effects.", 0, false, {
 	color = "#4198dc#", invert_values = true,
 	display = {
 		status_text = function(act)
 			local chance = act:paradoxFailChance()
-			return ("%d/%d (%d%%%%)"):format(act:getModifiedParadox(), act:getParadox(), chance), chance
+			return ("%d/%d (%d%%%%)"):tformat(act:getModifiedParadox(), act:getParadox(), chance), chance
 		end,
 	},
 	ai = { -- special ai functions and data
@@ -195,7 +195,7 @@ ActorResource:defineResource("Paradox", "paradox", ActorTalents.T_PARADOX_POOL, 
 	CharacterSheet = { -- special params for the character sheet
 		status_text = function(act1, act2, compare_fields)
 			local text = compare_fields(act1, act2, function(act) return act:paradoxFailChance() end, "%d%%", "%+d%%", 1, true)
-			return ("%d/%d(anom: %s)"):format(act1:getModifiedParadox(), act1:getParadox(), text)
+			return ("%d/%d(anom: %s)"):tformat(act1:getModifiedParadox(), act1:getParadox(), text)
 		end,
 		highlight = function(player, vc, vn, vm, vr) -- highlight the resource display if fail chance > 10%
 			return player:paradoxFailChance() > 10
@@ -220,7 +220,7 @@ ActorResource:defineResource("Paradox", "paradox", ActorTalents.T_PARADOX_POOL, 
 		end,
 	},
 })
-ActorResource:defineResource("Psi", "psi", ActorTalents.T_PSI_POOL, "psi_regen", "Psi represents your reserve of psychic energy.", nil, nil, {
+ActorResource:defineResource(_t"Psi", "psi", ActorTalents.T_PSI_POOL, "psi_regen", _t"Psi represents your reserve of psychic energy.", nil, nil, {
 	color = "#4080ff#",
 	wait_on_rest = true,
 	randomboss_enhanced = true,
@@ -257,7 +257,7 @@ ActorResource:defineResource("Psi", "psi", ActorTalents.T_PSI_POOL, "psi_regen",
 		end
 	},
 })
-ActorResource:defineResource("Souls", "soul", ActorTalents.T_SOUL_POOL, "soul_regen", "This is the number of soul fragments you have extracted from your foes for your own use.", 0, 10, {
+ActorResource:defineResource(_t"Souls", "soul", ActorTalents.T_SOUL_POOL, "soul_regen", _t"This is the number of soul fragments you have extracted from your foes for your own use.", 0, 10, {
 	color = "#bebebe#",
 	randomboss_enhanced = true,
 	Minimalist = {images = {front = "resources/front_souls.png", front_dark = "resources/front_souls_dark.png"}},

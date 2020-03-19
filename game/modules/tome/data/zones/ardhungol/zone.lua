@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Ardhungol",
+	name = _t"Ardhungol",
 	level_range = {25, 32},
 	level_scheme = "player",
 	max_level = 3,

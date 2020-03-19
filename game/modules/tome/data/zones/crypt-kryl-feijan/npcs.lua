@@ -29,8 +29,8 @@ newEntity{ base="BASE_NPC_MAJOR_DEMON", define_as = "KRYL_FEIJAN",
 	allow_infinite_dungeon = true,
 	name = "Kryl-Feijan", color=colors.VIOLET, unique = true,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/demon_major_kryl_feijan.png", display_h=2, display_y=-1}}},
-	desc = [[This huge demon is covered in darkness. The ripped flesh of its "mother" still hangs from its sharp claws.]],
-	killer_message = "and devoured as a demonic breakfast",
+	desc = _t[[This huge demon is covered in darkness. The ripped flesh of its "mother" still hangs from its sharp claws.]],
+	killer_message = _t"and devoured as a demonic breakfast",
 	level_range = {29, nil}, exp_worth = 2,
 	faction = "fearscape",
 	rank = 4,
@@ -91,7 +91,7 @@ newEntity{ define_as = "MELINDA",
 	display = "@", color=colors.LIGHT_BLUE,
 	image = "terrain/woman_naked_altar.png",
 	resolvers.generic(function(e) if engine.Map.tiles.nicer_tiles then e.display_w = 2 end end),
-	desc = [[A female Human with twisted sigils scored into her naked flesh. Her wrists and ankles are sore and hurt by ropes and chains. You can discern great beauty beyond the stains of blood covering her skin.]],
+	desc = _t[[A female Human with twisted sigils scored into her naked flesh. Her wrists and ankles are sore and hurt by ropes and chains. You can discern great beauty beyond the stains of blood covering her skin.]],
 	autolevel = "tank",
 	ai = "summoned", ai_real = "move_complex", ai_state = { ai_target="target_player", talent_in=4, },
 	stats = { str=8, dex=7, mag=8, con=12 },
@@ -122,7 +122,7 @@ newEntity{ define_as = "ACOLYTE",
 	name = "Acolyte of the Sect of Kryl-Feijan",
 	type = "humanoid", subtype = "elf", image = "npc/humanoid_shalore_elven_corruptor.png",
 	display = "p", color=colors.LIGHT_RED,
-	desc = [[Black-robed Elves with a mad look in their eyes.]],
+	desc = _t[[Black-robed Elves with a mad look in their eyes.]],
 	autolevel = "caster",
 	stats = { str=12, dex=17, mag=18, wil=22, con=12 },
 
@@ -172,7 +172,7 @@ newEntity{ define_as = "ACOLYTE",
 				melinda.image = "npc/woman_redhair_naked.png"
 				melinda:removeAllMOs()
 				game.level.map:updateMap(melinda.x, melinda.y)
-				require("engine.ui.Dialog"):simpleLongPopup("Melinda", "The woman seems to be freed from her bonds.\nShe stumbles on her feet, her naked body still dripping in blood. 'Please get me out of here!'", 400)
+				require("engine.ui.Dialog"):simpleLongPopup(_t"Melinda", _t"The woman seems to be freed from her bonds.\nShe stumbles on her feet, her naked body still dripping in blood. 'Please get me out of here!'", 400)
 			end
 		end
 	end,

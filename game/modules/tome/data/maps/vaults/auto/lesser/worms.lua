@@ -33,9 +33,8 @@ defineTile('.', "FLOOR")
 defineTile('#', "HARDWALL")
 defineTile('!', "DOOR_VAULT")
 
-defineTile('$', "FLOOR", {random_filter={add_levels=20, type="money"}})
-defineTile('*', "FLOOR", {random_filter={add_levels=15, tome_mod="gvault"}})
-defineTile('~', "FLOOR", {random_filter={add_levels=5, tome_mod="gvault"}})
+defineTile('*', "FLOOR", {random_filter={add_levels=20, tome_mod="gvault"}})
+defineTile('~', "FLOOR", {random_filter={add_levels=10, tome_mod="gvault"}})
 
 defineTile('w', "FLOOR", nil, {random_filter={add_levels=10, name = "carrion worm mass"}} )
 defineTile('W', "FLOOR", nil, {random_filter={add_levels=5, name = "worm that walks"}} )
@@ -45,8 +44,8 @@ return {
  [[#~~w*w~~#]],
  [[#..www..#]],
  [[#..ooo..#]],
- [[#.......#]],
- [[#.Wo.oW.#]],
- [[#$$o.o$$#]],
+ [[#..w.o..#]],
+ [[#.WowoW.#]],
+ [[#~~o.o~~#]],
  [[####!####]],
 }

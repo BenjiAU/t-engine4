@@ -46,15 +46,15 @@ end
 game.player:grantQuest("strange-new-world")
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*A beautiful Elven woman in golden robes stands before you, facing an orc clad in mail.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*A beautiful Elven woman in golden robes stands before you, facing an orc clad in mail.*#WHITE#
 Fillarel: "Abandon this fight, orc! You cannot win: I stand with the power of the Sun and the shadows of the Moons."
 Krogar: "Ha! It's only been one hour and you already look tired, my 'lady'."
 #LIGHT_GREEN#*As you enter the room they notice you.*#WHITE#
 Fillarel: "You! @playerdescriptor.race@! Help me defeat this monster or begone!"
 Krogar: "Ah, looking for help? Bah. @playerdescriptor.race@, kill this wench for me and I shall reward you!"]],
 	answers = {
-		{"[attack Krogar]", action=attack_krogar},
---		{"[attack Fillarel]", action=attack_fillarel, cond=function(npc, player) return not player:hasQuest("start-sunwall") and config.settings.cheat end},
+		{_t"[attack Krogar]", action=attack_krogar},
+--		{_t"[attack Fillarel]", action=attack_fillarel, cond=function(npc, player) return not player:hasQuest("start-sunwall") and config.settings.cheat end},
 	}
 }
 return "welcome"

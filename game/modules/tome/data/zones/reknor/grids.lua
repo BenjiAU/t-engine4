@@ -26,7 +26,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[A farportal is a way to travel incredible distances in the blink of an eye. They usually require an external item to use. You have no idea if it is even two-way.
+	desc = _t[[A farportal is a way to travel incredible distances in the blink of an eye. They usually require an external item to use. You have no idea if it is even two-way.
 This one seems to go to the Far East, a continent of which only rumours are known...]],
 
 	orb_portal = {
@@ -39,7 +39,7 @@ This one seems to go to the Far East, a continent of which only rumours are know
 		after_zone_teleport = {
 			x = 98, y = 25,
 		},
-		message = "#VIOLET#You enter the swirling portal and in the blink of an eye you set foot on an unfamiliar cave, with no trace of the portal...",
+		message = _t"#VIOLET#You enter the swirling portal and in the blink of an eye you set foot on an unfamiliar cave, with no trace of the portal...",
 		on_use = function(self, who)
 			game.state:goneEast()
 			who:setQuestStatus("wild-wild-east", engine.Quest.DONE)
@@ -65,7 +65,7 @@ newEntity{ base = "FAR_EAST_PORTAL", define_as = "CFAR_EAST_PORTAL",
 newEntity{
 	define_as = "IRON_THRONE_EDICT",
 	name = "Iron Throne Edict", lore="iron-throne-reknor-edict",
-	desc = [["AN EDICT TO ALL CITIZENS OF THE IRON THRONE. LONG MAY OUR EMPIRE ENDURE"]],
+	desc=_t[["AN EDICT TO ALL CITIZENS OF THE IRON THRONE. LONG MAY OUR EMPIRE ENDURE"]],
 	image = "terrain/marble_floor.png",
 	display = '_', color=colors.GREEN, back_color=colors.DARK_GREY,
 	add_displays = {class.new{image="terrain/signpost.png"}},

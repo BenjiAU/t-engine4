@@ -56,6 +56,10 @@ function _M:makeData(w, h, fill_with)
 	return data
 end
 
+function _M:erase(fill_with)
+	self.data = self:makeData(self.data_w, self.data_h, fill_with or '#')
+end
+
 function _M:clone()
 	local n = self.new()
 	n.data_w, n.data_h, n.data_size = self.data_w, self.data_h, self.data_size:clone()
@@ -115,6 +119,10 @@ point_meta = {
 		end,
 		distance = function(p, p2)
 			return core.fov.distance(p.x, p.y, p2.x, p2.y)
+		end,
+		addDir = function(p, dir)
+			local dx, dy = util.dirToCoord(dir)
+			return _M:point(p.x + dx, p.y + dy)
 		end,
 		clone = function(p)
 			return _M:point(p)
@@ -249,6 +257,9 @@ end
 
 --- Rotate the map
 function _M:rotate(angle)
+	if angle == "random" then angle = rng.table{0, 90, 180, 270} end
+	if angle == 0 then return self end
+
 	local function rotate_coords(i, j)
 		local ii, jj = i, j
 		if angle == 90 then ii, jj = j, self.data_w - i + 1
@@ -314,7 +325,7 @@ function _M:mapLoad(file)
 end
 
 --- Used internally to load a tilemap from a tmx file
-function _M:tmxLoad(file)
+function _M:tmxLoad(file, select_layer)
 	local f = fs.open(file, "r") local data = f:read(10485760) f:close()
 	local map = lom.parse(data)
 	local mapprops = {}
@@ -353,39 +364,41 @@ function _M:tmxLoad(file)
 	end
 
 	for _, layer in ipairs(map:findAll("layer")) do
-		local mapdata = layer:findOne("data")
-		if mapdata.attr.encoding == "base64" then
-			local b64 = mime.unb64(mapdata[1]:trim())
-			local data
-			if mapdata.attr.compression == "zlib" then data = zlib.decompress(b64)
-			elseif not mapdata.attr.compression then data = b64
-			else error("tmx map compression unsupported: "..mapdata.attr.compression)
-			end
-			local gid, i = nil, 1
-			local x, y = 1, 1
-			while i <= #data do
-				gid, i = struct.unpack("<I4", data, i)				
-				populate(x, y, gid)
-				x = x + 1
-				if x > w then x = 1 y = y + 1 end
-			end
-		elseif mapdata.attr.encoding == "csv" then
-			local data = mapdata[1]:gsub("[^,0-9]", ""):split(",")
-			local x, y = 1, 1
-			for i, gid in ipairs(data) do
-				gid = tonumber(gid)
-				populate(x, y, gid)
-				x = x + 1
-				if x > w then x = 1 y = y + 1 end
-			end
-		elseif not mapdata.attr.encoding then
-			local data = mapdata:findAll("tile")
-			local x, y = 1, 1
-			for i, tile in ipairs(data) do
-				local gid = tonumber(tile.attr.gid)
-				populate(x, y, gid)
-				x = x + 1
-				if x > w then x = 1 y = y + 1 end
+		if not select_layer or layer.attr.name == select_layer then
+			local mapdata = layer:findOne("data")
+			if mapdata.attr.encoding == "base64" then
+				local b64 = mime.unb64(mapdata[1]:trim())
+				local data
+				if mapdata.attr.compression == "zlib" then data = zlib.decompress(b64)
+				elseif not mapdata.attr.compression then data = b64
+				else error("tmx map compression unsupported: "..mapdata.attr.compression)
+				end
+				local gid, i = nil, 1
+				local x, y = 1, 1
+				while i <= #data do
+					gid, i = struct.unpack("<I4", data, i)				
+					populate(x, y, gid)
+					x = x + 1
+					if x > w then x = 1 y = y + 1 end
+				end
+			elseif mapdata.attr.encoding == "csv" then
+				local data = mapdata[1]:gsub("[^,0-9]", ""):split(",")
+				local x, y = 1, 1
+				for i, gid in ipairs(data) do
+					gid = tonumber(gid)
+					populate(x, y, gid)
+					x = x + 1
+					if x > w then x = 1 y = y + 1 end
+				end
+			elseif not mapdata.attr.encoding then
+				local data = mapdata:findAll("tile")
+				local x, y = 1, 1
+				for i, tile in ipairs(data) do
+					local gid = tonumber(tile.attr.gid)
+					populate(x, y, gid)
+					x = x + 1
+					if x > w then x = 1 y = y + 1 end
+				end
 			end
 		end
 	end
@@ -405,7 +418,7 @@ function _M:hasResult()
 end
 
 --- Locate a specific tile
-function _M:locateTile(char, erase, min_x, min_y, max_x, max_y)
+function _M:locateTile(char, erase, min_x, min_y, max_x, max_y, allow_position)
 	local res = {}
 	min_x = min_x or 1
 	min_y = min_y or 1
@@ -413,7 +426,7 @@ function _M:locateTile(char, erase, min_x, min_y, max_x, max_y)
 	max_y = max_y or self.data_h
 	for i = min_x, max_x do
 		for j = min_y, max_y do
-			if self.data[j][i] == char then
+			if self.data[j][i] == char and (not allow_position or allow_position(self:point(i, j))) then
 				res[#res+1] = self:point(i, j)
 				if erase then self.data[j][i] = erase end
 			end
@@ -515,6 +528,10 @@ group_meta = {
 		return ("Group[%s](%d points)"):format(tostring(g.list), #g.list)
 	end,
 	__index = {
+		print = function(g)
+			print(g)
+			for i, p in ipairs(g.list) do print(" - "..p.x.." x "..p.y) end
+		end,
 		updateReverse = function(g)
 			g.reverse = {}
 			for j = 1, #g.list do
@@ -791,7 +808,7 @@ function _M:eliminateByFloodfill(walls)
 	if g and #g.list > 0 then
 		print("[Tilemap] Ok floodfill with main group size", #g.list)
 		self:eliminateGroups(walls[1], groups)
-		return #g.list
+		return #g.list, g
 	else
 		print("[Tilemap] Floodfill left nothing")
 		return 0
@@ -939,9 +956,10 @@ function _M:groupOuterRectangle(group)
 end
 
 --- Carve out a simple linear path from coords until a tile is reached
-function _M:carveLinearPath(char, from, dir, stop_at, dig_only_into)
+function _M:carveLinearPath(char, from, dir, stop_at, dig_only_into, ignore_first)
 	local x, y = math.floor(from.x), math.floor(from.y)
 	local dx, dy = util.dirToCoord(dir)
+	if ignore_first then x, y = x + dx, y + dy end
 	if type(dig_only_into) == "table" then dig_only_into = table.reverse(dig_only_into) end
 	while x >= 1 and x <= self.data_w and y >= 1 and y <= self.data_h and self.data[y][x] ~= stop_at do
 		if not dig_only_into or (type(dig_only_into) == "table" and dig_only_into[self.data[y][x]]) or (type(dig_only_into) == "function" and dig_only_into(x, y, self.data[y][x])) then 
@@ -1044,7 +1062,7 @@ function _M:merge(x, y, tm, char_order, empty_char)
 	x = math.floor(x)
 	y = math.floor(y)
 	
-	char_order = table.reverse(char_order or {})
+	if type(char_order) ~= "function" then char_order = table.reverse(char_order or {}) end
 	
 	empty_char = empty_char or {' '}
 	if type(empty_char) == "string" then empty_char = {empty_char} end
@@ -1059,11 +1077,17 @@ function _M:merge(x, y, tm, char_order, empty_char)
 				local c = tm.data[j][i]
 				if not empty_char[c] then
 					local sc = self.data[sj][si]
-					local sc_o = char_order[sc] or 0
-					local c_o = char_order[c] or 0
+					if type(char_order) == "table" then
+						local sc_o = char_order[sc] or 0
+						local c_o = char_order[c] or 0
 
-					if c_o >= sc_o then
-						self.data[sj][si] = tm.data[j][i]
+						if c_o >= sc_o then
+							self.data[sj][si] = tm.data[j][i]
+						end
+					else
+						if char_order(si, sj, sc, c) then
+							self.data[sj][si] = tm.data[j][i]
+						end
 					end
 				end
 			end

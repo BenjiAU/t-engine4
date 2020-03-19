@@ -37,10 +37,10 @@ end
 function _M:init(actor)
 	self.actor = actor
 	actor.hotkey = actor.hotkey or {}
-	Dialog.init(self, "Arcane Combat", game.w * 0.6, game.h * 0.8)
+	Dialog.init(self, _t"Arcane Combat", game.w * 0.6, game.h * 0.8)
 
 	local vsep = Separator.new{dir="horizontal", size=self.ih - 10}
-	self.c_tut = Textzone.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=1, auto_height=true, no_color_bleed=true, text=[[
+	self.c_tut = Textzone.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=1, auto_height=true, no_color_bleed=true, text=_t[[
 You may select a spell for Arcane Combat to automatically trigger with melee attacks.  Otherwise, select 'Random spells' to have a spell selected automatically with each attack.
 ]]}
 	self.c_desc = TextzoneList.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=self.ih - self.c_tut.h - 20, scrollbar=true, no_color_bleed=true}
@@ -48,8 +48,8 @@ You may select a spell for Arcane Combat to automatically trigger with melee att
 	self:generateList()
 
 	local cols = {
-		{name="", width={40,"fixed"}, display_prop="char"},
-		{name="Talent", width=80, display_prop="name"},
+		{name=_t"", width={40,"fixed"}, display_prop="char"},
+		{name=_t"Talent", width=80, display_prop="name"},
 	}
 	self.c_list = TreeList.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=self.ih - 10, all_clicks=true, scrollbar=true, columns=cols, tree=self.list, fct=function(item, sel, button) self:use(item, button) end, select=function(item, sel) self:select(item) end}
 	self.c_list.cur_col = 2
@@ -134,9 +134,9 @@ function _M:generateList()
 	table.sort(talents, function(a,b) return a.cname < b.cname end)
 	
 	talents[#talents+1] = {
-		name = "Random spells",
+		name = _t"Random spells",
 		use_random = true,
-		desc = "Each time Arcane Combat is triggered, a random allowed spell will be used."
+		desc = _t"Each time Arcane Combat is triggered, a random allowed spell will be used."
 	}
 	
 	for _, node in ipairs(talents) do
@@ -146,7 +146,7 @@ function _M:generateList()
 	end
 
 	list = {
-		{ char='', name=('#{bold}#Choose a spell#{normal}#'):toTString(), status='', hotkey='', desc="All known spells that can be used with Arcane Combat.", color=function() return colors.simple(colors.LIGHT_GREEN) end, nodes=talents, shown=true },
+		{ char='', name=(_t'#{bold}#Choose a spell#{normal}#'):toTString(), status='', hotkey='', desc=_t"All known spells that can be used with Arcane Combat.", color=function() return colors.simple(colors.LIGHT_GREEN) end, nodes=talents, shown=true },
 		chars = chars,
 	}
 	self.list = list

@@ -24,8 +24,8 @@
 newLore{
 	id = "old-forest-note-1",
 	category = "old forest",
-	name = "journal entry (old forest)",
-	lore = [[#{italic}#From the notes of Darwood Oakton, explorer:
+	name = _t"journal entry (old forest)",
+	lore = _t[[#{italic}#From the notes of Darwood Oakton, explorer:
 #{bold}#CHAPTER ONE: THE SHER'TUL
 
 #{normal}#The Sher'Tul. Who were they? Where did they come from? Where did they go? The mysteries surrounding this ancient race are almost infinite. What little scraps of information we have regarding them allude to a mighty and world-spanning civilisation, wielding power and magic unthinkable. Now, however, all that remains of them are forgotten, wind-swept ruins, the tiniest minutiae of their technology sealed away in the studies of reclusive sages. Does their mystery not call to your curious nature as it does mine, gentle reader?
@@ -38,8 +38,8 @@ Rumours are growing of trees roaming in its depths, moving as you or I would. So
 newLore{
 	id = "old-forest-note-2",
 	category = "old forest",
-	name = "journal entry (old forest)",
-	lore = [[#{italic}#From the notes of Darwood Oakton, explorer:
+	name = _t"journal entry (old forest)",
+	lore = _t[[#{italic}#From the notes of Darwood Oakton, explorer:
 #{bold}#CHAPTER TWO: ANCIENT RUINS
 
 #{normal}#My inquiries have paid off! It took much searching, and even more arm-twisting and cajoling once I had found my man, but a local lumberjack who plies his trade in the old forest has divulged to me an amazing secret! He speaks of ruins within the forest, a location where the living trees seem to congregate in larger numbers. He would not speak much of the place, and seemed to believe it cursed, but I did manage to squeeze out of him the appearance of the ruins, submerged in the middle of the great lake. There is no longer any doubt in my mind now: They belonged to the Sher'Tul!]],
@@ -48,8 +48,8 @@ newLore{
 newLore{
 	id = "old-forest-note-3",
 	category = "old forest",
-	name = "journal entry (old forest)",
-	lore = [[#{italic}#From the notes of Darwood Oakton, explorer:
+	name = _t"journal entry (old forest)",
+	lore = _t[[#{italic}#From the notes of Darwood Oakton, explorer:
 #{bold}#CHAPTER THREE: DISASTER!
 
 #{normal}#Does my title not tell you enough? Disaster, and again disaster! True enough, these Sher'Tul ruins exist... several hundred feet at the bottom of a mighty lake! The lake of Nur, one of the largest in the old forest, has swallowed up the ruins in its murky depths. I am hardly a strong swimmer, gentle reader, but even if I could swim like a naga-spawned beast I could not hope to explore the ruin's sunken expanses before drowning. I fear I must abandon my present expedition... the trees are paying closer attention to me, and I do not believe it is of the pleasant sort...]],
@@ -58,8 +58,8 @@ newLore{
 newLore{
 	id = "old-forest-note-4",
 	category = "old forest",
-	name = "journal entry (old forest)",
-	lore = [[#{italic}#From the notes of Darwood Oakton, explorer:
+	name = _t"journal entry (old forest)",
+	lore = _t[[#{italic}#From the notes of Darwood Oakton, explorer:
 #{bold}#CHAPTER FOUR: NEEDS MUST...
 
 #{normal}#Before I continue, I must make one thing clear: I am no great friend to the mages. Some powers simply were not meant for mortal hands or minds. As history has taught us time and again, from the sudden disappearance of the Sher'Tul to the Spellblaze and the plagues it brought in its wake, magic is wont to cause more harm than good. But I fear it is a necessity for my current task. During my stay in Derth a fellow traveller and I have become fast friends, often drinking together in the local tavern. I can't put my finger on it, but I believe him to be a mage; he has an unexplainable feeling of power surrounding him, not to mention a rather ostentatious hat. I wonder what his thoughts would be on the art of water-breathing...?]],
@@ -68,9 +68,9 @@ newLore{
 newLore{
 	id = "old-forest-note-5",
 	category = "old forest",
-	name = "journal entry (old forest)",
+	name = _t"journal entry (old forest)",
 	bloodstains = 12,
-	lore = [[#{italic}#From the notes of Darwood Oakton, explorer:
+	lore = _t[[#{italic}#From the notes of Darwood Oakton, explorer:
 #{bold}#CHAPTER FIVE: HORR...
 
 #{italic}#This note seems hastily written and stained with water and blood.
@@ -99,7 +99,7 @@ If any come after, I bid you turn ... horrors ... too much. If you are foolish e
 newLore{
 	id = "lake-nur-not-flooded",
 	category = "lake of nur",
-	name = "magical barrier", always_pop = true,
+	name = _t"magical barrier", always_pop = true,
 	image = "nur-barrier.png",
-	lore = [[As you descend to the next level you traverse a kind of magical barrier keeping the water away. You hear terrible screams.]],
+	lore = _t[[As you descend to the next level you traverse a kind of magical barrier keeping the water away. You hear terrible screams.]],
 }

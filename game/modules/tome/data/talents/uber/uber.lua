@@ -17,13 +17,13 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-newTalentType{ hide = true, type="uber/strength", name = "strength", description = "Ultimate talents you may only know one." }
-newTalentType{ hide = true, type="uber/dexterity", name = "dexterity", description = "Ultimate talents you may only know one." }
-newTalentType{ hide = true, type="uber/constitution", name = "constitution", description = "Ultimate talents you may only know one." }
-newTalentType{ hide = true, type="uber/magic", name = "magic", description = "Ultimate talents you may only know one." }
-newTalentType{ hide = true, type="uber/willpower", name = "willpower", description = "Ultimate talents you may only know one." }
-newTalentType{ hide = true, type="uber/cunning", name = "cunning", description = "Ultimate talents you may only know one." }
-newTalentType{ hide = true, type="uber/other", name = "other", description = "Ultimate talents you may only know one." }
+newTalentType{ hide = true, type="uber/strength", name = _t"strength", description = _t"Ultimate talents you may only know one." }
+newTalentType{ hide = true, type="uber/dexterity", name = _t"dexterity", description = _t"Ultimate talents you may only know one." }
+newTalentType{ hide = true, type="uber/constitution", name = _t"constitution", description = _t"Ultimate talents you may only know one." }
+newTalentType{ hide = true, type="uber/magic", name = _t"magic", description = _t"Ultimate talents you may only know one." }
+newTalentType{ hide = true, type="uber/willpower", name = _t"willpower", description = _t"Ultimate talents you may only know one." }
+newTalentType{ hide = true, type="uber/cunning", name = _t"cunning", description = _t"Ultimate talents you may only know one." }
+newTalentType{ hide = true, type="uber/other", name = _t"other", description = _t"Ultimate talents you may only know one." }
 
 
 knowRessource = function(self, r, v)

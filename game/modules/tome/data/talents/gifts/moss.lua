@@ -71,7 +71,7 @@ newTalent{
 		The moss lasts %d turns.
 		Moss talents are instant but place all other moss talents on cooldown for 3 turns.
 		The damage will increase with your Mindpower.]]):
-		format(radius, damDesc(self, DamageType.NATURE, damage), slow, pin, duration)
+		tformat(radius, damDesc(self, DamageType.NATURE, damage), slow, pin, duration)
 	end,
 }
 
@@ -120,7 +120,7 @@ newTalent{
 		The moss lasts %d turns.
 		Moss talents are instant but place all other moss talents on cooldown for 3 turns.
 		The damage will increase with your Mindpower.]]):
-		format(radius, damDesc(self, DamageType.NATURE, damage), heal, duration)
+		tformat(radius, damDesc(self, DamageType.NATURE, damage), heal, duration)
 	end,
 }
 
@@ -168,7 +168,7 @@ newTalent{
 		The moss lasts %d turns.
 		Moss talents are instant but place all other moss talents on cooldown for 3 turns.
 		The damage and the chance to apply the slippery effect increase with your Mindpower.]]):
-		format(radius, damDesc(self, DamageType.NATURE, damage), fail, duration)
+		tformat(radius, damDesc(self, DamageType.NATURE, damage), fail, duration)
 	end,
 }
 
@@ -218,6 +218,6 @@ newTalent{
 		The moss lasts %d turns.
 		Moss talents are instant but place all other moss talents on cooldown for 3 turns.
 		The damage will increase with your Mindpower.]]):
-		format(radius, damDesc(self, DamageType.NATURE, damage), chance, power, duration)
+		tformat(radius, damDesc(self, DamageType.NATURE, damage), chance, power, duration)
 	end,
 }

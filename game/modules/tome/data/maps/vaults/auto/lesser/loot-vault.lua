@@ -57,11 +57,11 @@ if rng.percent(66) then
 else
 	local lore = mod.class.Object.new{
 		type = "lore", subtype="lore",
-		unided_name = "scroll", identified=true,
+		unided_name = _t"scroll", identified=true,
 		display = "?", color=colors.ANTIQUE_WHITE, image="object/scroll.png",
 		encumber = 0,
-		name = "Mocking Note", lore="loot-vault-empty",
-		desc = [[A small scrap of paper written in a mocking tone.]],
+		name = _t"Mocking Note", lore="loot-vault-empty",
+		desc = _t[[A small scrap of paper written in a mocking tone.]],
 		level_range = {1, 20},
 		rarity = false,
 	}

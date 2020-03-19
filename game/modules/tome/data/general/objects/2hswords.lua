@@ -28,7 +28,7 @@ newEntity{
 	encumber = 3,
 	rarity = 5,
 	combat = { talented = "sword", damrange = 1.6, physspeed = 1, sound = {"actions/melee", pitch=0.6, vol=1.2}, sound_miss = {"actions/melee", pitch=0.6, vol=1.2} },
-	desc = [[Massive two-handed swords.]],
+	desc = _t[[Massive two-handed swords.]],
 	twohanded = true,
 	metallic = true,
 	ego_bonus_mult = 0.4,

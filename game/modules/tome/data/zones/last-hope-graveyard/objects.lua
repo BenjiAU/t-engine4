@@ -26,7 +26,7 @@ load("/data/general/objects/objects-maj-eyal.lua")
 newEntity{ base = "BASE_LORE",
 	define_as = "CELIA_NOTE",
 	name = "creased letter", lore="celia-letter",
-	desc = [[A letter.]],
+	desc = _t[[A letter.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -35,18 +35,18 @@ newEntity{ define_as = "CELIA_HEART",
 	power_source = {arcane=true},
 	unique = true,
 	type = "misc", subtype="heart",
-	unided_name = "bloody heart",
+	unided_name = _t"bloody heart",
 	name = "Celia's Still Beating Heart",
 	level_range = {20, 35},
 	rarity = false,
 	display = "*", color=colors.RED,  image = "object/artifact/celias_heart.png",
 	encumber = 2,
 	not_in_stores = true,
-	desc = [[The living heart of the necromancer Celia, carved out of her chest and preserved with magic.]],
+	desc = _t[[The living heart of the necromancer Celia, carved out of her chest and preserved with magic.]],
 
 	max_power = 75, power_regen = 1,
 	use_sound = "talents/slime",
-	use_power = { name = "extract a tiny part of Celia's soul", power = 75, use = function(self, who)
+	use_power = { name = _t"extract a tiny part of Celia's soul", power = 75, use = function(self, who)
 		who:incSoul(1)
 		who.changed = true
 		game.logPlayer(who, "You squeeze Celia's heart in your hand, absorbing part of her soul into your necrotic aura.")

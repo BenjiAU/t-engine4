@@ -27,7 +27,7 @@ newEntity{
 		if not x then return end
 
 		local g = mod.class.WorldNPC.new{
-			name="Novice mage",
+			name=_t"Novice mage",
 			type="humanoid", subtype="human", faction="angolwen",
 			display='@', color=colors.RED,
 			image = "npc/humanoid_human_apprentice_mage.png",
@@ -44,15 +44,15 @@ newEntity{
 newEntity{
 	name = "Lost merchant",
 	type = "hostile", subtype = "special", unique = true,
-	level_range = {10, 20},
+	level_range = {14, 28},
 	rarity = 7,
-	min_level = 10,
+	min_level = 18,
 	on_world_encounter = "merchant-quest",
 	on_encounter = function(self, who)
 		who.energy.value = game.energy_to_act
 		game.paused = true
 		who:runStop()
-		engine.ui.Dialog:yesnoPopup("Encounter", "You find a hidden trap door, and hear cries for help from within...", function(ok)
+		engine.ui.Dialog:yesnoPopup(_t"Encounter", _t"You find a hidden trap door, and hear cries for help from within...", function(ok)
 			if not ok then
 				game.logPlayer(who, "#LIGHT_BLUE#You carefully get away without making a sound.")
 			else
@@ -61,7 +61,7 @@ newEntity{
 				game.logPlayer(who, "#LIGHT_RED#As you enter you notice the trap door has no visible handle on the inside. You are stuck here!")
 				who:grantQuest("lost-merchant")
 			end
-		end, "Enter the tunnels", "Leave carefully", true)
+		end, _t"Enter the tunnels", _t"Leave carefully", true)
 		return true
 	end,
 }
@@ -77,7 +77,7 @@ newEntity{
 		who.energy.value = game.energy_to_act
 		game.paused = true
 		who:runStop()
-		engine.ui.Dialog:yesnoLongPopup("Encounter", "You find an entrance to an old crypt. An aura of terrible evil emanates from this place. You feel threatened just standing there.\nYou hear the muffled cries of a woman coming from inside.", 400, function(ok)
+		engine.ui.Dialog:yesnoLongPopup(_t"Encounter", _t"You find an entrance to an old crypt. An aura of terrible evil emanates from this place. You feel threatened just standing there.\nYou hear the muffled cries of a woman coming from inside.", 400, function(ok)
 			if not ok then
 				game.logPlayer(who, "#LIGHT_BLUE#You carefully get away without making a sound.")
 			else
@@ -85,7 +85,7 @@ newEntity{
 				game.logPlayer(who, "#LIGHT_RED#You carefully open the door and enter the underground crypt...")
 				game.logPlayer(who, "#LIGHT_RED#As you enter you notice the door has no visible handle on the inside. You are stuck here!")
 			end
-		end, "Enter the crypt", "Leave carefully", true)
+		end, _t"Enter the crypt", _t"Leave carefully", true)
 		return true
 	end,
 }
@@ -102,7 +102,7 @@ newEntity{
 		game.paused = true
 		who:runStop()
 		local Chat = require "engine.Chat"
-		local chat = Chat.new("sage-kitty", mod.class.NPC.new{name="Lost Kitty", image="npc/sage_kitty.png"}, who)
+		local chat = Chat.new("sage-kitty", mod.class.NPC.new{name=_t"Lost Kitty", image="npc/sage_kitty.png"}, who)
 		chat:invoke()
 		return true
 	end,
@@ -117,7 +117,7 @@ newEntity{
 		if not x then return end
 
 		local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
-		g.name = "Entrance to some ancient elven ruins"
+		g.name = _t"Entrance to some ancient elven ruins"
 		g.display='>' g.color_r=0 g.color_g=255 g.color_b=255 g.notice = true
 		g.change_level=1 g.change_zone="ancient-elven-ruins" g.glow=true
 		g.add_displays = g.add_displays or {}
@@ -141,7 +141,7 @@ newEntity{
 		game.paused = true
 		who:runStop()
 		local Chat = require "engine.Chat"
-		local chat = Chat.new("lumberjack-quest", {name="Half-dead lumberjack"}, who)
+		local chat = Chat.new("lumberjack-quest", {name=_t"Half-dead lumberjack"}, who)
 		chat:invoke()
 		return true
 	end,
@@ -156,7 +156,7 @@ newEntity{
 		if not x then return end
 
 		local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
-		g.name = "Entrance to a ruined dungeon"
+		g.name = _t"Entrance to a ruined dungeon"
 		g.display='>' g.color_r=255 g.color_g=0 g.color_b=0 g.notice = true
 		g.change_level=1 g.change_zone="ruined-dungeon" g.glow=true
 		g.add_displays = g.add_displays or {}
@@ -178,7 +178,7 @@ newEntity{
 		if not x then return end
 
 		local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
-		g.name = "Mark of the Spellblaze"
+		g.name = _t"Mark of the Spellblaze"
 		g.display='>' g.color_r=0 g.color_g=200 g.color_b=0 g.notice = true
 		g.change_level=1 g.change_zone="mark-spellblaze" g.glow=true
 		g.add_displays = g.add_displays or {}
@@ -200,7 +200,7 @@ newEntity{
 		if not x then return end
 
 		local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
-		g.name = "Golem Graveyard"
+		g.name = _t"Golem Graveyard"
 		g.display='>' g.color_r=0 g.color_g=200 g.color_b=0 g.notice = true
 		g.change_level=1 g.change_zone="golem-graveyard" g.glow=true
 		g.add_displays = g.add_displays or {}
@@ -223,7 +223,8 @@ newEntity{
 		if not x then return end
 
 		local g = mod.class.WorldNPC.new{
-			name="Agrimley the Hermit",
+			name=_t"Agrimley the Hermit",
+			image = "npc/humanoid_halfling_agrimley_the_hermit.png",
 			type="humanoid", subtype="halfling", faction="neutral",
 			display='@', color=colors.BLUE,
 			can_talk = "alchemist-hermit",
@@ -246,7 +247,7 @@ newEntity{
 		if not x then return end
 
 		local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
-		g.name = "Hidden compound"
+		g.name = _t"Hidden compound"
 		g.display='>' g.color_r=200 g.color_g=0 g.color_b=0 g.notice = true
 		g.change_level=1 g.change_zone="ring-of-blood" g.glow=true
 		g.add_displays = g.add_displays or {}
@@ -273,7 +274,7 @@ newEntity{
 		if not x then return end
 
 		local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
-		g.name = "tranquil meadow"
+		g.name = _t"tranquil meadow"
 		g.display='>' g.color_r=0 g.color_g=255 g.color_b=128 g.notice = true
 		g.change_level=1 g.change_zone="keepsake-meadow" g.glow=true
 		g.add_displays = g.add_displays or {}

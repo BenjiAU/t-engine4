@@ -17,25 +17,25 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Storming the city"
+name = _t"Storming the city"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "As you approached Derth you saw a huge dark cloud over the small town."
-	desc[#desc+1] = "When you entered you were greeted by an army of air elementals slaughtering the population."
+	desc[#desc+1] = _t"As you approached Derth you saw a huge dark cloud over the small town."
+	desc[#desc+1] = _t"When you entered you were greeted by an army of air elementals slaughtering the population."
 	if self:isCompleted("saved-derth") then
-		desc[#desc+1] = " * You have dispatched the elementals but the cloud lingers still. You must find a powerful ally to remove it. There are rumours of a secret town in the mountains, to the southwest. You could also check out the Ziguranth group that is supposed to fight magic."
+		desc[#desc+1] = _t" * You have dispatched the elementals but the cloud lingers still. You must find a powerful ally to remove it. There are rumours of a secret town in the mountains, to the southwest. You could also check out the Ziguranth group that is supposed to fight magic."
 	end
 	if self:isCompleted("tempest-located") then
-		desc[#desc+1] = " * You have learned the real threat comes from a rogue Archmage, a Tempest named Urkis. The mages of Angolwen are ready to teleport you there."
+		desc[#desc+1] = _t" * You have learned the real threat comes from a rogue Archmage, a Tempest named Urkis. The mages of Angolwen are ready to teleport you there."
 	end
 	if self:isCompleted("tempest-entrance") then
-		desc[#desc+1] = " * You have learned the real threat comes from a rogue Archmage, a Tempest. You have been shown a secret entrance to his stronghold."
+		desc[#desc+1] = _t" * You have learned the real threat comes from a rogue Archmage, a Tempest. You have been shown a secret entrance to his stronghold."
 	end
 	if self:isCompleted("tempest-urkis-slain") then
-		desc[#desc+1] = " * You have slain Urkis.  Return to Angolwen or Zigur for a reward."
+		desc[#desc+1] = _t" * You have slain Urkis.  Return to Angolwen or Zigur for a reward."
 	end
 	if self:isCompleted() then
-		desc[#desc+1] = " * Urkis has been dealt with. Permanently."
+		desc[#desc+1] = _t" * Urkis has been dealt with. Permanently."
 	end
 
 	return table.concat(desc, "\n")
@@ -78,7 +78,7 @@ kill_one = function(self)
 
 	if self.kill_count >= self.max_count then
 		local Chat = require "engine.Chat"
-		local chat = Chat.new("derth-attack-over", {name="Scared Halfling"}, game.player)
+		local chat = Chat.new("derth-attack-over", {name=_t"Scared Halfling"}, game.player)
 		chat:invoke()
 
 		if not game.zone.unclean_derth_savior then
@@ -93,7 +93,7 @@ end
 
 teleport_urkis = function(self)
 	game:changeLevel(1, "tempest-peak")
-	require("engine.ui.Dialog"):simpleLongPopup("Danger...", [[You step out on unfamiliar grounds. You are nearly on top of one of the highest peaks you can see.
+	require("engine.ui.Dialog"):simpleLongPopup(_t"Danger...", _t[[You step out on unfamiliar grounds. You are nearly on top of one of the highest peaks you can see.
 The storm is raging above your head.]], 400)
 end
 
@@ -146,7 +146,7 @@ enter_derth = function(self)
 	end
 	self.kill_count = 0
 
-	require("engine.ui.Dialog"):simpleLongPopup("Danger...", "As you arrive in Derth you notice a huge dark cloud hovering over the town.\nYou hear screams coming from the town square.", 400)
+	require("engine.ui.Dialog"):simpleLongPopup(_t"Danger...", _t"As you arrive in Derth you notice a huge dark cloud hovering over the town.\nYou hear screams coming from the town square.", 400)
 end
 
 reenter_derth = function(self)
@@ -157,9 +157,9 @@ reenter_derth = function(self)
 
 		game.player:setQuestStatus(self.id, engine.Quest.COMPLETED, "restored-derth")
 		if self:isCompleted("tempest-entrance") then
-			require("engine.ui.Dialog"):simpleLongPopup("Clear sky", "It seems the Ziguranth have kept their word.\nDerth is free of the storm cloud.", 400)
+			require("engine.ui.Dialog"):simpleLongPopup(_t"Clear sky", _t"It seems the Ziguranth have kept their word.\nDerth is free of the storm cloud.", 400)
 		else
-			require("engine.ui.Dialog"):simpleLongPopup("Clear sky", "It seems the mages have kept their word.\nDerth is free of the storm cloud.", 400)
+			require("engine.ui.Dialog"):simpleLongPopup(_t"Clear sky", _t"It seems the mages have kept their word.\nDerth is free of the storm cloud.", 400)
 			local p = game.party:findMember{main=true}
 			if p:knowTalentType("cunning/trapping") then
 				game.party:learnLore("derth-beam-trap")

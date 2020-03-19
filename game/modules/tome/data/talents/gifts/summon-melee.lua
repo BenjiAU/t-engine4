@@ -22,7 +22,7 @@ newTalent{
 	type = {"wild-gift/other",1},
 	points = 5,
 	equilibrium = 10,
-	message = "@source@ oozes over the ground!!",
+	message = _t"@source@ oozes over the ground!!",
 	cooldown = 15,
 	tactical = { ATTACKAREA = { SLIME = 4} },
 	range = 0,
@@ -53,7 +53,7 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local duration = t.getDuration(self, t)
-		return ([[Ooze over the floor, spreading caustic jelly in a radius of 1 lasting %d turns and dealing %d nature damage per turn to hostile creatures caught within.]]):format(duration, damDesc(self, DamageType.NATURE, damage))
+		return ([[Ooze over the floor, spreading caustic jelly in a radius of 1 lasting %d turns and dealing %d nature damage per turn to hostile creatures caught within.]]):tformat(duration, damDesc(self, DamageType.NATURE, damage))
 	end,
 }
 
@@ -68,7 +68,7 @@ newTalent{
 		self:talentTemporaryValue(p, "clone_on_hit", {min_dam_pct=t.getDamage(self,t), chance=t.getChance(self,t)})
 	end,
 	info = function(self, t)
-		return ([[%d%% chance to split upon taking a single hit dealing at least %d%% of your maximum life.]]):format(t.getChance(self, t), t.getDamage(self, t))
+		return ([[%d%% chance to split upon taking a single hit dealing at least %d%% of your maximum life.]]):tformat(t.getChance(self, t), t.getDamage(self, t))
 	end,
 }
 
@@ -78,7 +78,7 @@ newTalent{
 	require = gifts_req1,
 	points = 5,
 	random_ego = "attack",
-	message = "@Source@ summons a War Hound!",
+	message = _t"@Source@ summons a War Hound!",
 	equilibrium = 3,
 	cooldown = 15,
 	range = 5,
@@ -135,7 +135,7 @@ newTalent{
 			type = "animal", subtype = "canine",
 			display = "C", color=colors.LIGHT_DARK, image = "npc/summoner_wardog.png",
 			name = "war hound", faction = self.faction,
-			desc = [[]],
+			desc = _t[[]],
 			autolevel = "none",
 			ai = "summoned", ai_real = "dumb_talented_simple", ai_state = { talent_in=5, },
 			stats = {str=0, dex=0, con=0, cun=0, wil=0, mag=0},
@@ -157,7 +157,7 @@ newTalent{
 			ai_target = {actor=target}
 		}
 		if self:attr("wild_summon") and rng.percent(self:attr("wild_summon")) then
-			m.name = m.name.." (wild summon)"
+			m.name = ("%s (wild summon)"):tformat(_t(m.name))
 			m[#m+1] = resolvers.talents{ [self.T_TOTAL_THUGGERY]=self:getTalentLevelRaw(t) }
 		end
 		m.is_nature_summon = true
@@ -178,7 +178,7 @@ newTalent{
 		It will get %d Strength, %d Dexterity and %d Constitution.
 		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		The hound's Strength and Dexterity will increase with your Mindpower.]])
-		:format(t.summonTime(self, t), incStats.str, incStats.dex, incStats.con)
+		:tformat(t.summonTime(self, t), incStats.str, incStats.dex, incStats.con)
 	end,
 }
 
@@ -188,7 +188,7 @@ newTalent{
 	require = gifts_req2,
 	points = 5,
 	random_ego = "attack",
-	message = "@Source@ summons a Jelly!",
+	message = _t"@Source@ summons a Jelly!",
 	equilibrium = 2,
 	cooldown = 10,
 	range = 5,
@@ -243,7 +243,7 @@ newTalent{
 		local m = NPC.new{
 			type = "immovable", subtype = "jelly", image = "npc/jelly-darkgrey.png",
 			display = "j", color=colors.BLACK,
-			desc = "A strange blob on the dungeon floor.",
+			desc = _t"A strange blob on the dungeon floor.",
 			name = "black jelly",
 			autolevel = "none", faction=self.faction,
 			stats = {str=0, dex=0, con=0, cun=0, wil=0, mag=0},
@@ -278,7 +278,7 @@ newTalent{
 			end,
 		}
 		if self:attr("wild_summon") and rng.percent(self:attr("wild_summon")) then
-			m.name = m.name.." (wild summon)"
+			m.name = ("%s (wild summon)"):tformat(_t(m.name))
 			m[#m+1] = resolvers.talents{ [self.T_JELLY_MITOTIC_SPLIT]=self:getTalentLevelRaw(t) }
 		end
 		m.is_nature_summon = true
@@ -299,7 +299,7 @@ newTalent{
 		It will get %d Constitution and %d Strength.
 		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		The jelly's Constitution will increase with your Mindpower.]])
-		:format(t.summonTime(self, t), incStats.con, incStats.str)
+		:tformat(t.summonTime(self, t), incStats.con, incStats.str)
        end,
 }
 
@@ -309,7 +309,7 @@ newTalent{
 	require = gifts_req3,
 	points = 5,
 	random_ego = "attack",
-	message = "@Source@ summons a Minotaur!",
+	message = _t"@Source@ summons a Minotaur!",
 	equilibrium = 10,
 	cooldown = 15,
 	range = 5,
@@ -378,7 +378,7 @@ newTalent{
 			global_speed_base=1.2,
 			stats = {str=0, dex=0, con=0, cun=0, wil=0, mag=0},
 			inc_stats = t.incStats(self, t),
-			desc = [[It is a cross between a human and a bull.]],
+			desc = _t[[It is a cross between a human and a bull.]],
 			resolvers.equip{ {type="weapon", subtype="battleaxe", auto_req=true}, },
 			level_range = {self.level, self.level}, exp_worth = 0,
 
@@ -393,7 +393,7 @@ newTalent{
 			ai_target = {actor=target}
 		}
 		if self:attr("wild_summon") and rng.percent(self:attr("wild_summon")) then
-			m.name = m.name.." (wild summon)"
+			m.name = ("%s (wild summon)"):tformat(_t(m.name))
 			m[#m+1] = resolvers.talents{ [self.T_RUSH]=self:getTalentLevelRaw(t) }
 		end
 		m.is_nature_summon = true
@@ -414,7 +414,7 @@ newTalent{
 		It will get %d Strength, %d Constitution and %d Dexterity.
 		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		The minotaur's Strength and Dexterity will increase with your Mindpower.]])
-		:format(t.summonTime(self,t), incStats.str, incStats.con, incStats.dex)
+		:tformat(t.summonTime(self,t), incStats.str, incStats.con, incStats.dex)
 	end,
 }
 
@@ -424,7 +424,7 @@ newTalent{
 	require = gifts_req4,
 	points = 5,
 	random_ego = "attack",
-	message = "@Source@ summons a Stone Golem!",
+	message = _t"@Source@ summons a Stone Golem!",
 	equilibrium = 15,
 	cooldown = 20,
 	range = 5,
@@ -496,7 +496,7 @@ newTalent{
 			ai = "summoned", ai_real = "dumb_talented_simple", ai_state = { talent_in=2, },
 			stats = {str=0, dex=0, con=0, cun=0, wil=0, mag=0},
 			inc_stats = t.incStats(self, t),
-			desc = [[It is a massive animated statue.]],
+			desc = _t[[It is a massive animated statue.]],
 			level_range = {self.level, self.level}, exp_worth = 0,
 
 			combat_armor = 25, combat_def = -20,
@@ -514,7 +514,7 @@ newTalent{
 			resolvers.sustains_at_birth(),
 		}
 		if self:attr("wild_summon") and rng.percent(self:attr("wild_summon")) then
-			m.name = m.name.." (wild summon)"
+			m.name = ("%s (wild summon)"):tformat(_t(m.name))
 			m[#m+1] = resolvers.talents{ [self.T_DISARM]=self:getTalentLevelRaw(t) }
 		end
 		m.is_nature_summon = true
@@ -535,6 +535,6 @@ newTalent{
 		It will get %d Strength, %d Constitution and %d Dexterity.
 		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		The golem's Strength and Dexterity will increase with your Mindpower.]])
-		:format(t.summonTime(self, t), incStats.str, incStats.con, incStats.dex)
+		:tformat(t.summonTime(self, t), incStats.str, incStats.con, incStats.dex)
 	end,
 }

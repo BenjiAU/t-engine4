@@ -30,31 +30,31 @@ newTalent{
 	die_speach = function(self, t)
 		if rng.percent(90) then return end
 		self:doEmote(rng.table{
-			"Noooooo!",
-			"Save me, Master, save meeee---",
-			"Aaaauuuggghhh!",
-			"Did I do good?",
-			"Bwuh? Nwaaah!",
-			"Why, Master, whyyyyy---?",
-			"I thought you loved me! I thought-",
-			"For Master's glory!",
-			"Bye... bye....",
-			"We love you, Master!",
-			"EeeeeeeaaaAAAAAUUUUUGGGGGHHHHH!!!!",
-			"The pain, the PAAAAAIN!",
-			"Please, no, nooo--",
-			"Unlife no more for this dead matter, the time comes for my flesh to splatter.",
-			"You gave back life, you gave back dreams, but now I'm bursting at the seams...",
-			"Remember meeeee!",
-			"My tummy hurts...",
-			"Whu..?",
-			"Ahahahahaha!",
-			"Me go boom, me go BOOM!",
-			"Grave circumstances, Master....",
-			"I see the light.. I see, oh.. just a wisp....",
-			"Master, wait... I thought I saw a....Master? ..",
-			"I'm not.. so sure my spine is supposed to bend this way....",
-			"I told you I could Dash 100 yards and back in time! You owe me 10 gol....",
+			_t"Noooooo!",
+			_t"Save me, Master, save meeee---",
+			_t"Aaaauuuggghhh!",
+			_t"Did I do good?",
+			_t"Bwuh? Nwaaah!",
+			_t"Why, Master, whyyyyy---?",
+			_t"I thought you loved me! I thought-",
+			_t"For Master's glory!",
+			_t"Bye... bye....",
+			_t"We love you, Master!",
+			_t"EeeeeeeaaaAAAAAUUUUUGGGGGHHHHH!!!!",
+			_t"The pain, the PAAAAAIN!",
+			_t"Please, no, nooo--",
+			_t"Unlife no more for this dead matter, the time comes for my flesh to splatter.",
+			_t"You gave back life, you gave back dreams, but now I'm bursting at the seams...",
+			_t"Remember meeeee!",
+			_t"My tummy hurts...",
+			_t"Whu..?",
+			_t"Ahahahahaha!",
+			_t"Me go boom, me go BOOM!",
+			_t"Grave circumstances, Master....",
+			_t"I see the light.. I see, oh.. just a wisp....",
+			_t"Master, wait... I thought I saw a....Master? ..",
+			_t"I'm not.. so sure my spine is supposed to bend this way....",
+			_t"I told you I could Dash 100 yards and back in time! You owe me 10 gol....",
 		}, 40)
 	end,
 	getDecay = function(self, t) return math.max(3, 10 - self:getTalentLevelRaw(self.T_AURA_MASTERY)) end,
@@ -64,7 +64,7 @@ newTalent{
 		self:incSoul(1)
 		if self:attr("extra_soul_chance") and rng.percent(self:attr("extra_soul_chance")) then
 			self:incSoul(1)
-			game.logPlayer(self, "%s rips more animus from its victim. (+1 more soul)", self.name:capitalize())
+			game.logPlayer(self, "%s rips more animus from its victim. (+1 more soul)", self:getName():capitalize())
 		end
 		self.changed = true
 		return self:getSoul() - nb
@@ -96,7 +96,7 @@ newTalent{
 		return ([[Emits a necrotic aura, sustaining your undead minions in a radius of %d. Minions outside the radius will lose %d%% life per turn.
 		Any creature you or your minions kill within your aura will be absorbed as a soul that can be used to raise minions.
 		Retch from your ghouls will also heal you, even if you are not undead.]]):
-		format(radius, decay)
+		tformat(radius, decay)
 	end,
 }
 
@@ -409,7 +409,7 @@ local minions_list = {
 		see_invisible = 5,
 		undead = 1,
 		name = "vampire", color=colors.SLATE, image = "npc/vampire.png",
-		desc=[[It is a humanoid with an aura of power. You notice a sharp set of front teeth.]],
+		desc=_t[[It is a humanoid with an aura of power. You notice a sharp set of front teeth.]],
 		max_life = resolvers.rngavg(70,80),
 		combat_armor = 9, combat_def = 6,
 		resolvers.talents{ T_STUN={base=1, every=7, max=5}, T_BLUR_SIGHT={base=1, every=7, max=5}, T_ROTTING_DISEASE={base=1, every=7, max=5}, },
@@ -437,7 +437,7 @@ local minions_list = {
 		undead = 1,
 		name = "master vampire", color=colors.GREEN, image = "npc/master_vampire.png",
 		resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/master_vampire.png", display_h=2, display_y=-1}}},
-		desc=[[It is a humanoid form dressed in robes. Power emanates from its chilling frame.]],
+		desc=_t[[It is a humanoid form dressed in robes. Power emanates from its chilling frame.]],
 		max_life = resolvers.rngavg(80,90),
 		combat_armor = 10, combat_def = 8,
 		ai = "dumb_talented_simple", ai_state = { talent_in=1, },
@@ -463,7 +463,7 @@ local minions_list = {
 		see_invisible = 7,
 		undead = 1,
 		name = "grave wight", color=colors.SLATE, image="npc/grave_wight.png",
-		desc=[[It is a ghostly form with eyes that haunt you.]],
+		desc=_t[[It is a ghostly form with eyes that haunt you.]],
 		max_life = resolvers.rngavg(70,80),
 		combat_armor = 9, combat_def = 6,
 		resolvers.talents{ T_FLAMESHOCK={base=2, every=5, max=6}, T_LIGHTNING={base=2, every=5, max=6}, T_GLACIAL_VAPOUR={base=2, every=5, max=6},
@@ -491,7 +491,7 @@ local minions_list = {
 		undead = 1,
 		name = "barrow wight", color=colors.LIGHT_RED, image="npc/barrow_wight.png",
 		resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/barrow_wight.png", display_h=2, display_y=-1}}},
-		desc=[[It is a ghostly nightmare of an entity.]],
+		desc=_t[[It is a ghostly nightmare of an entity.]],
 		max_life = resolvers.rngavg(80,90),
 		combat_armor = 10, combat_def = 8,
 		resolvers.talents{ T_FLAMESHOCK={base=3, every=5, max=7}, T_LIGHTNING={base=3, every=5, max=7}, T_GLACIAL_VAPOUR={base=3, every=5, max=7},
@@ -525,7 +525,7 @@ local minions_list = {
 		undead = 1,
 		resolvers.sustains_at_birth(),
 		name = "dread", color=colors.ORANGE, image="npc/dread.png",
-		desc = [[It is a form that screams its presence against the eye. Death incarnate, its hideous black body seems to struggle against reality as the universe itself strives to banish it.]],
+		desc=_t[[It is a form that screams its presence against the eye. Death incarnate, its hideous black body seems to struggle against reality as the universe itself strives to banish it.]],
 		level_range = {1, nil}, exp_worth = 0,
 		max_life = resolvers.rngavg(90,100),
 		combat_armor = 0, combat_def = resolvers.mbonus(10, 50),
@@ -575,7 +575,7 @@ local minions_list = {
 		combat_spellcrit = resolvers.mbonus(5, 5),
 		resolvers.sustains_at_birth(),
 		name = "lich", color=colors.DARK_BLUE,
-		desc=[[Having thought to discover life eternal, these beings have allowed undeath to rob them of the joys of life. Now they seek to destroy it as well.]],
+		desc=_t[[Having thought to discover life eternal, these beings have allowed undeath to rob them of the joys of life. Now they seek to destroy it as well.]],
 		resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/undead_lich_lich.png", display_h=2, display_y=-1}}},
 		level_range = {1, nil}, exp_worth = 0,
 		rarity = 20,
@@ -770,7 +770,7 @@ newTalent{
 		local c = getMinionChances(self)
 		local chancelist = tstring({})
 		for i, k in ipairs(minion_order) do
-			 if c[k] then chancelist:add(true,minions_list[k].name:capitalize(),(": %d%%"):format(c[k])) end
+			 if c[k] then chancelist:add(true,_t(minions_list[k].name):capitalize(),(": %d%%"):tformat(c[k])) end
 		end
 		return chancelist:toString()
 	end,
@@ -810,11 +810,11 @@ newTalent{
 	info = function(self, t)
 		local nb = t.getMax(self, t)
 		local lev = t.getLevel(self, t)
-		local mm = self:knowTalent(self.T_MINION_MASTERY) and " (Minion Mastery effects included)" or ""
+		local mm = self:knowTalent(self.T_MINION_MASTERY) and _t" (Minion Mastery effects included)" or ""
 		return ([[Fires powerful undead energies through your necrotic aura. For each recent death that happened inside your aura, you will raise an undead minion (up to %d minions). These minions will be raised within a cone that extends to the edge of your necrotic aura.
 		The minions level is your level %+d.
 		Each minion has a chance to be%s:%s]]):
-		format(nb, lev, mm, t.MinionChancesDesc(self, t))
+		tformat(nb, lev, mm, t.MinionChancesDesc(self, t))
 	end,
 }
 
@@ -836,7 +836,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Your dark power radiates further as you grow stronger. Increases the radius of your necrotic aura by %d, and reduces the decay rate of your minions outside the aura by %d%%.
 		At level 3, necrotic minions inside your aura have a 25%% chance to refund their soul on death. If a minion turns into a will o' the wisp then the wisp will have that chance instead.]]):
-		format(math.floor(t.getbonusRadius(self, t)), math.min(7, self:getTalentLevelRaw(t)))
+		tformat(math.floor(t.getbonusRadius(self, t)), math.min(7, self:getTalentLevelRaw(t)))
 	end,
 }
 
@@ -872,7 +872,7 @@ newTalent{
 	info = function(self, t)
 		return ([[A surge of power radiates to all your minions, increasing their Physical Power, Spellpower and Accuracy by %d, their Armour penetration by %d and their critical hit chance by %d for 6 turns.
 		The effects will increase with your Spellpower.]]):
-		format(t.getPower(self, t), t.getAPR(self, t), t.getCrit(self, t))
+		tformat(t.getPower(self, t), t.getAPR(self, t), t.getCrit(self, t))
 	end,
 }
 
@@ -887,6 +887,6 @@ newTalent{
 		return ([[You share your powers with your minions, granting them %d%% of your resistances and saves.
 		In addition all damage done by your minions to you or your other minions is reduced by %d%%.
 		The effect will increase with your Spellpower.]]):
-		format(t.getPerc(self, t), self:getTalentLevelRaw(t) * 20)
+		tformat(t.getPerc(self, t), self:getTalentLevelRaw(t) * 20)
 	end,
 }

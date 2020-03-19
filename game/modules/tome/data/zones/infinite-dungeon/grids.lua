@@ -236,7 +236,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[The rift leads to another floor of the dungeon.]],
+	desc=_t[[The rift leads to another floor of the dungeon.]],
 	change_level = 1,
 }
 

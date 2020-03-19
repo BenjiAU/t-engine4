@@ -18,12 +18,12 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*Before you stands a man covered in dirt and blood. He is out of breath and half mad.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*Before you stands a man covered in dirt and blood. He is out of breath and half mad.*#WHITE#
 PLEASE! You must help! #{bold}#IT#{normal}# is slaughtering everybody in my village! Please!
 #LIGHT_GREEN#*He points his finger at the nearby forest.*#WHITE#]],
 	answers = {
-		{"I will go there and see what I can do.", action=function(npc, player) player:grantQuest("lumberjack-cursed") end},
-		{"This is not my problem. Go away!"},
+		{_t"I will go there and see what I can do.", action=function(npc, player) player:grantQuest("lumberjack-cursed") end},
+		{_t"This is not my problem. Go away!"},
 	}
 }
 

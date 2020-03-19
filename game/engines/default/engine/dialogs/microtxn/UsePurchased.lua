@@ -35,7 +35,7 @@ function _M:init(mode)
 
 	self.cart = {}
 
-	self.base_title_text = game.__mod_info.long_name.." #GOLD#Purchased Options#LAST#"
+	self.base_title_text = ("%s #GOLD#Purchased Options#LAST#"):tformat(_t(game.__mod_info.long_name))
 	Dialog.init(self, self.base_title_text, 600, game.h * 0.8)
 
 	self.categories_icons = {
@@ -48,10 +48,10 @@ function _M:init(mode)
 
 	self:generateList()
 
-	self.c_waiter = Textzone.new{auto_width=1, auto_height=1, text="#YELLOW#-- connecting to server... --"}
+	self.c_waiter = Textzone.new{auto_width=1, auto_height=1, text=_t"#YELLOW#-- connecting to server... --"}
 	self.c_list = ListColumns.new{width=self.iw, height=200, scrollbar=true, sortable=true, columns={
-		{name="Name", width=80, display_prop="display_name"},
-		{name="Available", width=20, display_prop="nb_available"},
+		{name=_t"Name", width=80, display_prop="display_name"},
+		{name=_t"Available", width=20, display_prop="nb_available"},
 	}, list=self.list, all_clicks=true, fct=function(item, _, button) self:use(item, button) end, select=function(item, sel) end}
 
 	self:loadUI{
@@ -73,17 +73,17 @@ function _M:use(item, button)
 	if not item then return end
 
 	if game.zone.wilderness then
-		Dialog:simplePopup(item.name, "Please use purchased options when not on the worldmap.")
+		Dialog:simplePopup(item.name, _t"Please use purchased options when not on the worldmap.")
 		return
 	end
 
 	if item.once_per_character and game.state["has_"..item.effect] then
-		Dialog:simplePopup(item.name, "This option may only be used once per character to prevent wasting it.")
+		Dialog:simplePopup(item.name, _t"This option may only be used once per character to prevent wasting it.")
 		return
 	end
 
 	if (item.community_event or item.self_event) and not game.state:allowOnlineEvent() then
-		Dialog:simpleLongPopup(item.name, [[This option requires you to accept to receive events from the server.
+		Dialog:simpleLongPopup(item.name, _t[[This option requires you to accept to receive events from the server.
 Either you have the option currently disabled or you are playing a campaign that can not support these kind of events (mainly the Arena).
 Make sure you have #GOLD##{bold}#Allow online events#WHITE##{normal}# in the #GOLD##{bold}#Online#WHITE##{normal}# section of the game options set to "all". You can set it back to your own setting once you have received the event.
 ]], 600)
@@ -93,7 +93,7 @@ Make sure you have #GOLD##{bold}#Allow online events#WHITE##{normal}# in the #GO
 	if item.is_shimmer then
 		game:unregisterDialog(self)
 		if item.is_installed then
-			Dialog:simplePopup(item.name, "This pack is already installed and in use for your character.")
+			Dialog:simplePopup(item.name, _t"This pack is already installed and in use for your character.")
 		else
 			local ShowPurchasable = require("engine.dialogs.microtxn.ShowPurchasable")
 			ShowPurchasable:installShimmer(item)
@@ -102,16 +102,16 @@ Make sure you have #GOLD##{bold}#Allow online events#WHITE##{normal}# in the #GO
 	end
 
 	Dialog:forceNextDialogUI("microtxn")
-	Dialog:yesnoPopup(item.name, ("You are about to use a charge of this option. You currently have %d charges remaining."):format(item.nb_available), function(ret) if ret then
-		local popup = Dialog:simplePopup(item.name, "Please wait while contacting the server...", nil, true)
+	Dialog:yesnoPopup(item.name, ("You are about to use a charge of this option. You currently have %d charges remaining."):tformat(item.nb_available), function(ret) if ret then
+		local popup = Dialog:simplePopup(item.name, _t"Please wait while contacting the server...", nil, true)
 		profile:registerTemporaryEventHandler("MicroTxnUseActionable", function(e)
 			game:unregisterDialog(popup)
 			game:unregisterDialog(self)
 
 			if e.success then
-				Dialog:simplePopup(item.name, "The option has been activated.")			
+				Dialog:simplePopup(item.name, _t"The option has been activated.")			
 			else
-				Dialog:simplePopup(item.name, "There was an error from the server: "..tostring(e.error))
+				Dialog:simplePopup(item.name, ("There was an error from the server: %s"):tformat(tostring(e.error)))
 			end
 		end)
 		core.profile.pushOrder(string.format("o='MicroTxn' suborder='use_actionable' module=%q id_purchasable=%d", game.__mod_info.short_name, item.id_purchasable))
@@ -123,7 +123,7 @@ function _M:generateList()
 
 	profile:registerTemporaryEventHandler("MicroTxnListActionables", function(e)
 		if e.error then
-			Dialog:simplePopup("Online Store", e.error:capitalize())
+			Dialog:simplePopup(_t"Online Store", e.error:capitalize())
 			game:unregisterDialog(self)
 			return
 		end
@@ -138,10 +138,10 @@ function _M:generateList()
 			if item.is_shimmer then
 				local pack_name = "cosmetic-"..item.effect
 				if game.__mod_info.addons and game.__mod_info.addons[pack_name] then
-					item.nb_available = "#LIGHT_GREEN#Installed"
+					item.nb_available = _t"#LIGHT_GREEN#Installed"
 					item.is_installed = true
 				else
-					item.nb_available = "#YELLOW#Installable"
+					item.nb_available = _t"#YELLOW#Installable"
 					item.can_install = pack_name
 				end
 			end
@@ -155,7 +155,7 @@ function _M:generateList()
 
 		if #list == 0 then
 			game:unregisterDialog(self)
-			Dialog:yesnoPopup("Online Store", "You have not purchased any usable options yet. Would you like to see the store?", function(ret) if ret then
+			Dialog:yesnoPopup(_t"Online Store", _t"You have not purchased any usable options yet. Would you like to see the store?", function(ret) if ret then
 				package.loaded["engine.dialogs.microtxn.ShowPurchasable"] = nil
 				game:registerDialog(require("engine.dialogs.microtxn.ShowPurchasable").new())
 			end end)

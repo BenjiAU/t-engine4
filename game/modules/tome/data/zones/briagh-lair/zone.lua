@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Briagh's Lair",
+	name = _t"Briagh's Lair",
 	level_range = {30, 40},
 	level_scheme = "player",
 	max_level = 1,

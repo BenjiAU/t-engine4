@@ -38,7 +38,7 @@ newTalent{
 		Also increases your defense and armour by %d and %d, respectively.
 		If you are still in a wall when the effect ends you will randomly teleport.
 		]]):
-		format(t.getDuration(self, t), t.getDefs(self, t))
+		tformat(t.getDuration(self, t), t.getDefs(self, t))
 	end,
 }
 
@@ -73,7 +73,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Conjures up a bolt of shadowflame that moves toward the target and explodes into a flash of darkness and fire, doing %0.2f fire damage and %0.2f darkness damage in a radius of %d.
-		The damage will increase with your Spellpower.]]):format(
+		The damage will increase with your Spellpower.]]):tformat(
 			damDesc(self, DamageType.FIRE, self:combatTalentSpellDamage(t, 28, 220) / 2),
 			damDesc(self, DamageType.DARKNESS, self:combatTalentSpellDamage(t, 28, 220) / 2),
 			self:getTalentRadius(t)
@@ -90,7 +90,7 @@ newTalent{
 	sustain_vim = 90,
 	cooldown = 30,
 	tactical = { DEFEND = 1, BUFF = 2 },
-	getSpeed = function(self, t) return self:combatTalentScale(t, 0.03, 0.15, 0.75) end,
+	getSpeed = function(self, t) return self:combatTalentScale(t, 0.03, 0.15) end,
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/flame")
 		self.__old_type = {self.type, self.subtype}
@@ -117,7 +117,7 @@ newTalent{
 		While in demon form, you gain %d%% fire resistance, %d%% darkness resistance, and your global speed is increased by %d%%.
 		The flames of the Fearscape will heal you while in demon form.
 		The resistances and heal will increase with your Spellpower.]]):
-		format(self:combatTalentSpellDamage(t, 20, 30), self:combatTalentSpellDamage(t, 20, 35), t.getSpeed(self, t)*100)
+		tformat(self:combatTalentSpellDamage(t, 20, 30), self:combatTalentSpellDamage(t, 20, 35), t.getSpeed(self, t)*100)
 	end,
 }
 
@@ -187,7 +187,7 @@ newTalent{
 		if target == self then return end
 		if target:attr("negative_status_effect_immune") or target:attr("status_effect_immune") then return nil end
 
-		if not self:canBe("planechange") or target.summon_time or target.summon then
+		if not self:canBe("planechange") or target.summon_time or target.summoner then
 			game.logPlayer(self, "The spell fizzles...")
 			return
 		end
@@ -357,6 +357,6 @@ newTalent{
 		When the spell ends, only you and the target (if still alive) plus any loose objects are taken back to your home plane; all summons are left in the Fearscape.
 		This powerful spell drains 5 vim per turn initially, increasing by +1 for each turn it has been active, and ends when your vim is depleted.
 		It has no effect if cast from within the Fearscape.
-		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.FIRE, self:combatTalentSpellDamage(t, 12, 140)))
+		The damage will increase with your Spellpower.]]):tformat(damDesc(self, DamageType.FIRE, self:combatTalentSpellDamage(t, 12, 140)))
 	end,
 }

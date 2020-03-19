@@ -18,8 +18,8 @@
 -- darkgod@te4.org
 
 return {
-	name = "World of Eyal",
-	display_name = function(x, y) return game.level and game.level.map.attrs(x or game.player.x, y or game.player.y, "zonename") or "Eyal" end,
+	name = _t"World of Eyal",
+	display_name = function(x, y) return game.level and game.level.map.attrs(x or game.player.x, y or game.player.y, "zonename") or _t"Eyal" end,
 	variable_zone_name = true,
 	level_range = {1, 1},
 	max_level = 1,

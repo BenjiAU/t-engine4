@@ -30,7 +30,7 @@ newTalent{
 		self.combat_armor = self.combat_armor - 2
 	end,
 	info = function(self, t)
-		return ([[Your travels have hardened you. You gain +%d armor.]]):format(self:getTalentLevelRaw(t) * 2)
+		return ([[Your travels have hardened you. You gain +%d armor.]]):tformat(self:getTalentLevelRaw(t) * 2)
 	end
 }
 
@@ -47,7 +47,7 @@ newTalent{
 		self.trap_avoidance = self.trap_avoidance - 14
 	end,
 	info = function(self, t)
-		return ([[You have become wary of danger in your journeys. You have a %d%% chance of not triggering traps.]]):format(self:getTalentLevelRaw(t) * 14)
+		return ([[You have become wary of danger in your journeys. You have a %d%% chance of not triggering traps.]]):tformat(self:getTalentLevelRaw(t) * 14)
 	end
 }
 
@@ -67,7 +67,7 @@ newTalent{
 		self.resists[DamageType.COLD] = self.resists[DamageType.COLD] - 7
 	end,
 	info = function(self, t)
-		return ([[You have become weathered by the elements. Your Cold and Fire resistance is increased by %d%%]]):format(self:getTalentLevel(t) * 7)
+		return ([[You have become weathered by the elements. Your Cold and Fire resistance is increased by %d%%]]):tformat(self:getTalentLevel(t) * 7)
 	end
 }
 
@@ -84,7 +84,7 @@ newTalent{
 		self.exp_kill_multiplier = (self.exp_kill_multiplier or 1) - 0.03
 	end,
 	info = function(self, t)
-		return ([[You have become a keen observer in your travels. Each kill gives you %d%% more experience.]]):format(self:getTalentLevelRaw(t) * 3)
+		return ([[You have become a keen observer in your travels. Each kill gives you %d%% more experience.]]):tformat(self:getTalentLevelRaw(t) * 3)
 	end
 }
 

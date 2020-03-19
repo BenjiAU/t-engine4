@@ -22,7 +22,7 @@ chat_talent = player:getTalentFromId(chat_tid)
 chat_level = player:getTalentLevelRaw(chat_tid)
 
 local function generate_tools()
-	local answers = {{"[Cancel]"}}
+	local answers = {{_t"[Cancel]"}}
 	local tool_ids = tool_ids or player.main_env.artifice_tool_tids
 	player.artifice_tools = player.artifice_tools or {}
 	
@@ -60,9 +60,9 @@ local function generate_tools()
 				if tool_id == tid then slot = slot_id break end
 			end
 			if slot then
-				txt = ("[%sEquip %s%s#LAST#]"):format(slot==chat_tid and "#YELLOW#" or "", t.name, slot and (" (%s)"):format(player:getTalentFromId(slot).name) or "")
+				txt = ("[%sEquip %s%s#LAST#]"):tformat(slot==chat_tid and "#YELLOW#" or "", t.name, slot and (" (%s)"):format(player:getTalentFromId(slot).name) or "")
 			else
-				txt = ("[Equip %s]"):format(t.name)
+				txt = ("[Equip %s]"):tformat(t.name)
 			end
 
 			answers[#answers+1] = {txt,
@@ -86,7 +86,7 @@ local function generate_tools()
 					else
 						text = player:getTalentFullDescription(t, nil, {force_level=chat_level})
 					end
-					game:tooltipDisplayAtMap(game.w, game.h, "#GOLD#"..t.name.."#LAST#\n"..tostring(text))
+					game:tooltipDisplayAtMap(game.w, game.h, ("#GOLD#%s#LAST#\n%s"):tformat(t.name, tostring(text)))
 				end,
 			}
 		end
@@ -96,7 +96,7 @@ local function generate_tools()
 end
 
 newChat{ id="welcome",
-	text = ([[Equip which tool for #YELLOW#%s#LAST#?]]):format(chat_talent.name),
+	text = ([[Equip which tool for #YELLOW#%s#LAST#?]]):tformat(chat_talent.name),
 	answers = generate_tools(),
 }
 

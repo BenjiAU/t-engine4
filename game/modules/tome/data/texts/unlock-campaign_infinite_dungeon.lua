@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New game campaign: #LIGHT_GREEN#Infinite Dungeon: The Neverending Descent",
-[[
+return _t"New game campaign: #LIGHT_GREEN#Infinite Dungeon: The Neverending Descent",
+_t[[
 During the Age of Haze, the nine Godslayers set out to destroy the gods.
 The god Ralkur, while trying to escape one of the Godslayers, created the Infinite Dungeon.
 He retreated there, but the Godslayer followed, and each time he would reach the god, Ralkur would create a new level.

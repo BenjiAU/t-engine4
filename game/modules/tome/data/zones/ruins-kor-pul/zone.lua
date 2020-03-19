@@ -21,7 +21,7 @@ local layout = game.state:alternateZone(short_name, {"HIDEOUT", 2})
 local is_hideout = layout == "HIDEOUT"
 
 return {
-	name = "Ruins of Kor'Pul",
+	name = _t"Ruins of Kor'Pul",
 	level_range = {1, 7},
 	level_scheme = "player",
 	max_level = 3,

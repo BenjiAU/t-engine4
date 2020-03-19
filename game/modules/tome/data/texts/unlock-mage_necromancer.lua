@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New Class: #LIGHT_GREEN#Necromancer",
-[[
+return _t"New Class: #LIGHT_GREEN#Necromancer",
+_t[[
 Necromancy, the forbidden art.
 Necromancy, the black art.
 

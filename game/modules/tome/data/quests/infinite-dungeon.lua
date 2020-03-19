@@ -19,10 +19,10 @@
 
 use_ui = "quest-main"
 
-name = "The Infinite Dungeon"
+name = _t"The Infinite Dungeon"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You have entered the Infinite Dungeon. There is no going back now."
-	desc[#desc+1] = "Go deep, fight, win or die in a blaze of glory!"
+	desc[#desc+1] = _t"You have entered the Infinite Dungeon. There is no going back now."
+	desc[#desc+1] = _t"Go deep, fight, win or die in a blaze of glory!"
 	return table.concat(desc, "\n")
 end

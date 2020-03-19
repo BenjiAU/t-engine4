@@ -61,7 +61,7 @@ newTalent{
 		return ([[Strike twice with your mainhand weapon dealing %d%% Arcane damage.
 		If either of these attacks hit you gain %d mana.
 		The mana gain will increase with your Spellpower.]]):
-		format(t.getDamage(self, t)*100, t.getMana(self, t))
+		tformat(t.getDamage(self, t)*100, t.getMana(self, t))
 	end,
 }
 
@@ -105,7 +105,7 @@ newTalent{
 		return ([[Engulfs your hands (and weapons) in a sheath of fire, dealing %0.2f fire damage per melee attack and increasing all fire damage dealt by %d%%.
 		Each hit will also regenerate %0.2f stamina.
 		The effects will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.FIRE, firedamage), firedamageinc, self:getTalentLevel(t) / 3)
+		tformat(damDesc(self, DamageType.FIRE, firedamage), firedamageinc, self:getTalentLevel(t) / 3)
 	end,
 }
 
@@ -148,7 +148,7 @@ newTalent{
 		return ([[Engulfs your hands (and weapons) in a sheath of lightning, dealing %d lightning damage with a chance to daze (25%%) per melee attack and increasing all lightning damage dealt by %d%%.
 		Each hit will also regenerate %0.2f mana.
 		The effects will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHTNING, icedamage), icedamageinc, self:getTalentLevel(t) / 3)
+		tformat(damDesc(self, DamageType.LIGHTNING, icedamage), icedamageinc, self:getTalentLevel(t) / 3)
 	end,
 }
 
@@ -192,6 +192,6 @@ newTalent{
 		return ([[You concentrate on your inner self, increasing your Strength, Dexterity, Magic, and Cunning by %d.
 		Additionally, you gain a shield absorbing %d damage before you take damage every %d turns.
 		The stat increase and shield will improve with your Spellpower.]]):
-		format(statinc, absorb, self:getTalentCooldown(t) )
+		tformat(statinc, absorb, self:getTalentCooldown(t) )
 	end,
 }

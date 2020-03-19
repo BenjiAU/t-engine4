@@ -50,7 +50,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_ORC_SUMMON",
 	name = "orc baby", color=colors.GREEN,
-	desc = [[Crawling on all fours, this green-skinned creature is far from cute, with vicious little sharp teeth and nails, and slime still sticking to its skin.]],
+	desc = _t[[Crawling on all fours, this green-skinned creature is far from cute, with vicious little sharp teeth and nails, and slime still sticking to its skin.]],
 	level_range = {25, nil}, exp_worth = 0,
 	resolvers.generic(function(e) if rng.percent(50) then e.female = true end end),
 	rarity = 3,
@@ -65,7 +65,7 @@ newEntity{ base = "BASE_NPC_ORC_SUMMON",
 
 newEntity{ base = "BASE_NPC_ORC",
 	name = "orc child", color=colors.LIGHT_GREEN,
-	desc = [[This small orc has a malicious and greedy look in its eyes. Its veins pulse with new life and it moves with surprising speed. Though not fully developed you can still see the muscles forming on its long limbs, leading to clawed fingers and toes.]],
+	desc = _t[[This small orc has a malicious and greedy look in its eyes. Its veins pulse with new life and it moves with surprising speed. Though not fully developed you can still see the muscles forming on its long limbs, leading to clawed fingers and toes.]],
 	resolvers.generic(function(e) if rng.percent(50) then e.female = true end end),
 	level_range = {25, nil}, exp_worth = 0,
 	rarity = 3,
@@ -83,7 +83,7 @@ newEntity{ base = "BASE_NPC_ORC",
 
 newEntity{ base = "BASE_NPC_ORC",
 	name = "young orc", color=colors.TEAL,
-	desc = [[This young orc is almost fully formed, with hard muscles prominently visible beneath its thick skin. Whilst it has lost some of the wild energy of its younger siblings you can see the gleams of intelligence and cold calculation behind its dark eyes.]],
+	desc = _t[[This young orc is almost fully formed, with hard muscles prominently visible beneath its thick skin. Whilst it has lost some of the wild energy of its younger siblings you can see the gleams of intelligence and cold calculation behind its dark eyes.]],
 	resolvers.generic(function(e) if rng.percent(50) then e.female = true end end),
 	level_range = {25, nil}, exp_worth = 0,
 	rarity = 3,
@@ -102,7 +102,7 @@ newEntity{ base = "BASE_NPC_ORC",
 newEntity{ base = "BASE_NPC_ORC",
 	name = "orc mother", color=colors.YELLOW,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/humanoid_orc_orc_mother.png", display_h=2, display_y=-1}}},
-	desc = [[This giant, bloated form towers above you. Mucus and slime ooze from every orifice, dripping onto the cavern floor. Orc children fight over the right to feed from her distended teats whilst small babies are regularly emerge from folds of flesh. The sight and the smell make you retch.
+	desc = _t[[This giant, bloated form towers above you. Mucus and slime ooze from every orifice, dripping onto the cavern floor. Orc children fight over the right to feed from her distended teats whilst small babies are regularly emerge from folds of flesh. The sight and the smell make you retch.
 Here stands a tremendous form almost the size of a dragon. Bloated skin rises in thick folds, seeping viscous slime from its wide pores. Hundreds of hanging teats feed a small army of squabbling, fighting young orcs - only the toughest of them are able to gain the precious nutrients to grow stronger, the weaker ones left to wither on the mouldy floor. At the top of this towering hulk is a shrivelled head coated in long tangled hair. Dazed eyes peer out with a mixture of sadness and pain, but as they fix on you they turn to anger, the creature's face contorted with the fierce desire to protect its young.]],
 	level_range = {25, nil}, exp_worth = 1,
 	female = true,
@@ -135,9 +135,9 @@ Here stands a tremendous form almost the size of a dragon. Bloated skin rises in
 newEntity{ base="BASE_NPC_ORC", define_as = "GREATMOTHER",
 	name = "Orc Greatmother", color=colors.VIOLET, unique = true,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/humanoid_orc_orc_greatmother.png", display_h=2, display_y=-1}}},
-	desc = [[This giant, bloated form towers above you. Mucus and slime ooze from every orifice, dripping onto the cavern floor. Orc children fight over the right to feed from her distended teats whilst small babies are regularly emerge from folds of flesh. The sight and the smell make you retch.
+	desc = _t[[This giant, bloated form towers above you. Mucus and slime ooze from every orifice, dripping onto the cavern floor. Orc children fight over the right to feed from her distended teats whilst small babies are regularly emerge from folds of flesh. The sight and the smell make you retch.
 Here stands a tremendous form almost the size of a dragon. Bloated skin rises in thick folds, seeping viscous slime from its wide pores. Hundreds of hanging teats feed a small army of squabbling, fighting young orcs - only the toughest of them are able to gain the precious nutrients to grow stronger, the weaker ones left to wither on the mouldy floor. At the top of this towering hulk is a shrivelled head coated in long tangled hair. Dazed eyes peer out with a mixture of sadness and pain, but as they fix on you they turn to anger, the creature's face contorted with the fierce desire to protect its young.]],
-	killer_message = "and given to the children as a plaything",
+	killer_message = _t"and given to the children as a plaything",
 	level_range = {40, nil}, exp_worth = 1,
 	female = true,
 	rank = 5,

@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 newEntity{ define_as = "TRAP_TEMPORAL",
-	type = "temporal", subtype="water", id_by_type=true, unided_name = "trap",
+	type = "temporal", subtype="water", id_by_type=true, unided_name = _t"trap",
 	display = '^',
 	triggered = function(self, x, y, who)
 		return true, self.auto_disarm
@@ -31,9 +31,9 @@ newEntity{ base = "TRAP_TEMPORAL",
 	disarm_power = resolvers.clscale(25,25,8,0.5),
 	rarity = 3, level_range = {1, 50},
 	color=colors.VIOLET,
-	message = "@Target@ is caught in a distorted pocket of time!",
-	unided_name = "faint distortion",
-	desc = [[Creates a temporal anomaly when triggered.]],
+	message = _t"@Target@ is caught in a distorted pocket of time!",
+	unided_name = _t"faint distortion",
+	desc=_t[[Creates a temporal anomaly when triggered.]],
 	triggered = function(self, x, y, who)
 		who:paradoxDoAnomaly(100, 0, {anomaly_type="no-major"})
 		return true
@@ -46,9 +46,9 @@ newEntity{ base = "TRAP_TEMPORAL",
 	disarm_power = resolvers.clscale(32,25,8,0.5),
 	rarity = 6, level_range = {10, nil},
 	color=colors.PURPLE,
-	message = "@Target@ is caught in an extremely distorted pocket of time!",
-	unided_name = "distortion",
-	desc = [[Creates a major temporal anomaly when triggered.]],
+	message = _t"@Target@ is caught in an extremely distorted pocket of time!",
+	unided_name = _t"distortion",
+	desc=_t[[Creates a major temporal anomaly when triggered.]],
 	triggered = function(self, x, y, who)
 		who:paradoxDoAnomaly(100, 0, {anomaly_type="major"})
 		return true

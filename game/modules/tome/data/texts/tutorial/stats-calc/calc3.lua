@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 That one you should have been able to occasionally hit, and-- if you were persistent-- kill. 
 
 I hope you took note of its #LIGHT_GREEN#Defense#WHITE# score before it died.

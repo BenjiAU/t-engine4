@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[Welcome #LIGHT_GREEN#@name@#WHITE#.
+return _t[[Welcome #LIGHT_GREEN#@name@#WHITE#.
 You are a native of the northern region of the Allied Kingdoms, a peaceful land that both Humans and Halflings call home. You hail from the small town called Derth.
 Humans are the most common race of the land, and you are one of them. In an attempt to prove your worth, you have decided to venture into the old and wild places of the world, looking for ancient treasures and glory.
 

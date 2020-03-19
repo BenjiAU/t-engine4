@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 These tiers are not just for show. 
 
 Let's see if you can discover a way in which they're NOT purely cosmetic. Go plunder the room ahead!

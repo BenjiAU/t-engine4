@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 It simply costs more to increase scores that are in higher tiers.
 
 For each tier, here's the cost of increasing your score by one:

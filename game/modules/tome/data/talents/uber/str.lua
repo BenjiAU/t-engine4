@@ -20,7 +20,7 @@
 uberTalent{
 	name = "Giant Leap",
 	mode = "activated",
-	require = { special={desc="Have dealt over 50000 damage with any weapon or unarmed", fct=function(self) return
+	require = { special={desc=_t"Have dealt over 50000 damage with any weapon or unarmed", fct=function(self) return
 		self.damage_log and (
 			(self.damage_log.weapon.twohanded and self.damage_log.weapon.twohanded >= 50000) or
 			(self.damage_log.weapon.shield and self.damage_log.weapon.shield >= 50000) or
@@ -75,14 +75,14 @@ uberTalent{
 	info = function(self, t)
 		return ([[You accurately jump to the target and deal 200%% weapon damage to all foes within radius 1 on impact as well as dazing them for 3 turns.
 		When you jump you free yourself from any stun, daze and pinning effects.]])
-		:format()
+		:tformat()
 	end,
 }
 
 uberTalent{
 	name = "You Shall Be My Weapon!", short_name="TITAN_S_SMASH", image = "talents/titan_s_smash.png",
 	mode = "activated",
-	require = { special={desc="Be of size category 'big' or larger. This is also required to use it.", fct=function(self) return self.size_category and self.size_category >= 4 end} },
+	require = { special={desc=_t"Be of size category 'big' or larger. This is also required to use it.", fct=function(self) return self.size_category and self.size_category >= 4 end} },
 	requires_target = true,
 	tactical = { ATTACK = 3, DISABLE = {stun = 1}, ESCAPE = {knockback = 1} },
 	on_pre_use = function(self, t) return self.size_category and self.size_category >= 4 end,
@@ -119,14 +119,14 @@ uberTalent{
 		return ([[You deal a massive blow to your foe, smashing it for 350%% weapon damage, knocking it back 5 tiles, and knocking aside all foes in its path.
 		All targets affected are stunned for 3 turns.
 		For each size category over 'big' you gain an additional +80%% weapon damage.]])
-		:format()
+		:tformat()
 	end,
 }
 
 uberTalent{
 	name = "Massive Blow",
 	mode = "activated",
-	require = { special={desc="Have dug at least 30 walls/trees/etc. and have dealt over 50000 damage with two-handed weapons", fct=function(self) return
+	require = { special={desc=_t"Have dug at least 30 walls/trees/etc. and have dealt over 50000 damage with two-handed weapons", fct=function(self) return
 		self.dug_times and self.dug_times >= 30 and
 		self.damage_log and self.damage_log.weapon.twohanded and self.damage_log.weapon.twohanded >= 50000
 	end} },
@@ -157,19 +157,19 @@ uberTalent{
 	info = function(self, t)
 		return ([[You deal a massive blow to your foe, smashing it for 150%% weapon damage and knocking it back 4 tiles (ignoring knockback resistance or physical save).
 		If the knockback makes it hit a wall, it will smash down the wall, deal an additional 350%% weapon damage and apply the Counterstrike effect.]])
-		:format()
+		:tformat()
 	end,
 }
 
 uberTalent{
 	name = "Steamroller",
 	mode = "passive",
-	require = { special={desc="Know the Rush talent", fct=function(self) return self:knowTalent(self.T_RUSH) end} },
+	require = { special={desc=_t"Know the Rush talent", fct=function(self) return self:knowTalent(self.T_RUSH) end} },
 	info = function(self, t)
 		return ([[When you rush, the creature you rush to is marked. If you kill it in the next two turns then your rush cooldown is reset.
 		Each time that this effect triggers you gain a stacking +20%% damage buff, up to 100%%.
 		Rush now only costs 2 stamina.]])
-		:format()
+		:tformat()
 	end,
 }
 
@@ -180,7 +180,7 @@ uberTalent{
 	range = 5,
 	tactical = { ATTACKAREA = {LIGHT = 2, FIRE = 2, PHYSICAL = 2}, CLOSEIN = 2 },
 	target = {type="ball", range=0, friendlyfire=false, radius=5},
-	require = { special={desc="Have dealt over 50000 light or fire damage", fct=function(self) return
+	require = { special={desc=_t"Have dealt over 50000 light or fire damage", fct=function(self) return
 		self.damage_log and (
 			(self.damage_log[DamageType.FIRE] and self.damage_log[DamageType.FIRE] >= 50000) or
 			(self.damage_log[DamageType.LIGHT] and self.damage_log[DamageType.LIGHT] >= 50000)
@@ -195,14 +195,14 @@ uberTalent{
 		return ([[For 8 turns you gain the mass and power of a star, drawing all creatures within radius 5 toward you and dealing %0.2f fire, %0.2f light and %0.2f physical damage to all foes and reducing their damage dealt by 30%%.
 		Foes closer to you take up to 150%% damage.
 		The damage will increase with your Strength.]])
-		:format(damDesc(self, DamageType.FIRE, dam), damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.PHYSICAL, dam))
+		:tformat(damDesc(self, DamageType.FIRE, dam), damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.PHYSICAL, dam))
 	end,
 }
 
 uberTalent{
 	name = "I Can Carry The World!", short_name = "NO_FATIGUE",
 	mode = "passive",
-	require = { special={desc="Be able to use massive armours", fct=function(self) return self:getTalentLevelRaw(self.T_ARMOUR_TRAINING) >= 3 end} },
+	require = { special={desc=_t"Be able to use massive armours", fct=function(self) return self:getTalentLevelRaw(self.T_ARMOUR_TRAINING) >= 3 end} },
 	on_learn = function(self, t)
 		self:attr("size_category", 1)
 		self:attr("max_encumber", 500)
@@ -216,14 +216,14 @@ uberTalent{
 	info = function(self, t)
 		return ([[Your strength is legendary; fatigue and physical exertion mean nothing to you.
 		Your fatigue is permanently set to 0, carrying capacity increased by 500, and strength increased by 50 and you gain a size category.]])
-		:format()
+		:tformat()
 	end,
 }
 
 uberTalent{
 	name = "Legacy of the Naloren",
 	mode = "passive",
-	require = { special={desc="Have sided with Slasul and killed Ukllmswwik", fct=function(self)
+	require = { special={desc=_t"Have sided with Slasul and killed Ukllmswwik", fct=function(self)
 		if game.state.birth.ignore_prodigies_special_reqs then return true end
 		local q = self:hasQuest("temple-of-creation")
 		return q and not q:isCompleted("kill-slasul") and q:isCompleted("kill-drake")
@@ -255,14 +255,14 @@ uberTalent{
 		t.callbackOnLevelup(self, t)
 	end,
 	on_learn = function(self, t)
-		require("engine.ui.Dialog"):simplePopup("Legacy of the Naloren", "Slasul will be happy to know your faith in his cause. You should return to speak to him.")
+		require("engine.ui.Dialog"):simplePopup(_t"Legacy of the Naloren", _t"Slasul will be happy to know your faith in his cause. You should return to speak to him.")
 	end,
 	info = function(self, t)
 		local level = t.bonusLevel(self,t)
 		return ([[You have sided with Slasul and helped him vanquish Ukllmswwik. You are now able to breathe underwater with ease.
 		You have also learned to use tridents and other exotic weapons easily (talent level %d of Exotic Weapon Mastery), and can Spit Poison (talent level %d) as nagas do. These are bonus talent levels that increase with your character level.
 		In addition, should Slasul still live, he may have a further reward for you as thanks...]])
-		:format(level, level)
+		:tformat(level, level)
 	end,
 }
 
@@ -273,6 +273,6 @@ uberTalent{
 		return ([[A strong body is key to a strong mind, and a strong mind can be powerful enough to make a strong body.
 		This prodigy grants a Mindpower bonus equal to 60%% of your Strength.
 		Additionally, you treat all weapons as having an additional 40%% Willpower modifier.]])
-		:format()
+		:tformat()
 	end,
 }

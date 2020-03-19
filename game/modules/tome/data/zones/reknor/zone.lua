@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Lost Dwarven Kingdom of Reknor",
+	name = _t"Lost Dwarven Kingdom of Reknor",
 	level_range = {18, 35},
 	level_scheme = "player",
 	max_level = 4,

@@ -24,7 +24,7 @@ defineTile('>', "DOOR")
 quickEntity('>', {
 	always_remember = true,
 	show_tooltip=true,
-	name="Long tunnel to the island of Rel",
+	name=_t"Long tunnel to the island of Rel",
 	display='>',
 	image = "terrain/marble_floor.png", add_displays = {mod.class.Grid.new{image="terrain/stair_down.png"}},
 	color=colors.VIOLET,
@@ -40,7 +40,7 @@ quickEntity('>', {
 			end)
 			return
 		end
-		require("engine.ui.Dialog"):simplePopup("Long tunnel", "As you enter the tunnel you feel a strange compulsion to go backward.")
+		require("engine.ui.Dialog"):simplePopup(_t"Long tunnel", _t"As you enter the tunnel you feel a strange compulsion to go backward.")
 		return true
 	end,
 	notice = true,

@@ -72,7 +72,7 @@ newTalent{
 		return ([[Your offhand weapon damage penalty is reduced to %d%%.
 		Up to %0.1f times a turn, you have a %d%% chance to parry up to %d damage (based on your offhand weapon damage) from a melee or ranged attack.  The number of parries increases with your Cunning.  (A fractional parry has a reduced chance to succeed.)
 		A successful parry reduces damage like armour (before any attack multipliers) and prevents critical strikes.  It is difficult to parry attacks from unseen attackers and you cannot parry with a mindstar.]]):
-		format(100 - mult, t.getDeflects(self, t, true), chance, block)
+		tformat(100 - mult, t.getDeflects(self, t, true), chance, block)
 	end,
 }
 
@@ -115,7 +115,7 @@ newTalent{
 		return ([[The flow of battle invigorates you, allowing you to press your advantage as the fight progresses.
 		Up to once each per turn, while dual wielding, you may:
 		Riposte -- If a melee or archery attack misses you or you parry it, you instantly restore %0.1f stamina and gain %d%% of a turn.
-		Recover -- On performing a critical strike with your offhand weapon, you instantly restore %0.1f stamina.]]):format(sta, speed, sta)
+		Recover -- On performing a critical strike with your offhand weapon, you instantly restore %0.1f stamina.]]):tformat(sta, speed, sta)
 	end,
 }
 
@@ -153,7 +153,7 @@ newTalent{
 		if not self.dead and tx == target.x and ty == target.y then
 		
 			if target:attr("never_move") then
-				game.logPlayer(self, "%s cannot move!", target.name:capitalize())
+				game.logPlayer(self, "%s cannot move!", target:getName():capitalize())
 				return false
 			elseif not self:canMove(tx,ty,true) or not target:canMove(sx,sy,true) then
 				self:logCombat(target, "Terrain prevents #Source# from switching places with #Target#.")
@@ -179,7 +179,7 @@ newTalent{
 		return ([[Make a cunning feint that tricks your target into swapping places with you.  While moving, you take the opportunity to trip them, pinning and dazing them for 2 turns.
 		Switching places distracts your foes and allows you to improve your defenses:  For %d turns, Dual Weapon Mastery yields one extra parry each turn and you are %d%% less likely to miss your parry opportunities.
 		The chance to pin and to daze increases with your Accuracy]]):
-		format(t.getDuration(self, t), t.getParryEfficiency(self, t))
+		tformat(t.getDuration(self, t), t.getParryEfficiency(self, t))
 	end,
 }
 
@@ -222,7 +222,7 @@ newTalent{
 		if hitted and target:canBe("disarm") then
 			target:setEffect(target.EFF_DISARMED, t.getDuration(self, t), {apply_power=self:combatAttack()})
 		else
-			game.logSeen(target, "%s resists the blow!", target.name:capitalize())
+			game.logSeen(target, "%s resists the blow!", target:getName():capitalize())
 		end
 		return true
 	end,
@@ -232,6 +232,6 @@ newTalent{
 		return ([[Exploiting a gap in your target's defenses, you make a lethal strike with your offhand weapon for %d%% damage that causes them to drop their weapon, disarming them for %d turns.
 		Tempo will reduce the cooldown of this talent by 1 turn each time it is triggered defensively.
 		The chance to disarm increases with your Accuracy.]]):
-		format(dam*100, dur)
+		tformat(dam*100, dur)
 	end,
 }

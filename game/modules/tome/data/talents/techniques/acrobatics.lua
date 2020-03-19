@@ -120,7 +120,7 @@ newTalent {
 		return ([[Use an adjacent friend or foe as a springboard, vaulting over them to another tile within range.
 		This maneuver grants you a burst of speed from your momentum, allowing you run %d%% faster (movement speed bonus) in the same direction you vaulted for 3 turns.
 		The increased speed ends if you change directions or stop moving.
-		]]):format(t.speed_bonus(self, t) * 100)
+		]]):tformat(t.speed_bonus(self, t) * 100)
 	end,
 }
 
@@ -133,7 +133,7 @@ newTalent {
 	random_ego = "attack",
 	cooldown = function(self, t) return 20 - cooldown_bonus(self) end,
 	no_energy = true,
-	message = function(self, t) return "@Source@ tumbles to a better position!" end,
+	message = function(self, t) return _t"@Source@ tumbles to a better position!" end,
 	stamina = function(self, t)
 		return math.max(0, 20 - stamina_bonus(self))
 	end,
@@ -183,7 +183,7 @@ newTalent {
 	end,
 	info = function(self, t)
 		return ([[Move to a spot within range, bounding around, over, or through any enemies in the way.
-		This maneuver can surprise your foes and improves your tactical position, improving your physical critical chance by %d%% for 1 turn.]]):format(t.combat_physcrit(self, t))
+		This maneuver can surprise your foes and improves your tactical position, improving your physical critical chance by %d%% for 1 turn.]]):tformat(t.combat_physcrit(self, t))
 	end
 }
 
@@ -248,7 +248,7 @@ newTalent {
 		Any time you would lose more than %d%% of your maximum life in a single hit, you instead duck out of the way and assume a defensive posture.
 		This reduces the triggering damage and all further damage in the same turn by %d%%.
 		You need %0.1f Stamina and an adjacent open tile to perform this feat (though it does not cause you to move).]])
-		:format(trigger, reduce, cost)
+		:tformat(trigger, reduce, cost)
 	end,
 }
 
@@ -269,6 +269,6 @@ newTalent {
 	info = function(self, t)
 		return ([[You gain greater facility with your acrobatic moves, lowering the cooldowns of Vault, Tumble, and Trained Reactions by %d, and their stamina costs by %0.1f.
 		At Rank 3 you also gain 10%% global speed for 1 turn after Trained Reactions activates. At rank 5 this speed bonus improves to 20%% and lasts for 2 turns.]])
-		:format(t.cooldown_bonus(self, t), t.stamina_bonus(self, t))
+		:tformat(t.cooldown_bonus(self, t), t.stamina_bonus(self, t))
 	end,
 }

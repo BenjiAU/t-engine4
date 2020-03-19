@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New Class: #LIGHT_GREEN#Temporal Warden (Chronomancer)",
-[[Time isn't a linear thing; it only appears to be.  In truth it's a fabric, the very fabric that holds the universe together.
+return _t"New Class: #LIGHT_GREEN#Temporal Warden (Chronomancer)",
+_t[[Time isn't a linear thing; it only appears to be.  In truth it's a fabric, the very fabric that holds the universe together.
 As with all great powers, there are those who seek to manipulate it and pervert it, but there are also those who seek to uphold rather than destroy.
 Those who have learned to bend, rather than break, the fabric can keep the balance against dark or power-hungry forces.
 

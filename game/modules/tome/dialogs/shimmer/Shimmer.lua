@@ -38,16 +38,16 @@ function _M:init(player, slot)
 	self.search_filter = nil
 
 	local oname = self:getShimmerName(player, slot)
-	Dialog.init(self, "Shimmer object: "..oname, 680, 500)
+	Dialog.init(self, ("Shimmer object: %s"):tformat(oname), 680, 500)
 
 	self:generateList()
 
-	self.c_search = Textbox.new{title="Search: ", text="", chars=20, max_len=60, fct=function() end, on_change=function(text) self:search(text) end}
+	self.c_search = Textbox.new{title=_t"Search: ", text="", chars=20, max_len=60, fct=function() end, on_change=function(text) self:search(text) end}
 
-	self.c_list = ListColumns.new{columns={{name="Name", width=100, display_prop="name", sort="sortname"}}, hide_columns=true, scrollbar=true, width=300, height=self.ih - 5 - self.c_search.h, list=self.list, fct=function(item) self:use(item) end, select=function(item) self:select(item) end}
+	self.c_list = ListColumns.new{columns={{name=_t"Name", width=100, display_prop="name", sort="sortname"}}, hide_columns=true, scrollbar=true, width=300, height=self.ih - 5 - self.c_search.h, list=self.list, fct=function(item) self:use(item) end, select=function(item) self:select(item) end}
 	local donatortext = ""
-	if not profile:isDonator(1) then donatortext = "\n#{italic}##CRIMSON#This cosmetic feature is only available to donators/buyers. You can only preview.#WHITE##{normal}#" end
-	local help = Textzone.new{width=math.floor(self.iw - self.c_list.w - 20), height=self.ih, no_color_bleed=true, auto_height=true, text="You can alter "..oname.." to look like another item of the same type/slot.\n#{bold}#This is a purely cosmetic change.#{normal}#"..donatortext}
+	if not profile:isDonator(1) then donatortext = _t"\n#{italic}##CRIMSON#This cosmetic feature is only available to donators/buyers. You can only preview.#WHITE##{normal}#" end
+	local help = Textzone.new{width=math.floor(self.iw - self.c_list.w - 20), height=self.ih, no_color_bleed=true, auto_height=true, text=("You can alter %s to look like another item of the same type/slot.\n#{bold}#This is a purely cosmetic change.#{normal}#%s"):tformat(oname, donatortext)}
 	local actorframe = ActorFrame.new{actor=self.actor, w=128, h=128}
 
 	self:loadUI{
@@ -72,9 +72,9 @@ function _M:use(item)
 	if profile:isDonator(1) then
 		self:applyShimmers(self.true_actor, self.slot, item.id)
 	else
-		Dialog:yesnoPopup("Donator Cosmetic Feature", "This cosmetic feature is only available to donators/buyers.", function(ret) if ret then
-			game:registerDialog(require("mod.dialogs.Donation").new("shimmer ingame"))
-		end end, "Donate", "Cancel")
+		Dialog:yesnoPopup(_t"Donator Cosmetic Feature", _t"This cosmetic feature is only available to donators/buyers.", function(ret) if ret then
+			game:registerDialog(require("mod.dialogs.Donation").new(_t"shimmer ingame"))
+		end end, _t"Donate", _t"Cancel")
 	end
 end
 
@@ -102,7 +102,7 @@ function _M:generateList()
 	if self:matchSearch("invisible") then
 		list[#list+1] = {
 			moddables = {},
-			name = "#GREY#[Invisible]",
+			name = _t"#GREY#[Invisible]",
 			id = "invisible",
 			sortname = "--",
 		}

@@ -51,58 +51,58 @@ local function aeryn_comes(npc, player)
 end
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*The two Sorcerers stands before you, shining like the Sun.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*The two Sorcerers stands before you, shining like the Sun.*#WHITE#
 Ah! Our guest is finally here. I take it you found the peak entertaining?]],
 	answers = {
-		{"Spare me the small talk. I am here to stop you!", jump="explain"},
-		{"Why are you doing all that? You were supposed to help people!", jump="explain"},
+		{_t"Spare me the small talk. I am here to stop you!", jump="explain"},
+		{_t"Why are you doing all that? You were supposed to help people!", jump="explain"},
 	}
 }
 
 newChat{ id="explain",
-	text = [[Oh, but all we want is to help people. We have come to the self-evident conclusion that common people are just unfit to govern themselves, always bickering, arguing...
+	text = _t[[Oh, but all we want is to help people. We have come to the self-evident conclusion that common people are just unfit to govern themselves, always bickering, arguing...
 Since the last invasion of the orcs there has been no threat to unite them!]],
 	answers = {
-		{"So you have decided to become the threat yourselves?", jump="explain2"},
+		{_t"So you have decided to become the threat yourselves?", jump="explain2"},
 	}
 }
 
 newChat{ id="explain2",
-	text = [[Us? Ah, no, we are merely instruments for the Master. We have planned for His return.]],
+	text = _t[[Us? Ah, no, we are merely instruments for the Master. We have planned for His return.]],
 	answers = {
-		{"And 'He' would be...?", jump="explain3"},
+		{_t"And 'He' would be...?", jump="explain3"},
 	}
 }
 
 if void_portal_open(nil, game.player) then
 newChat{ id="explain3",
-	text = [[The Creator. The God who made this world, He who watched silently as the races fought and burnt the land.
+	text = _t[[The Creator. The God who made this world, He who watched silently as the races fought and burnt the land.
 He who felt great sorrow for this world. He who shall now shatter the barriers of this world to remake it, only better!
 The staff has allowed us to drain enough energy from this world to open the portal to the Void and summon Him through!
 It is already too late. He is coming through as we speak -- it is only a matter of hours!]],
 	answers = {
-		{"I *WILL* stop you! The world will not end today!", jump="aeryn", switch_npc={name="High Sun Paladin Aeryn"}, action=aeryn_comes, cond=aeryn_alive},
-		{"I *WILL* stop you! The world will not end today!", cond=aeryn_dead},
+		{_t"I *WILL* stop you! The world will not end today!", jump="aeryn", switch_npc={name=_t"High Sun Paladin Aeryn"}, action=aeryn_comes, cond=aeryn_alive},
+		{_t"I *WILL* stop you! The world will not end today!", cond=aeryn_dead},
 	}
 }
 else
 newChat{ id="explain3",
-	text = [[The Creator. The God who made this world, He who watched silently as the races fought and burnt the land.
+	text = _t[[The Creator. The God who made this world, He who watched silently as the races fought and burnt the land.
 He who felt great sorrow for this world. He who shall now shatter the barriers of this world to remake it, only better!
 The staff will allow us to drain enough energy from this world to open the portal to the Void and summon Him through!
 You cannot stop us now!]],
 	answers = {
-		{"I *WILL* stop you! The world will not end today!", jump="aeryn", switch_npc={name="High Sun Paladin Aeryn"}, action=aeryn_comes, cond=aeryn_alive},
-		{"I *WILL* stop you! The world will not end today!", cond=aeryn_dead},
+		{_t"I *WILL* stop you! The world will not end today!", jump="aeryn", switch_npc={name=_t"High Sun Paladin Aeryn"}, action=aeryn_comes, cond=aeryn_alive},
+		{_t"I *WILL* stop you! The world will not end today!", cond=aeryn_dead},
 	}
 }
 end
 
 newChat{ id="aeryn",
-	text = [[#LIGHT_GREEN#*The air whirls at your side and suddenly High Sun Paladin Aeryn appears!*#WHITE#
+	text = _t[[#LIGHT_GREEN#*The air whirls at your side and suddenly High Sun Paladin Aeryn appears!*#WHITE#
 Then you shall not fight alone! Together we shall stop them, or die trying!]],
 	answers = {
-		{"I am glad to have you at my side, my Lady. Let's hunt some wizards!"},
+		{_t"I am glad to have you at my side, my Lady. Let's hunt some wizards!"},
 	}
 }
 

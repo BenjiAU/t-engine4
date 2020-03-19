@@ -26,14 +26,15 @@ newEntity{ define_as = "RUNGOF_FANG",
 	power_source = {nature=true},
 	unique = true,
 	type = "misc", subtype="fang",
-	unided_name = "bloodied fang",
+	unided_name = _t"bloodied fang",
 	name = "Rungof's Fang", image = "object/artifact/rungof_fang.png",
 	level_range = {20, 35},
 	rarity = false,
 	display = "*", color=colors.DARK_RED,
+	cost = 100,
 	encumber = 1,
 	not_in_stores = true,
-	desc = [[A fang from the great warg, Rungof, still covered in blood.]],
+	desc = _t[[A fang from the great warg, Rungof, still covered in blood.]],
 
 	carrier = {
 		combat_apr = 7,
@@ -45,10 +46,10 @@ newEntity{ base = "BASE_BATTLEAXE",
 	power_source = {arcane=true},
 	define_as = "KHULMANAR_WRATH",
 	name = "Khulmanar's Wrath", color = colors.DARK_RED, image = "object/artifact/hellfire.png",
-	unided_name = "firey blackened battleaxe", unique = true,
+	unided_name = _t"firey blackened battleaxe", unique = true,
 	moddable_tile = "special/%s_hellfire",
 	moddable_tile_big = true,
-	desc = [[Blackened with soot and covered in spikes, this battleaxe roars with the flames of the Fearscape. Given by Urh'Rok himself to his general, this powerful weapon can burn even the most resilient of foes.]],
+	desc = _t[[Blackened with soot and covered in spikes, this battleaxe roars with the flames of the Fearscape. Given by Urh'Rok himself to his general, this powerful weapon can burn even the most resilient of foes.]],
 	level_range = {37, 50},
 	rarity = 300,
 	require = { stat = { str=52 }, },
@@ -83,8 +84,8 @@ newEntity{ base = "BASE_TOOL_MISC", image="object/temporal_instability.png",
 	define_as = "BLADE_RIFT",
 	unique = true,
 	name = "Bladed Rift", color = colors.BLUE, image = "object/artifact/bladed_rift.png",
-	unided_name = "hole in space",
-	desc = [[Upon defeat, Ak'Gishil collapsed into this tiny rift. How it remains stable, you are unsure. If you focus, you think you can call forth a sword from it.]],
+	unided_name = _t"hole in space",
+	desc = _t[[Upon defeat, Ak'Gishil collapsed into this tiny rift. How it remains stable, you are unsure. If you focus, you think you can call forth a sword from it.]],
 	level_range = {30, 50},
 	rarity = 500,
 	cost = 500,
@@ -113,10 +114,10 @@ newEntity{ base = "BASE_LONGSWORD", define_as = "RIFT_SWORD",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Blade of Distorted Time", image = "object/artifact/blade_of_distorted_time.png",
-	unided_name = "time-warped sword",
+	unided_name = _t"time-warped sword",
 	moddable_tile = "special/%s_blade_of_distorted_time",
 	moddable_tile_big = true,
-	desc = [[The remnants of a damaged timeline, this blade shifts and fades at random.]],
+	desc = _t[[The remnants of a damaged timeline, this blade shifts and fades at random.]],
 	level_range = {30, 50},
 	rarity = 220,
 	require = { stat = { str=44 }, },
@@ -124,30 +125,42 @@ newEntity{ base = "BASE_LONGSWORD", define_as = "RIFT_SWORD",
 	material_level = 4,
 	combat = {
 		dam = 40,
-		apr = 10,
+		apr = 40,
 		physcrit = 8,
 		dammod = {str=0.9,mag=0.2},
 		convert_damage={[DamageType.TEMPORAL] = 20},
-		special_on_hit = {desc="inflicts bonus temporal damage and slows target", fct=function(combat, who, target)
-			local dam = (20 + who:getMag()/2)
-			local slow = (10 + who:getMag()/5)/100
-			who:project({type="hit", range=1}, target.x, target.y, engine.DamageType.CHRONOSLOW, {dam=dam, slow=slow})
+		special_on_hit = {
+			desc=function(self, who, special)
+				local dam, slow = special.proc_values(who)
+				return ("deals %d temporal damage and slows enemies in radius 6 of the target by %d%% based on Magic"):tformat(dam, slow*100)
+			end,
+			proc_values=function(who)
+				local dam = (20 + who:getMag())
+				local slow = (30 + who:getMag())/100  -- This doesn't stack with the relatively easy to get basic slow proc, so it gets to be really big
+				return dam, slow
+			end,
+			fct=function(combat, who, target, dam, special)
+				local dam, slow = special.proc_values(who)
+				who:project({type="ball", range=1, radius=6, friendlyfire=false, selffire=false}, target.x, target.y, engine.DamageType.CHRONOSLOW, {dam=dam, slow=slow})
 		end},
 	},
 	wielder = {
 		inc_damage={
-			[DamageType.TEMPORAL] = 12,
-			[DamageType.PHYSICAL] = 10,
+			[DamageType.TEMPORAL] = 30,
+			[DamageType.PHYSICAL] = 30,
 		},
+		resist_all_on_teleport = 20,
+		defense_on_teleport = 20,
+		effect_reduction_on_teleport = 20,
 	},
-	max_power = 8, power_regen = 1,
-	use_talent = { id = Talents.T_RETHREAD, level = 2, power = 8 },
+	max_power = 10, power_regen = 1,
+	use_talent = { id = Talents.T_BLINK_BLADE, level = 4, power = 10 },
 }
 
 newEntity{ base = "BASE_RUNE", define_as = "RUNE_REFLECT",
 	name = "Rune of Reflection", unique=true, image = "object/artifact/rune_of_reflection.png",
-	desc = [[You can see your own image mirrored in the surface of this silvery rune.]],
-	unided_name = "shiny rune",
+	desc = _t[[You can see your own image mirrored in the surface of this silvery rune.]],
+	unided_name = _t"shiny rune",
 	level_range = {5, 15},
 	rarity = 240,
 	cost = 100,
@@ -168,10 +181,10 @@ newEntity{ base = "BASE_BATTLEAXE",
 	power_source = {nature=true, antimagic=true},
 	define_as = "GAPING_MAW",
 	name = "The Gaping Maw", color = colors.SLATE, image = "object/artifact/battleaxe_the_gaping_maw.png",
-	unided_name = "huge granite battleaxe", unique = true,
+	unided_name = _t"huge granite battleaxe", unique = true,
 	moddable_tile = "special/%s_battleaxe_the_gaping_maw",
 	moddable_tile_big = true,
-	desc = [[This huge granite battleaxe is as much mace as it is axe.  The shaft is made of blackened wood tightly bound in drakeskin leather and the sharpened granite head glistens with a viscous green fluid.]],
+	desc = _t[[This huge granite battleaxe is as much mace as it is axe.  The shaft is made of blackened wood tightly bound in drakeskin leather and the sharpened granite head glistens with a viscous green fluid.]],
 	level_range = {38, 50},
 	rarity = 300,
 	require = { stat = { str=60 }, },
@@ -184,7 +197,7 @@ newEntity{ base = "BASE_BATTLEAXE",
 		physcrit = 8,
 		dammod = {str=1.2},
 		melee_project={[DamageType.SLIME] = 50, [DamageType.ACID] = 50},
-		special_on_crit = {desc="deal manaburn damage equal to your mindpower in a radius 3 cone", on_kill=1, fct=function(combat, who, target)
+		special_on_crit = {desc=_t"deal manaburn damage equal to your mindpower in a radius 3 cone", on_kill=1, fct=function(combat, who, target)
 			who.turn_procs.gaping_maw = (who.turn_procs.gaping_maw or 0) + 1
 			local tg = {type="cone", range=10, radius=3, force_target=target, selffire=false}
 			local grids = who:project(tg, target.x, target.y, engine.DamageType.MANABURN, who:combatMindpower() / (who.turn_procs.gaping_maw))

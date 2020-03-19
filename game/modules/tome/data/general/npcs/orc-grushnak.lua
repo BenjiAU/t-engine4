@@ -38,7 +38,9 @@ newEntity{
 	size_category = 3,
 
 	resolvers.racial(),
-
+	rnd_boss_init = function(self, data)
+        self.inc_damage.all = (self.inc_damage.all or 0) - 30  -- Compensate for high base damage talents
+    end,
 	open_door = true,
 	resolvers.sustains_at_birth(),
 	resolvers.inscriptions(3, "infusion"),
@@ -51,7 +53,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_ORC_GRUSHNAK",
 	name = "orc fighter", color=colors.KHAKI,
-	desc = [[An orc clad in massive armour, wielding a shield and a deadly axe.]],
+	desc = _t[[An orc clad in massive armour, wielding a shield and a deadly axe.]],
 	level_range = {30, nil}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(110,120), life_rating = 14,
@@ -76,7 +78,7 @@ newEntity{ base = "BASE_NPC_ORC_GRUSHNAK",
 
 newEntity{ base = "BASE_NPC_ORC_GRUSHNAK", define_as = "ORC_ELITE_FIGHTER",
 	name = "orc elite fighter", color=colors.MOCCASIN,
-	desc = [[An orc clad in massive armour, wielding a shield and a deadly axe.]],
+	desc = _t[[An orc clad in massive armour, wielding a shield and a deadly axe.]],
 	level_range = {35, nil}, exp_worth = 1,
 	rarity = 3,
 	rank = 3,
@@ -108,7 +110,7 @@ newEntity{ base = "BASE_NPC_ORC_GRUSHNAK", define_as = "ORC_ELITE_FIGHTER",
 
 newEntity{ base = "BASE_NPC_ORC_GRUSHNAK",
 	name = "orc berserker", color=colors.SALMON,
-	desc = [[An orc clad in massive armour, wielding a huge axe.]],
+	desc = _t[[An orc clad in massive armour, wielding a huge axe.]],
 	level_range = {35, nil}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(110,120), life_rating = 14,
@@ -131,7 +133,7 @@ newEntity{ base = "BASE_NPC_ORC_GRUSHNAK",
 
 newEntity{ base = "BASE_NPC_ORC_GRUSHNAK", define_as = "ORC_ELITE_BERSERKER",
 	name = "orc elite berserker", color=colors.YELLOW,
-	desc = [[An orc clad in massive armour, wielding a huge axe.]],
+	desc = _t[[An orc clad in massive armour, wielding a huge axe.]],
 	level_range = {35, nil}, exp_worth = 1,
 	rarity = 3,
 	rank = 3,

@@ -26,7 +26,7 @@ module(..., package.seeall, class.inherit(engine.ui.Dialog))
 
 function _M:init()
 	self:generateList()
-	engine.ui.Dialog.init(self, "DEBUG -- Spawn Event", 1, 1)
+	engine.ui.Dialog.init(self, _t"DEBUG -- Spawn Event", 1, 1)
 
 	local list = List.new{width=400, height=500, scrollbar=true, list=self.list, fct=function(item) self:use(item) end}
 

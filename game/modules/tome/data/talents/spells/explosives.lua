@@ -144,7 +144,7 @@ newTalent{
 		return ([[Imbue an alchemist gem with an explosive charge of mana and throw it.
 		The gem will explode for %0.1f %s damage.
 		Each kind of gem will also provide a specific effect.
-		The damage will improve with better gems and with your Spellpower.]]):format(dam, DamageType:get(damtype).name)
+		The damage will improve with better gems and with your Spellpower.]]):tformat(dam, DamageType:get(damtype).name)
 	end,
 }
 
@@ -169,7 +169,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Grants %d%% protection to you, your golem and other friendly creatures against the elemental damage of your own bombs, and against external elemental damage (fire, cold, lightning and acid) by %d%%.
 		At talent level 5 it also protects against all side effects of your bombs.]]):
-		format(math.min(100, self:getTalentLevelRaw(t) * 20), self:getTalentLevelRaw(t) * 3)
+		tformat(math.min(100, self:getTalentLevelRaw(t) * 20), self:getTalentLevelRaw(t) * 3)
 	end,
 }
 
@@ -199,7 +199,7 @@ newTalent{
 		local min, max = t.minmax(self, t)
 		return ([[Your alchemist bombs now affect a radius of %d around them.
 		Explosion damage may increase by %d%% (if the explosion is not contained) to %d%% if the area of effect is confined.]]):
-		format(t.getRadius(self, t), min*100, max*100) --I5
+		tformat(t.getRadius(self, t), min*100, max*100) --I5
 	end,
 }
 
@@ -299,6 +299,6 @@ newTalent{
 		return ([[Crush together two alchemist gems, making them extremely unstable.
 		You then throw them to a target area, where they explode on impact, dealing %0.2f physical damage and knocking back any creatures in the blast radius.
 		Each kind of gem will also provide a specific effect.
-		The damage will improve with better gems and with your Spellpower.]]):format(dam)
+		The damage will improve with better gems and with your Spellpower.]]):tformat(dam)
 	end,
 }

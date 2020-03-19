@@ -29,7 +29,7 @@ local g = list.SLIME_FLOOR:clone()
 level.map(x, y, engine.Map.TERRAIN, g)
 game.nicer_tiles:updateAround(level, x, y)
 g = level.map(x, y, engine.Map.TERRAIN)
-g.name = "slimey pool"
+g.name = _t"slimey pool"
 g.on_stand = on_stand
 g.always_remember = true g.special_minimap = colors.OLIVE_DRAB
 g:altered()
@@ -45,7 +45,7 @@ for x, yy in pairs(grids) do for y, _ in pairs(yy) do
 	local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
 	g.on_stand = g.on_stand or on_stand
 	if g.on_stand == on_stand and g.type == "floor" then
-		g.name = g.name .. " (slimey)"
+		g.name = ("%s (slimey)"):tformat(_t(g.name))
 		if not g.special_minimap then g.special_minimap = colors.DARK_SEA_GREEN end
 	end
 	g.always_remember = true

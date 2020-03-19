@@ -29,7 +29,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Increases your spell critical chance by %d%%.]]):
-		format(t.getCrit(self, t))
+		tformat(t.getCrit(self, t))
 	end,
 }
 
@@ -62,7 +62,7 @@ newTalent{
 		local cooldownreduction = t.getCooldownReduction(self, t)
 		return ([[Increases your light and darkness resistance penetration by %d%% for %d turns, and reduces the cooldown of all Celestial skills by %d.
 		The resistance penetration will increase with your Cunning.]]):
-		format(penetration, duration, cooldownreduction)
+		tformat(penetration, duration, cooldownreduction)
 	end,
 }
 
@@ -130,7 +130,7 @@ newTalent{
 		This effect costs 2 positive or 2 negative energy each time it's triggered, and will not activate if either your positive or negative energy is below 2.
 		The damage scales with your Spellpower.
 		This spell cannot crit.]]):
-		format(targetcount, self:getTalentRange(t), damDesc(self, DamageType.LIGHT, lightdamage), damDesc(self, DamageType.DARKNESS, darknessdamage))
+		tformat(targetcount, self:getTalentRange(t), damDesc(self, DamageType.LIGHT, lightdamage), damDesc(self, DamageType.DARKNESS, darknessdamage))
 	end,
 }
 
@@ -169,6 +169,6 @@ newTalent{
 		local dotDam = t.getDotDamage(self, t)
 		local conversion = t.getConversion(self, t)
 		local duration = t.getDuration(self, t)
-		return ([[Shroud foes within radius %d in darkest light, dealing %0.2f light and %0.2f darkness damage per turn and converting %d%% of the damage they deal between light and darkness for %d turns.]]):format(radius, damDesc(self, DamageType.LIGHT, dotDam), damDesc(self, DamageType.DARKNESS, dotDam), conversion*100, duration)
+		return ([[Shroud foes within radius %d in darkest light, dealing %0.2f light and %0.2f darkness damage per turn and converting %d%% of the damage they deal between light and darkness for %d turns.]]):tformat(radius, damDesc(self, DamageType.LIGHT, dotDam), damDesc(self, DamageType.DARKNESS, dotDam), conversion*100, duration)
 	end,
 }

@@ -38,7 +38,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Allows you to dual wield any type of one handed weapons, and increases the damage of the off-hand weapon to %d%%.
 		Also, casting a spell (which uses a turn) will give a free melee attack at a random target in melee range for %d%% blight damage.]]):
-		format(100*t.getoffmult(self,t), 100 * self:combatTalentWeaponDamage(t, 0.2, 0.7))
+		tformat(100*t.getoffmult(self,t), 100 * self:combatTalentWeaponDamage(t, 0.2, 0.7))
 	end,
 }
 
@@ -59,7 +59,7 @@ newTalent{
 		return ([[Each time you hit an enemy with a melee weapon you enter a bloodlust-infused frenzy, increasing your Spellpower by %0.1f.
 		This effect stacks up to 10 times for a total Spellpower gain of %d.
 		The frenzy lasts 3 turns.]]):
-		format(SPbonus, SPbonus*10)
+		tformat(SPbonus, SPbonus*10)
 	end,
 }
 
@@ -78,7 +78,7 @@ newTalent{
 	info = function(self, t)
 		return ([[You gain a %d%% resistance to diseases, and each of your melee attacks have a %d%% chance to spread any diseases on your target.
 		(As the Epidemic talent with the melee attack treated like blight damage.)]]):
-		format(t.getDiseaseImmune(self, t)*100, t.getDiseaseSpread(self, t))
+		tformat(t.getDiseaseImmune(self, t)*100, t.getDiseaseSpread(self, t))
 	end,
 }
 
@@ -103,6 +103,6 @@ newTalent{
 		This deals %0.2f acid damage each turn for 5 turns, and reduces the attacker's Accuracy by %d.
 		At level 3, it will also reduce Armour by %d for 5 turns.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.ACID, self:combatTalentSpellDamage(t, 5, 30)), self:combatTalentSpellDamage(t, 15, 35), self:combatTalentSpellDamage(t, 15, 40))
+		tformat(damDesc(self, DamageType.ACID, self:combatTalentSpellDamage(t, 5, 30)), self:combatTalentSpellDamage(t, 15, 35), self:combatTalentSpellDamage(t, 15, 40))
 	end,
 }

@@ -27,11 +27,11 @@ local Quest = require "engine.Quest"
 module(..., package.seeall, class.inherit(Dialog))
 
 local statuses = {
-	[-1] = "#LIGHT_GREEN#New#LAST# Quest!",
-	[Quest.PENDING] = "Quest #AQUAMARINE#Updated!",
-	[Quest.COMPLETED] = "Quest #LIGHT_GREEN#Completed!",
-	[Quest.DONE] = "Quest #LIGHT_GREEN#Done!",
-	[Quest.FAILED] = "Quest #CIMSON#Failed!",
+	[-1] = _t"#LIGHT_GREEN#New#LAST# Quest!",
+	[Quest.PENDING] = _t"Quest #AQUAMARINE#Updated!",
+	[Quest.COMPLETED] = _t"Quest #LIGHT_GREEN#Completed!",
+	[Quest.DONE] = _t"Quest #LIGHT_GREEN#Done!",
+	[Quest.FAILED] = _t"Quest #CIMSON#Failed!",
 }
 
 function _M:init(quest, status)
@@ -59,10 +59,10 @@ function _M:init(quest, status)
 	self.blight = self:getUITexture("ui/dialogframe_backglow.png")
 
 	local f, fs = FontPackage:getFont("bold")
-	local quest = Textzone.new{auto_width=true, auto_height=true, text="#ANTIQUE_WHITE#Quest: #AQUAMARINE#"..self.quest.name, font={f, math.ceil(fs * 2)}}
+	local quest = Textzone.new{auto_width=true, auto_height=true, text=("#ANTIQUE_WHITE#Quest: #AQUAMARINE#%s"):tformat(self.quest.name), font={f, math.ceil(fs * 2)}}
 	quest:setTextShadow(3)
 
-	local info = Textzone.new{auto_width=true, auto_height=true, text=add..'#ANTIQUE_WHITE#(See your Journal for further details or click here)', font={f, math.ceil(fs)}}
+	local info = Textzone.new{auto_width=true, auto_height=true, text=add.._t'#ANTIQUE_WHITE#(See your Journal for further details or click here)', font={f, math.ceil(fs)}}
 	info:setTextShadow(3)
 	
 	local status = Textzone.new{ui=use_ui, auto_width=true, auto_height=true, text="#cc9f33#"..(statuses[status] or "????"), has_box=true, font={FontPackage:getFont("bignews")}}

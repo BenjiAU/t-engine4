@@ -42,7 +42,7 @@ for i = 1, 3 do
 	local i, j = gr.x, gr.y
 
 	local g = game.level.map(i, j, engine.Map.TERRAIN):cloneFull()
-	g.name = "weird pedestal"
+	g.name = _t"weird pedestal"
 	g.display='&' g.color_r=255 g.color_g=255 g.color_b=255 g.notice = true
 	g.always_remember = true g.special_minimap = colors.OLIVE_DRAB
 	g:removeAllMOs()
@@ -57,15 +57,15 @@ for i = 1, 3 do
 	g.special = true
 	g.block_move = function(self, x, y, who, act, couldpass)
 		if not who or not who.player or not act then return false end
-		who:runStop("weird pedestal")
+		who:runStop(_t"weird pedestal")
 		if self.pedestal_activated then return false end
-		require("engine.ui.Dialog"):yesnoPopup("Weird Pedestal", "Do you wish to inspect the pedestal?", function(ret) if ret then
-			who:restInit(20, "inspecting", "inspected", function(cnt, max)
+		require("engine.ui.Dialog"):yesnoPopup(_t"Weird Pedestal", _t"Do you wish to inspect the pedestal?", function(ret) if ret then
+			who:restInit(20, _t"inspecting", _t"inspected", function(cnt, max)
 				if cnt > max then
 					self.pedestal_activated = true
 					self.block_move = nil
 					self.autoexplore_ignore = true
-					require("engine.ui.Dialog"):simplePopup("Weird Pedestal", "As you inspect it a shadow materializes near you, and suddenly it is no more a shadow!")
+					require("engine.ui.Dialog"):simplePopup(_t"Weird Pedestal", _t"As you inspect it a shadow materializes near you, and suddenly it is no more a shadow!")
 
 					local m = game.zone:makeEntity(game.level, "actor", {
 						base_list=mod.class.NPC:loadList("/data/general/npcs/humanoid_random_boss.lua"),
@@ -77,13 +77,13 @@ for i = 1, 3 do
 							loot_quality = "store",
 							loot_quantity = 1,
 							no_loot_randart = true,
-							name_scheme = "#rng# the Invoker",
+							name_scheme = _t"#rng# the Invoker",
 					}}, nil, true)
 					local i, j = util.findFreeGrid(x, y, 5, true, {[engine.Map.ACTOR]=true})
 					if i then
 						game.level.map:particleEmitter(i, j, 1, "teleport")
 						game.zone:addEntity(game.level, m, "actor", i, j)
-						m.emote_random = {chance=30, "He shall come!", "You are dooooommmed!!", "He will consume all!", "My life for His!", "Die intruder!"}
+						m.emote_random = {chance=30, _t"He shall come!", _t"You are dooooommmed!!", _t"He will consume all!", _t"My life for His!", _t"Die intruder!"}
 						m.pedestal_x = self.x
 						m.pedestal_y = self.y
 						m.on_die = function(self)
@@ -93,10 +93,10 @@ for i = 1, 3 do
 								local ov = g.add_displays[#g.add_displays]
 								ov.image = "terrain/pedestal_orb_0"..rng.range(1, 5)..".png"
 							end
-							g.name = "weird pedestal (glowing)"
+							g.name = _t"weird pedestal (glowing)"
 							game.level.map:updateMap(self.pedestal_x, self.pedestal_y)
 							game.level.pedestal_events = (game.level.pedestal_events or 0) + 1
-							game.logSeen(self, "%s's soul is absorbed by the pedestal. A glowing orb appears.", self.name:capitalize())
+							game.logSeen(self, "%s's soul is absorbed by the pedestal. A glowing orb appears.", self:getName():capitalize())
 
 							if game.level.pedestal_events >= 3 then
 								game.level.pedestal_events = 0							
@@ -109,7 +109,7 @@ for i = 1, 3 do
 										life_rating=function(v) return v * 2 + 5 end,
 										loot_quantity = 0,
 										no_loot_randart = true,
-										name_scheme = "#rng# the Bringer of Doom",
+										name_scheme = _t"#rng# the Bringer of Doom",
 										on_die = function(self) world:gainAchievement("EVENT_PEDESTALS", game:getPlayer(true)) end,
 								}}, nil, true)
 
@@ -125,7 +125,7 @@ for i = 1, 3 do
 										game.zone:addEntity(game.level, o, "object")
 										m:addObject(m.INVEN_INVEN, o)
 									end
-									require("engine.ui.Dialog"):simplePopup("Weird Pedestal", "You hear a terrible voice saying 'Their lives are mine! I am coming!'")
+									require("engine.ui.Dialog"):simplePopup(_t"Weird Pedestal", _t"You hear a terrible voice saying 'Their lives are mine! I am coming!'")
 								end
 							end
 						end

@@ -54,10 +54,10 @@ end
 function _M:init(actor)
 	self.actor = actor
 	actor.hotkey = actor.hotkey or {}
-	Dialog.init(self, "Quicken", game.w * 0.6, game.h * 0.8)
+	Dialog.init(self, _t"Quicken", game.w * 0.6, game.h * 0.8)
 
 	local vsep = Separator.new{dir="horizontal", size=self.ih - 10}
-	self.c_tut = Textzone.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=1, auto_height=true, no_color_bleed=true, text=[[
+	self.c_tut = Textzone.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=1, auto_height=true, no_color_bleed=true, text=_t[[
 You may select a chronomancy spell to Quicken, reducing the time it takes you to cast that spell.
 ]]}
 	self.c_desc = TextzoneList.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=self.ih - self.c_tut.h - 20, scrollbar=true, no_color_bleed=true}
@@ -65,8 +65,8 @@ You may select a chronomancy spell to Quicken, reducing the time it takes you to
 	self:generateList()
 
 	local cols = {
-		{name="", width={40,"fixed"}, display_prop="char"},
-		{name="Talent", width=80, display_prop="name"},
+		{name=_t"", width={40,"fixed"}, display_prop="char"},
+		{name=_t"Talent", width=80, display_prop="name"},
 	}
 	self.c_list = TreeList.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=self.ih - 10, all_clicks=true, scrollbar=true, columns=cols, tree=self.list, fct=function(item, sel, button) self:use(item, button) end, select=function(item, sel) self:select(item) end}
 	self.c_list.cur_col = 2
@@ -151,7 +151,7 @@ function _M:generateList()
 	for i, node in ipairs(talents) do node.char = self:makeKeyChar(letter) chars[node.char] = node letter = letter + 1 end
 
 	list = {
-		{ char='', name=('#{bold}#Choose a talent#{normal}#'):toTString(), status='', hotkey='', desc="All talents that can be used with Quicken.", color=function() return colors.simple(colors.LIGHT_GREEN) end, nodes=talents, shown=true },
+		{ char='', name=(_t'#{bold}#Choose a talent#{normal}#'):toTString(), status='', hotkey='', desc=_t"All talents that can be used with Quicken.", color=function() return colors.simple(colors.LIGHT_GREEN) end, nodes=talents, shown=true },
 		chars = chars,
 	}
 	self.list = list

@@ -24,7 +24,7 @@ local function createDarkTendrils(summoner, x, y, target, damage, duration, pinD
 	if not summoner:getTalentFromId(summoner.T_CREEPING_DARKNESS) then return end
 
 	local e = Object.new{
-		name = "dark tendril",
+		name = _t"dark tendril",
 		block_sight=false,
 		canAct = false,
 		x = x, y = y,
@@ -89,7 +89,7 @@ local function createDarkTendrils(summoner, x, y, target, damage, duration, pinD
 
 			if hitTarget and self.target:canBe("pin") then
 				-- attack the target
-				game.logSeen(self, "The dark tendrils lash at %s.", self.target.name)
+				game.logSeen(self, "The dark tendrils lash at %s.", self.target:getName())
 
 				-- pin target
 				self.target:setEffect(self.target.EFF_PINNED, self.pinDuration, {})
@@ -204,7 +204,7 @@ newTalent{
 	end,
 	createDark = function(summoner, x, y, damage, duration, creep, creepChance, initialCreep)
 		local e = Object.new{
-			name = summoner.name:capitalize() .. "'s creeping dark",
+			name = ("%s's creeping dark"):tformat(summoner:getName():capitalize()),
 			block_sight=function(self, x, y, who)
 				if who and who.attr and who:attr("pierce_creeping_darkness") and x and who.x and core.fov.distance(x, y, who.x, who.y) <= who:attr("pierce_creeping_darkness") then
 					return false
@@ -350,7 +350,7 @@ newTalent{
 		local darkCount = t.getDarkCount(self, t)
 		local damageIncrease = getDamageIncrease(self)
 		return ([[Creeping dark slowly spreads from the target location and %d spots in a radius of %d around the targeted location. The dark deals %0.2f darkness damage each turn to anything in its area, and blocks the sight of any who do not possess Dark Vision or some other magical means of seeing.
-		The damage will increase with your Mindpower. You do +%d%% damage to anything that has entered your creeping dark.]]):format(darkCount, radius, damage, damageIncrease)
+		The damage will increase with your Mindpower. You do +%d%% damage to anything that has entered your creeping dark.]]):tformat(darkCount, radius, damage, damageIncrease)
 	end,
 }
 
@@ -373,7 +373,7 @@ newTalent{
 		local movementSpeedChange = t.getMovementSpeedChange(self, t)
 		local damageIncrease = getDamageIncrease(self)
 		return ([[Your eyes penetrate the darkness to find anyone that may be hiding there. This allows you to see through creeping darkness out to a radius of %d. You can also find your way through the darkness with greater speed (+%d%% movement into creeping darkness).
-		You do +%d%% damage to anything that has entered your creeping dark.]]):format(range, movementSpeedChange * 100, damageIncrease)
+		You do +%d%% damage to anything that has entered your creeping dark.]]):tformat(range, movementSpeedChange * 100, damageIncrease)
 	end,
 }
 
@@ -411,7 +411,7 @@ newTalent{
 						if not target.dead and target:canBe("blind") then
 							target:setEffect(target.EFF_BLINDED, 3, {apply_power=self:combatMindpower(), min_dur=1})
 							target:setTarget(nil)
-							--game.logSeen(target, "%s stumbles in the darkness!", target.name:capitalize())
+							--game.logSeen(target, "%s stumbles in the darkness!", target:getName():capitalize())
 						end
 					end
 				end
@@ -431,7 +431,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local damageIncrease = getDamageIncrease(self)
 		return ([[Sends a torrent of searing darkness through your foes, doing %d damage. There is a 25%% chance the rushing darkness will blind them for 3 turns, and cause them to forget their target.
-		The damage will increase with your Mindpower. You do +%d%% damage to anything that has entered your creeping dark.]]):format(damDesc(self, DamageType.DARKNESS, damage), damageIncrease)
+		The damage will increase with your Mindpower. You do +%d%% damage to anything that has entered your creeping dark.]]):tformat(damDesc(self, DamageType.DARKNESS, damage), damageIncrease)
 	end,
 }
 
@@ -474,6 +474,6 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local damageIncrease = getDamageIncrease(self)
 		return ([[Send tendrils of creeping dark out to attack your target, and pin them in the darkness for %d turns. Creeping dark will trail behind the tendrils as they move. The darkness does %d damage per turn.
-		The damage will increase with your Mindpower. You do +%d%% damage to anything that has entered your creeping dark.]]):format(pinDuration, damage, damageIncrease)
+		The damage will increase with your Mindpower. You do +%d%% damage to anything that has entered your creeping dark.]]):tformat(pinDuration, damage, damageIncrease)
 	end,
 }

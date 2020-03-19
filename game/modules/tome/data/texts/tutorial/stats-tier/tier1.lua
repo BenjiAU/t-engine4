@@ -17,6 +17,6 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 If you don't notice anything, try examining each monster's tooltip immediately after using Mana Gale on it.
 ]]

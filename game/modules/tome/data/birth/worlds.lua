@@ -66,14 +66,14 @@ Birther.default_eyal_descriptors = default_eyal_descriptors
 newBirthDescriptor{
 	type = "world",
 	name = "Maj'Eyal",
-	display_name = "Maj'Eyal: The Age of Ascendancy",
+	display_name = _t"Maj'Eyal: The Age of Ascendancy",
 	selection_default = config.settings.tome.default_birth and config.settings.tome.default_birth.campaign == "Maj'Eyal",
 	desc =
 	{
-		"The people of Maj'Eyal: Humans, Halflings, Elves and Dwarves.",
-		"The known world has been at relative peace for over one hundred years, and people are prospering again.",
-		"You are an adventurer, setting out to find lost treasure and glory.",
-		"But what lurks in the shadows of the world?",
+		_t"The people of Maj'Eyal: Humans, Halflings, Elves and Dwarves.",
+		_t"The known world has been at relative peace for over one hundred years, and people are prospering again.",
+		_t"You are an adventurer, setting out to find lost treasure and glory.",
+		_t"But what lurks in the shadows of the world?",
 	},
 	descriptor_choices = default_eyal_descriptors{},
 	game_state = {
@@ -101,17 +101,17 @@ newBirthDescriptor{
 newBirthDescriptor{
 	type = "world",
 	name = "Infinite",
-	display_name = "Infinite Dungeon: The Neverending Descent",
+	display_name = _t"Infinite Dungeon: The Neverending Descent",
 	locked = function() return profile.mod.allow_build.campaign_infinite_dungeon end,
-	locked_desc = "Ever deeper, never ending, no reprieve, keep descending. In ruins old, through barred gate, once riddle solved, find thy fate.",
+	locked_desc = _t"Ever deeper, never ending, no reprieve, keep descending. In ruins old, through barred gate, once riddle solved, find thy fate.",
 	selection_default = config.settings.tome.default_birth and config.settings.tome.default_birth.campaign == "Infinite",
 	desc =
 	{
-		"Play as your favorite race and class and venture into the infinite dungeon.",
-		"The only limit to how far you can go is your own skill!",
-		"Inside the infinite dungeon you will yourself be limitless. You can level up beyond level 50 and continue to gain stat and talent points (at a reduced rate).",
-		"Every level after level 50 the maximum of stats will increase by one.",
-		"Every 10 levels after level 50 the maximum points of each talent will increase by one.",
+		_t"Play as your favorite race and class and venture into the infinite dungeon.",
+		_t"The only limit to how far you can go is your own skill!",
+		_t"Inside the infinite dungeon you will yourself be limitless. You can level up beyond level 50 and continue to gain stat and talent points (at a reduced rate).",
+		_t"Every level after level 50 the maximum of stats will increase by one.",
+		_t"Every 10 levels after level 50 the maximum points of each talent will increase by one.",
 	},
 	descriptor_choices = default_eyal_descriptors{ difficulty = { Tutorial = "never"} },
 	random_escort_possibilities = { {"infinite-dungeon", 5, 40} },
@@ -177,16 +177,16 @@ newBirthDescriptor{
 newBirthDescriptor{
 	type = "world",
 	name = "Arena",
-	display_name = "The Arena: Challenge of the Master",
+	display_name = _t"The Arena: Challenge of the Master",
 	locked = function() return profile.mod.allow_build.campaign_arena end,
-	locked_desc = "Blood spilled on sand, only the strong survive. Prove yourself worthy to enter.",
+	locked_desc = _t"Blood spilled on sand, only the strong survive. Prove yourself worthy to enter.",
 	selection_default = config.settings.tome.default_birth and config.settings.tome.default_birth.campaign == "Arena",
 	desc =
 	{
-		"Play as a lone warrior facing the Arena's challenge!",
-		"You can use any class and race for it.",
-		"See how far you can go! Can you become the new Master of the Arena?",
-		"If so, you will battle your own champion next time!",
+		_t"Play as a lone warrior facing the Arena's challenge!",
+		_t"You can use any class and race for it.",
+		_t"See how far you can go! Can you become the new Master of the Arena?",
+		_t"If so, you will battle your own champion next time!",
 	},
 	descriptor_choices = default_eyal_descriptors{ difficulty = { Tutorial = "never" }, permadeath = { Exploration = "never", Adventure = "never" } },
 	copy = {

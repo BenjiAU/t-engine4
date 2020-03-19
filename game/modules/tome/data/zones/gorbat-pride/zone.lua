@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Gorbat Pride",
+	name = _t"Gorbat Pride",
 	level_range = {35, 60},
 	level_scheme = "player",
 	max_level = 3,

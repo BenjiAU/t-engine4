@@ -96,7 +96,7 @@ newTalent {
 		if target:canBe("pin") then
 			target:setEffect(target.EFF_PINNED, t.pin_duration(self, t), {apply_power = self:combatAttack()})
 		else
-			game.logSeen(target, "%s resists being knocked down.", target.name:capitalize())
+			game.logSeen(target, "%s resists being knocked down.", target:getName():capitalize())
 		end
 		pen_off(self, t, target, x, y)
 	end,
@@ -110,7 +110,7 @@ newTalent {
 		return ([[Strike your opponent in the knee (or other critical point in an ambulatory appendage) for %d%% weapon damage, knocking them down (%d turn pin) and slowing their movement by %d%% for %d turns afterwards.
 		This shot will bypass other enemies between you and your target.
 		The slow effect becomes more powerful with your Cunning.]])
-		:format(t.damage_multiplier(self, t) * 100,
+		:tformat(t.damage_multiplier(self, t) * 100,
 				t.pin_duration(self, t),
 				t.slow_power(self, t) * 100,
 				t.slow_duration(self, t))
@@ -180,7 +180,7 @@ newTalent {
 		This shot is focused on precision at long range and deals base %d%% ranged damage with a bonus that increases with distance.
 		The ranged bonus is %d%% (penalty) at point blank range, while at your maximum range of %d it is %d%%.
 		This shot will bypass other enemies between you and your target.]])
-		:format(t.damage_multiplier(self, t) * 100, t.getDistanceBonus(self, t, 1)*100, range, t.getDistanceBonus(self, t, range)*100)
+		:tformat(t.damage_multiplier(self, t) * 100, t.getDistanceBonus(self, t, 1)*100, range, t.getDistanceBonus(self, t, range)*100)
 
 		end,
 }
@@ -207,7 +207,7 @@ newTalent {
 		if target:canBe("stun") then
 			target:setEffect(target.EFF_SKIRMISHER_STUN_INCREASE, 1, {apply_power = self:combatAttack()})
 		else
-			game.logSeen(target, "%s resists the stunning shot!", target.name:capitalize())
+			game.logSeen(target, "%s resists the stunning shot!", target:getName():capitalize())
 		end
 		pen_off(self, t, target, x, y)
 	end,
@@ -219,7 +219,7 @@ newTalent {
 		Each shot deals %d%% Ranged damage and will try to stun or increase the target's stun duration by 1.
 		These shots will bypass other enemies between you and your target.
 		The chance to stun increases with your Accuracy.]])
-		:format(t.damage_multiplier(self, t) * 100)
+		:tformat(t.damage_multiplier(self, t) * 100)
 	end,
 }
 
@@ -234,7 +234,7 @@ newTalent {
 	info = function(self, t)
 		local bonuses = sniper_bonuses(self, true)
 		return ([[Your mastery of called shots is unparalleled. and you gain %d%% bonus critical chance and %d%% critical damage with your Called Shots Talents. At rank 3 the cooldowns of all of your Called Shots Talents are reduced by 2 each. At rank 5 you gain %d%% Physical resistance penetration with all Called Shot attacks.]])
-		:format(bonuses.crit_chance,
+		:tformat(bonuses.crit_chance,
 			bonuses.crit_power * 100,
 			bonuses.resists_pen[DamageType.PHYSICAL])
 	end

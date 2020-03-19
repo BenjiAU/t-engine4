@@ -47,7 +47,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Fire and guide an arrow to its target with precise telekinetic nudges. Does normal damage, but accuracy and crit chance are increased by %d.]]):format(t.shot_boost(self, t))
+		return ([[Fire and guide an arrow to its target with precise telekinetic nudges. Does normal damage, but accuracy and crit chance are increased by %d.]]):tformat(t.shot_boost(self, t))
 	end,
 }
 
@@ -83,7 +83,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Use telekinetic forces to greatly augment the durability and tension of your bow in order to fire an arrow with velocity unmatched by even the mightiest mundane archers. Increases armor penetration by %d, and deals %d%% damage.]]):format(t.apr_boost(self, t), t.dam_mult(self, t) * 100)
+		return ([[Use telekinetic forces to greatly augment the durability and tension of your bow in order to fire an arrow with velocity unmatched by even the mightiest mundane archers. Increases armor penetration by %d, and deals %d%% damage.]]):tformat(t.apr_boost(self, t), t.dam_mult(self, t) * 100)
 	end,
 }
 
@@ -119,7 +119,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Ready and release an arrow with a flitting thought. This attack does not use a turn, and increases in talent level reduce its cooldown.]])
+		return ([[Ready and release an arrow with a flitting thought. This attack does not use a turn, and increases in talent level reduce its cooldown.]]):tformat()
 	end,
 }
 
@@ -224,7 +224,7 @@ newTalent{
 		if not o then
 			return ([[You temporarily set aside a part of you mind to direct your telekinetically-wielded bow. It will automatically attack the nearest target each turn for %d turns.
 			The telekinetically-wielded bow uses Willpower in place of Strength and Cunning in place of Dexterity to determine attack and damage.
-			You are not telekinetically wielding anything right now.]]):format(duration)
+			You are not telekinetically wielding anything right now.]]):tformat(duration)
 		end
 		if o.type == "weapon" then
 			self:attr("use_psi_combat", 1)
@@ -243,6 +243,6 @@ newTalent{
 		APR: %d
 		Crit: %0.2f
 		Speed: %0.2f]]):
-		format(duration, atk, dam, apr, crit, speed)
+		tformat(duration, atk, dam, apr, crit, speed)
 	end,
 }

@@ -68,7 +68,7 @@ newTalent {
 	info = function(self, t)
 		local stamina = t.getRestoreRate(self, t)
 		return ([[Any time you do not have an opponent in a square adjacent to you, you gain %0.1f Stamina regeneration. With the third talent point, you also gain an equal amount of life regen when Breathing Room is active.]])
-			:format(stamina)
+			:tformat(stamina)
 	end,
 }
 
@@ -105,7 +105,7 @@ newTalent {
 		local slow = t.getSlow(self, t) * 100
 		local reduction = t.getReduction(self, t)
 		return ([[Control your movements to conserve your energy.  While this talent is activated, you are globally slowed by %0.1f%%, and your fatigue is decreased by %d%% (to a minimum of 0%%).]])
-		:format(slow, reduction)
+		:tformat(slow, reduction)
 	end,
 }
 
@@ -163,7 +163,7 @@ newTalent {
 		local stamina = t.getStaminaRate(self, t)
 		local health = t.getLifeRate(self, t)
 		return ([[When the going gets tough, you get tougher. You gain %0.1f Stamina regen per enemy in sight, and beginning with the third talent point, you also gain %0.1f life regen per enemy. The bonuses cap at 4 enemies.]])
-			:format(stamina, health)
+			:tformat(stamina, health)
 	end,
 }
 
@@ -215,6 +215,6 @@ newTalent {
 		local mult = (t.getMult(self, t, true) - 1) * 100
 		return ([[For each turn you spend stamina, you gain %0.1f%% resist all and %0.1f%% all resistances cap for %d turns. The buff stacks up to %d times, and each new application refreshes the duration.
 		Additionally, at the fifth talent point, Breathing Room and Dauntless Challenger are %d%% more effective.]])
-			:format(resist, cap, duration, max, mult)
+			:tformat(resist, cap, duration, max, mult)
 	end,
 }

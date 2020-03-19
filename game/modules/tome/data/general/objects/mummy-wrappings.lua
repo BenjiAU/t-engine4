@@ -29,7 +29,7 @@ newEntity{
 	display = "[", color=colors.ANTIQUE_WHITE, image="object/mummy_wrappings.png",
 	moddable_tile = resolvers.moddable_tile("mummy_wrapping"),
 	encumber = 6,
-	desc = [[Decaying mummy wrappings.]],
+	desc = _t[[Decaying mummy wrappings.]],
 	randart_able = "/data/general/objects/random-artifacts/generic.lua",
 	egos = "/data/general/objects/egos/robe.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 	wielder = {

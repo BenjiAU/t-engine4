@@ -48,7 +48,7 @@ newTalent{
 		local slow = t.getSlow(self, t)
 		local proj = t.getProj(self, t)
 		return ([[Project a bolt of time distortion, decreasing the target's global speed by %d%% and all projectiles it fires by %d%% for 7 turns.]]):
-		format(100 * slow, proj)
+		tformat(100 * slow, proj)
 	end,
 }
 
@@ -80,7 +80,7 @@ newTalent{
 		Once either the maximum damage (%d) is absorbed, or the time runs out (%d turns), the stored damage will return as a temporal restoration field over time (5 turns).
 		Each turn the restoration field is active, you get healed for 10%% of the absorbed damage (Aegis Shielding talent affects the percentage).
 		The shield's max absorption will increase with your Spellpower.]]):
-		format(maxabsorb, duration)
+		tformat(maxabsorb, duration)
 	end,
 }
 
@@ -112,7 +112,7 @@ newTalent{
 		return ([[Removes the target from the flow of time for %d turns. In this state, the target can neither act nor be harmed.
 		Time does not pass at all for the target, no talents will cooldown, no resources will regen, and so forth.
 		The duration will increase with your Spellpower.]]):
-		format(duration)
+		tformat(duration)
 	end,
 }
 
@@ -141,6 +141,6 @@ newTalent{
 	info = function(self, t)
 		local haste = t.getHaste(self, t)
 		return ([[Increases the caster's global speed by %d%%.]]):
-		format(100 * haste)
+		tformat(100 * haste)
 	end,
 }

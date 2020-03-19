@@ -26,7 +26,7 @@ newEntity{
 	moddable_tile = resolvers.moddable_tile("light"),
 	encumber = 9,
 	rarity = 5,
-	desc = [[A suit of armour made of leather.]],
+	desc = _t[[A suit of armour made of leather.]],
 	randart_able = "/data/general/objects/random-artifacts/generic.lua",
 	egos = "/data/general/objects/egos/light-armor.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 }

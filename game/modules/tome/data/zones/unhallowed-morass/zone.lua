@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Unhallowed Morass",
+	name = _t"Unhallowed Morass",
 	level_range = {1, 5},
 	level_scheme = "player",
 	max_level = 3,

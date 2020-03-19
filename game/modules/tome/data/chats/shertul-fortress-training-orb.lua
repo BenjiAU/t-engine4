@@ -50,7 +50,7 @@ end
 
 local function resist_dummies()
 	local GetQuantity = require "engine.dialogs.GetQuantity"
-	game:registerDialog(GetQuantity.new("All resistances", "From 0 to 100", 0, 100, function(qty)
+	game:registerDialog(GetQuantity.new(_t"All resistances", _t"From 0 to 100", 0, 100, function(qty)
 		qty = util.bound(qty, 0, 100)
 		for uid, e in pairs(game.level.entities) do
 			if e.define_as == "TRAINING_DUMMY" then e.resists.all = qty end
@@ -60,13 +60,13 @@ end
 
 local function armor_dummies()
 	local GetQuantity = require "engine.dialogs.GetQuantity"
-	game:registerDialog(GetQuantity.new("Armour Hardiness", "From 0 to 100", 0, 100, function(qty)
+	game:registerDialog(GetQuantity.new(_t"Armour Hardiness", _t"From 0 to 100", 0, 100, function(qty)
 		qty = util.bound(qty, 0, 100)
 		for uid, e in pairs(game.level.entities) do
 			if e.define_as == "TRAINING_DUMMY" then e.combat_armor_hardiness = qty - 30 end
 		end
 
-		game:registerDialog(GetQuantity.new("Armour", "From 0 to 1000", 0, 1000, function(qty)
+		game:registerDialog(GetQuantity.new(_t"Armour", _t"From 0 to 1000", 0, 1000, function(qty)
 			qty = util.bound(qty, 0, 1000)
 			for uid, e in pairs(game.level.entities) do
 				if e.define_as == "TRAINING_DUMMY" then e.combat_armor = qty end
@@ -76,17 +76,17 @@ local function armor_dummies()
 end
 
 newChat{ id="welcome",
-	text = [[*#LIGHT_GREEN#This orb is used to control the training facilities.#WHITE#*]],
+	text = _t[[*#LIGHT_GREEN#This orb is used to control the training facilities.#WHITE#*]],
 	answers = {
-		{"[Create one target dummy]", action=dummies(1)},
-		{"[Create two target dummy]", action=dummies(2)},
-		{"[Create three target dummy]", action=dummies(3)},
-		{"[Create five target dummy]", action=dummies(5)},
-		{"[Create ten target dummy]", action=dummies(10)},
-		{"[Change dummies armour]", action=armor_dummies},
-		{"[Change dummies resistances]", action=resist_dummies},
-		{"[Reset]", action=remove_dummies},
-		{"[Leave the orb alone]"},
+		{_t"[Create one target dummy]", action=dummies(1)},
+		{_t"[Create two target dummy]", action=dummies(2)},
+		{_t"[Create three target dummy]", action=dummies(3)},
+		{_t"[Create five target dummy]", action=dummies(5)},
+		{_t"[Create ten target dummy]", action=dummies(10)},
+		{_t"[Change dummies armour]", action=armor_dummies},
+		{_t"[Change dummies resistances]", action=resist_dummies},
+		{_t"[Reset]", action=remove_dummies},
+		{_t"[Leave the orb alone]"},
 	}
 }
 

@@ -29,9 +29,9 @@ local GetQuantity = require "engine.dialogs.GetQuantity"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init()
-	Dialog.init(self, "Steam Options", game.w * 0.8, game.h * 0.8)
+	Dialog.init(self, _t"Steam Options", game.w * 0.8, game.h * 0.8)
 
-	self.c_desc = Textzone.new{width=math.floor(self.iw / 2 - 10), height=self.ih, text=""}
+	self.c_desc = Textzone.new{width=math.floor(self.iw / 2 - 10), height=self.ih, text=_t""}
 
 	self:generateList()
 
@@ -74,22 +74,22 @@ function _M:generateList()
 	local list = {}
 	local i = 0
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Enable Steam Cloud saves.\nYour saves will be put on steam cloud and always be available everywhere.\nDisable if you have bandwidth limitations.#WHITE#"}
-	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Cloud Saves#WHITE##{normal}#", status=function(item)
-		return tostring(core.steam.isCloudEnabled(true) and "enabled" or "disabled")
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=(_t"Enable Steam Cloud saves.\nYour saves will be put on steam cloud and always be available everywhere.\nDisable if you have bandwidth limitations.#WHITE#"):toTString()}
+	list[#list+1] = { zone=zone, name=(_t"#GOLD##{bold}#Cloud Saves#WHITE##{normal}#"):toTString(), status=function(item)
+		return tostring(core.steam.isCloudEnabled(true) and _t"enabled" or _t"disabled")
 	end, fct=function(item)
 		game:saveSettings("steam_cloud_choose", "steam_cloud_choose = true\n")
 		core.steam.cloudEnable(not core.steam.isCloudEnabled(true))
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Purge all Steam Cloud saves.\nThis will remove all saves from the cloud cloud (but not your local copy). Only use if you somehow encounter storage problems on it (which should not happen, the game automatically manages it for you).#WHITE#"}
-	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Purge Cloud Saves#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=(_t"Purge all Steam Cloud saves.\nThis will remove all saves from the cloud cloud (but not your local copy). Only use if you somehow encounter storage problems on it (which should not happen, the game automatically manages it for you).#WHITE#"):toTString()}
+	list[#list+1] = { zone=zone, name=(_t"#GOLD##{bold}#Purge Cloud Saves#WHITE##{normal}#"):toTString(), status=function(item)
 		return "purge"
 	end, fct=function(item)
-		Dialog:yesnoPopup("Steam Cloud Purge", "Confirm purge?", function(ret) if ret then
+		Dialog:yesnoPopup(_t"Steam Cloud Purge", _t"Confirm purge?", function(ret) if ret then
 			self:purgeCloud()
-			Dialog:simplePopup("Steam Cloud Purge", "All data purged from the cloud.")
+			Dialog:simplePopup(_t"Steam Cloud Purge", _t"All data purged from the cloud.")
 		end end)
 	end,}
 

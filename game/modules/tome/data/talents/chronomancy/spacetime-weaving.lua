@@ -73,9 +73,9 @@ newTalent{
 		else
 			game.level.map:particleEmitter(self.x, self.y, 1, "temporal_teleport")
 			if not self:teleportRandom(x, y, 0) then
-				game.logSeen(self, "%s's space-time folding fizzles!", self.name:capitalize())
+				game.logSeen(self, "%s's space-time folding fizzles!", self:getName():capitalize())
 			else
-				game.logSeen(self, "%s emerges from a space-time rift!", self.name:capitalize())
+				game.logSeen(self, "%s emerges from a space-time rift!", self:getName():capitalize())
 				game.level.map:particleEmitter(self.x, self.y, 1, "temporal_teleport")
 			end
 		end
@@ -86,7 +86,7 @@ newTalent{
 	info = function(self, t)
 		local range = self:getTalentRange(t)
 		return ([[Teleports you to up to %d tiles away, to a targeted location in line of sight.
-		At talent level 5 you may swap positions with a target creature.]]):format(range)
+		At talent level 5 you may swap positions with a target creature.]]):tformat(range)
 	end,
 }
 
@@ -122,7 +122,7 @@ newTalent{
 	info = function(self, t)
 		local reduction = t.getReduction(self, t)
 		return ([[When you teleport you reduce the duration of a single detrimental effect by %d turns.]]):
-		format(reduction)
+		tformat(reduction)
 	end,
 }
 
@@ -163,11 +163,11 @@ newTalent{
 		-- Our base wormhole
 		local function makeWormhole(x, y, dest_x, dest_y)
 			local wormhole = mod.class.Trap.new{
-				name = "wormhole",
-				type = "annoy", subtype="teleport", id_by_type=true, unided_name = "trap",
+				name = _t"wormhole",
+				type = "annoy", subtype="teleport", id_by_type=true, unided_name = _t"trap",
 				image = "terrain/wormhole.png",
 				display = '&', color_r=255, color_g=255, color_b=255, back_color=colors.STEEL_BLUE,
-				message = "@Target@ moves onto the wormhole.",
+				message = _t"@Target@ moves onto the wormhole.",
 				temporary = t.getDuration(self, t),
 				x = x, y = y, dest_x = dest_x, dest_y = dest_y,
 				radius = self:getTalentRadius(t),
@@ -181,14 +181,14 @@ newTalent{
 					if hit or (who.reactionToward and who:reactionToward(self) >= 0) then
 						game.level.map:particleEmitter(who.x, who.y, 1, "temporal_teleport")
 						if not who:teleportRandom(self.dest_x, self.dest_y, self.radius, 1) then
-							game.logSeen(who, "%s tries to enter the wormhole but a violent force pushes it back.", who.name:capitalize())
+							game.logSeen(who, "%s tries to enter the wormhole but a violent force pushes it back.", who:getName():capitalize())
 						else
 							if who ~= self.summoner then who:setEffect(who.EFF_CONTINUUM_DESTABILIZATION, 100, {power=self.dest_power}) end
 							game.level.map:particleEmitter(who.x, who.y, 1, "temporal_teleport")
 							game:playSoundNear(self, "talents/teleport")
 						end
 					else
-						game.logSeen(who, "%s ignores the wormhole.", who.name:capitalize())
+						game.logSeen(who, "%s ignores the wormhole.", who:getName():capitalize())
 					end
 					return true
 				end,
@@ -227,7 +227,7 @@ newTalent{
 		entrance.dest = exit
 		exit.dest = entrance
 
-		game.logSeen(self, "%s folds the space between two points.", self.name)
+		game.logSeen(self, "%s folds the space between two points.", self:getName())
 		return true
 	end,
 	info = function(self, t)
@@ -237,7 +237,7 @@ newTalent{
 		return ([[You fold the space between yourself and a second point within a range of %d, creating a pair of wormholes.  Any creature stepping on either wormhole will be teleported near the other (radius %d accuracy).  
 		The wormholes will last %d turns and must be placed at least two tiles apart.
 		The chance of teleporting enemies will scale with your Spellpower.]])
-		:format(range, radius, duration)
+		:tformat(range, radius, duration)
 	end,
 }
 
@@ -294,6 +294,6 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[When you teleport you fire a pulse that jolts enemies out of phase in a radius of %d around both the start and the destination point. 
 		Each target has a %d%% chance per tile you travelled to be stunned, blinded, confused, or pinned for %d turns.]]):
-		format(radius, chance, duration)
+		tformat(radius, chance, duration)
 	end,
 }

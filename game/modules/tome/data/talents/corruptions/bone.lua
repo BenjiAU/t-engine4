@@ -55,7 +55,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Conjures up a spear of bones, doing %0.2f physical damage to all targets in a line.  Each target takes an additional %d%% damage for each magical debuff they are afflicted with up to a max of %d%% (%d).
-		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), t.getBonus(self, t)*100, t.getBonus(self, t)*100 * 5, damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t) * 2))
+		The damage will increase with your Spellpower.]]):tformat(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), t.getBonus(self, t)*100, t.getBonus(self, t)*100 * 5, damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t) * 2))
 	end,
 }
 
@@ -86,12 +86,12 @@ newTalent{
 				if target:canBe("pin") then
 					target:setEffect(target.EFF_BONE_GRAB, t.getDuration(self, t), {apply_power=self:combatSpellpower()})
 				else
-					game.logSeen(target, "%s resists the pin!", target.name:capitalize())
+					game.logSeen(target, "%s resists the pin!", target:getName():capitalize())
 				end
 
 				local hit = self:checkHit(self:combatSpellpower(), target:combatSpellResist() + (target:attr("continuum_destabilization") or 0))
 				if not target:canBe("teleport") or not hit then
-					game.logSeen(target, "%s resists being teleported by Bone Grab!", target.name:capitalize())
+					game.logSeen(target, "%s resists being teleported by Bone Grab!", target:getName():capitalize())
 					return true
 				end
 
@@ -113,12 +113,12 @@ newTalent{
 				if target:canBe("pin") then
 					target:setEffect(target.EFF_BONE_GRAB, t.getDuration(self, t), {apply_power=self:combatSpellpower()})
 				else
-					game.logSeen(target, "%s resists the pin!", target.name:capitalize())
+					game.logSeen(target, "%s resists the pin!", target:getName():capitalize())
 				end
 
 				local hit = self:checkHit(self:combatSpellpower(), target:combatSpellResist() + (target:attr("continuum_destabilization") or 0))
 				if not target:canBe("teleport") or not hit then
-					game.logSeen(target, "%s resists being teleported by Bone Grab!", target.name:capitalize())
+					game.logSeen(target, "%s resists being teleported by Bone Grab!", target:getName():capitalize())
 					return true
 				end
 				
@@ -133,7 +133,7 @@ newTalent{
 		return ([[Grab a target and teleport it to your side or if adjacent up to 6 spaces away from you, pinning it there with a bone rising from the ground for %d turns.
 		The bone will also deal %0.2f physical damage.
 		The damage will increase with your Spellpower.]]):
-		format(t.getDuration(self, t), damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)))
+		tformat(t.getDuration(self, t), damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)))
 	end,
 }
 
@@ -176,7 +176,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Whenever you use a non-instant talent you launch a spear of bone at all enemies afflicted by 3 or more magical detrimental effects dealing %d physical damage to all enemies it passes through.
-		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)) )
+		The damage will increase with your Spellpower.]]):tformat(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)) )
 	end,
 }
 
@@ -243,7 +243,7 @@ newTalent{
 			local pid = table.remove(p.particles)
 			self:removeParticles(pid)
 		end
-		game:delayedLogDamage(src, self, 0, ("#SLATE#(%d to bones)#LAST#"):format(cb.value), false)
+		game:delayedLogDamage(src, self, 0, ("#SLATE#(%d to bones)#LAST#"):tformat(cb.value), false)
 		cb.value = 0
 		return true
 	end,
@@ -279,6 +279,6 @@ newTalent{
 		%d shield(s) will be generated when first activated.
 		Then every %d turns a new one will be created if not full.
 		This will only trigger on hits over %d damage based on Spellpower.]]):
-		format(t.getNb(self, t), t.getRegen(self, t), t.getThreshold(self, t))
+		tformat(t.getNb(self, t), t.getRegen(self, t), t.getThreshold(self, t))
 	end,
 }

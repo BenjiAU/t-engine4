@@ -29,7 +29,7 @@ function _M:run()
 	local escort_count = 0
 	game.player.advance_zones_data = {}
 
-	game:registerDialog(require('engine.dialogs.GetText').new("Advance Through Zones", "Enter a comma delimited list of zones or zone tiers to clear", 1, 9999, function(text)
+	game:registerDialog(require('engine.dialogs.GetText').new(_t"Advance Through Zones", _t"Enter a comma delimited list of zones or zone tiers to clear", 1, 9999, function(text)
 		
 		list = self:getZones(text)
 		game.player.no_inventory_access = true
@@ -45,7 +45,7 @@ function _M:run()
 		-- Do some analysis of where the experience came from and show it
 		for i, zone in ipairs(game.player.advance_zones_data) do
 			local exp_list = self:getExpBreakdown(zone.data)
-			game.log(("%s:  Level %0.2f to %0.2f (#LIGHT_STEEL_BLUE#+%0.2f#LAST#)"):format(zone.name, zone.data.start_level, zone.data.end_level, zone.data.end_level - zone.data.start_level ))
+			game.log(("%s:  Level %0.2f to %0.2f (#LIGHT_STEEL_BLUE#+%0.2f#LAST#)"):tformat(zone.name, zone.data.start_level, zone.data.end_level, zone.data.end_level - zone.data.start_level ))
 			game.log(exp_list)
 		end
 
@@ -210,8 +210,8 @@ end
 --	- Log multiple run stats
 --  - Better UI
 function _M:clearZone(zone, escort_zones)
-	if not game:changeLevelCheck(1, zone) then game.log("Unable to level change to floor 1 of "..zone) end
-	if game.zone.debug_auto_clear and game.zone.debug_auto_clear == 0 then game.log(zone.." is not valid for autoclear") end
+	if not game:changeLevelCheck(1, zone) then game.log("Unable to level change to floor 1 of %s", zone) end
+	if game.zone.debug_auto_clear and game.zone.debug_auto_clear == 0 then game.log("%s is not valid for autoclear", zone) end
 	
 	local cur_exp, max_exp = game.player.exp, game.player:getExpChart(game.player.level+1)
 	local start_level = game.player.level + math.min(1, math.max(0, cur_exp / max_exp))
@@ -248,7 +248,7 @@ function _M:clearZone(zone, escort_zones)
 	while game.level.level < (max_floors) and i < 20 do
 		data[#data+1] = self:clearLevel()
 		if not game:changeLevelCheck(game.level.level + 1, game.zone.short_name) then
-			game.log("Unable to level change to floor "..i.." of "..zone)
+			game.log("Unable to level change to floor %d of %s", i, zone)
 			break 
 		end
 		game:changeLevel(game.level.level + 1, game.zone.short_name)

@@ -55,13 +55,13 @@ newTalent{
 			local spot = i == 1 and {x=x, y=y} or rng.tableRemove(grids)
 			if not spot then break end
 			local trap = Trap.new{
-				name = "glyph of explosion",
-				type = "elemental", id_by_type=true, unided_name = "trap",
+				name = _t"glyph of explosion",
+				type = "elemental", id_by_type=true, unided_name = _t"trap",
 				display = '^', color=colors.GOLD, image = "trap/trap_glyph_explosion_02_64.png",
 				faction = self.faction,
 				dam = dam,
 				desc = function(self)
-					return ([[Explodes (radius 1) for %d light damage.]]):format(engine.interface.ActorTalents.damDesc(self, engine.DamageType.LIGHT, self.dam))
+					return ([[Explodes (radius 1) for %d light damage.]]):tformat(engine.interface.ActorTalents.damDesc(self, engine.DamageType.LIGHT, self.dam))
 				end,
 				canTrigger = function(self, x, y, who)
 					if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
@@ -103,7 +103,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[test glyph]]):
-		format()
+		tformat()
 	end,
 }
 
@@ -131,12 +131,12 @@ newTalent{
 		
 		local dam = self:spellCrit(t.getDazeDuration(self, t))
 		local trap = Trap.new{
-			name = "glyph of paralysis",
-			type = "elemental", id_by_type=true, unided_name = "trap",
+			name = _t"glyph of paralysis",
+			type = "elemental", id_by_type=true, unided_name = _t"trap",
 			display = '^', color=colors.GOLD, image = "trap/trap_glyph_paralysis_01_64.png",
 			faction = self.faction,
 			desc = function(self)
-				return ([[Dazes for %d turns.]]):format(self.dam)
+				return ([[Dazes for %d turns.]]):tformat(self.dam)
 			end,
 			dam = dam,
 			canTrigger = function(self, x, y, who)
@@ -177,7 +177,7 @@ newTalent{
 		local dazeduration = t.getDazeDuration(self, t)
 		local duration = t.getDuration(self, t)
 		return ([[You bind light in a glyph on the floor. All enemies walking over the glyph will be dazed for %d turns.
-		The glyph is a hidden trap (%d detection and %d disarm power based on your Magic) and lasts for %d turns.]]):format(dazeduration, t.trapPower(self,t)*0.8, t.trapPower(self,t), duration)
+		The glyph is a hidden trap (%d detection and %d disarm power based on your Magic) and lasts for %d turns.]]):tformat(dazeduration, t.trapPower(self,t)*0.8, t.trapPower(self,t), duration)
 	end,
 }
 
@@ -205,13 +205,13 @@ newTalent{
 		local dam = self:spellCrit(t.getDamage(self, t))
 		local sp = self:combatSpellpower()
 		local trap = Trap.new{
-			name = "glyph of repulsion",
-			type = "elemental", id_by_type=true, unided_name = "trap",
+			name = _t"glyph of repulsion",
+			type = "elemental", id_by_type=true, unided_name = _t"trap",
 			display = '^', color=colors.GOLD, image = "trap/trap_glyph_repulsion_01_64.png",
 			faction = self.faction,
 			dam = dam,
 			desc = function(self)
-				return ([[Deals %d physical damage, knocking the target back.]]):format(engine.interface.ActorTalents.damDesc(self, engine.DamageType.PHYSICAL, self.dam))
+				return ([[Deals %d physical damage, knocking the target back.]]):tformat(engine.interface.ActorTalents.damDesc(self, engine.DamageType.PHYSICAL, self.dam))
 			end,
 			canTrigger = function(self, x, y, who)
 				if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
@@ -258,7 +258,7 @@ newTalent{
 		return ([[You bind light in a glyph on the floor. All enemies walking over the glyph will be hit by a blast that does %0.2f physical damage and knocks them back.
 		The glyph is a hidden trap (%d detection and %d disarm power based on your Magic) and lasts for %d turns.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.PHYSICAL, damage), t.trapPower(self, t)*0.8, t.trapPower(self, t), duration)
+		tformat(damDesc(self, DamageType.PHYSICAL, damage), t.trapPower(self, t)*0.8, t.trapPower(self, t), duration)
 	end,
 }
 --[=[
@@ -295,14 +295,14 @@ newTalent{
 			if not spot then break end
 		
 		local trap = Trap.new{
-			name = "glyph of explosion",
-			type = "elemental", id_by_type=true, unided_name = "trap",
+			name = _t"glyph of explosion",
+			type = "elemental", id_by_type=true, unided_name = _t"trap",
 			display = '^', color=colors.GOLD, image = "trap/trap_glyph_explosion_02_64.png",
 			faction = self.faction,
 			dam = dam,
 			desc = function(self)
 				return ([[Explodes (radius 1) for %d light damage.]]
---[[			):format(engine.interface.ActorTalents.damDesc(self, engine.DamageType.LIGHT, self.dam))
+--[[			):tformat(engine.interface.ActorTalents.damDesc(self, engine.DamageType.LIGHT, self.dam))
 			end,
 			canTrigger = function(self, x, y, who)
 				if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
@@ -346,7 +346,7 @@ newTalent{
 		The glyph is a hidden trap (%d detection and %d disarm power based on your Magic) and lasts for %d turns.
 		The damage will increase with your Spellpower.]]
 --[[	):
-		format(damDesc(self, DamageType.LIGHT, damage), t.trapPower(self, t)*0.8, t.trapPower(self, t)*0.8, duration)
+		tformat(damDesc(self, DamageType.LIGHT, damage), t.trapPower(self, t)*0.8, t.trapPower(self, t)*0.8, duration)
 	end,
 }
 ]=]
@@ -374,13 +374,13 @@ newTalent{
 
 		local dam = t.getSlow(self, t)
 		local trap = Trap.new{
-			name = "glyph of fatigue",
-			type = "elemental", id_by_type=true, unided_name = "trap",
+			name = _t"glyph of fatigue",
+			type = "elemental", id_by_type=true, unided_name = _t"trap",
 			display = '^', color=colors.GOLD, image = "trap/trap_glyph_fatigue_01_64.png",
 			faction = self.faction,
 			dam = dam,
 			desc = function(self)
-				return ([[Slows (%d%%) for 5 turns.]]):format(self.dam*100)
+				return ([[Slows (%d%%) for 5 turns.]]):tformat(self.dam*100)
 			end,
 			canTrigger = function(self, x, y, who)
 				if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
@@ -419,7 +419,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[You bind light in a glyph on the floor. All enemies walking over the glyph will be slowed by %d%% for 5 turns.
 		The glyph is a hidden trap (%d detection and %d disarm power based on your Magic) and lasts for %d turns.]]):
-		format(100 * slow, t.trapPower(self, t), t.trapPower(self, t), duration)
+		tformat(100 * slow, t.trapPower(self, t), t.trapPower(self, t), duration)
 	end,
 }
 

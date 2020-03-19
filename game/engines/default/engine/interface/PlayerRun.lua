@@ -46,7 +46,7 @@ function _M:runInit(dir)
 		block_hard_left = false,
 		block_hard_right = false,
 		cnt = 1,
-		dialog = Dialog:simplePopup("Running...", "You are running, press Enter to stop.", function()
+		dialog = Dialog:simplePopup(_t"Running...", _t"You are running, press Enter to stop.", function()
 			self:runStop()
 		end, false, true),
 	}
@@ -96,7 +96,7 @@ function _M:runFollow(path)
 	self.running = {
 		path = runpath,
 		cnt = 1,
-		dialog = Dialog:simplePopup("Running...", "You are running, press any key to stop.", function()
+		dialog = Dialog:simplePopup(_t"Running...", _t"You are running, press any key to stop.", function()
 			self:runStop()
 		end, false, true),
 	}
@@ -138,7 +138,7 @@ function _M:runStep()
 				self:runMoved()
 				-- Did not move ? no use in running unless we were busy
 				if self.running and not self.running.busy and self.x == oldx and self.y == oldy then
-					self:runStop("didn't move")
+					self:runStop(_t"didn't move")
 				end
 			end
 			if not self.running then return false end
@@ -180,7 +180,7 @@ function _M:runStep()
 				self.running = running_bak
 				-- Can't run around the trap
 				if not ret2 then
-					self:runStop("trap spotted")
+					self:runStop(_t"trap spotted")
 					return false
 				end
 			end
@@ -199,7 +199,7 @@ function _M:runStep()
 					self.running.ignore_left = nil
 					-- We do this check here because it is path/time dependent, not terrain configuration dependent
 					if dir_is_cardinal and self:checkRunDir(sides.left) and self:checkRunDir(self.running.dir, 2) then
-						self:runStop("terrain change on the left")
+						self:runStop(_t"terrain change on the left")
 						return false
 					end
 				end
@@ -212,7 +212,7 @@ function _M:runStep()
 					self.running.ignore_right = nil
 					-- We do this check here because it is path/time dependent, not terrain configuration dependent
 					if dir_is_cardinal and self:checkRunDir(sides.right) and self:checkRunDir(self.running.dir, 2) then
-						self:runStop("terrain change on the right")
+						self:runStop(_t"terrain change on the right")
 						return false
 					end
 				end
@@ -371,7 +371,7 @@ function _M:runStop(msg)
 	game:unregisterDialog(self.running.dialog)
 
 	if not msg and self.running.explore and self.running.path and self.running.cnt == #self.running.path + 1 then
-		msg = "at " .. self.running.explore
+		msg = ("at %s"):tformat(_t(self.running.explore))
 	end
 	if msg then
 		game.log("Ran for %d turns (stop reason: %s).", self.running.cnt, msg)

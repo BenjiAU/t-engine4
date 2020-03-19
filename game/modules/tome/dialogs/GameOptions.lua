@@ -35,16 +35,16 @@ function _M:init()
 	-- we can be called from the boot menu, so make sure to load initial settings in this case
 	dofile("/mod/settings.lua")
 
-	Dialog.init(self, "Game Options", game.w * 0.8, game.h * 0.8)
+	Dialog.init(self, _t"Game Options", game.w * 0.8, game.h * 0.8)
 
 	self.vsep = Separator.new{dir="horizontal", size=self.ih - 10}
 	self.c_desc = TextzoneList.new{width=math.floor((self.iw - self.vsep.w)/2), height=self.ih}
 
 	local tabs = {
-		{title="UI", kind="ui"},
-		{title="Gameplay", kind="gameplay"},
-		{title="Online", kind="online"},
-		{title="Misc", kind="misc"}
+		{title=_t"UI", kind="ui"},
+		{title=_t"Gameplay", kind="gameplay"},
+		{title=_t"Online", kind="online"},
+		{title=_t"Misc", kind="misc"}
 	}
 	self:triggerHook{"GameOptions:tabs", tab=function(title, fct)
 		local id = #tabs+1
@@ -96,8 +96,8 @@ function _M:generateListUi()
 	local list = {}
 	local i = 0
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Select the graphical mode to display the world.\nDefault is 'Modern'.\nWhen you change it, make a new character or it may look strange."}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Graphic Mode#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Select the graphical mode to display the world.\nDefault is 'Modern'.\nWhen you change it, make a new character or it may look strange."}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Graphic Mode#WHITE##{normal}#", status=function(item)
 		local ts = GraphicMode.tiles_packs[config.settings.tome.gfx.tiles]
 		local size = config.settings.tome.gfx.size or "???x???"
 		return (ts and ts.name or "???").." <"..size..">"
@@ -105,8 +105,8 @@ function _M:generateListUi()
 		game:registerDialog(GraphicMode.new())
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Make the movement of creatures and projectiles 'smooth'. When set to 0 movement will be instantaneous.\nThe higher this value the slower the movements will appear.\n\nNote: This does not affect the turn-based idea of the game. You can move again while your character is still moving, and it will correctly update and compute a new animation."}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Smooth creatures movement#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Make the movement of creatures and projectiles 'smooth'. When set to 0 movement will be instantaneous.\nThe higher this value the slower the movements will appear.\n\nNote: This does not affect the turn-based idea of the game. You can move again while your character is still moving, and it will correctly update and compute a new animation."}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Smooth creatures movement#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.smooth_move)
 	end, fct=function(item)
 		game:registerDialog(GetQuantity.new("Enter movement speed(lower is faster)", "From 0 to 60", config.settings.tome.smooth_move, 60, function(qty)
@@ -117,8 +117,8 @@ function _M:generateListUi()
 		end))
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Enables or disables 'twitch' movement.\nWhen enabled creatures will do small bumps when moving and attacking.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Twitch creatures movement and attack#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Enables or disables 'twitch' movement.\nWhen enabled creatures will do small bumps when moving and attacking.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Twitch creatures movement and attack#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.twitch_move and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.twitch_move = not config.settings.tome.twitch_move
@@ -126,8 +126,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Enables smooth fog-of-war.\nDisabling it will make the fog of war look 'blocky' but might gain a slight performance increase.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Smooth fog of war#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Enables smooth fog-of-war.\nDisabling it will make the fog of war look 'blocky' but might gain a slight performance increase.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Smooth fog of war#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.smooth_fov and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.smooth_fov = not config.settings.tome.smooth_fov
@@ -135,8 +135,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Select the interface look. Metal is the default one. Simple is basic but takes less screen space.\nYou must restart the game for the change to take effect."}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Interface Style#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Select the interface look. Metal is the default one. Simple is basic but takes less screen space.\nYou must restart the game for the change to take effect."}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Interface Style#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.ui_theme3):capitalize()
 	end, fct=function(item)
 		local uis = {{name="Dark", ui="dark"}, {name="Metal", ui="metal"}, {name="Stone", ui="stone"}, {name="Simple", ui="simple"}}
@@ -149,8 +149,8 @@ function _M:generateListUi()
 		end)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Select the HUD look. 'Minimalist' is the default one.\n#LIGHT_RED#This will take effect on next restart."}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#HUD Style#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Select the HUD look. 'Minimalist' is the default one.\n#LIGHT_RED#This will take effect on next restart."}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#HUD Style#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.uiset_mode):capitalize()
 	end, fct=function(item)
 		local huds = {{name="Minimalist", ui="Minimalist"}, {name="Classic", ui="Classic"}}
@@ -164,8 +164,8 @@ function _M:generateListUi()
 	end,}
 
 	if self:isTome() and game.uiset:checkGameOption("log_lines") then	
-		local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="The number of lines to display in the combat log (for the Classic HUD)."}
-		list[#list+1] = { zone=zone, name="#GOLD##{bold}#Log lines#WHITE##{normal}#", status=function(item)
+		local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"The number of lines to display in the combat log (for the Classic HUD)."}
+		list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Log lines#WHITE##{normal}#", status=function(item)
 			return tostring(config.settings.tome.log_lines)
 		end, fct=function(item)
 			game:registerDialog(GetQuantity.new("Log lines", "From 5 to 50", config.settings.tome.log_lines, 50, function(qty)
@@ -180,8 +180,8 @@ function _M:generateListUi()
 		end,}
 	end
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Draw faint lines to separate each grid, making visual positioning easier to see.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Display map grid lines#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Draw faint lines to separate each grid, making visual positioning easier to see.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Display map grid lines#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.show_grid_lines and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.show_grid_lines = not config.settings.tome.show_grid_lines
@@ -190,8 +190,8 @@ function _M:generateListUi()
 		if self:isTome() then game:createMapGridLines() end
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Select the fonts look. Fantasy is the default one. Basic is simplified and smaller.\nYou must restart the game for the change to take effect."}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Font Style#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Select the fonts look. Fantasy is the default one. Basic is simplified and smaller.\nYou must restart the game for the change to take effect."}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Font Style#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.fonts.type):capitalize()
 	end, fct=function(item)
 		local list = FontPackage:list()
@@ -203,8 +203,8 @@ function _M:generateListUi()
 		end)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Select the fonts size.\nYou must restart the game for the change to take effect."}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Font Size#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Select the fonts size.\nYou must restart the game for the change to take effect."}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Font Size#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.fonts.size):capitalize()
 	end, fct=function(item)
 		Dialog:listPopup("Font size", "Select font", {{name="Normal", size="normal"},{name="Small", size="small"},{name="Big", size="big"},}, 300, 200, function(sel)
@@ -215,8 +215,8 @@ function _M:generateListUi()
 		end)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="How many seconds before log and chat lines begin to fade away.\nIf set to 0 the logs will never fade away."}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Log fade time#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"How many seconds before log and chat lines begin to fade away.\nIf set to 0 the logs will never fade away."}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Log fade time#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.log_fade)
 	end, fct=function(item)
 		game:registerDialog(GetQuantity.new("Fade time (in seconds)", "From 0 to 20", config.settings.tome.log_fade, 20, function(qty)
@@ -231,8 +231,8 @@ function _M:generateListUi()
 		end, 0))
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="How long will flying text messages be visible on screen.\nThe range is 1 (very short) to 100 (10x slower) than the normal duration, which varies with each individual message."}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Duration of flying text#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"How long will flying text messages be visible on screen.\nThe range is 1 (very short) to 100 (10x slower) than the normal duration, which varies with each individual message."}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Duration of flying text#WHITE##{normal}#", status=function(item)
 		return tostring((config.settings.tome.flyers_fade_time or 10) )
 	end, fct=function(item)
 		game:registerDialog(GetQuantity.new("Relative duration", "From 1 to 100", (config.settings.tome.flyers_fade_time or 10), 100, function(qty)
@@ -245,8 +245,8 @@ function _M:generateListUi()
 
 	if self:isTome() then
 		if game.uiset:checkGameOption("icons_temp_effects") then
-			local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Uses the icons for status effects instead of text.#WHITE#"}
-			list[#list+1] = { zone=zone, name="#GOLD##{bold}#Icons status effects#WHITE##{normal}#", status=function(item)
+			local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Uses the icons for status effects instead of text.#WHITE#"}
+			list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Icons status effects#WHITE##{normal}#", status=function(item)
 				return tostring(config.settings.tome.effects_icons and "enabled" or "disabled")
 			end, fct=function(item)
 				config.settings.tome.effects_icons = not config.settings.tome.effects_icons
@@ -257,8 +257,8 @@ function _M:generateListUi()
 		end
 
 		if game.uiset:checkGameOption("icons_hotkeys") then
-			local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Uses the icons hotkeys toolbar or the textual one.#WHITE#"}
-			list[#list+1] = { zone=zone, name="#GOLD##{bold}#Icons hotkey toolbar#WHITE##{normal}#", status=function(item)
+			local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Uses the icons hotkeys toolbar or the textual one.#WHITE#"}
+			list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Icons hotkey toolbar#WHITE##{normal}#", status=function(item)
 				return tostring(config.settings.tome.hotkey_icons and "enabled" or "disabled")
 			end, fct=function(item)
 				config.settings.tome.hotkey_icons = not config.settings.tome.hotkey_icons
@@ -269,8 +269,8 @@ function _M:generateListUi()
 		end
 
 		if game.uiset:checkGameOption("hotkeys_rows") then
-			local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Number of rows to show in the icons hotkeys toolbar.#WHITE#"}
-			list[#list+1] = { zone=zone, name="#GOLD##{bold}#Icons hotkey toolbar rows#WHITE##{normal}#", status=function(item)
+			local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Number of rows to show in the icons hotkeys toolbar.#WHITE#"}
+			list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Icons hotkey toolbar rows#WHITE##{normal}#", status=function(item)
 				return tostring(config.settings.tome.hotkey_icons_rows)
 			end, fct=function(item)
 				game:registerDialog(GetQuantity.new("Number of icons rows", "From 1 to 4", config.settings.tome.hotkey_icons_rows, 4, function(qty)
@@ -284,8 +284,8 @@ function _M:generateListUi()
 		end
 	end
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="When you activate a hotkey, either by keyboard or click a visual feedback will appear over it in the hotkeys bar.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Visual hotkeys feedback#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"When you activate a hotkey, either by keyboard or click a visual feedback will appear over it in the hotkeys bar.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Visual hotkeys feedback#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.visual_hotkeys and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.visual_hotkeys = not config.settings.tome.visual_hotkeys
@@ -293,8 +293,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="When the player or an NPC uses a talent shows a quick popup with the talent's icon and name over its head.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Talents activations map display#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"When the player or an NPC uses a talent shows a quick popup with the talent's icon and name over its head.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Talents activations map display#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.talents_flyers and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.talents_flyers = not config.settings.tome.talents_flyers
@@ -302,8 +302,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Size of the icons in the hotkeys toolbar.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Icons hotkey toolbar icon size#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Size of the icons in the hotkeys toolbar.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Icons hotkey toolbar icon size#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.hotkey_icons_size)
 	end, fct=function(item)
 		game:registerDialog(GetQuantity.new("Icons size", "From 32 to 64", config.settings.tome.hotkey_icons_size, 64, function(qty)
@@ -315,8 +315,8 @@ function _M:generateListUi()
 		end, 32))
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="If disabled lore popups will only appear the first time you see the lore on your profile.\nIf enabled it will appear the first time you see it with each character.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Always show lore popup#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"If disabled lore popups will only appear the first time you see the lore on your profile.\nIf enabled it will appear the first time you see it with each character.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Always show lore popup#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.lore_popup and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.lore_popup = not config.settings.tome.lore_popup
@@ -324,8 +324,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="If disabled items with activations will not be auto-added to your hotkeys, you will need to manualty drag them from the inventory screen.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Always add objects to hotkeys#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"If disabled items with activations will not be auto-added to your hotkeys, you will need to manualty drag them from the inventory screen.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Always add objects to hotkeys#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.auto_hotkey_object and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.auto_hotkey_object = not config.settings.tome.auto_hotkey_object
@@ -334,14 +334,14 @@ function _M:generateListUi()
 	end,}
 
 	if self:isTome() then
-		local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString[[Toggles between various tactical information display:
+		local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t[[Toggles between various tactical information display:
 - Combined healthbar and small tactical frame
 - Combined healthbar and big tactical frame
 - Only healthbar
 - No tactical information at all
 
 #{italic}#You can also change this directly ingame by pressing shift+T.#{normal}##WHITE#]]}
-		list[#list+1] = { zone=zone, name="#GOLD##{bold}#Tactical overlay#WHITE##{normal}#", status=function(item)
+		list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Tactical overlay#WHITE##{normal}#", status=function(item)
 			local vs = "Combined Small"
 			if game.always_target == "old" then
 				vs = "Combined Big"
@@ -367,8 +367,8 @@ function _M:generateListUi()
 		end,}
 	end
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Toggles between a normal or flagpost tactical bars.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Flagpost tactical bars#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Toggles between a normal or flagpost tactical bars.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Flagpost tactical bars#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.flagpost_tactical and "Enabled" or "Disabled")
 	end, fct=function(item)
 		config.settings.tome.flagpost_tactical = not config.settings.tome.flagpost_tactical
@@ -376,8 +376,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Toggles between a bottom or side display for tactial healthbars.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Healthbars position#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Toggles between a bottom or side display for tactial healthbars.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Healthbars position#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.small_frame_side and "Sides" or "Bottom")
 	end, fct=function(item)
 		config.settings.tome.small_frame_side = not config.settings.tome.small_frame_side
@@ -385,8 +385,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="If disabled you will not get a fullscreen notification of stun/daze effects. Beware.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Fullscreen stun/daze notification#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"If disabled you will not get a fullscreen notification of stun/daze effects. Beware.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Fullscreen stun/daze notification#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.fullscreen_stun and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.fullscreen_stun = not config.settings.tome.fullscreen_stun
@@ -395,8 +395,8 @@ function _M:generateListUi()
 		if self:isTome() then if game.player.updateMainShader then game.player:updateMainShader() end end
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="If disabled you will not get a fullscreen notification of confusion effects. Beware.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Fullscreen confusion notification#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"If disabled you will not get a fullscreen notification of confusion effects. Beware.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Fullscreen confusion notification#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.fullscreen_confusion and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.fullscreen_confusion = not config.settings.tome.fullscreen_confusion
@@ -405,8 +405,8 @@ function _M:generateListUi()
 		if self:isTome() then if game.player.updateMainShader then game.player:updateMainShader() end end
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Toggles advanced weapon statistics display.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Advanced Weapon Statistics#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Toggles advanced weapon statistics display.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Advanced Weapon Statistics#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.advanced_weapon_stats and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.advanced_weapon_stats = not config.settings.tome.advanced_weapon_stats
@@ -414,8 +414,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Always display the combat properties of gloves even if you don't know unarmed attack talents.#WHITE#"}
-	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Always show glove combat properties#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Always display the combat properties of gloves even if you don't know unarmed attack talents.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Always show glove combat properties#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.display_glove_stats and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.display_glove_stats = not config.settings.tome.display_glove_stats
@@ -423,8 +423,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Always display combat properties of shields even if you don't know shield attack talents.#WHITE#"}
-	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Always show shield combat properties#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Always display combat properties of shields even if you don't know shield attack talents.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Always show shield combat properties#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.display_shield_stats and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.display_shield_stats = not config.settings.tome.display_shield_stats
@@ -432,8 +432,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="When you do a mouse gesture (right click + drag) a color coded trail is displayed.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Display mouse gesture trails#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"When you do a mouse gesture (right click + drag) a color coded trail is displayed.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Display mouse gesture trails#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.hide_gestures and "disabled" or "enabled")
 	end, fct=function(item)
 		config.settings.hide_gestures = not config.settings.hide_gestures
@@ -441,8 +441,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="If enabled new quests and quests updates will display a big popup, if not a simple line of text will fly on the screen.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Big Quest Popups#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"If enabled new quests and quests updates will display a big popup, if not a simple line of text will fly on the screen.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Big Quest Popups#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.quest_popup and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.quest_popup = not config.settings.tome.quest_popup
@@ -450,8 +450,8 @@ function _M:generateListUi()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Enable the WASD movement keys. Can be used to move diagonaly by pressing two directions at once.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Enable WASD movement keys#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Enable the WASD movement keys. Can be used to move diagonaly by pressing two directions at once.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Enable WASD movement keys#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.use_wasd and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.use_wasd = not config.settings.tome.use_wasd
@@ -460,8 +460,8 @@ function _M:generateListUi()
 		if self:isTome() then game:setupWASD() end
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Sharpen Visuals, set to 0 to disable.#WHITE#"}
-	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Sharpen Visuals#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Sharpen Visuals, set to 0 to disable.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Sharpen Visuals#WHITE##{normal}#", status=function(item)
 		return tostring((config.settings.tome.sharpen_display or 0))
 	end, fct=function(item)
 		game:registerDialog(GetQuantitySlider.new("Enter Sharpen Power", "From 0(disable) to 10", math.floor(config.settings.tome.sharpen_display or 0), 0, 10, 1, function(qty)
@@ -481,8 +481,8 @@ function _M:generateListGameplay()
 	local list = {}
 	local i = 0
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Defines the distance from the screen edge at which scrolling will start. If set high enough the game will always center on the player.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Scroll distance#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Defines the distance from the screen edge at which scrolling will start. If set high enough the game will always center on the player.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Scroll distance#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.scroll_dist)
 	end, fct=function(item)
 		game:registerDialog(GetQuantity.new("Scroll distance", "From 1 to 50", config.settings.tome.scroll_dist, 50, function(qty)
@@ -493,8 +493,8 @@ function _M:generateListGameplay()
 		end, 1))
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"If you loose more than this percentage of life in a turn, a warning will display and all key/mouse input will be ignored for 2 seconds to prevent mistakes.#WHITE#"}
-	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Life Lost Warning#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"If you loose more than this percentage of life in a turn, a warning will display and all key/mouse input will be ignored for 2 seconds to prevent mistakes.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Life Lost Warning#WHITE##{normal}#", status=function(item)
 		return (not config.settings.tome.life_lost_warning or config.settings.tome.life_lost_warning == 100) and "disabled" or tostring(config.settings.tome.life_lost_warning).."%"
 	end, fct=function(item)
 		game:registerDialog(GetQuantity.new("Life lost percentage (out of max life)", "From 1 to 99 (100 to disable)", config.settings.tome.life_lost_warning or 100, 100, function(qty)
@@ -505,8 +505,8 @@ function _M:generateListGameplay()
 		end, 1))
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Enables or disables weather effects in some zones.\nDisabling it can gain some performance. It will not affect previously visited zones.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Weather effects#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Enables or disables weather effects in some zones.\nDisabling it can gain some performance. It will not affect previously visited zones.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Weather effects#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.weather_effects and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.weather_effects = not config.settings.tome.weather_effects
@@ -514,8 +514,8 @@ function _M:generateListGameplay()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Enables or disables day/night light variations effects..#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Day/night light cycle#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Enables or disables day/night light variations effects..#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Day/night light cycle#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.daynight and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.daynight = not config.settings.tome.daynight
@@ -523,8 +523,8 @@ function _M:generateListGameplay()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Enables easy movement using the mouse by left-clicking on the map.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Use mouse to move#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Enables easy movement using the mouse by left-clicking on the map.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Use mouse to move#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.mouse_move and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.mouse_move = not config.settings.mouse_move
@@ -532,8 +532,8 @@ function _M:generateListGameplay()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Enables quick melee targeting.\nTalents that require a melee target will automatically target when pressing a direction key instead of requiring a confirmation.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Quick melee targeting#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Enables quick melee targeting.\nTalents that require a melee target will automatically target when pressing a direction key instead of requiring a confirmation.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Quick melee targeting#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.immediate_melee_keys and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.immediate_melee_keys = not config.settings.tome.immediate_melee_keys
@@ -541,8 +541,8 @@ function _M:generateListGameplay()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Enables quick melee targeting auto attacking.\nTalents that require a melee target will automatically target and confirm if there is only one hostile creatue around.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Quick melee targeting auto attack#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Enables quick melee targeting auto attacking.\nTalents that require a melee target will automatically target and confirm if there is only one hostile creatue around.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Quick melee targeting auto attack#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.immediate_melee_keys_auto and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.immediate_melee_keys_auto = not config.settings.tome.immediate_melee_keys_auto
@@ -550,8 +550,8 @@ function _M:generateListGameplay()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Enables mouse targeting. If disabled mouse movements will not change the target when casting a spell or using a talent.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Mouse targeting#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Enables mouse targeting. If disabled mouse movements will not change the target when casting a spell or using a talent.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Mouse targeting#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.disable_mouse_targeting and "disabled" or "enabled")
 	end, fct=function(item)
 		config.settings.tome.disable_mouse_targeting = not config.settings.tome.disable_mouse_targeting
@@ -559,8 +559,8 @@ function _M:generateListGameplay()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Auto-validate targets. If you fire an arrow/talent/... it will automatically use the default target without asking\n#LIGHT_RED#This is dangerous. Do not enable unless you know exactly what you are doing.#WHITE#\n\nDefault target is always either one of:\n - The last creature hovered by the mouse\n - The last attacked creature\n - The closest creature"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Auto-accept target#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Auto-validate targets. If you fire an arrow/talent/... it will automatically use the default target without asking\n#LIGHT_RED#This is dangerous. Do not enable unless you know exactly what you are doing.#WHITE#\n\nDefault target is always either one of:\n - The last creature hovered by the mouse\n - The last attacked creature\n - The closest creature"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Auto-accept target#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.auto_accept_target and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.auto_accept_target = not config.settings.auto_accept_target
@@ -568,8 +568,8 @@ function _M:generateListGameplay()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="New games begin with some talent points auto-assigned.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Auto-assign talent points at birth#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"New games begin with some talent points auto-assigned.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Auto-assign talent points at birth#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.autoassign_talents_on_birth and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.autoassign_talents_on_birth = not config.settings.tome.autoassign_talents_on_birth
@@ -577,8 +577,8 @@ function _M:generateListGameplay()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Always rest to full before auto-exploring.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Rest before auto-explore#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Always rest to full before auto-exploring.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Rest before auto-explore#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.rest_before_explore and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.rest_before_explore = not config.settings.tome.rest_before_explore
@@ -586,8 +586,8 @@ function _M:generateListGameplay()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="When swaping an item with a tinker attached, swap the tinker to the newly worn item automatically.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Swap tinkers#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"When swaping an item with a tinker attached, swap the tinker to the newly worn item automatically.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Swap tinkers#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.tinker_auto_switch and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.tinker_auto_switch = not config.settings.tome.tinker_auto_switch
@@ -603,8 +603,8 @@ function _M:generateListOnline()
 	local list = {}
 	local i = 0
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Configure the chat filters to select what kind of messages to see.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Chat message filters#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Configure the chat filters to select what kind of messages to see.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Chat message filters#WHITE##{normal}#", status=function(item)
 		return "select to configure"
 	end, fct=function(item)
 		game:registerDialog(require("engine.dialogs.ChatFilter").new({
@@ -613,18 +613,18 @@ function _M:generateListOnline()
 		}))
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Configure the chat ignore filter.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Chat ignore list#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Configure the chat ignore filter.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Chat ignore list#WHITE##{normal}#", status=function(item)
 		return "select to configure"
 	end, fct=function(item)	game:registerDialog(require("engine.dialogs.ChatIgnores").new()) end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Configure the chat channels to listen to.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Chat channels#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Configure the chat channels to listen to.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Chat channels#WHITE##{normal}#", status=function(item)
 		return "select to configure"
 	end, fct=function(item)	game:registerDialog(require("engine.dialogs.ChatChannels").new()) end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Open links in external browser instead of the embedded one.\nThis does not affect addons browse and installation which always stays ingame."}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Open links in external browser#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Open links in external browser instead of the embedded one.\nThis does not affect addons browse and installation which always stays ingame."}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Open links in external browser#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.open_links_external and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.open_links_external = not config.settings.open_links_external
@@ -632,8 +632,8 @@ function _M:generateListOnline()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Enable Discord's Rich Presence integration to show your current character on your currently playing profile on Discord (restart the game to apply).\n#ANTIQUE_WHITE#If you do not use Discord this option doesn't do anything in either state."}
-	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Discord's Rich Presence#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Enable Discord's Rich Presence integration to show your current character on your currently playing profile on Discord (restart the game to apply).\n#ANTIQUE_WHITE#If you do not use Discord this option doesn't do anything in either state."}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Discord's Rich Presence#WHITE##{normal}#", status=function(item)
 		return tostring(not config.settings.disable_discord and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.disable_discord = not config.settings.disable_discord
@@ -641,8 +641,8 @@ function _M:generateListOnline()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Keep a copy of your character sheets (not the whole savefile) on the online vault at te4.org.\nFor each character you will be given a link to this online character sheet so that you can brag about your heroic deeds or sad deaths to your friends or the whole community.#WHITE#"}
-	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Upload characters sheets to the online vault#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Keep a copy of your character sheets (not the whole savefile) on the online vault at te4.org.\nFor each character you will be given a link to this online character sheet so that you can brag about your heroic deeds or sad deaths to your friends or the whole community.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Upload characters sheets to the online vault#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.upload_charsheet and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.upload_charsheet = not config.settings.upload_charsheet
@@ -651,8 +651,8 @@ function _M:generateListOnline()
 
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Allow various events that are pushed by the server when playing online\n#{bold}#All#{normal}#: Allow all server events (bonus zones, random events, ...)\n#{bold}#Technical help only#{normal}#: Allow administrator to help in case of bugs or weirdness and allows website services (data reset, steam achievements push, ...) to work.\n#{bold}#Disabled#{normal}#: Disallow all.\n#WHITE#"}
-	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Allow online events#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Allow various events that are pushed by the server when playing online\n#{bold}#All#{normal}#: Allow all server events (bonus zones, random events, ...)\n#{bold}#Technical help only#{normal}#: Allow administrator to help in case of bugs or weirdness and allows website services (data reset, steam achievements push, ...) to work.\n#{bold}#Disabled#{normal}#: Disallow all.\n#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Allow online events#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.allow_online_events == true and "all" or (config.settings.allow_online_events == "limited" and "technical help only" or "disabled"))
 	end, fct=function(item)
 		if config.settings.allow_online_events == true then config.settings.allow_online_events = "limited"
@@ -662,7 +662,7 @@ function _M:generateListOnline()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, scrollbar=true, text=[[Disables all connectivity to the network.
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, scrollbar=true, text=_t[[Disables all connectivity to the network.
 This includes, but is not limited to:
 - Player profiles: You will not be able to login, register
 - Characters vault: You will not be able to upload any character to the online vault to show your glory
@@ -679,7 +679,7 @@ If you do not want that, simply run the game directly: the #{bold}#only#{normal}
 
 #{bold}##CRIMSON#This is an extremely restrictive setting. It is recommended you only activate it if you have no other choice as it will remove many fun and acclaimed features.
 A full exit and restart of the game is neccessary to apply this setting.#{normal}#]]}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Disable all connectivity#WHITE##{normal}#", status=function(item)
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Disable all connectivity#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.disable_all_connectivity and "yes" or "no")
 	end, fct=function(item)
 		config.settings.disable_all_connectivity = not config.settings.disable_all_connectivity
@@ -695,8 +695,8 @@ function _M:generateListMisc()
 	local list = {}
 	local i = 0
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Saves in the background, allowing you to continue playing.\n#LIGHT_RED#Disabling it is not recommended.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Save in the background#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Saves in the background, allowing you to continue playing.\n#LIGHT_RED#Disabling it is not recommended.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Save in the background#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.background_saves and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.background_saves = not config.settings.background_saves
@@ -704,8 +704,8 @@ function _M:generateListMisc()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Forces the game to save each level instead of each zone.\nThis makes it save more often but the game will use less memory when deep in a dungeon.\n\n#LIGHT_RED#Changing this option will not affect already visited zones.\n*THIS DOES NOT MAKE A FULL SAVE EACH LEVEL*.\n#LIGHT_RED#Disabling it is not recommended#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Zone save per level#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Forces the game to save each level instead of each zone.\nThis makes it save more often but the game will use less memory when deep in a dungeon.\n\n#LIGHT_RED#Changing this option will not affect already visited zones.\n*THIS DOES NOT MAKE A FULL SAVE EACH LEVEL*.\n#LIGHT_RED#Disabling it is not recommended#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Zone save per level#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.save_zone_levels and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.save_zone_levels = not config.settings.tome.save_zone_levels
@@ -713,8 +713,8 @@ function _M:generateListMisc()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="Disallow boot images that could be found 'offensive'.#WHITE#"}
-	list[#list+1] = { zone=zone, name="#GOLD##{bold}#Censor boot#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Disallow boot images that could be found 'offensive'.#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Censor boot#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.censor_boot and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.censor_boot = not config.settings.censor_boot
@@ -722,8 +722,8 @@ function _M:generateListMisc()
 		self.c_list:drawItem(item)
 	end,}
 
-	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=string.toTString"Replace headwear images by cloak hoods if a cloak is worn#WHITE#"}
-	list[#list+1] = { zone=zone, name=string.toTString"#GOLD##{bold}#Show cloak hoods#WHITE##{normal}#", status=function(item)
+	local zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=_t"Replace headwear images by cloak hoods if a cloak is worn#WHITE#"}
+	list[#list+1] = { zone=zone, name=_t"#GOLD##{bold}#Show cloak hoods#WHITE##{normal}#", status=function(item)
 		return tostring(config.settings.tome.show_cloak_hoods and "enabled" or "disabled")
 	end, fct=function(item)
 		config.settings.tome.show_cloak_hoods = not config.settings.tome.show_cloak_hoods

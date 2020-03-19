@@ -23,7 +23,7 @@ newEntity{
 	define_as = "BASE_NPC_SPIDER",
 	type = "spiderkin", subtype = "spider",
 	display = "S", color=colors.WHITE,
-	desc = [[Arachnophobia...]],
+	desc = _t[[Arachnophobia...]],
 	body = { INVEN = 10 },
 
 	max_stamina = 150,
@@ -40,7 +40,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_SPIDER",
 	name = "weaver hatchling", color=colors.LIGHT_STEEL_BLUE, image="npc/spiderkin_spider_weaver_young.png",
-	desc = [[A nearly translucent spider hatchling.]],
+	desc = _t[[A nearly translucent spider hatchling.]],
 	level_range = {1, nil}, exp_worth = 1,
 	rarity = 1,	size_category = 1,
 	max_life = resolvers.rngavg(10,20),
@@ -56,7 +56,7 @@ newEntity{ base = "BASE_NPC_SPIDER",
 
 newEntity{ base = "BASE_NPC_SPIDER",
 	name = "orb spinner", color=colors.UMBER,
-	desc = [[A large brownish arachnid, its fangs drip with a strange fluid.]],
+	desc = _t[[A large brownish arachnid, its fangs drip with a strange fluid.]],
 	level_range = {1, nil}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(20,40),
@@ -72,7 +72,7 @@ newEntity{ base = "BASE_NPC_SPIDER",
 
 newEntity{ base = "BASE_NPC_SPIDER",
 	name = "orb weaver", color=colors.DARK_UMBER,
-	desc = [[A large brownish arachnid spinning its web.  It doesn't look pleased that you've disturbed its work.]],
+	desc = _t[[A large brownish arachnid spinning its web.  It doesn't look pleased that you've disturbed its work.]],
 	level_range = {3, nil}, exp_worth = 1,
 	rarity = 10, -- rarely appears alone
 	max_life = resolvers.rngavg(40,60),
@@ -86,7 +86,7 @@ newEntity{ base = "BASE_NPC_SPIDER",
 
 newEntity{ base = "BASE_NPC_SPIDER",
 	name = "fate spinner", color=colors.SLATE,
-	desc = [[Easily as big as a horse, this giant spider menaces at you with claws and fangs.]],
+	desc = _t[[Easily as big as a horse, this giant spider menaces at you with claws and fangs.]],
 	level_range = {3, nil}, exp_worth = 1,
 	rarity = 2, rank = 2,
 	size_category = 4,
@@ -101,7 +101,7 @@ newEntity{ base = "BASE_NPC_SPIDER",
 
 newEntity{ base = "BASE_NPC_SPIDER",
 	name = "fate weaver", color=colors.WHITE,
-	desc = [[A large white spider.]],
+	desc = _t[[A large white spider.]],
 	level_range = {3, nil}, exp_worth = 1,
 	rarity = 3, rank = 2,
 	max_life = resolvers.rngavg(70,100),
@@ -119,7 +119,7 @@ newEntity{ base = "BASE_NPC_SPIDER",
 newEntity{ base = "BASE_NPC_SPIDER", define_as = "WEAVER_QUEEN",
 	name = "Weaver Queen", color=colors.WHITE, female=1,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/spiderkin_spider_weaver_queen.png", display_h=2, display_y=-1}}},
-	desc = [[A large white spider.]],
+	desc = _t[[A large white spider.]],
 	level_range = {7, nil}, exp_worth = 1,
 	unique = true,
 	rarity = false,
@@ -162,7 +162,7 @@ newEntity{ base = "BASE_NPC_SPIDER", define_as = "WEAVER_QUEEN",
 
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("start-point-zero", engine.Quest.COMPLETED, "morass")
-		require("engine.ui.Dialog"):simplePopup("Weaver Queen", "As you vanquish the queen you notice a temporal thread that seems to have been controlling her. It seems to go through a rift.")
+		require("engine.ui.Dialog"):simplePopup(_t"Weaver Queen", _t"As you vanquish the queen you notice a temporal thread that seems to have been controlling her. It seems to go through a rift.")
 		local rift = game.zone:makeEntityByName(game.level, "terrain", "RIFT_HOME")
 		game.zone:addEntity(game.level, rift, "terrain", self.x, self.y)
 	end,

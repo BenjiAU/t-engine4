@@ -26,14 +26,14 @@ local Stats = require"engine.interface.ActorStats"
 -- Artifact, randomly dropped in Vor Pride, and only there
 newEntity{ base = "BASE_SCROLL", subtype="tome",
 	power_source = {arcane=true},
-	name = "Tome of Wildfire", unided_name = "burning book", unique=true, no_unique_lore=true, image = "object/artifact/tome_of_wildfire.png",
-	desc = "This huge book is covered in searing flames. Yet they do not harm you.",
+	name = "Tome of Wildfire", unided_name = _t"burning book", unique=true, no_unique_lore=true, image = "object/artifact/tome_of_wildfire.png",
+	desc = _t"This huge book is covered in searing flames. Yet they do not harm you.",
 	color = colors.VIOLET,
 	level_range = {35, 45},
 	rarity = 200,
 	cost = 100,
 
-	use_simple = { name="learn the ancient secrets", use = function(self, who)
+	use_simple = { name=_t"learn the ancient secrets", use = function(self, who)
 		if not who:knowTalent(who.T_FLAME) then
 			who:learnTalent(who.T_FLAME, true, 3, {no_unlearn=true})
 			game.logPlayer(who, "#00FFFF#You read the tome and learn about ancient forgotten fire magic!")
@@ -50,14 +50,14 @@ newEntity{ base = "BASE_SCROLL", subtype="tome",
 -- Artifact, randomly dropped in Vor Pride, and only there
 newEntity{ base = "BASE_SCROLL", subtype="tome",
 	power_source = {arcane=true},
-	name = "Tome of Uttercold", unided_name = "frozen book", unique=true, no_unique_lore=true, image = "object/artifact/tome_of_uttercold.png",
-	desc = "This huge book is covered in slowly shifting patterns of ice. Yet they do not harm you.",
+	name = "Tome of Uttercold", unided_name = _t"frozen book", unique=true, no_unique_lore=true, image = "object/artifact/tome_of_uttercold.png",
+	desc = _t"This huge book is covered in slowly shifting patterns of ice. Yet they do not harm you.",
 	color = colors.VIOLET,
 	level_range = {35, 45},
 	rarity = 200,
 	cost = 100,
 
-	use_simple = { name="learn the ancient secrets", use = function(self, who)
+	use_simple = { name=_t"learn the ancient secrets", use = function(self, who)
 		if not who:knowTalent(who.T_ICE_STORM) then
 			who:learnTalent(who.T_ICE_STORM, true, 3, {no_unlearn=true})
 			game.logPlayer(who, "#00FFFF#You read the tome and learn about ancient forgotten ice magic!")
@@ -74,7 +74,7 @@ newEntity{ base = "BASE_SCROLL", subtype="tome",
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE_LORE",
 	name = "draft note", lore="vor-pride-note",
-	desc = [[A note.]],
+	desc = _t[[A note.]],
 	rarity = false,
 }
 
@@ -82,7 +82,7 @@ for i = 1, 5 do
 newEntity{ base = "BASE_LORE",
 	define_as = "ORC_HISTORY"..i,
 	name = "Records of Lorekeeper Hadak", lore="orc-history-"..i, unique="Records of Lorekeeper Hadak "..i,
-	desc = [[Part of the long history of the Orc race.]],
+	desc = _t[[Part of the long history of the Orc race.]],
 	rarity = false,
 }
 end

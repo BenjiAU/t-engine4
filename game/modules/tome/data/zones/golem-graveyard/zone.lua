@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Golem Graveyard",
+	name = _t"Golem Graveyard",
 	level_range = {14, 20},
 	level_scheme = "player",
 	max_level = 1,

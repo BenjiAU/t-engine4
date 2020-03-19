@@ -108,8 +108,8 @@ function _M:makeDownloadbox(downid, file)
 	local Waitbar = require "engine.ui.Waitbar"
 	local Button = require "engine.ui.Button"
 
-	local d = Dialog.new(self.title or "Download: "..file, 600, 100)
-	local b = Button.new{text="Cancel", fct=function() self.view:downloadAction(downid, false) game:unregisterDialog(d) end}
+	local d = Dialog.new(self.title or ("Download: %s"):tformat(file), 600, 100)
+	local b = Button.new{text=_t"Cancel", fct=function() self.view:downloadAction(downid, false) game:unregisterDialog(d) end}
 	local w = Waitbar.new{size=600, text=file}
 	d:loadUI{
 		{left=0, top=0, ui=w},

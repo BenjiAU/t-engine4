@@ -22,7 +22,7 @@ if layout == "DEFAULT" then
 
 -- Underground
 return {
-	name = "Rhaloren Camp",
+	name = _t"Rhaloren Camp",
 	level_range = {1, 7},
 	level_scheme = "player",
 	max_level = 3,
@@ -92,7 +92,7 @@ elseif layout == "OVERGROUND" then
 
 -- Overground
 return {
-	name = "Rhaloren Camp",
+	name = _t"Rhaloren Camp",
 	level_range = {1, 5},
 	level_scheme = "player",
 	max_level = 3,

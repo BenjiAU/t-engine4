@@ -20,12 +20,12 @@
 local entershop = function (self, player)
 	local arenashop = game:getStore("ARENA_SHOP")
 	arenashop:loadup(game.level, game.zone)
-	arenashop:interact(player, "Gladiator's wares")
+	arenashop:interact(player, _t"Gladiator's wares")
 	arenashop = nil
 end
 
 newChat{ id="ryal-entry",
-text = [[#LIGHT_GREEN#*A gigantic bone giant walks through the main gate.
+text = _t[[#LIGHT_GREEN#*A gigantic bone giant walks through the main gate.
 #LIGHT_GREEN#Its shape is intricate and sharp, resembling a drake, but with countless
 #LIGHT_GREEN#spikes instead of wings.
 #LIGHT_GREEN#The massive undead stares at you with unusual...intellect.
@@ -34,12 +34,12 @@ text = [[#LIGHT_GREEN#*A gigantic bone giant walks through the main gate.
 #LIGHT_GREEN#roars and multiple bones fly in your general direction!*
 ]],
 	answers = {
-		{"Have at you!!"},
+		{_t"Have at you!!"},
 	}
 }
 
 newChat{ id="ryal-defeat",
-text = [[#LIGHT_GREEN#*After taking several hits, the undead giant finally succumbs
+text = _t[[#LIGHT_GREEN#*After taking several hits, the undead giant finally succumbs
 #LIGHT_GREEN#to your attacks*
 #LIGHT_GREEN#Suddenly, Ryal's body starts to regenerate!
 #LIGHT_GREEN#Standing tall again, you can almost feel its emotionless skull staring
@@ -48,25 +48,25 @@ text = [[#LIGHT_GREEN#*After taking several hits, the undead giant finally succu
 #LIGHT_GREEN#*Ryal quietly turns towards the gate and leaves, seemingly unharmed*
 ]],
 	answers = {
-		{"It was fun, bone giant!", action=entershop},
-		{"...what? unharmed?", action=entershop}
+		{_t"It was fun, bone giant!", action=entershop},
+		{_t"...what? unharmed?", action=entershop}
 	}
 }
 
 newChat{ id="fryjia-entry",
-text = [[#LIGHT_GREEN#*The wind chills as a young girl walks calmly through the gate.
+text = _t[[#LIGHT_GREEN#*The wind chills as a young girl walks calmly through the gate.
 #LIGHT_GREEN#She looks surprisingly young, with extremely pale skin and contrasting
 #LIGHT_GREEN#long black hair. She examines you with eerie calmness*#WHITE#
 I am known as Fryjia the Hailstorm. That's all you need to know, @playerdescriptor.race@. Let us begin.
 #LIGHT_GREEN#*The whole arena starts to get colder as she speaks, and the audience
 #LIGHT_GREEN#starts wearing their finest winter cloaks*]],
 	answers = {
-		{"Bring it!"},
+		{_t"Bring it!"},
 	}
 }
 
 newChat{ id="fryjia-defeat",
-text = [[#LIGHT_GREEN#*With your final blow, Fryjia falls, unable to continue*
+text = _t[[#LIGHT_GREEN#*With your final blow, Fryjia falls, unable to continue*
 #LIGHT_GREEN#*She awkwardly stands up, but doesn't seem critically injured*
 #WHITE# I...I admit defeat.
 #LIGHT_GREEN#*The audience "oooohs" in awe. Fryjia has turned her back to you*
@@ -75,13 +75,13 @@ text = [[#LIGHT_GREEN#*With your final blow, Fryjia falls, unable to continue*
 #LIGHT_GREEN#towards the gate. As it closes, you realize her eyes are wet with tears.
 ]],
 	answers = {
-		{"...", action=entershop},
-		{"w...what was that about?", action=entershop}
+		{_t"...", action=entershop},
+		{_t"w...what was that about?", action=entershop}
 	}
 }
 
 newChat{ id="riala-entry",
-text = [[#LIGHT_GREEN#*The gate opens, revealing a mature human woman in crimson robes.
+text = _t[[#LIGHT_GREEN#*The gate opens, revealing a mature human woman in crimson robes.
 #LIGHT_GREEN#She looks at you with a wide smile*
 #WHITE# My, my, what a fine @playerdescriptor.race@ you are. What was your name again, @playername@? I am soo delighted to be your rival today.
 #LIGHT_GREEN#*She speaks quietly as if telling a secret* #WHITE#You know, so few get past the little one as of late, it's such a bore.#LIGHT_GREEN#*She giggles*#WHITE#
@@ -90,12 +90,12 @@ So! I am Reala, the Crimson. I came directly from Angolwen. Despite, you know, t
 Fryjia told me about you, the poor thing, so I will not underestimate such a promising aspirant #LIGHT_GREEN#*She smiles warmly* #WHITE#So, let's make haste my dear!
 There is a battle to fight here!]],
 	answers = {
-		{"Let's go!"},
+		{_t"Let's go!"},
 	}
 }
 
 newChat{ id="riala-defeat",
-text = [[#LIGHT_GREEN#*With the final blow, Reala falls...to suddenly burst in flames!!
+text = _t[[#LIGHT_GREEN#*With the final blow, Reala falls...to suddenly burst in flames!!
 #LIGHT_GREEN#You stare at the blazing inferno with understandable confusion,
 #LIGHT_GREEN#until you hear her voice from behind*#WHITE#
 Oh, my dear! That was quite the fight, wasn't it? I concede you the honor of victory.
@@ -105,13 +105,13 @@ Oh, and please forgive her behavior. You will understand when you meet her fathe
 And, if you keep fighting like this, it will be really soon.
 So, it's been my pleasure, @playername@. #LIGHT_GREEN#*She vanishes in a spiral of flame*]],
 	answers = {
-		{"I am pumped up! What's next?", action=entershop},
-		{"Am I the only person with a name that can die here?", action=entershop}
+		{_t"I am pumped up! What's next?", action=entershop},
+		{_t"Am I the only person with a name that can die here?", action=entershop}
 	}
 }
 
 newChat{ id="valfren-entry",
-text = [[#LIGHT_GREEN#*You suddenly realize everything has turned dark.
+text = _t[[#LIGHT_GREEN#*You suddenly realize everything has turned dark.
 #LIGHT_GREEN#You look around searching for your rival. And then you notice it. Standing
 #LIGHT_GREEN#right before you, a massive battle armor with an equally massive battle axe.
 #LIGHT_GREEN#It wasn't there just a second ago. You step back and examine him better,
@@ -125,12 +125,12 @@ f...t...ma....ll...
 #LIGHT_GREEN#emotions invading your very soul!!*
 ]],
 	answers = {
-		{"#LIGHT_GREEN#*You valiantly stand against the darkness*"},
+		{_t"#LIGHT_GREEN#*You valiantly stand against the darkness*"},
 	}
 }
 
 newChat{ id="valfren-defeat",
-text = [[#LIGHT_GREEN#*You valiantly deliver the finishing blow!*
+text = _t[[#LIGHT_GREEN#*You valiantly deliver the finishing blow!*
 #LIGHT_GREEN#*Valfren collapses as the light returns to this world.
 #LIGHT_GREEN#You close your eyes for a brief instant. Fryjia is there when you open them*
 Father... #LIGHT_GREEN#*She stands silent for a few seconds*#WHITE# You win, @playerdescriptor.race@.
@@ -146,14 +146,14 @@ Good luck...
 #RED#The final battle begins when the gate closes, just this final time!!
 ]],
 	answers = {
-		{"I will defeat you, Master of the Arena!!!", action=entershop},
-		{"I will become Master of the Arena instead of the Master of the Arena!!", action=entershop},
-		{"Wealth and glory! Wealth and glory!", action=entershop},
+		{_t"I will defeat you, Master of the Arena!!!", action=entershop},
+		{_t"I will become Master of the Arena instead of the Master of the Arena!!", action=entershop},
+		{_t"Wealth and glory! Wealth and glory!", action=entershop},
 	}
 }
 
 newChat{ id="master-entry",
-text = [[#LIGHT_GREEN#*Finally, the master of the arena comes into the gates!
+text = _t[[#LIGHT_GREEN#*Finally, the master of the arena comes into the gates!
 #LIGHT_GREEN#The public roars with excitement as he faces you with confidence!*
 I applaud you, @playerdescriptor.race@! You have fought with might and courage!
 And now...the time for the final showdown!
@@ -166,12 +166,12 @@ Pursue glory with all your might, @playerdescriptor.race@!!
 #LIGHT_GREEN#*The master steps forward into the sand*
 ]],
 	answers = {
-		{"Wealth and glory!!!"},
+		{_t"Wealth and glory!!!"},
 	}
 }
 
 newChat{ id="master-defeat",
-text = [[#LIGHT_GREEN#*After a glorious battle, the Master falls!*
+text = _t[[#LIGHT_GREEN#*After a glorious battle, the Master falls!*
 Hah...haha. You did it, @playerdescriptor.race@...
 #LIGHT_GREEN#*The master of the arena, defeated, stands up with a wide smile.
 #LIGHT_GREEN#Feeling the master's approval, you pick up its weapon, now lying
@@ -194,9 +194,9 @@ But meanwhile, this is your place! Welcome to paradise, @playerdescriptor.race@!
 #YELLOW#Next time you play, you shall battle this new champion instead!
 ]],
 	answers = {
-		{"WEALTH!! AND!! GLORYYYYY!!", action=function(npc, player) player:hasQuest("arena"):win() end},
-		{"I won't need to save chicks from cults anymore!", cond=function(npc, player) if player.female == true then return false else return true end end, action=function(npc, player) player:hasQuest("arena"):win() end},
-		{"I hereby stand victorious, awaiting future challenges!", action=function(npc, player) player:hasQuest("arena"):win() end},
-		{"#LIGHT_GREEN#*dance*", action=function(npc, player) player:hasQuest("arena"):win() end},
+		{_t"WEALTH!! AND!! GLORYYYYY!!", action=function(npc, player) player:hasQuest("arena"):win() end},
+		{_t"I won't need to save chicks from cults anymore!", cond=function(npc, player) if player.female == true then return false else return true end end, action=function(npc, player) player:hasQuest("arena"):win() end},
+		{_t"I hereby stand victorious, awaiting future challenges!", action=function(npc, player) player:hasQuest("arena"):win() end},
+		{_t"#LIGHT_GREEN#*dance*", action=function(npc, player) player:hasQuest("arena"):win() end},
 	}
 }

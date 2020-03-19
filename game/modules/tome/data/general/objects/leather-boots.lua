@@ -26,7 +26,7 @@ newEntity{
 	moddable_tile = resolvers.moddable_tile("leather_boots"),
 	encumber = 2,
 	rarity = 6,
-	desc = [[A pair of boots made of leather.]],
+	desc = _t[[A pair of boots made of leather.]],
 	randart_able = "/data/general/objects/random-artifacts/generic.lua",
 	egos = "/data/general/objects/egos/light-boots.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 }

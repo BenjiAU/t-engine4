@@ -18,12 +18,12 @@
 -- darkgod@te4.org
 
 return {
-	name = "Last Hope Graveyard",
+	name = _t"Last Hope Graveyard",
 	display_name = function(x, y)
-		if game.level.level == 1 then return "Last Hope Graveyard"
-		elseif game.level.level == 2 then return "Mausoleum"
+		if game.level.level == 1 then return _t"Last Hope Graveyard"
+		elseif game.level.level == 2 then return _t"Mausoleum"
 		end
-		return "Last Hope Graveyard"
+		return _t"Last Hope Graveyard"
 	end,
 	level_range = {15, 25},
 	level_scheme = "player",
@@ -89,7 +89,7 @@ return {
 			fct = function(self, x, y, who)
 				local Dialog = require("engine.ui.Dialog")
 				if not who:knowTalentType("cursed/cursed-aura") then
-					Dialog:simplePopup("Curse!", "The coffin was a decoy, a powerful curse was set upon you (check your talents).")
+					Dialog:simplePopup(_t"Curse!", _t"The coffin was a decoy, a powerful curse was set upon you (check your talents).")
 					who:learnTalentType("cursed/cursed-aura", true)
 					who:learnTalent(who.T_DEFILING_TOUCH, true, nil, {no_unlearn=true})
 				else
@@ -130,7 +130,7 @@ return {
 	
 	open_coffin = function(self, x, y, who)
 		local Dialog = require("engine.ui.Dialog")
-		Dialog:yesnoLongPopup("Open the coffin", "In rich families the dead are sometimes put to rest with some treasures. However they also sometime protect the coffins with powerful curses. Open?", 500, function(ret)
+		Dialog:yesnoLongPopup(_t"Open the coffin", _t"In rich families the dead are sometimes put to rest with some treasures. However they also sometime protect the coffins with powerful curses. Open?", 500, function(ret)
 			if not ret then return end
 
 			if self.coffin_open then
@@ -186,7 +186,7 @@ return {
 	on_enter = function(lev, old_lev, newzone)
 		local Dialog = require("engine.ui.Dialog")
 		if lev == 2 and not game.level.shown_warning then
-			Dialog:simpleLongPopup("Mausoleum", [[As you tread softly down the stairs a large stone slab slides into place behind you, blocking all retreat. The air is still and stuffy, and in this tight space you feel as if in a coffin, buried alive.
+			Dialog:simpleLongPopup(_t"Mausoleum", _t[[As you tread softly down the stairs a large stone slab slides into place behind you, blocking all retreat. The air is still and stuffy, and in this tight space you feel as if in a coffin, buried alive.
 
 Adding to your unease is a rising feeling of dread, overwhelming fear in fact. A hall of doors lies ahead, and behind each you sense a power of great malevolence and unholy horror. At the end of the corridor you see a faint light beneath a large black door, and you have a vague sense that the other doors are enslaved to this one - obedient, subservient, and waiting...
 

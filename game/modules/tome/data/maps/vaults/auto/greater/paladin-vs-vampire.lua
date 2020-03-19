@@ -31,7 +31,7 @@ specialList("actor", {
 }, true)
 defineTile('~', mod.class.Grid.new{
 	define_as = "NECRO",
-	name = "corrupted lava floor", image = "terrain/lava_floor.png",
+	name = _t"corrupted lava floor", image = "terrain/lava_floor.png",
 	display = '.', color=colors.RED, back_color=colors.DARK_GREY,
 	shader = "lava",
 	mindam = resolvers.mbonus(5, 15),
@@ -45,7 +45,7 @@ defineTile('~', mod.class.Grid.new{
 			--add undead
 			local m = game.zone:makeEntityByName(game.level, "actor", "RISEN_CORPSE")
 			game.zone:addEntity(game.level, m, "actor", x, y)
-			game.logSeen(m, "The corrupted lava reanimates %s's corpse!", who.name:capitalize())
+			game.logSeen(m, "The corrupted lava reanimates %s's corpse!", who:getName():capitalize())
 		end
 	end,
 })
@@ -53,10 +53,11 @@ defineTile('~', mod.class.Grid.new{
 defineTile('S', "FLOOR", nil, mod.class.NPC.new{
 	type = "humanoid", subtype = "human",
 	display = "p", color=colors.GOLD,
-	name = "human sun-paladin",
+	name = _t"human sun-paladin",
+	image = "npc/humanoid_human_human_sun_paladin.png",
 	faction = "sunwall", hard_faction = "sunwall",
 	body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1 },
-	desc = [[A Human in shining plate armour.]],
+	desc = _t[[A Human in shining plate armour.]],
 	level_range = {10, nil}, exp_worth = 1,
 	rank = 2,
 	size_category = 3,

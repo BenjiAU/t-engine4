@@ -28,12 +28,12 @@ function _M:init(what)
 
 	local f, err = loadfile("/data/texts/unlock-"..self.what..".lua")
 	if not f and err then error(err) end
-	setfenv(f, {})
+	setfenv(f, {_t=_t})
 	self.name, self.str = f()
 
-	game.logPlayer(game.player, "#VIOLET#Option unlocked: "..self.name)
+	game.logPlayer(game.player, "#VIOLET#Option unlocked: %s", self.name)
 
-	Dialog.init(self, "Option unlocked: "..self.name, 600, 400)
+	Dialog.init(self, ("Option unlocked: %s"):tformat(self.name), 600, 400)
 
 	self.c_desc = Textzone.new{width=math.floor(self.iw - 10), height=self.ih, no_color_bleed=true, auto_height=true, text=self.str}
 

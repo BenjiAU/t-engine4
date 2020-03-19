@@ -86,7 +86,7 @@ newTalent{
 		The bolt will only hurt hostile targets, and pass safely through friendly ones.
 		This attack always has a 100%% chance to hit, and ignores the target's Armour.
 		When projecting a bolt with your staff its damage modifier is increased by 20%%.]]):
-		format(damagemod * 100)
+		tformat(damagemod * 100)
 	end,
 }
 
@@ -102,7 +102,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local inc = t.getPercentInc(self, t)
 		return ([[Increases weapon damage by %d%% and physical power by 30 when using staves.]]):
-		format(100 * inc)
+		tformat(100 * inc)
 	end,
 }
 
@@ -134,7 +134,7 @@ newTalent{
 	info = function(self, t)
 		local defense = t.getDefense(self, t)
 		return ([[Adopt a defensive posture, increasing your Defense and Armour by %d.]]):
-		format(defense)
+		tformat(defense)
 	end,
 }
 
@@ -174,7 +174,7 @@ newTalent{
 			if target:canBe("stun") then
 				target:setEffect(target.EFF_STUNNED, t.getDazeDuration(self, t), {apply_power=self:combatSpellpower()})
 			else
-				game.logSeen(target, "%s resists the stunning blow!", target.name:capitalize())
+				game.logSeen(target, "%s resists the stunning blow!", target:getName():capitalize())
 			end
 		end
 
@@ -186,6 +186,6 @@ newTalent{
 		return ([[Hit a target for %d%% melee damage and stun it for %d turns.
 		Stun chance will improve with Spellpower.
 		At level 5, this attack cannot miss.]]):
-		format(100 * damage, dazedur)
+		tformat(100 * damage, dazedur)
 	end,
 }

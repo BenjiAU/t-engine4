@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 You've learned Shove, a weak knockback effect.
 
 Which #GOLD#combat stats#WHITE# will get compared when you attempt to Shove somebody?

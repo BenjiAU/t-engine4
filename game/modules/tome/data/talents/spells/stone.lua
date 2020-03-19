@@ -66,7 +66,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Conjures %d missile-shaped rocks that you target individually at any target or targets in range.  Each missile deals %0.2f physical damage, and an additional %0.2f bleeding damage every turn for 5 turns.
 		At talent level 5, you can conjure one additional missile.
-		The damage will increase with your Spellpower.]]):format(count,damDesc(self, DamageType.PHYSICAL, damage/2), damDesc(self, DamageType.PHYSICAL, damage/12))
+		The damage will increase with your Spellpower.]]):tformat(count,damDesc(self, DamageType.PHYSICAL, damage/2), damDesc(self, DamageType.PHYSICAL, damage/12))
 	end,
 }
 
@@ -130,7 +130,7 @@ newTalent{
 		* Reduces the cooldown of Earthen Missiles, Pulverizing Auger, Earthquake, and Mudslide by %d%%.
 		* Grants %d%% Fire Resistance, %d%% Lightning Resistance, %d%% Acid Resistance, and %d%% Stun Resistance.
 		Resistances scale with your Spellpower.]])
-		:format(cooldownred, fireres, lightningres, acidres, stunres*100)
+		:tformat(cooldownred, fireres, lightningres, acidres, stunres*100)
 	end,
 }
 
@@ -177,7 +177,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[Causes a violent earthquake that deals %0.2f physical damage in a radius of %d each turn for %d turns, and potentially stuns any and all creatures it affects.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.PHYSICAL, damage), radius, duration)
+		tformat(damDesc(self, DamageType.PHYSICAL, damage), radius, duration)
 	end,
 }
 
@@ -223,6 +223,6 @@ newTalent{
 		local saves = t.getSaves(self, t)
 		return ([[Concentrate on maintaining a Crystalline Focus, increasing all your physical damage by %0.1f%% and ignoring %d%% physical resistance of your targets.
 		Also raises your physical and magical saves by %d.]])
-		:format(damageinc, ressistpen, saves)
+		:tformat(damageinc, ressistpen, saves)
 	end,
 }

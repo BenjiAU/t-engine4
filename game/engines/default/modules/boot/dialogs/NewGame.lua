@@ -29,20 +29,20 @@ local Button = require "engine.ui.Button"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init()
-	Dialog.init(self, "New Game", game.w * 0.8, game.h * 0.8)
+	Dialog.init(self, _t"New Game", game.w * 0.8, game.h * 0.8)
 
 	self.c_desc = Textzone.new{width=math.floor(self.iw / 3 * 2 - 10), height=self.ih, text=""}
 
-	self.c_switch = Checkbox.new{default=false, width=math.floor(self.iw / 3 - 40), title="Show all versions", on_change=function() self:switch() end}
-	self.c_compat = Checkbox.new{default=true, width=math.floor(self.iw / 3 - 40), title="Show incompatible", on_change=function() self:switch() end}
+	self.c_switch = Checkbox.new{default=false, width=math.floor(self.iw / 3 - 40), title=_t"Show all versions", on_change=function() self:switch() end}
+	self.c_compat = Checkbox.new{default=true, width=math.floor(self.iw / 3 - 40), title=_t"Show incompatible", on_change=function() self:switch() end}
 
-	local url = Textzone.new{text="You can get new games at\n#LIGHT_BLUE##{underline}#https://te4.org/games#{normal}#", auto_height=true, auto_width=true, fct=function() util.browserOpenUrl("https://te4.org/games") end}
+	local url = Textzone.new{text=_t"You can get new games at\n#LIGHT_BLUE##{underline}#https://te4.org/games#{normal}#", auto_height=true, auto_width=true, fct=function() util.browserOpenUrl("https://te4.org/games") end}
 
 	self:generateList()
 
 	self.c_list = ListColumns.new{width=math.floor(self.iw / 3 - 10), height=self.ih - 10 - self.c_switch.h - self.c_compat.h - url.h, scrollbar=true, columns={
-		{name="Game Module", width=80, display_prop="name"},
-		{name="Version", width=20, display_prop="version_txt"},
+		{name=_t"Game Module", width=80, display_prop="name"},
+		{name=_t"Version", width=20, display_prop="version_txt"},
 	}, list=self.list, fct=function(item) end, select=function(item, sel) self:select(item) end}
 
 	local sep = Separator.new{dir="horizontal", size=self.ih - 10}
@@ -90,12 +90,12 @@ function _M:generateList()
 					if mod.no_get_name then
 						Module:instanciate(mod, "player", true, false)
 					else
-						game:registerDialog(require('engine.dialogs.GetText').new("Enter your character's name", "Name", 2, 25, function(text)
+						game:registerDialog(require('engine.dialogs.GetText').new(_t"Enter your character's name", "Name", 2, 25, function(text)
 							local savename = text:gsub("[^a-zA-Z0-9_-.]", "_")
 							if fs.exists(("/%s/save/%s/game.teag"):format(mod.short_name, savename)) then
-								Dialog:yesnoPopup("Overwrite character?", "There is already a character with this name, do you want to overwrite it?", function(ret)
+								Dialog:yesnoPopup(_t"Overwrite character?", _t"There is already a character with this name, do you want to overwrite it?", function(ret)
 									if not ret then Module:instanciate(mod, text, true) end
-								end, "No", "Yes")
+								end, _t"No", _t"Yes")
 							else
 								Module:instanciate(mod, text, true)
 							end
@@ -103,10 +103,10 @@ function _M:generateList()
 					end
 				end
 				mod.version_txt = ("%d.%d.%d"):format(mod.version[1], mod.version[2], mod.version[3])
-				local tstr = tstring{{"font","bold"}, {"color","GOLD"}, mod.long_name, true, true}
-				if mod.incompatible then tstr:add({"font","bold"}, {"color","LIGHT_RED"}, "This game is not compatible with your version of T-Engine, you can still try it but it might break.", true, true) end
+				local tstr = tstring{{"font","bold"}, {"color","GOLD"}, _t(mod.long_name), true, true}
+				if mod.incompatible then tstr:add({"font","bold"}, {"color","LIGHT_RED"}, _t"This game is not compatible with your version of T-Engine, you can still try it but it might break.", true, true) end
 				tstr:add({"font","normal"}, {"color","WHITE"})
-				tstr:merge(mod.description:toTString())
+				tstr:merge(_t(mod.description):toTString())
 				mod.zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=tstr}
 
 				if self.c_compat.checked or not mod.incompatible then

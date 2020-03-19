@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Ambush!",
+	name = _t"Ambush!",
 	level_range = {20, 50},
 	level_scheme = "player",
 	max_level = 1,

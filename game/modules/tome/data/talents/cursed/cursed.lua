@@ -18,28 +18,28 @@
 -- darkgod@te4.org
 
 -- Cursed
-newTalentType{ allow_random=true, type="cursed/slaughter", name = "slaughter", description = "Your weapon yearns for its next victim." }
-newTalentType{ allow_random=true, type="cursed/endless-hunt", name = "endless hunt", description = "Each day, you lift your weary body and begin the unending hunt." }
-newTalentType{ allow_random=true, type="cursed/strife", name = "strife", description = "The battlefield is your home; death and confusion, your comfort." }
-newTalentType{ allow_random=true, is_mind=true, type="cursed/gloom", name = "gloom", description = "All those in your sight must share your despair." }
-newTalentType{ allow_random=true, type="cursed/rampage", name = "rampage", description = "Let loose the hate that has grown within." }
-newTalentType{ allow_random=false, type="cursed/predator", name = "predator", description = "Track and kill your prey with single-minded focus." }
+newTalentType{ allow_random=true, type="cursed/slaughter", name = _t"slaughter", description = _t"Your weapon yearns for its next victim." }
+newTalentType{ allow_random=true, type="cursed/endless-hunt", name = _t"endless hunt", description = _t"Each day, you lift your weary body and begin the unending hunt." }
+newTalentType{ allow_random=true, type="cursed/strife", name = _t"strife", description = _t"The battlefield is your home; death and confusion, your comfort." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/gloom", name = _t"gloom", description = _t"All those in your sight must share your despair." }
+newTalentType{ allow_random=true, type="cursed/rampage", name = _t"rampage", description = _t"Let loose the hate that has grown within." }
+newTalentType{ allow_random=false, type="cursed/predator", name = _t"predator", description = _t"Track and kill your prey with single-minded focus." }
 
 -- Doomed
-newTalentType{ allow_random=true, is_mind=true, type="cursed/dark-sustenance", name = "dark sustenance", generic = true, description = "The powers of your foes feed your dark will." }
-newTalentType{ allow_random=true, is_mind=true, type="cursed/force-of-will", name = "force of will", description = "Invoke the powerful force of your will." }
-newTalentType{ allow_random=true, is_mind=true, type="cursed/darkness", name = "darkness", description = "Harness the power of darkness to envelop your foes." }
-newTalentType{ allow_random=true, is_mind=true, type="cursed/shadows", name = "shadows", description = "Summon shadows from the darkness to aid you." }
-newTalentType{ allow_random=true, is_mind=true, type="cursed/punishments", name = "punishments", description = "Your hate becomes punishment in the minds of your foes." }
-newTalentType{ allow_random=true, is_mind=true, type="cursed/one-with-shadows", name = "one with shadows", min_lev = 10, description = "Harness your shadows to their full potential." }
-newTalentType{ allow_random=true, is_mind=true, type="cursed/advanced-shadowmancy", name = "advanced shadowmancy", min_lev = 10, description = "Gain more direct control over your shadows with physical damage talents." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/dark-sustenance", name = _t"dark sustenance", generic = true, description = _t"The powers of your foes feed your dark will." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/force-of-will", name = _t"force of will", description = _t"Invoke the powerful force of your will." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/darkness", name = _t"darkness", description = _t"Harness the power of darkness to envelop your foes." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/shadows", name = _t"shadows", description = _t"Summon shadows from the darkness to aid you." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/punishments", name = _t"punishments", description = _t"Your hate becomes punishment in the minds of your foes." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/one-with-shadows", name = _t"one with shadows", min_lev = 10, description = _t"Harness your shadows to their full potential." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/advanced-shadowmancy", name = _t"advanced shadowmancy", min_lev = 10, description = _t"Gain more direct control over your shadows with physical damage talents." }
 
 -- Generic
-newTalentType{ allow_random=true, is_mind=true, type="cursed/gestures", name = "gestures", generic = true, description = "Enhance the power of your mind with gestures." }
-newTalentType{ allow_random=true, is_mind=true, type="cursed/cursed-form", name = "cursed form", generic = true, description = "You are wracked with the dark energies of the curse." }
-newTalentType{ allow_random=true, is_mind=true, type="cursed/cursed-aura", name = "cursed aura", generic = true, description = "The things you surround yourself with soon wither away." }
-newTalentType{ allow_random=false, is_mind=true, type="cursed/curses", name = "curses", hide = true, description = "The effects of cursed objects." }
-newTalentType{ allow_random=true, is_mind=true, type="cursed/fears", name = "fears", description = "Use the fear that lies at the heart of your curse to attack the minds of your enemies." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/gestures", name = _t"gestures", generic = true, description = _t"Enhance the power of your mind with gestures." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/cursed-form", name = _t"cursed form", generic = true, description = _t"You are wracked with the dark energies of the curse." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/cursed-aura", name = _t"cursed aura", generic = true, description = _t"The things you surround yourself with soon wither away." }
+newTalentType{ allow_random=false, is_mind=true, type="cursed/curses", name = _t"curses", hide = true, description = _t"The effects of cursed objects." }
+newTalentType{ allow_random=true, is_mind=true, type="cursed/fears", name = _t"fears", description = _t"Use the fear that lies at the heart of your curse to attack the minds of your enemies." }
 
 cursed_wil_req1 = {
 	stat = { wil=function(level) return 12 + (level-1) * 2 end },

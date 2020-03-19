@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Shadow Crypt",
+	name = _t"Shadow Crypt",
 	level_range = {34,45},
 	level_scheme = "player",
 	max_level = 3,

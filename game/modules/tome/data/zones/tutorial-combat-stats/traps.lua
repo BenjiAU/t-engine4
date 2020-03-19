@@ -20,15 +20,15 @@
 load("/data/general/traps/natural_forest.lua")
 
 newEntity{ define_as = "TRAP_TUTORIAL",
-	type = "tutorial", subtype="tutorial", id_by_type=true, unided_name = "tutorial",
+	type = "tutorial", subtype="tutorial", id_by_type=true, unided_name = _t"tutorial",
 	detect_power = 999999, disarm_power = 999999,
-	desc = [[A tutorial]],
+	desc=_t[[A tutorial]],
 	display = ' ', color=colors.WHITE,
 	message = false,
 	triggered = function(self, x, y, who)
 		if who.player then
 			game.player:runStop()
-			local d = require("engine.dialogs.ShowText").new("Tutorial: "..self.name, "tutorial/"..self.text)
+			local d = require("engine.dialogs.ShowText").new(("Tutorial: %s"):tformat(_t(self.name)), "tutorial/"..self.text)
 			game:registerDialog(d)
 		end
 		return false, false
@@ -36,15 +36,15 @@ newEntity{ define_as = "TRAP_TUTORIAL",
 }
 
 newEntity{ define_as = "TRAP_TUTORIAL2",
-	type = "tutorial", subtype="tutorial2", id_by_type=true, unided_name = "tutorial",
+	type = "tutorial", subtype="tutorial2", id_by_type=true, unided_name = _t"tutorial",
 	detect_power = 999999, disarm_power = 999999,
-	desc = [[A tutorial]],
+	desc=_t[[A tutorial]],
 	display = ' ', color=colors.WHITE,
 	message = false,
 	triggered = function(self, x, y, who)
 		if who.player then
 			game.player:runStop()
-			local d = require("engine.dialogs.ShowText").new("Tutorial: "..self.name, "tutorial/stats/"..self.text)
+			local d = require("engine.dialogs.ShowText").new(("Tutorial: %s"):tformat(_t(self.name)), "tutorial/stats/"..self.text)
 			game:registerDialog(d)
 		end
 		return false, false
@@ -52,15 +52,15 @@ newEntity{ define_as = "TRAP_TUTORIAL2",
 }
 
 newEntity{ define_as = "TRAP_TUTORIAL3",
-	type = "tutorial", subtype="tutorial3", id_by_type=true, unided_name = "tutorial",
+	type = "tutorial", subtype="tutorial3", id_by_type=true, unided_name = _t"tutorial",
 	detect_power = 999999, disarm_power = 999999,
-	desc = [[A tutorial]],
+	desc=_t[[A tutorial]],
 	display = ' ', color=colors.WHITE,
 	message = false,
 	triggered = function(self, x, y, who)
 		if who.player then
 			game.player:runStop()
-			local d = require("engine.dialogs.ShowText").new("Tutorial: "..self.name, "tutorial/stats-scale/"..self.text)
+			local d = require("engine.dialogs.ShowText").new(("Tutorial: %s"):tformat(_t(self.name)), "tutorial/stats-scale/"..self.text)
 			game:registerDialog(d)
 		end
 		return false, false
@@ -68,15 +68,15 @@ newEntity{ define_as = "TRAP_TUTORIAL3",
 }
 
 newEntity{ define_as = "TRAP_TUTORIAL4",
-	type = "tutorial", subtype="tutorial4", id_by_type=true, unided_name = "tutorial",
+	type = "tutorial", subtype="tutorial4", id_by_type=true, unided_name = _t"tutorial",
 	detect_power = 999999, disarm_power = 999999,
-	desc = [[A tutorial]],
+	desc=_t[[A tutorial]],
 	display = ' ', color=colors.WHITE,
 	message = false,
 	triggered = function(self, x, y, who)
 		if who.player then
 			game.player:runStop()
-			local d = require("engine.dialogs.ShowText").new("Tutorial: "..self.name, "tutorial/stats-calc/"..self.text)
+			local d = require("engine.dialogs.ShowText").new(("Tutorial: %s"):tformat(_t(self.name)), "tutorial/stats-calc/"..self.text)
 			game:registerDialog(d)
 		end
 		return false, false
@@ -84,15 +84,15 @@ newEntity{ define_as = "TRAP_TUTORIAL4",
 }
 
 newEntity{ define_as = "TRAP_TUTORIAL5",
-	type = "tutorial", subtype="tutorial5", id_by_type=true, unided_name = "tutorial",
+	type = "tutorial", subtype="tutorial5", id_by_type=true, unided_name = _t"tutorial",
 	detect_power = 999999, disarm_power = 999999,
-	desc = [[A tutorial]],
+	desc=_t[[A tutorial]],
 	display = ' ', color=colors.WHITE,
 	message = false,
 	triggered = function(self, x, y, who)
 		if who.player then
 			game.player:runStop()
-			local d = require("engine.dialogs.ShowText").new("Tutorial: "..self.name, "tutorial/stats-timed/"..self.text)
+			local d = require("engine.dialogs.ShowText").new(("Tutorial: %s"):tformat(_t(self.name)), "tutorial/stats-timed/"..self.text)
 			game:registerDialog(d)
 		end
 		return false, false
@@ -100,15 +100,15 @@ newEntity{ define_as = "TRAP_TUTORIAL5",
 }
 
 newEntity{ define_as = "TRAP_TUTORIAL6",
-	type = "tutorial", subtype="tutorial6", id_by_type=true, unided_name = "tutorial",
+	type = "tutorial", subtype="tutorial6", id_by_type=true, unided_name = _t"tutorial",
 	detect_power = 999999, disarm_power = 999999,
-	desc = [[A tutorial]],
+	desc=_t[[A tutorial]],
 	display = ' ', color=colors.WHITE,
 	message = false,
 	triggered = function(self, x, y, who)
 		if who.player then
 			game.player:runStop()
-			local d = require("engine.dialogs.ShowText").new("Tutorial: "..self.name, "tutorial/stats-tier/"..self.text)
+			local d = require("engine.dialogs.ShowText").new(("Tutorial: %s"):tformat(_t(self.name)), "tutorial/stats-tier/"..self.text)
 			game:registerDialog(d)
 		end
 		return false, false

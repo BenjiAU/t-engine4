@@ -40,12 +40,12 @@ local function auto_id(npc, player)
 
 	-- Create the chat
 	newChat{ id="id_list",
-		text = [[Let's see what have you got here...
-]]..table.concat(list, "\n")..[[
+		text = ([[Let's see what have you got here...
+%s
 
-That is very nice, @playername@!]],
+That is very nice, @playername@!]]):tformat(table.concat(list, "\n")),
 		answers = {
-			{"Thank you, Elisa!", jump=do_quest and "quest" or nil},
+			{_t"Thank you, Elisa!", jump=do_quest and "quest" or nil},
 		}
 	}
 
@@ -54,21 +54,21 @@ That is very nice, @playername@!]],
 end
 
 newChat{ id="welcome",
-	text = [[Hello friend, what can I do for you?]],
+	text = _t[[Hello friend, what can I do for you?]],
 	answers = {
-		{"Could you have a look at these objects, please? [show her your unidentified items]", cond=can_auto_id, action=auto_id},
-		{"Nothing, goodbye."},
+		{_t"Could you have a look at these objects, please? [show her your unidentified items]", cond=can_auto_id, action=auto_id},
+		{_t"Nothing, goodbye."},
 	}
 }
 
 newChat{ id="quest",
-	text = [[Wait, @playername@, you seem to be quite the adventurer. Maybe we can help one another.
+	text = _t[[Wait, @playername@, you seem to be quite the adventurer. Maybe we can help one another.
 You see, I #{bold}#LOOOVVVEEEE#{normal}# learning new lore and finding old artifacts of power, but I am not exactly an adventurer and I would surely get killed out there.
 So take this orb (#LIGHT_GREEN#*she gives you an orb of scrying*#WHITE#). You can use it to talk to me from anywhere in the world! This way you can show me your new shiny findings!
 I get to see many interesting things, and you get to know what your items do. We both win! Isn't it sweet?
 Oh yes, the orb will also identify mundane items for you, as long as you carry it.]],
 	answers = {
-		{"Woah, thanks, Elisa. This is really nice!", action=function(npc, player)
+		{_t"Woah, thanks, Elisa. This is really nice!", action=function(npc, player)
 			player:setQuestStatus("first-artifact", engine.Quest.COMPLETED)
 
 			local orb = game.zone:makeEntityByName(game.level, "object", "ORB_SCRYING")

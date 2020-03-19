@@ -18,19 +18,19 @@
 -- darkgod@te4.org
 
 -- Quest for the the breeding pits
-name = "Desperate Measures"
+name = _t"Desperate Measures"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You have encountered a dying sun paladin that told you about the orcs breeding pit, a true abomination."
+	desc[#desc+1] = _t"You have encountered a dying sun paladin that told you about the orcs breeding pit, a true abomination."
 	if self:isStatus(engine.Quest.COMPLETED, "wuss-out") then
-		desc[#desc+1] = "You have decided to report the information to Aeryn so she can deal with it."
+		desc[#desc+1] = _t"You have decided to report the information to Aeryn so she can deal with it."
 		if self:isStatus(engine.Quest.COMPLETED, "wuss-out-done") then
-			desc[#desc+1] = "Aeryn said she would send troops to deal with it."
+			desc[#desc+1] = _t"Aeryn said she would send troops to deal with it."
 		end
 	else
-		desc[#desc+1] = "You have taken upon yourself to cleanse it and deal a crippling blow to the orcs."
+		desc[#desc+1] = _t"You have taken upon yourself to cleanse it and deal a crippling blow to the orcs."
 		if self:isStatus(engine.Quest.COMPLETED, "genocide") then
-			desc[#desc+1] = "The abominable task is done."
+			desc[#desc+1] = _t"The abominable task is done."
 		end
 	end
 	return table.concat(desc, "\n")
@@ -47,7 +47,7 @@ reveal = function(self)
 	if not spot then return end
 
 	local g = game.level.map(spot.x, spot.y, engine.Map.TERRAIN):cloneFull()
-	g.name = "Entrance to the orc breeding pit"
+	g.name = _t"Entrance to the orc breeding pit"
 	g.display='>' g.color_r=colors.GREEN.r g.color_g=colors.GREEN.g g.color_b=colors.GREEN.b g.notice = true
 	g.change_level=1 g.change_zone="orc-breeding-pit" g.glow=true
 	g.add_displays = g.add_displays or {}

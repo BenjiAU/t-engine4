@@ -23,7 +23,7 @@ load("/data/general/objects/lore/orc-prides.lua")
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE_LORE",
 	name = "draft note", lore="grushnak-pride-note",
-	desc = [[A note.]],
+	desc = _t[[A note.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -32,13 +32,13 @@ for i = 1, 4 do
 newEntity{ base = "BASE_LORE",
 	define_as = "BREEDING_HISTORY"..i,
 	name = "Clinician Korbek's experimental notes", lore="orc-breeding-"..i,
-	desc = [[Birthing new orcs ...]],
+	desc = _t[[Birthing new orcs ...]],
 	rarity = false,
 }
 end
 newEntity{ base = "BASE_LORE",
 	define_as = "BREEDING_HISTORY5",
 	name = "Captain Gumlarat's report", lore="orc-breeding-5",
-	desc = [[Birthing new orcs ...]],
+	desc = _t[[Birthing new orcs ...]],
 	rarity = false,
 }

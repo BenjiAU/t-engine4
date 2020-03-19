@@ -35,7 +35,7 @@ newTalent {
 		local inc = t.getPercentInc(self, t)
 		local reloads = t.ammo_mastery_reload(self, t)
 		return ([[Increases weapon damage by %d%% and physical power by 30 when using slings.
-		Also, increases your reload rate by %d.]]):format(inc * 100, reloads)
+		Also, increases your reload rate by %d.]]):tformat(inc * 100, reloads)
 	end,
 }
 
@@ -67,7 +67,7 @@ newTalent {
 	getAttackSpeed = function(self,t) return self:combatTalentLimit(t, 40, 10, 25) end,
 	display_speed = function(self, t)
 		return ("Double Archery (#LIGHT_GREEN#%d%%#LAST# of a turn)"):
-			format(self:getSpeed('archery') * 50)
+			tformat(self:getSpeed('archery') * 50)
 	end,
 	action = function(self, t)
 		local targets = self:archeryAcquireTargets(nil, {one_shot=true, add_speed=self.combat_physspeed})
@@ -89,7 +89,7 @@ newTalent {
 	info = function(self, t)
 		return ([[Fire off a quick sling bullet for %d%% damage at double your normal attack speed, as well as increasing your attack speed by %d%% for 5 turns.
 		Each time you move, the cooldown of this talent is reduced by 1.]])
-			:format(t.getDamage(self, t) * 100, t.getAttackSpeed(self,t))
+			:tformat(t.getDamage(self, t) * 100, t.getAttackSpeed(self,t))
 	end,
 }
 
@@ -146,14 +146,12 @@ newTalent {
 		table.shuffle(targets)
 
 		-- Fire each shot individually.
-		local old_target_forced = game.target.forced
 		local limit_shots = t.limit_shots(self, t)
 		local shot_params_base = {mult = t.damage_multiplier(self, t), phasing = true}
 		local fired = nil -- If we've fired at least one shot.
 		for i = 1, math.min(limit_shots, #targets) do
 			local target = targets[i]
-			game.target.forced = {target.x, target.y, target}
-			local targets = self:archeryAcquireTargets({type = "hit", speed = 200}, {one_shot=true, no_energy = fired})
+			local targets = self:archeryAcquireTargets({type = "hit", speed = 200}, {one_shot=true, no_energy = fired, x = target.x, y = target.y})
 			if targets then
 				local params = table.clone(shot_params_base)
 				local target = targets.dual and targets.main[1] or targets[1]
@@ -166,11 +164,10 @@ newTalent {
 			end
 		end
 
-		game.target.forced = old_target_forced
 		return fired
 	end,
 	info = function(self, t)
-		return ([[Take aim and unload up to %d shots for %d%% weapon damage each against random enemies inside a cone. Each enemy can only be hit once (twice for talent level 3 and higher). Using Swift Shot lowers the cooldown by 1.]]):format(t.limit_shots(self, t),	t.damage_multiplier(self, t) * 100)
+		return ([[Take aim and unload up to %d shots for %d%% weapon damage each against random enemies inside a cone. Each enemy can only be hit once (twice for talent level 3 and higher). Using Swift Shot lowers the cooldown by 1.]]):tformat(t.limit_shots(self, t),	t.damage_multiplier(self, t) * 100)
 	end,
 }
 
@@ -200,6 +197,6 @@ newTalent {
 	deactivate = function(self, t, p) return true end,
 	info = function(self, t)
 		return ([[Your Shoot talent now costs %d stamina but fires %d times for %d%% damage per shot.]])
-		:format(t.shot_stamina(self, t), t.bullet_count(self, t), t.damage_multiplier(self, t) * 100 )
+		:tformat(t.shot_stamina(self, t), t.bullet_count(self, t), t.damage_multiplier(self, t) * 100 )
 	end,
 }

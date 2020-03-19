@@ -26,8 +26,8 @@ local Talents = require("engine.interface.ActorTalents")
 
 newEntity{ base="BASE_NPC_ORC_RAK_SHOR", define_as = "CULTIST_RAK_SHOR",
 	name = "Rak'Shor Cultist", color=colors.VIOLET, unique = true,
-	desc = [[An old orc, wearing black robes. He seems to be responsible for the creation of the shades.]],
-	killer_message = "but nobody knew why #sex# suddenly became evil",
+	desc = _t[[An old orc, wearing black robes. He seems to be responsible for the creation of the shades.]],
+	killer_message = _t"but nobody knew why #sex# suddenly became evil",
 	level_range = {35, nil}, exp_worth = 2,
 	rank = 4,
 	max_life = 150, life_rating = 17, fixed_rating = true,
@@ -91,7 +91,7 @@ newEntity{ base="BASE_NPC_ORC_RAK_SHOR", define_as = "CULTIST_RAK_SHOR",
 				max_level=table.NIL_MERGE,
 				name = is_yeek and ("Wayist Shade of %s"):format(plr.name) or ("Doomed Shade of %s"):format(plr.name),
 				desc = is_yeek and ([[%s under the mental protection of The Way could not be swayed and sided with you against the Cultist!]]):format(plr.name) or ([[The Dark Side of %s, completely consumed by hate...]]):format(plr.name),
-				killer_message = "but nobody knew why #sex# suddenly became evil",
+				killer_message = _t"but nobody knew why #sex# suddenly became evil",
 				color_r = 150, color_g = 150, color_b = 150,
 				ai = "tactical", ai_state = {talent_in=1},
 				}))
@@ -124,11 +124,11 @@ newEntity{ base="BASE_NPC_ORC_RAK_SHOR", define_as = "CULTIST_RAK_SHOR",
 			local x, y = util.findFreeGrid(self.x, self.y, 10, true, {[engine.Map.ACTOR]=true})
 			if x and y then
 				self:logCombat(game.player, "#GREY#The #Source# looks deep into your eyes. You feel torn apart!")
-				self:doEmote("Ra'kk kor merk ZUR!!!", 120)
+				self:doEmote(_t"Ra'kk kor merk ZUR!!!", 120)
 				game.zone:addEntity(game.level, a, "actor", x, y)
 				a:resolve()
 				if is_yeek then
-					a:doEmote("FOR THE WAY! Die cultist!", 120)
+					a:doEmote(_t"FOR THE WAY! Die cultist!", 120)
 					a.can_talk = "shadow-crypt-yeek-clone"
 					self:logCombat(game.player, "#PURPLE#The #Source# looks afraid, he did not plan on his creation turning against him!")
 				end

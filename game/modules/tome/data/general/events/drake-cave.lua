@@ -26,7 +26,7 @@ local kind = rng.table{"fire", "fire", "cold", "cold", "storm", "storm", "multih
 print("[EVENT] Placing event", kind.."-dragon-cave", "at", x, y)
 
 local g = game.state:dynamicZoneEntry(game.level.map(x, y, engine.Map.TERRAIN):cloneFull(), kind.."-dragon-cave", {
-	name = "Intimidating Cave",
+	name = _t"Intimidating Cave",
 	level_range = game.zone.actor_adjust_level and {math.floor(game.zone:actor_adjust_level(game.level, game.player)*1.05),
 		math.ceil(game.zone:actor_adjust_level(game.level, game.player)*1.15)} or {game.zone.base_level, game.zone.base_level}, -- 5-15% higher levels
 	__applied_difficulty = true, -- Difficulty already applied to parent zone
@@ -47,7 +47,7 @@ local g = game.state:dynamicZoneEntry(game.level.map(x, y, engine.Map.TERRAIN):c
 			min_floor = 1200,
 			floor = "CAVEFLOOR",
 			wall = "CAVEWALL",
-			up = "CAVE_LADDER_UP_WILDERNESS",
+			up = "DYNAMIC_ZONE_EXIT",
 			door = "CAVEFLOOR",
 		},
 		actor = {
@@ -75,7 +75,7 @@ local g = game.state:dynamicZoneEntry(game.level.map(x, y, engine.Map.TERRAIN):c
 	trap_list = {"/data/general/traps/natural_forest.lua"},
 },
 function(zone, goback)
-	goback("ladder back to %s", zone.grid_list.CAVE_LADDER_UP_WILDERNESS)
+	goback(_t"ladder back to %s", zone.grid_list.CAVE_LADDER_UP_WILDERNESS)
 end)
 
 g.display='>' g.color_r=0 g.color_g=0 g.color_b=255 g.notice = true

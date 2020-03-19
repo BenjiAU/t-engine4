@@ -19,26 +19,26 @@
 
 use_ui = "quest-main"
 
-name = "Falling Toward Apotheosis"
+name = _t"Falling Toward Apotheosis"
 desc = function(self, who)
 	local desc = {}
 
 	if not self:isCompleted() then
-		desc[#desc+1] = "You have vanquished the masters of the Orc Pride. Now you must venture inside the most dangerous place of this world: the High Peak."
-		desc[#desc+1] = "Seek the Sorcerers and stop them before they bend the world to their will."
-		desc[#desc+1] = "To enter, you will need the four orbs of command to remove the shield over the peak."
-		desc[#desc+1] = "The entrance to the peak passes through a place called 'the slime tunnels', probably located inside or near Grushnak Pride."
+		desc[#desc+1] = _t"You have vanquished the masters of the Orc Pride. Now you must venture inside the most dangerous place of this world: the High Peak."
+		desc[#desc+1] = _t"Seek the Sorcerers and stop them before they bend the world to their will."
+		desc[#desc+1] = _t"To enter, you will need the four orbs of command to remove the shield over the peak."
+		desc[#desc+1] = _t"The entrance to the peak passes through a place called 'the slime tunnels', probably located inside or near Grushnak Pride."
 	else
-		desc[#desc+1] = "You have reached the summit of the High Peak, entered the sanctum of the Sorcerers and destroyed them, freeing the world from the threat of evil."
-		desc[#desc+1] = "You have won the game!"
+		desc[#desc+1] = _t"You have reached the summit of the High Peak, entered the sanctum of the Sorcerers and destroyed them, freeing the world from the threat of evil."
+		desc[#desc+1] = _t"You have won the game!"
 	end
 
-	if self:isCompleted("killed-aeryn") then desc[#desc+1] = "#LIGHT_GREEN#* You encountered Sun Paladin Aeryn who blamed you for the loss of the Sunwall. You were forced to kill her.#LAST#" end
-	if self:isCompleted("spared-aeryn") then desc[#desc+1] = "#LIGHT_GREEN#* You encountered Sun Paladin Aeryn who blamed you for the loss of the Sunwall, but you spared her.#LAST#" end
+	if self:isCompleted("killed-aeryn") then desc[#desc+1] = _t"#LIGHT_GREEN#* You encountered Sun Paladin Aeryn who blamed you for the loss of the Sunwall. You were forced to kill her.#LAST#" end
+	if self:isCompleted("spared-aeryn") then desc[#desc+1] = _t"#LIGHT_GREEN#* You encountered Sun Paladin Aeryn who blamed you for the loss of the Sunwall, but you spared her.#LAST#" end
 
-	if game.winner and game.winner == "full" then desc[#desc+1] = "#LIGHT_GREEN#* You defeated the Sorcerers before the Void portal could open.#LAST#" end
-	if game.winner and game.winner == "aeryn-sacrifice" then desc[#desc+1] = "#LIGHT_GREEN#* You defeated the Sorcerers and Aeryn sacrificed herself to close the Void portal.#LAST#" end
-	if game.winner and game.winner == "self-sacrifice" then desc[#desc+1] = "#LIGHT_GREEN#* You defeated the Sorcerers and sacrificed yourself to close the Void portal.#LAST#" end
+	if game.winner and game.winner == "full" then desc[#desc+1] = _t"#LIGHT_GREEN#* You defeated the Sorcerers before the Void portal could open.#LAST#" end
+	if game.winner and game.winner == "aeryn-sacrifice" then desc[#desc+1] = _t"#LIGHT_GREEN#* You defeated the Sorcerers and Aeryn sacrificed herself to close the Void portal.#LAST#" end
+	if game.winner and game.winner == "self-sacrifice" then desc[#desc+1] = _t"#LIGHT_GREEN#* You defeated the Sorcerers and sacrificed yourself to close the Void portal.#LAST#" end
 
 	return table.concat(desc, "\n")
 end
@@ -59,7 +59,7 @@ on_status_change = function(self, who, status, sub)
 			end
 
 			local Chat = require"engine.Chat"
-			local chat = Chat.new("sorcerer-end", {name="Endgame"}, game:getPlayer(true))
+			local chat = Chat.new("sorcerer-end", {name=_t"Endgame"}, game:getPlayer(true))
 			chat:invoke()
 
 			self:end_end_combat()
@@ -106,8 +106,8 @@ function failed_charred_scar(self, level)
 	game:onLevelLoad("wilderness-1", function(zone, level)
 		local spot = level:pickSpot{type="zone-pop", subtype="ruined-gates-of-morning"}
 		local wild = level.map(spot.x, spot.y, engine.Map.TERRAIN)
-		wild.name = "Ruins of the Gates of Morning"
-		wild.desc = "The Sunwall was destroyed while you were trapped in the High Peak."
+		wild.name = _t"Ruins of the Gates of Morning"
+		wild.desc = _t"The Sunwall was destroyed while you were trapped in the High Peak."
 		wild.change_level = nil
 		wild.change_zone = nil
 	end)
@@ -140,7 +140,7 @@ function win(self, how)
 
 	local p = game:getPlayer(true)
 	p.winner = how
-	game:registerDialog(require("engine.dialogs.ShowText").new("Winner", "win", {playername=p.name, how=how}, game.w * 0.6))
+	game:registerDialog(require("engine.dialogs.ShowText").new(_t"Winner", "win", {playername=p.name, how=how}, game.w * 0.6))
 
 	-- Save the winner, if alive
 	if not p.dead then
@@ -172,46 +172,46 @@ end
 function onWin(self, who)
 	local desc = {}
 
-	desc[#desc+1] = "#GOLD#Well done! You have won the Tales of Maj'Eyal: The Age of Ascendancy#WHITE#"
-	desc[#desc+1] = ""
-	desc[#desc+1] = "The Sorcerers are dead, and the Orc Pride lies in ruins, thanks to your efforts."
-	desc[#desc+1] = ""
+	desc[#desc+1] = _t"#GOLD#Well done! You have won the Tales of Maj'Eyal: The Age of Ascendancy#WHITE#"
+	desc[#desc+1] = _t""
+	desc[#desc+1] = _t"The Sorcerers are dead, and the Orc Pride lies in ruins, thanks to your efforts."
+	desc[#desc+1] = _t""
 
 	-- Yeeks are special
 	if who:isQuestStatus("high-peak", engine.Quest.COMPLETED, "yeek") then
-		desc[#desc+1] = "Your sacrifice worked. Your mental energies were imbued with farportal energies. The Way radiated from the High Peak toward the rest of Eyal like a mental tidal wave."
-		desc[#desc+1] = "Every sentient being in Eyal is now part of the Way. Peace and happiness are enforced for all."
-		desc[#desc+1] = "Only the mages of Angolwen were able to withstand the mental shock and thus are the only unsafe people left. But what can they do against the might of the Way?"
+		desc[#desc+1] = _t"Your sacrifice worked. Your mental energies were imbued with farportal energies. The Way radiated from the High Peak toward the rest of Eyal like a mental tidal wave."
+		desc[#desc+1] = _t"Every sentient being in Eyal is now part of the Way. Peace and happiness are enforced for all."
+		desc[#desc+1] = _t"Only the mages of Angolwen were able to withstand the mental shock and thus are the only unsafe people left. But what can they do against the might of the Way?"
 		return 0, desc
 	elseif who:isQuestStatus("high-peak", engine.Quest.COMPLETED, "yeek-stab") then
-		desc[#desc+1] = "In the aftermath of the battle the Way tried to force you to act as a vessel to bring the Way to every sentient being."
-		desc[#desc+1] = "Through an incredible display of willpower you resisted long enough to ask Aeryn to kill you."
-		desc[#desc+1] = "She sadly agreed and ran her sword through you, enabling you to do the last sacrifice you could for the world."
+		desc[#desc+1] = _t"In the aftermath of the battle the Way tried to force you to act as a vessel to bring the Way to every sentient being."
+		desc[#desc+1] = _t"Through an incredible display of willpower you resisted long enough to ask Aeryn to kill you."
+		desc[#desc+1] = _t"She sadly agreed and ran her sword through you, enabling you to do the last sacrifice you could for the world."
 		return 0, desc
 	end
 
 	if who.winner == "full" then
-		desc[#desc+1] = "You have prevented the portal to the Void from opening and thus stopped the Creator from bringing about the end of the world."
+		desc[#desc+1] = _t"You have prevented the portal to the Void from opening and thus stopped the Creator from bringing about the end of the world."
 	elseif who.winner == "aeryn-sacrifice" then
-		desc[#desc+1] = "In a selfless act, High Sun Paladin Aeryn sacrificed herself to close the portal to the Void and thus stopped the Creator from bringing about the end of the world."
+		desc[#desc+1] = _t"In a selfless act, High Sun Paladin Aeryn sacrificed herself to close the portal to the Void and thus stopped the Creator from bringing about the end of the world."
 	elseif who.winner == "self-sacrifice" then
-		desc[#desc+1] = "In a selfless act, you sacrificed yourself to close the portal to the Void and thus stopped the Creator from bringing about the end of the world."
+		desc[#desc+1] = _t"In a selfless act, you sacrificed yourself to close the portal to the Void and thus stopped the Creator from bringing about the end of the world."
 	end
 
 	if who:isQuestStatus("high-peak", engine.Quest.COMPLETED, "gates-of-morning-destroyed") then
-		desc[#desc+1] = ""
-		desc[#desc+1] = "The Gates of Morning have been destroyed and the Sunwall has fallen. The last remnants of the free people in the Far East will surely diminish, and soon only orcs will inhabit this land."
+		desc[#desc+1] = _t""
+		desc[#desc+1] = _t"The Gates of Morning have been destroyed and the Sunwall has fallen. The last remnants of the free people in the Far East will surely diminish, and soon only orcs will inhabit this land."
 	else
-		desc[#desc+1] = ""
-		desc[#desc+1] = "The orc presence in the Far East has greatly been diminished by the loss of their leaders and the destruction of the Sorcerers. The free people of the Sunwall will be able to prosper and thrive on this land."
+		desc[#desc+1] = _t""
+		desc[#desc+1] = _t"The orc presence in the Far East has greatly been diminished by the loss of their leaders and the destruction of the Sorcerers. The free people of the Sunwall will be able to prosper and thrive on this land."
 	end
 
-	desc[#desc+1] = ""
-	desc[#desc+1] = "Maj'Eyal will once more know peace. Most of its inhabitants will never know they even were on the verge of destruction, but then this is what being a true hero means: to do the right thing even though nobody will know about it."
+	desc[#desc+1] = _t""
+	desc[#desc+1] = _t"Maj'Eyal will once more know peace. Most of its inhabitants will never know they even were on the verge of destruction, but then this is what being a true hero means: to do the right thing even though nobody will know about it."
 
 	if who.winner ~= "self-sacrifice" then
-		desc[#desc+1] = ""
-		desc[#desc+1] = "You may continue playing and enjoy the rest of the world."
+		desc[#desc+1] = _t""
+		desc[#desc+1] = _t"You may continue playing and enjoy the rest of the world."
 	end
 	return 0, desc
 end

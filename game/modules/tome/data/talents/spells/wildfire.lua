@@ -59,7 +59,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local radius = self:getTalentRadius(t)
 		return ([[A wave of fire emanates from you with a radius of %d, knocking back anything caught inside and setting them ablaze, doing %0.2f fire damage over 3 turns.
-		The damage will increase with your Spellpower.]]):format(radius, damDesc(self, DamageType.FIRE, damage))
+		The damage will increase with your Spellpower.]]):tformat(radius, damDesc(self, DamageType.FIRE, damage))
 	end,
 }
 
@@ -91,7 +91,7 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		return ([[Your Flame, Flameshock, Fireflash and Blastwave spells leave a burning wake on the ground, burning all within for %0.2f fire damage for 4 turns.
-		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.FIRE, damage))
+		The damage will increase with your Spellpower.]]):tformat(damDesc(self, DamageType.FIRE, damage))
 	end,
 }
 
@@ -105,7 +105,7 @@ newTalent{
 	info = function(self, t)
 		return ([[When your Burning Wake talent is active, your Inferno and Burning Wake effects have a %d%% chance, each turn, to remove a status effect (physical or magical) from the targets.
 		If the target is hostile, it will remove a beneficial effect.
-		If the target is friendly, it will remove a detrimental effect (but still burn).]]):format(t.getChance(self, t))
+		If the target is friendly, it will remove a detrimental effect (but still burn).]]):tformat(t.getChance(self, t))
 	end,
 }
 
@@ -150,6 +150,6 @@ newTalent{
 		local ressistpen = t.getResistPenalty(self, t)
 		local selfres = t.getResistSelf(self, t)
 		return ([[Surround yourself with Wildfire, increasing all your fire damage by %0.1f%%, ignoring %d%% fire resistance of your targets and reducing self-inflicted fire damage by %d%%.]])
-		:format(damageinc, ressistpen, selfres)
+		:tformat(damageinc, ressistpen, selfres)
 	end,
 }

@@ -80,7 +80,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Strike the target with both weapons dealing %d%% damage with each hit.  Each strike that hits will increase the duration of the lowest duration disease effect by %d.]]):
-		format(100 * t.getDamage(self, t), t.getIncrease(self, t))
+		tformat(100 * t.getDamage(self, t), t.getIncrease(self, t))
 	end,
 }
 
@@ -110,7 +110,7 @@ newTalent{
 		local dam = damDesc(self, DamageType.BLIGHT, t.getDamage(self, t))
 		return ([[Concentrate on the corruption you bring, enhancing each of your melee strikes with %0.2f blight damage (which also heals you for %0.2f each hit).
 		The damage will increase with your Spellpower.]]):
-		format(dam, dam * 0.4)
+		tformat(dam, dam * 0.4)
 	end,
 }
 
@@ -164,7 +164,7 @@ newTalent{
 		return ([[Strike with each of your weapons, doing %d%% acid weapon damage with each hit.
 		If at least one of the strikes hits, an acid splash is generated, doing %0.2f acid damage to all enemies in radius %d around the foe you struck.
 		The splash damage will increase with your Spellpower.]]):
-		format(100 * t.getDamage(self, t), damDesc(self, DamageType.ACID, t.getSplash(self, t)), self:getTalentRadius(t))
+		tformat(100 * t.getDamage(self, t), damDesc(self, DamageType.ACID, t.getSplash(self, t)), self:getTalentRadius(t))
 	end,
 }
 
@@ -206,6 +206,6 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Corrupt the target reducing disease immunity by 100%% for 2 turns and stripping up to 2 nature sustains then strike with both your weapons dealing %d%% damage.]]):
-		format(100 * t.getDamage(self, t))
+		tformat(100 * t.getDamage(self, t))
 	end,
 }

@@ -99,8 +99,8 @@ newTalent{
 			end
 
 			local paradox = getQuantity(
-				"Spacetime Tuning",
-				"What's your preferred paradox level?",
+				_t"Spacetime Tuning",
+				_t"What's your preferred paradox level?",
 				math.floor(self.paradox))
 			if not paradox then return end
 			if paradox > 1000 then paradox = 1000 end
@@ -127,7 +127,7 @@ newTalent{
 		Willpower Paradox Modifier : -%d
 		Paradox Sustain Modifier : +%d
 		Total Modifed Paradox :  %d
-		Current Anomaly Chance :  %d%%]]):format(tune, preference, sp_modifier, spellpower, will_modifier, sustain_modifier, after_will, anomaly)
+		Current Anomaly Chance :  %d%%]]):tformat(tune, preference, sp_modifier, spellpower, will_modifier, sustain_modifier, after_will, anomaly)
 	end,
 }
 
@@ -174,7 +174,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[Creates a time distortion in a radius of %d that lasts for %d turns, decreasing global speed by %d%% for 3 turns and inflicting %0.2f temporal damage each turn to all targets within the area.
 		The slow effect and damage dealt will scale with your Spellpower.]]):
-		format(radius, duration, 100 * slow, damDesc(self, DamageType.TEMPORAL, damage))
+		tformat(radius, duration, 100 * slow, damDesc(self, DamageType.TEMPORAL, damage))
 	end,
 }
 
@@ -197,7 +197,7 @@ newTalent{
 		local cooldown = t.cdred(self, t, 10)
 		local wormhole = t.cdred(self, t, 20)
 		return ([[Your mastery of spacetime reduces the cooldown of Banish, Dimensional Step, Swap, and Temporal Wake by %d, and the cooldown of Wormhole by %d.  Also improves your Spellpower for purposes of hitting targets with chronomancy effects that may cause continuum destabilization (Banish, Time Skip, etc.), as well as your chance of overcoming continuum destabilization, by %d%%.]]):
-		format(cooldown, wormhole, t.getPower(self, t)*100)
+		tformat(cooldown, wormhole, t.getPower(self, t)*100)
 
 	end,
 }
@@ -229,7 +229,7 @@ newTalent{
 	info = function(self, t)
 		local power = t.getPower(self, t)
 		return ([[You've learned to boost your magic through your control over the spacetime continuum.  Increases your Magic and your Spell Save by %d.
-		The effect will scale with your Willpower.]]):format(power)
+		The effect will scale with your Willpower.]]):tformat(power)
 	end
 }
 
@@ -263,7 +263,7 @@ newTalent{
 		return ([[You pull your awareness fully into the moment, increasing your stealth detection, see invisibility, defense, and accuracy by %d for %d turns.
 		If you have Spin Fate active when you cast this spell, you'll gain a bonus to these values equal to 50%% of your spin.
 		This spell takes no time to cast.]]):
-		format(power, duration)
+		tformat(power, duration)
 	end,
 }
 
@@ -287,7 +287,7 @@ newTalent{
 		return ([[You begin to gather energy from other timelines. Your Spellpower will increase by %0.2f on the first turn and %0.2f more each additional turn.
 		The effect ends either when you cast a spell, or after five turns.
 		Eacn turn the effect is active, your Paradox will be reduced by %d.
-		This spell will not break Spacetime Tuning, nor will it be broken by activating Spacetime Tuning.]]):format(primary + (primary/5), primary/5, reduction)
+		This spell will not break Spacetime Tuning, nor will it be broken by activating Spacetime Tuning.]]):tformat(primary + (primary/5), primary/5, reduction)
 	end,
 }
 
@@ -317,7 +317,7 @@ newTalent{
 	info = function(self, t)
 		local power = t.getPower(self, t)
 		return ([[You encase yourself in a field that slows incoming projectiles by %d%%, and increases your physical resistance by %d%%.
-		The effect will scale with your Spellpower.]]):format(power, power / 2)
+		The effect will scale with your Spellpower.]]):tformat(power, power / 2)
 	end,
 }
 
@@ -343,7 +343,7 @@ newTalent{
 		This increases your resistance to all damage by %d%%, reduces the duration of all detrimental effects on you by %d%%, and reduces all damage you deal by 20%%.
 		The resistance bonus, effect reduction, and damage penalty will gradually lose power over the duration of the spell.
 		The effects scale with your Spellpower.]]):
-		format(resist, dur)
+		tformat(resist, dur)
 	end,
 }
 
@@ -378,8 +378,8 @@ newTalent{
 
 		local m = makeParadoxClone(self, self, t.getDuration(self, t))
 		-- Change some values
-		m.name = self.name.."'s Paradox Clone"
-		m.desc = ([[The real %s... or so %s says.]]):format(self.name, self:he_she())
+		m.name = ("%s's Paradox Clone"):tformat(self:getName())
+		m.desc = ([[The real %s... or so %s says.]]):tformat(self:getName(), self:he_she())
 		m.life = util.bound(m.life, m.die_at, m.max_life)
 		m.forceLevelup = function() end
 		m.summoner = self
@@ -413,7 +413,7 @@ newTalent{
 			game.party:addMember(m, {
 				control="no",
 				type="minion",
-				title="Paradox Clone",
+				title=_t"Paradox Clone",
 				orders = {target=true},
 			})
 		end
@@ -424,7 +424,7 @@ newTalent{
 	info = function(self, t)
 		local duration = t.getDuration(self, t)
 		return ([[You summon your future self to fight alongside you for %d turns.  At some point in the future, you'll be pulled into the past to fight alongside your past self after the initial effect ends.
-		This spell splits the timeline.  Attempting to use another spell that also splits the timeline while this effect is active will be unsuccessful.]]):format(duration)
+		This spell splits the timeline.  Attempting to use another spell that also splits the timeline while this effect is active will be unsuccessful.]]):tformat(duration)
 	end,
 }
 
@@ -473,7 +473,7 @@ newTalent{
 	info = function(self, t)
 		local displace = t.getDisplaceDamage(self, t) * 100
 		return ([[You bend space around you, displacing %d%% of any damage you receive onto a random enemy within range.
-		]]):format(displace)
+		]]):tformat(displace)
 	end,
 }
 
@@ -517,7 +517,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[You surround yourself with a radius %d distortion of gravity, knocking back and dealing %0.2f physical damage to all creatures inside it.  The effect lasts %d turns.  Deals 50%% extra damage to pinned targets, in addition to the knockback.
 		The blast wave may hit targets more then once, depending on the radius and the knockback effect.
-		The damage will scale with your Spellpower.]]):format(radius, damDesc(self, DamageType.PHYSICAL, damage), duration)
+		The damage will scale with your Spellpower.]]):tformat(radius, damDesc(self, DamageType.PHYSICAL, damage), duration)
 	end,
 }
 
@@ -579,7 +579,7 @@ newTalent{
 			game.party:addMember(m, {
 				control="no",
 				type="temporal-clone",
-				title="Temporal Clone",
+				title=_t"Temporal Clone",
 				orders = {target=true},
 			})
 		end
@@ -595,7 +595,7 @@ newTalent{
 		return ([[Clones the target creature for up to %d turns.  The duration of the effect will be divided by half the target's rank, and the target will have have %d%% of its normal life and deal %d%% less damage.
 		If you clone a hostile creature the clone will target the creature it was cloned from.
 		The life and damage penalties will be lessened by your Spellpower.]]):
-		format(duration, 100 - damage_penalty, damage_penalty)
+		tformat(duration, 100 - damage_penalty, damage_penalty)
 	end,
 }
 
@@ -613,7 +613,7 @@ newTalent{
 		if dam > 0 and type ~= DamageType.TEMPORAL then
 			local smear = dam * t.getPercent(self, t)
 			self:setEffect(self.EFF_DAMAGE_SMEARING, t.getDuration(self, t), {dam=smear/t.getDuration(self, t), no_ct_effect=true})
-			game:delayedLogDamage(src, self, 0, ("%s(%d smeared)#LAST#"):format(DamageType:get(type).text_color or "#aaaaaa#", smear), false)
+			game:delayedLogDamage(src, self, 0, ("%s(%d smeared)#LAST#"):tformat(DamageType:get(type).text_color or "#aaaaaa#", smear), false)
 			dam = dam - smear
 		end
 
@@ -630,7 +630,7 @@ newTalent{
 		local percent = t.getPercent(self, t) * 100
 		local duration = t.getDuration(self, t)
 		return ([[You convert %d%% of all non-temporal damage you receive into temporal damage spread out over %d turns.
-		This damage will bypass resistance and affinity.]]):format(percent, duration)
+		This damage will bypass resistance and affinity.]]):tformat(percent, duration)
 	end,
 }
 
@@ -651,7 +651,7 @@ newTalent{
 	info = function(self, t)
 		local duration = t.getDuration(self, t)
 		return ([[Phase shift yourself for %d turns; any damage greater than 10%% of your maximum life will teleport you to an adjacent tile and be reduced by 50%% (can only happen once per turn).]]):
-		format(duration)
+		tformat(duration)
 	end,
 }
 
@@ -705,7 +705,7 @@ newTalent{
 				game.logSeen(self, "The spell fizzles!")
 			end
 		else
-			game.logSeen(target, "%s resists the swap!", target.name:capitalize())
+			game.logSeen(target, "%s resists the swap!", target:getName():capitalize())
 		end
 
 		game:playSoundNear(self, "talents/teleport")
@@ -716,7 +716,7 @@ newTalent{
 		local duration = t.getConfuseDuration(self, t)
 		local power = t.getConfuseEfficency(self, t)
 		return ([[You manipulate the spacetime continuum in such a way that you switch places with another creature with in a range of %d.  The targeted creature will be confused (power %d%%) for %d turns.
-		The spell's hit chance will increase with your Spellpower.]]):format (range, power, duration)
+		The spell's hit chance will increase with your Spellpower.]]):tformat (range, power, duration)
 	end,
 }
 
@@ -769,7 +769,7 @@ newTalent{
 					if target:canBe("stun") then
 						target:setEffect(target.EFF_STUNNED, t.getDuration(self, t), {apply_power=getParadoxSpellpower(self, t)})
 					else
-						game.logSeen(target, "%s resists the stun!", target.name:capitalize())
+						game.logSeen(target, "%s resists the stun!", target:getName():capitalize())
 					end
 				end
 			end)
@@ -785,7 +785,7 @@ newTalent{
 		return ([[Violently fold the space between yourself and another point within range.
 		You teleport to the target location, and leave a temporal wake behind that stuns for %d turns and deals %0.2f temporal and %0.2f physical warp damage to targets in the path.
 		The damage will scale with your Spellpower.]]):
-		format(stun, damDesc(self, DamageType.TEMPORAL, damage/2), damDesc(self, DamageType.PHYSICAL, damage/2))
+		tformat(stun, damDesc(self, DamageType.TEMPORAL, damage/2), damDesc(self, DamageType.PHYSICAL, damage/2))
 	end,
 }
 
@@ -835,7 +835,7 @@ newTalent{
 		return ([[Fragile spikes of carbon protrude from your flesh, clothing, and armor, increasing your armor rating by %d and inflicting %0.2f bleed damage over six turns on attackers.   Each time you're struck, the armor increase will be reduced by 1.  Each turn the spell will regenerate 1 armor up to its starting value.
 		If the armor increase from the spell ever falls below 1, the sustain will deactivate and the effect will end.
 		The armor and bleed damage will increase with your Spellpower.]]):
-		format(armor, damDesc(self, DamageType.PHYSICAL, damage))
+		tformat(armor, damDesc(self, DamageType.PHYSICAL, damage))
 	end,
 }
 
@@ -870,7 +870,7 @@ newTalent{
 		return ([[Destabilizes the target, inflicting %0.2f temporal damage per turn for 10 turns.  If the target dies while destabilized, it will explode, doing %0.2f temporal damage and %0.2f physical damage in a radius of 4.
 		If the target dies while also under the effects of continuum destabilization, all explosion damage will be done as temporal damage.
 		The damage will scale with your Spellpower.]]):
-		format(damDesc(self, DamageType.TEMPORAL, damage), damDesc(self, DamageType.TEMPORAL, explosion/2), damDesc(self, DamageType.PHYSICAL, explosion/2))
+		tformat(damDesc(self, DamageType.TEMPORAL, damage), damDesc(self, DamageType.TEMPORAL, explosion/2), damDesc(self, DamageType.PHYSICAL, explosion/2))
 	end,
 }
 
@@ -910,10 +910,10 @@ newTalent{
 		if target then
 			if target:checkHit(self:combatSpellpower(), target:combatPhysicalResist(), 0, 95, 15) and target:canBe("instakill") and target.life > 0 and target.life < target.max_life * 0.2 then
 				-- KILL IT !
-				game.logSeen(target, "%s has been pulled apart at a molecular level!", target.name:capitalize())
+				game.logSeen(target, "%s has been pulled apart at a molecular level!", target:getName():capitalize())
 				target:die(self)
 			elseif target.life > 0 and target.life < target.max_life * 0.2 then
-				game.logSeen(target, "%s resists the quantum spike!", target.name:capitalize())
+				game.logSeen(target, "%s resists the quantum spike!", target:getName():capitalize())
 			end
 		end
 		
@@ -930,6 +930,6 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Attempts to pull the target apart at a molecular level, inflicting %0.2f temporal damage and %0.2f physical damage.  If the target ends up with low enough life (<20%%), it might be instantly killed.
 		Quantum Spike deals 50%% additional damage to targets affected by temporal destabilization and/or continuum destabilization.
-		The damage will scale with your Spellpower.]]):format(damDesc(self, DamageType.TEMPORAL, damage/2), damDesc(self, DamageType.PHYSICAL, damage/2))
+		The damage will scale with your Spellpower.]]):tformat(damDesc(self, DamageType.TEMPORAL, damage/2), damDesc(self, DamageType.PHYSICAL, damage/2))
 	end,
 }

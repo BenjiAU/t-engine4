@@ -121,9 +121,9 @@ newTalent{
 ----------------------------------------------------------------
 local function makeSunGlyph()
 	local sun_glyph = Trap.new{
-		name = "glyph of sunlight",
+		name = _t"glyph of sunlight",
 		is_glyph = "sunlight",
-		type = "elemental", id_by_type=true, unided_name = "trap",
+		type = "elemental", id_by_type=true, unided_name = _t"trap",
 		display = '^', color=colors.GOLD, image = "trap/trap_glyph_explosion_02_64.png",
 		disarmable = false,
 		no_disarm_message = true,
@@ -134,7 +134,7 @@ local function makeSunGlyph()
 		dam = dam,
 		heal = heal,
 		desc = function(self)
-			return ([[Deals %d light damage and heals the summoner for %d]]):format(engine.interface.ActorTalents.damDesc(self, engine.DamageType.LIGHT, self.dam), self.heal)
+			return ([[Deals %d light damage and heals the summoner for %d]]):tformat(engine.interface.ActorTalents.damDesc(self, engine.DamageType.LIGHT, self.dam), self.heal)
 		end,
 		canTrigger = function(self, x, y, who)
 			if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
@@ -181,9 +181,9 @@ end
 
 local function makeMoonGlyph()
 	local star_glyph = Trap.new{
-		name = "glyph of moonlight",
+		name = _t"glyph of moonlight",
 		is_glyph = "moonlight",
-		type = "elemental", id_by_type=true, unided_name = "trap",
+		type = "elemental", id_by_type=true, unided_name = _t"trap",
 		display = '^', color=colors.GOLD, image = "trap/trap_glyph_fatigue_01_64.png",
 		disarmable = false,
 		no_disarm_message = true,
@@ -196,7 +196,7 @@ local function makeMoonGlyph()
 		numbDur = numbDur,
 		desc = function(self)
 			return ([[Deals %d darkness damage and saps the foes energy, reducing all damage dealt by %d%% for %d turns.]]):
-				format(engine.interface.ActorTalents.damDesc(self, engine.DamageType.DARKNESS, self.dam), self.numb, self.numbDur)
+				tformat(engine.interface.ActorTalents.damDesc(self, engine.DamageType.DARKNESS, self.dam), self.numb, self.numbDur)
 		end,
 		canTrigger = function(self, x, y, who)
 			if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
@@ -243,9 +243,9 @@ end
 
 local function makeTwilightGlyph()
 	local twi_glyph = Trap.new{
-		name = "glyph of twilight",
+		name = _t"glyph of twilight",
 		is_glyph = "twilight",
-		type = "elemental", id_by_type=true, unided_name = "trap",
+		type = "elemental", id_by_type=true, unided_name = _t"trap",
 		display = '^', color=colors.GOLD, image = "trap/trap_glyph_repulsion_01_64.png",
 		disarmable = false,
 		no_disarm_message = true,
@@ -256,7 +256,7 @@ local function makeTwilightGlyph()
 		dam = dam,
 		dist=dist,
 		desc = function(self)
-			return ([[Explodes knocking the enemy 1 space in a random direction and dealing %d light and %d darkness damage.]]):format(engine.interface.ActorTalents.damDesc(self, engine.DamageType.LIGHT, self.dam/2), engine.interface.ActorTalents.damDesc(self, engine.DamageType.DARKNESS, self.dam/2))
+			return ([[Explodes knocking the enemy 1 space in a random direction and dealing %d light and %d darkness damage.]]):tformat(engine.interface.ActorTalents.damDesc(self, engine.DamageType.LIGHT, self.dam/2), engine.interface.ActorTalents.damDesc(self, engine.DamageType.DARKNESS, self.dam/2))
 		end,
 		canTrigger = function(self, x, y, who)
 			if who:reactionToward(self.summoner) < 0 then return mod.class.Trap.canTrigger(self, x, y, who) end
@@ -355,7 +355,7 @@ end
 		#ffd700#Glyph of Sunlight#LAST#:  Bind sunlight into a glyph. When triggered it will release a brilliant light, dealing %0.2f light damage and healing you for %d.
 		#7f7f7f#Glyph of Moonlight#LAST#:  Bind moonlight into a glyph. When triggered it will release a fatiguing darkness,  dealing %0.2f darkness damage and reducing the foes damage dealt by %d%% for %d turns.
 		#9D9DC9#Glyph of Twilight#LAST#:  Bind twilight into a glyph. When triggered it will release a burst of twilight, dealing %0.2f light and %0.2f darkness damage and knocking the foe back %d tiles.
-		]]):format(self:getTalentRange(t), t.getDuration(self, t), t.getGlyphCD(self, t),
+		]]):tformat(self:getTalentRange(t), t.getDuration(self, t), t.getGlyphCD(self, t),
 			damDesc(self, DamageType.LIGHT, dam), heal,
 			damDesc(self, DamageType.DARKNESS, dam), numb, numbDur,
 			damDesc(self, DamageType.LIGHT, dam/2), damDesc(self, DamageType.DARKNESS, dam/2), dist)
@@ -376,7 +376,7 @@ newTalent{
 		return ([[Your glyphs are imbued with celestial fury; they last %d turns longer and when triggered they will deal damage.
 		#ffd700#Glyph of Sunlight#LAST#:  Deals %0.2f light damage.
 		#7f7f7f#Glyph of Moonlight#LAST#:  Deals %0.2f darkness damage.
-		#9D9DC9#Glyph of Twilight#LAST#:  Deals %0.2f light and %0.2f darkness damage.]]):format(t.getPersistentDuration(self, t), damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.DARKNESS, dam), damDesc(self, DamageType.LIGHT, dam/2), damDesc(self, DamageType.DARKNESS, dam/2))
+		#9D9DC9#Glyph of Twilight#LAST#:  Deals %0.2f light and %0.2f darkness damage.]]):tformat(t.getPersistentDuration(self, t), damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.DARKNESS, dam), damDesc(self, DamageType.LIGHT, dam/2), damDesc(self, DamageType.DARKNESS, dam/2))
 	end,
 }
 
@@ -390,7 +390,7 @@ newTalent{
 	getMaxStacks = function(self, t) return self:combatTalentLimit(t, 6, 2, 5) end,
 	getTurns = function(self, t) return self:combatTalentLimit(t, 10, 1, 7) end,
 	info = function(self, t)
-		return ([[Up to 3 times per turn when one of your glyphs triggers you feel a surge of celestial power, increasing your darkness and light resistance and affinity by 5%% for %d turns, stacking up to %d times.]]):format(t.getTurns(self, t), t.getMaxStacks(self, t))
+		return ([[Up to 3 times per turn when one of your glyphs triggers you feel a surge of celestial power, increasing your darkness and light resistance and affinity by 5%% for %d turns, stacking up to %d times.]]):tformat(t.getTurns(self, t), t.getMaxStacks(self, t))
 	end,
 }
 
@@ -452,6 +452,6 @@ newTalent{
 		At talent level 2 glyphs triggered this way will leave a residue of themselves on the ground, dealing damage each turn for %d turns.
 		#ffd700#Sunlight#LAST#:  %0.2f light damage.
 		#7f7f7f#Moonlight#LAST#:  %0.2f darkness damage.
-		#9D9DC9#Twilight#LAST#:  %0.2f light and %0.2f darkness damage]]):format(t.getDuration(self, t), damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.DARKNESS, dam), damDesc(self, DamageType.LIGHT, dam/2), damDesc(self, DamageType.DARKNESS, dam/2))
+		#9D9DC9#Twilight#LAST#:  %0.2f light and %0.2f darkness damage]]):tformat(t.getDuration(self, t), damDesc(self, DamageType.LIGHT, dam), damDesc(self, DamageType.DARKNESS, dam), damDesc(self, DamageType.LIGHT, dam/2), damDesc(self, DamageType.DARKNESS, dam/2))
 	end,
 }

@@ -95,9 +95,10 @@ function _M:init()
 	end
 	
 	self:handleEvents()
+	local default_font, _ = FontPackage:getFont("default")
 	if not profile.connected then core.webview, core.webview_inactive = nil, core.webview end
 
-	self.floating_tooltip = Tooltip.new(nil, 14, nil, colors.DARK_GREY, 467)
+	self.floating_tooltip = Tooltip.new(default_font, 14, nil, colors.DARK_GREY, 467)
 
 --	self.refuse_threads = true
 	self.normal_key = self.key
@@ -174,8 +175,8 @@ function _M:run()
 	-- Get news
 	if not self.news then
 		self.news = {
-			title = "Welcome to T-Engine and the Tales of Maj'Eyal",
-			text = [[#GOLD#"Tales of Maj'Eyal"#WHITE# is the main game, you can also install more addons or modules by going to https://te4.org/
+			title = _t"Welcome to T-Engine and the Tales of Maj'Eyal",
+			text = _t[[#GOLD#"Tales of Maj'Eyal"#WHITE# is the main game, you can also install more addons or modules by going to https://te4.org/
 
 When inside a module remember you can press Escape to bring up a menu to change keybindings, resolution and other module specific options.
 
@@ -211,7 +212,7 @@ Now go and have some fun!]]
 
 	if not config.settings.upgrades or not config.settings.upgrades.v1_0_5 then
 		if not config.settings.background_saves or (config.settings.tome and config.settings.tome.save_zone_levels) then
-			Dialog:simpleLongPopup("Upgrade to 1.0.5", [[The way the engine manages saving has been reworked for v1.0.5.
+			Dialog:simpleLongPopup(_t"Upgrade to 1.0.5", _t[[The way the engine manages saving has been reworked for v1.0.5.
 
 The background saves should no longer lag horribly and as such it is highly recommended that you use the option. The upgrade turned it on for you.
 
@@ -232,7 +233,7 @@ For the same reason the save per level option should not be used unless you have
 	util.removeForceSafeBoot()
 
 	if core.display.safeMode() then
-		Dialog:simpleLongPopup("Safe Mode", [[Oops! Either you activated safe mode manually or the game detected it did not start correctly last time and thus you are in #LIGHT_GREEN#safe mode#WHITE#.
+		Dialog:simpleLongPopup(_t"Safe Mode", _t[[Oops! Either you activated safe mode manually or the game detected it did not start correctly last time and thus you are in #LIGHT_GREEN#safe mode#WHITE#.
 Safe Mode disabled all graphical options and sets a low FPS. It is not advisable to play this way (as it will be very painful and ugly).
 
 Please go to the Video Options and try enabling/disabling options and then restarting until you do not get this message.
@@ -241,13 +242,13 @@ A usual problem is shaders and thus should be your first target to disable.]], 7
 
 	local reboot_message = core.game.getRebootMessage()
 	if reboot_message then
-		Dialog:simpleLongPopup("Message", reboot_message, 700)
+		Dialog:simpleLongPopup(_t"Message", reboot_message, 700)
 	end
 
 	self:checkBootLoginRegister()
 
 	if __module_extra_info.duplicate_addon then
-		Dialog:simpleLongPopup("Duplicate Addon", ([[Oops! It seems like you have the same addon/dlc installed twice.
+		Dialog:simpleLongPopup(_t"Duplicate Addon", (_t[[Oops! It seems like you have the same addon/dlc installed twice.
 This is unsupported and would make many things explode. Please remove one of the copies.
 
 Addon name: #YELLOW#%s#LAST#
@@ -323,7 +324,7 @@ function _M:grabAddons()
 			local co co = coroutine.create(function()
 			for i, add in ipairs(update_list) do
 				if core.webview then
-					local d = Downloader.new{title="Updating addon: #LIGHT_GREEN#"..list[add.name].long_name, co=co, dest=add.file..".tmp", url=add.download_url, allow_downloads={addons=true}}
+					local d = Downloader.new{title=("Updating addon: #LIGHT_GREEN#%s"):tformat(list[add.name].long_name), co=co, dest=add.file..".tmp", url=add.download_url, allow_downloads={addons=true}}
 					local ok = d:start()
 					if ok then
 						local wdir = fs.getWritePath()
@@ -598,13 +599,13 @@ end
 --- Ask if we really want to close, if so, save the game first
 function _M:onQuit()
 	if self.is_quitting then return end
-	self.is_quitting = Dialog:yesnoPopup("Quit", "Really exit T-Engine/ToME?", function(ok)
+	self.is_quitting = Dialog:yesnoPopup(_t"Quit", _t"Really exit T-Engine/ToME?", function(ok)
 		self.is_quitting = false
 		if ok then core.game.exit_engine() end
-	end, "Quit", "Continue")
+	end, _t"Quit", _t"Continue")
 end
 
-profile_help_text = [[Welcome to #LIGHT_GREEN#Tales of Maj'Eyal#LAST#!
+profile_help_text = _t[[Welcome to #LIGHT_GREEN#Tales of Maj'Eyal#LAST#!
 
 Before you can start dying in many innovative ways we need to ask you about online play.
 
@@ -654,28 +655,28 @@ end
 function _M:createProfile(loginItem)
 	if not loginItem.create then
 		self.auth_tried = nil
-		local d = Dialog:simpleWaiter("Login in...", "Please wait...") core.display.forceRedraw()
+		local d = Dialog:simpleWaiter(_t"Login in...", _t"Please wait...") core.display.forceRedraw()
 		profile:performlogin(loginItem.login, loginItem.pass)
 		profile:waitFirstAuth()
 		d:done()
 		if profile.auth then
-			Dialog:simplePopup("Profile logged in!", "Your online profile is now active. Have fun!", function() end )
+			Dialog:simplePopup(_t"Profile logged in!", _t"Your online profile is now active. Have fun!", function() end )
 		else
-			Dialog:simplePopup("Login failed!", "Check your login and password or try again in in a few moments.", function() end )
+			Dialog:simplePopup(_t"Login failed!", _t"Check your login and password or try again in in a few moments.", function() end )
 		end
 	else
 		self.auth_tried = nil
-		local d = Dialog:simpleWaiter("Registering...", "Registering on https://te4.org/, please wait...") core.display.forceRedraw()
+		local d = Dialog:simpleWaiter(_t"Registering...", _t"Registering on https://te4.org/, please wait...") core.display.forceRedraw()
 		local ok, err = profile:newProfile(loginItem.login, loginItem.name, loginItem.pass, loginItem.email, loginItem.news)
 		profile:waitFirstAuth()
 		d:done()
 		if profile.auth then
-			Dialog:simplePopup(self.justlogin and "Logged in!" or "Profile created!", "Your online profile is now active. Have fun!", function() end )
+			Dialog:simplePopup(self.justlogin and _t"Logged in!" or _t"Profile created!", _t"Your online profile is now active. Have fun!", function() end )
 		else
 			if err ~= "unknown" and err then
-				Dialog:simplePopup("Profile creation failed!", "Creation failed: "..err.." (you may also register on https://te4.org/)", function() end )
+				Dialog:simplePopup(_t"Profile creation failed!", ("Creation failed: %s (you may also register on https://te4.org/)"):tformat(err), function() end )
 			else
-				Dialog:simplePopup("Profile creation failed!", "Try again in in a few moments, or try online at https://te4.org/", function() end )
+				Dialog:simplePopup(_t"Profile creation failed!", _t"Try again in in a few moments, or try online at https://te4.org/", function() end )
 			end
 		end
 	end

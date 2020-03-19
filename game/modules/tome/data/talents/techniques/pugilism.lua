@@ -65,7 +65,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Increases your Accuracy by %d, the damage multiplier of your striking talents (Pugilism and Finishing Moves) by %d%%, and reduces all damage taken by %d.
 		The offensive bonuses scale with your Dexterity and the damage reduction with your Strength.]]):
-		format(attack, damage, t.getFlatReduction(self, t))
+		tformat(attack, damage, t.getFlatReduction(self, t))
 	end,
 }
 
@@ -77,7 +77,7 @@ newTalent{
 	random_ego = "attack",
 	--cooldown = function(self, t) return math.ceil(3 * getRelentless(self, cd)) end,
 	cooldown = 3,
-	message = "@Source@ throws two quick punches.",
+	message = _t"@Source@ throws two quick punches.",
 	tactical = { ATTACK = { weapon = 2 } },
 	requires_target = true,
 	is_melee = true,
@@ -147,7 +147,7 @@ newTalent{
 		local damage = t.getDamage(self, t) * 100
 		return ([[Deliver two quick punches that deal %d%% damage each, and switch your stance to Striking Stance. If you already have Striking Stance active and Double Strike isn't on cooldown, this talent will automatically replace your normal attacks (and trigger the cooldown).
 		If either jab connects, you earn one combo point. At talent level 4 or greater, if both jabs connect, you'll earn two combo points.]])
-		:format(damage)
+		:tformat(damage)
 	end,
 }
 
@@ -166,7 +166,7 @@ newTalent{
 	target = function(self, t) return {type="bolt", range=self:getTalentRange(t)} end,
 	range = function(self, t) return math.ceil(2 + self:combatTalentScale(t, 2.2, 4.3)) end, -- being able to use this over rush without massive investment is much more fun
 	chargeBonus = function(self, t, dist) return self:combatScale(dist, 0.15, 1, 0.50, 5) end,
-	message = "@Source@ lashes out with a spinning backhand.",
+	message = _t"@Source@ lashes out with a spinning backhand.",
 	tactical = { ATTACKAREA = { weapon = 2 }, CLOSEIN = 1 },
 	requires_target = true,
 	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1.0, 1.7) + getStrikingStyle(self, dam) end,
@@ -259,7 +259,7 @@ newTalent{
 		local charge =t.chargeBonus(self, t, t.range(self, t)-1)*100
 		return ([[Attack your foes in a frontal arc with a spinning backhand, doing %d%% damage. If you're not adjacent to the target, you'll step forward as you spin, gaining up to %d%% bonus damage, which increases the farther you move.
 		This attack will remove any grapples you're maintaining, and earn one combo point (or one combo point per attack that connects, if the talent level is 4 or greater).]])
-		:format(damage, charge)
+		:tformat(damage, charge)
 	end,
 }
 
@@ -279,7 +279,7 @@ newTalent{
 	is_melee = true,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
 	range = 1,
-	message = "@Source@ raises their leg and snaps it downward in a devastating axe kick.",
+	message = _t"@Source@ raises their leg and snaps it downward in a devastating axe kick.",
 	tactical = { ATTACK = { weapon = 2 } },
 	requires_target = true,
 	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 0.8, 2) + getStrikingStyle(self, dam) end, -- low damage scaling, investment gets the extra CP
@@ -316,7 +316,7 @@ newTalent{
 		local damage = t.getDamage(self, t) * 100
 		return ([[Deliver a devastating axe kick dealing %d%% damage. If the blow connects your target is brain damaged, causing all talents to fail for %d turns and earning 2 combo points.
 		This effect cannot be saved against, though it can be dodged and checks confusion immunity.]])
-		:format(damage, t.getDuration(self, t))
+		:tformat(damage, t.getDuration(self, t))
 	end,
 }
 
@@ -328,7 +328,7 @@ newTalent{
 	random_ego = "attack",
 	cooldown = 16,
 	stamina = 15,
-	message = "@Source@ lashes out with a flurry of fists.",
+	message = _t"@Source@ lashes out with a flurry of fists.",
 	tactical = { ATTACK = { weapon = 2 } },
 	requires_target = true,
 	is_melee = true,
@@ -380,6 +380,6 @@ newTalent{
 		local damage = t.getDamage(self, t) * 100
 		return ([[Lashes out at the target with three quick punches that each deal %d%% damage.
 		Earns one combo point. If your talent level is 4 or greater, this instead earns one combo point per blow that connects.]])
-		:format(damage)
+		:tformat(damage)
 	end,
 }

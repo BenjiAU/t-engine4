@@ -39,14 +39,14 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[A farportal is a way to travel incredible distances in the blink of an eye. They were left behind by the powerful Sher'tul race.
+	desc = _t[[A farportal is a way to travel incredible distances in the blink of an eye. They were left behind by the powerful Sher'tul race.
 This farportal is not connected to any other portal. It is made for exploration; you cannot know where it will send you.
 It should automatically create a portal back, but it might not be near your arrival zone.]],
 
 	block_move = function(self, x, y, who, act, couldpass)
 		if not who or not who.player or not act then return true end
 		local Dialog = require "engine.ui.Dialog"
-		Dialog:simplePopup("Farportal", "The farportal seems to be inactive")
+		Dialog:simplePopup(_t"Farportal", _t"The farportal seems to be inactive")
 		return true
 	end,
 }

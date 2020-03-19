@@ -17,23 +17,23 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "The Temple of Creation"
+name = _t"The Temple of Creation"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "Ukllmswwik asked you to take his portal to the Temple of Creation and kill Slasul who has turned mad."
+	desc[#desc+1] = _t"Ukllmswwik asked you to take his portal to the Temple of Creation and kill Slasul who has turned mad."
 	if self:isCompleted("slasul-story") then
-		desc[#desc+1] = "Slasul told you his side of the story. Now you must decide: which of them is corrupt?"
+		desc[#desc+1] = _t"Slasul told you his side of the story. Now you must decide: which of them is corrupt?"
 	end
 	if self:isCompleted("legacy-naloren") then
-		desc[#desc+1] = "Slasul bound his lifeforce to yours and gave your a powerful trident in return."
+		desc[#desc+1] = _t"Slasul bound his lifeforce to yours and gave your a powerful trident in return."
 	end
 
 	if self:isCompleted("kill-slasul") and self:isCompleted("kill-drake") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have killed both Ukllmswwik and Slasul, betraying them both.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have killed both Ukllmswwik and Slasul, betraying them both.#WHITE#"
 	elseif self:isCompleted("kill-slasul") and not self:isCompleted("kill-drake") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have sided with Ukllmswwik and killed Slasul.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have sided with Ukllmswwik and killed Slasul.#WHITE#"
 	elseif not self:isCompleted("kill-slasul") and self:isCompleted("kill-drake") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have sided with Slasul and killed Ukllmswwik.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have sided with Slasul and killed Ukllmswwik.#WHITE#"
 	end
 	return table.concat(desc, "\n")
 end
@@ -51,7 +51,7 @@ end
 on_grant = function(self, who)
 	local g = mod.class.Grid.new{
 		show_tooltip=true,
-		name="Portal to the Temple of Creation",
+		name=_t"Portal to the Temple of Creation",
 		display='>', color=colors.VIOLET,
 		notice = true,
 		change_level=1, change_zone="temple-of-creation",
@@ -75,7 +75,7 @@ portal_back = function(self, who)
 
 	local g = mod.class.Grid.new{
 		show_tooltip=true,
-		name="Portal to the Flooded Cave",
+		name=_t"Portal to the Flooded Cave",
 		display='>', color=colors.VIOLET,
 		notice = true,
 		change_level=2, change_zone="flooded-cave",

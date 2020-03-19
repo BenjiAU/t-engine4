@@ -21,7 +21,7 @@ local layout = game.state:alternateZone(short_name, {"TWISTED", 2})
 if layout == "TWISTED" then
 
 return {
-	name = "Scintillating Caves",
+	name = _t"Scintillating Caves",
 	level_range = {1, 7},
 	level_scheme = "player",
 	max_level = 5,
@@ -96,7 +96,7 @@ return {
 	on_enter = function(lev)
 		if lev == 1 and not game.level.data.warned then
 			game.level.data.warned = true
-			require("engine.ui.Dialog"):simplePopup("Caves...", "As you enter the caves you notice the magic here has distorted the land, making sharp angles and turns.")
+			require("engine.ui.Dialog"):simplePopup(_t"Caves...", _t"As you enter the caves you notice the magic here has distorted the land, making sharp angles and turns.")
 		end
 	end,
 }
@@ -104,7 +104,7 @@ return {
 else
 
 return {
-	name = "Scintillating Caves",
+	name = _t"Scintillating Caves",
 	level_range = {1, 5},
 	level_scheme = "player",
 	max_level = 3,

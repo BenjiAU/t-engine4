@@ -29,7 +29,7 @@ function _M:init()
 	Tilemap.init(self)
 end
 
-function _M:makeSimple(w, h, floors, walls, enclosed)
+function _M:makeSimple(w, h, floors, walls, enclosed, allow_position)
 	if type(floors) == "string" then floors = {floors} end
 	if type(walls) == "string" then walls = {walls} end
 
@@ -68,16 +68,16 @@ function _M:makeSimple(w, h, floors, walls, enclosed)
 		xpos = pick[1]
 		ypos = pick[2]
 		local dir = {}
-		if xpos+2>mw and xpos+2<Mw and mazemap[ypos][xpos+2] then
+		if xpos+2>mw and xpos+2<Mw and mazemap[ypos][xpos+2] and (not allow_position or allow_position(self:point(xpos+2, ypos))) then
 			dir[#dir+1] = 6
 		end
-		if xpos-2>mw and xpos-2<Mw and mazemap[ypos][xpos-2] then
+		if xpos-2>mw and xpos-2<Mw and mazemap[ypos][xpos-2] and (not allow_position or allow_position(self:point(xpos-2, ypos))) then
 			dir[#dir+1] = 4
 		end
-		if ypos-2>mh and ypos-2<Mh and mazemap[ypos-2][xpos] then
+		if ypos-2>mh and ypos-2<Mh and mazemap[ypos-2][xpos] and (not allow_position or allow_position(self:point(xpos, ypos-2))) then
 			dir[#dir+1] = 8
 		end
-		if ypos+2>mh and ypos+2<Mh and mazemap[ypos+2][xpos] then
+		if ypos+2>mh and ypos+2<Mh and mazemap[ypos+2][xpos] and (not allow_position or allow_position(self:point(xpos, ypos+2))) then
 			dir[#dir+1] = 2
 		end
 

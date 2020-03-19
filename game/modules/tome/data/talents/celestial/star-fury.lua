@@ -48,7 +48,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Focuses the power of the Moon into a beam of shadows, doing %0.2f damage.
 		The damage dealt will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.DARKNESS, damage))
+		tformat(damDesc(self, DamageType.DARKNESS, damage))
 	end,
 }
 
@@ -97,7 +97,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[Invokes a blast of shadows that deals %0.2f darkness damage, and leaves a radius 3 field that does %0.2f darkness damage per turn for %d turns.
 		The damage dealt will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.DARKNESS, damage),damDesc(self, DamageType.DARKNESS, damage/2),duration)
+		tformat(damDesc(self, DamageType.DARKNESS, damage),damDesc(self, DamageType.DARKNESS, damage/2),duration)
 	end,
 }
 
@@ -133,7 +133,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[A surge of twilight pulses from you, doing %0.2f light and %0.2f darkness damage to all others within radius %d.
 		The damage dealt will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHT, dam),damDesc(self, DamageType.DARKNESS, dam), radius)
+		tformat(damDesc(self, DamageType.LIGHT, dam),damDesc(self, DamageType.DARKNESS, dam), radius)
 	end,
 }
 
@@ -175,6 +175,6 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[A star falls on a radius %d area, doing %0.2f darkness damage on impact and stunning all within the area for 4 turns.
 		The damage dealt will increase with your Spellpower.]]):
-		format(radius, damDesc(self, DamageType.DARKNESS, damage))
+		tformat(radius, damDesc(self, DamageType.DARKNESS, damage))
 	end,
 }

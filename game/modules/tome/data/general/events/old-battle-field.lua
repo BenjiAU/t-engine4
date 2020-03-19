@@ -43,7 +43,7 @@ if tries < 100 then
 		terrains.CAVE_LADDER_UP_WILDERNESS.change_level_shift_back = true
 		terrains.CAVE_LADDER_UP_WILDERNESS.change_zone_auto_stairs = true
 		terrains.CAVE_LADDER_UP_WILDERNESS.change_level = 1
-		terrains.CAVE_LADDER_UP_WILDERNESS.name = "ramp up to "..game.zone.name
+		terrains.CAVE_LADDER_UP_WILDERNESS.name = ("ramp up to %s"):tformat(game.zone.name)
 		terrains.CAVE_LADDER_UP_WILDERNESS.change_zone = game.zone.short_name
 		terrains.CAVE_LADDER_UP_WILDERNESS.change_level_check = function(self, who)
 			game.log("#VIOLET# The ramp crumbles as you climb it, followed by the collapse of the cavern.")
@@ -51,7 +51,7 @@ if tries < 100 then
 			return
 		end
 		local zone = mod.class.Zone.new(id, {
-			name = "Cavern beneath tombstones",
+			name = _t"Cavern beneath tombstones",
 			level_range = game.zone.actor_adjust_level and {math.floor(game.zone:actor_adjust_level(game.level, game.player)*1.05),
 			math.ceil(game.zone:actor_adjust_level(game.level, game.player)*1.15)} or {game.zone.base_level, game.zone.base_level}, -- 5-15% higher levels
 			__applied_difficulty = true, -- Difficulty already applied to parent zone
@@ -79,7 +79,7 @@ if tries < 100 then
 			on_enter = function(lev)
 				game.level.turn_counter = 101 * 10
 				game.level.max_turn_counter = 101 * 10
-				game.level.turn_counter_desc = "Undead are rising from the ground! You must hold on!"
+				game.level.turn_counter_desc = _t"Undead are rising from the ground! You must hold on!"
 				game.level.nb_pop = 1
 			end,
 			on_turn = function(self)
@@ -104,7 +104,7 @@ if tries < 100 then
 						end
 
 						world:gainAchievement("EVENT_OLDBATTLEFIELD", game:getPlayer(true))
-						require("engine.ui.Dialog"):simpleLongPopup("Onslaught", "You have survived the onslaught of undead. You notice a way to climb up you had not seen before in a wall nearby.", 400)
+						require("engine.ui.Dialog"):simpleLongPopup(_t"Onslaught", _t"You have survived the onslaught of undead. You notice a way to climb up you had not seen before in a wall nearby.", 400)
 					elseif game.level.turn_counter % 50 == 0 then
 						for i = 1, math.floor(game.level.nb_pop) do
 							local spot = game.level:pickSpot{type="pop", subtype="undead"}
@@ -127,7 +127,7 @@ if tries < 100 then
 		local p = rng.tableRemove(grids)
 
 		local g = game.level.map(p.x, p.y, engine.Map.TERRAIN):cloneFull()
-		g.name = "grave" g.x, g.y = p.x, p.y
+		g.name = _t"grave" g.x, g.y = p.x, p.y
 		g.display='&' g.color_r=255 g.color_g=255 g.color_b=255 g.notice = true
 		g.always_remember = true g.special_minimap = colors.OLIVE_DRAB
 		g:removeAllMOs()
@@ -142,8 +142,8 @@ if tries < 100 then
 		g.block_move = function(self, x, y, who, act, couldpass)
 			if not who or not who.player or not act then return false end
 			if game.level.event_battlefield_entered then return false end
-			who:runStop("grave")
-			require("engine.ui.Dialog"):yesnoPopup("Grave", "Do you wish to disturb the grave?", function(ret) if ret then
+			who:runStop(_t"grave")
+			require("engine.ui.Dialog"):yesnoPopup(_t"Grave", _t"Do you wish to disturb the grave?", function(ret) if ret then
 				self:change_level_check()
 			end end)
 			return false
@@ -157,11 +157,11 @@ if tries < 100 then
 				local ov = self.add_displays[#self.add_displays]
 				ov.image = "terrain/grave_opened_0"..rng.range(1, 3).."_64.png"
 			end
-			self.name = "opened grave"
+			self.name = _t"opened grave"
 			game.level.map:updateMap(self.x, self.y)
 			game.level.event_battlefield_entered = true
 			game:changeLevel(1, self.real_change(self.change_zone), {temporary_zone_shift=true, direct_switch=true})
-			require("engine.ui.Dialog"):simplePopup("Fall...", "As you began digging up the grave, the ground collapsed beneath you. You fall into an eerily lit cavern.")
+			require("engine.ui.Dialog"):simplePopup(_t"Fall...", _t"As you began digging up the grave, the ground collapsed beneath you. You fall into an eerily lit cavern.")
 			for i, gr in ipairs(self.graves) do
 				gr.change_level_check = nil
 				gr.change_level = nil

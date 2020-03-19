@@ -223,7 +223,7 @@ trapGetGrid = function(self, t, tg, defense)
 		end
 		local trap = game.level.map(x, y, Map.TRAP)
 		if trap then
-			game.logPlayer(self, trap:knownBy(self) and game.level.map.seens(x, y) and "There is already a trap there." or "You somehow fail to set the trap.") return nil 
+			game.logPlayer(self, trap:knownBy(self) and game.level.map.seens(x, y) and _t"There is already a trap there." or _t"You somehow fail to set the trap.") return nil 
 		end
 	end
 	print("Trap Placement for", self.name, t.id, x, y)
@@ -239,7 +239,7 @@ end
 trapping_CreateTrap = function(self, t, dur, add)
 	local Trap = require "mod.class.Trap"
 	local trap = {
-		id_by_type=true, unided_name = "trap",
+		id_by_type=true, unided_name = _t"trap",
 		display = '^',
 		type = "rogue",
 		faction = self.faction,
@@ -260,7 +260,7 @@ trapping_CreateTrap = function(self, t, dur, add)
 					game.level.map:remove(self.x, self.y, engine.Map.TRAP)
 					if self.summoner and self.stamina and self.stamina > 0 then -- Refund
 						self.summoner:incStamina(self.stamina * 0.8)
-						game.logPlayer(self.summoner, "#CADET_BLUE#Your %s has expired.", self.name)
+						game.logPlayer(self.summoner, "#CADET_BLUE#Your %s has expired.", self:getName())
 					end
 				end
 				if self.particles then game.level.map:removeParticleEmitter(self.particles) end
@@ -303,7 +303,7 @@ traps_initialize = function()
 				trap_mastery_tids[t.id] = t.trap_mastery_level
 			end
 			if t.message == nil then -- default, vague talent message
-				t.message = "@Source@ activates a prepared device."
+				t.message = _t"@Source@ activates a prepared device."
 			end
 			if t.on_pre_use_ai == nil then t.on_pre_use_ai = traps_on_pre_use_ai end
 		end
@@ -317,8 +317,8 @@ summon_assassin = function(self, target, duration, x, y, scale )
 	local m = mod.class.NPC.new{
 		type = "humanoid", subtype = "human",
 		display = "p", color=colors.BLUE, image = "npc/humanoid_human_assassin.png", shader = "shadow_simulacrum",
-		name = "shadowy assassin", faction = self.faction,
-		desc = [[A shadowy figure, garbed all in black.]],
+		name = _t"shadowy assassin", faction = self.faction,
+		desc = _t[[A shadowy figure, garbed all in black.]],
 		autolevel = "rogue",
 		ai = "dumb_talented_simple", ai_state = { ai_move="move_complex", talent_in=5, },
 		stats = { str=8, dex=15, mag=6, cun=15, con=7 },
@@ -392,8 +392,8 @@ summon_bladestorm = function(self, target, duration, x, y, scale )
 	local m = mod.class.NPC.new{
 		type = "construct", subtype = "mechanical",
 		display = "^", color=colors.BROWN, image = "npc/trap_bladestorm_swish_01.png",
-		name = "bladestorm construct", faction = self.faction,
-		desc = [[A lethal contraption of whirling blades.]],
+		name = _t"bladestorm construct", faction = self.faction,
+		desc = _t[[A lethal contraption of whirling blades.]],
 		autolevel = "warrior",
 		ai = "dumb_talented_simple", ai_state = { ai_move="move_complex", talent_in=5, },
 		stats = { str=18, dex=15, mag=6, cun=6, con=7 },
@@ -597,8 +597,8 @@ newTalent{
 	end,
 	action = function(self, t)
 		local nb = t.getNbTraps(self,t)
-		local txt = ("Prepare which traps? (maximum: %d, up to tier %d)%s"):format(nb, math.min(5, self:getTalentLevelRaw(t)), self.turn_procs.free_trap_mastery and "\nGame Start: Newly prepared traps will NOT start on cooldown." or "\n#YELLOW#Newly prepared traps are put on cooldown.#LAST#")
-		local traps_dialog = require("mod.dialogs.TrapsSelect").new("Select Prepared Traps", self,
+		local txt = ("Prepare which traps? (maximum: %d, up to tier %d)%s"):tformat(nb, math.min(5, self:getTalentLevelRaw(t)), self.turn_procs.free_trap_mastery and _t"\nGame Start: Newly prepared traps will NOT start on cooldown." or _t"\n#YELLOW#Newly prepared traps are put on cooldown.#LAST#")
+		local traps_dialog = require("mod.dialogs.TrapsSelect").new(_t"Select Prepared Traps", self,
 		txt, t, nb, trap_mastery_tids)
 		local traps_sel, traps_prev = self:talentDialog(traps_dialog)
 
@@ -613,7 +613,7 @@ newTalent{
 			end
 			for tid, sel in pairs(traps_sel) do
 				if sel and not traps_prev[tid] then
-					game.log("#LIGHT_GREEN#Preparing %s%s", self:getTalentFromId(tid).name, self.trap_primed == tid and " (normal trigger)" or "")
+					game.log("#LIGHT_GREEN#Preparing %s%s", self:getTalentFromId(tid).name, self.trap_primed == tid and _t" (normal trigger)" or "")
 					self:learnTalent(tid, true, 1, {no_unlearn=true})
 					if self.trap_primed == tid then 
 						self.trap_primed = nil
@@ -645,13 +645,13 @@ newTalent{
 				local tr = self:getTalentFromId(tid)
 				show_traps[#show_traps+1] = {tier=tr.trap_mastery_level, name=tr.name,
 				known = self.trap_primed ~= tid and known, 
-				info = tr.short_info and tr.short_info(self, tr) or "#GREY#(see trap description)#LAST#"}
+				info = tr.short_info and tr.short_info(self, tr) or _t"#GREY#(see trap description)#LAST#"}
 			end
 		end
 		table.sort(show_traps, function(a, b) return a.tier < b.tier end)
 		local trap_descs = ""
 		for i, trap in ipairs(show_traps) do
-			trap_descs = trap_descs.."\n\t"..("%sTier %d: %s#LAST#\n%s"):format(trap.known and "#YELLOW#" or "#YELLOW_GREEN#", trap.tier, trap.name, trap.info)
+			trap_descs = trap_descs.."\n\t"..("%sTier %d: %s#LAST#\n%s"):tformat(trap.known and "#YELLOW#" or "#YELLOW_GREEN#", trap.tier, trap.name, trap.info)
 		end
 		self.turn_procs.trap_mastery_tid = nil
 		return ([[This talent allows you to prepare up to %d different trap(s) of tier %d or less for later deployment. (Use this ability to select which to prepare.)
@@ -662,7 +662,7 @@ newTalent{
 		You are immune to the damage and negative effects of your traps, and traps may critically strike based on your physical crit chance.
 		Most traps last %d turns if not triggered, and refund 80%% of their stamina cost on expiration.
 		More designs may be discovered via disarming or learned from special instructors in the world.]]):
-		format(t.getNbTraps(self, t), math.min(5, self:getTalentLevelRaw(t)), trap_descs, detect_power, disarm_power, t.getTrapMastery(self, t), stealth_chance, t.getDuration(self, t))
+		tformat(t.getNbTraps(self, t), math.min(5, self:getTalentLevelRaw(t)), trap_descs, detect_power, disarm_power, t.getTrapMastery(self, t), stealth_chance, t.getDuration(self, t))
 	end,
 }
 
@@ -701,8 +701,8 @@ newTalent{
 		local m = NPC.new{
 			type = "construct", subtype = "lure",
 			display = "*", color=colors.UMBER,
-			name = "lure", faction = self.faction, image = "npc/lure.png",
-			desc = [[A noisy lure.]],
+			name = _t"lure", faction = self.faction, image = "npc/lure.png",
+			desc = _t[[A noisy lure.]],
 			autolevel = "none",
 			ai = "summoned", ai_real = "dumb_talented", ai_state = { talent_in=1, },
 			level_range = {1, nil}, exp_worth = 0,
@@ -749,7 +749,7 @@ newTalent{
 		return ([[Deploy a noisy lure that attracts all creatures within radius %d to it for %d turns.
 		It has %d life (based on your Cunning) and is very durable, with %d armor and %d%% resistance to non-physical damage.
 		At level 5, when the lure is destroyed, it will trigger some traps in a radius of 2 around it (check individual trap descriptions to see if they are triggered).
-		Use of this talent will not break stealth.]]):format(rad, t.getDuration(self,t), t.getLife(self, t), t.getArmor(self, t), t.getResist(self, t))
+		Use of this talent will not break stealth.]]):tformat(rad, t.getDuration(self,t), t.getLife(self, t), t.getArmor(self, t), t.getResist(self, t))
 	end,
 }
 
@@ -763,7 +763,7 @@ newTalent{
 	trapStealth = function(self, t) return math.min(25, self:getTalentLevel(t)) end,
 	info = function(self, t)
 		return ([[You learn new techniques for setting traps.
-		Deploying one of your traps is possible up to %d grids from you, takes %d%% less time than normal, and has %d%% less chance to break stealth.]]):format(trap_range(self, t), (1 - t.trapSpeed(self, t))*100, t.trapStealth(self, t))
+		Deploying one of your traps is possible up to %d grids from you, takes %d%% less time than normal, and has %d%% less chance to break stealth.]]):tformat(trap_range(self, t), (1 - t.trapSpeed(self, t))*100, t.trapStealth(self, t))
 	end,
 }
 
@@ -827,7 +827,7 @@ newTalent{
 			-- show only primable traps that are primed or that the player knows about
 			if tr and tr.allow_primed_trigger and tr.trap_mastery_level and (self:knowTalent(tid) or game.state:unlockTalentCheck(tid, player)) then
 				show_traps[#show_traps+1] = {tier=tr.trap_mastery_level, name=tr.name,
-				info = tr.short_info and tr.short_info(self, tr) or "#GREY#(see trap description)#LAST#"}
+				info = tr.short_info and tr.short_info(self, tr) or _t"#GREY#(see trap description)#LAST#"}
 				if tid == self.trap_primed then
 					show_traps[#show_traps].instant = true
 					instant = tr.name
@@ -838,7 +838,7 @@ newTalent{
 		table.sort(show_traps, function(a, b) return a.tier < b.tier end)
 		local trap_descs = ""
 		for i, trap in ipairs(show_traps) do
-			trap_descs = trap_descs.."\n\t"..("%sTier %d: %s#LAST#\n%s"):format(trap.instant and "#YELLOW#" or "#YELLOW_GREEN#", trap.tier, trap.name, trap.info)
+			trap_descs = trap_descs.."\n\t"..("%sTier %d: %s#LAST#\n%s"):tformat(trap.instant and "#YELLOW#" or "#YELLOW_GREEN#", trap.tier, trap.name, trap.info)
 		end
 		return ([[You prepare an additional trap (up to tier %d) with a special primed trigger that causes it to activate immediately when deployed. (Use this ability to select the trap.)
 		Not all traps can be prepared this way and each trap can have only one type of preparation.
@@ -847,7 +847,7 @@ newTalent{
 
 A trap with a primed trigger gains %+d%% effectiveness (replacing the normal bonus from Trap Mastery) and won't break stealth %d%% of the time.
 #YELLOW#Current primed trap: %s#LAST#]]):
-		format(self:getTalentLevelRaw(t), trap_descs, mastery, stealth_chance, instant)
+		tformat(self:getTalentLevelRaw(t), trap_descs, mastery, stealth_chance, instant)
 	end,
 }
 
@@ -882,7 +882,7 @@ newTalent{
 		local dam = self:physicalCrit(t.getDamage(self, t))
 		local power = t.getPower(self,t)
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "physical", name = "springrazor trap", color=colors.LIGHT_RED, image = "trap/trap_springrazor.png",
+			type = "physical", name = _t"springrazor trap", color=colors.LIGHT_RED, image = "trap/trap_springrazor.png",
 			dam = dam,
 			power = power,
 			tg = tg,
@@ -922,15 +922,15 @@ newTalent{
 	end,
 	short_info = function(self, t)
 		return ([[Shrapnel (radius 2) deals %0.2f physical damage, reduces accuracy, armour, and defence by %d.]]):
-		format(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), t.getPower(self,t))
+		tformat(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), t.getPower(self,t))
 	end,
 	info = function(self, t)
 		local dam = t.getDamage(self, t)
 		local power = t.getPower(self,t)
-		local instant = self.trap_primed == t.id and "\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
+		local instant = self.trap_primed == t.id and _t"\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
 		return ([[Lay a pressure triggered trap that explodes into a radius 2 wave of razor sharp wire, doing %0.2f physical damage. Those struck by the wire may be shredded, reducing accuracy, armor and defence by %d.
 		This trap can use a primed trigger and a high level lure can trigger it.%s]]):
-		format(damDesc(self, DamageType.PHYSICAL, dam), power, instant)
+		tformat(damDesc(self, DamageType.PHYSICAL, dam), power, instant)
 	end,
 }
 
@@ -956,7 +956,7 @@ newTalent{
 		
 		local dam = self:physicalCrit(t.getDamage(self, t))
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "physical", name = "bear trap", color=colors.UMBER, image = "trap/beartrap01.png",
+			type = "physical", name = _t"bear trap", color=colors.UMBER, image = "trap/beartrap01.png",
 			dam = dam,
 			stamina = t.stamina,
 			check_hit = self:combatAttack(),
@@ -988,12 +988,12 @@ newTalent{
 	end,
 	short_info = function(self, t)
 		local dam = damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t))
-		return ([[Deals %0.2f physical damage and pins, slows (30%%), and wounds for an additional %0.2f damage over 5 turns).]]):format(dam, dam)
+		return ([[Deals %0.2f physical damage and pins, slows (30%%), and wounds for an additional %0.2f damage over 5 turns).]]):tformat(dam, dam)
 	end,
 	info = function(self, t)
 		local dam = damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t))
-		local instant = self.trap_primed == t.id and "\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
-		return ([[Lay a pressure triggered bear trap that snaps onto the first creature passing over it.  Victims are dealt %0.2f physical damage and become snared (pinned and slowed 30%%) and wounded for %0.2f bleeding damage over 5 turns.  Creatures that avoid being snared still suffer bleeding damage.%s]]):format(dam, dam, instant)
+		local instant = self.trap_primed == t.id and _t"\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
+		return ([[Lay a pressure triggered bear trap that snaps onto the first creature passing over it.  Victims are dealt %0.2f physical damage and become snared (pinned and slowed 30%%) and wounded for %0.2f bleeding damage over 5 turns.  Creatures that avoid being snared still suffer bleeding damage.%s]]):tformat(dam, dam, instant)
 	end,
 }
 
@@ -1018,7 +1018,7 @@ newTalent{
 
 		local dam = t.getDamage(self, t)
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "physical", name = "disarming trap", color=colors.DARK_GREY, image = "trap/trap_magical_disarm_01_64.png",
+			type = "physical", name = _t"disarming trap", color=colors.DARK_GREY, image = "trap/trap_magical_disarm_01_64.png",
 			dur = t.getDuration(self, t),
 			check_hit = self:combatAttack(),
 			dam = dam,
@@ -1029,7 +1029,7 @@ newTalent{
 				if who:canBe("disarm") then
 					who:setEffect(who.EFF_DISARMED, self.dur, {apply_power=self.check_hit})
 				else
-					game.logSeen(who, "%s resists!", who.name:capitalize())
+					game.logSeen(who, "%s resists!", who:getName():capitalize())
 				end
 				return true, true
 			end,
@@ -1046,11 +1046,11 @@ newTalent{
 	end,
 	short_info = function(self, t)
 		return ([[Deals %0.2f acid damage, disarms for %d turns.]]):
-		format(damDesc(self, DamageType.ACID, t.getDamage(self, t)), t.getDuration(self, t))
+		tformat(damDesc(self, DamageType.ACID, t.getDamage(self, t)), t.getDuration(self, t))
 	end,
 	info = function(self, t)
 		return ([[Lay a tricky trap that maims creatures passing by with acid doing %0.2f damage and disarming them for %d turns.]]):
-		format(damDesc(self, DamageType.ACID, t.getDamage(self, t)), t.getDuration(self, t))
+		tformat(damDesc(self, DamageType.ACID, t.getDamage(self, t)), t.getDuration(self, t))
 	end,
 }
 
@@ -1074,7 +1074,7 @@ newTalent{
 		
 		local dam = self:physicalCrit(t.getDamage(self, t))
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "physical", name = "pitfall trap", color=colors.UMBER, image = "trap/trap_pitfall_setup.png",
+			type = "physical", name = _t"pitfall trap", color=colors.UMBER, image = "trap/trap_pitfall_setup.png",
 			dam = dam,
 			stamina = t.stamina,
 			check_hit = self:combatAttack(),
@@ -1087,15 +1087,15 @@ newTalent{
 				-- Check hit
 				local hit = self:checkHit(self.check_hit, who:combatPhysicalResist())
 				if hit and not who.player then 
-					game.logSeen(who, "%s disappears into a collapsing pit!", who.name:capitalize())
+					game.logSeen(who, "%s disappears into a collapsing pit!", who:getName():capitalize())
 				else -- try to pin if they avoided the pit
 					if rng.percent(50) or who:canBe("pin") then
-						game.logSeen(who, "%s is partially buried in a collapsing pit!", who.name:capitalize())
+						game.logSeen(who, "%s is partially buried in a collapsing pit!", who:getName():capitalize())
 						if (table.get(who, "can_pass", "pass_wall") or 0) <= 0 then
 							who:setEffect(who.EFF_PINNED, 5, {})
 						end
 					else
-						game.logSeen(who, "%s avoids a collapsing pit!", who.name:capitalize())
+						game.logSeen(who, "%s avoids a collapsing pit!", who:getName():capitalize())
 					end
 					return true, true
 				end
@@ -1104,7 +1104,7 @@ newTalent{
 				if (oe and oe:attr("temporary")) or game.level.map:checkEntity(x, y, engine.Map.TERRAIN, "block_move") then game.logPlayer(self, "Something has prevented the pit.") return true end
 				local e = mod.class.Object.new{
 					old_feat = oe, type = "pit", subtype = "pit",
-					name = "pit", image = "trap/trap_pitfall_pit.png",
+					name = _t"pit", image = "trap/trap_pitfall_pit.png",
 					display = '&', color=colors.BROWN,
 					temporary = 5,
 					canAct = false,
@@ -1128,7 +1128,7 @@ newTalent{
 							self.target.forceLevelup = function() end
 							self.target.check = function() end
 							game.zone:addEntity(game.level, self.target, "actor", mx, my)
-							game.logSeen(self.target, "%s emerges from a collapsed pit.", self.target.name:capitalize())
+							game.logSeen(self.target, "%s emerges from a collapsed pit.", self.target:getName():capitalize())
 							self.target.forceLevelup = old_levelup
 							self.target.check = old_check
 						end
@@ -1163,12 +1163,12 @@ newTalent{
 		return true
 	end,
 	short_info = function(self, t)
-		return ([[Deals %0.2f physical damage.  Target removed from combat or pinned 5 turns.]]):format(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)))
+		return ([[Deals %0.2f physical damage.  Target removed from combat or pinned 5 turns.]]):tformat(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)))
 	end,
 	info = function(self, t)
 		return ([[Lay a pressure triggered trap that collapses the ground under the target, dealing %0.2f physical damage while burying them (removing from combat) for 5 turns.
 Victims may resist being buried, in which case they are pinned (ignores 50%% pin immunity) instead.]]):
-		format(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)))
+		tformat(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)))
 	end,
 }
 
@@ -1199,7 +1199,7 @@ newTalent{
 		local tg = self:getTalentTarget(t)
 		local dam = self:physicalCrit(t.getDamage(self, t))
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "elemental", name = "flash bang trap", color=colors.YELLOW, image = "trap/trap_flashbang.png",
+			type = "elemental", name = _t"flash bang trap", color=colors.YELLOW, image = "trap/trap_flashbang.png",
 			dur = t.getDuration(self, t),
 			check_hit = self:combatAttack(),
 			lure_trigger = true,
@@ -1243,13 +1243,13 @@ newTalent{
 		return true
 	end,
 	short_info = function(self, t)
-		return ([[Explodes (radius 2) for %0.2f physical damage, 50%% blind/daze for %d turns.]]):format(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), t.getDuration(self, t))
+		return ([[Explodes (radius 2) for %0.2f physical damage, 50%% blind/daze for %d turns.]]):tformat(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), t.getDuration(self, t))
 	end,
 	info = function(self, t)
-		local instant = self.trap_primed == t.id and "\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
+		local instant = self.trap_primed == t.id and _t"\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
 		return ([[Lay a trap that explodes in a radius of 2, dealing %0.2f physical damage and blinding and dazing (50%% chance of each) any creature caught inside for %d turns.
 		This trap can use a primed trigger and a high level lure can trigger it.%s]]):
-		format(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), t.getDuration(self, t), instant)
+		tformat(damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)), t.getDuration(self, t), instant)
 	end,
 }
 
@@ -1274,7 +1274,7 @@ newTalent{
 
 		local dur = t.getDuration(self,t)
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "physical", name = "bladestorm trap", color=colors.BLACK, image = "trap/trap_bladestorm_01.png",
+			type = "physical", name = _t"bladestorm trap", color=colors.BLACK, image = "trap/trap_bladestorm_01.png",
 			dur = dur,
 			stamina = t.stamina,
 			triggered = function(self, x, y, who)
@@ -1296,10 +1296,10 @@ newTalent{
 		return true
 	end,
 	short_info = function(self, t)
-		return ([[Construct attacks all adjacent enemies each turn for %d turns.]]):format(t.getDuration(self, t))
+		return ([[Construct attacks all adjacent enemies each turn for %d turns.]]):tformat(t.getDuration(self, t))
 	end,
 	info = function(self, t)
-		return ([[Lay a trap that activates a lethal contraption of whirling blades, lasting %d turns.  This stationary construct is very durable, receives your damage bonuses, and automatically attacks all adjacent enemies each turn.]]):format(t.getDuration(self,t))
+		return ([[Lay a trap that activates a lethal contraption of whirling blades, lasting %d turns.  This stationary construct is very durable, receives your damage bonuses, and automatically attacks all adjacent enemies each turn.]]):tformat(t.getDuration(self,t))
 	end,
 }
 
@@ -1331,7 +1331,7 @@ newTalent{
 		local dam = self:physicalCrit(t.getDamage(self, t))
 
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "physical", name = "beam trap", color=colors.BLUE, image = "trap/trap_beam.png",
+			type = "physical", name = _t"beam trap", color=colors.BLUE, image = "trap/trap_beam.png",
 			dam = dam,
 			proj_speed = 2,
 			triggered = function(self, x, y, who) return true, false end,
@@ -1373,14 +1373,14 @@ newTalent{
 	end,
 	short_info = function(self, t)
 		return ([[Fires a beam (range 5) at a foe each turn for %0.2f arcane damage.  Lasts %d turns.]]):
-		format(damDesc(self, DamageType.ARCANE, t.getDamage(self, t)), t.getDuration(self, t))
+		tformat(damDesc(self, DamageType.ARCANE, t.getDamage(self, t)), t.getDuration(self, t))
 	end,
 	info = function(self, t)
 		local dam = t.getDamage(self, t)
 		local dur = t.getDuration(self,t)
 		return ([[Lay a magical trap that fires a beam of arcane energy at a random foe (within range 5) each turn for %d turns, inflicting %0.2f arcane damage.
 This trap requires 20 Magic to prepare and does not refund stamina when it expires.
-#YELLOW#Activates immediately when placed.#LAST#]]):format(dur, damDesc(self, DamageType.ARCANE, dam))
+#YELLOW#Activates immediately when placed.#LAST#]]):tformat(dur, damDesc(self, DamageType.ARCANE, dam))
 	end,
 }
 
@@ -1391,7 +1391,7 @@ newTalent{
 	points = 1,
 	type_no_req = true,
 	require = cuns_req_unlock,
-	unlock_talent = "You have learned how to create Poison Gas traps!",
+	unlock_talent = _t"You have learned how to create Poison Gas traps!",
 	cooldown = 10,
 	stamina = 12,
 	tactical = { ATTACKAREA = { poison = 1.5 }, DISABLE = { poison = 0.5 },
@@ -1415,7 +1415,7 @@ newTalent{
 		local power = t.getPower(self,t)
 
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "nature", name = "poison gas trap", color=colors.LIGHT_RED, image = "trap/trap_poison_gas.png",
+			type = "nature", name = _t"poison gas trap", color=colors.LIGHT_RED, image = "trap/trap_poison_gas.png",
 			dam = dam,
 			power = power,
 			check_hit = self:combatAttack(),
@@ -1454,14 +1454,14 @@ newTalent{
 		return true
 	end,
 	short_info = function(self, t)
-		return ([[Releases a radius 3 poison gas cloud, poisoning for %0.2f nature damage over 5 turns with a 25%% for enhanced effects.]]):format(damDesc(self, DamageType.POISON, t.getDamage(self, t)))
+		return ([[Releases a radius 3 poison gas cloud, poisoning for %0.2f nature damage over 5 turns with a 25%% for enhanced effects.]]):tformat(damDesc(self, DamageType.POISON, t.getDamage(self, t)))
 	end,
 	info = function(self, t)
-		local instant = self.trap_primed == t.id and "\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
+		local instant = self.trap_primed == t.id and _t"\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
 		return ([[Lay a trap that releases a radius 3 cloud of thick poisonous gas lasting 4 turns.
 		Each turn, the cloud poisons all within (%0.2f nature damage over 5 turns).   There is a 25%% chance the poison is enhanced with crippling, numbing or insidious effects.
 		This trap can use a primed trigger and a high level lure can trigger it.%s]]):
-		format(damDesc(self, DamageType.POISON, t.getDamage(self, t)), instant)
+		tformat(damDesc(self, DamageType.POISON, t.getDamage(self, t)), instant)
 	end,
 }
 
@@ -1492,7 +1492,7 @@ newTalent{
 		local dam = self:physicalCrit(t.getDamage(self, t))
 		local tg = self:getTalentTarget(t)
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "cold", name = "freezing trap", color=colors.BLUE, image = "trap/trap_freezing.png",
+			type = "cold", name = _t"freezing trap", color=colors.BLUE, image = "trap/trap_freezing.png",
 			dam = dam,
 			tg = tg,
 			power = power,
@@ -1541,15 +1541,15 @@ newTalent{
 	end,
 	short_info = function(self, t)
 		local dam = damDesc(self, DamageType.COLD, t.getDamage(self, t))
-		return ([[Explodes (radius 2):  Deals %0.2f cold damage and pins for 3 turns.  Area freezes (%0.2f cold damage, 25%% freeze chance) for 5 turns.]]):format(dam, dam/3)
+		return ([[Explodes (radius 2):  Deals %0.2f cold damage and pins for 3 turns.  Area freezes (%0.2f cold damage, 25%% freeze chance) for 5 turns.]]):tformat(dam, dam/3)
 	end,
 	info = function(self, t)
 		local dam = damDesc(self, DamageType.COLD, t.getDamage(self, t))
-		local instant = self.trap_primed == t.id and "\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
+		local instant = self.trap_primed == t.id and _t"\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
 		return ([[Lay a trap that explodes into a radius 2 cloud of freezing vapour when triggered.  Foes take %0.2f cold damage and are pinned for 3 turns.
 		The freezing vapour persists for 5 turns, dealing %0.2f cold damage each turn to foes with a 25%% chance to freeze.
 		This trap can use a primed trigger and a high level lure can trigger it.%s]]):
-		format(dam, dam/3, instant)
+		tformat(dam, dam/3, instant)
 	end,
 }
 
@@ -1582,7 +1582,7 @@ newTalent{
 		local tg = self:getTalentTarget(t)
 		local dam = self:physicalCrit(t.getDamage(self, t))
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "fire", name = "dragonsfire trap", color=colors.RED, image = "trap/trap_dragonsfire.png",
+			type = "fire", name = _t"dragonsfire trap", color=colors.RED, image = "trap/trap_dragonsfire.png",
 			dam = dam,
 			tg = tg,
 			power = power,
@@ -1636,15 +1636,15 @@ newTalent{
 	end,
 	short_info = function(self, t)
 		dam = damDesc(self, DamageType.FIRE, t.getDamage(self, t))
-		return ([[Explodes (radius 2): stuns and combusts for %0.2f fire damage per turn for 3 turns.  Area deflagrates (%0.2f fire damage) for 5 turns.]]):format(dam/3, dam/2)
+		return ([[Explodes (radius 2): stuns and combusts for %0.2f fire damage per turn for 3 turns.  Area deflagrates (%0.2f fire damage) for 5 turns.]]):tformat(dam/3, dam/2)
 	end,
 	info = function(self, t)
-		local instant = self.trap_primed == t.id and "\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
+		local instant = self.trap_primed == t.id and _t"\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
 		dam = damDesc(self, DamageType.FIRE, t.getDamage(self, t))
 		return ([[Lay a pressure triggered trap that explodes in a radius 2 cloud of searing flames when triggered, stunning foes with the blast (%0.2f fire damage per turn) for 3 turns.
 		The deflagration persists in the area for 5 turns, burning foes for %0.2f fire damage each turn.
 		This trap can use a primed trigger and a high level lure can trigger it.%s]]):
-		format(dam/3, dam/2, instant)
+		tformat(dam/3, dam/2, instant)
 	end,
 }
 
@@ -1663,7 +1663,7 @@ newTalent{
 	range = trap_range,
 	speed = trap_speed,
 	no_break_stealth = trap_stealth,
-	message = "@Source@ deploys a warped device.",
+	message = _t"@Source@ deploys a warped device.",
 	getDamage = function(self, t) return 10 + trap_effectiveness(self, t, "mag")*10 end,
 	getDuration = function(self, t) return math.floor(self:combatTalentLimit(self:getTalentLevel(self.T_TRAP_MASTERY), 20/2, 3, 5)) end,
 	target = function(self, t) return {type="ball", range=self:getTalentRange(t), friendlyfire=false, radius=5} end, -- for AI
@@ -1676,7 +1676,7 @@ newTalent{
 		local dam = t.getDamage(self, t)
 		local dur = t.getDuration(self, t)
 		local trap = trapping_CreateTrap(self, t, nil, {
-			subtype = "arcane", name = "gravitic trap", color=colors.LIGHT_RED, image = "invis.png",
+			subtype = "arcane", name = _t"gravitic trap", color=colors.LIGHT_RED, image = "invis.png",
 			embed_particles = {{name="wormhole", rad=5, args={image="shockbolt/trap/trap_gravitic", speed=1}}},
 			dam = dam,
 			check_hit = math.max(self:combatAttack(), self:combatSpellpower()),
@@ -1757,14 +1757,14 @@ newTalent{
 	end,
 	short_info = function(self, t)
 		return ([[Creates a radius 5 gravitic anomaly lasting up to %d turns.  Hostile creatures are dealt %d temporal damgae and pulled in.  Triggers out to range 1.]]):
-		format(t.getDuration(self,t), damDesc(self, engine.DamageType.TEMPORAL, t.getDamage(self, t)))
+		tformat(t.getDuration(self,t), damDesc(self, engine.DamageType.TEMPORAL, t.getDamage(self, t)))
 	end,
 	info = function(self, t)
 		return ([[Lay a trap that creates a radius 5 gravitic anomaly when triggered by foes approaching within range 1.  Each turn, the anomaly deals %0.2f temporal damage (based on your Magic) to foes whle pulling them towards its center (chance increases with your combat accuracy or spell power, whichever is higher).
 		Each anomaly lasts %d turns (up to the amount of time since the last anomaly dissipated, based on your Trap Mastery skill).
 		The trap may trigger more than once, but requires at least 2 turns to recharge between activations.
 This design does not require advanced preparation to use.]]):
-		format(damDesc(self, engine.DamageType.TEMPORAL, t.getDamage(self, t)), t.getDuration(self,t))
+		tformat(damDesc(self, engine.DamageType.TEMPORAL, t.getDamage(self, t)), t.getDuration(self,t))
 	end,
 }
 
@@ -1775,7 +1775,7 @@ newTalent{
 	points = 1,
 	type_no_req = true,
 	require = cuns_req_unlock,
-	unlock_talent = "You have learned how to create Ambush traps!",
+	unlock_talent = _t"You have learned how to create Ambush traps!",
 	no_unlearn_last = true,
 	cooldown = 25,
 	stamina = 20,
@@ -1792,7 +1792,7 @@ newTalent{
 
 		local dur = t.getDuration(self,t)
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "annoy", subtype = "alarm", name = "ambush trap", color=colors.BLACK, image = "trap/trap_ambush.png",
+			type = "annoy", subtype = "alarm", name = _t"ambush trap", color=colors.BLACK, image = "trap/trap_ambush.png",
 			dur = dur,
 			unlock_talent_on_disarm = {tid=t.id, chance=20},
 			triggered = function(self, x, y, who)
@@ -1818,13 +1818,13 @@ newTalent{
 		return true
 	end,
 	short_info = function(self, t)
-		return ([[3 stealthed rogues attack the target for %d turns.]]):format(t.getDuration(self,t))
+		return ([[3 stealthed rogues attack the target for %d turns.]]):tformat(t.getDuration(self,t))
 	end,
 	info = function(self, t)
 		return ([[Lay a magical trap that summons a trio of shadowy rogues to attack the target.
 The rogues receive your damage bonuses and are permanently stealthed.
 They disappear after %d turns or when their work is done.]]):
-		format(t.getDuration(self,t))
+		tformat(t.getDuration(self,t))
 	end,
 }
 
@@ -1868,7 +1868,7 @@ newTalent{
 		local dur = t.getDuration(self,t)
 		local nb = t.getNb(self,t)
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "nature", name = "purging trap", color=colors.YELLOW, image = "trap/trap_purging.png",
+			type = "nature", name = _t"purging trap", color=colors.YELLOW, image = "trap/trap_purging.png",
 			check_hit = self:combatAttack(),
 			lure_trigger = true,
 			stamina = t.stamina,
@@ -1943,7 +1943,7 @@ newTalent{
 		local dur = t.getDuration(self,t)
 		local nb = t.getNb(self,t)
 		return ([[Radius 2 antimagic: Drains up to %d mana, %d vim, %d positive/negative, deals up to %0.2f arcane damage.  Removes %d magical effects and silences for %d turns.]]):
-		format(base, base/2, base/4, damDesc(self, DamageType.ARCANE, base), nb, dur)
+		tformat(base, base/2, base/4, damDesc(self, DamageType.ARCANE, base), nb, dur)
 	end,
 	info = function(self, t)
 		local base = t.getDamage(self,t)
@@ -1953,11 +1953,11 @@ newTalent{
 		local negative = base / 4
 		local dur = t.getDuration(self,t)
 		local nb = t.getNb(self,t)
-		local instant = self.trap_primed == t.id and "\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
+		local instant = self.trap_primed == t.id and _t"\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
 		return ([[Lay a trap that releases a burst of antimagic energies (radius 2), draining up to %d mana, %d vim, %d positive and %d negative energies from affected targets, while inflicting up to %0.2f arcane damage based on the resources drained, silencing for %d turns, and removing up to %d beneficial magical effects or sustains.
 		The draining effect scales with your Willpower, and you must have 25 Willpower to prepare this trap.
 		This trap can use a primed trigger and a high level lure can trigger it.%s]]):
-		format(mana, vim, positive, negative, damDesc(self, DamageType.ARCANE, base), dur, nb, instant)
+		tformat(mana, vim, positive, negative, damDesc(self, DamageType.ARCANE, base), dur, nb, instant)
 	end,
 }
 
@@ -1968,7 +1968,7 @@ newTalent{
 	points = 1,
 	type_no_req = true,
 	require = cuns_req_unlock,
-	unlock_talent = "You have learned how to create Explosion traps!",
+	unlock_talent = _t"You have learned how to create Explosion traps!",
 	no_unlearn_last = true,
 	cooldown = 8,
 	stamina = 15,
@@ -1990,7 +1990,7 @@ newTalent{
 		local tg = self:getTalentTarget(t)
 		local dam = t.getDamage(self, t)
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "elemental", name = "explosion trap", color=colors.LIGHT_RED, image = "trap/blast_fire01.png",
+			type = "elemental", name = _t"explosion trap", color=colors.LIGHT_RED, image = "trap/blast_fire01.png",
 			dam = dam,
 			stamina = t.stamina,
 			lure_trigger = true,
@@ -2026,13 +2026,13 @@ newTalent{
 	end,
 	short_info = function(self, t)
 		return ([[Explodes (radius 2) for %0.2f fire damage over 3 turns.]]):
-		format(damDesc(self, DamageType.FIRE, t.getDamage(self, t)))
+		tformat(damDesc(self, DamageType.FIRE, t.getDamage(self, t)))
 	end,
 	info = function(self, t)
-		local instant = self.trap_primed == t.id and "\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
+		local instant = self.trap_primed == t.id and _t"\n#YELLOW#Triggers immediately when placed.#LAST#" or ""
 		return ([[Lay a simple yet effective trap that explodes in a radius 2 on contact, setting those affected on fire for %0.2f fire damage over 3 turns.
 		This trap can use a primed trigger and a high level lure can trigger it.%s]]):
-		format(damDesc(self, DamageType.FIRE, t.getDamage(self, t)), instant)
+		tformat(damDesc(self, DamageType.FIRE, t.getDamage(self, t)), instant)
 	end,
 }
 
@@ -2043,7 +2043,7 @@ newTalent{
 	points = 1,
 	type_no_req = true,
 	require = cuns_req_unlock,
-	unlock_talent = "You have learned how to create Catapult traps!",
+	unlock_talent = _t"You have learned how to create Catapult traps!",
 	no_unlearn_last = true,
 	cooldown = 10,
 	stamina = 15,
@@ -2065,7 +2065,7 @@ newTalent{
 		if not (x and y) then return nil end
 
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "physical", name = "catapult trap", color=colors.LIGHT_UMBER, image = "trap/trap_catapult_01_64.png",
+			type = "physical", name = _t"catapult trap", color=colors.LIGHT_UMBER, image = "trap/trap_catapult_01_64.png",
 			dist = t.getDistance(self, t),
 			unlock_talent_on_disarm = {tid=t.id, chance=50},
 			check_hit = self:combatAttack(),
@@ -2079,11 +2079,11 @@ newTalent{
 			target_y = self.y,
 			desc = function(self)
 				local dir = game.level.map:compassDirection(self.target_x-self.x, self.target_y-self.y)
-				dir = dir and (" (%s)"):format(dir) or ""
-				return ([[Target knocked back up to %d grids%s and dazed.]]):format(self.dist, dir)
+				dir = dir and (" (%s)"):tformat(dir) or ""
+				return ([[Target knocked back up to %d grids%s and dazed.]]):tformat(self.dist, dir)
 			end,
 			disarm = function(self, x, y, who) -- summoner won't disarm
---game.log("custom disarm for %s at (%s, %s) by %s", self.name, x, y, who.name)
+--game.log("custom disarm for %s at (%s, %s) by %s", self.name, x, y, who:getName())
 				if who == self.summoner then return false end
 --game.log("non summoner disarm")
 				return mod.class.Trap.disarm(self, x, y, who)
@@ -2101,11 +2101,11 @@ newTalent{
 				end
 
 				if kb_test(who) then
-					game.logSeen(who, "%s knocks %s back!", self:getName():capitalize(), who.name:capitalize())
+					game.logSeen(who, "%s knocks %s back!", self:getName():capitalize(), who:getName():capitalize())
 					who:pull(self.target_x, self.target_y, self.dist, kb_test)
 					if who:canBe("stun") then who:setEffect(who.EFF_DAZED, 5, {}) end
 				else
-					game.logSeen(who, "%s fails to knock %s back!", self:getName():capitalize(), who.name:capitalize())
+					game.logSeen(who, "%s fails to knock %s back!", self:getName():capitalize(), who:getName():capitalize())
 				end
 				return true, not rng.percent(self.resetChance)
 			end,
@@ -2146,13 +2146,13 @@ newTalent{
 	end,
 	short_info = function(self, t)
 		return ([[Target knocked back %d grids and dazed.]]):
-		format(t.getDistance(self, t))
+		tformat(t.getDistance(self, t))
 	end,
 	info = function(self, t)
 		return ([[Deploy a hidden spring-loaded catapult that will trigger (by pressure) for any creature passing over it.  Victims will be knocked back towards a target location up to %d grids away and be dazed for 5 turns.
 		This trap has a %d%% chance to reset itself after triggering, but can only trigger once per turn.
 		The chance to affect the target improves with your combat accuracy.]]):
-		format(t.getDistance(self, t), t.resetChance(self, t))
+		tformat(t.getDistance(self, t), t.resetChance(self, t))
 	end,
 }
 
@@ -2163,7 +2163,7 @@ newTalent{
 	points = 1,
 	type_no_req = true,
 	require = cuns_req_unlock,
-	unlock_talent = "You have learned how to create Nightshade traps!",
+	unlock_talent = _t"You have learned how to create Nightshade traps!",
 	no_unlearn_last = true,
 	trap_mastery_level = 4,
 	cooldown = 8,
@@ -2179,7 +2179,7 @@ newTalent{
 
 		local dam = t.getDamage(self, t)
 		local trap = trapping_CreateTrap(self, t, nil, {
-			type = "nature", name = "nightshade trap", color=colors.LIGHT_BLUE, image = "trap/poison_vines01.png",
+			type = "nature", name = _t"nightshade trap", color=colors.LIGHT_BLUE, image = "trap/poison_vines01.png",
 			dam = dam,
 			stamina = t.stamina,
 			check_hit = self:combatAttack(),
@@ -2208,12 +2208,12 @@ newTalent{
 	short_info = function(self, t)
 		local dam = damDesc(self, DamageType.NATURE, t.getDamage(self, t))
 		return ([[Deals %0.1f nature damage, stuns and poisons for %0.1f nature/turn for 4 turns.]]):
-		format(dam, dam/10)
+		tformat(dam, dam/10)
 	end,
 	info = function(self, t)
 		local dam = damDesc(self, DamageType.NATURE, t.getDamage(self, t))
 		return ([[Lay a trap armed with potent venom.  A creature passing over it will be dealt %0.2f nature damage and be stunned and poisoned for %0.2f nature damage per turn for 4 turns.]]):
-		format(dam, dam/10)
+		tformat(dam, dam/10)
 	end,
 }
 

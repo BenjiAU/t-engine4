@@ -26,7 +26,7 @@ newEntity{ define_as = "STAFF_ABSORPTION",
 	slot = "MAINHAND",
 	slot_forbid = "OFFHAND",
 	type = "weapon", subtype="staff",
-	unided_name = "dark runed staff",
+	unided_name = _t"dark runed staff",
 	name = "Staff of Absorption",
 	flavor_name = "magestaff",
 	level_range = {30, 30},
@@ -35,7 +35,7 @@ newEntity{ define_as = "STAFF_ABSORPTION",
 	encumber = 7,
 	auto_pickup = 1,
 	plot = true, quest = true,
-	desc = [[Carved with runes of power, this staff seems to have been made long ago, yet it bears no signs of tarnish.
+	desc = _t[[Carved with runes of power, this staff seems to have been made long ago, yet it bears no signs of tarnish.
 Light around it seems to dim and you can feel its tremendous power simply by touching it.]],
 
 	require = { stat = { mag=40 }, },
@@ -53,7 +53,7 @@ Light around it seems to dim and you can feel its tremendous power simply by tou
 	},
 
 	max_power = 1000, power_regen = 1,
-	use_power = { name = "absorb energies", power = 1000,
+	use_power = { name = _t"absorb energies", power = 1000,
 		no_npc_use = true,
 		use = function(self, who)
 			game.logPlayer(who, "This power seems too much to wield; you fear it might absorb YOU.")
@@ -79,19 +79,19 @@ newEntity{ define_as = "ORB_MANY_WAYS",
 	power_source = {unknown=true},
 	unique = true, quest=true,
 	type = "orb", subtype="orb",
-	unided_name = "swirling orb",
+	unided_name = _t"swirling orb",
 	name = "Orb of Many Ways",
 	level_range = {30, 30},
 	display = "*", color=colors.VIOLET, image = "object/artifact/orb_many_ways.png",
 	encumber = 1,
 	plot = true, quest = true,
-	desc = [[The orb projects images of distant places, some that seem to be not of this world, switching rapidly.
+	desc = _t[[The orb projects images of distant places, some that seem to be not of this world, switching rapidly.
 If used near a portal it could probably activate it.]],
 
 	auto_hotkey = 1,
 
 	max_power = 30, power_regen = 1,
-	use_power = { name = "activate a portal", power = 10,
+	use_power = { name = _t"activate a portal", power = 10,
 		no_npc_use = true,
 		use = function(self, who)
 			self:identify(true)
@@ -119,17 +119,17 @@ newEntity{ define_as = "ORB_MANY_WAYS_DEMON",
 	power_source = {unknown=true},
 	unique = "Orb of Many Ways Demon", quest=true, no_unique_lore=true,
 	type = "orb", subtype="orb",
-	unided_name = "swirling orb", identified=true,
+	unided_name = _t"swirling orb", identified=true,
 	name = "Orb of Many Ways",
 	level_range = {30, 30},
 	display = "*", color=colors.VIOLET, image = "object/artifact/orb_many_ways.png",
 	encumber = 1,
 	plot = true, quest = true,
-	desc = [[The orb projects images of distant places, some that seem to be not of this world, switching rapidly.
+	desc = _t[[The orb projects images of distant places, some that seem to be not of this world, switching rapidly.
 If used near a portal it could probably activate it.]],
 
 	max_power = 30, power_regen = 1,
-	use_power = { name = "activate a portal", power = 10,
+	use_power = { name = _t"activate a portal", power = 10,
 		no_npc_use = true,
 		use = function(self, who)
 			local g = game.level.map(who.x, who.y, game.level.map.TERRAIN)
@@ -138,12 +138,12 @@ If used near a portal it could probably activate it.]],
 				who:useOrbPortal{
 					change_level = 1,
 					change_zone = "demon-plane",
-					message = "#VIOLET#The world twists sickeningly around you and you find yourself someplace unexpected! It felt nothing like your previous uses of the Orb of Many Ways. Tannen must have switched the Orb out for a fake!",
+					message = _t"#VIOLET#The world twists sickeningly around you and you find yourself someplace unexpected! It felt nothing like your previous uses of the Orb of Many Ways. Tannen must have switched the Orb out for a fake!",
 					on_use = function(self, who)
 						who:setQuestStatus("east-portal", engine.Quest.COMPLETED, "tricked-demon")
 						local orb = who:findInAllInventoriesBy("define_as", "ORB_MANY_WAYS_DEMON")
 						if orb then orb.name = "Demonic Orb of Many Ways" end
-						require("engine.ui.Dialog"):simplePopup("Demonic Orb of Many Ways", "It felt nothing like your previous uses of the Orb of Many Ways. Tannen must have switched the Orb out for a fake!")
+						require("engine.ui.Dialog"):simplePopup(_t"Demonic Orb of Many Ways", _t"It felt nothing like your previous uses of the Orb of Many Ways. Tannen must have switched the Orb out for a fake!")
 					end,
 				}
 			else
@@ -168,13 +168,13 @@ newEntity{ define_as = "ORB_UNDEATH",
 	power_source = {unknown=true},
 	unique = true, quest=true,
 	type = "orb", subtype="orb",
-	unided_name = "orb of command",
+	unided_name = _t"orb of command",
 	name = "Orb of Undeath (Orb of Command)",
 	level_range = {50, 50},
 	display = "*", color=colors.VIOLET, image = "object/artifact/orb_undeath.png",
 	encumber = 1,
 	plot = true, quest = true,
-	desc = [[Dark visions fill your mind as you lift the orb. It is cold to the touch.]],
+	desc = _t[[Dark visions fill your mind as you lift the orb. It is cold to the touch.]],
 
 	on_drop = function(self, who)
 		if who == game.player then
@@ -184,7 +184,7 @@ newEntity{ define_as = "ORB_UNDEATH",
 	end,
 
 	max_power = 1, power_regen = 1,
-	use_power = { name = "use the orb", power = 1,
+	use_power = { name = _t"use the orb", power = 1,
 		no_npc_use = true,
 		use = function(self, who) who:useCommandOrb(self) return {id=true, used=true} end
 	},
@@ -199,13 +199,13 @@ newEntity{ define_as = "ORB_DRAGON",
 	power_source = {unknown=true},
 	unique = true, quest=true,
 	type = "orb", subtype="orb",
-	unided_name = "orb of command",
+	unided_name = _t"orb of command",
 	name = "Dragon Orb (Orb of Command)",
 	level_range = {50, 50},
 	display = "*", color=colors.VIOLET, image = "object/artifact/orb_dragon.png",
 	encumber = 1,
 	plot = true, quest = true,
-	desc = [[This orb is warm to the touch.]],
+	desc = _t[[This orb is warm to the touch.]],
 
 	on_drop = function(self, who)
 		if who == game.player then
@@ -215,7 +215,7 @@ newEntity{ define_as = "ORB_DRAGON",
 	end,
 
 	max_power = 1, power_regen = 1,
-	use_power = { name = "use the orb", power = 1,
+	use_power = { name = _t"use the orb", power = 1,
 		no_npc_use = true,
 		use = function(self, who) who:useCommandOrb(self) return {id=true, used=true} end
 	},
@@ -230,13 +230,13 @@ newEntity{ define_as = "ORB_ELEMENTS",
 	power_source = {unknown=true},
 	unique = true, quest=true,
 	type = "orb", subtype="orb",
-	unided_name = "orb of command",
+	unided_name = _t"orb of command",
 	name = "Elemental Orb (Orb of Command)",
 	level_range = {50, 50},
 	display = "*", color=colors.VIOLET, image = "object/artifact/elemental_orb.png",
 	encumber = 1,
 	plot = true, quest = true,
-	desc = [[Flames swirl on the icy surface of this orb.]],
+	desc = _t[[Flames swirl on the icy surface of this orb.]],
 
 	on_drop = function(self, who)
 		if who == game.player then
@@ -246,7 +246,7 @@ newEntity{ define_as = "ORB_ELEMENTS",
 	end,
 
 	max_power = 1, power_regen = 1,
-	use_power = { name = "use the orb", power = 1,
+	use_power = { name = _t"use the orb", power = 1,
 		no_npc_use = true,
 		use = function(self, who) who:useCommandOrb(self) return {id=true, used=true} end
 	},
@@ -261,13 +261,13 @@ newEntity{ define_as = "ORB_DESTRUCTION",
 	power_source = {unknown=true},
 	unique = true, quest=true,
 	type = "orb", subtype="orb",
-	unided_name = "orb of command",
+	unided_name = _t"orb of command",
 	name = "Orb of Destruction (Orb of Command)",
 	level_range = {50, 50},
 	display = "*", color=colors.VIOLET, image = "object/artifact/orb_destruction.png",
 	encumber = 1,
 	plot = true, quest = true,
-	desc = [[Visions of death and destruction fill your mind as you lift this orb.]],
+	desc = _t[[Visions of death and destruction fill your mind as you lift this orb.]],
 
 	on_drop = function(self, who)
 		if who == game.player then
@@ -277,7 +277,7 @@ newEntity{ define_as = "ORB_DESTRUCTION",
 	end,
 
 	max_power = 1, power_regen = 1,
-	use_power = { name = "use the orb", power = 1,
+	use_power = { name = _t"use the orb", power = 1,
 		no_npc_use = true,
 		use = function(self, who) who:useCommandOrb(self) return {id=true, used=true} end
 	},
@@ -292,12 +292,12 @@ newEntity{ define_as = "ORB_SCRYING",
 	power_source = {unknown=true},
 	unique = true, quest=true, no_unique_lore=true,
 	type = "orb", subtype="orb",
-	unided_name = "orb of scrying",
+	unided_name = _t"orb of scrying",
 	name = "Scrying Orb",
 	display = "*", color=colors.VIOLET, image = "object/artifact/orb_scrying.png",
 	encumber = 1,
 	plot = true, quest = true,
-	desc = [[This orb will automatically identify items you find.]],
+	desc = _t[[This orb will automatically identify items you find.]],
 
 	on_drop = function(self, who)
 		if who == game.player then
@@ -314,16 +314,16 @@ newEntity{ define_as = "ORB_SCRYING",
 newEntity{ base = "BASE_ROD",
 	power_source = {unknown=true, arcane=false},
 	define_as = "ROD_OF_RECALL",
-	unided_name = "unstable rod", identified=true, force_lore_artifact=true,
+	unided_name = _t"unstable rod", identified=true, force_lore_artifact=true,
 	name = "Rod of Recall", color=colors.LIGHT_BLUE, unique=true, image = "object/artifact/rod_of_recall.png",
-	desc = [[This rod is made entirely of voratun, infused with raw magical energies that can bend space itself.
+	desc = _t[[This rod is made entirely of voratun, infused with raw magical energies that can bend space itself.
 You have heard of such items before. They are very useful to adventurers, allowing faster travel.]],
 	cost = 0, quest=true,
 
 	auto_hotkey = 1,
 
 	max_power = 400, power_regen = 1,
-	use_power = { name = "recall the user to the worldmap after 40 turns", power = 202,
+	use_power = { name = _t"recall the user to the worldmap after 40 turns", power = 202,
 		no_npc_use = true,
 		use = function(self, who)
 			if who:hasEffect(who.EFF_RECALL) then
@@ -337,7 +337,7 @@ You have heard of such items before. They are very useful to adventurers, allowi
 					game.logPlayer(who, "Space around you starts to dissolve...")
 					return {id=true, used=true}
 				elseif game.zone.force_farportal_recall then
-					require("engine.ui.Dialog"):yesnoLongPopup("Force a recall", "The Fortress Shadow warned you that trying to force a recall without finding the portal back could break the exploratory farportal forever.", 500, function(ret)
+					require("engine.ui.Dialog"):yesnoLongPopup(_t"Force a recall", _t"The Fortress Shadow warned you that trying to force a recall without finding the portal back could break the exploratory farportal forever.", 500, function(ret)
 						if not ret then
 							who:setEffect(who.EFF_RECALL, 40, { where = self.shertul_fortress and "shertul-fortress" or nil, allow_override=true })
 							game.logPlayer(who, "Space around you starts to dissolve...")
@@ -345,7 +345,7 @@ You have heard of such items before. They are very useful to adventurers, allowi
 								who:hasQuest("shertul-fortress"):break_farportal()
 							end
 						end
-					end, "Cancel", "Recall", true)
+					end, _t"Cancel", _t"Recall", true)
 					return {id=true, used=true}
 				end
 			end
@@ -363,7 +363,7 @@ You have heard of such items before. They are very useful to adventurers, allowi
 
 	on_pickup = function(self, who)
 		if who == game.player then
-			require("engine.ui.Dialog"):simplePopup("Rod of Recall", "You found a Rod of Recall. You can use it to quickly get out of your current zone and return to the worldmap.")
+			require("engine.ui.Dialog"):simplePopup(_t"Rod of Recall", _t"You found a Rod of Recall. You can use it to quickly get out of your current zone and return to the worldmap.")
 		end
 	end,
 }
@@ -375,7 +375,7 @@ newEntity{ base = "BASE_ROD",
 	add_name = false,
 	identified=true, force_lore_artifact=true,
 	name = "Transmogrification Chest", display = '~', color=colors.GOLD, unique=true, image = "object/chest4.png",
-	desc = [[This chest is an extension of old Sher'tul places of power. Any items dropped inside are transported to an other place, processed and destroyed to extract energy.
+	desc = _t[[This chest is an extension of old Sher'tul places of power. Any items dropped inside are transported to an other place, processed and destroyed to extract energy.
 The byproduct of this effect is the creation of gold, which is useless to process, so it is sent back to you.
 
 When you possess the chest all items you walk upon will automatically be put inside and transmogrified when you leave the level.
@@ -388,7 +388,7 @@ Items in the chest will not encumber you.]],
 	},
 
 	max_power = 1000, power_regen = 1,
-	use_power = { name = "transmogrify all the items in your chest at once (also done automatically when you change level)", power = 0,
+	use_power = { name = _t"transmogrify all the items in your chest at once (also done automatically when you change level)", power = 0,
 		no_npc_use = true,
 		use = function(self, who)
 			if not who.player then return {id=true, used=false} end
@@ -402,14 +402,14 @@ Items in the chest will not encumber you.]],
 				local floor = game.level.map:getObjectTotal(who.x, who.y)
 				if floor == 0 then
 					if who:attr("has_transmo") >= 2 then
-						require("engine.ui.Dialog"):yesnoPopup("Transmogrification Chest", "Make the Transmogrification Chest the default item's destroyer?", function(ret) if ret then
+						require("engine.ui.Dialog"):yesnoPopup(_t"Transmogrification Chest", _t"Make the Transmogrification Chest the default item's destroyer?", function(ret) if ret then
 							who.default_transmo_source = self
 						end end)
 					else
-						require("engine.ui.Dialog"):simplePopup("Transmogrification Chest", "You do not have any items to transmogrify in your chest or on the floor.")
+						require("engine.ui.Dialog"):simplePopup(_t"Transmogrification Chest", _t"You do not have any items to transmogrify in your chest or on the floor.")
 					end
 				else
-					require("engine.ui.Dialog"):yesnoPopup("Transmogrification Chest", "Transmogrify all "..floor.." item(s) on the floor?", function(ret)
+					require("engine.ui.Dialog"):yesnoPopup(_t"Transmogrification Chest", ("Transmogrify all %s item(s) on the floor?"):tformat(floor), function(ret)
 						if not ret then return end
 						for i = floor, 1, -1 do
 							local o = game.level.map:getObject(who.x, who.y, i)
@@ -423,7 +423,7 @@ Items in the chest will not encumber you.]],
 				return {id=true, used=true}
 			end
 
-			require("engine.ui.Dialog"):yesnoPopup("Transmogrification Chest", "Transmogrify all "..nb.." item(s) in your chest?", function(ret)
+			require("engine.ui.Dialog"):yesnoPopup(_t"Transmogrification Chest", ("Transmogrify all %s item(s) in your chest?"):tformat(nb), function(ret)
 				if not ret then return end
 				for i = #inven, 1, -1 do
 					local o = inven[i]
@@ -438,7 +438,7 @@ Items in the chest will not encumber you.]],
 
 	on_pickup = function(self, who)
 		who.default_transmo_source = self
-		require("engine.ui.Dialog"):simpleLongPopup("Transmogrification Chest", [[This chest is an extension of old Sher'Tul places of power. Any items dropped inside is transported to an other place, processed and destroyed to extract energy.
+		require("engine.ui.Dialog"):simpleLongPopup(_t"Transmogrification Chest", _t[[This chest is an extension of old Sher'Tul places of power. Any items dropped inside is transported to an other place, processed and destroyed to extract energy.
 The byproduct of this effect is the creation of gold, which is useless to process, so it is sent back to you.
 
 When you possess the chest all items you walk upon will automatically be put inside and transmogrified when you leave the level.
@@ -457,8 +457,8 @@ Items in the chest will not encumber you.]], 500)
 newEntity{ base = "BASE_CLOTH_ARMOR", define_as = "FUN_BIKINI",
 	unique = true,
 	name = "Bikini", color = colors.RED, image = "object/artifact/bikini.png",
-	unided_name = "tiny piece of cloth",
-	desc = [[Revealing, pink, fun.
+	unided_name = _t"tiny piece of cloth",
+	desc = _t[[Revealing, pink, fun.
 #{bold}#If you never take it off and win you will gain a neat achievement and bragging rights!#{normal}#]],
 	level_range = {1, 1},
 	rarity = false,
@@ -466,7 +466,7 @@ newEntity{ base = "BASE_CLOTH_ARMOR", define_as = "FUN_BIKINI",
 	material_level = 1,
 	moddable_tile = "special/bikini_01",
 	moddable_tile_big = true,
-	special_desc = function(self) return "You have never taken it off." end,
+	special_desc = function(self) return _t"You have never taken it off." end,
 	on_win = function(self)
 		world:gainAchievement("WIN_BIKINI", game.player)
 	end,
@@ -482,8 +482,8 @@ newEntity{ base = "BASE_CLOTH_ARMOR", define_as = "FUN_BIKINI",
 newEntity{ base = "BASE_CLOTH_ARMOR", define_as = "FUN_MANKINI",
 	unique = true,
 	name = "Mankini", color = colors.RED, image = "object/artifact/mankini.png",
-	unided_name = "tiny piece of cloth",
-	desc = [[Revealing, green, fun.
+	unided_name = _t"tiny piece of cloth",
+	desc = _t[[Revealing, green, fun.
 #{bold}#If you never take it off and win you will gain a neat achievement and bragging rights!#{normal}#]],
 	level_range = {1, 1},
 	rarity = false,
@@ -491,7 +491,7 @@ newEntity{ base = "BASE_CLOTH_ARMOR", define_as = "FUN_MANKINI",
 	material_level = 1,
 	moddable_tile = "special/mankini_01",
 	moddable_tile_big = true,
-	special_desc = function(self) return "You have never taken it off." end,
+	special_desc = function(self) return _t"You have never taken it off." end,
 	on_win = function(self)
 		world:gainAchievement("WIN_MANKINI", game.player)
 	end,

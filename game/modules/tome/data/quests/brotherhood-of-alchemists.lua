@@ -16,43 +16,43 @@
 --
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
-name = "The Brotherhood of Alchemists"
+name = _t"The Brotherhood of Alchemists"
 
 desc = function(self, player, who)
 	local desc = {}
 
 	if self:isStatus(self.DONE) and self.player_won == true then
-		desc[#desc+1] = "#LIGHT_GREEN#Thanks to your timely aid, "..self.winner.." is the newest member of the Brotherhood of Alchemists.#WHITE#"
+		desc[#desc+1] = ("#LIGHT_GREEN#Thanks to your timely aid, %s is the newest member of the Brotherhood of Alchemists.#WHITE#"):tformat(_t(self.winner))
 	elseif self:isStatus(self.DONE) and self.player_won == false then
-		desc[#desc+1] = "#RED#You aided various denizens of Maj'Eyal in their attempts to join the Brotherhood of Alchemists, though you did not prove the deciding factor for any. This year's new member is "..self.winner..".#WHITE#"
+		desc[#desc+1] = ("#RED#You aided various denizens of Maj'Eyal in their attempts to join the Brotherhood of Alchemists, though you did not prove the deciding factor for any. This year's new member is %s.#WHITE#"):tformat(_t(self.winner))
 	else
-		desc[#desc+1] = "#LIGHT_BLUE#Various alchemists around Maj'Eyal are competing to gain entry into the great Brotherhood of Alchemists, and one or more have enlisted your aid.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_BLUE#Various alchemists around Maj'Eyal are competing to gain entry into the great Brotherhood of Alchemists, and one or more have enlisted your aid.#WHITE#"
 	end
 	--e (for elixir) is the name of the table listing all the elixirs and their various strings and ingredients and such. self.e[2][3], for example, refers to the table containing all the information for the second alchemist's third elixir. self.e[2][3].ingredients[1] refers to the first ingredient of the third elixir of the second alchemist. This saves a ton of work in making the desc function, since it's messy and it would suck to copy/paste twelve of them (one for each elixir).
 	for i = 1, 4 do --run through list of four alchemists
 		for j = 1, 3 do --run through each alchemist's list of three elixirs
 			if self:isCompleted(self.e[i][j].full) and not self:isCompleted(self.e[i][j].poached) then
-				desc[#desc+1] = "#GREEN#You have aided "..self.e[i][j].alchemist.." in creating an "..self.e[i][j].name..".#WHITE#"
+				desc[#desc+1] = ("#GREEN#You have aided %s in creating an %s.#WHITE#"):tformat(_t(self.e[i][j].alchemist), _t(self.e[i][j].name))
 			elseif self:isCompleted(self.e[i][j].full) and self:isCompleted(self.e[i][j].poached) then
-				desc[#desc+1] = "#RED#"..self.e[i][j].alchemist.." has completed an "..self.e[i][j].name.." without your aid.#WHITE#"
+				desc[#desc+1] = ("#RED#%s has completed an %s without your aid.#WHITE#"):tformat(_t(self.e[i][j].alchemist), _t(self.e[i][j].name))
 			elseif self:isCompleted(self.e[i][j].start) and not self:isCompleted(self.e[i][j].full) and self:isStatus(self.DONE) then
-				desc[#desc+1] = "#SLATE#Having failed to gain admittance to the Brotherhood of the Alchemists, "..self.e[i][j].alchemist.." no longer needs your help making the "..self.e[i][j].name.."."
+				desc[#desc+1] = ("#SLATE#Having failed to gain admittance to the Brotherhood of the Alchemists, %s no longer needs your help making the %s."):tformat(_t(self.e[i][j].alchemist), _t(self.e[i][j].name))
 			elseif self:isCompleted(self.e[i][j].start) and not self:isCompleted(self.e[i][j].full) then
-				desc[#desc+1] = ""..self.e[i][j].alchemist.." needs your help making an "..self.e[i][j].name..". He has given you some notes on the ingredients:"
+				desc[#desc+1] = ("%s needs your help making an %s. He has given you some notes on the ingredients:"):tformat(_t(self.e[i][j].alchemist), _t(self.e[i][j].name))
 				if not self:check_i(player, self.e[i][j].ingredients[1]) then
-					desc[#desc+1] = "#SLATE#  * 'Needed: one "..self.e[i][j].ingredients[1].name..". "..game.party:getIngredient(self.e[i][j].ingredients[1].id).alchemy_text.."'#WHITE#"
+					desc[#desc+1] = ("#SLATE#  * 'Needed: one %s. %s'#WHITE#"):tformat(_t(self.e[i][j].ingredients[1].name), game.party:getIngredient(self.e[i][j].ingredients[1].id).alchemy_text)
 				else
-					desc[#desc+1] = "#LIGHT_GREEN#  * You've found the needed "..self.e[i][j].ingredients[1].name..".#WHITE#"
+					desc[#desc+1] = ("#LIGHT_GREEN#  * You've found the needed %s.#WHITE#"):tformat(_t(self.e[i][j].ingredients[1].name))
 				end
 				if not self:check_i(player, self.e[i][j].ingredients[2]) then
-					desc[#desc+1] = "#SLATE#  * 'Needed: one "..self.e[i][j].ingredients[2].name..". "..game.party:getIngredient(self.e[i][j].ingredients[2].id).alchemy_text.."'#WHITE#"
+					desc[#desc+1] = ("#SLATE#  * 'Needed: one %s. %s'#WHITE#"):tformat(_t(self.e[i][j].ingredients[2].name), game.party:getIngredient(self.e[i][j].ingredients[2].id).alchemy_text)
 				else
-					desc[#desc+1] = "#LIGHT_GREEN#  * You've found the needed "..self.e[i][j].ingredients[2].name..".#WHITE#"
+					desc[#desc+1] = ("#LIGHT_GREEN#  * You've found the needed %s.#WHITE#"):tformat(_t(self.e[i][j].ingredients[2].name))
 				end
 				if not self:check_i(player, self.e[i][j].ingredients[3]) then
-					desc[#desc+1] = "#SLATE#  * 'Needed: one "..self.e[i][j].ingredients[3].name..". "..game.party:getIngredient(self.e[i][j].ingredients[3].id).alchemy_text.."'#WHITE#"
+					desc[#desc+1] = ("#SLATE#  * 'Needed: one %s. %s'#WHITE#"):tformat(_t(self.e[i][j].ingredients[3].name), game.party:getIngredient(self.e[i][j].ingredients[3].id).alchemy_text)
 				else
-					desc[#desc+1] = "#LIGHT_GREEN#  * You've found the needed "..self.e[i][j].ingredients[3].name..".#WHITE#"
+					desc[#desc+1] = ("#LIGHT_GREEN#  * You've found the needed %s.#WHITE#"):tformat(_t(self.e[i][j].ingredients[3].name))
 				end
 			end
 		end
@@ -207,7 +207,7 @@ recipes = function(self)
 		{
 			{
 			short_name = "fox",
-			name = "elixir of the fox",
+			name = _t"elixir of the fox",
 			id = "ELIXIR_FOX",
 			start = "fox_start",
 			almost = "fox_almost_done",
@@ -224,7 +224,7 @@ recipes = function(self)
 			},
 			{
 			short_name = "avoidance",
-			name = "elixir of avoidance",
+			name = _t"elixir of avoidance",
 			id = "ELIXIR_AVOIDANCE",
 			start = "avoidance_start",
 			almost = "avoidance_almost_done",
@@ -241,7 +241,7 @@ recipes = function(self)
 			},
 			{
 			short_name = "precision",
-			name = "elixir of precision",
+			name = _t"elixir of precision",
 			id = "ELIXIR_PRECISION",
 			start = "precision_start",
 			almost = "precision_almost_done",
@@ -260,7 +260,7 @@ recipes = function(self)
 		{
 			{
 			short_name = "mysticism",
-			name = "elixir of mysticism",
+			name = _t"elixir of mysticism",
 			id = "ELIXIR_MYSTICISM",
 			start = "mysticism_start",
 			almost = "mysticism_almost_done",
@@ -277,7 +277,7 @@ recipes = function(self)
 			},
 			{
 			short_name = "savior",
-			name = "elixir of the savior",
+			name = _t"elixir of the savior",
 			id = "ELIXIR_SAVIOR",
 			start = "savior_start",
 			almost = "savior_almost_done",
@@ -294,7 +294,7 @@ recipes = function(self)
 			},
 			{
 			short_name = "mastery",
-			name = "elixir of mastery",
+			name = _t"elixir of mastery",
 			id = "ELIXIR_MASTERY",
 			start = "mastery_start",
 			almost = "mastery_almost_done",
@@ -313,7 +313,7 @@ recipes = function(self)
 		{
 			{
 			short_name = "force",
-			name = "elixir of explosive force",
+			name = _t"elixir of explosive force",
 			id = "ELIXIR_FORCE",
 			start = "force_start",
 			almost = "force_almost_done",
@@ -330,7 +330,7 @@ recipes = function(self)
 			},
 			{
 			short_name = "serendipity",
-			name = "elixir of serendipity",
+			name = _t"elixir of serendipity",
 			id = "ELIXIR_SERENDIPITY",
 			start = "serendipity_start",
 			almost = "serendipity_almost_done",
@@ -347,7 +347,7 @@ recipes = function(self)
 			},
 			{
 			short_name = "focus",
-			name = "elixir of focus",
+			name = _t"elixir of focus",
 			id = "ELIXIR_FOCUS",
 			start = "focus_start",
 			almost = "focus_almost_done",
@@ -366,7 +366,7 @@ recipes = function(self)
 		{
 			{
 			short_name = "brawn",
-			name = "elixir of brawn",
+			name = _t"elixir of brawn",
 			id = "ELIXIR_BRAWN",
 			start = "brawn_start",
 			almost = "brawn_almost_done",
@@ -383,7 +383,7 @@ recipes = function(self)
 			},
 			{
 			short_name = "stoneskin",
-			name = "elixir of stoneskin",
+			name = _t"elixir of stoneskin",
 			id = "ELIXIR_STONESKIN",
 			start = "stoneskin_start",
 			almost = "stoneskin_almost_done",
@@ -400,7 +400,7 @@ recipes = function(self)
 			},
 			{
 			short_name = "foundations",
-			name = "elixir of foundations",
+			name = _t"elixir of foundations",
 			id = "ELIXIR_FOUNDATIONS",
 			start = "foundations_start",
 			almost = "foundations_almost_done",

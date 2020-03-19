@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New Class: #LIGHT_GREEN#Cursed (Afflicted)",
-[[Through ignorance, greed or folly, the Cursed served some dark design and are now doomed to pay for their sins.
+return _t"New Class: #LIGHT_GREEN#Cursed (Afflicted)",
+_t[[Through ignorance, greed or folly, the Cursed served some dark design and are now doomed to pay for their sins.
 Their only master now is the hatred they carry for every living thing.
 Drawing strength from the death of all they encounter, the Cursed become terrifying combatants.
 Worse, any who approach the Cursed can be driven mad by their terrible aura.

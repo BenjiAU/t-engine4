@@ -22,7 +22,7 @@ load("/data/general/objects/objects-maj-eyal.lua")
 newEntity{ base = "BASE_LORE",
 	define_as = "DRAFT_LETTER",
 	name = "draft letter", lore="grand-corruptor-draft",
-	desc = [[A letter.]],
+	desc = _t[[A letter.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -31,13 +31,13 @@ newEntity{
 	power_source = {arcane=true},
 	define_as = "CORRUPTED_SANDQUEEN_HEART",
 	type = "corpse", subtype = "heart", image = "object/artifact/corrupted_queen_heart.png",
-	name = "Corrupted heart of the Sandworm Queen", unique=true, unided_name="pulsing organ",
+	name = "Corrupted heart of the Sandworm Queen", unique=true, unided_name=_t"pulsing organ",
 	display = "*", color=colors.VIOLET,
-	desc = [[The heart of the Sandworm Queen, ripped from her dead body and corrupted in the mark of the spellblaze altar. You could ... consume it, should you feel mad enough.]],
+	desc = _t[[The heart of the Sandworm Queen, ripped from her dead body and corrupted in the mark of the spellblaze altar. You could ... consume it, should you feel mad enough.]],
 	cost = 3000,
 	quest = 1,
 
-	use_simple = { name="consume the heart", use = function(self, who)
+	use_simple = { name=_t"consume the heart", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You consume the heart and feel the corruption fill you!")
 		who.unused_stats = who.unused_stats + 3
 		who.unused_talents = who.unused_talents + 1

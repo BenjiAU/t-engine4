@@ -26,8 +26,8 @@ newEntity{ base = "BASE_LEATHER_BOOT",
 	define_as = "BOOTS_OF_PHASING",
 	unique = true,
 	name = "Shifting Boots", image = "object/artifact/shifting_boots.png",
-	unided_name = "pair of shifting boots",
-	desc = [[Those leather boots can make anybody as annoying as their former possessor, Draebor.]],
+	unided_name = _t"pair of shifting boots",
+	desc = _t[[Those leather boots can make anybody as annoying as their former possessor, Draebor.]],
 	color = colors.BLUE,
 	rarity = false,
 	cost = 200,
@@ -42,12 +42,12 @@ newEntity{ base = "BASE_LEATHER_BOOT",
 
 	max_power = 40, power_regen = 1,
 	use_power = {
-		name = function(self, who) return ("blink to a nearby random location within range %d (based on Magic)"):format(self.use_power.range(self, who)) end,
+		name = function(self, who) return ("blink to a nearby random location within range %d (based on Magic)"):tformat(self.use_power.range(self, who)) end,
 		power = 22,
 		tactical = { ESCAPE = 2},
 		range = function(self, who) return 10 + who:getMag(5) end,
 		use = function(self, who)
-			game.logSeen(who, "%s taps %s %s together!", who.name:capitalize(), who:his_her(), self:getName{no_count=true, do_color = true, no_add_name = true})
+			game.logSeen(who, "%s taps %s %s together!", who:getName():capitalize(), who:his_her(), self:getName{no_count=true, do_color = true, no_add_name = true})
 			game.level.map:particleEmitter(who.x, who.y, 1, "teleport")
 			who:teleportRandom(who.x, who.y, self.use_power.range(self, who))
 			game.level.map:particleEmitter(who.x, who.y, 1, "teleport")

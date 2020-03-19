@@ -34,26 +34,26 @@ function _M:init(title, actor, filter, action, on_select)
 	self.actor = actor
 	self.on_select = on_select
 
-	Dialog.init(self, title or "Inventory", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
+	Dialog.init(self, title or _t"Inventory", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
 
 	self.max_h = 0
 
 --	self.c_desc = TextzoneList.new{width=self.iw, height=self.max_h*self.font_h, no_color_bleed=true}
 
 	self.c_inven = ListColumns.new{width=math.floor(self.iw / 2 - 10), height=self.ih - self.max_h*self.font_h - 10, sortable=true, scrollbar=true, columns={
-		{name="", width={20,"fixed"}, display_prop="char", sort="id"},
-		{name="", width={24,"fixed"}, display_prop="object", sort="sortname", direct_draw=function(item, x, y) if item.object then item.object:toScreen(nil, x+4, y, 16, 16) end end},
-		{name="Inventory", width=72, display_prop="name", sort="sortname"},
-		{name="Category", width=20, display_prop="cat", sort="cat"},
-		{name="Enc.", width=8, display_prop="encumberance", sort="encumberance"},
+		{name=_t"", width={20,"fixed"}, display_prop="char", sort="id"},
+		{name=_t"", width={24,"fixed"}, display_prop="object", sort="sortname", direct_draw=function(item, x, y) if item.object then item.object:toScreen(nil, x+4, y, 16, 16) end end},
+		{name=_t"Inventory", width=72, display_prop="name", sort="sortname"},
+		{name=_t"Category", width=20, display_prop="cat", sort="cat"},
+		{name=_t"Enc.", width=8, display_prop="encumberance", sort="encumberance"},
 	}, list={}, fct=function(item, sel, button, event) self:use(item, button, event) end, select=function(item, sel) self:select(item) end, on_drag=function(item) if self.on_drag then self.on_drag(item) end end}
 
 	self.c_equip = ListColumns.new{width=math.floor(self.iw / 2 - 10), height=self.ih - self.max_h*self.font_h - 10, scrollbar=true, columns={
-		{name="", width={20,"fixed"}, display_prop="char"},
-		{name="", width={8+16,"fixed"}, display_prop="object", direct_draw=function(item, x, y) if item.object then item.object:toScreen(nil, x+4, y, 16, 16) end end},
-		{name="Equipment", width=72, display_prop="name"},
-		{name="Category", width=20, display_prop="cat"},
-		{name="Enc.", width=8, display_prop="encumberance"},
+		{name=_t"", width={20,"fixed"}, display_prop="char"},
+		{name=_t"", width={8+16,"fixed"}, display_prop="object", direct_draw=function(item, x, y) if item.object then item.object:toScreen(nil, x+4, y, 16, 16) end end},
+		{name=_t"Equipment", width=72, display_prop="name"},
+		{name=_t"Category", width=20, display_prop="cat"},
+		{name=_t"Enc.", width=8, display_prop="encumberance"},
 	}, list={}, fct=function(item, sel, button, event) self:use(item, button, event) end, select=function(item, sel) self:select(item) end, on_drag=function(item) if self.on_drag then self.on_drag(item) end end}
 
 	self:generateList()
@@ -104,7 +104,7 @@ function _M:defineHotkey(id)
 	if not item or not item.object then return end
 
 	self.actor.hotkey[id] = {"inventory", item.object:getName{no_add_name=true, no_count=true}}
-	self:simplePopup("Hotkey "..id.." assigned", item.object:getName{no_add_name=true, no_count=true}:capitalize().." assigned to hotkey "..id)
+	self:simplePopup(("Hotkey %s assigned"):tformat(id), ("%s assigned to hotkey %s"):tformat(item.object:getName{no_add_name=true, no_count=true}:capitalize(), id))
 	self.actor.changed = true
 end
 
@@ -149,7 +149,8 @@ function _M:generateList(no_update)
 					local enc = 0
 					o:forAllStack(function(o) enc=enc+o.encumber end)
 
-					list[#list+1] = { id=#list+1, char=char, name=o:getName(), sortname=o:getName():toString():removeColorCodes(), color=o:getDisplayColor(), object=o, inven=inven_id, item=item, cat=o.subtype, encumberance=enc, desc=o:getDesc() }
+					list[#list+1] = { id=#list+1, char=char, name=o:getName(), sortname=o:getName():toString():removeColorCodes(), 
+					color=o:getDisplayColor(), object=o, inven=inven_id, item=item, cat=_t(o.subtype, "entity subtype"), encumberance=enc, desc=o:getDesc() }
 					chars[char] = #list
 					i = i + 1
 				end
@@ -170,8 +171,7 @@ function _M:generateList(no_update)
 
 			local enc = 0
 			o:forAllStack(function(o) enc=enc+o.encumber end)
-
-			list[#list+1] = { id=#list+1, char=char, name=o:getName(), sortname=o:getName():toString():removeColorCodes(), color=o:getDisplayColor(), object=o, inven=self.actor.INVEN_INVEN, item=item, cat=o.subtype, encumberance=enc, desc=o:getDesc() }
+			list[#list+1] = { id=#list+1, char=char, name=o:getName(), sortname=o:getName():toString():removeColorCodes(), color=o:getDisplayColor(), object=o, inven=self.actor.INVEN_INVEN, item=item, cat=_t(o.subtype, "entity subtype"), encumberance=enc, desc=o:getDesc() }
 			chars[char] = #list
 			i = i + 1
 		end

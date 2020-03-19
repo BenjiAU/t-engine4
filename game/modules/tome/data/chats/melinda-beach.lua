@@ -19,7 +19,7 @@
 
 newChat{ id="welcome",
 
-	text = [[#LIGHT_GREEN#*The two of you spend some time relaxing on the beach.
+	text = _t[[#LIGHT_GREEN#*The two of you spend some time relaxing on the beach.
 The air is fresh, the sand shimmers, and the surf roars softly.*#WHITE#
 
 This was such a lovely idea!
@@ -27,15 +27,15 @@ I have had a wonderful time with you today.
 
 #LIGHT_GREEN#*She looks longingly into your eyes.*#WHITE#]],
 	answers = {
-		{"#LIGHT_GREEN#[Lean closer and kiss her]#WHITE#", action=function() game.zone.start_yaech() end, jump="firstbase"},
+		{_t"#LIGHT_GREEN#[Lean closer and kiss her]#WHITE#", action=function() game.zone.start_yaech() end, jump="firstbase"},
 	}
 }
 
 newChat{ id="firstbase",
-	text = [[Just before your lips touch, you sense that something is very wrong.
+	text = _t[[Just before your lips touch, you sense that something is very wrong.
 ]],
 	answers = {
-		{"#LIGHT_GREEN#[Continue...]#WHITE#"},
+		{_t"#LIGHT_GREEN#[Continue...]#WHITE#"},
 	}
 }
 

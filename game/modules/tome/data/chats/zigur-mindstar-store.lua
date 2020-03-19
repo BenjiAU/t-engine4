@@ -18,21 +18,21 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[Welcome @playername@ to my shop.]],
+	text = _t[[Welcome @playername@ to my shop.]],
 	answers = {
-		{"Let me see your wares.", action=function(npc, player)
+		{_t"Let me see your wares.", action=function(npc, player)
 			npc.store:loadup(game.level, game.zone)
 			npc.store:interact(player)
 		end},
-		{"I am looking for mindstar training.", jump="training"},
-		{"Sorry, I have to go!"},
+		{_t"I am looking for mindstar training.", jump="training"},
+		{_t"Sorry, I have to go!"},
 	}
 }
 
 newChat{ id="training",
-	text = [[I can teach you mindstar mastery (talent category Wild-gift/Mindstar mastery).  Learning the basics costs 100 gold, while more intensive training to gain proficiency costs 500 gold.  Once you're proficient, I can teach you some additional skills for 750 gold.]],
+	text = _t[[I can teach you mindstar mastery (talent category Wild-gift/Mindstar mastery).  Learning the basics costs 100 gold, while more intensive training to gain proficiency costs 500 gold.  Once you're proficient, I can teach you some additional skills for 750 gold.]],
 	answers = {
-		{"Just give me the basics (reveals locked talent category) - 100 gold.", action=function(npc, player) -- Normal basic training
+		{_t"Just give me the basics (reveals locked talent category) - 100 gold.", action=function(npc, player) -- Normal basic training
 			game.logPlayer(player, "The shopkeeper spends some time with you, teaching you the basics of channeling energy through mindstars.")
 			player:incMoney(-100)
 			player:learnTalentType("wild-gift/mindstar-mastery", false)
@@ -46,7 +46,7 @@ newChat{ id="training",
 			if player:knowTalentType("wild-gift/mindstar-mastery") or player:knowTalentType("wild-gift/mindstar-mastery") == false then return end
 			return true
 		end},
-		{"Please teach me what I need to know (unlocks talent category) - 500 gold.", action=function(npc, player)
+		{_t"Please teach me what I need to know (unlocks talent category) - 500 gold.", action=function(npc, player)
 			game.logPlayer(player, "The shopkeeper spends a great deal of time going over the finer details of channeling energy through mindstars with you.")
 			player:incMoney(-500)
 			player:learnTalentType("wild-gift/mindstar-mastery", true)
@@ -62,17 +62,17 @@ newChat{ id="training",
 			if player:knowTalentType("wild-gift/mindstar-mastery") then return end
 			return true
 		end},
-		{"I'm already proficient, but I want to be an expert (improves talent mastery by 0.2) - 750 gold.", action=function(npc, player) --Enhanced intensive training
+		{_t"I'm already proficient, but I want to be an expert (improves talent mastery by 0.2) - 750 gold.", action=function(npc, player) --Enhanced intensive training
 			player:incMoney(-750)
 			player:learnTalentType("wild-gift/mindstar-mastery", true)
 			player:setTalentTypeMastery("wild-gift/mindstar-mastery", player:getTalentTypeMastery("wild-gift/mindstar-mastery") + 0.2)
-			game.logPlayer(player, ("The shopkeeper spends a great deal of time going over the finer details of channeling energy through mindstars with you%s."):format(player:getTalentTypeMastery("wild-gift/mindstar-mastery")>1 and ", and teaches you enhanced mental discipline needed to maintain powerful energy fields" or ""))
+			game.logPlayer(player, ("The shopkeeper spends a great deal of time going over the finer details of channeling energy through mindstars with you%s."):tformat(player:getTalentTypeMastery("wild-gift/mindstar-mastery")>1 and _t", and teaches you enhanced mental discipline needed to maintain powerful energy fields" or ""))
 			player.changed = true
 		end, cond=function(npc, player)
 			if player.money < 750 then return end
 			if player:knowTalentType("wild-gift/mindstar-mastery") and player:getTalentTypeMastery("wild-gift/mindstar-mastery") < 1.2 then return true end
 		end},
-		{"No thanks."},
+		{_t"No thanks."},
 	}
 }
 

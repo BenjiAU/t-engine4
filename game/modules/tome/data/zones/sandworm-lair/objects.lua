@@ -23,7 +23,7 @@ for i = 1, 4 do
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE"..i,
 	name = "Song of the Sands", lore="sandworm-note-"..i,
-	desc = [[Some people get the weirdest ideas!]],
+	desc = _t[[Some people get the weirdest ideas!]],
 	rarity = false,
 }
 end
@@ -33,14 +33,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "SANDQUEEN_HEART",
 	type = "corpse", subtype = "heart", image = "object/artifact/queen_heart.png",
-	name = "Heart of the Sandworm Queen", unique=true, unided_name="pulsing organ",
+	name = "Heart of the Sandworm Queen", unique=true, unided_name=_t"pulsing organ",
 	display = "*", color=colors.VIOLET,
-	desc = [[The heart of the Sandworm Queen, ripped from her dead body.
+	desc = _t[[The heart of the Sandworm Queen, ripped from her dead body.
 You could ... consume it, should you feel mad enough or you could try to corrupt it somewhere.]],
 	cost = 3000,
 	quest = 1,
 
-	use_simple = { name="consume the heart", use = function(self, who)
+	use_simple = { name=_t"consume the heart", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You consume the heart and feel the knowledge of this very old creature fill you!")
 		who.unused_stats = who.unused_stats + 3
 		who.unused_talents = who.unused_talents + 1
@@ -75,13 +75,13 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "PUTRESCENT_POTION",
 	type = "corpse", subtype = "blood",
-	name = "Wyrm Bile", unique=true, unided_name="putrescent potion", image="object/artifact/vial_wyrm_bile.png",
+	name = "Wyrm Bile", unique=true, unided_name=_t"putrescent potion", image="object/artifact/vial_wyrm_bile.png",
 	display = "*", color=colors.VIOLET,
-	desc = [[A vial of thick, lumpy fluid. Who knows what this will do to you if you drink it?]],
+	desc = _t[[A vial of thick, lumpy fluid. Who knows what this will do to you if you drink it?]],
 	cost = 3000,
 	quest = 1,
 
-	use_simple = { name="drink the vile fluid", use = function(self, who)
+	use_simple = { name=_t"drink the vile fluid", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the wyrm bile and feel forever transformed!")
 		who.unused_talents_types = who.unused_talents_types + 1
 		game.log("You have %d category point(s) to spend. Press p to use them.", who.unused_talents_types)
@@ -105,7 +105,7 @@ newEntity{ base = "BASE_GEM",
 	define_as = "ATAMATHON_ACTIVATE",
 	subtype = "red",
 	name = "Atamathon's Lost Ruby Eye", color=colors.VIOLET, quest=true, unique=true, identified=true, image="object/artifact/atamathons_lost_ruby_eye.png",
-	desc = [[One of the ruby eyes of the legendary giant golem Atamathon.
+	desc = _t[[One of the ruby eyes of the legendary giant golem Atamathon.
 It is said it was made by the halflings during the Age of Pyre as a weapon against the orcs. Even though it was destroyed it managed to deal a crippling blow by killing their leader, Garkul the Devourer.]],
 	material_level = 5,
 	cost = 100,

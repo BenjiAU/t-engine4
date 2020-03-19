@@ -29,7 +29,7 @@ while not game.state:canEventGrid(level, x, y) and tries < 100 do
 end
 if tries < 100 then
 	local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
-	g.name = "grave"
+	g.name = _t"grave"
 	g.display='&' g.color_r=255 g.color_g=255 g.color_b=255 g.notice = true
 	g.always_remember = true g.special_minimap = colors.OLIVE_DRAB
 	g:removeAllMOs()
@@ -42,15 +42,15 @@ if tries < 100 then
 	g.grow = nil g.dig = nil
 	g.block_move = function(self, x, y, who, act, couldpass)
 		if not who or not who.player or not act then return false end
-		who:runStop("grave")
-		require("engine.ui.Dialog"):yesnoPopup("Grave", "Do you wish to disturb the grave?", function(ret) if ret then
+		who:runStop(_t"grave")
+		require("engine.ui.Dialog"):yesnoPopup(_t"Grave", _t"Do you wish to disturb the grave?", function(ret) if ret then
 			local g = game.level.map(x, y, engine.Map.TERRAIN)
 			g:removeAllMOs()
 			if g.add_displays then
 				local ov = g.add_displays[#g.add_displays]
 				ov.image = "terrain/grave_opened_0"..rng.range(1, 3).."_64.png"
 			end
-			g.name = "grave (opened)"
+			g.name = _t"grave (opened)"
 			game.level.map:updateMap(x, y)
 
 			self.block_move = nil

@@ -18,45 +18,45 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[What just happened?!]],
+	text = _t[[What just happened?!]],
 	answers = {
-		{"I'm sorry I didn't manage to protect you and as you were about to die you... fired a powerful wave of blight.", jump="next1"},
+		{_t"I'm sorry I didn't manage to protect you and as you were about to die you... fired a powerful wave of blight.", jump="next1"},
 	}
 }
 
 newChat{ id="next1",
-	text = [[But I have never cast a spell in my life!]],
+	text = _t[[But I have never cast a spell in my life!]],
 	answers = {
-		{"You are still tainted by that ... foul Demon! The taint is not all gone!", jump="next_am", cond=function(npc, player) return player:attr("forbid_arcane") end},
-		{"There must be some of that demon's taint still inside you.", jump="next_notam", cond=function(npc, player) return not player:attr("forbid_arcane") end},
+		{_t"You are still tainted by that ... foul Demon! The taint is not all gone!", jump="next_am", cond=function(npc, player) return player:attr("forbid_arcane") end},
+		{_t"There must be some of that demon's taint still inside you.", jump="next_notam", cond=function(npc, player) return not player:attr("forbid_arcane") end},
 	}
 }
 
 newChat{ id="next_am",
-	text = [[This is terrible! I assure you I had no idea this would happen. You must trust me!]],
+	text = _t[[This is terrible! I assure you I had no idea this would happen. You must trust me!]],
 	answers = {
-		{"I do. The Ziguranth are not raving zealots, you know. We will look for a way to cure you, as long as you reject the blight.", jump="next2"},
+		{_t"I do. The Ziguranth are not raving zealots, you know. We will look for a way to cure you, as long as you reject the blight.", jump="next2"},
 	}
 }
 
 newChat{ id="next_notam",
-	text = [[This is terrible! What is happening to me?!? You must help me!]],
+	text = _t[[This is terrible! What is happening to me?!? You must help me!]],
 	answers = {
-		{"I will. We will find a cure for this together.", jump="next2"},
+		{_t"I will. We will find a cure for this together.", jump="next2"},
 	}
 }
 
 newChat{ id="next2",
-	text = [[I'm a very lucky girl, am I not... This is the second time I've had you to save me now.]],
+	text = _t[[I'm a very lucky girl, am I not... This is the second time I've had you to save me now.]],
 	answers = {
-		{"Over the last weeks you've become very important to me, and I am glad to have you. This is certainly not the place to talk, though, let's go.", jump="next3"},
+		{_t"Over the last weeks you've become very important to me, and I am glad to have you. This is certainly not the place to talk, though, let's go.", jump="next3"},
 	}
 }
 
 newChat{ id="next3",
-	text = [[You're right, let's get out of here.]],
+	text = _t[[You're right, let's get out of here.]],
 	answers = {
-		{"#LIGHT_GREEN#[go back to Last Hope]", action=function(npc, player)
+		{_t"#LIGHT_GREEN#[go back to Last Hope]", action=function(npc, player)
 			game:changeLevel(1, "town-last-hope", {direct_switch=true})
 			player:move(25, 44, true)
 		end},

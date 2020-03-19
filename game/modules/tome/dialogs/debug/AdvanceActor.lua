@@ -35,13 +35,13 @@ _M.last_actors = {}
 function _M:init(data)
 	self.actor = data and data.actor or game.player
 	
-	Dialog.init(self, ("DEBUG -- Levelup Actor: [%s] %s"):format(self.actor.uid, self.actor.name), 800, 500)
+	Dialog.init(self, ("DEBUG -- Levelup Actor: [%s] %s"):tformat(self.actor.uid, self.actor.name), 800, 500)
 
 	-- set default inputs
 	self.inputs = {do_level_up=true, levelup=50, set_base_stats=true, set_bonus_stats=true}
 	
 	self.c_tut = Textzone.new{auto_width=true, auto_height=true, no_color_bleed=true, font=self.font,
-	text=[[Levelup an actor.
+	text=_t[[Levelup an actor.
 Optionally set Stat levels, learn all talents possible, and gain points to spend on Levelup. 
 The actor is backed up before changes are made.  (Use the "Restore" button to recover.)
 ]]}
@@ -58,7 +58,7 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 	}
 	self.do_level_up = do_level_up
 	
-	local lev_box = Numberbox.new{title=" Advance to Level: ", number=self.inputs.levelup, max=1000, min=1, chars=6, fct=function(value)
+	local lev_box = Numberbox.new{title=_t" Advance to Level: ", number=self.inputs.levelup, max=1000, min=1, chars=6, fct=function(value)
 			self.inputs.levelup = value
 			self:finish()
 		end,
@@ -73,9 +73,9 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 	local restore_text = function(self)
 		local last_actor = _M.last_actors[self.actor]
 		if last_actor and #last_actor > 0 then
-			return ("Restore: %s (v%d)"):format(last_actor[#last_actor].name, #last_actor), 1
+			return ("Restore: %s (v%d)"):tformat(last_actor[#last_actor].name, #last_actor), 1
 		else
-			return "Restore: none", 0.5
+			return _t"Restore: none", 0.5
 		end
 	end
 	local rest_text, rest_alpha = restore_text(self)
@@ -97,7 +97,7 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 	}
 	self.restore = restore
 	
-	local get_points = Checkbox.new{title="Gain points for stats, talents, and prodigies (unlimited respec)", text="Text", default=false, check_last=false,
+	local get_points = Checkbox.new{title=_t"Gain points for stats, talents, and prodigies (unlimited respec)", text="Text", default=false, check_last=false,
 		fct=function(checked)
 		end,
 		on_change=function(checked)
@@ -116,7 +116,7 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 	}
 	self.set_base_stats = set_base_stats
 	
-	local base_stat_box = Numberbox.new{title=" Force all BASE stats to: ", number=self:autoStatLevel(self.inputs.levelup), max=1000, min=1, chars=6, fct=function(value)
+	local base_stat_box = Numberbox.new{title=_t" Force all BASE stats to: ", number=self:autoStatLevel(self.inputs.levelup), max=1000, min=1, chars=6, fct=function(value)
 			self.inputs.base_stat_level = value
 		end,
 		on_change = function(value)
@@ -131,7 +131,7 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 	end
 	self.base_stat_box = base_stat_box
 
-	local set_bonus_stats = Checkbox.new{title="", default=self.inputs.set_bonus_stats, check_last=false,
+	local set_bonus_stats = Checkbox.new{title=_t"", default=self.inputs.set_bonus_stats, check_last=false,
 		fct=function(checked)
 			self.inputs.set_bonus_stats = checked
 		end,
@@ -141,7 +141,7 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 	}
 	self.set_bonus_stats = set_bonus_stats
 	
-	local bonus_stat_box = Numberbox.new{title=" Force all BONUS stats to: ", number=self:autoStatBonusLevel(self.inputs.levelup), max=1000, min=-50, chars=6, fct=function(value)
+	local bonus_stat_box = Numberbox.new{title=_t" Force all BONUS stats to: ", number=self:autoStatBonusLevel(self.inputs.levelup), max=1000, min=-50, chars=6, fct=function(value)
 			self.inputs.bonus_stat_level = value
 		end,
 		on_change = function(value)
@@ -156,7 +156,7 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 	end
 	self.bonus_stat_box = bonus_stat_box
 	
-	local set_tl = Checkbox.new{title="Learn Talents ", text="Text", default=false, check_last=true,
+	local set_tl = Checkbox.new{title=_t"Learn Talents ", text="Text", default=false, check_last=true,
 		fct=function(checked)
 		end,
 		on_change=function(checked)
@@ -164,7 +164,7 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 		end
 	}
 	self.set_tl = set_tl
-	local tl_box = Numberbox.new{title="Unlock & Learn all available talents to level: ", number="maximum allowed", max=1000, min=1, chars=20, fct=function(value)
+	local tl_box = Numberbox.new{title=_t"Unlock & Learn all available talents to level: ", number=_t"maximum allowed", max=1000, min=1, chars=20, fct=function(value)
 			self.tl_box:updateText(0)
 			self.inputs.talent_levelup = value
 			self:finish()
@@ -179,7 +179,7 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 	}
 	self.tl_box = tl_box
 
-	local force_tl = Checkbox.new{title="Ignore requirements", text="Text", default=false, check_last=false,
+	local force_tl = Checkbox.new{title=_t"Ignore requirements", text="Text", default=false, check_last=false,
 		fct=function(checked)
 			self.inputs.ignore_talent_limits = checked
 		end,
@@ -189,7 +189,7 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 	}
 	self.force_tl = force_tl
 	
-	local mastery_box = Numberbox.new{title="Force all talent mastery levels to (0.1-5.0): ", number="no change", max=5.0, min=0.1, chars=10, step=0.1, fct=function(value)
+	local mastery_box = Numberbox.new{title=_t"Force all talent mastery levels to (0.1-5.0): ", number=_t"no change", max=5.0, min=0.1, chars=10, step=0.1, fct=function(value)
 			local old = self.mastery_box.number
 			self.mastery_box:updateText(0)
 			self.inputs.set_mastery = value
@@ -207,7 +207,7 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 	}
 	self.mastery_box = mastery_box
 	
-	local learn_all_talents = Checkbox.new{title="Unlock all talent types (slow)", default=false, check_last=false,
+	local learn_all_talents = Checkbox.new{title=_t"Unlock all talent types (slow)", default=false, check_last=false,
 		fct=function(checked)
 			self.inputs.alltalents = checked
 		end,
@@ -217,8 +217,8 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 	}
 	self.learn_all_talents = learn_all_talents
 	
-	local ok = Button.new{text="Accept", fct=function() self:finish() end}
-	local cancel = Button.new{text="Cancel", fct=function() self:cancelclick() end}
+	local ok = Button.new{text=_t"Accept", fct=function() self:finish() end}
+	local cancel = Button.new{text=_t"Cancel", fct=function() self:cancelclick() end}
 
 	local top = lev_box.h + self.c_tut.h + 15
 	self:loadUI{
@@ -311,7 +311,7 @@ function _M:levelupActor(who, lev, data)
 	 -- backup the character
 	_M.last_actors[who] = _M.last_actors[who] or {}
 	table.insert(_M.last_actors[who], who:cloneFull())
---	game.log("#LIGHT_BLUE#Advancing actor %s[%s]", who.name, who.uid)
+--	game.log("#LIGHT_BLUE#Advancing actor %s[%s]", who:getName(), who.uid)
 	local tt_def=who.talents_types_def
 	who.lastLearntTalentsMax = function(what) return 500 end
 	
@@ -323,16 +323,16 @@ function _M:levelupActor(who, lev, data)
 	lev = who.level
 
 	if data.base_stat_level then
-		game.log("%s #GOLD#Forcing all Base Stats to %s", who.name, data.base_stat_level)
+		game.log("%s #GOLD#Forcing all Base Stats to %s", who:getName(), data.base_stat_level)
 		for stat = 1, 6 do
 			local inc = data.base_stat_level - who:getStat(stat, nil, nil, true)
 			who:incStat(stat, inc)
 		end
 	end
 	
-	if data.set_mastery then game.log("%s #GOLD#Resetting all talents_types_mastery to %s", who.name, data.set_mastery) end
+	if data.set_mastery then game.log("%s #GOLD#Resetting all talents_types_mastery to %s", who:getName(), data.set_mastery) end
 	if data.alltalents then
-		game.log("%s #GOLD#Unlocking All Talent Types", who.name)
+		game.log("%s #GOLD#Unlocking All Talent Types", who:getName())
 		for key, value in ipairs(tt_def) do
 			who:learnTalentType(tt_def[key].type)
 			game.log("#LIGHT_BLUE#%s -- %s", key, value.type)
@@ -366,7 +366,7 @@ function _M:levelupActor(who, lev, data)
 	
 	-- done last to reverse any passive stat bonuses from talents
 	if data.bonus_stat_level then
-		game.log("%s #GOLD#Forcing all Bonus Stats to %s", who.name, data.bonus_stat_level)
+		game.log("%s #GOLD#Forcing all Bonus Stats to %s", who:getName(), data.bonus_stat_level)
 		for stat = 1, 6 do
 			local inc = data.bonus_stat_level - (who:getStat(stat, nil, nil, false) - who:getStat(stat, nil, nil, true))
 			who:incIncStat(stat, inc)
@@ -383,11 +383,11 @@ function _M:levelupActor(who, lev, data)
 		who.unused_stats = who.unused_stats + 200
 
 		local points = {}
-		if who.unused_stats > 0 then points[#points+1] = ("%d stat point(s)"):format(who.unused_stats) end
-		if who.unused_talents > 0 then points[#points+1] = ("%d class talent point(s)"):format(who.unused_talents) end
-		if who.unused_generics > 0 then points[#points+1] = ("%d generic talent point(s)"):format(who.unused_generics) end
-		if who.unused_talents_types > 0 then points[#points+1] = ("%d category point(s)"):format(who.unused_talents_types) end
-		if who.unused_prodigies > 0 then points[#points+1] = ("#ORCHID#%d prodigy point(s)#LAST#"):format(who.unused_prodigies) end
-		if #points > 0 then game.log("#LIGHT_BLUE#%s has %s to spend", who.name:capitalize(), table.concatNice(points, ", ", ", and ")) end
+		if who.unused_stats > 0 then points[#points+1] = ("%d stat point(s)"):tformat(who.unused_stats) end
+		if who.unused_talents > 0 then points[#points+1] = ("%d class talent point(s)"):tformat(who.unused_talents) end
+		if who.unused_generics > 0 then points[#points+1] = ("%d generic talent point(s)"):tformat(who.unused_generics) end
+		if who.unused_talents_types > 0 then points[#points+1] = ("%d category point(s)"):tformat(who.unused_talents_types) end
+		if who.unused_prodigies > 0 then points[#points+1] = ("#ORCHID#%d prodigy point(s)#LAST#"):tformat(who.unused_prodigies) end
+		if #points > 0 then game.log("#LIGHT_BLUE#%s has %s to spend", who:getName():capitalize(), table.concatNice(points, ", ", _t", and ")) end
 	end
 end

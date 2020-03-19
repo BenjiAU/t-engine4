@@ -27,7 +27,7 @@ newEntity{
 	display = "\\", color=colors.LIGHT_BLUE, image = resolvers.image_material("pickaxe", "metal"),
 	encumber = 3,
 	rarity = 14,
-	desc = [[Allows you to dig a wall, remove a tree, create ways.]],
+	desc = _t[[Allows you to dig a wall, remove a tree, create ways.]],
 	add_name = " (#DIGSPEED#)",
 
 	carrier = {

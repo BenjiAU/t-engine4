@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 There's another pesky orc plugging the tunnel to the west, and some new tools in the cave to the north.
 
 Find a means to push that orc out of the way!  

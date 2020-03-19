@@ -36,16 +36,16 @@ function _M:init(player)
 	self.actor:removeAllMOs()
 	self.search_filter = nil
 
-	Dialog.init(self, "Shimmer Sets: "..player.name, 680, 500)
+	Dialog.init(self, ("Shimmer Sets: %s"):tformat(player.name), 680, 500)
 
 	self:generateList()
 
-	self.c_search = Textbox.new{title="Search: ", text="", chars=20, max_len=60, fct=function() end, on_change=function(text) self:search(text) end}
+	self.c_search = Textbox.new{title=_t"Search: ", text="", chars=20, max_len=60, fct=function() end, on_change=function(text) self:search(text) end}
 
-	self.c_list = ListColumns.new{columns={{name="Name", width=100, display_prop="name", sort="sortname"}}, hide_columns=true, scrollbar=true, width=300, height=self.ih - 5 - self.c_search.h, list=self.list, fct=function(item) self:use(item) end, select=function(item) self:select(item) end}
+	self.c_list = ListColumns.new{columns={{name=_t"Name", width=100, display_prop="name", sort="sortname"}}, hide_columns=true, scrollbar=true, width=300, height=self.ih - 5 - self.c_search.h, list=self.list, fct=function(item) self:use(item) end, select=function(item) self:select(item) end}
 	local donatortext = ""
 	if not profile:isDonator(1) then donatortext = "\n#{italic}##CRIMSON#This cosmetic feature is only available to donators/buyers. You can only preview.#WHITE##{normal}#" end
-	local help = Textzone.new{width=math.floor(self.iw - self.c_list.w - 20), height=self.ih, no_color_bleed=true, auto_height=true, text="You can switch your appearance to a saved set of shimmers.\n#{bold}#This is a purely cosmetic change.#{normal}#"..donatortext}
+	local help = Textzone.new{width=math.floor(self.iw - self.c_list.w - 20), height=self.ih, no_color_bleed=true, auto_height=true, text=_t"You can switch your appearance to a saved set of shimmers.\n#{bold}#This is a purely cosmetic change.#{normal}#"..donatortext}
 	local actorframe = ActorFrame.new{actor=self.actor, w=128, h=128}
 
 	self:loadUI{
@@ -70,7 +70,7 @@ function _M:use(item)
 	if profile:isDonator(1) then
 		if item.id == "current" then
 			local set = table.clone(self.true_actor.shimmer_current_outfit, true)
-			local d = GetText.new("Save Outfit", "Outfit name?", 1, 100, function(text)
+			local d = GetText.new(_t"Save Outfit", _t"Outfit name?", 1, 100, function(text)
 				set.name = text
 				world.shimmer_sets[set.name] = set
 				self:generateList()
@@ -81,9 +81,9 @@ function _M:use(item)
 			self:applyShimmers(self.true_actor, item.set)
 		end
 	else
-		Dialog:yesnoPopup("Donator Cosmetic Feature", "This cosmetic feature is only available to donators/buyers.", function(ret) if ret then
-			game:registerDialog(require("mod.dialogs.Donation").new("shimmer ingame"))
-		end end, "Donate", "Cancel")
+		Dialog:yesnoPopup(_t"Donator Cosmetic Feature", _t"This cosmetic feature is only available to donators/buyers.", function(ret) if ret then
+			game:registerDialog(require("mod.dialogs.Donation").new(_t"shimmer ingame"))
+		end end, _t"Donate", _t"Cancel")
 	end
 end
 
@@ -114,7 +114,7 @@ function _M:generateList()
 
 	if self:matchSearch("current") then
 		list[#list+1] = {
-			name = "#GOLD#[save current outfit]",
+			name = _t"#GOLD#[save current outfit]",
 			id = "current",
 			sortname = "--",
 		}

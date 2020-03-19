@@ -120,7 +120,7 @@ defineTile('W', "FLOOR", nil,
    end,
    random_filter={special_rarity="wyrm_rarity",
       add_levels=10,
-      random_boss={name_scheme="Sleeping #rng#", force_classes={Wyrmic=true}, class_filter=function(d) return d.power_source and ((d.power_source.nature or d.power_source.technique) and not d.power_source.arcane) end, loot_quality="store", loot_quantity=1, rank=3.5}
+      random_boss={name_scheme=_t"Sleeping #rng#", force_classes={Wyrmic=true}, class_filter=function(d) return d.power_source and ((d.power_source.nature or d.power_source.technique) and not d.power_source.arcane) and d.name ~= "Wyrmic" end, loot_quality="store", loot_quantity=1, rank=3.5}
       }
    }
 )
@@ -135,7 +135,7 @@ defineTile('D', "FLOOR", nil,
       return e
    end,
    random_filter={special_rarity="drake_rarity",
-      random_boss={name_scheme="Dozing #rng#", force_classes={Wyrmic=true}, class_filter=function(d) return d.power_source and ((d.power_source.nature or d.power_source.technique) and not d.power_source.arcane) end, nb_classes=1, loot_quality="store", loot_quantity=1, rank=3.5}
+      random_boss={name_scheme=_t"Dozing #rng#", force_classes={Wyrmic=true}, class_filter=function(d) return d.power_source and ((d.power_source.nature or d.power_source.technique) and not d.power_source.arcane) and d.name ~= "Wyrmic" end, nb_classes=1, loot_quality="store", loot_quantity=1, rank=3.5}
       }
    }
 )

@@ -30,13 +30,13 @@ uberTalent{
 	end,
 	info = function(self, t)
 		return ([[Each time that you make a melee attack you have a 50%% chance to execute an additional unarmed strike.]])
-		:format()
+		:tformat()
 	end,
 }
 
 uberTalent{
 	name = "Through The Crowd",
-	require = { special={desc="Have had at least 6 party members at the same time", fct=function(self)
+	require = { special={desc=_t"Have had at least 6 party members at the same time", fct=function(self)
 		return self:attr("huge_party")
 	end} },
 	mode = "sustained",
@@ -84,7 +84,7 @@ uberTalent{
 		- you can never damage your friends or neutral creatures while this talent is active.
 		- you love being surrounded by friends; for each friendly creature in sight you gain +10 to all saves and +3%% to global speed (max 15%%)
 		- every party member is also automatically granted Through The Crowd]])
-		:format()
+		:tformat()
 	end,
 }
 
@@ -105,14 +105,14 @@ uberTalent{
 		return ([[You have very agile hands; swapping equipment sets (default q key) takes no time, nor does equipping/unequipping items.
 		The free item switch may only happen once per turn.
 		The cooldown for equipping activatable equipment is removed.]])
-		:format()
+		:tformat()
 	end,
 }
 
 uberTalent{
 	name = "Windblade",
 	mode = "activated",
-	require = { special={desc="Have dealt over 50000 damage with dual wielded weapons", fct=function(self) return self.damage_log and self.damage_log.weapon.dualwield and self.damage_log.weapon.dualwield >= 50000 end} },
+	require = { special={desc=_t"Have dealt over 50000 damage with dual wielded weapons", fct=function(self) return self.damage_log and self.damage_log.weapon.dualwield and self.damage_log.weapon.dualwield >= 50000 end} },
 	cooldown = 12,
 	radius = 4,
 	range = 0,
@@ -139,14 +139,14 @@ uberTalent{
 	end,
 	info = function(self, t)
 		return ([[You spin madly, generating a sharp gust of wind with your weapons that deals 320%% weapon damage to all targets within radius 4 and disarms them for 4 turns.]])
-		:format()
+		:tformat()
 	end,
 }
 
 uberTalent{
 	name = "Windtouched Speed",
 	mode = "passive",
-	require = { special={desc="Know at least 10 talent levels of equilibrium-using talents", fct=function(self) return knowRessource(self, "equilibrium", 10) end} },
+	require = { special={desc=_t"Know at least 10 talent levels of equilibrium-using talents", fct=function(self) return knowRessource(self, "equilibrium", 10) end} },
 	on_learn = function(self, t)
 		self:attr("global_speed_add", 0.2)
 		self:attr("avoid_pressure_traps", 1)
@@ -162,7 +162,7 @@ uberTalent{
 	info = function(self, t)
 		return ([[You are attuned with Nature, and she helps you in your fight against the arcane forces.
 		You gain 20%% permanent global speed, 10%% cooldowns reduction and do not trigger pressure traps.]])
-		:format()
+		:tformat()
 	end,
 }
 
@@ -171,12 +171,12 @@ uberTalent{
 	mode = "passive",
 	no_npc_use = true,
 	cant_steal = true,
-	require = { special={desc="Know Imbue Item to level 5", fct=function(self)
+	require = { special={desc=_t"Know Imbue Item to level 5", fct=function(self)
 		return self:getTalentLevelRaw(self.T_IMBUE_ITEM) >= 5
 	end} },
 	info = function(self, t)
 		return ([[You are very crafty. You can now also embed gems into helms and belts.]])
-		:format()
+		:tformat()
 	end,
 }
 
@@ -189,7 +189,7 @@ uberTalent{
 		else return {ESCAPE = 2, DEFEND = 2}
 		end
 	end,
-	require = { special={desc="Have been knocked around at least 50 times", fct=function(self) return self:attr("knockback_times") and self:attr("knockback_times") >= 50 end} },
+	require = { special={desc=_t"Have been knocked around at least 50 times", fct=function(self) return self:attr("knockback_times") and self:attr("knockback_times") >= 50 end} },
 	-- Called by default projector in mod.data.damage_types.lua
 	getMult = function(self, t) return self:combatLimit(self:getDex(), 0.7, 0.9, 50, 0.85, 100) end, -- Limit > 70% damage taken
 	activate = function(self, t)
@@ -206,7 +206,7 @@ uberTalent{
 		So long as you can move, you find a way to dodge, evade, deflect or otherwise reduce physical damage against you by %d%%.
 		Once per turn, when you get hit by a melee or archery attack you move back one tile for free and gain 200%% movement speed for a turn.
 		The damage avoidance scales with your Dexterity and applies after resistances.]])
-		:format(100*(1-t.getMult(self, t)))
+		:tformat(100*(1-t.getMult(self, t)))
 	end,
 }
 
@@ -215,7 +215,7 @@ uberTalent{
 	no_energy = "fake",
 	cooldown = 10,
 	range = archery_range,
-	require = { special={desc="Have dealt over 50000 damage with ranged weapons", fct=function(self) return self.damage_log and self.damage_log.weapon.archery and self.damage_log.weapon.archery >= 50000 end} },
+	require = { special={desc=_t"Have dealt over 50000 damage with ranged weapons", fct=function(self) return self.damage_log and self.damage_log.weapon.archery and self.damage_log.weapon.archery >= 50000 end} },
 	tactical = { ATTACK = { weapon = 3 }, DISABLE = {2, stun = 2}},
 	requires_target = true,
 	on_pre_use = function(self, t, silent) return archerPreUse(self, t, silent) end,
@@ -234,6 +234,6 @@ uberTalent{
 	info = function(self, t)
 		return ([[You fire a shot straight at your enemy's vital areas, wounding them terribly.
 		Enemies hit by this shot will take 450%% weapon damage and will be stunned and crippled (losing 50%% physical, magical and mental attack speeds) for five turns due to the devastating impact of the shot.
-		The stun and cripple chances increase with your Accuracy.]]):format()
+		The stun and cripple chances increase with your Accuracy.]]):tformat()
 	end,
 }

@@ -51,7 +51,7 @@ newTalent{
 		Only one arcane eye can exist at any given time.
 		At level 4, if cast on a creature it will follow it until it expires, or until the creature dies.
 		At level 5, it will place a magical marker on the creatures, negating invisibility and stealth effects.]]):
-		format(duration, radius)
+		tformat(duration, radius)
 	end,
 }
 
@@ -88,7 +88,7 @@ newTalent{
 		return ([[You focus your senses, getting information from moments in the future.
 		Improves your capacity to see invisible foes by +%d, to see through stealth by +%d, and to perform a critical spell cast by +%d%%.
 		The effects will improve with your Spellpower.]]):
-		format(seeinvisible, seestealth, criticalchance)
+		tformat(seeinvisible, seestealth, criticalchance)
 	end,
 }
 
@@ -110,7 +110,7 @@ newTalent{
 	info = function(self, t)
 		local radius = t.getRadius(self, t)
 		return ([[Form a map of your surroundings in your mind in a radius of %d]]):
-		format(radius)
+		tformat(radius)
 	end,
 }
 
@@ -145,6 +145,6 @@ newTalent{
 		return ([[Echoes of the future flash before your eyes, allowing you to sense some incoming attacks.
 		If the attack is not physical, you will erect a temporary shield that reduces all damage of this type by %d%% for 5 turns.
 		This effect can only happen once every 5 turns, and happens before damage is taken.
-		The bonus will increase with your Spellpower.]]):format(resist)
+		The bonus will increase with your Spellpower.]]):tformat(resist)
 	end,
 }

@@ -30,7 +30,7 @@ module(..., package.seeall, class.inherit(Dialog))
 function _M:init(actor, def)
 	self.actor = actor
 	self.def = def
-	Dialog.init(self, "Define tactical talents usage", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
+	Dialog.init(self, _t"Define tactical talents usage", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
 
 	local vsep = Separator.new{dir="horizontal", size=self.ih - 10}
 	local halfwidth = math.floor((self.iw - vsep.w)/2)
@@ -38,13 +38,13 @@ function _M:init(actor, def)
 %s is listening attentively, and wants to know what talents to use.
 You can modify the tactical weights of various talents to increase or decrease their use.  The weights are multiplicative (zero will turn the talent off) and relative (changing everything to a weight of 2 will not alter how talents are used relative to each other).
 Word travels fast in Maj'Eyal, and if %s is a summon all future summons of the same type will remember your preferences.
-]]):format(actor.name:capitalize(), actor.name)}
+]]):tformat(actor:getName():capitalize(), actor:getName())}
 	self.c_desc = TextzoneList.new{width=halfwidth, height=self.ih, no_color_bleed=true}
 
 	self.c_list = ListColumns.new{width=halfwidth, height=self.ih - 10, sortable=true, scrollbar=true, columns={
-		{name="", width={20,"fixed"}, display_prop="char", sort="id"},
-		{name="Talent Name", width=72, display_prop="name", sort="name"},
-		{name="Weight", width=20, display_prop="multiplier", sort="multiplier"},
+		{name=_t"", width={20,"fixed"}, display_prop="char", sort="id"},
+		{name=_t"Talent Name", width=72, display_prop="name", sort="name"},
+		{name=_t"Weight", width=20, display_prop="multiplier", sort="multiplier"},
 	}, list={}, fct=function(item) self:use(item) end, select=function(item, sel) self:select(item) end}
 
 	self:generateList()
@@ -88,7 +88,7 @@ function _M:use(item)
 	if not self.actor.ai_talents then
 		self.actor.ai_talents = {}
 	end
-	game:registerDialog(GetQuantity.new("Enter the talent weight multiplier", "0 is off, 1 is normal", item.multiplier, nil, function(qty)
+	game:registerDialog(GetQuantity.new(_t"Enter the talent weight multiplier", _t"0 is off, 1 is normal", item.multiplier, nil, function(qty)
 			self.actor.ai_talents[item.tid] = qty
 			self:generateList()
 	end), 1)

@@ -34,25 +34,21 @@ local Module = require "engine.Module"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init()
-	Dialog.init(self, "Main Menu", 250, 400, 450, 50)
+	Dialog.init(self, _t"Main Menu", 250, 400, 450, 50)
 	self.__showup = false
 	self.__main_menu = true
 	self.absolute = true
 
 	local l = {}
 	self.list = l
-	l[#l+1] = {name="New Game", fct=function() game:registerDialog(require("mod.dialogs.NewGame").new()) end}
-	l[#l+1] = {name="Load Game", fct=function() game:registerDialog(require("mod.dialogs.LoadGame").new()) end}
---	l[#l+1] = {name="Online Profile", fct=function() game:registerDialog(require("mod.dialogs.Profile").new()) end}
-	-- l[#l+1] = {name="View High Scores", fct=function() game:registerDialog(require("mod.dialogs.ViewHighScores").new()) end}
-	l[#l+1] = {name="Addons", fct=function() game:registerDialog(require("mod.dialogs.Addons").new()) end}
---	if config.settings.install_remote then l[#l+1] = {name="Install Module", fct=function() end} end
---	l[#l+1] = {name="Update", fct=function() game:registerDialog(require("mod.dialogs.UpdateAll").new()) end}
-	l[#l+1] = {name="Options", fct=function()
+	l[#l+1] = {name=_t"New Game", fct=function() game:registerDialog(require("mod.dialogs.NewGame").new()) end}
+	l[#l+1] = {name=_t"Load Game", fct=function() game:registerDialog(require("mod.dialogs.LoadGame").new()) end}
+	l[#l+1] = {name=_t"Addons", fct=function() game:registerDialog(require("mod.dialogs.Addons").new()) end}
+	l[#l+1] = {name=_t"Options", fct=function()
 		local list = {
 			"resume",
 			"keybinds_all",
-			{"Game Options", function()
+			{_t"Game Options", function()
 				-- OMFG this is such a nasty hack, I'm nearly pround of it !
 				local mod = Module:listModules().tome
 				if not mod then return end
@@ -68,6 +64,7 @@ function _M:init()
 				end
 				game:registerDialog(d)
 			end},
+			"language",
 			"video",
 			"sound",
 			"steam",
@@ -76,17 +73,17 @@ function _M:init()
 		local menu = require("engine.dialogs.GameMenu").new(list)
 		game:registerDialog(menu)
 	end}
-	l[#l+1] = {name="Credits", fct=function() game:registerDialog(require("mod.dialogs.Credits").new()) end}
-	l[#l+1] = {name="Exit", fct=function() game:onQuit() end}
-	if config.settings.cheat then l[#l+1] = {name="Reboot", fct=function() util.showMainMenu() end} end
+	l[#l+1] = {name=_t"Credits", fct=function() game:registerDialog(require("mod.dialogs.Credits").new()) end}
+	l[#l+1] = {name=_t"Exit", fct=function() game:onQuit() end}
+	if config.settings.cheat then l[#l+1] = {name=_t"Reboot", fct=function() util.showMainMenu() end} end
 	-- if config.settings.cheat then l[#l+1] = {name="webtest", fct=function() util.browserOpenUrl("http://google.com") end} end
 --	if config.settings.cheat then l[#l+1] = {name="webtest", fct=function() util.browserOpenUrl("asset://te4/html/test.html") end} end
 	-- if config.settings.cheat then l[#l+1] = {name="foo", fct=function() Dialog:simpleWaiter("Test", "Test", 500, nil, 500) end} end
 	-- if config.settings.cheat then l[#l+1] = {name="foo", fct=function() if core.game.CProfiler then core.game.CProfiler("luastarted.profiler.prof") end end} end
 
-	self.c_background = Checkbox.new{title="Disable animated background", default=config.settings.boot_menu_background and true or false, on_change=function() self:switchBackground() end}
+	self.c_background = Checkbox.new{title=_t"Disable animated background", default=config.settings.boot_menu_background and true or false, on_change=function() self:switchBackground() end}
 	-- self.c_background = Button.new{text=game.stopped and "Enable background" or "Disable background", fct=function() self:switchBackground() end}
-	self.c_version = Textzone.new{font={FontPackage:getFont("default"), 10}, auto_width=true, auto_height=true, text=("#{bold}##B9E100#T-Engine4 version: %d.%d.%d"):format(engine.version[1], engine.version[2], engine.version[3])}
+	self.c_version = Textzone.new{font={FontPackage:getFont("default"), 10}, auto_width=true, auto_height=true, text=("#{bold}##B9E100#T-Engine4 version: %d.%d.%d"):tformat(engine.version[1], engine.version[2], engine.version[3])}
 
 	self.c_list = List.new{width=self.iw, nb_items=#self.list, list=self.list, fct=function(item) end, font={FontPackage:getFont("default")}}
 
@@ -140,7 +137,7 @@ function _M:setupDLCButtons()
 		local posx, posy = self:getLastPosition()
 		if v then game:floatingTooltip(posx, posy, "top", {
 			Image.new{file="dlcs-icons/ashes-banner.png", width=467, height=181},
-[[#{bold}##GOLD#Ashes of Urh'Rok - Expansion#LAST##{normal}#
+_t[[#{bold}##GOLD#Ashes of Urh'Rok - Expansion#LAST##{normal}#
 #{italic}##ANTIQUE_WHITE#Many in Maj'Eyal have heard of "demons", sadistic creatures who appear seemingly from nowhere, leaving a trail of suffering and destruction wherever they go.#{normal}##LAST#
 
 #{bold}#Features#{normal}#:
@@ -149,7 +146,7 @@ function _M:setupDLCButtons()
 #LIGHT_UMBER#New race:#WHITE# Doomelves. Shalore who've taken to the demonic alterations especially well, corrupting their typical abilities into a darker form.
 #LIGHT_UMBER#New artifacts, lore, zones, events...#WHITE# For your demonic delight!
 
-]]..(has_ashes and "\n#LIGHT_GREEN#Installed" or "#YELLOW#Not installed - Click to download / purchase")})
+]]..(has_ashes and _t"#LIGHT_GREEN#Installed" or _t"#YELLOW#Not installed - Click to download / purchase")})
 		else game:floatingTooltip(nil)
 		end
 	end
@@ -157,7 +154,7 @@ function _M:setupDLCButtons()
 		local posx, posy = self:getLastPosition()
 		if v then game:floatingTooltip(posx, posy, "top", {
 			Image.new{file="dlcs-icons/embers-banner.png", width=467, height=181},
-[[#{bold}##GOLD#Embers of Rage - Expansion#LAST##{normal}#
+_t[[#{bold}##GOLD#Embers of Rage - Expansion#LAST##{normal}#
 #{italic}##ANTIQUE_WHITE#One year has passed since the one the Orcs call the "Scourge from the West" came and single-handedly crushed the Orc Prides of Grushnak, Vor, Gorbat, and Rak'Shor.  The Allied Kingdoms, now linked by farportal to their distant, long-lost Sunwall allies, have helped them conquer most of Var'Eyal.  The few remnants of the ravaged Prides are caged...  but one Pride remains.#{normal}##LAST#
 
 #{bold}#Features#{normal}#:
@@ -168,7 +165,7 @@ function _M:setupDLCButtons()
 #LIGHT_UMBER#Salves:#WHITE# Bound to the tinker system, create powerful medical salves to inject into your skin, replacing the infusions§runes system.
 #LIGHT_UMBER#A ton#WHITE# of artifacts, lore, zones, events... 
 
-]]..(has_embers and "\n#LIGHT_GREEN#Installed" or "#YELLOW#Not installed - Click to download / purchase")})
+]]..(has_embers and _t"#LIGHT_GREEN#Installed" or _t"#YELLOW#Not installed - Click to download / purchase")})
 		else game:floatingTooltip(nil)
 		end
 	end
@@ -176,7 +173,7 @@ function _M:setupDLCButtons()
 		local posx, posy = self:getLastPosition()
 		if v then game:floatingTooltip(posx, posy, "top", {
 			Image.new{file="dlcs-icons/cults-banner.png", width=467, height=181},
-[[#{bold}##GOLD#Forgotten Cults - Expansion#LAST##{normal}#
+_t[[#{bold}##GOLD#Forgotten Cults - Expansion#LAST##{normal}#
 #{italic}##ANTIQUE_WHITE#Not all adventurers seek fortune, not all that defend the world have good deeds in mind. Lately the number of sightings of horrors have grown tremendously. People wander off the beaten paths only to be found years later, horribly mutated and partly insane, if they are found at all. It is becoming evident something is stirring deep below Maj'Eyal. That something is you.#{normal}##LAST#
 
 #{bold}#Features#{normal}#:
@@ -189,7 +186,7 @@ function _M:setupDLCButtons()
 #LIGHT_UMBER#Sick of your own head:#WHITE#  Replace it with a nice cozy horror!
 #LIGHT_UMBER#A ton#WHITE# of artifacts, lore, events... 
 
-]]..(has_cults and "\n#LIGHT_GREEN#Installed" or "#YELLOW#Not installed - Click to download / purchase")})
+]]..(has_cults and _t"#LIGHT_GREEN#Installed" or _t"#YELLOW#Not installed - Click to download / purchase")})
 		else game:floatingTooltip(nil)
 		end
 	end
@@ -286,11 +283,11 @@ end
 function _M:uiLogin(uis)
 	if core.steam then return self:uiLoginSteam(uis) end
 
-	local str = Textzone.new{auto_width=true, auto_height=true, text="#GOLD#Online Profile"}
-	local bt = Button.new{text="Login", width=50, fct=function() self:login() end}
-	local btr = Button.new{text="Register", fct=function() self:register() end}
-	self.c_login = Textbox.new{title="Username: ", text="", chars=16, max_len=200, fct=function(text) self:login() end}
-	self.c_pass = Textbox.new{title="Password: ", size_title=self.c_login.title, text="", chars=16, max_len=200, hide=true, fct=function(text) self:login() end}
+	local str = Textzone.new{auto_width=true, auto_height=true, text=_t"#GOLD#Online Profile"}
+	local bt = Button.new{text=_t"Login", width=50, fct=function() self:login() end}
+	local btr = Button.new{text=_t"Register", fct=function() self:register() end}
+	self.c_login = Textbox.new{title=_t"Username: ", text="", chars=16, max_len=200, fct=function(text) self:login() end}
+	self.c_pass = Textbox.new{title=_t"Password: ", size_title=self.c_login.title, text="", chars=16, max_len=200, hide=true, fct=function(text) self:login() end}
 
 	uis[#uis+1] = {left=10, bottom=bt.h + self.c_login.h + self.c_pass.h + str.h, ui=Separator.new{dir="vertical", size=self.iw - 20}}
 	uis[#uis+1] = {hcenter=0, bottom=bt.h + self.c_login.h + self.c_pass.h, ui=str}
@@ -301,8 +298,8 @@ function _M:uiLogin(uis)
 end
 
 function _M:uiLoginSteam(uis)
-	local str = Textzone.new{auto_width=true, auto_height=true, text="#GOLD#Online Profile"}
-	local bt = Button.new{text="Login with Steam", fct=function() self:loginSteam() end}
+	local str = Textzone.new{auto_width=true, auto_height=true, text=_t"#GOLD#Online Profile"}
+	local bt = Button.new{text=_t"Login with Steam", fct=function() self:loginSteam() end}
 
 	uis[#uis+1] = {left=10, bottom=bt.h + str.h, ui=Separator.new{dir="vertical", size=self.iw - 20}}
 	uis[#uis+1] = {hcenter=0, bottom=bt.h, ui=str}
@@ -311,10 +308,10 @@ end
 
 function _M:uiStats(uis)
 	self.logged_url = "https://te4.org/users/"..profile.auth.page
-	local str1 = Textzone.new{auto_width=true, auto_height=true, text="#GOLD#Online Profile#WHITE#"}
-	local str2 = Textzone.new{auto_width=true, auto_height=true, text="#LIGHT_BLUE##{underline}#"..self.logged_url.."#LAST##{normal}#", fct=function() util.browserOpenUrl(self.logged_url, {is_external=true}) end}
+	local str1 = Textzone.new{auto_width=true, auto_height=true, text=_t"#GOLD#Online Profile#WHITE#"}
+	local str2 = Textzone.new{auto_width=true, auto_height=true, text=("#LIGHT_BLUE##{underline}#%s#LAST##{normal}#"):tformat(self.logged_url), fct=function() util.browserOpenUrl(self.logged_url, {is_external=true}) end}
 
-	local logoff = Textzone.new{text="#LIGHT_BLUE##{underline}#Logout", auto_height=true, width=50, fct=function() self:logout() end}
+	local logoff = Textzone.new{text=_t"#LIGHT_BLUE##{underline}#Logout", auto_height=true, width=50, fct=function() self:logout() end}
 
 	uis[#uis+1] = {left=10, bottom=logoff.h + str2.h + str1.h, ui=Separator.new{dir="vertical", size=self.iw - 20}}
 	uis[#uis+1] = {hcenter=0, bottom=logoff.h + str2.h, ui=str1}
@@ -324,22 +321,22 @@ end
 
 function _M:login()
 	if self.c_login.text:len() < 2 then
-		Dialog:simplePopup("Username", "Your username is too short")
+		Dialog:simplePopup(_t"Username", _t"Your username is too short")
 		return
 	end
 	if self.c_pass.text:len() < 4 then
-		Dialog:simplePopup("Password", "Your password is too short")
+		Dialog:simplePopup(_t"Password", _t"Your password is too short")
 		return
 	end
 	game:createProfile({create=false, login=self.c_login.text, pass=self.c_pass.text})
 end
 
 function _M:loginSteam()
-	local d = self:simpleWaiter("Login...", "Login in your account, please wait...") core.display.forceRedraw()
-	d:timeout(10, function() Dialog:simplePopup("Steam", "Steam client not found.")	end)
+	local d = self:simpleWaiter(_t"Login...", _t"Login in your account, please wait...") core.display.forceRedraw()
+	d:timeout(10, function() Dialog:simplePopup("Steam", _t"Steam client not found.")	end)
 	core.steam.sessionTicket(function(ticket)
 		if not ticket then
-			Dialog:simplePopup("Steam", "Steam client not found.")
+			Dialog:simplePopup("Steam", _t"Steam client not found.")
 			d:done()
 			return
 		end

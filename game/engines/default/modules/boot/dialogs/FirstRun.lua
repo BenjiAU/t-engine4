@@ -28,14 +28,14 @@ local Button = require "engine.ui.Button"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init(text)
-	Dialog.init(self, "Welcome to Tales of Maj'Eyal", math.min(800, game.w * 0.9), 200)
+	Dialog.init(self, _t"Welcome to Tales of Maj'Eyal", math.min(800, game.w * 0.9), 200)
 
 	local c_desc = Textzone.new{width=self.iw, auto_height=true, text=text}
 
-	local c_register = Button.new{text="Register now!", fct=function() self:doRegister() end}
-	local c_login = Button.new{text="Login existing account", fct=function() self:doLogin() end}
-	local c_later = Button.new{text="Maybe later", fct=function() self:doLater() end}
-	local c_disable = Button.new{text="#RED#Disable all online features", fct=function() self:doDisable() end}
+	local c_register = Button.new{text=_t"Register now!", fct=function() self:doRegister() end}
+	local c_login = Button.new{text=_t"Login existing account", fct=function() self:doLogin() end}
+	local c_later = Button.new{text=_t"Maybe later", fct=function() self:doLater() end}
+	local c_disable = Button.new{text=_t"#RED#Disable all online features", fct=function() self:doDisable() end}
 
 	self:loadUI{
 		{left=0, top=0, ui=c_desc},
@@ -48,7 +48,7 @@ function _M:init(text)
 end
 
 function _M:doDisable()
-	Dialog:yesnoLongPopup("Disable all connectivity", [[You are about to disable all connectivity to the network.
+	Dialog:yesnoLongPopup(_t"Disable all connectivity", _t[[You are about to disable all connectivity to the network.
 This includes, but is not limited to:
 - Player profiles: You will not be able to login, register
 - Characters vault: You will not be able to upload any character to the online vault to show your glory
@@ -67,7 +67,7 @@ If you disable this option you can always re-activate it in the Online category 
 		game:saveSettings("disable_all_connectivity", ("disable_all_connectivity = true\n"))
 		game:saveSettings("firstrun_gdpr", ("firstrun_gdpr = true\n"))
 		util.showMainMenu()
-	end end, "Cancel", "#RED#Disable all!", true)
+	end end, _t"Cancel", _t"#RED#Disable all!", true)
 end
 
 function _M:doLater()

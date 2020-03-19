@@ -72,7 +72,7 @@ newTalent{
 			local proj = require("mod.class.Projectile"):makeHoming(
 				self,
 				{particle="arrow", particle_args={tile="particles_images/temporal_bolt", proj_x=self.x, proj_y=self.y, src_x=x, src_y=y}, trail="trail_paradox"},
-				{speed=3, name="Temporal Bolt", dam=dam, cdr=cdr, start_x=x, start_y=y},
+				{speed=3, name=_t"Temporal Bolt", dam=dam, cdr=cdr, start_x=x, start_y=y},
 				self, self:getTalentRange(t),
 				function(self, src)
 					local talent = src:getTalentFromId 'T_TEMPORAL_BOLT'
@@ -112,7 +112,7 @@ newTalent{
 		return ([[Pull a bolt of temporal energy back through time.  The bolt will home in on your location, dealing %0.2f temporal damage to targets, and reducing the cooldown of one chronomancy talent on cooldown by one turn per enemy hit.
 		The bolt gains 5%% damage each time it moves and the damage will scale with your Spellpower.
 		At talent level five cooldowns are reduced by two.]]):
-		format(damDesc(self, DamageType.TEMPORAL, damage))
+		tformat(damDesc(self, DamageType.TEMPORAL, damage))
 	end,
 }
 
@@ -141,7 +141,7 @@ newTalent{
 		if not target then return end
 
 		if target:attr("timetravel_immune") then
-			game.logSeen(target, "%s is immune!", target.name:capitalize())
+			game.logSeen(target, "%s is immune!", target:getName():capitalize())
 			return true
 		end
 
@@ -157,7 +157,7 @@ newTalent{
 		-- Check hit
 		local power = getParadoxSpellpower(self, t)
 		local hit = self:checkHit(power, target:combatSpellResist() + (target:attr("continuum_destabilization") or 0))
-		if not hit then game.logSeen(target, "%s resists!", target.name:capitalize()) return true end
+		if not hit then game.logSeen(target, "%s resists!", target:getName():capitalize()) return true end
 		
 		-- Apply spellshock and destabilization
 		target:crossTierEffect(target.EFF_SPELLSHOCKED, getParadoxSpellpower(self, t))
@@ -168,7 +168,7 @@ newTalent{
 		if (oe and oe:attr("temporary")) or game.level.map:checkEntity(x, y, Map.TERRAIN, "block_move") then game.logPlayer(self, "Something has prevented the timetravel.") return true end
 		local e = mod.class.Object.new{
 			old_feat = oe, type = "temporal", subtype = "instability",
-			name = "temporal instability",
+			name = _t"temporal instability",
 			display = '&', color=colors.LIGHT_BLUE,
 			temporary = t.getDuration(self, t),
 			canAct = false,
@@ -200,7 +200,7 @@ newTalent{
 		}
 		
 		-- Remove the target
-		game.logSeen(target, "%s has moved forward in time!", target.name:capitalize())
+		game.logSeen(target, "%s has moved forward in time!", target:getName():capitalize())
 		game.level:removeEntity(target, true)
 		
 		-- add the time skip object to the map
@@ -216,7 +216,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local duration = t.getDuration(self, t)
 		return ([[Inflicts %0.2f temporal damage.  If your target survives, it may be removed from time for %d turns.
-		The damage will scale with your Spellpower.]]):format(damDesc(self, DamageType.TEMPORAL, damage), duration)
+		The damage will scale with your Spellpower.]]):tformat(damDesc(self, DamageType.TEMPORAL, damage), duration)
 	end,
 }
 
@@ -289,7 +289,7 @@ newTalent{
 
 			if not game.state.temporal_reprieve_lore and rng.percent(5) then
 				game.state.temporal_reprieve_lore = true
-				require("engine.ui.Dialog"):simpleLongPopup("What the... ugh.", "Some rookie paradox mage is about to find out that the standard-issue Temporal Reprieve takes you to a random safe-zone, not a fixed one, and left the contents of their pack strewn about the place. Nearly all of it is equipment that your transmutation chest won't process and is unusable by anything with less than twelve limbs, so you kick most of it into the void, but a crumpled note catches your eye...", 500, function()
+				require("engine.ui.Dialog"):simpleLongPopup(_t"What the... ugh.", _t"Some rookie paradox mage is about to find out that the standard-issue Temporal Reprieve takes you to a random safe-zone, not a fixed one, and left the contents of their pack strewn about the place. Nearly all of it is equipment that your transmutation chest won't process and is unusable by anything with less than twelve limbs, so you kick most of it into the void, but a crumpled note catches your eye...", 500, function()
 					game.party:learnLore("galsame-orientation-notes")
 				end)
 			end
@@ -302,7 +302,7 @@ newTalent{
 	info = function(self, t)
 		local duration = t.getDuration(self, t)
 		return ([[Transport yourself to a safe place for %d turns.]]):
-		format(duration)
+		tformat(duration)
 	end,
 }
 
@@ -348,6 +348,6 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Creates a temporal echo in a radius of %d around you.  Affected targets take %0.2f temporal damage, as well as up to %d%% of the difference between their current life and max life as additional temporal damage.
 		The additional damage will be divided by the target's rank and the damage scales with your Spellpower.]]):
-		format(radius, damDesc(self, DamageType.TEMPORAL, damage), percent)
+		tformat(radius, damDesc(self, DamageType.TEMPORAL, damage), percent)
 	end,
 }

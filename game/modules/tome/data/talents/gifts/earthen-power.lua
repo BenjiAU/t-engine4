@@ -45,7 +45,7 @@ newTalent{
 		local inc = t.getPercentInc(self, t)
 		return ([[The first time you take damage each turn, you regenerate %d%% of the damage dealt as mana (up to a maximum of %0.2f) and %d%% as equilibrium (up to %0.2f).
 		Increases Physical Power by %d, increases damage done with shields by %d%%, and allows you to dual-wield shields.
-		Also, all of your melee attacks will perform a shield bash in addition to their normal effects.]]):format(100 * m, mm, 100 * e, em, damage, inc*100)
+		Also, all of your melee attacks will perform a shield bash in addition to their normal effects.]]):tformat(100 * m, mm, 100 * e, em, damage, inc*100)
 	end,
 }
 
@@ -66,7 +66,7 @@ newTalent{
 	info = function(self, t)
 		return ([[When you use your Resilience of the Dwarves racial power your skin becomes so tough that it even absorbs damage from non-physical attacks.
 		Non-physical damage is reduced by %d%% of your total armour value (ignoring hardiness).]]):
-		format(t.getPercent(self, t))
+		tformat(t.getPercent(self, t))
 	end,
 }
 
@@ -89,7 +89,7 @@ newTalent{
 		return ([[Sharp shards of stone grow from your shields.
 		When you are hit in melee, you will get a free attack against the attacker with the shards doing %d%% shield damage (as Nature).
 		This effect can only happen once per turn.]]):
-		format(self:combatTalentWeaponDamage(t, 0.4, 1) * 100)
+		tformat(self:combatTalentWeaponDamage(t, 0.4, 1) * 100)
 	end,
 }
 
@@ -121,6 +121,6 @@ newTalent{
 		When the effect ends, all equilibrium above minimum will be converted to mana in a storm of arcane energy and the cooldown of your Block is reset.
 		The storm inflicts Arcane damage equal to the converted equilibrium (maximum %d) against everyone around you in a radius %d.
 		Also while resting you will passively regenerate %0.2f mana each turn.
-		The shield strength will increase with Willpower]]):format(power, t.maxDamage(self, t), radius, t.manaRegen(self, t))
+		The shield strength will increase with Willpower]]):tformat(power, t.maxDamage(self, t), radius, t.manaRegen(self, t))
 	end,
 }

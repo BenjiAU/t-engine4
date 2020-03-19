@@ -43,7 +43,7 @@ function _M:init(title, shadow, log, chat)
 	for name, data in pairs(chat.channels) do list[#list+1] = name end
 	table.sort(list, function(a,b) if a == "global" then return 1 elseif b == "global" then return nil else return a < b end end)
 
-	tabs[#tabs+1] = {top=0, left=0, ui = Tab.new{title="Game Log", on_change=function(s) if s then self:switchTo(tabs[1]) end end, default=true}, tab_channel="__log", timestamp=log:getLogLast()}
+	tabs[#tabs+1] = {top=0, left=0, ui = Tab.new{title=_t"Game Log", on_change=function(s) if s then self:switchTo(tabs[1]) end end, default=true}, tab_channel="__log", timestamp=log:getLogLast()}
 	for i, name in ipairs(list) do
 		local oname = name
 		local nb_users = 0
@@ -133,7 +133,7 @@ function _M:mouseEvent(button, x, y, xrel, yrel, bx, by, event)
 					for i, e in ipairs(sub_es) do
 						if e.tooltip then
 							tooltip:merge(e:tooltip())
-							if e:getEntityKind() == "actor" then tooltip:add(true, "Right click to inspect.", true) end
+							if e:getEntityKind() == "actor" then tooltip:add(true, _t"Right click to inspect.", true) end
 							if i < #sub_es then tooltip:add(true, "---", true)
 							else tooltip:add(true) end
 						end
@@ -168,14 +168,14 @@ function _M:mouseEvent(button, x, y, xrel, yrel, bx, by, event)
 				local data = profile.chat:getUserInfo(citem.login)
 				if data then
 					local list = {
-						{name="Show infos", ui="show"},
-						{name="Whisper", ui="whisper"},
-						{name="Ignore", ui="ignore"},
-						{name="Open profile(in browser)", ui="profile"},
-						{name="Report for bad behavior", ui="report"}
+						{name=_t"Show infos", ui="show"},
+						{name=_t"Whisper", ui="whisper"},
+						{name=_t"Ignore", ui="ignore"},
+						{name=_t"Open profile(in browser)", ui="profile"},
+						{name=_t"Report for bad behavior", ui="report"}
 					}
-					if data.char_link then table.insert(list, 3, {name="Open charsheet(in browser)", ui="charsheet"}) end
-					Dialog:listPopup("User: "..citem.login, "Action", list, 300, 200, function(sel)
+					if data.char_link then table.insert(list, 3, {name=_t"Open charsheet(in browser)", ui="charsheet"}) end
+					Dialog:listPopup(("User: "):tformat(citem.login), _t"Action", list, 300, 200, function(sel)
 						if not sel or not sel.ui then return end
 						if sel.ui == "show" then
 							local UserInfo = require "engine.dialogs.UserInfo"
@@ -188,9 +188,9 @@ function _M:mouseEvent(button, x, y, xrel, yrel, bx, by, event)
 							profile.chat:setCurrentTarget(false, citem.login)
 							profile.chat:talkBox()
 						elseif sel.ui == "ignore" then
-							Dialog:yesnoPopup("Ignore user", "Really ignore all messages from: "..citem.login, function(ret) if ret then profile.chat:ignoreUser(citem.login) end end)
+							Dialog:yesnoPopup(_t"Ignore user", ("Really ignore all messages from: %s"):tformat(citem.login), function(ret) if ret then profile.chat:ignoreUser(citem.login) end end)
 						elseif sel.ui == "report" then
-							game:registerDialog(require('engine.dialogs.GetText').new("Reason to report: "..citem.login, "Reason", 4, 500, function(text)
+							game:registerDialog(require('engine.dialogs.GetText').new(("Reason to report: %s"):tformat(citem.login), _t"Reason", 4, 500, function(text)
 								profile.chat:reportUser(citem.login, text)
 								game.log("#VIOLET#", "Report sent.")
 							end))							

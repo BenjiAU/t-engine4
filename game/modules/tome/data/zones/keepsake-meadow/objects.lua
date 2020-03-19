@@ -23,7 +23,7 @@ newEntity{ base = "BASE_LORE",
 	define_as = "BANDERS_NOTES",
 	name = "folded up piece of paper",
 	lore="keepsake-banders-notes",
-	desc = [[A folded up piece of paper with a few notes written on it.]],
+	desc = _t[[A folded up piece of paper with a few notes written on it.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -42,7 +42,7 @@ newEntity{
 	material_level = 1,
 	encumber = 0,
 	not_in_stores = true,
-	desc = [[A small acorn, crafted crudely out of iron.]],
+	desc = _t[[A small acorn, crafted crudely out of iron.]],
 	on_pickup = function(self, who)
 		if who.player then
 			who:hasQuest("keepsake"):on_pickup_acorn(who)
@@ -70,7 +70,7 @@ newEntity{
 	material_level = 1,
 	encumber = 0,
 	not_in_stores = true,
-	desc = [[A small acorn, crafted crudely out of iron. It once belonged to Bander, but now it is yours. You find having the acorn helps to anchor your mind and prepare you for the trials ahead.]],
+	desc = _t[[A small acorn, crafted crudely out of iron. It once belonged to Bander, but now it is yours. You find having the acorn helps to anchor your mind and prepare you for the trials ahead.]],
 	carrier = {
 		resists={[DamageType.MIND] = 30, [DamageType.PHYSICAL] = 8,},
 		combat_mindpower = 15,
@@ -98,7 +98,7 @@ newEntity{
 	material_level = 1,
 	encumber = 0,
 	not_in_stores = true,
-	desc = [[A small acorn, crafted crudely out of iron. It once belonged to Bander, but now it is yours. The acorn serves as a reminder of who and what you are.]],
+	desc = _t[[A small acorn, crafted crudely out of iron. It once belonged to Bander, but now it is yours. The acorn serves as a reminder of who and what you are.]],
 	carrier = {
 		resists={[DamageType.MIND] = 30,},
 		inc_damage = { [DamageType.PHYSICAL] = 12 },
@@ -116,7 +116,7 @@ for i = 1, 4 do
 	newEntity{ base = "BASE_LORE",
 		define_as = "KYLESS_JOURNAL_"..i,
 		name = "journal page", lore="keepsake-kyless-journal-"..i,
-		desc = [[A page containing an entry from Kyless' journal.]],
+		desc = _t[[A page containing an entry from Kyless' journal.]],
 		rarity = false,
 		is_magic_device = false,
 		encumberance = 0,
@@ -137,7 +137,7 @@ newEntity{
 	material_level = 1,
 	encumber = 5,
 	not_in_stores = true,
-	desc = [[This was the book that gave power to Kyless and eventually led to his doom. The book is simple in appearance, bound in leather with no markings on the cover. All of the pages are blank.]],
+	desc = _t[[This was the book that gave power to Kyless and eventually led to his doom. The book is simple in appearance, bound in leather with no markings on the cover. All of the pages are blank.]],
 }
 
 

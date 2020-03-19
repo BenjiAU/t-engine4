@@ -20,6 +20,7 @@
 require "engine.class"
 local Dialog = require "engine.ui.Dialog"
 local Input = require "engine.ui.blocks.Input"
+local FontPackage = require "engine.FontPackage"
 
 --- Debug Console
 -- @classmod engine.DebugConsole
@@ -133,7 +134,7 @@ function _M:init()
 	self.blink_period = 20
 	self.blink = self.blink_period
 	local w, h = core.display.size()
-	Dialog.init(self, "Lua Console", w, h, 0, 0, nil, nil, false)
+	Dialog.init(self, _t"Lua Console", w, h, 0, 0, nil, core.display.newFont(FontPackage:getFont("mono"), 12))
 	self.font, self.font_h = self.font_mono, self.font_mono_h
 	game:onTickEnd(function() self.key:unicodeInput(true) end)
 

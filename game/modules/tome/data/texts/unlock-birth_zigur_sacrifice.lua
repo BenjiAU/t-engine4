@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New birth power: #LIGHT_GREEN#Ziguranth Sacrifice",
-[[You have discovered Zigur, the bastion of Nature fighting against all arcane magics.
+return _t"New birth power: #LIGHT_GREEN#Ziguranth Sacrifice",
+_t[[You have discovered Zigur, the bastion of Nature fighting against all arcane magics.
 Magic has caused so much pain and suffering on the world, it needs to stop.
 
 All your new characters will now be able to betray arcane escort quests to send them to Zigur, granting new, different, rewards.

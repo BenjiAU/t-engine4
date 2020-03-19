@@ -33,7 +33,7 @@ newEntity{ define_as = "SANDWORM_TUNNELER",
 	type = "vermin", subtype = "sandworm",
 	name = "sandworm burrower",
 	display = "w", color=colors.GREEN,
-	desc = [[This sandworm seems to not care about your presence at all and simply continues digging its way through the sand.
+	desc = _t[[This sandworm seems to not care about your presence at all and simply continues digging its way through the sand.
 	
 Maybe following it is the only way to move around here...]],
 	level_range = {12, 50}, exp_worth = 0,
@@ -59,7 +59,7 @@ newEntity{ define_as = "SANDWORM_TUNNELER_HUGE",
 	name = "huge sandworm burrower",
 	display_w = 2, display_h = 2, display_x = -0.5, display_y = -0.5,
 	display = "w", color=colors.GREEN,
-	desc = [[This sandworm seems to not care about your presence at all and simply continues digging its way through the sand.
+	desc = _t[[This sandworm seems to not care about your presence at all and simply continues digging its way through the sand.
 	
 Maybe following it is the only way to move around here...]],
 	level_range = {12, 50}, exp_worth = 0,
@@ -87,8 +87,8 @@ newEntity{ define_as = "SANDWORM_QUEEN",
 	name = "Sandworm Queen",
 	display = "w", color=colors.VIOLET,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/vermin_sandworm_sandworm_queen.png", display_h=2, display_y=-1}}},
-	desc = [[Before you stands the queen of the sandworms. Massive and bloated, she slithers toward you, calling for her offspring!]],
-	killer_message = "and swallowed whole",
+	desc = _t[[Before you stands the queen of the sandworms. Massive and bloated, she slithers toward you, calling for her offspring!]],
+	killer_message = _t"and swallowed whole",
 	level_range = {15, nil}, exp_worth = 2,
 	female = 1,
 	max_life = 150, life_rating = 17, fixed_rating = true,
@@ -150,14 +150,14 @@ newEntity{ define_as = "SANDWORM_QUEEN",
 				self.move_project = {[engine.DamageType.DIG]=1}
 				
 				local Dialog = require("engine.ui.Dialog")
-				Dialog:simplePopup("Rumbling...", "The ground shakes.  Something very large is stirring in the distance.")				
+				Dialog:simplePopup(_t"Rumbling...", _t"The ground shakes.  Something very large is stirring in the distance.")				
 			end
 		end
 		
 	end,
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("CORRUPTED_SAND_WYRM", 1, 45, "Did you hear? Something seems to have devoured all the last sandworms!", function(gen)
+		game.state:activateBackupGuardian("CORRUPTED_SAND_WYRM", 1, 45, _t"Did you hear? Something seems to have devoured all the last sandworms!", function(gen)
 			if gen then return end
 			for i = #game.level.e_array, 1, -1 do
 				local e = game.level.e_array[i]
@@ -176,7 +176,7 @@ newEntity{ define_as = "CORRUPTED_SAND_WYRM",
 	name = "Corrupted Sand Wyrm",
 	display = "D", color=colors.VIOLET,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/dragon_sand_corrupted_sand_wyrm.png", display_h=2, display_y=-1}}},
-	desc = [[The sandworms are gone, devoured by this shrieking, warped horror.]],
+	desc = _t[[The sandworms are gone, devoured by this shrieking, warped horror.]],
 	level_range = {47, nil}, exp_worth = 3,
 	max_life = 850, life_rating = 24, fixed_rating = true,
 	infravision = 10,

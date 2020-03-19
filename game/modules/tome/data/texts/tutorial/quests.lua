@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[During your adventures you will find quests.
+return _t[[During your adventures you will find quests.
 A quest can come from performing an action, finding an item, speaking to somebody, and more.
 
 You can view your current quests by pressing 'j' or right-clicking yourself.

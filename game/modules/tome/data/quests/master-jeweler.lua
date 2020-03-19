@@ -17,13 +17,13 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Lost Knowledge"
+name = _t"Lost Knowledge"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You found an ancient tome about gems."
-	desc[#desc+1] = "You should bring it to the jeweler in the Gates of Morning."
+	desc[#desc+1] = _t"You found an ancient tome about gems."
+	desc[#desc+1] = _t"You should bring it to the jeweler in the Gates of Morning."
 	if self:isCompleted("search-valley") then
-		desc[#desc+1] = "Limmir told you to look for the Valley of the Moon in the southern mountains."
+		desc[#desc+1] = _t"Limmir told you to look for the Valley of the Moon in the southern mountains."
 	end
 	return table.concat(desc, "\n")
 end
@@ -88,7 +88,7 @@ summon_limmir = function(self, who)
 	limmir.no_party_ai = true
 	game.zone:addEntity(game.level, limmir, "actor", 45, 1)
 
-	game.party:addMember(limmir, {type="quest", title="Limmir (Quest)", temporary_level = true})
+	game.party:addMember(limmir, {type="quest", title=_t"Limmir (Quest)", temporary_level = true})
 end
 
 ritual_end = function(self)
@@ -111,7 +111,7 @@ ritual_end = function(self)
 		local e = game.level.e_array[i]
 		if not e.unique and e.type == "demon" then e:die() end
 	end
-	limmir.name = "Limmir the Master Jeweler"
+	limmir.name = _t"Limmir the Master Jeweler"
 	limmir.can_talk = "jewelry-store"
 
 	game.party:removeMember(limmir)

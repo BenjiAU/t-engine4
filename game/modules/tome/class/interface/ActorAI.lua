@@ -756,7 +756,7 @@ function _M:aiFindSafeGrid(radius, dam_wt, air_wt, dist_weight, want_closer, ign
 
 	if log_detail > 0 then
 		print(("[aiFindSafeGrid]%s searching for safer grids [radius %s from (%s, %s), val = %s], dam_wt=%s, air_wt=%s, dist_weight=%s, want_closer=%s"):format(self.name, radius, self.x, self.y, grid.val, dam_wt, air_wt, dist_weight, want_closer))
-if log_detail > 1.4 and config.settings.cheat then game.log("%s #PINK#searching for safer grids [radius %s from (%s, %s), val = %s], dam_wt=%s, air_wt=%s, dist_weight=%s, want_closer=%s", self.name:capitalize(), radius, self.x, self.y, grid.val, dam_wt, air_wt, dist_weight, want_closer) end -- debugging
+if log_detail > 1.4 and config.settings.cheat then game.log("%s #PINK#searching for safer grids [radius %s from (%s, %s), val = %s], dam_wt=%s, air_wt=%s, dist_weight=%s, want_closer=%s", self:getName():capitalize(), radius, self.x, self.y, grid.val, dam_wt, air_wt, dist_weight, want_closer) end -- debugging
 	 end
 	local grid_count = 0
 	core.fov.calc_circle(self.x, self.y, game.level.map.w, game.level.map.h, radius or 10,

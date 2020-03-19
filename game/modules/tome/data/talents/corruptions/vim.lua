@@ -41,7 +41,7 @@ newTalent{
 		return ([[Projects a bolt of pure blight, doing %0.2f blight damage.
 		This spell has an improved critical strike chance of +%0.2f%%.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 20, 250)), t.getCritChance(self, t))
+		tformat(damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 20, 250)), t.getCritChance(self, t))
 	end,
 }
 
@@ -96,7 +96,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Open a dark portal (radius 3) to the target zone. All creatures caught inside will be teleported to your location, and you to theirs.
 		All creatures (except you) traversing the portal will catch a random disease, doing %0.2f blight damage per turn for 6 turns and reducing one of its physical stats (strength, constitution, dexterity) by %d.
-		The damage will increase with your Spellpower.]]):format(damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 12, 80)), self:combatTalentSpellDamage(t, 5, 25))
+		The damage will increase with your Spellpower.]]):tformat(damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 12, 80)), self:combatTalentSpellDamage(t, 5, 25))
 	end,
 }
 
@@ -134,7 +134,7 @@ newTalent{
 		return ([[Feel the very existence of creatures around you for %d turns, in a radius of 10.
 		The evil touch will reduce their blight resistance by %d%% and all saves by %d, but also make them aware of you.
 		The resistance and save reduction will improve with your Spellpower.]]):
-		format(t.getDuration(self,t), t.getResistPenalty(self,t), t.getSaves(self, t))
+		tformat(t.getDuration(self,t), t.getResistPenalty(self,t), t.getSaves(self, t))
 	end,
 }
 
@@ -149,7 +149,7 @@ newTalent{
 	getHeal = function(self, t) return self:combatTalentScale(t, 4, 15, 0.75) end,
 	info = function(self, t)
 		return ([[Each time a creature affected by vimsense hurts you, you regain %0.2f vim and %0.2f health.]]):
-		format(t.getVim(self,t),t.getHeal(self,t))
+		tformat(t.getVim(self,t),t.getHeal(self,t))
 	end,
 }
 

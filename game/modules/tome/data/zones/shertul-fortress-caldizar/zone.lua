@@ -18,11 +18,11 @@
 -- darkgod@te4.org
 
 return {
-	name = "Unknown Sher'Tul Fortress",
+	name = _t"Unknown Sher'Tul Fortress",
 	display_name = function(x, y)
 		local zn = game.level.map.attrs(x or game.player.x, y or game.player.y, "zonename")
-		if zn then return "Unknown Sher'Tul Fortress ("..zn..")"
-		else return "Unknown the Sher'Tul Fortress" end
+		if zn then return ("Unknown Sher'Tul Fortress (%s)"):tformat(zn)
+		else return _t"Unknown the Sher'Tul Fortress" end
 	end,
 	variable_zone_name = true,
 	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(-1,2) end,
@@ -71,7 +71,7 @@ return {
 	end,
 	on_enter = function(lev, old_lev, zone)
 		local Dialog = require("engine.ui.Dialog")
-		Dialog:simpleLongPopup("Unknown Sher'Tul Fortress", "With a sudden jolt you find yourself... somewhere familiar. The smooth walls and gentle lighting remind you of your fortress. And yet it feels different too. There is a gentle humming noise in the background, and your whole body feels light, almost weightless, such that the slightest movement propels you into the air. You have the odd feeling that you are not on Maj'Eyal any longer... From ahead you sense something both terrible and wonderful, and trepidation fills every corner of your being.", 500)
+		Dialog:simpleLongPopup(_t"Unknown Sher'Tul Fortress", _t"With a sudden jolt you find yourself... somewhere familiar. The smooth walls and gentle lighting remind you of your fortress. And yet it feels different too. There is a gentle humming noise in the background, and your whole body feels light, almost weightless, such that the slightest movement propels you into the air. You have the odd feeling that you are not on Maj'Eyal any longer... From ahead you sense something both terrible and wonderful, and trepidation fills every corner of your being.", 500)
 	end,
 
 	background = function(level, x, y, nb_keyframes)

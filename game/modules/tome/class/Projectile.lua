@@ -42,7 +42,7 @@ function _M:move(x, y, force)
 	return moved
 end
 function _M:tooltip(x, y)
-	local tstr = tstring{"Projectile: ", self.name}
+	local tstr = tstring{_t"Projectile: ", self:getName()}
 
 	if self.src and self.src.name then 
 		local hostile = self.src.faction and game.player:reactionToward(self.src) or 0
@@ -50,31 +50,31 @@ function _M:tooltip(x, y)
 		if hostile < 0 then color = {"color", "LIGHT_RED"}
 		elseif hostile == 0 then color = {"color", "LIGHT_BLUE"}
 		end
-		tstr:add(true, "Origin: ", color, self.src.name, {"color", "LAST"})
+		tstr:add(true, _t"Origin: ", color, self.src:getName(), {"color", "LAST"})
 	end
 
 	if self.project and self.project.def and self.project.def.typ then
 		if self.project.def.x then
-			tstr:add(true, ("Speed: %d%% %s"):format(self.energy.mod*100, game.level.map:compassDirection(self.project.def.x - self.x, self.project.def.y - self.y) or ""))
+			tstr:add(true, ("Speed: %d%% %s"):tformat(self.energy.mod*100, game.level.map:compassDirection(self.project.def.x - self.x, self.project.def.y - self.y) or ""))
 		end
 		if self.project.def.typ.selffire then
 			local x = self.project.def.typ.selffire
 			if x == true then x = 100 end
-			tstr:add(true, "Affect origin chance: ", tostring(x), "%")
+			tstr:add(true, _t"Affect origin chance: ", tostring(x), "%")
 		end
 		if self.project.def.typ.friendlyfire then
 			local x = self.project.def.typ.friendlyfire
 			if x == true then x = 100 end
-			tstr:add(true, "Affect origin's friends chance: ", tostring(x), "%")
+			tstr:add(true, _t"Affect origin's friends chance: ", tostring(x), "%")
 		end
 	end
 
 	if config.settings.cheat then
-		tstr:add(true, "UID: ", tostring(self.uid), true, "Coords: ", tostring(x), "x", tostring(y))
+		tstr:add(true, _t"UID: ", tostring(self.uid), true, _t"Coords: ", tostring(x), "x", tostring(y))
 		if self.homing then
-			tstr:add((" homing: %s(%s, %s)"):format(self.homing.target.name, self.homing.target.x,self.homing.target.y))
+			tstr:add((" homing: %s(%s, %s)"):tformat(self.homing.target:getName(), self.homing.target.x,self.homing.target.y))
 		else
-			tstr:add(" range: ", tostring(self.project.def.typ.range or "nil"), " ==> (", tostring(self.project.def.x), ",", tostring(self.project.def.y), ")")
+			tstr:add(_t" range: ", tostring(self.project.def.typ.range or "nil"), " ==> (", tostring(self.project.def.x), ",", tostring(self.project.def.y), ")")
 		end
 	end
 	return tstr
@@ -90,9 +90,9 @@ end
 
 --gets the full name of the projectile
 function _M:getName()
-	local name = self.name or "projectile"
+	local name = _t(self.name) or _t"projectile"
 	if self.src and self.src.name then
-		return self.src.name:capitalize().."'s "..name
+		return ("%s's %s"):tformat(self.src:getName():capitalize(), name)
 	else
 		return name
 	end

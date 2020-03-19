@@ -99,7 +99,7 @@ newEntity{
 	define_as = "WATER_FLOOR_BUBBLE",
 	type = "floor", subtype = "water",
 	name = "underwater air bubble", image = "terrain/underwater/subsea_floor_bubbles.png",
-	desc = "#LIGHT_BLUE#Replenishes air level when standing inside.#LAST#", show_tooltip = true,
+	desc = _t"#LIGHT_BLUE#Replenishes air level when standing inside.#LAST#", show_tooltip = true,
 	display = ':', color=colors.LIGHT_BLUE, back_color=colors.DARK_BLUE,
 	air_level = 15, nb_charges = resolvers.rngrange(4, 7),
 	force_clone = true,

@@ -119,25 +119,25 @@ KeyBind:load("move,hotkeys,inventory,actions,interface,tome,debug,mtxn")
 dofile("/mod/resolvers.lua")
 
 -- Body parts
-ActorInventory:defineInventory("MAINHAND", "In main hand", true, "Most weapons are wielded in the main hand.", nil, {equipdoll_back="ui/equipdoll/mainhand_inv.png", shimmerable=true})
-ActorInventory:defineInventory("OFFHAND", "In off hand", true, "You can use shields or a second weapon in your off-hand, if you have the talents for it.", nil, {equipdoll_back="ui/equipdoll/offhand_inv.png", shimmerable=true})
-ActorInventory:defineInventory("PSIONIC_FOCUS", "Psionic focus", true, "Object held in your telekinetic grasp. It can be a weapon or some other item to provide a benefit to your psionic powers.", nil, {equipdoll_back="ui/equipdoll/psionic_inv.png", etheral=true})
-ActorInventory:defineInventory("FINGER", "On fingers", true, "Rings are worn on fingers.", nil, {equipdoll_back="ui/equipdoll/ring_inv.png"})
-ActorInventory:defineInventory("NECK", "Around neck", true, "Amulets are worn around the neck.", nil, {equipdoll_back="ui/equipdoll/amulet_inv.png"})
-ActorInventory:defineInventory("LITE", "Light source", true, "A light source allows you to see in the dark places of the world.", nil, {equipdoll_back="ui/equipdoll/light_inv.png"})
-ActorInventory:defineInventory("BODY", "Main armor", true, "Armor protects you from physical attacks. The heavier the armor the more it hinders the use of talents and spells.", nil, {equipdoll_back="ui/equipdoll/body_inv.png", shimmerable=true})
-ActorInventory:defineInventory("CLOAK", "Cloak", true, "A cloak can simply keep you warm or grant you wondrous powers should you find a magical one.", nil, {equipdoll_back="ui/equipdoll/cloak_inv.png", shimmerable=true})
-ActorInventory:defineInventory("HEAD", "On head", true, "You can wear helmets or crowns on your head.", nil, {equipdoll_back="ui/equipdoll/head_inv.png", shimmerable=true})
-ActorInventory:defineInventory("BELT", "Around waist", true, "Belts are worn around your waist.", nil, {equipdoll_back="ui/equipdoll/belt_inv.png"})
-ActorInventory:defineInventory("HANDS", "On hands", true, "Various gloves can be worn on your hands.", nil, {equipdoll_back="ui/equipdoll/hands_inv.png", shimmerable=true})
-ActorInventory:defineInventory("FEET", "On feet", true, "Sandals or boots can be worn on your feet.", nil, {equipdoll_back="ui/equipdoll/boots_inv.png", shimmerable=true})
-ActorInventory:defineInventory("TOOL", "Tool", true, "This is your readied tool, always available immediately.", nil, {equipdoll_back="ui/equipdoll/tool_inv.png"})
-ActorInventory:defineInventory("QUIVER", "Quiver", true, "Your readied ammo.", nil, {equipdoll_back="ui/equipdoll/ammo_inv.png", shimmerable=true})
-ActorInventory:defineInventory("GEM", "Socketed Gems", true, "Gems worn in/on the body, providing their worn bonuses.", nil, {equipdoll_back="ui/equipdoll/gem_inv.png", stack_limit = 1})
-ActorInventory:defineInventory("QS_MAINHAND", "Second weapon set: In main hand", false, "Weapon Set 2: Most weapons are wielded in the main hand. Press 'x' to switch weapon sets.", true)
-ActorInventory:defineInventory("QS_OFFHAND", "Second weapon set: In off hand", false, "Weapon Set 2: You can use shields or a second weapon in your off-hand, if you have the talents for it. Press 'x' to switch weapon sets.", true)
-ActorInventory:defineInventory("QS_PSIONIC_FOCUS", "Second weapon set: psionic focus", false, "Weapon Set 2: Object held in your telekinetic grasp. It can be a weapon or some other item to provide a benefit to your psionic powers. Press 'x' to switch weapon sets.", true)
-ActorInventory:defineInventory("QS_QUIVER", "Second weapon set: Quiver", false, "Weapon Set 2: Your readied ammo.", true)
+ActorInventory:defineInventory("MAINHAND", _t"In main hand", true, _t"Most weapons are wielded in the main hand.", nil, {equipdoll_back="ui/equipdoll/mainhand_inv.png", shimmerable=true})
+ActorInventory:defineInventory("OFFHAND", _t"In off hand", true, _t"You can use shields or a second weapon in your off-hand, if you have the talents for it.", nil, {equipdoll_back="ui/equipdoll/offhand_inv.png", shimmerable=true})
+ActorInventory:defineInventory("PSIONIC_FOCUS", _t"Psionic focus", true, _t"Object held in your telekinetic grasp. It can be a weapon or some other item to provide a benefit to your psionic powers.", nil, {equipdoll_back="ui/equipdoll/psionic_inv.png", etheral=true})
+ActorInventory:defineInventory("FINGER", _t"On fingers", true, _t"Rings are worn on fingers.", nil, {equipdoll_back="ui/equipdoll/ring_inv.png"})
+ActorInventory:defineInventory("NECK", _t"Around neck", true, _t"Amulets are worn around the neck.", nil, {equipdoll_back="ui/equipdoll/amulet_inv.png"})
+ActorInventory:defineInventory("LITE", _t"Light source", true, _t"A light source allows you to see in the dark places of the world.", nil, {equipdoll_back="ui/equipdoll/light_inv.png"})
+ActorInventory:defineInventory("BODY", _t"Main armor", true, _t"Armor protects you from physical attacks. The heavier the armor the more it hinders the use of talents and spells.", nil, {equipdoll_back="ui/equipdoll/body_inv.png", shimmerable=true})
+ActorInventory:defineInventory("CLOAK", _t"Cloak", true, _t"A cloak can simply keep you warm or grant you wondrous powers should you find a magical one.", nil, {equipdoll_back="ui/equipdoll/cloak_inv.png", shimmerable=true})
+ActorInventory:defineInventory("HEAD", _t"On head", true, _t"You can wear helmets or crowns on your head.", nil, {equipdoll_back="ui/equipdoll/head_inv.png", shimmerable=true})
+ActorInventory:defineInventory("BELT", _t"Around waist", true, _t"Belts are worn around your waist.", nil, {equipdoll_back="ui/equipdoll/belt_inv.png"})
+ActorInventory:defineInventory("HANDS", _t"On hands", true, _t"Various gloves can be worn on your hands.", nil, {equipdoll_back="ui/equipdoll/hands_inv.png", shimmerable=true})
+ActorInventory:defineInventory("FEET", _t"On feet", true, _t"Sandals or boots can be worn on your feet.", nil, {equipdoll_back="ui/equipdoll/boots_inv.png", shimmerable=true})
+ActorInventory:defineInventory("TOOL", _t"Tool", true, _t"This is your readied tool, always available immediately.", nil, {equipdoll_back="ui/equipdoll/tool_inv.png"})
+ActorInventory:defineInventory("QUIVER", _t"Quiver", true, _t"Your readied ammo.", nil, {equipdoll_back="ui/equipdoll/ammo_inv.png", shimmerable=true})
+ActorInventory:defineInventory("GEM", _t"Socketed Gems", true, _t"Gems worn in/on the body, providing their worn bonuses.", nil, {equipdoll_back="ui/equipdoll/gem_inv.png", stack_limit = 1})
+ActorInventory:defineInventory("QS_MAINHAND", _t"Second weapon set: In main hand", false, _t"Weapon Set 2: Most weapons are wielded in the main hand. Press 'x' to switch weapon sets.", true)
+ActorInventory:defineInventory("QS_OFFHAND", _t"Second weapon set: In off hand", false, _t"Weapon Set 2: You can use shields or a second weapon in your off-hand, if you have the talents for it. Press 'x' to switch weapon sets.", true)
+ActorInventory:defineInventory("QS_PSIONIC_FOCUS", _t"Second weapon set: psionic focus", false, _t"Weapon Set 2: Object held in your telekinetic grasp. It can be a weapon or some other item to provide a benefit to your psionic powers. Press 'x' to switch weapon sets.", true)
+ActorInventory:defineInventory("QS_QUIVER", _t"Second weapon set: Quiver", false, _t"Weapon Set 2: Your readied ammo.", true)
 ActorInventory.equipdolls = {
 	default = { w=48, h=48, itemframe="ui/equipdoll/itemframe48.png", itemframe_sel="ui/equipdoll/itemframe-sel48.png", ix=3, iy=3, iw=42, ih=42, doll_x=116, doll_y=168+64, doll_w=128, doll_h=128,
 	list={
@@ -181,14 +181,14 @@ ActorTemporaryEffects:loadDefinition("/data/timed_effects.lua")
 dofile("/data/resources.lua")
 
 -- Actor stats
-ActorStats:defineStat("Strength",	"str", 10, 1, 100, "Strength defines your character's ability to apply physical force. It increases your melee damage, damage done with heavy weapons, your chance to resist physical effects, and carrying capacity.")
-ActorStats:defineStat("Dexterity",	"dex", 10, 1, 100, "Dexterity defines your character's ability to be agile and alert. It increases your chance to hit, your ability to avoid attacks, and your damage with light or ranged weapons.")
-ActorStats:defineStat("Magic",		"mag", 10, 1, 100, "Magic defines your character's ability to manipulate the magical energy of the world. It increases your spell power, and the effect of spells and other magic items.")
-ActorStats:defineStat("Willpower",	"wil", 10, 1, 100, "Willpower defines your character's ability to concentrate. It increases your mana, stamina and PSI capacity, and your chance to resist mental attacks.")
-ActorStats:defineStat("Cunning",	"cun", 10, 1, 100, "Cunning defines your character's ability to learn, think, and react. It allows you to learn many worldly abilities, and increases your mental capabilities and chance of critical hits.")
-ActorStats:defineStat("Constitution",	"con", 10, 1, 100, "Constitution defines your character's ability to withstand and resist damage. It increases your maximum life and physical resistance.")
+ActorStats:defineStat("Strength",	"str", 10, 1, 100, _t"Strength defines your character's ability to apply physical force. It increases your melee damage, damage done with heavy weapons, your chance to resist physical effects, and carrying capacity.")
+ActorStats:defineStat("Dexterity",	"dex", 10, 1, 100, _t"Dexterity defines your character's ability to be agile and alert. It increases your chance to hit, your ability to avoid attacks, and your damage with light or ranged weapons.")
+ActorStats:defineStat("Magic",		"mag", 10, 1, 100, _t"Magic defines your character's ability to manipulate the magical energy of the world. It increases your spell power, and the effect of spells and other magic items.")
+ActorStats:defineStat("Willpower",	"wil", 10, 1, 100, _t"Willpower defines your character's ability to concentrate. It increases your mana, stamina and PSI capacity, and your chance to resist mental attacks.")
+ActorStats:defineStat("Cunning",	"cun", 10, 1, 100, _t"Cunning defines your character's ability to learn, think, and react. It allows you to learn many worldly abilities, and increases your mental capabilities and chance of critical hits.")
+ActorStats:defineStat("Constitution",	"con", 10, 1, 100, _t"Constitution defines your character's ability to withstand and resist damage. It increases your maximum life and physical resistance.")
 -- Luck is hidden and starts at half max value (50) which is considered the standard
-ActorStats:defineStat("Luck",		"lck", 50, 1, 100, "Luck defines your character's fortune when dealing with unknown events. It increases your critical strike chance, your chance of random encounters, ...")
+ActorStats:defineStat("Luck",		"lck", 50, 1, 100, _t"Luck defines your character's fortune when dealing with unknown events. It increases your critical strike chance, your chance of random encounters, ...")
 
 -- Actor leveling, player is restricted to 50 but npcs can go higher
 ActorLevel:defineMaxLevel(nil)
@@ -266,18 +266,18 @@ require("engine.dialogs.Chat").show_portraits = true
 -- Inventory tabs
 InventoryUI.default_tabslist = function(self)
 	local tabslist = {}
-	tabslist[#tabslist+1] = {image="inven_tabs/weapons.png", 	kind="weapons",		desc="All kinds of weapons",		filter=function(o) return not o.__transmo and (o.type == "weapon") end}
-	tabslist[#tabslist+1] = {image="inven_tabs/armors.png", 	kind="armors",		desc="All kinds of armours",		filter=function(o) return not o.__transmo and (o.type == "armor") end}
-	tabslist[#tabslist+1] = {image="inven_tabs/jewelry.png", 	kind="jewelry",		desc="Rings and Amulets",		filter=function(o) return not o.__transmo and (o.type == "jewelry") end}
-	tabslist[#tabslist+1] = {image="inven_tabs/gems.png", 		kind="gems",		desc="Gems"		,		filter=function(o) return not o.__transmo and (o.type == "gem" or o.type == "alchemist-gem") end}
-	tabslist[#tabslist+1] = {image="inven_tabs/inscriptions.png", 	kind="inscriptions",	desc="Infusions, Runes, ...",		filter=function(o) return not o.__transmo and (o.type == "scroll") end}
-	if self.actor.can_tinker then tabslist[#tabslist+1] = {image="inven_tabs/tinkers.png", kind="tinker", desc="Tinkers", filter=function(o) return o.is_tinker end} end
-	tabslist[#tabslist+1] = {image="inven_tabs/misc.png", 		kind="misc",		desc="Miscellaneous",			filter="others"}
-	tabslist[#tabslist+1] = {image="inven_tabs/quests.png", 	kind="quests",		desc="Quest and plot related items",	filter=function(o) return not o.__transmo and (o.plot or o.quest) end}
-	if self.actor:attr("has_transmo") then tabslist[#tabslist+1] = {image="inven_tabs/chest.png", kind="transmo", desc="Transmogrification Chest", filter=function(o) return o.__transmo end} end
+	tabslist[#tabslist+1] = {image="inven_tabs/weapons.png", 	kind="weapons",		desc=_t"All kinds of weapons",		filter=function(o) return not o.__transmo and (o.type == "weapon") end}
+	tabslist[#tabslist+1] = {image="inven_tabs/armors.png", 	kind="armors",		desc=_t"All kinds of armours",		filter=function(o) return not o.__transmo and (o.type == "armor") end}
+	tabslist[#tabslist+1] = {image="inven_tabs/jewelry.png", 	kind="jewelry",		desc=_t"Rings and Amulets",		filter=function(o) return not o.__transmo and (o.type == "jewelry") end}
+	tabslist[#tabslist+1] = {image="inven_tabs/gems.png", 		kind="gems",		desc=_t"Gems"		,		filter=function(o) return not o.__transmo and (o.type == "gem" or o.type == "alchemist-gem") end}
+	tabslist[#tabslist+1] = {image="inven_tabs/inscriptions.png", 	kind="inscriptions",	desc=_t"Infusions, Runes, ...",		filter=function(o) return not o.__transmo and (o.type == "scroll") end}
+	if self.actor.can_tinker then tabslist[#tabslist+1] = {image="inven_tabs/tinkers.png", kind="tinker", desc=_t"Tinkers", filter=function(o) return o.is_tinker end} end
+	tabslist[#tabslist+1] = {image="inven_tabs/misc.png", 		kind="misc",		desc=_t"Miscellaneous",			filter="others"}
+	tabslist[#tabslist+1] = {image="inven_tabs/quests.png", 	kind="quests",		desc=_t"Quest and plot related items",	filter=function(o) return not o.__transmo and (o.plot or o.quest) end}
+	if self.actor:attr("has_transmo") then tabslist[#tabslist+1] = {image="inven_tabs/chest.png", kind="transmo", desc=_t"Transmogrification Chest", filter=function(o) return o.__transmo end} end
 
 	self:triggerHook{"Inventory:makeTabs", tabslist=tabslist}
-	tabslist[#tabslist+1] = {image="inven_tabs/all.png", kind="all", desc="All", filter="all"}
+	tabslist[#tabslist+1] = {image="inven_tabs/all.png", kind="all", desc=_t"All", filter="all"}
 	for _, t in ipairs(tabslist) do if fs.exists("/data/gfx/"..UIBase.ui.."-ui/"..t.image) then t.image = UIBase.ui.."-ui/"..t.image else t.image = "metal-ui/"..t.image end end
 	return tabslist
 end

@@ -83,7 +83,7 @@ newTalent{
 		return ([[Calls forth a ray of light from the Sun, doing %0.1f Light damage to the target.
 		At level 3 the ray will be so intense it will also blind the target and everyone in a radius 2 around it for %d turns.
 		The damage dealt will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHT, damage), t.getDuration(self, t))
+		tformat(damDesc(self, DamageType.LIGHT, damage), t.getDuration(self, t))
 	end,
 }
 
@@ -124,7 +124,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[A path of sunlight appears in front of you for 5 turns. All foes standing inside take %0.1f Light damage per turn.
 		While standing in the path, your movement takes no time and can not trigger traps.
-		The damage done will increase with your Spellpower.]]):format(damDesc(self, DamageType.LIGHT, damage / 5), radius)
+		The damage done will increase with your Spellpower.]]):tformat(damDesc(self, DamageType.LIGHT, damage / 5), radius)
 	end,
 }
 
@@ -162,7 +162,7 @@ newTalent{
 		While affected by Sun's Vengeance, your Sun Ray will take no time to use and will deal 25%% more damage.
 		If Sun Ray was on cooldown, the remaining turns are reduced by one instead.
 		This effect can only happen once per turn.]]):
-		format(crit, chance)
+		tformat(crit, chance)
 	end,
 }
 
@@ -198,7 +198,7 @@ newTalent{
 		return ([[You wrap yourself in a cloak of sunlight that empowers your magic and protects you for 6 turns.
 		While the cloak is active, your spell casting speed is increased by %d%%, your spell cooldowns are reduced by %d%%, and you cannot take more than %d%% of your maximum life from a single blow.
 		The effects will increase with your Spellpower.]]):
-		format(t.getHaste(self, t)*100, t.getCD(self, t)*100, t.getCap(self, t))
+		tformat(t.getHaste(self, t)*100, t.getCD(self, t)*100, t.getCap(self, t))
    end,
 }
 

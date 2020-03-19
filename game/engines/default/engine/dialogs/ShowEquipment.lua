@@ -32,16 +32,16 @@ function _M:init(title, actor, filter, action)
 	self.actor = actor
 	self.filter = filter
 	self.action = action
-	Dialog.init(self, title or "Equipment", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
+	Dialog.init(self, title or _t"Equipment", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
 
 	self.c_desc = TextzoneList.new{width=math.floor(self.iw / 2 - 10), height=self.ih, no_color_bleed=true}
 
 	self.c_list = ListColumns.new{width=math.floor(self.iw / 2 - 10), height=self.ih - 10, scrollbar=true, columns={
-		{name="", width={20,"fixed"}, display_prop="char"},
-		{name="", width={24,"fixed"}, display_prop="object", direct_draw=function(item, x, y) if item.object then item.object:toScreen(nil, x+4, y, 16, 16) end end},
-		{name="Equipment", width=72, display_prop="name"},
-		{name="Category", width=20, display_prop="cat"},
-		{name="Enc.", width=8, display_prop="encumberance"},
+		{name=_t"", width={20,"fixed"}, display_prop="char"},
+		{name=_t"", width={24,"fixed"}, display_prop="object", direct_draw=function(item, x, y) if item.object then item.object:toScreen(nil, x+4, y, 16, 16) end end},
+		{name=_t"Equipment", width=72, display_prop="name"},
+		{name=_t"Category", width=20, display_prop="cat"},
+		{name=_t"Enc.", width=8, display_prop="encumberance"},
 	}, list={}, fct=function(item) self:use(item) end, select=function(item, sel) self:select(item) end}
 
 	self:generateList()
@@ -102,7 +102,7 @@ function _M:generateList()
 					local enc = 0
 					o:forAllStack(function(o) enc=enc+o.encumber end)
 
-					list[#list+1] = { id=#list+1, char=char, name=o:getName(), color=o:getDisplayColor(), object=o, inven=inven_id, item=item, cat=o.subtype, encumberance=enc, desc=o:getDesc() }
+					list[#list+1] = { id=#list+1, char=char, name=o:getName(), color=o:getDisplayColor(), object=o, inven=inven_id, item=item, cat=_t(o.subtype, "entity subtype"), encumberance=enc, desc=o:getDesc() }
 					chars[char] = #list
 					i = i + 1
 				end

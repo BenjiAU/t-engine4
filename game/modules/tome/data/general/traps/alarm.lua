@@ -20,7 +20,7 @@
 local Talents = require"engine.interface.ActorTalents"
 
 newEntity{ define_as = "TRAP_ALARM",
-	type = "annoy", subtype="alarm", id_by_type=true, unided_name = "trap",
+	type = "annoy", subtype="alarm", id_by_type=true, unided_name = _t"trap",
 	display = '^',
 	triggered = function() end,
 }
@@ -31,9 +31,9 @@ newEntity{ base = "TRAP_ALARM",
 	disarm_power = resolvers.clscale(30,25,8,0.5),
 	rarity = 3, level_range = {1, 50},
 	color=colors.UMBER,
-	message = "@Target@ triggers an alarm!",
-	unided_name = "pressure plate",
-	desc = function(self) return ("Makes noise, alerting others.") end,
+	message = _t"@Target@ triggers an alarm!",
+	unided_name = _t"pressure plate",
+	desc = function(self) return (_t"Makes noise, alerting others.") end,
 	pressure_trap = true,
 	triggered = function(self, x, y, who)
 		for i = x - 20, x + 20 do for j = y - 20, y + 20 do if game.level.map:isBound(i, j) then
@@ -60,9 +60,9 @@ newEntity{ base = "TRAP_ALARM",
 	rarity = 3, level_range = {10, 50},
 	color=colors.DARK_UMBER,
 	nb_summon = resolvers.mbonus(3, 2),
-	message = "An alarm rings!",
-	unided_name = "ring of faded sigils",
-	desc = function(self) return ("Summons creatures.") end,
+	message = _t"An alarm rings!",
+	unided_name = _t"ring of faded sigils",
+	desc = function(self) return (_t"Summons creatures.") end,
 	unlock_talent_on_disarm = {tid=Talents.T_AMBUSH_TRAP, chance=8},
 	triggered = function(self, sx, sy, who)
 		for i = 1, self.nb_summon do

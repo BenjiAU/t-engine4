@@ -162,7 +162,22 @@ function _M:activateHotkey(id)
 	if self.hotkey[id] then
 		HotkeysIcons:use(self.hotkey[id], self)
 	else
-		Dialog:simplePopup("Hotkey not defined", "You may define a hotkey by pressing 'm' and following the instructions there.")
+		Dialog:simplePopup(_t"Hotkey not defined", _t"You may define a hotkey by pressing 'm' and following the instructions there.")
+	end
+end
+
+--- Activates a hotkey with a type "talent"
+function _M:hotkeyTalent(tid)
+	self:useTalent(tid)
+end
+
+--- Activates a hotkey with a type "inventory"
+function _M:hotkeyInventory(name)
+	local o, item, inven = self:findInAllInventories(name)
+	if not o then
+		Dialog:simplePopup(_t"Item not found", ("You do not have any %s ."):tformat(name))
+	else
+		self:playerUseItem(o, item, inven)
 	end
 end
 

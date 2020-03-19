@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Temple of Creation",
+	name = _t"Temple of Creation",
 	level_range = {30, 40},
 	level_scheme = "player",
 	max_level = 3,

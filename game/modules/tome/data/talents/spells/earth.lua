@@ -65,7 +65,7 @@ newTalent{
 		The beam continues to a range of %d, affecting any creatures in its path, dealing %0.2f physical damage to them.
 		If any walls are dug, you gain %d%% physical damage bonus for 6 turns.
 		The damage will increase with your Spellpower.]]):
-		format(nb, self:getTalentRange(t), damDesc(self, DamageType.PHYSICAL, damage), t.getBonus(self, t))
+		tformat(nb, self:getTalentRange(t), damDesc(self, DamageType.PHYSICAL, damage), t.getBonus(self, t))
 	end,
 }
 
@@ -118,7 +118,7 @@ newTalent{
 		return ([[The caster's skin grows as hard as stone, granting a %d bonus to Armour.
 		Each time you are hit in melee, you have a %d%% chance to reduce the cooldown of an Earth or Stone spell by 2 (this effect can only happen once per turn).
 		The bonus to Armour will increase with your Spellpower.]]):
-		format(armor, t.getCDChance(self, t))
+		tformat(armor, t.getCDChance(self, t))
 	end,
 }
 
@@ -152,7 +152,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[Conjures a mudslide, dealing %0.2f physical damage in a radius of %d. Any creatures caught inside will be knocked back 8 spaces.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.PHYSICAL, damage), self:getTalentRadius(t))
+		tformat(damDesc(self, DamageType.PHYSICAL, damage), self:getTalentRadius(t))
 	end,
 }
 
@@ -208,12 +208,12 @@ newTalent{
 
 				local e = Object.new{
 					old_feat = oe,
-					name = "stone wall",
+					name = _t"stone wall",
 					image = oe.image,
 					add_mos = table.clone(oe.add_mos or {}, true),
 					add_displays = table.clone(oe.add_displays or {}),
 					display = '#', color_r=255, color_g=255, color_b=255, back_color=colors.GREY,
-					desc = "a summoned wall of stone",
+					desc = _t"a summoned wall of stone",
 					type = "wall", --subtype = "floor",
 					always_remember = true,
 					can_pass = {pass_wall=1},
@@ -259,6 +259,6 @@ newTalent{
 		At level 4, it becomes targetable.
 		Any hostile creature caught in the radius will also suffer %0.2f physical damage.
 		Duration and damage will improve with your Spellpower.]]):
-		format(duration, damDesc(self, DamageType.PHYSICAL, damage))
+		tformat(duration, damDesc(self, DamageType.PHYSICAL, damage))
 	end,
 }

@@ -18,10 +18,10 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*The Master crumbles before you, vanquished. Yet in the blink of an eye you see his form recreating from dust; unharmed and ready to fight again!*#WHITE#
+	text = _t[[#LIGHT_GREEN#*The Master crumbles before you, vanquished. Yet in the blink of an eye you see his form recreating from dust; unharmed and ready to fight again!*#WHITE#
 Ahah you fool! See how even death has no meaning for me; for I am the Master and you are my toy, now and forever.]],
 	answers = {
-		{"Never! Die!"},
+		{_t"Never! Die!"},
 	}
 }
 

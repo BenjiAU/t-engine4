@@ -42,7 +42,7 @@ newTalent{
 		return ([[Fires a bolt of blight, doing %0.2f blight damage and replenishing 20%% of it as vim energy.
 		The amount of vim regained depends on the target's rank (higher ranks give more vim).
 		The effect will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 25, 200)))
+		tformat(damDesc(self, DamageType.BLIGHT, self:combatTalentSpellDamage(t, 25, 200)))
 	end,
 }
 
@@ -59,7 +59,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[The cost of using life instead of vim for talents is reduced to %d%%.]]):
-		format(t.getLifeCost(self,t))
+		tformat(t.getLifeCost(self,t))
 	end,
 }
 
@@ -94,7 +94,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Absorbs the life force of your foes as you kill them.
 		As long as this talent is active, vim will decrease by 0.5 per turn and increase by %0.1f for each kill of a non-undead creature (in addition to the usual increase based on Willpower).]]):
-		format(t.VimOnDeath(self, t))
+		tformat(t.VimOnDeath(self, t))
 	end,
 }
 
@@ -117,6 +117,6 @@ newTalent{
 		return ([[Feed on the pain you cause your foes.
 			For 2 turns you gain %d%% lifesteal on all damage dealt.
 			The lifesteal will increase with your Spellpower.]]):
-		format(t.getMult(self,t))
+		tformat(t.getMult(self,t))
 	end,
 }

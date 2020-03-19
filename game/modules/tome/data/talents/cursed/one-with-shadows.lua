@@ -30,7 +30,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Your awareness extends to your shadows.
 		You always know exactly where your shadows are and can perceive any foe within %d tiles of their vision.]])
-		:format(self:getTalentRange(t))
+		:tformat(self:getTalentRange(t))
 	end,
 }
 
@@ -88,7 +88,7 @@ newTalent{
 	info = function(self, t)
 		return ([[You empathy with your shadows causes the line between you and your shadows to blur.
 		You lose %d%% light resistance, but gain %d%% darkness resistance and affinity. You also gain %0.2f%% all resistance for each shadow in your party.]]):
-		format(t.getLightResist(self, t), t.getDarkResist(self, t), t.getAllResScale(self, t))
+		tformat(t.getLightResist(self, t), t.getDarkResist(self, t), t.getAllResScale(self, t))
 	end,
 }
 
@@ -104,7 +104,7 @@ newTalent{
 	getNb = function(self, t) return math.floor(self:combatTalentScale(t, 1, 3, 1)) end,
 	on_pre_use = function(self, t) return self:callTalent(self.T_CALL_SHADOWS, "nbShadowsUp") > 0 end,
 	action = function(self, t) --closest friend will be a shadow almost all the time
-		local tg = {type="hit", nolock=true, first_target="friend", range=self:getTalentRadius(t)}
+		local tg = {type="hit", nolock=true, pass_terrain = true, first_target="friend", range=self:getTalentRadius(t)}
 		local x, y, target = self:getTarget(tg)
 		if not x or not y or not target then return nil end
 		if core.fov.distance(self.x, self.y, target.x, target.y) > self:getTalentRadius(t) then return nil end
@@ -125,7 +125,7 @@ newTalent{
 		return ([[Observers find it difficult to tell you and your shadows apart.
 		You can target a shadow in radius %d and instantly trade places with it.
 		%d random negative physical or magical effects are transferred from you to the chosen shadow in the process.]])
-		:format(self:getTalentRadius(t), t.getNb(self, t))
+		:tformat(self:getTalentRadius(t), t.getNb(self, t))
 	end,
 }
 
@@ -161,8 +161,8 @@ newTalent{
 		-- end
 		if not shadow then return false end
 
-		game:delayedLogDamage(src, self, 0, ("#GOLD#(%d decoy)#LAST#"):format(value), false)
-		game:delayedLogDamage(src, shadow, value, ("#GOLD#%d decoy#LAST#"):format(value), false)
+		game:delayedLogDamage(src, self, 0, ("#GOLD#(%d decoy)#LAST#"):tformat(value), false)
+		game:delayedLogDamage(src, shadow, value, ("#GOLD#%d decoy#LAST#"):tformat(value), false)
 		shadow:takeHit(value, src)
 		self:setEffect(self.EFF_SHADOW_DECOY, 4, {power=t.getPower(self, t)})
 		self:forceUseTalent(t.id, {ignore_energy=true})
@@ -184,6 +184,6 @@ newTalent{
 		When you would receive a fatal blow, you instantly transpose with a random shadow that takes the blow instead, putting this talent on cooldown.
 		For the next 4 turns you only die if you reach -%d life.
 		Effect increases with Mindpower.]]):
-		format(t.getPower(self, t))
+		tformat(t.getPower(self, t))
 	end,
 }

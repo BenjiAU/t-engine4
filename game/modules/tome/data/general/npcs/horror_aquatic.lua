@@ -55,13 +55,13 @@ newEntity{
 				end
 			end
 		end end
-		game.logSeen(self, "#LIGHT_BLUE#%s explodes into a huge bubble of air!", self.name:capitalize())
+		game.logSeen(self, "#LIGHT_BLUE#%s explodes into a huge bubble of air!", self:getName():capitalize())
 	end,
 }
 
 newEntity{ base = "BASE_NPC_HORROR_AQUATIC",
 	name = "entrenched horror", color=colors.DARK_GREY,
-	desc ="This massive stony structure shifts and pulsates, its many long, thin tentacles probing the nearby water for food.",
+	desc =_t"This massive stony structure shifts and pulsates, its many long, thin tentacles probing the nearby water for food.",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_aquatic_entrenched_horror.png", display_h=2, display_y=-1}}},
 	level_range = {15, nil}, exp_worth = 1,
 	rarity = 3,
@@ -90,7 +90,7 @@ newEntity{ base = "BASE_NPC_HORROR_AQUATIC",
 
 newEntity{ base = "BASE_NPC_HORROR_AQUATIC",
 	name = "swarming horror", color=colors.GREY,
-	desc ="This tiny fish-like creature moves erratically, but is constantly surrounded by others of its kind.",
+	desc =_t"This tiny fish-like creature moves erratically, but is constantly surrounded by others of its kind.",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_aquatic_swarming_horror.png", display_h=2, display_y=-1}}},
 	level_range = {10, nil}, exp_worth = 1,
 	rarity = 2,
@@ -113,7 +113,7 @@ newEntity{ base = "BASE_NPC_HORROR_AQUATIC",
 
 newEntity{ base = "BASE_NPC_HORROR_AQUATIC",
 	name = "ravenous horror", color=colors.GREY,
-	desc ="A vile looking liquid flows from the teeth of this agile monster. It glides through the water towards you, spined fins jutting outwards.",
+	desc =_t"A vile looking liquid flows from the teeth of this agile monster. It glides through the water towards you, spined fins jutting outwards.",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_aquatic_ravenous_horror.png", display_h=2, display_y=-1}}},
 	level_range = {10, nil}, exp_worth = 1,
 	rarity = 2,
@@ -132,7 +132,7 @@ newEntity{ base = "BASE_NPC_HORROR_AQUATIC",
 
 newEntity{ base = "BASE_NPC_HORROR_AQUATIC",
 	name = "boiling horror", color=colors.BLUE,
-	desc ="This frothing ball of water rages with an intense heat.",
+	desc =_t"This frothing ball of water rages with an intense heat.",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_aquatic_boiling_horror.png", display_h=2, display_y=-1}}},
 	level_range = {14, nil}, exp_worth = 1,
 	rarity = 4,
@@ -161,7 +161,7 @@ newEntity{ base = "BASE_NPC_HORROR_AQUATIC",
 
 newEntity{ base = "BASE_NPC_HORROR_AQUATIC",
 	name = "swarm hive", color=colors.BLACK,
-	desc ="This titanic mass of flesh pulsates and churns as tiny monsters burst from its orifices.",
+	desc =_t"This titanic mass of flesh pulsates and churns as tiny monsters burst from its orifices.",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_aquatic_swarm_hive.png", display_h=2, display_y=-1}}},
 	level_range = {15, nil}, exp_worth = 1,
 	rarity = 6,
@@ -191,7 +191,7 @@ newEntity{ base = "BASE_NPC_HORROR_AQUATIC",
 
 newEntity{ base = "BASE_NPC_HORROR_AQUATIC",
 	name = "abyssal horror", color=colors.BLACK,
-	desc = "This pitch black form is shrouded in darkness. All you can make out are a pair of deep red eyes, hidden behind a mass of tentacles.",
+	desc = _t"This pitch black form is shrouded in darkness. All you can make out are a pair of deep red eyes, hidden behind a mass of tentacles.",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_aquatic_abyssal_horror.png", display_h=2, display_y=-1}}},
 	level_range = {16, nil}, exp_worth = 1,
 	rarity = 12, --Scary but rare

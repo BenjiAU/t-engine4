@@ -32,7 +32,7 @@ function _M:init(mx, my, tmx, tmy, extra)
 	self:generateList()
 	self.__showup = false
 
-	local name = "Actions"
+	local name = _t"Actions"
 	local w = self.font_bold:size(name)
 	engine.ui.Dialog.init(self, name, 1, 100, mx, my)
 
@@ -98,7 +98,7 @@ function _M:use(item)
 	elseif act == "debug-inventory" then
 		local d
 		local actor = item.actor
-		d = item.actor:showEquipInven(item.actor.name..": Inventory", nil, function(o, inven, item, button, event)
+		d = item.actor:showEquipInven(("%s: Inventory"):tformat(item.actor:getName()), nil, function(o, inven, item, button, event)
 			if not o then return end
 			local ud = require("mod.dialogs.UseItemDialog").new(event == "button", actor, o, item, inven, function(_, _, _, stop)
 				d:updateData()
@@ -131,29 +131,29 @@ function _M:generateList()
 	local p = game.level.map(self.tmx, self.tmy, Map.PROJECTILE)
 
 	-- Generic actions
-	if g and g.change_level and self.on_player then list[#list+1] = {name="Change level", action="change_level", color=colors.simple(colors.VIOLET)} end
-	if o and self.on_player then list[#list+1] = {name="Pickup item", action="pickup", color=colors.simple(colors.ANTIQUE_WHITE)} end
-	if g and not self.on_player then list[#list+1] = {name="Move to", action="move_to", color=colors.simple(colors.ANTIQUE_WHITE)} end
-	if a and not self.on_player and game.party:canControl(a, false) then list[#list+1] = {name="Control", action="control", color=colors.simple(colors.TEAL), actor=a} end
-	if a and not self.on_player and game.party:canOrder(a, false) then list[#list+1] = {name="Give order", action="order", color=colors.simple(colors.TEAL), actor=a} end
+	if g and g.change_level and self.on_player then list[#list+1] = {name=_t"Change level", action="change_level", color=colors.simple(colors.VIOLET)} end
+	if o and self.on_player then list[#list+1] = {name=_t"Pickup item", action="pickup", color=colors.simple(colors.ANTIQUE_WHITE)} end
+	if g and not self.on_player then list[#list+1] = {name=_t"Move to", action="move_to", color=colors.simple(colors.ANTIQUE_WHITE)} end
+	if a and not self.on_player and game.party:canControl(a, false) then list[#list+1] = {name=_t"Control", action="control", color=colors.simple(colors.TEAL), actor=a} end
+	if a and not self.on_player and game.party:canOrder(a, false) then list[#list+1] = {name=_t"Give order", action="order", color=colors.simple(colors.TEAL), actor=a} end
 
-	if a and not self.on_player and config.settings.cheat then list[#list+1] = {name="Target player", action="target-player", color=colors.simple(colors.RED), actor=a} end
-	if a and config.settings.cheat then list[#list+1] = {name="Lua inspect [Actor]", action="debug-inspect", color=colors.simple(colors.LIGHT_BLUE), actor=a} end
-	if g and config.settings.cheat then list[#list+1] = {name="Lua inspect [Terrain]", action="debug-inspect", color=colors.simple(colors.LIGHT_BLUE), actor=g} end
-	if t and config.settings.cheat then list[#list+1] = {name="Lua inspect [Trap]", action="debug-inspect", color=colors.simple(colors.LIGHT_BLUE), actor=t} end
-	if p and config.settings.cheat then list[#list+1] = {name="Lua inspect [Projectile]", action="debug-inspect", color=colors.simple(colors.LIGHT_BLUE), actor=p} end
-	if a and config.settings.cheat then list[#list+1] = {name="Show inventory", action="debug-inventory", color=colors.simple(colors.YELLOW), actor=a} end
+	if a and not self.on_player and config.settings.cheat then list[#list+1] = {name=_t"Target player", action="target-player", color=colors.simple(colors.RED), actor=a} end
+	if a and config.settings.cheat then list[#list+1] = {name=_t"Lua inspect [Actor]", action="debug-inspect", color=colors.simple(colors.LIGHT_BLUE), actor=a} end
+	if g and config.settings.cheat then list[#list+1] = {name=_t"Lua inspect [Terrain]", action="debug-inspect", color=colors.simple(colors.LIGHT_BLUE), actor=g} end
+	if t and config.settings.cheat then list[#list+1] = {name=_t"Lua inspect [Trap]", action="debug-inspect", color=colors.simple(colors.LIGHT_BLUE), actor=t} end
+	if p and config.settings.cheat then list[#list+1] = {name=_t"Lua inspect [Projectile]", action="debug-inspect", color=colors.simple(colors.LIGHT_BLUE), actor=p} end
+	if a and config.settings.cheat then list[#list+1] = {name=_t"Show inventory", action="debug-inventory", color=colors.simple(colors.YELLOW), actor=a} end
 
-	if self.on_player then list[#list+1] = {name="Rest a while", action="rest", color=colors.simple(colors.ANTIQUE_WHITE)} end
-	if self.on_player then list[#list+1] = {name="Auto-explore", action="autoexplore", color=colors.simple(colors.ANTIQUE_WHITE)} end
-	if self.on_player then list[#list+1] = {name="Inventory", action="inventory", color=colors.simple(colors.ANTIQUE_WHITE)} end
-	if self.on_player then list[#list+1] = {name="Quest Log", action="quests", color=colors.simple(colors.ANTIQUE_WHITE)} end
-	if a and game.player:canSee(a) then list[#list+1] = {name="Inspect Creature", action="character_sheet", color=colors.simple(colors.ANTIQUE_WHITE), actor=a} end
+	if self.on_player then list[#list+1] = {name=_t"Rest a while", action="rest", color=colors.simple(colors.ANTIQUE_WHITE)} end
+	if self.on_player then list[#list+1] = {name=_t"Auto-explore", action="autoexplore", color=colors.simple(colors.ANTIQUE_WHITE)} end
+	if self.on_player then list[#list+1] = {name=_t"Inventory", action="inventory", color=colors.simple(colors.ANTIQUE_WHITE)} end
+	if self.on_player then list[#list+1] = {name=_t"Quest Log", action="quests", color=colors.simple(colors.ANTIQUE_WHITE)} end
+	if a and game.player:canSee(a) then list[#list+1] = {name=_t"Inspect Creature", action="character_sheet", color=colors.simple(colors.ANTIQUE_WHITE), actor=a} end
 		-- can add extended inspection commands here by including the start tab with the dialog
 	-- space separating inspect from active actions
-	list[#list+1] = {name=" ", action=nil, color=colors.simple(colors.ANTIQUE_WHITE)}
-	if not self.on_player and a and profile.auth and profile.hash_valid then list[#list+1] = {name="Link creature in chat", action="chat-link"} end
-	if self.on_player and (player.unused_stats > 0 or player.unused_talents > 0 or player.unused_generics > 0 or player.unused_talents_types > 0) then list[#list+1] = {name="Levelup!", action="levelup", color=colors.simple(colors.YELLOW)} end
+	list[#list+1] = {name=_t" ", action=nil, color=colors.simple(colors.ANTIQUE_WHITE)}
+	if not self.on_player and a and profile.auth and profile.hash_valid then list[#list+1] = {name=_t"Link creature in chat", action="chat-link"} end
+	if self.on_player and (player.unused_stats > 0 or player.unused_talents > 0 or player.unused_generics > 0 or player.unused_talents_types > 0) then list[#list+1] = {name=_t"Levelup!", action="levelup", color=colors.simple(colors.YELLOW)} end
 
 	-- Talents
 	if game.zone and not game.zone.wilderness then
@@ -189,9 +189,9 @@ function _M:generateList()
 				-- Pregenenerate icon with the Tiles instance that allows images
 				if t.display_entity and game.uiset.hotkeys_display_icons then t.display_entity:getMapObjects(game.uiset.hotkeys_display_icons.tiles, {}, 1) end
 				if self.on_player and not rt then
-					tals[#tals+1] = {name=e:getDisplayString()..t.name, dname=t.name, talent=t, action="talent", color=colors.simple(colors.GOLD)}
+					tals[#tals+1] = {name=e:getDisplayString()..tostring(player:getTalentDisplayName(t)), dname=t.name, talent=t, action="talent", color=colors.simple(colors.GOLD)}
 				elseif not self.on_player and rt then
-					tals[#tals+1] = {name=e:getDisplayString()..t.name, dname=t.name, talent=t, action="talent", set_target=tg or default_tg, color=colors.simple(colors.GOLD)}
+					tals[#tals+1] = {name=e:getDisplayString()..tostring(player:getTalentDisplayName(t)), dname=t.name, talent=t, action="talent", set_target=tg or default_tg, color=colors.simple(colors.GOLD)}
 				end
 			end
 		end

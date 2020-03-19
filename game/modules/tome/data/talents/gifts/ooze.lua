@@ -54,8 +54,8 @@ newTalent{
 		local m = mod.class.NPC.new{
 			type = "vermin", subtype = "oozes",
 			display = "j", color=colors.GREEN, image = "npc/vermin_oozes_bloated_ooze.png",
-			name = "bloated ooze",
-			desc = "It's made from your own flesh and it's oozing.",
+			name = _t"bloated ooze",
+			desc = _t"It's made from your own flesh and it's oozing.",
 			sound_moam = {"creatures/jelly/jelly_%d", 1, 3},
 			sound_die = {"creatures/jelly/jelly_die_%d", 1, 2},
 			sound_random = {"creatures/jelly/jelly_%d", 1, 3},
@@ -108,7 +108,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		local xs = self:knowTalent(self.T_REABSORB) and ([[In addition, you restore %0.1f Equilibrium per turn while this talent is active.
-		]]):format(self:callTalent(self.T_REABSORB, "equiRegen")) or ""
+		]]):tformat(self:callTalent(self.T_REABSORB, "equiRegen")) or ""
 		return ([[Your body is more like that of an ooze.
 		When you take damage, you may split and create a Bloated Ooze nearby within your line of sight.
 		This ooze has as much health as twice the damage you took (up to a maximum of %d, based on your Mindpower and maximum life).
@@ -116,7 +116,7 @@ newTalent{
 		You may have up to %d Bloated Oozes active at any time (limited by talent level and the summoning limit), and all damage you take will be split equally between you and them so long as this talent is active.
 		Bloated Oozes last for %d turns, are very resilient (%d%% all damage resistance to damage not coming through your shared link), and regenerate life quickly.
 		%sThe chance to split increases with your Cunning.]]):
-		format(t.getMaxHP(self, t), t.getChance(self, t)*3/100, t.getMax(self, t), t.getSummonTime(self, t), t.getOozeResist(self, t), xs)
+		tformat(t.getMaxHP(self, t), t.getChance(self, t)*3/100, t.getMax(self, t), t.getSummonTime(self, t), t.getOozeResist(self, t), xs)
 	end,
 }
 
@@ -166,7 +166,7 @@ newTalent{
 		This process releases a burst of antimagic, dealing %0.1f Manaburn damage in radius %d.
 		This talent allows you to restore %0.1f Equilibrium per turn while Mitosis is active.
 		The damage, duration and Equilibrium restoration increase with your Mindpower.]]):
-		format(t.getDuration(self, t), damDesc(self, DamageType.ARCANE, t.getDam(self, t)),	3, t.equiRegen(self, t))
+		tformat(t.getDuration(self, t), damDesc(self, DamageType.ARCANE, t.getDam(self, t)),	3, t.equiRegen(self, t))
 	end,
 }
 
@@ -240,7 +240,7 @@ newTalent{
 		If you have less than the maximum number of oozes allowed by the Mitosis talent, up to %d will be created with %d life (%d%% of the maximum life allowed by Mitosis).
 		Each ooze created will form near a random foe in sight (no more than one ooze per target) and grab its attention.
 		This will then allow you to channel a melee attack through your ooze to its target, doing %d%% weapon damage (as Acid).]]):
-		format(t.getMax(self, t), t.getLife(self, t), t.getModHP(self, t)*100, t.getWepDamage(self, t) * 100)
+		tformat(t.getMax(self, t), t.getLife(self, t), t.getModHP(self, t)*100, t.getWepDamage(self, t) * 100)
 	end,
 }
 
@@ -264,6 +264,6 @@ newTalent{
 		return ([[Your body's internal organs are indistinct, disguising your vital areas.
 		You have a %d%% chance to shrug off all direct critical hits (physical, mental, spell).
 		In addition you gain %d%% resistance to disease, poison, wounds and blindness.]]):
-		format(t.critResist(self, t), 100*t.immunities(self, t))
+		tformat(t.critResist(self, t), 100*t.immunities(self, t))
 	end,
 }

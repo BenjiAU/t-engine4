@@ -42,5 +42,5 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[An invocation portal, perpetually summoning beings through it.]],
+	desc = _t[[An invocation portal, perpetually summoning beings through it.]],
 }

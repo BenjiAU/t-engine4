@@ -24,7 +24,7 @@ newEntity{ base = "BASE_SCROLL", define_as = "NOTE_FROM_LAST_HOPE",
 	image = "object/letter1.png",
 	fire_proof = true,
 
-	use_simple = { name="open the seal and read the message", use = function(self, who)
+	use_simple = { name=_t"open the seal and read the message", use = function(self, who)
 		game:registerDialog(require("engine.dialogs.ShowText").new(self:getName{do_color=true}, "message-last-hope", {playername=who.name}, game.w * 0.6))
 		return {used=true, id=true}
 	end}
@@ -47,12 +47,12 @@ newEntity{ base = "BASE_GEM",
 newEntity{ define_as = "ATHAME_WEST",
 	quest=true, unique="Blood-Runed Athame West", identified=true, no_unique_lore=true,
 	type = "misc", subtype="misc",
-	unided_name = "athame",
+	unided_name = _t"athame",
 	name = "Blood-Runed Athame", image = "object/artifact/blood_runed_athame.png",
 	level_range = {50, 50},
 	display = "|", color=colors.VIOLET,
 	encumber = 1,
-	desc = [[An athame, covered in blood runes. It radiates power.]],
+	desc = _t[[An athame, covered in blood runes. It radiates power.]],
 
 	on_drop = function(self, who)
 		if who == game.player then
@@ -66,7 +66,7 @@ for i = 1, 4 do
 newEntity{ base = "BASE_LORE",
 	define_as = "IRON_THRONE_PROFIT"..i,
 	name = "Iron Throne Profits History", lore="iron-throne-profits-"..i,
-	desc = [[A journal of the profits history of the Iron Throne dwarves.]],
+	desc = _t[[A journal of the profits history of the Iron Throne dwarves.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -75,7 +75,7 @@ end
 newEntity{ base = "BASE_LORE",
 	define_as = "IRON_THRONE_LEDGER",
 	name = "Iron Throne trade ledger", lore="iron-throne-trade-ledger",
-	desc = [[A trade ledger of the Iron Throne dwarves.]],
+	desc = _t[[A trade ledger of the Iron Throne dwarves.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -83,7 +83,7 @@ newEntity{ base = "BASE_LORE",
 newEntity{ base = "BASE_LORE",
 	define_as = "IRON_THRONE_LAST_WORDS",
 	name = "Iron Throne Reknor expedition, last words", lore="iron-throne-last-words",
-	desc = [[Last words of a dwarven expedition to secure Reknor.]],
+	desc = _t[[Last words of a dwarven expedition to secure Reknor.]],
 	rarity = false,
 	encumberance = 0,
 }

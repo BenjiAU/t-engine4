@@ -20,45 +20,45 @@
 newAchievement{
 	name = "Level 10",
 	show = "full",
-	desc = [[Got a character to level 10.]],
+	desc = _t[[Got a character to level 10.]],
 }
 newAchievement{
 	name = "Level 20",
 	show = "full",
-	desc = [[Got a character to level 20.]],
+	desc = _t[[Got a character to level 20.]],
 }
 newAchievement{
 	name = "Level 30",
 	show = "full",
-	desc = [[Got a character to level 30.]],
+	desc = _t[[Got a character to level 30.]],
 }
 newAchievement{
 	name = "Level 40",
 	show = "full", huge=true,
-	desc = [[Got a character to level 40.]],
+	desc = _t[[Got a character to level 40.]],
 }
 newAchievement{
 	name = "Level 50",
 	show = "full", huge=true,
-	desc = [[Got a character to level 50.]],
+	desc = _t[[Got a character to level 50.]],
 }
 
 newAchievement{
 	name = "Unstoppable",
 	show = "full",
-	desc = [[Returned from the dead.]],
+	desc = _t[[Returned from the dead.]],
 }
 
 newAchievement{
 	name = "Utterly Destroyed", id = "EIDOLON_DEATH",
 	show = "name",
-	desc = [[Died on the Eidolon Plane.]],
+	desc = _t[[Died on the Eidolon Plane.]],
 }
 
 newAchievement{
 	name = "Fool of a Took!", id = "HALFLING_SUICIDE",
 	show = "name",
-	desc = [[Killed oneself as a halfling.]],
+	desc = _t[[Killed oneself as a halfling.]],
 	can_gain = function(self, who)
 		if who.descriptor and who.descriptor.race == "Halfling" then return true end
 	end
@@ -68,7 +68,7 @@ newAchievement{
 	name = "Emancipation", id = "EMANCIPATION",
 	image = "npc/alchemist_golem.png",
 	show = "name", huge=true,
-	desc = [[Had the golem kill a boss while its master was already dead.]],
+	desc = _t[[Had the golem kill a boss while its master was already dead.]],
 	mode = "player",
 	can_gain = function(self, who, target)
 		local p = game.party:findMember{main=true}
@@ -85,7 +85,7 @@ newAchievement{
 newAchievement{
 	name = "Take you with me", id = "BOSS_REVENGE",
 	show = "full", huge=true,
-	desc = [[Killed a boss while already dead.]],
+	desc = _t[[Killed a boss while already dead.]],
 	mode = "player",
 	can_gain = function(self, who, target)
 		local p = game.party:findMember{main=true}
@@ -98,11 +98,11 @@ newAchievement{
 newAchievement{
 	name = "Look at me, I'm playing a roguelike!", id = "SELF_CENTERED",
 	show = "name",
-	desc = [[Linked yourself in the in-game chat.]],
+	desc = _t[[Linked yourself in the in-game chat.]],
 }
 
 newAchievement{
 	name = "Fear me not!", id = "FEARSCAPE",
 	show = "full",
-	desc = [[Survived the Fearscape!]],
+	desc = _t[[Survived the Fearscape!]],
 }

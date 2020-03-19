@@ -18,11 +18,11 @@
 -- darkgod@te4.org
 
 -- race & classes
-newTalentType{ type="base/class", name = "class", hide = true, description = "The basic talents defining a class." }
-newTalentType{ type="base/race", name = "race", hide = true, description = "The various racial bonuses a character can have." }
-newTalentType{ is_nature = true, type="inscriptions/infusions", name = "infusions", hide = true, description = "Infusions are not class abilities, you must find them or learn them from other people." }
-newTalentType{ is_spell=true, no_silence=true, type="inscriptions/runes", name = "runes", hide = true, description = "Runes are not class abilities, you must find them or learn them from other people." }
-newTalentType{ is_spell=true, no_silence=true, type="inscriptions/taints", name = "taints", hide = true, description = "Taints are not class abilities, you must find them or learn them from other people." }
+newTalentType{ type="base/class", name = _t"class", hide = true, description = _t"The basic talents defining a class." }
+newTalentType{ type="base/race", name = _t"race", hide = true, description = _t"The various racial bonuses a character can have." }
+newTalentType{ is_nature = true, type="inscriptions/infusions", name = _t"infusions", hide = true, description = _t"Infusions are not class abilities, you must find them or learn them from other people." }
+newTalentType{ is_spell=true, no_silence=true, type="inscriptions/runes", name = _t"runes", hide = true, description = _t"Runes are not class abilities, you must find them or learn them from other people." }
+newTalentType{ is_spell=true, no_silence=true, type="inscriptions/taints", name = _t"taints", hide = true, description = _t"Taints are not class abilities, you must find them or learn them from other people." }
 
 -- Load other misc things
 load("/data/talents/misc/objects.lua")
@@ -87,7 +87,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Hack and slash, baby!]])
+		return ([[Hack and slash, baby!]]):tformat()
 	end,
 }
 
@@ -213,17 +213,17 @@ newTalent{
 		if target.level - 2 > self.level then
 			-- level bonus
 			hateGain = hateGain + math.ceil(self:combatTalentScale(target.level - 2 - self.level, 2, 10, "log", 0, 1))
-			hateMessage = "#F53CBE#You have taken the life of an experienced foe!"
+			hatemessage = _t"#F53CBE#You have taken the life of an experienced foe!"
 		end
 
 		if target.rank >= 4 then
 			-- boss bonus
 			hateGain = hateGain * 4
-			hateMessage = "#F53CBE#Your hate has conquered a great adversary!"
+			hatemessage = _t"#F53CBE#Your hate has conquered a great adversary!"
 		elseif target.rank >= 3 then
 			-- elite bonus
 			hateGain = hateGain * 2
-			hateMessage = "#F53CBE#An elite foe has fallen to your hate!"
+			hatemessage = _t"#F53CBE#An elite foe has fallen to your hate!"
 		end
 		hateGain = math.min(hateGain, 100)
 
@@ -262,7 +262,7 @@ newTalent{
 	end,
 	info = function(self, t) return ([[You are hunted!.
 		There is a %d%% chance each turn that all foes in a %d radius get a glimpse of your position for 30 turns.]]):
-		format(math.min(100, 1 + self.level / 7), 10 + self.level / 5)
+		tformat(math.min(100, 1 + self.level / 7), 10 + self.level / 5)
 	end,
 }
 
@@ -295,7 +295,7 @@ newTalent{
 		self:setEffect(self.EFF_TELEPORT_ANGOLWEN, 40, {})
 		return true
 	end,
-	info = [[Allows a mage to teleport to the secret town of Angolwen.
+	info = _t[[Allows a mage to teleport to the secret town of Angolwen.
 	You have studied the magic arts there and have been granted a special portal spell to teleport there.
 	Nobody must learn about this spell and so it should never be used while seen by any creatures.
 	The spell will take time to activate. You must be out of sight of any creature when you cast it and when the teleportation takes effect.]]
@@ -338,7 +338,7 @@ newTalent{
 		self:attr("time_travel_times", 1)
 		return true
 	end,
-	info = [[Allows a chronomancer to timeport to Point Zero.
+	info = _t[[Allows a chronomancer to timeport to Point Zero.
 	You have studied the chronomancy there and have been granted a special portal spell to teleport back.
 	This spell must be kept secret; it should never be used within view of uninitiated witnesses.
 	The spell takes time (40 turns) to activate, and you must be out of sight of any other creature when you cast it and when the timeportation takes effect.]]
@@ -371,7 +371,7 @@ newTalent{
 			local e = target.tempeffect_def[eff_id]
 			if e.status == "detrimental" and self.save_for_effects[e.type] then
 				local decrease = t.getReduction(self, t, e)
-				print(("%s: Reducing duration of %s, using %s, by %d"):format(t.name, e.desc, self.save_for_effects[e.type], decrease))
+				print(("%s: Reducing duration of %s, using %s, by %d"):tformat(t.name, e.desc, self.save_for_effects[e.type], decrease))
 				p.dur = p.dur - decrease
 				if p.dur <= 0 then todel[#todel+1] = eff_id end
 			end
@@ -385,13 +385,13 @@ newTalent{
 	info = function(self, t)
 		local eff_desc = ""
 		for e_type, fn in pairs(self.save_for_effects) do
-			eff_desc = eff_desc .. ("\n%s effect durations -%d turns"):format(e_type:capitalize(), t.getReduction(self, t, e_type))
+			eff_desc = eff_desc .. ("\n%s effect durations -%d turns"):tformat(_t(e_type):capitalize(), t.getReduction(self, t, e_type))
 		end
 		return ([[Not the Master himself, nor all the orcs in fallen Reknor, nor even the terrifying unknown beyond Reknor's portal could slow your pursuit of the Staff of Absorption.
 		Children will hear of your relentlessness in song for years to come.
 		When activated, this ability reduces the duration of all active detrimental effects by 20%% of your associated save value or 2, whichever is greater:
 		%s]]):
-		format(eff_desc)
+		tformat(eff_desc)
 	end,
 }
 
@@ -412,7 +412,7 @@ newTalent{
 		end)
 		return true
 	end,
-	info = [[Use the onboard short-range teleport of the Fortress to beam down to the surface.
+	info = _t[[Use the onboard short-range teleport of the Fortress to beam down to the surface.
 	Requires being in flight above the ground of a planet.]]
 }
 
@@ -443,7 +443,7 @@ newTalent{
 		game:playSoundNear(self, "talents/arcane")
 		return true
 	end,
-	info = [[Use 10 Fortress energy to send a powerful blast to the ground, directly below the Fortress, heavily damaging any creatures caught inside.
+	info = _t[[Use 10 Fortress energy to send a powerful blast to the ground, directly below the Fortress, heavily damaging any creatures caught inside.
 	Requires being in flight above the ground of a planet.]]
 }
 
@@ -462,6 +462,6 @@ newTalent{
 
 		return true
 	end,
-	info = [[Activate the powerful flight engines of the Fortress, propelling it fast into high planetary orbit.
+	info = _t[[Activate the powerful flight engines of the Fortress, propelling it fast into high planetary orbit.
 	Requires being in flight above the ground of a planet.]]
 }

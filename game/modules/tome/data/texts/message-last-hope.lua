@@ -20,7 +20,7 @@
 local delivered_staff = game.player:resolveSource():isQuestStatus("staff-absorption", engine.Quest.COMPLETED, "survived-ukruk")
 
 if delivered_staff then
-return [[@playername@, this message is of utmost importance.
+return _t[[@playername@, this message is of utmost importance.
 
 The staff you left at Last Hope is gone. A raid of orcs ambushed the guards that were transporting it to a secret vault.
 Our troops managed to capture one of the orcs and made him talk.
@@ -33,7 +33,7 @@ This calls for urgency; should you find this Golbug or the portal, please invest
 
 else
 
-return [[@playername@, this message is of utmost importance.
+return _t[[@playername@, this message is of utmost importance.
 
 Our elders searched the old texts looking for clues about the staff of which you spoke.
 It turns out to be a powerful object indeed, able to absorb the power of places, and beings.

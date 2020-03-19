@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 Some clues:
 
 1) #LIGHT_GREEN#Defense#WHITE# is 20 and #LIGHT_GREEN#Physical Save#WHITE# is 21, yet they have different colors and positions.

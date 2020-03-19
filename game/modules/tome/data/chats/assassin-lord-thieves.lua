@@ -18,9 +18,9 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[I ain't no chatting! Speak to the boss!]],
+	text = _t[[I ain't no chatting! Speak to the boss!]],
 	answers = {
-		{"[leave]"},
+		{_t"[leave]"},
 	}
 }
 

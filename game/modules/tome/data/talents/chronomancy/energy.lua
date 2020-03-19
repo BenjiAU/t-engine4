@@ -36,7 +36,7 @@ newTalent{
 		-- works like armor with 30% hardiness
 		dam = math.max(dam * 0.3 - decomp, 0) + (dam * 0.7)
 		print("[PROJECTOR] after static reduction dam", dam)
-		game:delayedLogDamage(src or self, self, 0, ("%s(%d dissipated)#LAST#"):format(DamageType:get(type).text_color or "#aaaaaa#", lastdam - dam), false)
+		game:delayedLogDamage(src or self, self, 0, ("%s(%d dissipated)#LAST#"):tformat(DamageType:get(type).text_color or "#aaaaaa#", lastdam - dam), false)
 		return {dam=dam}
 	end,
 	activate = function(self, t)
@@ -54,7 +54,7 @@ newTalent{
 	info = function(self, t)
 		local decomp = t.getDecomposition(self, t)
 		return ([[Partially dissipates all incoming damage, reducing it by 30%%, up to a maximum of %d.
-		The maximum damage reduction will scale with your Spellpower.]]):format(decomp)
+		The maximum damage reduction will scale with your Spellpower.]]):tformat(decomp)
 	end,
 }
 
@@ -86,7 +86,7 @@ newTalent{
 		if not target then return end
 
 		if not self:checkHit(getParadoxSpellpower(self, t), target:combatSpellResist()) then
-			game.logSeen(target, "%s resists!", target.name:capitalize())
+			game.logSeen(target, "%s resists!", target:getName():capitalize())
 			return true
 		end
 
@@ -103,7 +103,7 @@ newTalent{
 			local t = rng.tableRemove(tids)
 			if not t then break end
 			target.talents_cd[t.id] = cdr
-			game.logSeen(target, "%s's %s is disrupted by the Energy Absorption!", target.name:capitalize(), t.name)
+			game.logSeen(target, "%s's %s is disrupted by the Energy Absorption!", target:getName():capitalize(), t.name)
 			count = count + 1
 		end
 
@@ -134,7 +134,7 @@ newTalent{
 		local cooldown = t.getCooldown(self, t)
 		return ([[You sap the target's energy and add it to your own, placing up to %d random talents on cooldown for %d turns.
 		For each talent put on cooldown, you reduce the cooldown of one of your talents currently on cooldown by %d turns.]]):
-		format(talentcount, cooldown, cooldown)
+		tformat(talentcount, cooldown, cooldown)
 	end,
 }
 
@@ -160,7 +160,7 @@ newTalent{
 		local cooldown = t.getMaxCooldown(self, t)
 		return ([[The next talent you cast with a cooldown of %d or less will not go on cooldown.
 		Once a talent is effected by this spell or %d turns pass the effect is lost.]]):
-		format(cooldown, duration)
+		tformat(cooldown, duration)
 	end,
 }
 
@@ -194,6 +194,6 @@ newTalent{
 	end,
 	info = function(self, t)
 		local duration = t.getDuration(self, t)
-		return ([[Each turn, for the next %d turns, one of the target's sustained talents will be deactivated.]]):format(duration)
+		return ([[Each turn, for the next %d turns, one of the target's sustained talents will be deactivated.]]):tformat(duration)
 	end,
 }

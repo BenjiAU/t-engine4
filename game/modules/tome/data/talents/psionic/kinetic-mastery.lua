@@ -49,7 +49,7 @@ newTalent{
 		Kinetic Leech will put enemies to sleep.
 		Kinetic Strike will hit 2 adjacent enemies in a sweeping attack.
 		The damage bonus and resistance penetration scale with your Mindpower.
-		Only one Transcendent talent may be in effect at a time.]]):format(t.getDuration(self, t), t.getPower(self, t), t.getPenetration(self, t))
+		Only one Transcendent talent may be in effect at a time.]]):tformat(t.getDuration(self, t), t.getPower(self, t), t.getPenetration(self, t))
 	end,
 }
 
@@ -99,7 +99,7 @@ newTalent{
 				if target:canBe("stun") then
 					target:setEffect(target.EFF_STUNNED, math.floor(self:getTalentRange(t) / 2), {apply_power=self:combatMindpower()})
 				else
-					game.logSeen(target, "%s resists the stun!", target.name:capitalize())
+					game.logSeen(target, "%s resists the stun!", target:getName():capitalize())
 				end
 			else --If the target resists the knockback, do half damage to it.
 				target:logCombat(self, "#YELLOW##Source# resists #Target#'s throw!")
@@ -151,7 +151,7 @@ newTalent{
 		When used on yourself, you will launch in a straight line, knocking enemies flying and doing %0.1f Physical damage to each.
 		You can break through %d walls while doing this.
 		The damage and range increases with Mindpower.]]):
-		format(range, dam, math.floor(range/2), dam/2, t.getKBResistPen(self, t), dam, math.floor(range/2))
+		tformat(range, dam, math.floor(range/2), dam/2, t.getKBResistPen(self, t), dam, math.floor(range/2))
 	end,
 }
 
@@ -212,7 +212,7 @@ newTalent{
 		All projectiles targeting you have a %d%% chance to instead target another spot within radius %d and move %d%% slower.
 		If you choose, you can use your mind to grab all projectiles within radius 10 of you and hurl them toward any location within range %d of you, but this will break your concentration.
 		To do this, deactivate this sustained talent.]]):
-		format(chance, spread, chance, self:getTalentRange(t))
+		tformat(chance, spread, chance, self:getTalentRange(t))
 	end,
 }
 
@@ -255,6 +255,6 @@ newTalent{
 		local dam = t.getDamage(self, t)
 		return ([[Bind the target mercilessly with constant, bone-shattering pressure, pinning and slowing it by 50%% for %d turns and dealing %0.1f Physical damage each turn.
 		The duration and damage improve with Mindpower.]]):
-		format(dur, damDesc(self, DamageType.PHYSICAL, dam))
+		tformat(dur, damDesc(self, DamageType.PHYSICAL, dam))
 	end,
 }

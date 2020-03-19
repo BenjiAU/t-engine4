@@ -33,7 +33,7 @@ newTalent{
 		return ([[Increases weapon damage by %d%% and physical power by 30 when using swords, axes, maces, knives, or bows.
 		You now also use your Magic in place of Strength when equipping weapons and ammo as well as when calculating weapon damage.
 		These bonuses override rather than stack with weapon mastery, dagger mastery, and bow mastery.]]):
-		format(100*inc)
+		tformat(100*inc)
 	end,
 }
 
@@ -54,7 +54,7 @@ newTalent{
 		-- If we already have a guardian, split the damage
 		if self.unity_warden and game.level:hasEntity(self.unity_warden) then
 		
-			game:delayedLogDamage(src, self.unity_warden, split, ("#STEEL_BLUE#(%d shared)#LAST#"):format(split), nil)
+			game:delayedLogDamage(src, self.unity_warden, split, ("#STEEL_BLUE#(%d shared)#LAST#"):tformat(split), nil)
 			cb.value = cb.value - split
 			self.unity_warden:takeHit(split, src)
 		
@@ -91,7 +91,7 @@ newTalent{
 					game.party:addMember(m, {
 						control="order",
 						type="temporal-clone",
-						title="Guardian",
+						title=_t"Guardian",
 						orders = {target=true, leash=true, anchor=true, talents=true},
 					})
 				end
@@ -102,7 +102,7 @@ newTalent{
 				m:takeHit(split, src)
 				m:setTarget(src or nil)
 				game:delayedLogMessage(self, nil, "guardian_damage", "#STEEL_BLUE##Source# shares damage with %s guardian!", string.his_her(self))
-				game:delayedLogDamage(src or self, self, 0, ("#STEEL_BLUE#(%d shared)#LAST#"):format(split), nil)
+				game:delayedLogDamage(src or self, self, 0, ("#STEEL_BLUE#(%d shared)#LAST#"):tformat(split), nil)
 
 			else
 				game.logPlayer(self, "Not enough space to summon warden!")
@@ -118,7 +118,7 @@ newTalent{
 		local cooldown = self:getTalentCooldown(t)
 		return ([[When a single hit deals more than %d%% of your maximum life another you appears and takes %d%% of the damage as well as %d%% of all damage you take for the next %d turns.
 		The clone is out of phase with this reality and deals 50%% less damage but its arrows will pass through friendly targets.
-		This talent has a cooldown.]]):format(trigger, split * 2, split, duration)
+		This talent has a cooldown.]]):tformat(trigger, split * 2, split, duration)
 	end,
 }
 
@@ -142,7 +142,7 @@ newTalent{
 	callbackOnActBase = function(self, t)
 		if rng.percent(t.getPower(self, t)) then
 			if self:removeEffectsFilter({status="detrimental", ignore_crosstier=true}, 1) > 0 then
-				game.logSeen(self, "#ORCHID#%s has recovered!#LAST#", self.name:capitalize())
+				game.logSeen(self, "#ORCHID#%s has recovered!#LAST#", self:getName():capitalize())
 			end
 		end
 	end,
@@ -151,7 +151,7 @@ newTalent{
 		local power = t.getPower(self, t)
 		return ([[Improves your capacity to see invisible foes by +%d and to see through stealth by +%d.  Additionally you have a %d%% chance to recover from a single negative status effect each turn.
 		Sense abilities will scale with your Magic stat.]]):
-		format(sense, sense, power)
+		tformat(sense, sense, power)
 	end,
 }
 
@@ -206,6 +206,6 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[Attack the target with either your ranged or melee weapons for %d%% weapon damage.  For the next %d turns random targeting, such as from Blink Blade and Warden's Call, will focus on this target.
 		Attacks against this target gain %d%% critical chance and critical strike power while you take %d%% less damage from all enemies whose rank is lower then that of your focus target.]])
-		:format(damage, duration, power, power, power)
+		:tformat(damage, duration, power, power, power)
 	end
 }

@@ -22,7 +22,7 @@ newTalent{
 	type = {"wild-gift/call", 1},
 	require = gifts_req1,
 	points = 5,
-	message = function(self, t) return self.sustain_talents[t.id] and "@Source@ interrupts @hisher@ #GREEN#meditation#LAST#." or "@Source@ #GREEN#meditates#LAST# on nature." end,
+	message = function(self, t) return self.sustain_talents[t.id] and _t"@Source@ interrupts @hisher@ #GREEN#meditation#LAST#." or _t"@Source@ #GREEN#meditates#LAST# on nature." end,
 	mode = "sustained",
 	cooldown = 20,
 	range = 10,
@@ -84,7 +84,7 @@ newTalent{
 		Your deep meditation does not let you deal damage correctly, reducing the damage you and your summons deal by 50%%.
 		Also, any time you are resting (even with Meditation not sustained) you enter a simple meditative state that decreases your equilibrium by %0.2f per turn.
 		The activated effects increase with your Mindpower.]]):
-		format(pt, save, heal, rest)
+		tformat(pt, save, heal, rest)
 	end,
 }
 
@@ -146,7 +146,7 @@ newTalent{ short_name = "NATURE_TOUCH",
 	info = function(self, t)
 		return ([[Touch a target (or yourself) to infuse it with Nature, healing it for %d (this heal does not work on undead).
 		The amount healed will increase with your Mindpower.]]):
-		format(t.getHeal(self, t))
+		tformat(t.getHeal(self, t))
 	end,
 }
 
@@ -172,7 +172,7 @@ newTalent{
 		local radius_esp = t.radius_esp(self, t)
 		return ([[Using your connection to Nature, you can see your surrounding area in a radius of %d.
 		Also, while meditating, you are able to detect the presence of creatures around you in a radius of %d.]]):
-		format(radius, radius_esp)
+		tformat(radius, radius_esp)
 	end,
 }
 
@@ -211,6 +211,6 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Your deep link with Nature allows you to reset the cooldown of %d of your wild gifts of tier %d or less.]]):
-		format(t.getTalentCount(self, t), t.getMaxLevel(self, t))
+		tformat(t.getTalentCount(self, t), t.getMaxLevel(self, t))
 	end,
 }

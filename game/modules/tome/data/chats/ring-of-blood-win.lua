@@ -18,11 +18,11 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[So, you tasted blood? Liked it? I am sure you did; you are just that kind of people.
+	text = _t[[So, you tasted blood? Liked it? I am sure you did; you are just that kind of people.
 Anyway, I suppose you deserve your reward.
 You can always participate again for fun, if you've got the gold to spare.]],
 	answers = {
-		{"Thanks, it was fun!", action=function(npc, player) player:hasQuest("ring-of-blood"):reward(player) end},
+		{_t"Thanks, it was fun!", action=function(npc, player) player:hasQuest("ring-of-blood"):reward(player) end},
 	}
 }
 

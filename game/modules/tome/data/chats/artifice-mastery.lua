@@ -21,7 +21,7 @@ local Talents = require("engine.interface.ActorTalents")
 chat_talent = player:getTalentFromId(chat_tid)
 chat_level = player:getTalentLevelRaw(chat_tid)
 local function generate_tools()
-	local answers = {{"Cancel"}}
+	local answers = {{_t"Cancel"}}
 	for tid, m_tid in pairs(tool_ids) do
 		local t = player:getTalentFromId(tid)
 		local m_t = player:getTalentFromId(m_tid)
@@ -47,12 +47,12 @@ local function generate_tools()
 					player:talentDialogReturn(m_tid)
 				end
 			end
-			answers[#answers+1] = {("%s[%s -- mastery: %s]#LAST#"):format(player.artifice_tools_mastery == tid and "#YELLOW#" or "", t.name, m_t.name),
+			answers[#answers+1] = {("%s[%s -- mastery: %s]#LAST#"):tformat(player.artifice_tools_mastery == tid and "#YELLOW#" or "", t.name, m_t.name),
 				action=master_talent,
 				on_select=function(npc, player)
 					local mastery = nil
 					game.tooltip_x, game.tooltip_y = 1, 1
-					game:tooltipDisplayAtMap(game.w, game.h, "#GOLD#"..m_t.name.."#LAST#\n"..tostring(player:getTalentFullDescription(m_t, nil, {force_level=chat_level}, mastery)))
+					game:tooltipDisplayAtMap(game.w, game.h, ("#GOLD#%s#LAST#\n%s"):tformat(m_t.name, tostring(player:getTalentFullDescription(m_t, nil, {force_level=chat_level}, mastery))))
 				end,
 			}
 		end
@@ -61,7 +61,7 @@ local function generate_tools()
 end
 
 newChat{ id="welcome",
-	text = [[Master which tool?]],
+	text = _t[[Master which tool?]],
 	answers = generate_tools(),
 }
 

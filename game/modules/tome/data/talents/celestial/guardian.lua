@@ -56,7 +56,7 @@ newTalent{
 		If you do not have any positive energy, the effect will not trigger.
 		Additionally, once per turn successful melee attacks will trigger a bonus attack with your shield dealing %d%% light damage.
 		The healing done will increase with your Spellpower.]]):
-		format(heal, t.getShieldDamage(self, t)*100)
+		tformat(heal, t.getShieldDamage(self, t)*100)
 	end,
 }
 
@@ -113,7 +113,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[Hits the target with your weapon doing %d%% damage, and with a shield strike doing %d%% damage. If the shield strike connects, your shield will explode in a burst of light that inflicts %0.2f light damage on all targets except yourself within radius %d of the target, and light up all tiles in that radius.
 		The light damage will increase with your Spellpower.]]):
-		format(100 * weapondamage, 100 * shielddamage, damDesc(self, DamageType.LIGHT, lightdamage), radius)
+		tformat(100 * weapondamage, 100 * shielddamage, damDesc(self, DamageType.LIGHT, lightdamage), radius)
 	end,
 }
 
@@ -167,13 +167,13 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local absorb_string = ""
 		if self.retribution_absorb and self.retribution_strike then
-			absorb_string = ([[#RED#Absorb Remaining: %d]]):format(self.retribution_absorb)
+			absorb_string = ([[#RED#Absorb Remaining: %d]]):tformat(self.retribution_absorb)
 		end
 
 		return ([[Retribution negates half of all damage you take while it is active. Once Retribution has negated %0.2f damage, your shield will explode in a burst of light, inflicting damage equal to the amount negated in a radius of %d and deactivating the talent.
 		The amount absorbed will increase with your Spellpower.
 		%s]]):
-		format(damage, self:getTalentRange(t), absorb_string)
+		tformat(damage, self:getTalentRange(t), absorb_string)
 	end,
 }
 
@@ -224,6 +224,6 @@ newTalent{
 		return ([[You demonstrate your dedication to the light with a measured attack striking once with your weapon for %d%% Light damage and once with your shield for %d%% Light damage.
 			If the first strike connects %d random talent cooldowns are reduced by 1.
 			If the second strike connects you are cleansed of %d debuffs.]]):
-		format(weapon, shield, cooldown, cleanse)
+		tformat(weapon, shield, cooldown, cleanse)
 	end,
 }

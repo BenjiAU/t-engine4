@@ -51,7 +51,7 @@ newTalent{
 		local dam = t.getDamage(self, t)
 		return ([[Channel acid through your psiblades, extending their reach to create a beam doing %0.1f Acid damage (which can disarm them).
 		The damage increases with your Mindpower.]]):
-		format(damDesc(self, DamageType.ACID, dam))
+		tformat(damDesc(self, DamageType.ACID, dam))
 	end,
 }
 
@@ -75,14 +75,14 @@ newTalent{
 		When you deal Nature damage to a creature, you gain a %0.1f%% bonus to Acid damage for %d turns.
 		This damage bonus will improve up to 4 times (no more than once each turn) with later Nature damage you do, up to a maximum of %0.1f%%.
 		The resistance and damage increase improve with your Mindpower.]]):
-		format(t.getResist(self, t), t.getAcidDamage(self, t, 1), t.getDuration(self, t), t.getAcidDamage(self, t, 5))
+		tformat(t.getResist(self, t), t.getAcidDamage(self, t, 1), t.getDuration(self, t), t.getAcidDamage(self, t, 5))
 	end,
 }
 
 local basetrap = function(self, t, x, y, dur, add)
 	local Trap = require "mod.class.Trap"
 	local trap = {
-		id_by_type=true, unided_name = "trap",
+		id_by_type=true, unided_name = _t"trap",
 		display = '^',
 		faction = self.faction,
 		summoner = self, summoner_gain_exp = true,
@@ -176,7 +176,7 @@ newTalent{
 		The first seed will appear at the center of the target zone, while others will appear at random spots.
 		Each seed lasts %d turns and will explode when a hostile creature walks over it, knocking the creature back and dealing %0.1f Acid damage within radius 1.
 		The damage will increase with your Mindpower.]]):
-		format(nb, t.getDuration(self, t), damDesc(self, DamageType.ACID, dam))
+		tformat(nb, t.getDuration(self, t), damDesc(self, DamageType.ACID, dam))
 	end,
 }
 
@@ -218,6 +218,6 @@ newTalent{
 		local regen = t.getRegen(self, t)
 		return ([[Surround yourself with natural forces, ignoring %d%% acid resistance of your targets.
 		In addition, the acid will nourish your bloated oozes, giving them an additional %0.1f life regeneration per turn.]])
-		:format(ressistpen, regen)
+		:tformat(ressistpen, regen)
 	end,
 }

@@ -72,7 +72,7 @@ newTalent{
 		At level 3, it will create a beam of shadows.
 		At level 5, none of your Nightfall spells will hurt your minions.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.DARKNESS, damage))
+		tformat(damDesc(self, DamageType.DARKNESS, damage))
 	end,
 }
 
@@ -119,7 +119,7 @@ newTalent{
 		Only one bane can affect a creature.
 		Banes last for %d turns, and also deal %0.2f darkness damage.
 		The damage will increase with your Spellpower.]]):
-		format(t.getBaneDur(self,t), damDesc(self, DamageType.DARKNESS, damage))
+		tformat(t.getBaneDur(self,t), damDesc(self, DamageType.DARKNESS, damage))
 	end,
 }
 
@@ -152,7 +152,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[Invoke a cone dealing %0.2f darkness damage in a radius of %d. Any creatures caught inside must make check against their Mental Save or be knocked back 4 grids away.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.DARKNESS, damage), self:getTalentRadius(t))
+		tformat(damDesc(self, DamageType.DARKNESS, damage), self:getTalentRadius(t))
 	end,
 }
 
@@ -190,6 +190,6 @@ newTalent{
 		Necrotic minions' damage against those creatures is increased by %d%%.
 		The effects last for %d turns.
 		The damage done and the minions' damage increase will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.DARKNESS, damage), self:getTalentRadius(t), speed, minion, dur)
+		tformat(damDesc(self, DamageType.DARKNESS, damage), self:getTalentRadius(t), speed, minion, dur)
 	end,
 }

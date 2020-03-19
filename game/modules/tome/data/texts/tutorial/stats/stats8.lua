@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 It looks like there are quite a few ways to match up the offensive #GOLD#combat stats#WHITE#...
 #LIGHT_GREEN#Accuracy#WHITE#
 #LIGHT_GREEN#Physical power#WHITE#

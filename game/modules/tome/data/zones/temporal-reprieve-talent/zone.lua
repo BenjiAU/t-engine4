@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Temporal Reprieve",
+	name = _t"Temporal Reprieve",
 	level_range = {1, 100},
 	level_scheme = "player",
 	max_level = 1,

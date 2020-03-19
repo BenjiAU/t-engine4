@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 Congratulations! Hopefully this series of obstacles has led you to some conclusions:
 
 1) When comparing #GOLD#combat stat#WHITE# scores, a difference of ten is the magic number that maximizes success.

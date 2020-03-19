@@ -24,11 +24,11 @@ local Talents = require "engine.interface.ActorTalents"
 newEntity{ base = "BASE_GEM", define_as = "ANCIENT_STORM_SAPHIR",
 	power_source = {unknown=true},
 	unique = true,
-	unided_name = "strange sapphire",
+	unided_name = _t"strange sapphire",
 	name = "Ancient Storm Sapphire", subtype = "blue", image = "object/ancient_storm_saphir.png",
 	color = colors.ROYAL_BLUE,
 	level_range = {30, 50},
-	desc = [[This seemingly normal sapphire seems to be charged with the destructive power of a raging storm.]],
+	desc = _t[[This seemingly normal sapphire seems to be charged with the destructive power of a raging storm.]],
 	rarity = 300,
 	cost = 0,
 	material_level = 4,
@@ -45,7 +45,7 @@ newEntity{ base = "BASE_SCROLL", define_as = "JEWELER_SUMMON", subtype="tome", n
 	fire_proof = true,
 
 	max_power = 1, power_regen = 1,
-	use_power = { name = "summon Limmir the jeweler at the center of the lake of the moon", power = 1,
+	use_power = { name = _t"summon Limmir the jeweler at the center of the lake of the moon", power = 1,
 		use = function(self, who) who:hasQuest("master-jeweler"):summon_limmir(who) return {id=true, used=true} end
 	},
 }
@@ -54,13 +54,13 @@ newEntity{ base = "BASE_AMULET",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Pendant of the Sun and Moons", color = colors.LIGHT_SLATE, image = "object/artifact/amulet_pendant_of_sun_and_the_moon.png",
-	unided_name = "a gray and gold pendant",
-	desc = [[This small pendant depicts a hematite moon eclipsing a golden sun and according to legend was worn by one of the Sunwall's founders.]],
+	unided_name = _t"a gray and gold pendant",
+	desc = _t[[This small pendant depicts a hematite moon eclipsing a golden sun and according to legend was worn by one of the Sunwall's founders.]],
 	level_range = {35, 45},
 	rarity = 300,
 	cost = 200,
 	material_level = 4,
-	special_desc = function(self) return "All your damage is converted and split into light and darkness." end,
+	special_desc = function(self) return _t"All your damage is converted and split into light and darkness." end,
 	wielder = {
 		twilight_mastery = 0.5,
 		combat_spellpower = 8,
@@ -77,11 +77,11 @@ newEntity{ base = "BASE_AMULET",
 newEntity{ base = "BASE_SHIELD", define_as = "SHIELD_UNSETTING",
 	power_source = {arcane=true},
 	unique = true,
-	unided_name = "shimmering gold shield",
+	unided_name = _t"shimmering gold shield",
 	name = "Unsetting Sun", image = "object/artifact/shield_unsetting_sun.png",
 	moddable_tile = "special/%s_unsetting_sun",
 	moddable_tile_big = true,
-	desc = [[When Elmio Panason, captain of the Vanguard, first sought shelter for his shipwrecked crew, he reflected the last rays of the setting sun off his shield.  Where the beam hit they rested and built the settlement that would become the Sunwall.  In the dark days that followed the shield became a symbol of hope for a better future.]],
+	desc = _t[[When Elmio Panason, captain of the Vanguard, first sought shelter for his shipwrecked crew, he reflected the last rays of the setting sun off his shield.  Where the beam hit they rested and built the settlement that would become the Sunwall.  In the dark days that followed the shield became a symbol of hope for a better future.]],
 	color = colors.YELLOW,
 	rarity = 300,
 	level_range = {35, 45},
@@ -107,7 +107,7 @@ newEntity{ base = "BASE_SHIELD", define_as = "SHIELD_UNSETTING",
 	},
 	set_list = { {"define_as","SWORD_DAWN"} },
 	set_desc = {
-		dawn = "Glows brightly in the light of dawn.",
+		dawn = _t"Glows brightly in the light of dawn.",
 	},
 	on_set_complete = function(self, who)
 		self:specialSetAdd({"wielder","life_regen"}, 5)
@@ -122,8 +122,8 @@ newEntity{ base = "BASE_HEAVY_BOOTS",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Scorched Boots", image = "object/artifact/scorched_boots.png",
-	unided_name = "pair of blackened boots",
-	desc = [[The master blood mage Ru'Khan was the first orc to experiment with the power of the Sher'Tul farportals in the Age of Pyre.  However, that first experiment was not particularly successful, and after the explosion of energy all that could be found of Ru'Khan was a pair of scorched boots.]],
+	unided_name = _t"pair of blackened boots",
+	desc = _t[[The master blood mage Ru'Khan was the first orc to experiment with the power of the Sher'Tul farportals in the Age of Pyre.  However, that first experiment was not particularly successful, and after the explosion of energy all that could be found of Ru'Khan was a pair of scorched boots.]],
 	color = colors.DARK_GRAY,
 	level_range = {30, 40},
 	rarity = 250,
@@ -145,12 +145,12 @@ newEntity{ base = "BASE_HEAVY_BOOTS",
 newEntity{ base = "BASE_GEM",
 	power_source = {arcane=true},
 	unique = true,
-	unided_name = "unearthly black stone",
+	unided_name = _t"unearthly black stone",
 	name = "Goedalath Rock", subtype = "demonic", image = "object/artifact/goedalath_rock.png",
 	define_as = 'GOEDALATH_ROCK',
 	color = colors.PURPLE,
 	level_range = {42, 50},
-	desc = [[A small rock that seems from beyond this world, vibrating with a fierce energy.  It feels warped and terrible and evil... and yet oh so powerful.]],
+	desc = _t[[A small rock that seems from beyond this world, vibrating with a fierce energy.  It feels warped and terrible and evil... and yet oh so powerful.]],
 	rarity = 300,
 	cost = 300,
 	material_level = 5,
@@ -177,8 +177,8 @@ newEntity{ base = "BASE_GEM",
 	},
 	on_pickup = function(self, who)
 		if who == game.player then
-			who:runStop("evil touch")
-			who:restStop("evil touch")
+			who:runStop(_t"evil touch")
+			who:restStop(_t"evil touch")
 		end
 	end,
 	color_attributes = {damage_type = 'SHADOWFLAME',},}
@@ -187,8 +187,8 @@ newEntity{ base = "BASE_CLOAK",
 	power_source = {arcane=true}, define_as = "THREADS_FATE",
 	unique = true,
 	name = "Threads of Fate", image = "object/artifact/cloak_threads_of_fate.png",
-	unided_name = "a shimmering white cloak",
-	desc = [[Untouched by the ravages of time, this fine spun white cloak appears to be crafted of an otherworldly material that shifts and shimmers in the light.]],
+	unided_name = _t"a shimmering white cloak",
+	desc = _t[[Untouched by the ravages of time, this fine spun white cloak appears to be crafted of an otherworldly material that shifts and shimmers in the light.]],
 	level_range = {45, 50},
 	color = colors.WHITE,
 	rarity = 500,
@@ -223,13 +223,13 @@ newEntity{ base = "BASE_LONGSWORD", define_as = "BLOODEDGE",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Blood-Edge", image = "object/artifact/sword_blood_edge.png",
-	unided_name = "red crystalline sword",
+	unided_name = _t"red crystalline sword",
 	moddable_tile = "special/%s_sword_blood_edge",
 	moddable_tile_big = true,
 	level_range = {36, 48},
 	color=colors.RED,
 	rarity = 260,
-	desc = [[This deep red sword weeps blood continuously. It was born in the labs of the orcish corrupter Hurik, who sought to make a crystal that would house his soul after death. But his plans were disrupted by a band of sun paladins, and though most died purging his keep of dread minions, their leader Raasul fought through to Hurik's lab, sword in hand. There the two did battle, blade against blood magic, till both fell to the floor with weeping wounds. The orc with his last strength crawled towards his fashioned phylactery, hoping to save himself, but Raasul saw his plans and struck the crystal with his light-bathed sword. It shattered, and in the sudden impulse of energies the steel, crystal and blood were fused into one.
+	desc = _t[[This deep red sword weeps blood continuously. It was born in the labs of the orcish corrupter Hurik, who sought to make a crystal that would house his soul after death. But his plans were disrupted by a band of sun paladins, and though most died purging his keep of dread minions, their leader Raasul fought through to Hurik's lab, sword in hand. There the two did battle, blade against blood magic, till both fell to the floor with weeping wounds. The orc with his last strength crawled towards his fashioned phylactery, hoping to save himself, but Raasul saw his plans and struck the crystal with his light-bathed sword. It shattered, and in the sudden impulse of energies the steel, crystal and blood were fused into one.
 Now the broken fragments of Raasul's soul are trapped in this terrible artifact, his mind warped beyond all sanity by decades of imprisonment. Only the taste of blood calls him forth, his soul stealing the lifeblood of others to take on physical form again, that he may thrash and wail against the living.]],
 	cost = 1000,
 	require = { stat = { mag=20, str=32,}, },
@@ -255,7 +255,7 @@ Now the broken fragments of Raasul's soul are trapped in this terrible artifact,
 		dammod = {str=1, mag=0.1},
 		convert_damage = {[DamageType.BLIGHT] = 50},
 		lifesteal=5,
-		special_on_hit = {desc="15% chance to animate a bleeding foe's blood", fct=function(combat, who, target)
+		special_on_hit = {desc=_t"15% chance to animate a bleeding foe's blood", fct=function(combat, who, target)
 			if not rng.percent(15) then return end
 			local cut = false
 
@@ -277,9 +277,9 @@ Now the broken fragments of Raasul's soul are trapped in this terrible artifact,
 			local m = NPC.new{
 				type = "undead", subtype = "blood",
 				display = "L",
-				name = "animated blood", color=colors.RED,
+				name = _t"animated blood", color=colors.RED,
 				resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/undead_horror_animated_blood.png", display_h=1, display_y=0}}},
-				desc = "A haze of blood, vibrant and pulsing through the air, possessed by a warped and cracked soul. Every now and then a scream or wail of agony garbles through it, telling of the mindless suffering undergone by its possessor.",
+				desc = _t"A haze of blood, vibrant and pulsing through the air, possessed by a warped and cracked soul. Every now and then a scream or wail of agony garbles through it, telling of the mindless suffering undergone by its possessor.",
 				body = { INVEN = 10, MAINHAND=1, OFFHAND=1, },
 				rank = 3,
 				life_rating = 10, exp_worth = 0,
@@ -322,13 +322,13 @@ Now the broken fragments of Raasul's soul are trapped in this terrible artifact,
 			game.party:addMember(m, {
 				control=false,
 				type="summon",
-				title="Summon",
+				title=_t"Summon",
 				orders = {target=true, leash=true, anchor=true, talents=true},
 			})
 
-			game.logSeen(who, "#GOLD#As the blade touches %s's spilt blood, the blood rises, animated!", target.name:capitalize())
+			game.logSeen(who, "#GOLD#As the blade touches %s's spilt blood, the blood rises, animated!", target:getName():capitalize())
 			if who:knowTalent(who.T_VIM_POOL) then
-				game.logSeen(who, "#GOLD#%s draws power from the spilt blood!", who.name:capitalize())
+				game.logSeen(who, "#GOLD#%s draws power from the spilt blood!", who:getName():capitalize())
 			end
 
 		end},
@@ -339,13 +339,13 @@ newEntity{ base = "BASE_LONGSWORD", define_as = "SWORD_DAWN",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Dawn's Blade",
-	unided_name = "shining longsword",
+	unided_name = _t"shining longsword",
 	moddable_tile = "special/%s_dawn_blade",
 	moddable_tile_big = true,
 	level_range = {35, 42},
 	color=colors.YELLOW, image = "object/artifact/dawn_blade.png",
 	rarity = 260,
-	desc = [[Said to have been forged in the earliest days of the Sunwall, this longsword shines with the light of daybreak, capable of banishing all shadows.]],
+	desc = _t[[Said to have been forged in the earliest days of the Sunwall, this longsword shines with the light of daybreak, capable of banishing all shadows.]],
 	cost = 1000,
 	require = { stat = { mag=18, str=35,}, },
 	material_level = 5,
@@ -373,7 +373,7 @@ newEntity{ base = "BASE_LONGSWORD", define_as = "SWORD_DAWN",
 	},
 	max_power = 35, power_regen = 1,
 	use_power = {
-		name = function(self, who) return ("invoke dawn, inflicting %0.2f light damage in radius %d (based on Magic) and lighting the area within radius %d"):format(engine.interface.ActorTalents.damDesc(who, engine.DamageType.LIGHT, self.use_power.damage(who)), self.use_power.radius, self.use_power.radius*2) end,
+		name = function(self, who) return ("invoke dawn, inflicting %0.2f light damage in radius %d (based on Magic) and lighting the area within radius %d"):tformat(engine.interface.ActorTalents.damDesc(who, engine.DamageType.LIGHT, self.use_power.damage(who)), self.use_power.radius, self.use_power.radius*2) end,
 		power = 35,
 		radius = 5,
 		damage = function(who) return 75 + who:getMag()*2 end,
@@ -384,7 +384,7 @@ newEntity{ base = "BASE_LONGSWORD", define_as = "SWORD_DAWN",
 			game.level.map:particleEmitter(who.x, who.y, blast.radius, "sunburst", {radius=blast.radius})
 			who:project({type="ball", range=0, radius=self.use_power.radius*2}, who.x, who.y, engine.DamageType.LITE, dam/2)
 			game:playSoundNear(self, "talents/fireflash")
-			game.logSeen(who, "%s raises %s and sends out a burst of light!", who.name:capitalize(), self:getName())
+			game.logSeen(who, "%s raises %s and sends out a burst of light!", who:getName():capitalize(), self:getName())
 			return {id=true, used=true}
 		end
 	},
@@ -409,7 +409,7 @@ newEntity{ base = "BASE_LONGSWORD", define_as = "SWORD_DAWN",
 	
 	set_list = { {"define_as","SHIELD_UNSETTING"} },
 	set_desc = {
-		dawn = "If the sun doesn't set, dawn's power lasts forever.",
+		dawn = _t"If the sun doesn't set, dawn's power lasts forever.",
 	},
 	on_set_complete = function(self, who)
 		self:specialSetAdd({"combat","melee_project"}, {[engine.DamageType.LIGHT]=15, [engine.DamageType.FIRE]=15})
@@ -425,8 +425,8 @@ newEntity{ base = "BASE_AMULET",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Zemekkys' Broken Hourglass", color = colors.WHITE,
-	unided_name = "a broken hourglass", image="object/artifact/amulet_zemekkys_broken_hourglass.png",
-	desc = [[This small broken hourglass hangs from a thin gold chain.  The glass is cracked and the sand has long since escaped.]],
+	unided_name = _t"a broken hourglass", image="object/artifact/amulet_zemekkys_broken_hourglass.png",
+	desc = _t[[This small broken hourglass hangs from a thin gold chain.  The glass is cracked and the sand has long since escaped.]],
 	level_range = {30, 40},
 	rarity = 300,
 	cost = 200,
@@ -448,10 +448,10 @@ newEntity{ base = "BASE_KNIFE", define_as = "MANDIBLE_UNGOLMOR",
 	power_source = {nature=true},
 	unique = true,
 	name = "Mandible of Ungolmor", image = "object/artifact/mandible_of_ungolmor.png",
-	unided_name = "curved, serrated black dagger",
+	unided_name = _t"curved, serrated black dagger",
 	moddable_tile = "special/%s_mandible_of_ungolmor",
 	moddable_tile_big = true,
-	desc = [[This obsidian-crafted, curved blade is studded with the deadly fangs of the Ungolmor. It seems to drain light from the world around it.]],
+	desc = _t[[This obsidian-crafted, curved blade is studded with the deadly fangs of the Ungolmor. It seems to drain light from the world around it.]],
 	level_range = {40, 50},
 	rarity = 270,
 	require = { stat = { cun=38 }, },
@@ -464,7 +464,7 @@ newEntity{ base = "BASE_KNIFE", define_as = "MANDIBLE_UNGOLMOR",
 		physcrit = 22,
 		dammod = {cun=0.30, str=0.35, dex=0.35},
 		convert_damage ={[DamageType.DARKNESS] = 30},
-		special_on_crit = {desc="inflicts spydric poison dealing 200 damage over 3 turns and pinning the target", fct=function(combat, who, target)
+		special_on_crit = {desc=_t"inflicts spydric poison dealing 200 damage over 3 turns and pinning the target", fct=function(combat, who, target)
 			if target:canBe("poison") then
 				local tg = {type="hit", range=1}
 				who:project(tg, target.x, target.y, engine.DamageType.SPYDRIC_POISON, {src=who, dam=200, dur=3})
@@ -486,10 +486,10 @@ newEntity{ base = "BASE_KNIFE", define_as = "KINETIC_SPIKE",
 	power_source = {psionic=true},
 	unique = true,
 	name = "Kinetic Spike", image = "object/artifact/kinetic_spike.png",
-	unided_name = "bladeless hilt",
+	unided_name = _t"bladeless hilt",
 	moddable_tile = "special/%s_kinetic_spike",
 	moddable_tile_big = true,
-	desc = [[A simple, rudely crafted stone hilt, this object manifests a blade of wavering, nearly invisible force, like a heat haze, as you grasp it. Despite its simple appearance, it is capable of shearing through solid granite, in the hands of those with the necessary mental fortitude to use it properly.]],
+	desc = _t[[A simple, rudely crafted stone hilt, this object manifests a blade of wavering, nearly invisible force, like a heat haze, as you grasp it. Despite its simple appearance, it is capable of shearing through solid granite, in the hands of those with the necessary mental fortitude to use it properly.]],
 	level_range = {42, 50},
 	rarity = 310,
 	require = { stat = { wil=42 }, },
@@ -512,7 +512,7 @@ newEntity{ base = "BASE_KNIFE", define_as = "KINETIC_SPIKE",
 	},
 	max_power = 10, power_regen = 1,
 	use_power = {
-		name = function(self, who) return ("fire a bolt of kinetic force (range %d), dealing 150%% (physical) weapon damage"):format(self.use_power.range) end,
+		name = function(self, who) return ("fire a bolt of kinetic force (range %d), dealing 150%% (physical) weapon damage"):tformat(self.use_power.range) end,
 		power = 10,
 		range = 8,
 		use = function(self, who)
@@ -536,12 +536,12 @@ newEntity{ base = "BASE_STAFF",
 	power_source = {unknown=true},
 	unique = true,
 	name = "Rod of Sarrilon", image = "object/artifact/rod_of_sarrilon.png",
-	unided_name = "ceremonial staff",
+	unided_name = _t"ceremonial staff",
 	flavor_name = "starstaff",
 	level_range = {37, 50},
 	color=colors.VIOLET,
 	rarity = 250,
-	desc = [[A plain looking ceremonial rod. It has connections with Time that even chronomancers do not yet understand.]],
+	desc = _t[[A plain looking ceremonial rod. It has connections with Time that even chronomancers do not yet understand.]],
 	cost = math.random(700,1100),
 	material_level = 5,
 

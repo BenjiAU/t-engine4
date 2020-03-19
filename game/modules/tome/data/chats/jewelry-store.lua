@@ -35,8 +35,8 @@ local imbueEgo = function(gem, ring)
 end
 
 local imbue_ring = function(npc, player)
-	player:showInventory("Imbue which ring?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "ring" and o.material_level and not o.unique and not o.plot and not o.special and not o.tinker and not o.shop_gem_imbue end, function(ring, ring_item)
-		player:showInventory("Use which gem?", player:getInven("INVEN"), function(gem) return gem.type == "gem" and gem.imbue_powers and gem.material_level end, function(gem, gem_item)
+	player:showInventory(_t"Imbue which ring?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "ring" and o.material_level and not o.unique and not o.plot and not o.special and not o.tinker and not o.shop_gem_imbue end, function(ring, ring_item)
+		player:showInventory(_t"Use which gem?", player:getInven("INVEN"), function(gem) return gem.type == "gem" and gem.imbue_powers and gem.material_level end, function(gem, gem_item)
 			local lev = (ring.material_level + gem.material_level) / 2 * 10 + 10  -- Average the material level then add a bonus so we guarantee greater ego level range
 			local new_ring
 			local r = rng.range(0, 99)
@@ -61,14 +61,14 @@ local imbue_ring = function(npc, player)
 			
 			local price = 200 * (ring.material_level + gem.material_level) / 2
 			if gem.unique then price = price * 1.5 end
-			if price > player.money then require("engine.ui.Dialog"):simplePopup("Not enough money", "This costs "..price.." gold, you need more gold.") return end
+			if price > player.money then require("engine.ui.Dialog"):simplePopup(_t"Not enough money", ("This costs %d gold, you need more gold."):tformat(price)) return end
 
-			require("engine.ui.Dialog"):yesnoPopup("Imbue cost", "This will cost you "..price.." gold, do you accept?", function(ret) if ret then
+			require("engine.ui.Dialog"):yesnoPopup(_t"Imbue cost", ("This will cost you %s gold, do you accept?"):tformat(price), function(ret) if ret then
 				imbueEgo(gem, new_ring)
 				player:incMoney(-price)
 				player:removeObject(player:getInven("INVEN"), gem_item)
 
-				new_ring.name = (ring.short_name or ring.name or "weird").." "..gem.name .. " ring"
+				new_ring.name = ("%s %s ring"):tformat(_t(ring.short_name) or _t(ring.name) or _t"weird", _t(gem.name))
 				new_ring:identify(true)
 				-- player:addObject(player:getInven("INVEN"), new_ring)
 				ring:replaceWith(new_ring)
@@ -81,13 +81,13 @@ local imbue_ring = function(npc, player)
 end
 
 local artifact_imbue_amulet = function(npc, player)
-	player:showInventory("Imbue which amulet?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "amulet" and o.material_level and not o.unique and not o.plot and not o.special and not o.tinker end, function(amulet, amulet_item)
-		player:showInventory("Use which first gem?", player:getInven("INVEN"), function(gem1) return gem1.type == "gem" and (gem1.material_level or 99) <= amulet.material_level and gem1.imbue_powers end, function(gem1, gem1_item)
-			player:showInventory("Use which second gem?", player:getInven("INVEN"), function(gem2) return gem2.type == "gem" and (gem2.material_level or 99) <= amulet.material_level and gem1.name ~= gem2.name and gem2.imbue_powers end, function(gem2, gem2_item)
+	player:showInventory(_t"Imbue which amulet?", player:getInven("INVEN"), function(o) return o.type == "jewelry" and o.subtype == "amulet" and o.material_level and not o.unique and not o.plot and not o.special and not o.tinker end, function(amulet, amulet_item)
+		player:showInventory(_t"Use which first gem?", player:getInven("INVEN"), function(gem1) return gem1.type == "gem" and (gem1.material_level or 99) <= amulet.material_level and gem1.imbue_powers end, function(gem1, gem1_item)
+			player:showInventory(_t"Use which second gem?", player:getInven("INVEN"), function(gem2) return gem2.type == "gem" and (gem2.material_level or 99) <= amulet.material_level and gem1.name ~= gem2.name and gem2.imbue_powers end, function(gem2, gem2_item)
 				local price = 1000
-				if price > player.money then require("engine.ui.Dialog"):simplePopup("Not enough money", "Limmir needs more gold for the magical plating.") return end
+				if price > player.money then require("engine.ui.Dialog"):simplePopup(_t"Not enough money", _t"Limmir needs more gold for the magical plating.") return end
 
-				require("engine.ui.Dialog"):yesnoPopup("Imbue cost", "You need to use "..price.." gold for the plating, do you accept?", function(ret) if ret then
+				require("engine.ui.Dialog"):yesnoPopup(_t"Imbue cost", ("You need to use %s gold for the plating, do you accept?"):tformat(price), function(ret) if ret then
 					player:incMoney(-price)
 					local gem3, tries = nil, 10
 					while gem3 == nil and tries > 0 do gem3 = game.zone:makeEntity(game.level, "object", {type="gem"}, nil, true) tries = tries - 1 end
@@ -112,7 +112,7 @@ local artifact_imbue_amulet = function(npc, player)
 					imbueEgo(gem2, new_amulet)
 					imbueEgo(gem3, new_amulet)
 
-					new_amulet.name = "Limmir's Amulet of the Moon"
+					new_amulet.name = _t"Limmir's Amulet of the Moon"
 					new_amulet.unique = util.uuid()
 					new_amulet:identify(true)
 					-- player:addObject(player:getInven("INVEN"), new_amulet)
@@ -126,47 +126,47 @@ local artifact_imbue_amulet = function(npc, player)
 end
 
 newChat{ id="welcome",
-	text = [[Welcome, @playername@, to my shop.]],
+	text = _t[[Welcome, @playername@, to my shop.]],
 	answers = {
-		{"Let me see your wares.", action=function(npc, player)
+		{_t"Let me see your wares.", action=function(npc, player)
 			npc.store:loadup(game.level, game.zone)
 			npc.store:interact(player)
 		end, cond=function(npc, player) return npc.store and true or false end},
-		{"I am looking for special jewelry.", jump="jewelry"},
-		{"So you can infuse amulets in this place?", jump="artifact_jewelry", cond=function(npc, player) return npc.can_craft and player:hasQuest("master-jeweler") and player:isQuestStatus("master-jeweler", engine.Quest.COMPLETED, "limmir-survived") end},
-		{"I have found this tome; it looked important.", jump="quest", cond=function(npc, player) return npc.can_quest and player:hasQuest("master-jeweler") and player:hasQuest("master-jeweler"):has_tome(player) end},
-		{"Sorry I have to go!"},
+		{_t"I am looking for special jewelry.", jump="jewelry"},
+		{_t"So you can infuse amulets in this place?", jump="artifact_jewelry", cond=function(npc, player) return npc.can_craft and player:hasQuest("master-jeweler") and player:isQuestStatus("master-jeweler", engine.Quest.COMPLETED, "limmir-survived") end},
+		{_t"I have found this tome; it looked important.", jump="quest", cond=function(npc, player) return npc.can_quest and player:hasQuest("master-jeweler") and player:hasQuest("master-jeweler"):has_tome(player) end},
+		{_t"Sorry I have to go!"},
 	}
 }
 
 newChat{ id="jewelry",
-	text = [[Then you are at the right place, for I am an expert jeweler.
+	text = _t[[Then you are at the right place, for I am an expert jeweler.
 If you bring me a gem and a ring, I can create a new ring imbued with the properties of the gem.  The original traits of the ring will be lost in the process but new ones of similar quality will be generated.
 There is a small fee dependent on the level of the ring, and you need a quality ring to use a quality gem.]],
 	answers = {
-		{"I need your services.", action=imbue_ring},
-		{"Not now, thanks."},
+		{_t"I need your services.", action=imbue_ring},
+		{_t"Not now, thanks."},
 	}
 }
 
 newChat{ id="artifact_jewelry",
-	text = [[Yes! Thanks to you this place is now free from the corruption. I will stay on this island to study the magical aura, and as promised I can make you powerful amulets.
+	text = _t[[Yes! Thanks to you this place is now free from the corruption. I will stay on this island to study the magical aura, and as promised I can make you powerful amulets.
 Bring me a an amulet and two different gems and I will turn them into a powerful amulet, though the original properties of the amulet will be lost.
 I will not make you pay a fee for it since you helped me so much, but I am afraid the ritual requires a gold plating. This should be equal to about 1000 gold pieces.]],
 	answers = {
-		{"I need your services.", action=artifact_imbue_amulet},
-		{"Not now, thanks."},
+		{_t"I need your services.", action=artifact_imbue_amulet},
+		{_t"Not now, thanks."},
 	}
 }
 
 newChat{ id="quest",
-	text = [[#LIGHT_GREEN#*He quickly looks at the tome and looks amazed.*#WHITE# This is an amazing find! Truly amazing!
+	text = _t[[#LIGHT_GREEN#*He quickly looks at the tome and looks amazed.*#WHITE# This is an amazing find! Truly amazing!
 With this knowledge I could create potent amulets. However, it requires a special place of power to craft such items.
 There are rumours about a site of power in the southern mountains. Old legends tell about a place where a part of the Wintertide Moon melted when it got too close to the Sun and fell from the sky.
 A lake formed in the crater of the crash. The water of this lake, soaked in intense Moonlight for eons, should be sufficient to forge powerful artifacts!
 Go to the lake and then summon me with this scroll. I will retire to study the tome, awaiting your summon.]],
 	answers = {
-		{"I will see if I can find it.", action=function(npc, player)
+		{_t"I will see if I can find it.", action=function(npc, player)
 			game.level:removeEntity(npc)
 			player:hasQuest("master-jeweler"):remove_tome(player)
 			player:hasQuest("master-jeweler"):start_search(player)

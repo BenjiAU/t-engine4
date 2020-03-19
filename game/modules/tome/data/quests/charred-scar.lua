@@ -20,22 +20,22 @@
 use_ui = "quest-main"
 
 -- Ruysh Charred scar
-name = "The Doom of the World!"
+name = _t"The Doom of the World!"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You were sent to the Charred Scar at the heart of which lies a huge volcano. In the Age of Pyre it destroyed the old Sher'Tul ruins that stood there, absorbing much of their latent magic."
-	desc[#desc+1] = "This place is still full of that power and the orcs intend to absorb this power using the Staff of Absorption!"
-	desc[#desc+1] = "Whatever their plan may be, they must be stopped at all cost."
-	desc[#desc+1] = "The volcano is attacked by orcs. A few Sun Paladins made it there with you. They will hold the line at the cost of their lives to buy you some time."
-	desc[#desc+1] = "Honor their sacrifice; do not let the orcs finish their work!"
+	desc[#desc+1] = _t"You were sent to the Charred Scar at the heart of which lies a huge volcano. In the Age of Pyre it destroyed the old Sher'Tul ruins that stood there, absorbing much of their latent magic."
+	desc[#desc+1] = _t"This place is still full of that power and the orcs intend to absorb this power using the Staff of Absorption!"
+	desc[#desc+1] = _t"Whatever their plan may be, they must be stopped at all cost."
+	desc[#desc+1] = _t"The volcano is attacked by orcs. A few Sun Paladins made it there with you. They will hold the line at the cost of their lives to buy you some time."
+	desc[#desc+1] = _t"Honor their sacrifice; do not let the orcs finish their work!"
 	if self:isCompleted("not-stopped") then
-		desc[#desc+1] = ""
-		desc[#desc+1] = "You arrived too late. The place has been drained of its power and the sorcerers have left."
-		desc[#desc+1] = "Use the portal to go back to the Far East. You *MUST* stop them, no matter the cost."
+		desc[#desc+1] = _t""
+		desc[#desc+1] = _t"You arrived too late. The place has been drained of its power and the sorcerers have left."
+		desc[#desc+1] = _t"Use the portal to go back to the Far East. You *MUST* stop them, no matter the cost."
 	elseif self:isCompleted("stopped") then
-		desc[#desc+1] = ""
-		desc[#desc+1] = "You arrived in time and interrupted the ritual. The sorcerers have departed."
-		desc[#desc+1] = "Use the portal to go back to the Far East. You *MUST* stop them, no matter the cost."
+		desc[#desc+1] = _t""
+		desc[#desc+1] = _t"You arrived in time and interrupted the ritual. The sorcerers have departed."
+		desc[#desc+1] = _t"Use the portal to go back to the Far East. You *MUST* stop them, no matter the cost."
 	end
 	return table.concat(desc, "\n")
 end

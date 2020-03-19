@@ -18,29 +18,29 @@
 -- darkgod@te4.org
 
 newEntity{ define_as = "TRAP_TELEPORT",
-	type = "annoy", subtype="teleport", id_by_type=true, unided_name = "trap",
+	type = "annoy", subtype="teleport", id_by_type=true, unided_name = _t"trap",
 	display = '^',
 	triggered = function() end,
 }
 
 newEntity{ base = "TRAP_TELEPORT",
 	name = "teleport trap", auto_id = true, image = "trap/trap_teleport_01.png",
-	desc = [[Teleports the victim away.  How does anyone get close enough to disarm this trap...?]],
+	desc=_t[[Teleports the victim away.  How does anyone get close enough to disarm this trap...?]],
 	detect_power = resolvers.mbonus(5, 40), disarm_power = resolvers.mbonus(10, 50),
 	rarity = 5, level_range = {5, nil},
 	color=colors.UMBER,
 	pressure_trap = true,
-	message = "@Target@ shimmers briefly.",
-	unided_name = "shimmering floor switch",
+	message = _t"@Target@ shimmers briefly.",
+	unided_name = _t"shimmering floor switch",
 	triggered = function(self, x, y, who)
 		if who:canBe("teleport") then
 			game:onTickEnd(function()
-					game.logSeen(who, "%s is teleported away!", who.name:capitalize())
+					game.logSeen(who, "%s is teleported away!", who:getName():capitalize())
 					who:teleportRandom(x, y, 100) 
 				end)
 			return true
 		else
-			game.logSeen(who, "%s resists being teleported!", who.name:capitalize())
+			game.logSeen(who, "%s resists being teleported!", who:getName():capitalize())
 		end
 	end
 }

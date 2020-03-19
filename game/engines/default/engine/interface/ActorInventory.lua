@@ -247,10 +247,10 @@ function _M:pickupFloor(i, vocal, no_sort)
 				slot = self:itemPosition(self.INVEN_INVEN, newo, true) or 1
 				local letter = ShowPickupFloor:makeKeyChar(slot)
 
-				if vocal then game.logSeen(self, "%s picks up (%s.): %s%s.", self.name:capitalize(), letter, num>1 and ("%d "):format(num) or "", o:getName{do_color=true, no_count = true}) end
+				if vocal then game.logSeen(self, "%s picks up (%s.): %s%s.", self:getName():capitalize(), letter, num>1 and ("%d "):format(num) or "", o:getName{do_color=true, no_count = true}) end
 				return inven[slot], num
 			else
-				if vocal then game.logSeen(self, "%s has no room for: %s.", self.name:capitalize(), o:getName{do_color=true}) end
+				if vocal then game.logSeen(self, "%s has no room for: %s.", self:getName():capitalize(), o:getName{do_color=true}) end
 				return
 			end
 		elseif prepickup == "skip" then
@@ -350,7 +350,7 @@ function _M:dropFloor(inven, item, vocal, all)
 
 	local ok, idx = game.level.map:addObject(self.x, self.y, o)
 
-	if vocal then game.logSeen(self, "%s drops on the floor: %s.", self.name:capitalize(), o:getName{do_color=true}) end
+	if vocal then game.logSeen(self, "%s drops on the floor: %s.", self:getName():capitalize(), o:getName{do_color=true}) end
 	if ok and game.level.map.attrs(self.x, self.y, "on_drop") then
 		game.level.map.attrs(self.x, self.y, "on_drop")(self, self.x, self.y, idx, o)
 	end
@@ -409,7 +409,7 @@ function _M:canWearObject(o, try_slot)
 
 	-- check if the slot matches dammit
 	if try_slot and try_slot ~= o.slot and try_slot ~= self:getObjectOffslot(o) then
-		return nil, "wrong equipment slot"
+		return nil, _t"wrong equipment slot"
 	end
 
 	-- Check prerequisites
@@ -417,7 +417,7 @@ function _M:canWearObject(o, try_slot)
 		-- Obviously this requires the ActorStats interface
 		if req.stat then
 			for s, v in pairs(req.stat) do
-				if self:getStat(s) < v then return nil, "not enough stat" end
+				if self:getStat(s) < v then return nil, _t"not enough stat" end
 			end
 		end
 		if req.flag then
@@ -425,25 +425,25 @@ function _M:canWearObject(o, try_slot)
 				if type(flag) == "table" then
 					if not self:attr(flag[1]) or self:attr(flag[1]) < flag[2] then
 						local name = o.requirement_flags_names and o.requirement_flags_names[flag[1]] or flag[1]
-						return nil, "missing "..tostring(name).." (level "..tostring(flag[2])..")"
+						return nil, ("missing %s (level %s )"):tformat(tostring(name), tostring(flag[2]))
 					end
 				else
 					if not self:attr(flag) then
 						local name = o.requirement_flags_names and o.requirement_flags_names[flag] or flag
-						return nil, "missing "..tostring(name)
+						return nil, ("missing %s"):tformat(tostring(name))
 					end
 				end
 			end
 		end
 		if req.level and self.level < req.level then
-			return nil, "not enough levels"
+			return nil, _t"not enough levels"
 		end
 		if req.talent then
 			for _, tid in ipairs(req.talent) do
 				if type(tid) == "table" then
-					if self:getTalentLevelRaw(tid[1]) < tid[2] then return nil, "missing dependency" end
+					if self:getTalentLevelRaw(tid[1]) < tid[2] then return nil, _t"missing dependency" end
 				else
-					if not self:knowTalent(tid) then return nil, "missing dependency" end
+					if not self:knowTalent(tid) then return nil, _t"missing dependency" end
 				end
 			end
 		end
@@ -454,7 +454,7 @@ function _M:canWearObject(o, try_slot)
 		local inven = self:getInven(o.slot_forbid)
 		-- If the object cant coexist with that inventory slot and it exists and is not empty, refuse wearing
 		if inven and #inven > 0 then
-			return nil, "cannot use currently due to an other worn object"
+			return nil, _t"cannot use currently due to an other worn object"
 		end
 	end
 
@@ -465,7 +465,7 @@ function _M:canWearObject(o, try_slot)
 				-- print("fight: ", o.name, wo.name, "::", wo.slot_forbid, try_slot or o.slot)
 				if wo.slot_forbid and self:slotForbidCheck(wo, id) and wo.slot_forbid == (try_slot or o.slot) then
 					print(" impossible => ", o.name, wo.name, "::", wo.slot_forbid, try_slot or o.slot)
-					return nil, "cannot use currently due to an other worn object"
+					return nil, _t"cannot use currently due to an other worn object"
 				end
 			end
 		end
@@ -513,14 +513,14 @@ function _M:wearObject(o, replace, vocal, force_inven, force_item)
 		return false
 	end
 	if not inven then
-		if vocal then game.logSeen(self, "%s can not wear %s.", self.name, o_name) end
+		if vocal then game.logSeen(self, "%s can not wear %s.", self:getName(), o_name) end
 		return false
 	end
 
 
 	local ok, err = self:canWearObject(o, inven.name)
 	if not ok then
-		if vocal then game.logSeen(self, "%s can not wear (%s): %s (%s).", self.name:capitalize(), self.inven_def[inven.name].name:lower(), o_name, err) end
+		if vocal then game.logSeen(self, "%s can not wear (%s): %s (%s).", self:getName():capitalize(), self.inven_def[inven.name].name:lower(), o_name, err) end
 		return false
 	end
 	if o:check("on_canwear", self, inven) then return false end
@@ -528,10 +528,10 @@ function _M:wearObject(o, replace, vocal, force_inven, force_item)
 	local added, slot, stack = self:addObject(inven_id, o, nil, force_item)
 
 	if added then
-		if vocal then game.logSeen(self, "%s wears: %s.", self.name:capitalize(), o_name) end
+		if vocal then game.logSeen(self, "%s wears: %s.", self:getName():capitalize(), o_name) end
 		return true, stack
 	elseif not force_inven and offslot and self:getInven(offslot) and #(self:getInven(offslot)) < self:getInven(offslot).max and self:canWearObject(o, offslot) then
-		if vocal then game.logSeen(self, "%s wears (offslot): %s.", self.name:capitalize(), o:getName{do_color=true}) end
+		if vocal then game.logSeen(self, "%s wears (offslot): %s.", self:getName():capitalize(), o:getName{do_color=true}) end
 		added, slot, stack = self:addObject(offslot, o)
 		return added, stack
 	elseif replace then -- no room but replacement is allowed
@@ -540,18 +540,18 @@ function _M:wearObject(o, replace, vocal, force_inven, force_item)
 		-- Check if we still can wear it, to prevent the replace-abuse
 		local ok, err = self:canWearObject(o, inven.name)
 		if not ok then
-			if vocal then game.logSeen(self, "%s can not wear (%s): %s (%s).", self.name:capitalize(), self.inven_def[inven.name].name:lower(), o_name, err) end
+			if vocal then game.logSeen(self, "%s can not wear (%s): %s (%s).", self:getName():capitalize(), self.inven_def[inven.name].name:lower(), o_name, err) end
 			if ro then self:addObject(inven_id, ro, true, force_item) end
 			return false
 		end
 		added, slot, stack = self:addObject(inven_id, o, nil, force_item)
-		if vocal then game.logSeen(self, "%s wears (replacing %s): %s.", self.name:capitalize(), ro:getName{do_color=true}, o_name) end
+		if vocal then game.logSeen(self, "%s wears (replacing %s): %s.", self:getName():capitalize(), ro:getName{do_color=true}, o_name) end
 		if stack and ro:stack(stack) then -- stack remaining stack with old if possible (ignores stack limits)
 			stack = nil
 		end
 		return ro, stack -- caller handles the replaced object and remaining stack if any
 	else
-		if vocal then game.logSeen(self, "%s can not wear: %s.", self.name:capitalize(), o:getName{do_color=true}) end
+		if vocal then game.logSeen(self, "%s can not wear: %s.", self:getName():capitalize(), o:getName{do_color=true}) end
 		return false
 	end
 end

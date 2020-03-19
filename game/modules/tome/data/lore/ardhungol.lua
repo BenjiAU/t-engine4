@@ -24,8 +24,8 @@
 newLore{
 	id = "ardhungol-1",
 	category = "ardhungol",
-	name = "Rashim Journal (1)",
-	lore = [[#{bold}#Journal Entry I#{normal}#
+	name = _t"Rashim Journal (1)",
+	lore = _t[[#{bold}#Journal Entry I#{normal}#
 
 It's been some time since High Sun Paladin Aeryn sent me out on an assignment. According to recent intelligence, it would seem that a cavern has mysteriously emerged near our outpost, the Gates of Morning. They have bestowed the name "Ardhungol" on the newly discovered cavern. The elder warriors seem anxious in regards to the origin of this new subterranean area; they're likely concerned that the orcs are using Ardhungol as a staging point for further aggression against the Gates of Morning. I'll have to make sure I'm well equipped for this journey; the fate of us all could hang in the balance.
 
@@ -38,8 +38,8 @@ I spoke with the border patrols tonight. There seem to have been several sightin
 newLore{
 	id = "ardhungol-2",
 	category = "ardhungol",
-	name = "Rashim Journal (2)",
-	lore = [[#{bold}#Journal Entry III#{normal}#
+	name = _t"Rashim Journal (2)",
+	lore = _t[[#{bold}#Journal Entry III#{normal}#
 
 It was a half days journey from the Gates of Morning to Ardhungol, but I've finally arrived. I've decided to rest beneath the shade of a great oak tree and enjoy one of the sweet rolls my wife Melnela prepared for me. I'm unsure why, but the closer I've come to Ardhungol, the thicker the atmosphere has become, almost as if there is a foreign energy infecting the very air I breathe. I've been to many places in this vast world, but I've never felt an aura quite like this; I will have to uncover the source of this energy before I can bring a full report back to Aeryn.
 
@@ -56,8 +56,8 @@ Impossible; how could spiders have grown to such an immense size? Not only that,
 newLore{
 	id = "ardhungol-3",
 	category = "ardhungol",
-	name = "Rashim Journal (3)",
-	lore = [[#{bold}#Journal Entry VI#{normal}#
+	name = _t"Rashim Journal (3)",
+	lore = _t[[#{bold}#Journal Entry VI#{normal}#
 
 It took some time, but my muscles have started to adapt and react to the unique movements of these arachnid. The way they fight, it's almost as if they possess a higher level of thought, elevating them far beyond the base intelligence of lesser arachnid... is it possible that they could be sentient? Do they act individually, or are they perhaps manipulated by a greater arachnid? Let us pray that this species is not connected through a hive mind, for this threat could become even greater than I had imagined.
 
@@ -73,10 +73,10 @@ Incredible, the size of that arachnid is unimaginable; there is no doubt about i
 newLore{
 	id = "ardhungol-4",
 	category = "ardhungol",
-	name = "scrap of paper",
-	lore = function() return game and game.state and game.state.spydre_mantra and [[#{italic}#A few tattered scraps of paper lie on the ground, ruined from your fight with the creature carrying it.  It's almost completely illegible, but you can piece some of it together to read:#{normal}#
+	name = _t"scrap of paper",
+	lore = function() return game and game.state and game.state.spydre_mantra and _t[[#{italic}#A few tattered scraps of paper lie on the ground, ruined from your fight with the creature carrying it.  It's almost completely illegible, but you can piece some of it together to read:#{normal}#
 "...pheromone signals effective on much Eyalite wildlife ineffective on species 'sun paladin.'  at current planetary core cooling rates, passive study would lead to great loss - next step of emigration program should be cleaning of local 'sun paladin' nest and establishment of..."]]
 	or
-	[[#{italic}#This pile of tattered paper could theoretically be assembled into something legible, but without more text to draw back on, it'd still be in a language you could never interpret.  If only you had more Spydric text to help translate this...#{normal}#]]
+	_t[[#{italic}#This pile of tattered paper could theoretically be assembled into something legible, but without more text to draw back on, it'd still be in a language you could never interpret.  If only you had more Spydric text to help translate this...#{normal}#]]
 	end,
 }

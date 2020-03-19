@@ -48,7 +48,7 @@ newTalent{
 	info = function(self, t)
 		local chance = t.getChance(self,t)
 		return ([[Your melee and ranged attacks have a %d%% chance to shred enemies inflicting an additional 100%% of the damage dealt as a bleed over 4 turns.]]):
-		format(chance)
+		tformat(chance)
 	end,
 }
 
@@ -76,7 +76,7 @@ newTalent{
 		local t = rng.tableRemove(tids)
 		if not t or #tids<=0 then return end
 		target.talents_cd[t.id] = cd
-		game.logSeen(target, "#CRIMSON#%s's %s is disrupted by %s wounds!#LAST#", target.name:capitalize(), t.name, target:his_her())
+		game.logSeen(target, "#CRIMSON#%s's %s is disrupted by %s wounds!#LAST#", target:getName():capitalize(), t.name, target:his_her())
 		self.turn_procs.scoundrel = self.turn_procs.scoundrel or {}
 		self.turn_procs.scoundrel[target] = true
 	end,
@@ -96,7 +96,7 @@ newTalent{
 		local t = rng.tableRemove(tids)
 		if not t or #tids<=0 then return end
 		target.talents_cd[t.id] = cd
-		game.logSeen(target, "#CRIMSON#%s's %s is disrupted by %s wounds!#LAST#", target.name:capitalize(), t.name, target:his_her())
+		game.logSeen(target, "#CRIMSON#%s's %s is disrupted by %s wounds!#LAST#", target:getName():capitalize(), t.name, target:his_her())
 		self.turn_procs.scoundrel = self.turn_procs.scoundrel or {}
 		self.turn_procs.scoundrel[target] = true
 	end,
@@ -106,7 +106,7 @@ newTalent{
 		local dur = t.getDuration(self,t)
 		return ([[Your melee and ranged attacks inflict distracting wounds that reduce the target’s critical strike multiplier by %d%% for 5 turns. 
 In addition, your attacks have a %d%% chance to inflict a painful wound that causes them to forget a random talent for %d turns.  The last effect cannot occur more than once per turn per target.
-		]]):format(crit, chance, dur)
+		]]):tformat(crit, chance, dur)
 	end,
 }
 
@@ -132,7 +132,7 @@ newTalent{
 		if e.status ~= "detrimental" or e.type ~= "physical" or not (p.src and p.src._is_actor) then return end
 		local chance = self:callTalent(self.T_MISDIRECTION, "getChance")
 		if not rng.percent(chance) then return end
-		game.logSeen(self, "#ORANGE#%s redirects the effect '%s'!#LAST#", self.name:capitalize(), e.desc)
+		game.logSeen(self, "#ORANGE#%s redirects the effect '%s'!#LAST#", self:getName():capitalize(), e.desc)
 		
 		local tgts = {}
 		self:project({type="ball", radius=1}, self.x, self.y, function(px, py)
@@ -153,7 +153,7 @@ newTalent{
 		return ([[Your abilities in sowing confusion and chaos have reached their peak.  Whenever a foe attempts to apply a detrimental physical effect to you, they have a %d%% chance to fail. If there is an adjacent enemy to you, you misdirect your foe into applying it to them at %d%% duration.
 You gain %d defense.
 The chance to apply status effects increases with your Accuracy and the Defense with your Cunning.]]):
-		format(t.getChance(self,t),t.getDuration(self,t), t.getDefense(self, t))
+		tformat(t.getChance(self,t),t.getDuration(self,t), t.getDefense(self, t))
 	end,
 }
 
@@ -184,6 +184,6 @@ newTalent{
 		If any effect causes the target's turn to fail they fumble and injure themself, taking %0.2f physical damage.
 		If the turn loss was caused by this effect then Fumble is removed.
 		The damage dealt increases with your Cunning.
-		]]):format(stacks*3, damDesc(self, DamageType.PHYSICAL, dam))
+		]]):tformat(stacks*3, damDesc(self, DamageType.PHYSICAL, dam))
 	end,
 }

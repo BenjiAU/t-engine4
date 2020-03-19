@@ -39,9 +39,16 @@ newTalent{
 	-- knockback: distance to knockback
 	-- knockbackDamage: when knockback strikes something, both parties take damage - percent of damage * remaining knockback
 	-- power: used to determine the initial radius of particles
-	forceHit = function(self, t, target, sourceX, sourceY, damage, knockback, knockbackDamage, power, max, tmp)
-		tmp = tmp or {}
-		if tmp[target] then return end
+	forceHit = function(self, t, target, sourceX, sourceY, damage, knockback, knockbackDamage, power, max)
+
+		-- give direct hit a direction?
+		if sourceX == target.x and sourceY == target.y then
+			local newDirection = rng.table(util.adjacentDirs())
+			local dx, dy = util.dirToCoord(newDirection, sourceX, sourceY)
+			sourceX = sourceX + dx
+			sourceY = sourceY + dy
+		end
+
 		-- apply initial damage
 		if damage > 0 then
 			damage = self:mindCrit(damage)
@@ -51,14 +58,6 @@ newTalent{
 
 		-- knockback?
 		if not target.dead and knockback and knockback > 0 and target:canBe("knockback") and (target.never_move or 0) < 1 then
-			-- give direct hit a direction?
-			if sourceX == target.x and sourceY == target.y then
-				local newDirection = rng.table(util.adjacentDirs())
-				local dx, dy = util.dirToCoord(newDirection, sourceX, sourceY)
-				sourceX = sourceX + dx
-				sourceY = sourceY + dy
-			end
-
 			local block_actor = function(_, bx, by) return game.level.map:checkEntity(bx, by, Map.TERRAIN, "block_move", target) end
 			local lineFunction = core.fov.line(sourceX, sourceY, target.x, target.y, block_actor, true)
 			local finalX, finalY = target.x, target.y
@@ -77,9 +76,9 @@ newTalent{
 							target:logCombat(nextTarget, "#Source# was blasted into #Target#!")
 						end
 					elseif knockbackCount > 0 then
-						game.logSeen(target, "%s was smashed back %d spaces!", target.name:capitalize(), knockbackCount)
+						game.logSeen(target, "%s was smashed back %d spaces!", target:getName():capitalize(), knockbackCount)
 					else
-						game.logSeen(target, "%s was smashed!", target.name:capitalize())
+						game.logSeen(target, "%s was smashed!", target:getName():capitalize())
 					end
 
 					-- take partial damage
@@ -89,7 +88,7 @@ newTalent{
 					if nextTarget then
 						-- start a new force hit with the knockback damage and current knockback
 						if max > 0 then
-							t.forceHit(self, t, nextTarget, sourceX, sourceY, blockDamage, knockback, knockbackDamage, power / 2, max - 1, tmp)
+							t.forceHit(self, t, nextTarget, sourceX, sourceY, blockDamage, knockback, knockbackDamage, power / 2, max - 1)
 						end
 					end
 
@@ -104,7 +103,7 @@ newTalent{
 			end
 
 			if not blocked and knockbackCount > 0 then
-				game.logSeen(target, "%s was blasted back %d spaces!", target.name:capitalize(), knockbackCount)
+				game.logSeen(target, "%s was blasted back %d spaces!", target:getName():capitalize(), knockbackCount)
 			end
 
 			if not target.dead and (finalX ~= target.x or finalY ~= target.y) then
@@ -140,7 +139,7 @@ newTalent{
 		local knockback = t.getKnockback(self, t)
 		return ([[Focusing your hate, you strike your foe with unseen force for %d damage and %d knockback.
 		In addition, your ability to channel force with this talent increases all critical damage by %d%% (currently: %d%%)
-		Damage increases with your Mindpower.]]):format(damDesc(self, DamageType.PHYSICAL, damage), knockback, t.critpower(self, t), self.combat_critical_power or 0)
+		Damage increases with your Mindpower.]]):tformat(damDesc(self, DamageType.PHYSICAL, damage), knockback, t.critpower(self, t), self.combat_critical_power or 0)
 	end,
 }
 
@@ -159,7 +158,7 @@ newTalent{
 		return self:combatTalentMindDamage(t, 0, 400)
 	end,
 	getDisplayName = function(self, t, p)
-		return ("Deflection (%d)"):format(p.value)
+		return ("Deflection (%d)"):tformat(p.value)
 	end,
 	iconOverlay = function(self, t, p)
 		local val = p.value or 0
@@ -231,7 +230,7 @@ newTalent{
 		local recharge_rate = t.getRechargeRate(self, t)
 		return ([[Create a barrier that siphons hate from you at the rate of 0.2 a turn. The barrier will deflect 50%% of incoming damage with the force of your will, up to %d damage. The barrier charges at a rate of 1/%d of its maximum charge per turn.
 		In addition, your ability to channel force with this talent increases all critical damage by %d%% (currently: %d%%)
-		The maximum damage deflected increases with your Mindpower.]]):format(maxDamage, recharge_rate, t.critpower(self, t),self.combat_critical_power or 0)
+		The maximum damage deflected increases with your Mindpower.]]):tformat(maxDamage, recharge_rate, t.critpower(self, t),self.combat_critical_power or 0)
 	end,
 }
 
@@ -270,24 +269,26 @@ newTalent{
 		local blastX, blastY = self:getTarget(tg)
 		if not self:canProject(tg, blastX, blastY) then return nil end
 
-		local tmp = {}
-		local grids = self:project(tg, blastX, blastY,
-			function(x, y, target, self)
-				-- your will ignores friendly targets (except for knockback hits)
-				local target = game.level.map(x, y, Map.ACTOR)
-				if target and self:reactionToward(target) < 0 then
-					local distance = core.fov.distance(blastX, blastY, x, y)
-					local power = (1 - (distance / radius))
-					local localDamage = damage * power
-					local dazeDuration = t.getDazeDuration(self, t)
+		local list = {}
+		self:project(tg, blastX, blastY, function(x, y, target, self)
+			-- your will ignores friendly targets (except for knockback hits)
+			local target = game.level.map(x, y, Map.ACTOR)
+			if target and self:reactionToward(target) < 0 then
+				local distance = core.fov.distance(blastX, blastY, x, y)
+				local power = 1 - 0.5 * (distance / radius)
+				list[#list + 1] = {target = target, power = power, damage = damage * power, knockback = math.max(0, knockback - distance)}
+			end
+		end)
 
-					self:callTalent(self.T_WILLFUL_STRIKE, "forceHit", target, blastX, blastY, damage, math.max(0, knockback - distance), 7, power, 10, tmp)
-					if target:canBe("stun") then
-						target:setEffect(target.EFF_DAZED, dazeDuration, {src=self})
-					end
-				end
-			end,
-			nil, nil)
+		if #list == 0 then return end
+		local dazeDuration = t.getDazeDuration(self, t)
+		for i = 1, #list do
+			local hit = list[i]
+			self:callTalent(self.T_WILLFUL_STRIKE, "forceHit", hit.target, blastX, blastY, hit.damage, hit.knockback, 7, hit.power, 10)
+			if hit.target:canBe("stun") then
+				hit.target:setEffect(hit.target.EFF_DAZED, dazeDuration, {src=self})
+			end
+		end
 
 		local _ _, _, _, x, y = self:canProject(tg, blastX, blastY)
 		game.level.map:particleEmitter(x, y, tg.radius, "force_blast", {radius=tg.radius})
@@ -305,7 +306,7 @@ newTalent{
 		local dazeDuration = t.getDazeDuration(self, t)
 		return ([[You rage coalesces at a single point, and then explodes outward, blasting enemies within a radius of %d in all directions. The blast causes %d damage and %d knockback at the center, that decreases with distance. Anyone caught in the explosion will also be dazed for 3 turns.
 		In addition, your ability to channel force with this talent increases all critical damage by %d%% (currently: %d%%)
-		Damage increases with your Mindpower.]]):format(radius, damDesc(self, DamageType.PHYSICAL, damage), knockback, t.critpower(self, t), self.combat_critical_power or 0)
+		Damage increases with your Mindpower.]]):tformat(radius, damDesc(self, DamageType.PHYSICAL, damage), knockback, t.critpower(self, t), self.combat_critical_power or 0)
 	end,
 }
 
@@ -317,7 +318,7 @@ newTalent{
 	hate = 18,
 	cooldown = 30,
 	tactical = { ATTACKAREA = { PHYSICAL = 2 } },
-	range = 4,
+	range = 5,
 	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 6, 10))	end,
 	getDamage = function(self, t)
 		return self:combatTalentMindDamage(t, 0, 140)
@@ -341,7 +342,7 @@ newTalent{
 		local secondchance = t.getSecondHitChance(self, t)
 		self:setEffect(self.EFF_UNSEEN_FORCE, t.getDuration(self, t), {
 			damage = t.getDamage(self, t), knockback = t.getKnockback(self, t),
-			hits = 1 + math.floor(secondchance / 100), extrahit = secondchance % 100,
+			hits = 1 + math.floor(secondchance / 100), extrahit = secondchance % 100, range = self:getTalentRange(t)
 		})
 		return true
 	end,
@@ -356,8 +357,8 @@ newTalent{
 		local secondHitChance = t.getSecondHitChance(self, t)
 		local hits = 1 + math.floor(secondHitChance/100)
 		local chance = secondHitChance - math.floor(secondHitChance/100)*100
-		return ([[Your fury becomes an unseen force that randomly lashes out at foes around you. For %d turns you strike %d (%d%% chance for %d) nearby target(s) within range 5 doing %d damage and %d knockback. The number of extra strikes increases at higher talent levels.
+		return ([[Your fury becomes an unseen force that randomly lashes out at foes around you. For %d turns you strike %d (%d%% chance for %d) nearby target(s) within range %d doing %d damage and %d knockback. The number of extra strikes increases at higher talent levels.
 		In addition, your ability to channel force with this talent increases all critical damage by %d%% (currently: %d%%)
-		Damage increases with your Mindpower.]]):format(duration, hits, chance, hits+1, damDesc(self, DamageType.PHYSICAL, damage), knockback, t.critpower(self, t), self.combat_critical_power or 0)
+		Damage increases with your Mindpower.]]):tformat(duration, hits, chance, hits+1, self:getTalentRange(t), damDesc(self, DamageType.PHYSICAL, damage), knockback, t.critpower(self, t), self.combat_critical_power or 0)
 	end,
 }

@@ -54,6 +54,8 @@ function _M:newTalentType(t)
 	t.description = t.description or ""
 	t.category = t.category or t.type:gsub("/.*", "")
 	t.points = t.points or 1
+	-- I18N
+	t.name = _t(t.name)
 	t.talents = {}
 	table.insert(self.talents_types_def, t)
 	self.talents_types_def[t.type] = self.talents_types_def[t.type] or t
@@ -82,6 +84,9 @@ function _M:newTalent(t)
 	-- Remove line stat with tabs to be cleaner ..
 	local info = t.info
 	t.info = function(self, t) return info(self, t):gsub("\n\t+", "\n") end
+
+	-- I18N
+	t.name = _t(t.name)
 
 	t.id = "T_"..t.short_name
 	self.talents_def[t.id] = t
@@ -306,7 +311,7 @@ function _M:useTalent(id, who, force_level, ignore_cd, force_target, silent, no_
 		end)
 		if not no_confirm and self:isTalentConfirmable(ab) then
 			local abname = game:getGenericTextTiles(ab)..tostring(self:getTalentDisplayName(ab))
-			require "engine.ui.Dialog":yesnoPopup("Talent Use Confirmation", ("Use %s?"):format(abname),
+			require "engine.ui.Dialog":yesnoPopup(_t"Talent Use Confirmation", ("Use %s?"):tformat(abname),
 			function(quit)
 				if quit ~= false then
 					cancel = true
@@ -318,7 +323,7 @@ function _M:useTalent(id, who, force_level, ignore_cd, force_target, silent, no_
 					error(ret)
 				end
 			end,
-			"Cancel","Continue")
+			_t"Cancel",_t"Continue")
 		else
 			success, ret = coroutine.resume(co_wrapper) -- cancel checked in coroutine
 		end
@@ -344,12 +349,12 @@ function _M:useTalentMessage(ab)
 	if not ab.message then return nil end
 	local str = util.getval(ab.message, self, ab)
 	local _, _, target = self:getTarget()
-	local tname = "unknown"
-	if target then tname = target.name end
-	str = str:gsub("@Source@", self.name:capitalize())
-	str = str:gsub("@source@", self.name)
-	str = str:gsub("@target@", tname)
-	str = str:gsub("@Target@", tname:capitalize())
+	local tname = _t"unknown"
+	if target then tname = target:getName() end
+	str = str:noun_sub("@Source@", self:getName():capitalize())
+	str = str:noun_sub("@source@", self:getName())
+	str = str:noun_sub("@target@", tname)
+	str = str:noun_sub("@Target@", tname:capitalize())
 	str = str:gsub("@hisher@", string.his_her(self))
 	return str
 end
@@ -364,9 +369,9 @@ function _M:logTalentMessage(ab)
 	elseif ab.message then
 		game.logSeen(self, "%s", self:useTalentMessage(ab))
 	elseif ab.mode == "sustained" then
-		game.logSeen(self, "%s %s %s.", self.name:capitalize(), self:isTalentActive(ab.id) and "deactivates" or "activates", ab.name)
+		game.logSeen(self, "%s %s %s.", self:getName():capitalize(), self:isTalentActive(ab.id) and _t"deactivates" or _t"activates", ab.name)
 	else
-		game.logSeen(self, "%s uses %s.", self.name:capitalize(), ab.name)
+		game.logSeen(self, "%s uses %s.", self:getName():capitalize(), ab.name)
 	end
 end
 
@@ -726,12 +731,12 @@ function _M:canLearnTalent(t, offset, ignore_special)
 		if req.stat then
 			for s, v in pairs(req.stat) do
 				v = util.getval(v, tlev)
-				if self:getStat(s) < v then return nil, "not enough stat: "..s:upper() end
+				if self:getStat(s) < v then return nil, ("not enough stat: %s"):tformat(s:upper()) end
 			end
 		end
 		if req.level then
 			if self.level < util.getval(req.level, tlev) then
-				return nil, "not enough levels"
+				return nil, _t"not enough levels"
 			end
 		end
 		if req.special and not ignore_special then
@@ -753,28 +758,28 @@ function _M:canLearnTalent(t, offset, ignore_special)
 			for _, tid in ipairs(req.talent) do
 				if type(tid) == "table" then
 					if type(tid[2]) == "boolean" and tid[2] == false then
-						if self:knowTalent(tid[1]) then return nil, "missing dependency" end
+						if self:knowTalent(tid[1]) then return nil, _t"missing dependency" end
 					else
-						if self:getTalentLevelRaw(tid[1]) < tid[2] then return nil, "missing dependency" end
+						if self:getTalentLevelRaw(tid[1]) < tid[2] then return nil, _t"missing dependency" end
 					end
 				else
-					if not self:knowTalent(tid) then return nil, "missing dependency" end
+					if not self:knowTalent(tid) then return nil, _t"missing dependency" end
 				end
 			end
 		end
 		if req.birth_descriptors then
 			for _, d in ipairs(req.birth_descriptors) do
-				if not self.descriptor or self.descriptor[d[1]] ~= d[2] then return nil, ("is not %s"):format(d[2]) end
+				if not self.descriptor or self.descriptor[d[1]] ~= d[2] then return nil, ("is not %s"):tformat(_t(d[2])) end
 			end
 		end
 	end
 
-	if not self:knowTalentType(t.type[1]) and not t.type_no_req then return nil, "unknown talent type" end
+	if not self:knowTalentType(t.type[1]) and not t.type_no_req then return nil, _t"unknown talent type" end
 
 	-- Check talent type
 	local known = self:numberKnownTalent(t.type[1], t.id, t.type[2])
 	if t.type[2] and known < t.type[2] - 1 then
-		return nil, "not enough talents of this type known"
+		return nil, _t"not enough talents of this type known"
 	end
 
 	-- Ok!
@@ -795,13 +800,13 @@ function _M:getTalentReqDesc(t_id, levmod)
 	local str = tstring{}
 
 	if not t.type_no_req then
-		str:add((self:knowTalentType(t.type[1]) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}), "- Talent category known", true)
+		str:add((self:knowTalentType(t.type[1]) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}), _t"- Talent category known", true)
 	end
 
 	if t.type[2] and t.type[2] > 1 then
 		local known = self:numberKnownTalent(t.type[1], t.id, t.type[2])
 		local c = (known >= t.type[2] - 1) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
-		str:add(c, ("- Lower talents of the same category: %d"):format(t.type[2] - 1), true)
+		str:add(c, ("- Lower talents of the same category: %d"):tformat(t.type[2] - 1), true)
 	end
 
 	-- Obviously this requires the ActorStats interface
@@ -815,7 +820,7 @@ function _M:getTalentReqDesc(t_id, levmod)
 	if req.level then
 		local v = util.getval(req.level, tlev)
 		local c = (self.level >= v) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
-		str:add(c, ("- Level %d"):format(v), true)
+		str:add(c, ("- Level %d"):tformat(v), true)
 	end
 	if req.special then
 		local c = (req.special.fct(self, t, offset)) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
@@ -834,21 +839,21 @@ function _M:getTalentReqDesc(t_id, levmod)
 			if type(tid) == "table" then
 				if type(tid[2]) == "boolean" and tid[2] == false then
 					local c = (not self:knowTalent(tid[1])) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
-					str:add(c, ("- Talent %s (not known)"):format(self:getTalentFromId(tid[1]).name), true)
+					str:add(c, ("- Talent %s (not known)"):tformat(self:getTalentFromId(tid[1]).name), true)
 				else
 					local c = (self:getTalentLevelRaw(tid[1]) >= tid[2]) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
-					str:add(c, ("- Talent %s (%d)"):format(self:getTalentFromId(tid[1]).name, tid[2]), true)
+					str:add(c, ("- Talent %s (%d)"):tformat(self:getTalentFromId(tid[1]).name, tid[2]), true)
 				end
 			else
 				local c = self:knowTalent(tid) and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
-				str:add(c, ("- Talent %s"):format(self:getTalentFromId(tid).name), true)
+				str:add(c, ("- Talent %s"):tformat(self:getTalentFromId(tid).name), true)
 			end
 		end
 	end
 	if req.birth_descriptors then
 		for _, d in ipairs(req.birth_descriptors) do
 			local c = self.descriptor and self.descriptor[d[1]] == d[2] and {"color", 0x00,0xff,0x00} or {"color", 0xff,0x00,0x00}
-			str:add(c, ("- Is %s"):format(d[2]), true)
+			str:add(c, ("- Is %s"):tformat(_t(d[2])), true)
 		end
 	end
 

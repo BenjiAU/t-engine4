@@ -47,7 +47,7 @@ newTalent{
 		return ([[You focus the inexorable pull of nature against a single creature, eroding it and allowing it to be reclaimed by the cycle of life.
 		This deals %0.1f Nature and %0.1f Acid damage to the target, and is particularly devastating against undead and constructs, dealing %d%% more damage to them.
 		The damage increases with your Mindpower.]]):
-		format(damDesc(self, DamageType.NATURE, dam/2), damDesc(self, DamageType.ACID, dam/2), t.undeadBonus)
+		tformat(damDesc(self, DamageType.NATURE, dam/2), damDesc(self, DamageType.ACID, dam/2), t.undeadBonus)
 	end,
 }
 
@@ -77,7 +77,7 @@ newTalent{
 		You gain %d Spell save, %0.1f%% Arcane resistance, and %0.1f%% Nature damage affinity.
 		You defy arcane forces, so that any time you take damage from a spell, you restore %0.1f Equilibrium each turn for %d turns.
 		The effects increase with your Mindpower.]]):
-		format(t.getSave(self, t), t.getResist(self, t), t.getAffinity(self, t), t.getPower(self, t), t.getDuration(self, t))
+		tformat(t.getSave(self, t), t.getResist(self, t), t.getAffinity(self, t), t.getPower(self, t), t.getDuration(self, t))
 	end,
 }
 
@@ -155,7 +155,7 @@ newTalent{
 		)
 		eff.chance = t.getChance(self, t)
 		eff.removeEffect = t.removeEffect
-		eff.name = "Acidfire cloud"
+		eff.name = _t"Acidfire cloud"
 		game:playSoundNear(self, "talents/cloud")
 		return true
 	end,
@@ -163,7 +163,7 @@ newTalent{
 		return ([[You call upon the earth to create a blinding, corrosive cloud in an area of radius %d for %d turns.
 		Each turn, this cloud deals %0.1f acid damage to each foe with a 25%% chance to blind and a %d%% chance of burning away one magical sustain or beneficial magical effect.
 		The damage increases with your Mindpower.]]):
-		format(self:getTalentRadius(t), t.getDuration(self, t), damDesc(self, DamageType.ACID, t.getDamage(self, t)), t.getChance(self, t))
+		tformat(self:getTalentRadius(t), t.getDuration(self, t), damDesc(self, DamageType.ACID, t.getDamage(self, t)), t.getChance(self, t))
 	end,
 }
 
@@ -188,7 +188,7 @@ newTalent{
 		act:incMana(-mana); act:incVim(-vim); act:incPositive(-positive); act:incNegative(-negative)
 		local drain = mana + vim + positive + negative
 		if drain > 0 then
-			game:delayedLogMessage(eff.src, act, "Eyal's Wrath", ("#CRIMSON#%s drains magical energy!"):format(eff:getName())) 
+			game:delayedLogMessage(eff.src, act, "Eyal's Wrath", ("#CRIMSON#%s drains magical energy!"):tformat(eff:getName())) 
 			eff.src:incEquilibrium(-drain/10)
 		end
 	end,
@@ -220,7 +220,7 @@ newTalent{
 		)
 		eff.drain = t.getDrain(self, t)
 		eff.drainMagic = t.drainMagic
-		eff.name = "Eyal's Wrath"
+		eff.name = _t"Eyal's Wrath"
 		game:playSoundNear(self, "talents/thunderstorm")
 		return true
 	end,
@@ -230,6 +230,6 @@ newTalent{
 		This storm moves with you and deals %0.1f Nature damage each turn to all foes it hits.
 		In addtion, it will drain up to %d Mana, %d Vim, %d Positive, and %d Negative energy from each enemy within it's area every turn, while you restore Equilibrium equal to 10%% of the amount drained.
 		The damage and drain increase with your Mindpower.]]):
-		format(self:getTalentRadius(t), t.getDuration(self, t), damDesc(self, DamageType.NATURE, t.getDamage(self, t)), drain, drain/2, drain/4, drain/4)
+		tformat(self:getTalentRadius(t), t.getDuration(self, t), damDesc(self, DamageType.NATURE, t.getDamage(self, t)), drain, drain/2, drain/4, drain/4)
 	end,
 }

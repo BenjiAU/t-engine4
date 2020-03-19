@@ -21,17 +21,17 @@ uberTalent{
 	name = "Draconic Body",
 	mode = "passive",
 	cooldown = 15,
-	require = { special={desc="Be close to the draconic world", fct=function(self) return game.state.birth.ignore_prodigies_special_reqs or (self:attr("drake_touched") and self:attr("drake_touched") >= 2) end} },
+	require = { special={desc=_t"Be close to the draconic world", fct=function(self) return game.state.birth.ignore_prodigies_special_reqs or (self:attr("drake_touched") and self:attr("drake_touched") >= 2) end} },
 	trigger = function(self, t, value)
 		if self.life - value < self.max_life * 0.3 and not self:isTalentCoolingDown(t) then
 			self:heal(self.max_life * 0.4, t)
 			self:startTalentCooldown(t)
-			game.logSeen(self,"%s's draconic body hardens and heals!",self.name)
+			game.logSeen(self,"%s's draconic body hardens and heals!",self:getName())
 		end
 	end,
 	info = function(self, t)
 		return ([[Your body hardens and recovers quickly. When pushed below 30%% life, you instantly restore 40%% of your total life.]])
-		:format()
+		:tformat()
 	end,
 }
 
@@ -39,7 +39,7 @@ uberTalent{
 	name = "Bloodspring",
 	mode = "passive",
 	cooldown = 12,
-	require = { special={desc="Have let Melinda be sacrificed", fct=function(self) return game.state.birth.ignore_prodigies_special_reqs or (self:hasQuest("kryl-feijan-escape") and self:hasQuest("kryl-feijan-escape"):isStatus(engine.Quest.FAILED)) end} },
+	require = { special={desc=_t"Have let Melinda be sacrificed", fct=function(self) return game.state.birth.ignore_prodigies_special_reqs or (self:hasQuest("kryl-feijan-escape") and self:hasQuest("kryl-feijan-escape"):isStatus(engine.Quest.FAILED)) end} },
 	trigger = function(self, t)
 		-- Add a lasting map effect
 		game.level.map:addEffect(self,
@@ -60,17 +60,17 @@ uberTalent{
 	info = function(self, t)
 		return ([[When a single blow deals more than 15%% of your total life, a torrent of blood gushes from your body, creating a bloody tidal wave for 4 turns that deals %0.2f blight damage, heals you for 50%% of the damage done, and knocks foes back.
 		The damage increases with your Constitution.]])
-		:format(100 + self:getCon() * 3)
+		:tformat(100 + self:getCon() * 3)
 	end,
 }
 
 uberTalent{
 	name = "Eternal Guard",
 	mode = "passive",
-	require = { special={desc="Know the Block talent", fct=function(self) return self:knowTalent(self.T_BLOCK) end} },
+	require = { special={desc=_t"Know the Block talent", fct=function(self) return self:knowTalent(self.T_BLOCK) end} },
 	info = function(self, t)
 		return ([[Your Block talent now lasts for 2 game turns and you can apply Counterstrike to any number of enemies.]])
-		:format()
+		:tformat()
 	end,
 }
 
@@ -81,7 +81,7 @@ uberTalent{
 	sustain_stamina = 10,
 	tactical = { CLOSEIN = 0.5, ESCAPE = 0.5, STAMINA = -0.5, SPECIAL = -0.5}, -- values small for instant use
 	no_energy = true,
-	require = { special={desc="Know at least 20 levels of stamina-using talents", fct=function(self) return knowRessource(self, "stamina", 20) end} },
+	require = { special={desc=_t"Know at least 20 levels of stamina-using talents", fct=function(self) return knowRessource(self, "stamina", 20) end} },
 	activate = function(self, t)
 		local ret = {}
 		self:talentTemporaryValue(ret, "move_stamina_instead_of_energy", 12)
@@ -91,14 +91,14 @@ uberTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[While this talent is active, you dig deep into your stamina reserves, allowing you to move without taking a turn. However, this costs 12 stamina for each tile that you cross.]]):format()
+		return ([[While this talent is active, you dig deep into your stamina reserves, allowing you to move without taking a turn. However, this costs 12 stamina for each tile that you cross.]]):tformat()
 	end,
 }
 
 uberTalent{
 	name = "Armour of Shadows",
 	mode = "passive",
-	require = { special={desc="Have dealt over 50000 darkness damage", fct=function(self) return
+	require = { special={desc=_t"Have dealt over 50000 darkness damage", fct=function(self) return
 		self.damage_log and (
 			(self.damage_log[DamageType.DARKNESS] and self.damage_log[DamageType.DARKNESS] >= 50000)
 		)
@@ -115,7 +115,7 @@ uberTalent{
 		Any time you deal darkness damage, you will unlight both the target tile and yours.
 		Passively increases your stealth rating by %d.
 		The armor bonus scales with your Constitution.]])
-		:format(t.ArmourBonus(self,t), t.getStealth(self, t))
+		:tformat(t.ArmourBonus(self,t), t.getStealth(self, t))
 	end,
 }
 
@@ -128,13 +128,13 @@ uberTalent{
 	end,
 	info = function(self, t)
 		return ([[Your back is as hard as stone. Each time that you are affected by a physical effect, your body hardens, making you immune to all other physical effects for 5 turns.]])
-		:format()
+		:tformat()
 	end,
 }
 
 uberTalent{
 	name = "Fungal Blood",
-	require = { special={desc="Be able to use infusions", fct=function(self)
+	require = { special={desc=_t"Be able to use infusions", fct=function(self)
 		return 
 			(not self.inscription_restrictions or self.inscription_restrictions['inscriptions/infusions']) and
 			(not self.inscription_forbids or not self.inscription_forbids['inscriptions/infusions'])
@@ -168,15 +168,15 @@ uberTalent{
 		You may use this prodigy to release the power as a heal (never more than %d life) and remove up to 10 detrimental magical effects.
 		Fungal power lasts for up to 6 turns, losing the greater of 10 potency or 10%% of its power each turn.
 		The amount of fungal power produced and the maximum heal possible increase with your Constitution and maximum life.]])
-		:format(t.fungalPower(self, t), t.healmax(self,t))
+		:tformat(t.fungalPower(self, t), t.healmax(self,t))
 	end,
 }
 
 uberTalent{
 	name = "Corrupted Shell",
 	mode = "passive",
-	require = { special={desc="Have received at least 7500 blight damage and destroyed Zigur with the Grand Corruptor.", fct=function(self) return
-		(self.damage_intake_log and self.damage_intake_log[DamageType.BLIGHT] and self.damage_intake_log[DamageType.BLIGHT] >= 7500) and
+	require = { special={desc=_t"Have received at least 3500 blight damage and destroyed Zigur with the Grand Corruptor.", fct=function(self) return
+		(self.damage_intake_log and self.damage_intake_log[DamageType.BLIGHT] and self.damage_intake_log[DamageType.BLIGHT] >= 3500) and
 		(game.state.birth.ignore_prodigies_special_reqs or (
 			self:hasQuest("anti-antimagic") and 
 			self:hasQuest("anti-antimagic"):isStatus(engine.Quest.DONE) and
@@ -195,6 +195,6 @@ uberTalent{
 		return ([[Thanks to your newfound knowledge of corruption, you've learned some tricks for toughening your body... but only if you are healthy enough to withstand the strain from the changes.
 		Improves your life by 500, your defense by %d, your armour by %d, your armour hardiness by 20%% and your saves by %d as your natural toughness and reflexes are pushed beyond their normal limits.
 		Your saves armour and defense will improve with your Constitution.]])
-		:format(self:getCon() / 3, self:getCon() / 3.5, self:getCon() / 3)
+		:tformat(self:getCon() / 3, self:getCon() / 3.5, self:getCon() / 3)
 	end,
 }

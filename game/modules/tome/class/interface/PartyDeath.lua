@@ -55,7 +55,7 @@ function _M:onPartyDeath(src, death_note)
 		game.party:setPlayer(game.party:findMember{main=true}, true)
 		game.paused = true
 		game.player.energy.value = game.energy_to_act
-		src = src or {name="unknown"}
+		src = src or {name=_t"unknown"}
 		game.player.killedBy = src
 		game.player.died_times[#game.player.died_times+1] = {name=src.name, level=game.player.level, turn=game.turn}
 		game.player:registerDeath(game.player.killedBy)
@@ -86,54 +86,54 @@ function _M:onPartyDeath(src, death_note)
 
 		local msg, short_msg
 		if not death_note.special_death_msg then
-			msg = "%s the level %d %s %s was %s to death by %s%s%s on level %s of %s."
-			short_msg = "%s(%d %s %s) was %s to death by %s%s on %s %s."
-			local srcname = src.unique and src.name or src.name:a_an()
-			local killermsg = (src.killer_message and " "..src.killer_message or ""):gsub("#sex#", game.player.female and "her" or "him")
+			msg = _t"%s the level %d %s %s was %s to death by %s%s%s on level %s of %s."
+			short_msg = _t"%s(%d %s %s) was %s to death by %s%s on %s %s."
+			local srcname = src.unique and src:getName() or src:getName():a_an()
+			local killermsg = (src.killer_message and " "..src.killer_message or ""):gsub("#sex#", game.player.female and _t"her" or _t"him")
 			if src.name == game.player.name then
-				srcname = game.player.female and "herself" or "himself"
+				srcname = game.player.female and _t"herself" or _t"himself"
 				killermsg = rng.table{
-					" (the fool)",
-					" in an act of extreme incompetence",
-					" out of supreme humility",
-					", by accident of course,",
-					" in some sort of fetish experiment gone wrong",
-					", providing a free meal to the wildlife",
-					" (how embarrassing)",
+					_t" (the fool)",
+					_t" in an act of extreme incompetence",
+					_t" out of supreme humility",
+					_t", by accident of course,",
+					_t" in some sort of fetish experiment gone wrong",
+					_t", providing a free meal to the wildlife",
+					_t" (how embarrassing)",
 				}
 			end
 			msg = msg:format(
-				game.player.name, game.player.level, game.player.descriptor.subrace:lower(), game.player.descriptor.subclass:lower(),
-				death_mean or "battered",
+				game.player.name, game.player.level, _t(game.player.descriptor.subrace):lower(), _t(game.player.descriptor.subclass):lower(),
+				death_mean or _t"battered",
 				srcname,
-				src.name == top_killer and " (yet again)" or "",
+				src.name == top_killer and _t" (yet again)" or "",
 				killermsg,
 				game.level.level, game.zone.name
 			)
 			short_msg = short_msg:format(
-				game.player.name, game.player.level, game.player.descriptor.subrace:lower(), game.player.descriptor.subclass:lower(),
-				death_mean or "battered",
+				game.player.name, game.player.level, _t(game.player.descriptor.subrace):lower(), _t(game.player.descriptor.subclass):lower(),
+				death_mean or _t"battered",
 				srcname,
 				killermsg,
 				game.zone.name, game.level.level
 			)
 		else
-			msg = "%s the level %d %s %s %s on level %s of %s."
-			short_msg = "%s(%d %s %s) %s on %s %s."
+			msg = _t"%s the level %d %s %s %s on level %s of %s."
+			short_msg = _t"%s(%d %s %s) %s on %s %s."
 			msg = msg:format(
-				game.player.name, game.player.level, game.player.descriptor.subrace:lower(), game.player.descriptor.subclass:lower(),
+				game.player.name, game.player.level, _t(game.player.descriptor.subrace):lower(), _t(game.player.descriptor.subclass):lower(),
 				death_note.special_death_msg,
 				game.level.level, game.zone.name
 			)
 			short_msg = short_msg:format(
-				game.player.name, game.player.level, game.player.descriptor.subrace:lower(), game.player.descriptor.subclass:lower(),
+				game.player.name, game.player.level, _t(game.player.descriptor.subrace):lower(), _t(game.player.descriptor.subclass):lower(),
 				death_note.special_death_msg,
 				game.zone.name, game.level.level
 			)
 		end
 
 		game:playSound("actions/death")
-		game.delayed_death_message = "#{bold}#"..msg.."#{normal}#"
+		game.delayed_death_message = _t"#{bold}#"..msg.."#{normal}#"
 		if (not game.player.easy_mode_lifes or game.player.easy_mode_lifes <= 0) and not game.player.infinite_lifes then
 			profile.chat.uc_ext:sendKillerLink(msg, short_msg, src)
 		end

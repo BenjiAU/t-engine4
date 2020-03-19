@@ -39,7 +39,7 @@ newEntity{
 		sound = {"actions/melee", pitch=0.6, vol=1.2}, sound_miss = {"actions/melee", pitch=0.6, vol=1.2},
 	},
 	command_staff = {inc_damage = 1,},
-	desc = [[Staves designed for wielders of magic, by the greats of the art.]],
+	desc = _t[[Staves designed for wielders of magic, by the greats of the art.]],
 	egos = "/data/general/objects/egos/staves.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 }
 

@@ -18,32 +18,32 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*A ray of light illuminates the gleam of steal amidst the grass. Investigating, you find a lone sun paladin lying stricken on the ground. Her wounds are minor, but her pallid features bely a poison that is taking its final toll. She whispers to you.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*A ray of light illuminates the gleam of steal amidst the grass. Investigating, you find a lone sun paladin lying stricken on the ground. Her wounds are minor, but her pallid features bely a poison that is taking its final toll. She whispers to you.*#WHITE#
 Help, Help me.
 ]],
 	answers = {
-		{"What should I do?", jump="next1"},
+		{_t"What should I do?", jump="next1"},
 	}
 }
 
 newChat{ id="next1",
-	text = [[I found it... the abomination Aeryn sent me to seek out. The breeding pits of the orcs... It is more vile than you can imagine... They have it hidden away from their encampments, out of sight of all their people. Their mothers, their young, all there - all vulnerable!
+	text = _t[[I found it... the abomination Aeryn sent me to seek out. The breeding pits of the orcs... It is more vile than you can imagine... They have it hidden away from their encampments, out of sight of all their people. Their mothers, their young, all there - all vulnerable!
 #LIGHT_GREEN#*She pulls out a sketched map, and with some effort puts it in your palm.*#WHITE#
 
 This could be the final solution, the end to the war... forever. We must strike soon, before reinforcements...
 
 #LIGHT_GREEN#*She looks hard at you, exerting all her effort into a final pleading stare.*#WHITE#]],
 	answers = {
-		{"I cannot do this myself... I will tell Aeryn about it, it is in her hands.", action=function(npc, player)
+		{_t"I cannot do this myself... I will tell Aeryn about it, it is in her hands.", action=function(npc, player)
 			player:grantQuest("orc-breeding-pits")
 			player:setQuestStatus("orc-breeding-pits", engine.Quest.COMPLETED, "wuss-out")
 		end},
-		{"I will go myself and ensure this is thoroughly dealt with.", action=function(npc, player)
+		{_t"I will go myself and ensure this is thoroughly dealt with.", action=function(npc, player)
 			player:grantQuest("orc-breeding-pits")
 			local q = player:hasQuest("orc-breeding-pits")
 			q:reveal()
 		end},
-		{"You want me to kill mothers and children? This is barbaric, I'll have nothing to do with it!"},
+		{_t"You want me to kill mothers and children? This is barbaric, I'll have nothing to do with it!"},
 	}
 }
 

@@ -17,12 +17,12 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-newTalentType{ type="technique/horror", name = "horror techniques", hide = true, description = "Physical talents of the various horrors of the world." }
-newTalentType{ type="psionic/horror", name = "horror techniques", hide = false, description = "Psionic talents of the various horrors of the world." }
-newTalentType{ type="wild-gift/horror", name = "horror techniques", hide = false, description = "Psionic talents of the various horrors of the world." }
-newTalentType{ no_silence=true, is_spell=true, type="spell/horror", name = "horror spells", hide = true, description = "Spell talents of the various horrors of the world." }
-newTalentType{ no_silence=true, is_spell=true, type="corruption/horror", name = "horror spells", hide = true, description = "Spell talents of the various horrors of the world." }
-newTalentType{ type="other/horror", name = "horror powers", hide = true, description = "Unclassified talents of the various horrors of the world." }
+newTalentType{ type="technique/horror", name = _t"horror techniques", hide = true, description = _t"Physical talents of the various horrors of the world." }
+newTalentType{ type="psionic/horror", name = _t"horror techniques", hide = false, description = _t"Psionic talents of the various horrors of the world." }
+newTalentType{ type="wild-gift/horror", name = _t"horror techniques", hide = false, description = _t"Psionic talents of the various horrors of the world." }
+newTalentType{ no_silence=true, is_spell=true, type="spell/horror", name = _t"horror spells", hide = true, description = _t"Spell talents of the various horrors of the world." }
+newTalentType{ no_silence=true, is_spell=true, type="corruption/horror", name = _t"horror spells", hide = true, description = _t"Spell talents of the various horrors of the world." }
+newTalentType{ type="other/horror", name = _t"horror powers", hide = true, description = _t"Unclassified talents of the various horrors of the world." }
 
 local oldTalent = newTalent
 local newTalent = function(t) if type(t.hide) == "nil" then t.hide = true end return oldTalent(t) end
@@ -37,7 +37,7 @@ newTalent{
 	cooldown = 12,
 	stamina = 24,
 	tactical = { ATTACK = { PHYSICAL = 1 }, DISABLE = { cut = 2 } },
-	message = "In a frenzy @Source@ bites at @Target@!",
+	message = _t"In a frenzy @Source@ bites at @Target@!",
 	is_melee = true,
 	range = 1,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
@@ -63,7 +63,7 @@ newTalent{
 		local bleed = t.getBleedDamage(self, t) * 100
 		local heal_penalty = t.getHealingPenalty(self, t)
 		return ([[A nasty bite that hits for %d%% weapon damage, reduces the targets healing by %d%%, and causes the target to bleed for %d%% weapon damage over 5 turns.
-		Only usable while frenzied.]]):format(damage, heal_penalty, bleed)
+		Only usable while frenzied.]]):tformat(damage, heal_penalty, bleed)
 	end,
 }
 
@@ -74,7 +74,7 @@ newTalent{
 	cooldown = 5,
 	tactical = { CLOSEIN = 3 },
 	direct_hit = true,
-	message = "@Source@ leaps forward in a frenzy!",
+	message = _t"@Source@ leaps forward in a frenzy!",
 	range = function(self, t) return math.floor(self:combatTalentScale(t, 2.4, 10)) end,
 	requires_target = true,
 	on_pre_use = function(self, t, silent) if not self:hasEffect(self.EFF_FRENZY) or self:attr("encased_in_ice") or self:attr("never_move") then return false end return true end,
@@ -106,7 +106,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Leaps toward a target within range.
-		Only usable while frenzied.]])
+		Only usable while frenzied.]]):tformat()
 	end,
 }
 
@@ -116,7 +116,7 @@ newTalent{
 	points = 5,
 	cooldown = 3,
 	stamina = 8,
-	message = "@Source@ tries to bite @Target@ with razor sharp teeth!",
+	message = _t"@Source@ tries to bite @Target@ with razor sharp teeth!",
 	requires_target = true,
 	is_melee = true,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
@@ -127,7 +127,7 @@ newTalent{
 	getPower = function(self, t) return self:combatLimit(self:combatTalentStatDamage(t, "con", 10, 50), 1, 0, 0, 0.357, 35.7) end,
 	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 3, 7)) end,
 	do_devourer_frenzy = function(self, target, t)
-		game.logSeen(self, "The scent of blood sends the %ss into a frenzy!", self.name:capitalize())
+		game.logSeen(self, "The scent of blood sends the %ss into a frenzy!", self:getName():capitalize())
 		-- frenzy devourerers
 		local tg = {type="ball", range=0, radius=3, selffire=true, talent=t}
 		self:project(tg, target.x, target.y, function(px, py)
@@ -161,7 +161,7 @@ newTalent{
 			target:setEffect(target.EFF_CUT, 5, {power=t.getBleedDamage(self, t), src=self, apply_power=self:combatPhysicalpower()})
 			t.do_devourer_frenzy(self, target, t)
 		else
-			game.logSeen(target, "%s resists the cut!", target.name:capitalize())
+			game.logSeen(target, "%s resists the cut!", target:getName():capitalize())
 		end
 
 		return true
@@ -173,7 +173,7 @@ newTalent{
 		return ([[Bites the target for %d%% weapon damage, potentially causing it to bleed for %d%% weapon damage over five turns.
 		If the target is affected by the bleed it will send the devourer into a frenzy for %d turns (which in turn will frenzy other nearby devourers).
 		The frenzy will increase global speed by %d%%, physical crit chance by %d%%, and prevent death until -%d%% life.]]):
-		format(damage, bleed, t.getDuration(self, t), power, power, power)
+		tformat(damage, bleed, t.getDuration(self, t), power, power, power)
 	end,
 }
 
@@ -221,7 +221,7 @@ newTalent{
 		local light_reduction = t.getLiteReduction(self, t)
 		local darkness_resistance = t.getDarknessPower(self, t)
 		return ([[Creates a shroud of darkness over a radius 3 area that lasts %d turns.  The shroud causes %0.2f darkness damage each turn, reduces light radius by %d, and darkness resistance by %d%% of those within.]]):
-		format(duration, damDesc(self, DamageType.DARKNESS, (damage)), light_reduction, darkness_resistance)
+		tformat(duration, damDesc(self, DamageType.DARKNESS, (damage)), light_reduction, darkness_resistance)
 	end,
 }
 -- Temporal Stalker Powers
@@ -231,7 +231,7 @@ newTalent{
 	name = "Echoes From The Void",
 	type = {"other/horror", 1},
 	points = 5,
-	message = "@Source@ shows @Target@ the madness of the void.",
+	message = _t"@Source@ shows @Target@ the madness of the void.",
 	cooldown = 10,
 	range = 10,
 	requires_target = true,
@@ -253,7 +253,7 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		return ([[Shows the target the madness of the void.  Each turn for 6 turns the target must make a mental save or suffer %0.2f mind damage as well as resource damage (based off the mind damage and nature of the resource).]]):
-		format(damDesc(self, DamageType.MIND, (damage)))
+		tformat(damDesc(self, DamageType.MIND, (damage)))
 	end,
 }
 
@@ -261,7 +261,7 @@ newTalent{
 	name = "Void Shards",
 	type = {"other/horror", 1},
 	points = 5,
-	message = "@Source@ summons void shards.",
+	message = _t"@Source@ summons void shards.",
 	cooldown = 20,
 	range = 10,
 	radius = 5, -- used by the the AI as additional range to the target
@@ -298,8 +298,8 @@ newTalent{
 			local m = NPC.new{
 				type = "horror", subtype = "temporal",
 				display = "h", color=colors.GREY, image = "npc/horror_temporal_void_horror.png",
-				name = "void shard", faction = self.faction,
-				desc = [[It looks like a small hole in the fabric of spacetime.]],
+				name = _t"void shard", faction = self.faction,
+				desc = _t[[It looks like a small hole in the fabric of spacetime.]],
 				stats = { str=22, dex=20, wil=15, con=15 },
 
 				--level_range = {self.level, self.level},
@@ -345,7 +345,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local explosion = t.getExplosion(self, t)
 		return ([[Summons %d void shards.  The void shards come into being destabilized and will suffer %0.2f temporal damage each turn for five turns.  If they die while destabilized they'll explode for %0.2f temporal and %0.2f physical damage in a radius of 4.]]):
-		format(number, damDesc(self, DamageType.TEMPORAL, (damage)), damDesc(self, DamageType.TEMPORAL, (explosion/2)), damDesc(self, DamageType.PHYSICAL, (explosion/2)))
+		tformat(number, damDesc(self, DamageType.TEMPORAL, (damage)), damDesc(self, DamageType.TEMPORAL, (explosion/2)), damDesc(self, DamageType.PHYSICAL, (explosion/2)))
 	end,
 }
 -------------------------------------------
@@ -392,7 +392,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local duration = t.getDuration(self, t)
 		return ([[Summon a storm of swirling blades to slice your foes, inflicting %d physical damage and bleeding to anyone who approaches for %d turns.
-		The damage and duration will increase with your Mindpower.]]):format(damDesc(self, DamageType.PHYSICAL, damage), duration)
+		The damage and duration will increase with your Mindpower.]]):tformat(damDesc(self, DamageType.PHYSICAL, damage), duration)
 	end,
 }
 
@@ -422,14 +422,14 @@ newTalent{
 				local ox, oy = target.x, target.y
 				target:pull(self.x, self.y, 2)
 				self:project({type="hit", range=10, friendlyfire=false, talent=t}, target.x, target.y, engine.DamageType.PHYSICAL, self:mindCrit(self:combatTalentMindDamage(t, 20, 120)))
-				if target.x ~= ox or target.y ~= oy then game.logSeen(target, "%s is pulled in!", target.name:capitalize()) end
+				if target.x ~= ox or target.y ~= oy then game.logSeen(target, "%s is pulled in!", target:getName():capitalize()) end
 			end
 		end)
 		return true
 	end,
 	info = function(self, t)
 		return ([[Pull all foes toward you in radius 5 while dealing %d physical damage.
-The damage will increase with your mindpower.]]):format(damDesc(self, DamageType.PHYSICAL, self:combatTalentMindDamage(t, 20, 120)))
+The damage will increase with your mindpower.]]):tformat(damDesc(self, DamageType.PHYSICAL, self:combatTalentMindDamage(t, 20, 120)))
 	end,
 }
 
@@ -457,7 +457,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Launches a knife with intense power doing %0.2f physical damage to all targets in line.
-		The damage will increase with Mindpower]]):format(damDesc(self, DamageType.PHYSICAL, self:combatTalentMindDamage(t, 20, 200)))
+		The damage will increase with Mindpower]]):tformat(damDesc(self, DamageType.PHYSICAL, self:combatTalentMindDamage(t, 20, 200)))
 	end,
 }
 
@@ -504,7 +504,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[A wall of slime oozes out from the caster with radius 1, increasing once every two turns to a maximum eventual radius of %d, doing %0.2f slime damage for %d turns.
 		The damage and duration will increase with your Mindpower.]]):
-		format(radius, damDesc(self, DamageType.NATURE, damage), duration)
+		tformat(radius, damDesc(self, DamageType.NATURE, damage), duration)
 	end,
 }
 
@@ -539,7 +539,7 @@ newTalent{
 				end
 			end)
 		else
-			game.logSeen(target, "%s resists the grab!", target.name:capitalize())
+			game.logSeen(target, "%s resists the grab!", target:getName():capitalize())
 		end
 		game:playSoundNear(self, "talents/slime")
 
@@ -551,7 +551,7 @@ newTalent{
 		return ([[Grab a target and drag it to your side, holding it in place and silencing non-undead and creatures that need to breathe for %d turns.
 		The grab will also deal %0.2f slime damage per turn.
 		The damage will increase with your Mindpower.]]):
-		format(duration, damDesc(self, DamageType.SLIME, damage))
+		tformat(duration, damDesc(self, DamageType.SLIME, damage))
 	end,
 }
 
@@ -578,7 +578,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Spit slime at your target doing %0.2f nature damage and slowing it down by 30%% for 3 turns.
-		The damage will increase with the Dexterity stat]]):format(damDesc(self, DamageType.NATURE, self:combatTalentStatDamage(t, "dex", 30, 290)))
+		The damage will increase with the Dexterity stat]]):tformat(damDesc(self, DamageType.NATURE, self:combatTalentStatDamage(t, "dex", 30, 290)))
 	end,
 }
 
@@ -616,7 +616,7 @@ newTalent{
 	info = function(self, t)
 		local range = self:getTalentRange(t)
 		local radius = self:getTalentRadius(t)
-		return ([[You extend slimy roots into the ground, follow them, and re-appear somewhere else in a range of %d with error margin of %d.]]):format(range, radius)
+		return ([[You extend slimy roots into the ground, follow them, and re-appear somewhere else in a range of %d with error margin of %d.]]):tformat(range, radius)
 	end,
 }
 
@@ -668,7 +668,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Open a hole in space, summoning an animated blade for 10 turns.]])
+		return ([[Open a hole in space, summoning an animated blade for 10 turns.]]):tformat()
 	end,
 }
 
@@ -701,14 +701,14 @@ newTalent{
 	info = function(self, t)
 		local radius = self:getTalentRadius(t)
 		return ([[Blast a wave of water all around you with a radius of %d, making all creatures Wet for 10 turns.
-		The damage will increase with your Spellpower.]]):format(radius)
+		The damage will increase with your Spellpower.]]):tformat(radius)
 	end,
 }
 
 newTalent{
 	name = "Blood Suckers",
 	type = {"wild-gift/other", 1},
-	message = "@Source@ tries to latch on and suck blood!",
+	message = _t"@Source@ tries to latch on and suck blood!",
 	points = 5,
 	cooldown = 2,
 	tactical = { ATTACK = { weapon = 2 } },
@@ -733,6 +733,6 @@ newTalent{
 		return ([[Latch on to the target and suck their blood, doing %0.2f physical and %0.2f acid damage per turn.
 		After 5 turns of drinking, drop off and gain the ability to Multiply.
 		Damage scales with your level.
-		]]):format(Pdam, Fdam)
+		]]):tformat(Pdam, Fdam)
 	end,
 }

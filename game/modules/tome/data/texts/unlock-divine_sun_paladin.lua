@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New Class: #LIGHT_GREEN#Sun Paladin (Celestial)",
-[[
+return _t"New Class: #LIGHT_GREEN#Sun Paladin (Celestial)",
+_t[[
 In the uttermost east, on the continent known only as the Far East, dwell the last remnants of Elves and Humans, fighting the Orc Pride and the many perils of the Far East.
 
 Sun Paladins are warriors who are trained in special magic to focus the powers of the Sun.

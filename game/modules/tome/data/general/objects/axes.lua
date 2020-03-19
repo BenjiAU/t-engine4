@@ -28,7 +28,7 @@ newEntity{
 	rarity = 3,
 	metallic = true,
 	combat = { talented = "axe", damrange = 1.4, physspeed = 1, sound = {"actions/melee", pitch=0.6, vol=1.2}, sound_miss = {"actions/melee", pitch=0.6, vol=1.2}},
-	desc = [[One-handed war axes.]],
+	desc = _t[[One-handed war axes.]],
 	randart_able = "/data/general/objects/random-artifacts/melee.lua",
 	egos = "/data/general/objects/egos/weapon.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 }

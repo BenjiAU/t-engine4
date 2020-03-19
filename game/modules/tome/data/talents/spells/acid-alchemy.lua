@@ -43,7 +43,7 @@ newTalent{
 		return ([[When you throw your alchemist bombs, you infuse them with explosive acid that can blind.
 		In addition all acid damage you do is increased by %d%%.
 		You cannot have more than one alchemist infusion sustain active at once.]]):
-		format(daminc)
+		tformat(daminc)
 	end,
 }
 
@@ -69,7 +69,7 @@ newTalent{
 		return ([[While Acid Infusion is active, your bombs coat your golem in acid for %d turns when they hit it.
 		While coated, any melee hit against your golem has a %d%% chance to trigger a radius 4 cone of acid towards the attacker that does %0.1f Acid damage to all caught inside. (This can only happen once per turn.)
 		The effects increase with your talent level and with the Spellpower and damage modifiers of your golem.]]):
-		format(duration, chance, dam)
+		tformat(duration, chance, dam)
 	end,
 }
 
@@ -117,7 +117,7 @@ newTalent{
 		return ([[A radius %d pool of acid spawns at the target location, doing %0.1f Acid damage each turn for %d turns.
 		All creatures caught in the mire will also suffer a %d%% slowness effect.
 		The damage will increase with your Spellpower.]]):
-		format(radius, damDesc(self, DamageType.ACID, damage), duration, slow)
+		tformat(radius, damDesc(self, DamageType.ACID, damage), duration, slow)
 	end,
 }
 
@@ -185,6 +185,6 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Acid erupts all around your target, dealing %0.1f acid damage.
 		The acid attack is extremely distracting, and may remove up to %d physical or mental temporary effects or mental sustains (depending on the Spell Save of the target).
-		The damage and chance to remove effects will increase with your Spellpower.]]):format(damDesc(self, DamageType.ACID, damage), t.getRemoveCount(self, t))
+		The damage and chance to remove effects will increase with your Spellpower.]]):tformat(damDesc(self, DamageType.ACID, damage), t.getRemoveCount(self, t))
 	end,
 }

@@ -24,17 +24,17 @@ newChat{ id="welcome",
 	text = text,
 	answers =
 	{
-		{"#LIGHT_GREEN#[Pretend to help but when it is time you will use a Ziguranth technique to make the portal fizzle. @npcname@ will be sent to Zigur to be 'dealt with' properly.]#WHITE#\nLead on; I will protect you.", action=function(npc, player)
+		{_t"#LIGHT_GREEN#[Pretend to help but when it is time you will use a Ziguranth technique to make the portal fizzle. @npcname@ will be sent to Zigur to be 'dealt with' properly.]#WHITE#\nLead on; I will protect you.", action=function(npc, player)
 			player:hasQuest(npc.quest_id).to_zigur = true
 			npc.ai_state.tactic_leash = 100
 			game.party:addMember(npc, {
 				control="order",
 				type="escort",
-				title="Escort",
+				title=_t"Escort",
 				orders = {escort_portal=true, escort_rest=true},
 			})
 		end},
-		{"Go away; I do not help filthy arcane users!", action=function(npc, player)
+		{_t"Go away; I do not help filthy arcane users!", action=function(npc, player)
 			game.player:registerEscorts("lost")
 			npc:disappear()
 			npc:removed()
@@ -52,26 +52,26 @@ newChat{ id="welcome",
 	text = text,
 	answers =
 	{
-		{"Lead on; I will protect you.", action=function(npc, player)
+		{_t"Lead on; I will protect you.", action=function(npc, player)
 			npc.ai_state.tactic_leash = 100
 			game.party:addMember(npc, {
 				control="order",
 				type="escort",
-				title="Escort",
+				title=_t"Escort",
 				orders = {escort_portal=true, escort_rest=true},
 			})
 		end},
-		{"#LIGHT_GREEN#[Pretend to help but when it is time you will use a technique to make the portal fizzle. @npcname@ will be sent to Zigur to be 'dealt with' properly.]#WHITE#\nLead on; I will protect you.", action=function(npc, player)
+		{_t"#LIGHT_GREEN#[Pretend to help but when it is time you will use a technique to make the portal fizzle. @npcname@ will be sent to Zigur to be 'dealt with' properly.]#WHITE#\nLead on; I will protect you.", action=function(npc, player)
 			player:hasQuest(npc.quest_id).to_zigur = true
 			npc.ai_state.tactic_leash = 100
 			game.party:addMember(npc, {
 				control="order",
 				type="escort",
-				title="Escort",
+				title=_t"Escort",
 				orders = {escort_portal=true, escort_rest=true},
 			})
 		end},
-		{"Go away; I do not care for the weak.", action=function(npc, player)
+		{_t"Go away; I do not care for the weak.", action=function(npc, player)
 			game.player:registerEscorts("lost")
 			npc:disappear()
 			npc:removed()
@@ -87,16 +87,16 @@ newChat{ id="welcome",
 	text = text,
 	answers =
 	{
-		{"Lead on; I will protect you.", action=function(npc, player)
+		{_t"Lead on; I will protect you.", action=function(npc, player)
 			npc.ai_state.tactic_leash = 100
 			game.party:addMember(npc, {
 				control="order",
 				type="escort",
-				title="Escort",
+				title=_t"Escort",
 				orders = {escort_portal=true, escort_rest=true},
 			})
 		end},
-		{"Go away; I do not care for the weak.", action=function(npc, player)
+		{_t"Go away; I do not care for the weak.", action=function(npc, player)
 			game.player:registerEscorts("lost")
 			npc:disappear()
 			npc:removed()

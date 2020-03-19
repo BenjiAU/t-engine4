@@ -131,6 +131,11 @@ if core.display.safeMode() then
 	config.settings.window = {size='800x600 Windowed'}
 end
 
+if config.settings.locale then
+	I18N:loadLocale("/data/locales/engine/"..config.settings.locale..".lua")
+	I18N:setLocale(config.settings.locale)
+end
+
 -- Default resolution as big as possible
 if not config.settings.window or not config.settings.window.size then
 	local list = core.display.getModesList()
@@ -206,5 +211,6 @@ core.game.setFPS(config.settings.display_fps)
 if config.settings.disable_discord then core.discord = nil end
 if core.discord then core.discord.init() end
 
-util.showMainMenu(true)
+-- I18N:test()
 
+util.showMainMenu(true)

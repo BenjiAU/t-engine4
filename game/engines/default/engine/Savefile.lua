@@ -180,7 +180,7 @@ function _M:saveWorld(world, no_dialog)
 
 	local popup
 	if not no_dialog then
-		popup = Dialog:simpleWaiter("Saving world", "Please wait while saving the world...")
+		popup = Dialog:simpleWaiter(_t"Saving world", _t"Please wait while saving the world...")
 	end
 	core.display.forceRedraw()
 
@@ -259,7 +259,7 @@ function _M:saveGame(game, no_dialog)
 
 	local popup
 	if not no_dialog then
-		popup = Dialog:simpleWaiter("Saving game", "Please wait while saving the game...")
+		popup = Dialog:simpleWaiter(_t"Saving game", _t"Please wait while saving the game...")
 	end
 	core.display.forceRedraw()
 
@@ -353,7 +353,7 @@ function _M:saveZone(zone, no_dialog)
 
 	local popup
 	if not no_dialog then
-		popup = Dialog:simpleWaiter("Saving zone", "Please wait while saving the zone...")
+		popup = Dialog:simpleWaiter(_t"Saving zone", _t"Please wait while saving the zone...")
 	end
 	core.display.forceRedraw()
 
@@ -390,7 +390,7 @@ function _M:saveLevel(level, no_dialog)
 
 	local popup
 	if not no_dialog then
-		popup = Dialog:simpleWaiter("Saving level", "Please wait while saving the level...")
+		popup = Dialog:simpleWaiter(_t"Saving level", _t"Please wait while saving the level...")
 	end
 	core.display.forceRedraw()
 
@@ -424,7 +424,7 @@ function _M:saveEntity(e, no_dialog)
 
 	local popup
 	if not no_dialog then
-		popup = Dialog:simpleWaiter("Saving entity", "Please wait while saving the entity...")
+		popup = Dialog:simpleWaiter(_t"Saving entity", _t"Please wait while saving the entity...")
 	end
 	core.display.forceRedraw()
 
@@ -497,7 +497,7 @@ function _M:loadWorld()
 
 	fs.mount(path, self.load_dir)
 
-	local popup = Dialog:simpleWaiter("Loading world", "Please wait while loading the world...")
+	local popup = Dialog:simpleWaiter(_t"Loading world", _t"Please wait while loading the world...")
 	core.display.forceRedraw()
 
 	local loadedWorld = self:loadReal("main")
@@ -553,7 +553,7 @@ function _M:loadGame()
 
 	fs.mount(path, self.load_dir)
 
-	local popup = Dialog:simpleWaiter("Loading game", "Please wait while loading the game...")
+	local popup = Dialog:simpleWaiter(_t"Loading game", _t"Please wait while loading the game...")
 	core.display.forceRedraw()
 
 	local loadedGame = self:loadReal("main")
@@ -622,7 +622,7 @@ function _M:loadZone(zone)
 		f:close()
 	end
 
-	local popup = Dialog:simpleWaiter("Loading zone", "Please wait while loading the zone...", nil, nil, nb > 0 and nb)
+	local popup = Dialog:simpleWaiter(_t"Loading zone", _t"Please wait while loading the zone...", nil, nil, nb > 0 and nb)
 	core.wait.enableManualTick(true)
 	core.display.forceRedraw()
 
@@ -666,7 +666,7 @@ function _M:loadLevel(zone, level)
 		f:close()
 	end
 
-	local popup = Dialog:simpleWaiter("Loading level", "Please wait while loading the level...", nil, nil, nb > 0 and nb)
+	local popup = Dialog:simpleWaiter(_t"Loading level", _t"Please wait while loading the level...", nil, nil, nb > 0 and nb)
 	core.display.forceRedraw()
 
 	local loadedLevel = self:loadReal("main")
@@ -707,7 +707,7 @@ function _M:loadEntity(name)
 		f:close()
 	end
 
-	local popup = Dialog:simpleWaiter("Loading entity", "Please wait while loading the entity...", nil, nil, nb > 0 and nb)
+	local popup = Dialog:simpleWaiter(_t"Loading entity", _t"Please wait while loading the entity...", nil, nil, nb > 0 and nb)
 	core.display.forceRedraw()
 
 	local loadedEntity = self:loadReal("main")

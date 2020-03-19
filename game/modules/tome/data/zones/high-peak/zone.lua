@@ -18,10 +18,10 @@
 -- darkgod@te4.org
 
 return {
-	name = "High Peak",
+	name = _t"High Peak",
 	display_name = function(x, y)
-		if game.level.level == 11 then return "High Peak: The Sanctum" end
-		return "High Peak ("..game.level.level..")"
+		if game.level.level == 11 then return _t"High Peak: The Sanctum" end
+		return ("High Peak (%d)"):tformat(game.level.level)
 	end,
 	level_range = {55, 80},
 	level_scheme = "player",

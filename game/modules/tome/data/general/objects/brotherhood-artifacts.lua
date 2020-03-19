@@ -28,14 +28,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_FOX",
 	type = "potion", subtype="potion", image = "object/elixir_of_the_fox.png",
-	name = "Elixir of the Fox", unique=true, unided_name="vial of pink fluid",
+	name = "Elixir of the Fox", unique=true, unided_name=_t"vial of pink fluid",
 	display = "!", color=colors.VIOLET,
-	desc = [[A vial of pink, airy fluid.]],
+	desc = _t[[A vial of pink, airy fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="permanently increase your dexterity and cunning by three", use = function(self, who)
+	use_simple = { name=_t"permanently increase your dexterity and cunning by three", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.inc_stats[who.STAT_DEX] = who.inc_stats[who.STAT_DEX] + 3
 		who:onStatChange(who.STAT_DEX, 3)
@@ -50,14 +50,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_AVOIDANCE",
 	type = "potion", subtype="potion", image = "object/elixir_of_avoidance.png",
-	name = "Elixir of Avoidance", unique=true, unided_name="vial of green fluid",
+	name = "Elixir of Avoidance", unique=true, unided_name=_t"vial of green fluid",
 	display = "!", color=colors.GREEN,
-	desc = [[A vial of opaque green fluid.]],
+	desc = _t[[A vial of opaque green fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="permanently increase your defense and ranged defense by six", use = function(self, who)
+	use_simple = { name=_t"permanently increase your defense and ranged defense by six", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.combat_def = who.combat_def + 6
 		game.logPlayer(who, "#00FF00#The elixir has improved your defensive instincts!")
@@ -69,14 +69,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_PRECISION",
 	type = "potion", subtype="potion", image = "object/elixir_of_precision.png",
-	name = "Elixir of Precision", unique=true, unided_name="vial of red fluid",
+	name = "Elixir of Precision", unique=true, unided_name=_t"vial of red fluid",
 	display = "!", color=colors.RED,
-	desc = [[A vial of chunky red fluid.]],
+	desc = _t[[A vial of chunky red fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="permanently increase your physical critical strike chance by 4%", use = function(self, who)
+	use_simple = { name=_t"permanently increase your physical critical strike chance by 4%", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.combat_physcrit = who.combat_physcrit + 4
 		game.logPlayer(who, "#00FF00#The elixir has improved your eye for an enemy's weak points!")
@@ -88,14 +88,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_MYSTICISM",
 	type = "potion", subtype="potion", image = "object/elixir_of_mysticism.png",
-	name = "Elixir of Mysticism", unique=true, unided_name="vial of cyan fluid",
+	name = "Elixir of Mysticism", unique=true, unided_name=_t"vial of cyan fluid",
 	display = "!", color=colors.AQUAMARINE,
-	desc = [[A vial of glowing cyan fluid.]],
+	desc = _t[[A vial of glowing cyan fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="permanently increase your magic and willpower by three", use = function(self, who)
+	use_simple = { name=_t"permanently increase your magic and willpower by three", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.inc_stats[who.STAT_MAG] = who.inc_stats[who.STAT_MAG] + 3
 		who:onStatChange(who.STAT_MAG, 3)
@@ -110,14 +110,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_SAVIOR",
 	type = "potion", subtype="potion", image = "object/elixir_of_the_saviour.png",
-	name = "Elixir of the Savior", unique=true, unided_name="vial of grey fluid",
+	name = "Elixir of the Savior", unique=true, unided_name=_t"vial of grey fluid",
 	display = "!", color=colors.GREY,
-	desc = [[A vial of bubbling, slate-colored fluid.]],
+	desc = _t[[A vial of bubbling, slate-colored fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="permanently increase all your saving throws by 4", use = function(self, who)
+	use_simple = { name=_t"permanently increase all your saving throws by 4", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.combat_physresist = who.combat_physresist + 4
 		who.combat_spellresist = who.combat_spellresist + 4
@@ -131,14 +131,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_MASTERY",
 	type = "potion", subtype="potion", image = "object/elixir_of_mastery.png",
-	name = "Elixir of Mastery", unique=true, unided_name="vial of maroon fluid",
+	name = "Elixir of Mastery", unique=true, unided_name=_t"vial of maroon fluid",
 	display = "!", color=colors.DARK_RED,
-	desc = [[A vial of thick maroon fluid.]],
+	desc = _t[[A vial of thick maroon fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="grant you four additional stat points", use = function(self, who)
+	use_simple = { name=_t"grant you four additional stat points", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.unused_stats = who.unused_stats + 4
 		game.logPlayer(who, "#00FF00#The elixir has greatly expanded your capacity for improving your mind and body.")
@@ -151,14 +151,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_FORCE",
 	type = "potion", subtype="potion", image = "object/elixir_of_explosive_force.png",
-	name = "Elixir of Explosive Force", unique=true, unided_name="vial of orange fluid",
+	name = "Elixir of Explosive Force", unique=true, unided_name=_t"vial of orange fluid",
 	display = "!", color=colors.ORANGE,
-	desc = [[A vial of churning orange fluid.]],
+	desc = _t[[A vial of churning orange fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="permanently increase your chance to critically strike with spells by 4%", use = function(self, who)
+	use_simple = { name=_t"permanently increase your chance to critically strike with spells by 4%", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.combat_spellcrit = who.combat_spellcrit + 4
 		game.logPlayer(who, "#00FF00#The elixir has improved your eye for an enemy's magical weak points!")
@@ -170,14 +170,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_SERENDIPITY",
 	type = "potion", subtype="potion", image = "object/elixir_of_serendipity.png",
-	name = "Elixir of Serendipity", unique=true, unided_name="vial of yellow fluid",
+	name = "Elixir of Serendipity", unique=true, unided_name=_t"vial of yellow fluid",
 	display = "!", color=colors.YELLOW,
-	desc = [[A vial of lively yellow fluid.]],
+	desc = _t[[A vial of lively yellow fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="permanently increase your luck by 5", use = function(self, who)
+	use_simple = { name=_t"permanently increase your luck by 5", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.inc_stats[who.STAT_LCK] = who.inc_stats[who.STAT_LCK] + 5
 		who:onStatChange(who.STAT_LCK, 5)
@@ -190,14 +190,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_FOCUS",
 	type = "potion", subtype="potion", image = "object/elixir_of_focus.png",
-	name = "Elixir of Focus", unique=true, unided_name="vial of clear fluid",
+	name = "Elixir of Focus", unique=true, unided_name=_t"vial of clear fluid",
 	display = "!", color=colors.WHITE,
-	desc = [[A vial of clear, steaming fluid.]],
+	desc = _t[[A vial of clear, steaming fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="grant you two additional class talent points", use = function(self, who)
+	use_simple = { name=_t"grant you two additional class talent points", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.unused_talents = who.unused_talents + 2
 		game.logPlayer(who, "#00FF00#The elixir has improved your capacity for exercising your core talents.")
@@ -209,14 +209,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_BRAWN",
 	type = "potion", subtype="potion", image = "object/elixir_of_brawn.png",
-	name = "Elixir of Brawn", unique=true, unided_name="vial of tan fluid",
+	name = "Elixir of Brawn", unique=true, unided_name=_t"vial of tan fluid",
 	display = "!", color=colors.TAN,
-	desc = [[A vial of sluggish tan fluid.]],
+	desc = _t[[A vial of sluggish tan fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="permanently increase your strength and constitution by three", use = function(self, who)
+	use_simple = { name=_t"permanently increase your strength and constitution by three", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.inc_stats[who.STAT_STR] = who.inc_stats[who.STAT_STR] + 3
 		who:onStatChange(who.STAT_STR, 3)
@@ -231,14 +231,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_STONESKIN",
 	type = "potion", subtype="potion", image = "object/elixir_of_stoneskin.png",
-	name = "Elixir of Stoneskin", unique=true, unided_name="vial of iron-colored fluid",
+	name = "Elixir of Stoneskin", unique=true, unided_name=_t"vial of iron-colored fluid",
 	display = "!", color=colors.SLATE,
-	desc = [[A vial of grainy, iron-colored fluid.]],
+	desc = _t[[A vial of grainy, iron-colored fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="permanently increase your armor by four", use = function(self, who)
+	use_simple = { name=_t"permanently increase your armor by four", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.combat_armor = who.combat_armor + 4
 		game.logPlayer(who, "#00FF00#The elixir has reinforced your entire body!")
@@ -250,14 +250,14 @@ newEntity{
 	power_source = {nature=true},
 	define_as = "ELIXIR_FOUNDATIONS",
 	type = "potion", subtype="potion", image = "object/elixir_of_foundations.png",
-	name = "Elixir of Foundations", unique=true, unided_name="vial of white fluid",
+	name = "Elixir of Foundations", unique=true, unided_name=_t"vial of white fluid",
 	display = "!", color=colors.WHITE,
-	desc = [[A vial of murky white fluid.]],
+	desc = _t[[A vial of murky white fluid.]],
 	no_unique_lore = true,
 	cost = 1000,
 	quest = 1,
 
-	use_simple = { name="grant you two additional generic talent points", use = function(self, who)
+	use_simple = { name=_t"grant you two additional generic talent points", use = function(self, who)
 		game.logPlayer(who, "#00FFFF#You drink the elixir and feel forever transformed!")
 		who.unused_generics = who.unused_generics + 2
 		game.logPlayer(who, "#00FF00#The elixir has improved your capacity for exercising your core talents.")
@@ -303,10 +303,10 @@ newEntity{ base = "BASE_GEM",
 	define_as = "LIFEBINDING_EMERALD",
 	power_source = {nature=true},
 	unique = true,
-	unided_name = "cloudy, heavy emerald",
+	unided_name = _t"cloudy, heavy emerald",
 	name = "Lifebinding Emerald", subtype = "green", image = "object/lifebinding_emerald.png",
 	color = colors.GREEN,
-	desc = [[A lopsided, heavy emerald with murky green clouds shifting sluggishly under the surface.]],
+	desc = _t[[A lopsided, heavy emerald with murky green clouds shifting sluggishly under the surface.]],
 	cost = 200,
 	quest = 1,
 	material_level = 5,
@@ -345,13 +345,13 @@ newEntity{
 	define_as = "ELIXIR_INVULNERABILITY",
 	encumber = 2,
 	type = "potion", subtype="potion", image = "object/elixir_of_invulnerability.png",
-	name = "Elixir of Invulnerability", unique=true, unided_name="vial of black fluid",
+	name = "Elixir of Invulnerability", unique=true, unided_name=_t"vial of black fluid",
 	display = "!", color=colors.SLATE,
-	desc = [[A vial of thick fluid, metallic and reflective. It's incredibly heavy.]],
+	desc = _t[[A vial of thick fluid, metallic and reflective. It's incredibly heavy.]],
 	cost = 200,
 	quest = 1,
 
-	use_simple = { name="grant you complete invulnerability for five turns", use = function(self, who)
+	use_simple = { name=_t"grant you complete invulnerability for five turns", use = function(self, who)
 		who:setEffect(who.EFF_DAMAGE_SHIELD, 5, {power=1000000})
 		game.logPlayer(who, "#00FF00#You feel indestructible!")
 		return {used=true, id=true, destroy=true}

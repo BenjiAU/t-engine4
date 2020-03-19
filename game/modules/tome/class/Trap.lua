@@ -85,10 +85,10 @@ end
 
 -- Gets the full name of the trap
 function _M:getName()
-	local name = self.name or "trap"
+	local name = _t(self.name) or _t"trap"
 	if not self:isIdentified() and self:getUnidentifiedName() then name = self:getUnidentifiedName() end
 	if self.summoner and self.summoner.name then
-		return self.summoner.name:capitalize().."'s "..name
+		return ("%s's %s"):tformat(self.summoner:getName():capitalize(), name)
 	else
 		return name
 	end
@@ -114,38 +114,38 @@ function _M:tooltip()
 	if self:knownBy(game.player) then
 		local res = tstring{{"uid", self.uid}, self:getName(), true}
 		local id = self:isIdentified()
-		if self.temporary then res:add(("#LIGHT_GREEN#%d turns #WHITE#"):format(self.temporary)) end
+		if self.temporary then res:add(("#LIGHT_GREEN#%d turns #WHITE#"):tformat(self.temporary)) end
 		if self.is_store then
-			res:add(true, {"font","italic"}, "<Store>", {"font","normal"})
+			res:add(true, {"font","italic"}, _t"<Store>", {"font","normal"})
 			if self.store_faction then
-				local factcolor, factstate, factlevel = "#ANTIQUE_WHITE#", "neutral", Faction:factionReaction(self.store_faction, game.player.faction)
-				if factlevel < 0 then factcolor, factstate = "#LIGHT_RED#", "hostile"
-				elseif factlevel > 0 then factcolor, factstate = "#LIGHT_GREEN#", "friendly"
+				local factcolor, factstate, factlevel = "#ANTIQUE_WHITE#", _t"neutral", Faction:factionReaction(self.store_faction, game.player.faction)
+				if factlevel < 0 then factcolor, factstate = "#LIGHT_RED#", _t"hostile"
+				elseif factlevel > 0 then factcolor, factstate = "#LIGHT_GREEN#", _t"friendly"
 				end
-				if Faction.factions[self.store_faction] then res:add(true, "Faction: ") res:merge(factcolor:toTString()) res:add(("%s (%s, %d)"):format(Faction.factions[self.store_faction].name, factstate, factlevel), {"color", "WHITE"}, true) end
+				if Faction.factions[self.store_faction] then res:add(true, _t"Faction: ") res:merge(factcolor:toTString()) res:add(("%s (%s, %d)"):format(Faction.factions[self.store_faction].name, factstate, factlevel), {"color", "WHITE"}, true) end
 			end
 		else
 			if id then
 				if self.faction then
 					if self.beneficial_trap then 
 						if self:reactionToward(game.player) >= 0 then
-							res:add({"color", "LIGHT_GREEN"}, "(beneficial)", {"color", "WHITE"})
+							res:add({"color", "LIGHT_GREEN"}, _t"(beneficial)", {"color", "WHITE"})
 						else
-							res:add({"color", "ORANGE"}, "(beneficial to enemies)", {"color", "WHITE"})
+							res:add({"color", "ORANGE"}, _t"(beneficial to enemies)", {"color", "WHITE"})
 						end
 					elseif self:reactionToward(game.player) >= 0 then
-						res:add({"color", "LIGHT_GREEN"}, "(safe)", {"color", "WHITE"})
+						res:add({"color", "LIGHT_GREEN"}, _t"(safe)", {"color", "WHITE"})
 					end
 				end
 				if self.pressure_trap then
-					res:add(true, {"color", "GREEN"}, "pressure_trigger", {"color", "WHITE"})
+					res:add(true, {"color", "GREEN"}, _t"pressure_trigger", {"color", "WHITE"})
 				end
 				local desc = util.getval(self.desc, self)
 				if desc then res:add(true, desc) end
 			end
-			res:add(true, ("#YELLOW#Detect: %d#WHITE#"):format(self.detect_power))
+			res:add(true, ("#YELLOW#Detect: %d#WHITE#"):tformat(self.detect_power))
 			if id or config.settings.cheat then
-				res:add(("#YELLOW# Disarm: %d#WHITE#"):format(self.disarm_power))
+				res:add(("#YELLOW# Disarm: %d#WHITE#"):tformat(self.disarm_power))
 			end
 		end
 		if config.settings.cheat then res:add(true, "UID: "..self.uid, true) end
@@ -198,7 +198,7 @@ function _M:onDisarm(x, y, who)
 			local success, consec, msg = false, 0
 			local oldrestCheck = rawget(who, "restCheck") -- hack restCheck to perform action each turn
 			who.restCheck = function(player)
-				if not player.resting then player.restCheck = oldrestCheck return false, "not resting" end
+				if not player.resting then player.restCheck = oldrestCheck return false, _t"not resting" end
 				if player.resting.cnt >= diff_level then -- start making checks at diff_level turns
 					if rng.percent(chance) then
 						consec = consec + 1
@@ -206,17 +206,17 @@ function _M:onDisarm(x, y, who)
 						consec = 0
 						if rng.percent(10) then -- oops! 10% chance to set it off
 							game:onTickEnd(function() self:triggered(player.x, player.y, player) end)
-							msg = "You set off the trap!"
+							msg = _t"You set off the trap!"
 							return false, msg
 						end
 					end
 				end
 				if consec >= diff_level then -- success after diff_level consecutive checks
-					msg = "You successfully dismantled the trap."
+					msg = _t"You successfully dismantled the trap."
 					success = true return false, msg
 				end
 				local continue, reason = mod.class.Player.restCheck(player)
-				if not continue then msg = "You were interrupted." end
+				if not continue then msg = _t"You were interrupted." end
 				return continue, reason
 			end
 
@@ -224,20 +224,20 @@ function _M:onDisarm(x, y, who)
 			local dismantle = coroutine.create(function(self, who)
 				local wait = function()
 					local co = coroutine.running()
-					who:restInit(turns, "Dismantling", "dismantled", function(cnt, max)
+					who:restInit(turns, _t"Dismantling", _t"dismantled", function(cnt, max)
 						-- "resting" finished, undo the restCheck hack and check results
 						who.restCheck = oldrestCheck
 						if not success then
 							if cnt >= max then -- too difficult
-								msg = "Your level of skill was not enough to understand the workings of this trap."
+								msg = _t"Your level of skill was not enough to understand the workings of this trap."
 							else -- interrupted
-								msg = msg or "You quit dismantling the trap."
+								msg = msg or _t"You quit dismantling the trap."
 							end
 						end
 						coroutine.resume(co)
 					end)
 					coroutine.yield()
-					game.logPlayer(who, "#LIGHT_BLUE#%s: %s#LAST#", success and "Success" or "Failure", msg)
+					game.logPlayer(who, "#LIGHT_BLUE#%s: %s#LAST#", success and _t"Success" or _t"Failure", msg)
 					return success
 				end
 				if not wait() then
@@ -247,19 +247,19 @@ function _M:onDisarm(x, y, who)
 			end)
 			self:identify(true)
 			local desc = util.getval(self.desc, self)
-			desc = desc and "\n#LIGHT_BLUE#Trap Description:#WHITE#\n"..desc or ""
-			require "engine.ui.Dialog":yesnoLongPopup(("Disarming a trap: %s"):format(self:getName()),
+			desc = desc and _t"\n#LIGHT_BLUE#Trap Description:#WHITE#\n"..desc or ""
+			require "engine.ui.Dialog":yesnoLongPopup(("Disarming a trap: %s"):tformat(self:getName()),
 	([[As you begin disarming the trap, you think you may be able to learn how it works by carefully dismantling it.  You estimate this will take up to #YELLOW#%d#LAST# uninterrupted turns.
 	What do you want to do?
 %s
-]]):format(turns, desc), math.min(800, game.w*.75),
+]]):tformat(turns, desc), math.min(800, game.w*.75),
 			function(quit)
 				if quit == true then
 					game:playSoundNear(who, "ambient/town/town_large2")
 					coroutine.resume(dismantle, self, who)
 				end
 			end,
-			"Dismantle Carefully", "Disarm Normally")
+			_t"Dismantle Carefully", _t"Disarm Normally")
 		end
 	end
 end
@@ -270,15 +270,15 @@ function _M:canTrigger(x, y, who, no_random)
 
 	local avoid
 	if who:attr("avoid_traps") then
-		avoid = "ignore"
+		avoid = _t"ignore"
 	elseif self.pressure_trap and (who:attr("levitation") or who:attr("avoid_pressure_traps")) then
-		avoid = "simply ignore"
+		avoid = _t"simply ignore"
 	elseif not no_random and who.trap_avoidance and rng.percent(who.trap_avoidance) then
-		avoid = "carefully avoid"
+		avoid = _t"carefully avoid"
 	elseif not self.beneficial_trap and rng.percent(self.trigger_fail) then
-		avoid = "somehow avoid"
+		avoid = _t"somehow avoid"
 	elseif who:attr("walk_sun_path") and game.level then
-		for i, e in ipairs(game.level.map.effects) do if e.damtype == DamageType.SUN_PATH and e.grids[x] and e.grids[x][y] then	avoid = "dodge" break end
+		for i, e in ipairs(game.level.map.effects) do if e.damtype == DamageType.SUN_PATH and e.grids[x] and e.grids[x][y] then	avoid = _t"dodge" break end
 		end
 	end
 	
@@ -288,7 +288,7 @@ function _M:canTrigger(x, y, who, no_random)
 			if who.player then
 				if known_player then game.log("#CADET_BLUE#You %s a trap (%s).", avoid, self:getName()) end
 			else
-				game.logSeen(who, "#CADET_BLUE#%s %ss %s.", who.name:capitalize(), avoid, known_player and ("a trap (%s)"):format(self:getName()) or "something on the floor")
+				game.logSeen(who, "#CADET_BLUE#%s %ss %s.", who:getName():capitalize(), avoid, known_player and ("a trap (%s)"):tformat(self:getName()) or _t"something on the floor")
 			end
 		end
 		return false
@@ -301,7 +301,7 @@ end
 function _M:trigger(x, y, who)
 	engine.Trap.trigger(self, x, y, who)
 	if who.player then self:identify(true) end
-	if who.runStop and self:canTrigger(x, y, who) then who:runStop("trap") end
+	if who.runStop and self:canTrigger(x, y, who) then who:runStop(_t"trap") end
 end
 
 --- Identify the trap (controls info displayed for the player)

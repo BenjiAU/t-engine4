@@ -24,7 +24,7 @@ load("/data/general/objects/lore/orc-prides.lua")
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE_LORE",
 	name = "draft note", lore="rak-shor-pride-note",
-	desc = [[A note.]],
+	desc = _t[[A note.]],
 	rarity = false,
 	encumberance = 0,
 }

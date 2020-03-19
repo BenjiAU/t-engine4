@@ -30,7 +30,7 @@ function _M:init(source, o, inven, item, on_end)
 	self.inven = inven
 	self.item = item
 	self.o = o
-	engine.ui.Dialog.init(self, "Give item to a party member", 1, 1)
+	engine.ui.Dialog.init(self, _t"Give item to a party member", 1, 1)
 
 	local list = List.new{width=400, nb_items=#self.list, list=self.list, fct=function(item) self:use(item) end}
 
@@ -51,11 +51,11 @@ end
 
 function _M:use(item)
 	if not item or not item.actor:canAddToInven(item.actor.INVEN_INVEN) or (item.actor:attr("sleep") and not item.actor:attr("lucid_dreamer")) then
-		game.log("%s cannot receive items while asleep!", item.actor.name:capitalize())
+		game.log("%s cannot receive items while asleep!", item.actor:getName():capitalize())
 		return
 	end
 	if self.source:attr("sleep") and not self.source:attr("lucid_dreamer") then
-		game.log("%s cannot transfer items while asleep!", self.source.name:capitalize())
+		game.log("%s cannot transfer items while asleep!", self.source:getName():capitalize())
 		return 
 	end
 	game:unregisterDialog(self)
@@ -63,7 +63,7 @@ function _M:use(item)
 	self.source:sortInven(self.inven)
 	self.o.__transmo = nil
 	item.actor:addObject(item.actor.INVEN_INVEN, self.o, true) -- force full stack transfer
-	game.log("You give %s to %s.", self.o:getName{do_color=true}, item.actor.name)
+	game.log("You give %s to %s.", self.o:getName{do_color=true}, item.actor:getName())
 	item.actor:sortInven(item.actor.INVEN_INVEN)
 	self.on_end()
 end
@@ -73,8 +73,8 @@ function _M:generateList()
 
 	for i, act in ipairs(game.party.m_list) do
 		if not act.no_inventory_access and act ~= game.player and act:getInven(act.INVEN_INVEN) then
-			local warn = act:attr("sleep") and not act:attr("lucid_dreamer") and " #YELLOW#[SLEEPING]#LAST#" or ""
-			if not act:canAddToInven(act.INVEN_INVEN) then warn = " #YELLOW#[NO ROOM]#LAST#" end
+			local warn = act:attr("sleep") and not act:attr("lucid_dreamer") and _t" #YELLOW#[SLEEPING]#LAST#" or ""
+			if not act:canAddToInven(act.INVEN_INVEN) then warn = _t" #YELLOW#[NO ROOM]#LAST#" end
 			list[#list+1] = {name=act.name..warn, actor=act}
 		end
 	end

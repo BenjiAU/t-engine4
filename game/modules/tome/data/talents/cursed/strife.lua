@@ -44,7 +44,7 @@ newTalent{
 	getDefenseChange = function(self, t)
 		return -self:combatTalentStatDamage(t, "wil", 6, 45)
 	end,
-	getResistPenetration = function(self, t) return self:combatLimit(self:combatTalentStatDamage(t, "wil", 30, 80), 100, 0, 0, 55, 55) end, -- Limit < 100%
+	getResistPenetration = function(self, t) return math.min(70, self:combatTalentStatDamage(t, "wil", 25, 60)) end, -- Limit < 70%
 	is_melee = true,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
 	action = function(self, t)
@@ -83,7 +83,7 @@ newTalent{
 		return ([[Turn your attention to a nearby foe, and dominate them with your overwhelming presence. If the target fails to save versus your Mindpower, it will be unable to move for %d turns and vulnerable to attacks. They will lose %d Armour, %d Defense and your attacks will gain %d%% resistance penetration. If the target is adjacent to you, your domination will include a melee attack.
 		Effects will improve with your Willpower.
 
-		This talent will also attack with your shield, if you have one equipped.]]):format(duration, -armorChange, -defenseChange, resistPenetration)
+		This talent will also attack with your shield, if you have one equipped.]]):tformat(duration, -armorChange, -defenseChange, resistPenetration)
 	end,
 }
 
@@ -102,7 +102,7 @@ newTalent{
 		return ([[Your preternatural senses aid you in your hunt for the next victim. You sense foes in a radius of %0.1f. You will always sense a stalked victim in a radius of 10.
 		Also increases stealth detection by %d and invisibility detection by %d.
 		Stealth and invisibility detection improves with your Willpower]]):
-		format(range, sense, sense)
+		tformat(range, sense, sense)
 	end,
 }
 
@@ -140,7 +140,7 @@ newTalent{
 --		local conversionDuration = t.getConversionDuration(self, t)
 --		local conversionPercent = t.getConversionPercent(self, t)
 --		local maxConversion = t.getMaxConversion(self, t)
---		return ([[Your suffering becomes theirs. %d%% of all damage (up to a maximum of %d per turn) that you inflict over %d turns feeds your own endurance allowing you to negate that much damage over % turns.]]):format(conversionPercent, maxConversion, conversionDuration, duration)
+--		return ([[Your suffering becomes theirs. %d%% of all damage (up to a maximum of %d per turn) that you inflict over %d turns feeds your own endurance allowing you to negate that much damage over % turns.]]):tformat(conversionPercent, maxConversion, conversionDuration, duration)
 --	end,
 --}
 
@@ -177,7 +177,7 @@ newTalent{
 --	info = function(self, t)
 --		local damagePercent = t.getDamagePercent(self, t)
 --		local distance = t.getDistance(self, t)
---		return ([[Swing your weapon for %d%% damage as you leap backwards %d spaces from your target.]]):format(damagePercent, distance)
+--		return ([[Swing your weapon for %d%% damage as you leap backwards %d spaces from your target.]]):tformat(damagePercent, distance)
 --	end,
 --}
 
@@ -229,7 +229,7 @@ newTalent{
 --		local healFactorMax = t.getHealFactor(self, t, 100)
 --		local duration = t.getDuration(self, t)
 --		return ([[Poison your foe with the essence of your curse inflicting %d%% damage and %d (at 0 Hate) to %d (at 100+ Hate) poison damage over %d turns. Healing is also reduced by %d%% (at 0 Hate) to %d%% (at 100+ Hate).
---		Poison damage increases with the Willpower stat. Hate-based effects will improve when wielding cursed weapons.]]):format(damagePercent, poisonDamageMin, poisonDamageMax, duration, healFactorMin, healFactorMax)
+--		Poison damage increases with the Willpower stat. Hate-based effects will improve when wielding cursed weapons.]]):tformat(damagePercent, poisonDamageMin, poisonDamageMax, duration, healFactorMin, healFactorMax)
 --	end,
 --}
 
@@ -274,7 +274,7 @@ newTalent{
 		local multiplier = self:combatTalentWeaponDamage(t, 0.7, 1.9)
 		local defenseChange = t.getDefenseChange(self, t)
 		return ([[With blinding speed, you suddenly appear next to a target up to %d spaces away and attack for %d%% (at 0 Hate) to %d%% (at 100+ Hate) damage. Your sudden appearance catches everyone off-guard, giving you %d extra Defense for 1 turn.
-		The Defense boost improves with your Strength.]]):format(self:getTalentRange(t), multiplier * 30, multiplier * 100, defenseChange)
+		The Defense boost improves with your Strength.]]):tformat(self:getTalentRange(t), multiplier * 30, multiplier * 100, defenseChange)
 	end,
 }
 
@@ -364,7 +364,7 @@ newTalent{
 		-- local confuseDuration = t.getConfuseDuration(self, t)
 		-- local confuseEfficiency = t.getConfuseEfficiency(self, t)
 
-		-- return ([[With unnatural speed you assail all foes in sight within a range of 4 with wild swings from your axe. You will attack up to %d different targets for %d%% damage. When the assualt finally ends all foes in range will be confused for %d turns and you will find yourself in a nearby location.]]):format(attackCount, damagePercent, confuseDuration)
+		-- return ([[With unnatural speed you assail all foes in sight within a range of 4 with wild swings from your axe. You will attack up to %d different targets for %d%% damage. When the assualt finally ends all foes in range will be confused for %d turns and you will find yourself in a nearby location.]]):tformat(attackCount, damagePercent, confuseDuration)
 	-- end,
 -- }
 
@@ -419,6 +419,6 @@ newTalent{
 		local chance = t.getChance(self, t)
 		return ([[Rather than hide from the onslaught, you face down every threat. While active you have a %d%% chance of repelling a melee attack. The recklessness of your defense brings you bad luck (Luck -3).
 		Cleave, Repel and Surge cannot be active simultaneously, and activating one will place the others in cooldown.
-		Repel chance increases with your Strength and by 20%% when equipped with a shield.]]):format(chance)
+		Repel chance increases with your Strength and by 20%% when equipped with a shield.]]):tformat(chance)
 	end,
 }

@@ -19,21 +19,21 @@
 
 newEntity{ base = "BASE_LORE_RANDOM",
 	name = "The story of my salvation", lore="zigur-potion", unique=true,
-	desc = [[An old tale about the fear of magic.]],
+	desc = _t[[An old tale about the fear of magic.]],
 	level_range = {1, 20},
 	rarity = 40,
 }
 
 newEntity{ base = "BASE_LORE_RANDOM",
 	name = "On Adventuring", lore="kestin-highfin-adventuring-notes", unique=true,
-	desc = [[Fragments of a fabled traveler.]],
+	desc = _t[[Fragments of a fabled traveler.]],
 	level_range = {10, 25},
 	rarity = 35,
 }
 
 newEntity{ base = "BASE_LORE_RANDOM",
 	name = "memories of Artelia Firstborn", lore="creation-elf", unique=true,
-	desc = [[The memories of the first elf ever to awaken.]],
+	desc = _t[[The memories of the first elf ever to awaken.]],
 	level_range = {1, 25},
 	rarity = 40,
 	-- Only elves can find it
@@ -42,7 +42,7 @@ newEntity{ base = "BASE_LORE_RANDOM",
 
 newEntity{ base = "BASE_LORE_RANDOM",
 	name = "human myth of creation", lore="creation-human", unique=true,
-	desc = [[Myth of creation of the humans.]],
+	desc = _t[[Myth of creation of the humans.]],
 	level_range = {1, 25},
 	rarity = 40,
 	-- Only humans can find it
@@ -51,7 +51,7 @@ newEntity{ base = "BASE_LORE_RANDOM",
 
 newEntity{ base = "BASE_LORE_RANDOM",
 	name = "a logical analysis of creation, by philosopher Smythen", lore="creation-halfling", unique=true,
-	desc = [[Myth of creation of the halflings.]],
+	desc = _t[[Myth of creation of the halflings.]],
 	level_range = {1, 25},
 	rarity = 40,
 	-- Only hhalflings can find it
@@ -60,7 +60,7 @@ newEntity{ base = "BASE_LORE_RANDOM",
 
 newEntity{ base = "BASE_LORE_RANDOM",
 	name = "Tale of the Moonsisters", lore="moons-human", unique=true,
-	desc = [[The creation of Eyal's moons.]],
+	desc = _t[[The creation of Eyal's moons.]],
 	level_range = {1, 35},
 	rarity = 40,
 	-- Only humans can find it

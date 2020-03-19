@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Tannen's Tower",
+	name = _t"Tannen's Tower",
 	level_range = {35, 45},
 	level_scheme = "player",
 	max_level = 4, reverse_level_display=true,
@@ -52,14 +52,14 @@ return {
 	},
 	on_enter = function(lev, old_lev, newzone)
 		if newzone and not game.level.shown_warning then
-			require("engine.ui.Dialog"):simplePopup("Tannen's Tower", "The portal brought you to what seems to be a cell in the basement of the tower. You must escape!")
+			require("engine.ui.Dialog"):simplePopup(_t"Tannen's Tower", _t"The portal brought you to what seems to be a cell in the basement of the tower. You must escape!")
 			game.level.shown_warning = true
 		end
 		if lev == 4 then
 			core.fov.set_actor_vision_size(0)
 			if not game.level.data.seen_tannen then
 				game.level.data.seen_tannen = true
-				require("engine.ui.Dialog"):simpleLongPopup("Tannen's Tower", [[As you climb up the steps, you see Tannen standing with his drolem, reading a scrap of parchment.  As he reads, his eyes grow wider, and he starts sweating and pacing back and forth.  When he reaches to stuff it in his pocket, he sees you and jumps back like a startled cat.  "No!  Not now!  You have no idea what's at stake!"  He retrieves a fistful of brightly-colored flasks from his robes, and his drolem's eyes glow as it springs to life, metal screeching in an impressive imitation of a roar.]], 500)
+				require("engine.ui.Dialog"):simpleLongPopup(_t"Tannen's Tower", _t[[As you climb up the steps, you see Tannen standing with his drolem, reading a scrap of parchment.  As he reads, his eyes grow wider, and he starts sweating and pacing back and forth.  When he reaches to stuff it in his pocket, he sees you and jumps back like a startled cat.  "No!  Not now!  You have no idea what's at stake!"  He retrieves a fistful of brightly-colored flasks from his robes, and his drolem's eyes glow as it springs to life, metal screeching in an impressive imitation of a roar.]], 500)
 			end
 		end
 	end,

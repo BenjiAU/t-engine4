@@ -71,7 +71,7 @@ newTalent{
 		return ([[Conjures up a bolt of fire, setting the target ablaze and doing %0.2f fire damage over 3 turns.
 		At level 5, it will create a beam of flames.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.FIRE, damage))
+		tformat(damDesc(self, DamageType.FIRE, damage))
 	end,
 }
 
@@ -121,7 +121,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[Conjures up a cone of flame with radius %d. Any targets caught in the area will suffer Burning Shock, stunning them and dealing %0.2f fire damage over %d turns.
 		The damage will increase with your Spellpower.]]):
-		format(radius, damDesc(self, DamageType.FIRE, damage), stunduration)
+		tformat(radius, damDesc(self, DamageType.FIRE, damage), stunduration)
 	end,
 }
 
@@ -167,7 +167,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[Conjures up a bolt of fire that moves toward the target and explodes into a flash of fire, doing %0.2f fire damage in a radius of %d.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.FIRE, damage), radius)
+		tformat(damDesc(self, DamageType.FIRE, damage), radius)
 	end,
 }
 
@@ -212,7 +212,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[Raging flames burn foes and allies alike, doing %0.2f fire damage in a radius of %d each turn for %d turns.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.FIRE, damage), radius, duration)
+		tformat(damDesc(self, DamageType.FIRE, damage), radius, duration)
 	end,
 }
 

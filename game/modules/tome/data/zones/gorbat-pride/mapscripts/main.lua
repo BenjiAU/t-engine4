@@ -74,6 +74,11 @@ tm:applyOnGroups(rooms, function(room, idx)
 end)
 if levers_placed < 2 then return self:redo() end
 
+if rng.percent(15) and not game.state:doneEvent("renegade-wyrmics") then 
+	game.state:doneEvent("renegade-wyrmics",1) -- special vault! can only show once per game and only in gorbat pride; contains exceptionally difficult foes and exceptional loot
+	game.level.data.generator.map.greater_vaults_list = {"renegade-wyrmics"}
+end
+
 -- Complete the map by putting wall in all the remaining blank spaces
 tm:fillAll()
 

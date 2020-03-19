@@ -45,7 +45,8 @@ end
 function _M:newAchievement(t)
 	t.id = t.id or t.name
 	t.id = t.id:upper():gsub("[ ]", "_")
-	t.category = t.category or "Maj'Eyal"
+	t.name = _t(t.name)
+	t.category = t.category or _t"Maj'Eyal"
 	findTile(t)
 
 	WA.newAchievement(self, t)
@@ -57,7 +58,7 @@ function _M:newAchievement(t)
 		-- Normal
 		local t2 = table.clone(t)
 		t2.id = "NORMAL_ROGUELIKE_"..t2.id
-		t2.name = t2.name.." (Roguelike)"
+		t2.name = ("%s (Roguelike)"):tformat(t2.name)
 		t2.difficulty = DIFFICULTY_NORMAL
 		t2.permadeath = PERMADEATH_ONE
 		findTile(t2)
@@ -66,7 +67,7 @@ function _M:newAchievement(t)
 		-- Exploration
 		local t3 = table.clone(t)
 		t3.id = "EXPLORATION_"..t3.id
-		t3.name = t3.name.." (Exploration mode)"
+		t3.name = ("%s (Exploration mode)"):tformat(t3.name)
 		t3.permadeath = PERMADEATH_INFINITE
 		findTile(t3)
 		WA.newAchievement(self, t3)
@@ -78,7 +79,7 @@ function _M:newAchievement(t)
 		-- Nightmare
 		local t4 = table.clone(t)
 		t4.id = "NIGHTMARE_ADVENTURE_"..t4.id
-		t4.name = t4.name.." (Nightmare (Adventure) difficulty)"
+		t4.name = ("%s (Nightmare (Adventure) difficulty)"):tformat(t4.name)
 		t4.difficulty = DIFFICULTY_NIGHTMARE
 		t4.permadeath = PERMADEATH_MANY
 		t4.autogrant = {t.id}
@@ -87,7 +88,7 @@ function _M:newAchievement(t)
 
 		local t5 = table.clone(t)
 		t5.id = "NIGHTMARE_"..t5.id
-		t5.name = t5.name.." (Nightmare (Roguelike) difficulty)"
+		t5.name = ("%s (Nightmare (Roguelike) difficulty)"):tformat(t5.name)
 		t5.difficulty = DIFFICULTY_NIGHTMARE
 		t5.permadeath = PERMADEATH_ONE
 		t5.autogrant = {t4.id, t2.id}
@@ -97,7 +98,7 @@ function _M:newAchievement(t)
 		-- Insane
 		local t6 = table.clone(t)
 		t6.id = "INSANE_ADVENTURE_"..t6.id
-		t6.name = t6.name.." (Insane (Adventure) difficulty)"
+		t6.name = ("%s (Insane (Adventure) difficulty)"):tformat(t6.name)
 		t6.difficulty = DIFFICULTY_INSANE
 		t6.permadeath = PERMADEATH_MANY
 		t6.autogrant = {t4.id}
@@ -106,7 +107,7 @@ function _M:newAchievement(t)
 
 		local t7 = table.clone(t)
 		t7.id = "INSANE_"..t7.id
-		t7.name = t7.name.." (Insane (Roguelike) difficulty)"
+		t7.name = ("%s (Insane (Roguelike) difficulty)"):tformat(t7.name)
 		t7.difficulty = DIFFICULTY_INSANE
 		t7.permadeath = PERMADEATH_ONE
 		t7.autogrant = {t6.id, t5.id}
@@ -116,7 +117,7 @@ function _M:newAchievement(t)
 		-- Madness
 		local t8 = table.clone(t)
 		t8.id = "MADNESS_ADVENTURE_"..t8.id
-		t8.name = t8.name.." (Madness (Adventure) difficulty)"
+		t8.name = ("%s (Madness (Adventure) difficulty)"):tformat(t8.name)
 		t8.difficulty = DIFFICULTY_MADNESS
 		t8.permadeath = PERMADEATH_MANY
 		t8.autogrant = {t6.id}
@@ -125,7 +126,7 @@ function _M:newAchievement(t)
 
 		local t9 = table.clone(t)
 		t9.id = "MADNESS_"..t9.id
-		t9.name = t9.name.." (Madness (Roguelike) difficulty)"
+		t9.name = ("%s (Madness (Roguelike) difficulty)"):tformat(t9.name)
 		t9.difficulty = DIFFICULTY_MADNESS
 		t9.permadeath = PERMADEATH_ONE
 		t9.autogrant = {t8.id, t7.id}

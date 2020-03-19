@@ -18,11 +18,11 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[What? Ah, it is you, @playername@.
+	text = _t[[What? Ah, it is you, @playername@.
 I take it you are satisfied with the portal.]],
 	answers = {
-		{"Yes, thank you."},
-		{"Whatever."},
+		{_t"Yes, thank you."},
+		{_t"Whatever."},
 	}
 }
 

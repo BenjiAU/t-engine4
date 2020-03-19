@@ -49,8 +49,8 @@ function _M:easingSimple(time, easing, txt, ...)
 	txt = txt:format(...)
 
 	if game.player then
-		if game.player.stopRun then game.player:stopRun("important news") end
-		if game.player.stopRest then game.player:stopRest("important news") end
+		if game.player.stopRun then game.player:stopRun(_t"important news") end
+		if game.player.stopRest then game.player:stopRest(_t"important news") end
 	end
 	self:triggerHook{"BigNews:talk", text=txt}	
 

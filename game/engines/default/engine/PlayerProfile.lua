@@ -792,43 +792,43 @@ end
 
 function _M:checkModuleHash(module, md5)
 	self.hash_valid = false
-	if not self.auth then return nil, "no online profile active" end
-	if config.settings.cheat then return nil, "cheat mode active" end
-	if game and game:isTainted() then return nil, "savefile tainted" end
+	if not self.auth then return nil, _t"no online profile active" end
+	if config.settings.cheat then return nil, _t"cheat mode active" end
+	if game and game:isTainted() then return nil, _t"savefile tainted" end
 	core.profile.pushOrder(table.serialize{o="CheckModuleHash", module=module, md5=md5})
 
 	local ok = false
 	self:waitEvent("CheckModuleHash", function(e) ok = e.ok end, 10000)
 
-	if not ok then return nil, "bad game version" end
+	if not ok then return nil, _t"bad game version" end
 	print("[ONLINE PROFILE] module hash is valid")
 	self.hash_valid = true
 	return true
 end
 
 function _M:checkAddonHash(module, addon, md5)
-	if not self.auth then return nil, "no online profile active" end
-	if config.settings.cheat then return nil, "cheat mode active" end
-	if game and game:isTainted() then return nil, "savefile tainted" end
+	if not self.auth then return nil, _t"no online profile active" end
+	if config.settings.cheat then return nil, _t"cheat mode active" end
+	if game and game:isTainted() then return nil, _t"savefile tainted" end
 	core.profile.pushOrder(table.serialize{o="CheckAddonHash", module=module, addon=addon, md5=md5})
 
 	local ok = false
 	self:waitEvent("CheckAddonHash", function(e) ok = e.ok end, 10000)
 
-	if not ok then return nil, "bad game addon version" end
+	if not ok then return nil, _t"bad game addon version" end
 	print("[ONLINE PROFILE] addon hash is valid")
 	return true
 end
 
 function _M:checkAddonUpdates(list)
-	if not self.auth then return nil, "no online profile active" end
-	if #list == 0 then return nil, "nothing to update" end
+	if not self.auth then return nil, _t"no online profile active" end
+	if #list == 0 then return nil, _t"nothing to update" end
 	core.profile.pushOrder(table.serialize{o="CheckAddonUpdates", list=list})
 
 	local ok = false
 	self:waitEvent("CheckAddonUpdates", function(e) ok = e.ok end, 10000)
 
-	if not ok then return nil, "bad game addon version" end
+	if not ok then return nil, _t"bad game addon version" end
 	ok = ok:unserialize()
 	print("[ONLINE PROFILE] addon update list returned")
 	table.print(ok)
@@ -836,16 +836,16 @@ function _M:checkAddonUpdates(list)
 end
 
 function _M:checkBatchHash(list)
-	if not self.auth then return nil, "no online profile active" end
-	if config.settings.cheat then return nil, "cheat mode active" end
-	if game and game:isTainted() then return nil, "savefile tainted" end
+	if not self.auth then return nil, _t"no online profile active" end
+	if config.settings.cheat then return nil, _t"cheat mode active" end
+	if game and game:isTainted() then return nil, _t"savefile tainted" end
 	core.profile.pushOrder(table.serialize{o="CheckBatchHash", data=list})
 
 	local ok = false
 	local error = nil
 	self:waitEvent("CheckBatchHash", function(e) ok = e.ok error = e.error end, 10000)
 
-	if not ok then return nil, error or "unknown error" end
+	if not ok then return nil, error or _t"unknown error" end
 	print("[ONLINE PROFILE] all hashes are valid")
 	self.hash_valid = true
 	return true
@@ -875,7 +875,7 @@ end
 
 function _M:registerNewCharacter(module)
 	if not self.auth or not self.hash_valid then return end
-	local dialog = Dialog:simpleWaiter("Registering character", "Character is being registered on https://te4.org/")
+	local dialog = Dialog:simpleWaiter(_t"Registering character", _t"Character is being registered on https://te4.org/")
 	core.display.forceRedraw()
 
 	core.profile.pushOrder(table.serialize{o="RegisterNewCharacter", module=module})
@@ -890,7 +890,7 @@ end
 
 function _M:getCharball(id_profile, uuid)
 	if not self.auth then return end
-	local dialog = Dialog:simpleWaiter("Retrieving data from the server", "Retrieving...")
+	local dialog = Dialog:simpleWaiter(_t"Retrieving data from the server", _t"Retrieving...")
 	core.display.forceRedraw()
 
 	local data = nil

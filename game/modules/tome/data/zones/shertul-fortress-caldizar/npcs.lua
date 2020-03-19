@@ -23,7 +23,7 @@ local Talents = require("engine.interface.ActorTalents")
 newEntity{ base = "BASE_NPC_SHERTUL", define_as = "CALDIZAR",
 	name = "Caldizar", color=colors.LIGHT_RED, unique="Caldizar Unknown Fortress",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_sher_tul_caldizar.png", display_h=2, display_y=-1}}},
-	desc ="A creature stands before you, with long tentacle-like appendages and a squat bump in place of a head. An intense aura of power radiates from this being unlike anything you've ever felt before. It can only be a Sher'Tul. A living Sher'Tul!",
+	desc =_t"A creature stands before you, with long tentacle-like appendages and a squat bump in place of a head. An intense aura of power radiates from this being unlike anything you've ever felt before. It can only be a Sher'Tul. A living Sher'Tul!",
 	level_range = {1000, nil}, exp_worth = 5,
 	life_rating = 40,
 	rank = 5,

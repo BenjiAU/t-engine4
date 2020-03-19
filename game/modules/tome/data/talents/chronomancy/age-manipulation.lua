@@ -45,7 +45,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local damagestat = t.getDamageStat(self, t)
 		return ([[Projects a bolt of temporal energy that deals %0.2f temporal damage, and reduces the targets three highest stats by %d for 3 turns.
-		The damage dealt will scale with your Spellpower.]]):format(damDesc(self, DamageType.TEMPORAL, damage), damagestat)
+		The damage dealt will scale with your Spellpower.]]):tformat(damDesc(self, DamageType.TEMPORAL, damage), damagestat)
 	end,
 }
 
@@ -83,7 +83,7 @@ newTalent{
 		local duration = t.getConfuseDuration(self, t)
 		local radius = self:getTalentRadius(t)
 		return ([[Reverts the minds of all creatures in a radius %d cone to an infantile state, in effect confusing them (%d%% to act randomly) for %d turns.]]):
-		format(radius, t.getConfuseEfficency(self, t), duration)
+		tformat(radius, t.getConfuseEfficency(self, t), duration)
 	end,
 }
 
@@ -127,7 +127,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		local radius = self:getTalentRadius(t)
 		return ([[You surround yourself with a radius %d distortion of time, which deals %0.2f stacking temporal damage over 3 turns to all other creatures.  The effect lasts %d turns.
-		The damage dealt will scale with your Spellpower.]]):format(radius, damDesc(self, DamageType.TEMPORAL, damage), duration)
+		The damage dealt will scale with your Spellpower.]]):tformat(radius, damDesc(self, DamageType.TEMPORAL, damage), duration)
 	end,
 }
 
@@ -187,6 +187,6 @@ newTalent{
 		local count = t.getRemoveCount(self, t)
 		return ([[You revert your body to a previous state, healing yourself for %0.2f life and removing %d physical status effects (both good and bad).
 		The amount of life healed will scale with your Spellpower.]]):
-		format(heal, count)
+		tformat(heal, count)
 	end,
 }

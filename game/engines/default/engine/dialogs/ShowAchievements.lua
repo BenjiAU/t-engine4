@@ -38,11 +38,11 @@ function _M:init(title, player)
 	local nb = 0
 	for id, data in pairs(world.achieved) do nb = nb + 1 end
 
-	Dialog.init(self, (title or "Achievements").." ("..nb.."/"..total..")", game.w * 0.8, game.h * 0.8)
+	Dialog.init(self, title or ("Achievements(%s/%s)"):tformat(nb, total), game.w * 0.8, game.h * 0.8)
 
-	self.c_self = Checkbox.new{title="Yours only", default=false, fct=function() end, on_change=function(s) if s then self:switchTo("self") end end}
-	self.c_main = Checkbox.new{title="All achieved", default=true, fct=function() end, on_change=function(s) if s then self:switchTo("main") end end}
-	self.c_all = Checkbox.new{title="Everything", default=false, fct=function() end, on_change=function(s) if s then self:switchTo("all") end end}
+	self.c_self = Checkbox.new{title=_t"Yours only", default=false, fct=function() end, on_change=function(s) if s then self:switchTo("self") end end}
+	self.c_main = Checkbox.new{title=_t"All achieved", default=true, fct=function() end, on_change=function(s) if s then self:switchTo("main") end end}
+	self.c_all = Checkbox.new{title=_t"Everything", default=false, fct=function() end, on_change=function(s) if s then self:switchTo("all") end end}
 
 	self.c_image = Image.new{file="trophy_gold.png", width=128, height=128, shadow=true}
 	self.c_desc = TextzoneList.new{scrollbar=true, width=math.floor(self.iw * 0.4 - 10), height=self.ih - self.c_self.h}
@@ -52,11 +52,11 @@ function _M:init(title, player)
 	local direct_draw = function(item, h) if item.img_renderer then item.img_renderer:scale(h, h, 1) return item.img_renderer end end
 
 	self.c_list = ListColumns.new{width=math.floor(self.iw * 0.6 - 10), height=self.ih - 10 - self.c_self.h, floating_headers = true, scrollbar=true, sortable=true, columns={
-		{name="", width={24,"fixed"}, display_prop="--", direct_draw=direct_draw},
-		{name="Achievement", width=50, display_prop="name", sort="name"},
-		{name="Category", width=20, display_prop="category", sort="category"},
-		{name="When", width=15, display_prop="when", sort="when"},
-		{name="Who", width=15, display_prop="who", sort="who"},
+		{name=_t"", width={24,"fixed"}, display_prop="--", direct_draw=direct_draw},
+		{name=_t"Achievement", width=50, display_prop="name", sort="name"},
+		{name=_t"Category", width=20, display_prop="category", sort="category"},
+		{name=_t"When", width=15, display_prop="when", sort="when"},
+		{name=_t"Who", width=15, display_prop="who", sort="who"},
 	}, list=self.list, fct=function(item) end, select=function(item, sel) self:select(item) end}
 
 	local sep = Separator.new{dir="horizontal", size=self.ih - 10 - self.c_self.h}
@@ -94,13 +94,13 @@ function _M:select(item)
 	if item then
 		local also = ""
 		if self.player and self.player.achievements and self.player.achievements[item.id] then
-			also = "#GOLD#Also achieved by your current character#LAST#\n"
+			also = _t"#GOLD#Also achieved by your current character#LAST#\n"
 		end
 		self.c_image:setDO(item.ido:clone():scale(128, 128))
 		local track = self:getTrack(item.a)
-		local desc = ("#GOLD#Achieved on:#LAST# %s\n#GOLD#Achieved by:#LAST# %s\n%s\n#GOLD#Description:#LAST# %s"):format(item.when, item.who, also, item.desc):toTString()
+		local desc = ("#GOLD#Achieved on:#LAST# %s\n#GOLD#Achieved by:#LAST# %s\n%s\n#GOLD#Description:#LAST# %s"):tformat(item.when, item.who, also, item.desc):toTString()
 		if track then
-			desc:add(true, true, {"color","GOLD"}, "Progress: ", {"color","LAST"})
+			desc:add(true, true, {"color","GOLD"}, _t"Progress: ", {"color","LAST"})
 			desc:merge(track)
 		end
 		self.c_desc:switchItem(item, desc)
@@ -153,9 +153,9 @@ function _M:generateList(kind)
 			if a.show == "full" or not data.notdone then
 				list[#list+1] = { name=a.name, color=color, desc=a.desc, category=a.category or "--", when=data.when, who=data.who, order=a.order, id=id, img_renderer=renderer, ido=ido, a=a }
 			elseif a.show == "none" then
-				list[#list+1] = { name="???", color=color, desc="-- Unknown --", category=a.category or "--", when=data.when, who=data.who, order=a.order, id=id, img_renderer=renderer, ido=ido, a=a }
+				list[#list+1] = { name="???", color=color, desc=_t"-- Unknown --", category=a.category or "--", when=data.when, who=data.who, order=a.order, id=id, img_renderer=renderer, ido=ido, a=a }
 			elseif a.show == "name" then
-				list[#list+1] = { name=a.name, color=color, desc="-- Unknown --", category=a.category or "--", when=data.when, who=data.who, order=a.order, id=id, img_renderer=renderer, ido=ido, a=a }
+				list[#list+1] = { name=a.name, color=color, desc=_t"-- Unknown --", category=a.category or "--", when=data.when, who=data.who, order=a.order, id=id, img_renderer=renderer, ido=ido, a=a }
 			else
 				list[#list+1] = { name=a.name, color=color, desc=a.desc, category=a.category or "--", when=data.when, who=data.who, order=a.order, id=id, img_renderer=renderer, ido=ido, a=a }
 			end

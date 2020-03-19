@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Unremarkable Cave",
+	name = _t"Unremarkable Cave",
 	level_range = {25, 35},
 	level_scheme = "player",
 	max_level = 1,

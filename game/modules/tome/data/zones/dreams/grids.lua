@@ -56,7 +56,7 @@ newEntity{
 	define_as = "DREAM_MOUSE_HOLE",
 	type = "wall", subtype = "grass",
 	name = "mouse hole",
-	desc = "A hole small enough that only you can go through.",
+	desc = _t"A hole small enough that only you can go through.",
 	color_r=0, color_g=0, color_b=0, notice = true,
 	image = "terrain/jungle/jungle_grass_floor_01.png",
 	add_displays = class:makeTrees("terrain/jungle/jungle_tree_", 17, 7),

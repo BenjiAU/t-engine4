@@ -23,7 +23,7 @@ for i = 1, 2 do
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE"..i,
 	name = "tattered paper scrap", lore="trollmire-note-"..i,
-	desc = [[A paper scrap, left by an adventurer.]],
+	desc = _t[[A paper scrap, left by an adventurer.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -32,7 +32,7 @@ end
 newEntity{ base = "BASE_LORE",
 	define_as = "PROX_NOTE",
 	name = "tattered paper scrap", lore="trollmire-note-3",
-	desc = [[A paper scrap, left by an adventurer.]],
+	desc = _t[[A paper scrap, left by an adventurer.]],
 	rarity = false,
 	encumberance = 0,
 }

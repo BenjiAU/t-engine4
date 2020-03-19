@@ -38,7 +38,7 @@ newTalent{
 		Your vision adapts to this glow, giving you %d%% blindness resistance.
 		The light radius overrides your normal light if it is bigger (it does not stack).
 		]]):
-		format(radianceRadius(self), t.getResist(self, t))
+		tformat(radianceRadius(self), t.getResist(self, t))
 	end,
 }
 
@@ -75,7 +75,7 @@ newTalent{
 		All enemies in your Radiance aura have their invisibility and stealth power reduced by %d.
 		In addition, all actors affected by illumination are easier to see and therefore hit; their defense is reduced by %d and all evasion bonuses from being unseen are negated.
 		The effects increase with your Spellpower.]]):
-		format(t.getPower(self, t), t.getDef(self, t))
+		tformat(t.getPower(self, t), t.getDef(self, t))
 	end,
 }
 
@@ -111,7 +111,7 @@ newTalent{
 		return ([[Your Radiance is so powerful it burns all foes caught in it, doing %0.1f light damage to all non-dazed foes caught inside.
 		Each enemy effected has a %d%% chance of being dazed for 5 turns.
 		The damage increases with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHT, t.getDamage(self, t)), t.getDaze(self, t))
+		tformat(damDesc(self, DamageType.LIGHT, t.getDamage(self, t)), t.getDaze(self, t))
 	end,
 }
 
@@ -140,7 +140,7 @@ newTalent{
 			local proj = require("mod.class.Projectile"):makeHoming(
 				self,
 				{particle="bolt_light", trail="lighttrail"},
-				{speed=1, name="Judgement", dam=dam, movedam=movedam},
+				{speed=1, name=_t"Judgement", dam=dam, movedam=movedam},
 				target,
 				self:getTalentRange(t),
 				function(self, src)
@@ -161,7 +161,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Fire a glowing orb of light at each enemy within your Radiance.  Each orb will slowly follow its target until it connects dealing %d light damage to anything else it contacts along the way.  When the target is reached the orb will explode dealing %d light damage in radius 1 and healing you for 50%% of the damage dealt.]]):
-		format(t.getMoveDamage(self, t), t.getExplosionDamage(self, t))
+		tformat(t.getMoveDamage(self, t), t.getExplosionDamage(self, t))
 	end,
 }
 

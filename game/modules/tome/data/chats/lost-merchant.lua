@@ -18,17 +18,17 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[Please save me! I will make it worth your whi..
+	text = _t[[Please save me! I will make it worth your whi..
 *#LIGHT_GREEN#The assassin lord hits him in the face.#WHITE#*Shut up!]],
 	answers = {
-		{"Sorry, I have to go!", action = function(npc, player) npc.can_talk = nil end},
+		{_t"Sorry, I have to go!", action = function(npc, player) npc.can_talk = nil end},
 	}
 }
 
 newChat{ id="welcome2",
-	text = [[Please get me out of here!]],
+	text = _t[[Please get me out of here!]],
 	answers = {
-		{"Come, there is a way out!", action = function(npc, player) npc.can_talk = nil npc.cant_be_moved = nil end},
+		{_t"Come, there is a way out!", action = function(npc, player) npc.can_talk = nil npc.cant_be_moved = nil end},
 	}
 }
 

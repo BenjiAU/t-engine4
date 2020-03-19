@@ -355,10 +355,13 @@ end
 --- Run all registered tick end functions
 -- Usually just let the engine call it
 function _M:onTickEndExecute()
-	if self.on_tick_end and #self.on_tick_end > 0 then
-		local fs = self.on_tick_end
-		self.on_tick_end = {}
-		self.on_tick_end_names = nil
+	local set = self.on_tick_end_custom or self.on_tick_end
+	if not set then return end
+
+	if #set.fcts > 0 then
+		local fs = set.fcts
+		set.fcts = {}
+		set.names = {}
 		for i = 1, #fs do fs[i]() end
 	end
 end
@@ -367,23 +370,56 @@ end
 -- @func f function to do on tick end
 -- @string name callback to reference the function
 function _M:onTickEnd(f, name)
-	self.on_tick_end = self.on_tick_end or {}
+	local set = self.on_tick_end_custom or self.on_tick_end
+	if not set then self.on_tick_end = { fcts={}, names={} } set = self.on_tick_end end
 
 	if name then
-		self.on_tick_end_names = self.on_tick_end_names or {}
-		if self.on_tick_end_names[name] then return end
-		self.on_tick_end_names[name] = f
+		if set.names[name] then return end
+		set.names[name] = f
 	end
 
-	self.on_tick_end[#self.on_tick_end+1] = f
+	set.fcts[#set.fcts+1] = f
 	core.game.requestNextTick()
 end
 
 --- Returns a registered function to do on tick end by name
 -- @string name callback to reference the function
 function _M:onTickEndGet(name)
-	if not self.on_tick_end_names then return end
-	return self.on_tick_end_names[name]
+	local set = self.on_tick_end_custom or self.on_tick_end
+	if not set then return end
+	return set.names[name]
+end
+
+--- Returns true if at laest one on tick end is planned
+function _M:onTickEndExists()
+	local set = self.on_tick_end_custom or self.on_tick_end
+	if not set then return end
+	return #set.fcts > 0
+end
+
+--- Cancels all on tick end factions
+function _M:onTickEndCancelAll()
+	local set = self.on_tick_end_custom or self.on_tick_end
+	if not set then return end
+	set.fcts = {}
+	set.names = {}
+end
+
+--- Capture all calls to onTickEnd into a custom table
+-- @param set The table to contain all the calls. If set is nil the capture mode ends
+function _M:onTickEndCapture(set)
+	if set then set.fcts = {} set.names = {} end
+	self.on_tick_end_custom = set
+end
+
+--- Merge a custom set of on tick end to the current list
+-- @param srcset The table that contain all the calls
+function _M:onTickEndMerge(srcset)
+	local set = self.on_tick_end_custom or self.on_tick_end
+	if not set then self.on_tick_end = { fcts={}, names={} } set = self.on_tick_end end
+
+	for _, fct in ipairs(srcset.fcts) do set.fcts[#set.fcts+1] = fct end
+	for name, fct in pairs(srcset.names) do set.names[name] = fct end
 end
 
 --- Returns a registered function to do on tick end by name
@@ -673,7 +709,7 @@ function _M:onResolutionChange()
 	end
 	
 	-- Are you sure you want to save these settings?  Somewhat obnoxious...
---	self.change_res_dialog = require("engine.ui.Dialog"):yesnoPopup("Resolution changed", "Accept the new resolution?", function(ret)
+--	self.change_res_dialog = require("engine.ui.Dialog"):yesnoPopup(_t"Resolution changed", _t"Accept the new resolution?", function(ret)
 --		if ret then
 --			if not self.creating_player then self:saveGame() end
 --			util.showMainMenu(false, nil, nil, self.__mod_info.short_name, self.save_name, false)
@@ -683,7 +719,7 @@ function _M:onResolutionChange()
 --			self.change_res_dialog = nil
 --			self.change_res_dialog_oldw, self.change_res_dialog_oldh, self.change_res_dialog_oldf = nil, nil, nil
 --		end
---	end, "Accept", "Revert")
+--	end, _t"Accept", _t"Revert")
 	print("onResolutionChange: (Would have) created popup.")
 	
 end
@@ -827,9 +863,9 @@ function _M:saveScreenshot()
 	if core.steam then
 		local desc = self:getSaveDescription()
 		core.steam.screenshot(file, self.w, self.h, desc.description)
-		Dialog:simpleLongPopup("Screenshot taken!", "Screenshot should appear in your Steam client's #LIGHT_GREEN#Screenshots Library#LAST#.\nAlso available on disk: "..fs.getRealPath(file), 600)
+		Dialog:simpleLongPopup(_t"Screenshot taken!", ("Screenshot should appear in your Steam client's #LIGHT_GREEN#Screenshots Library#LAST#.\nAlso available on disk: %s"):tformat(fs.getRealPath(file)), 600)
 	else
-		Dialog:simplePopup("Screenshot taken!", "File: "..fs.getRealPath(file))
+		Dialog:simplePopup(_t"Screenshot taken!", ("File: %s"):tformat(fs.getRealPath(file)))
 	end
 end
 

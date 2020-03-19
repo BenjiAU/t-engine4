@@ -19,42 +19,42 @@
 
 use_ui = "quest-main"
 
-name = "The many Prides of the Orcs"
+name = _t"The many Prides of the Orcs"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "Investigate the bastions of the Pride."
+	desc[#desc+1] = _t"Investigate the bastions of the Pride."
 
 	if self:isCompleted("rak-shor") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have destroyed Rak'shor.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have destroyed Rak'shor.#WHITE#"
 	else
-		desc[#desc+1] = "#SLATE#* Rak'shor Pride, in the west of the southern desert.#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* Rak'shor Pride, in the west of the southern desert.#WHITE#"
 	end
 --[[
 	if self:isCompleted("eastport") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have killed the master of Eastport.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have killed the master of Eastport.#WHITE#"
 	else
-		desc[#desc+1] = "#SLATE#* A group of corrupted Humans live in Eastport on the southern coastline. They have contact with the Pride.#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* A group of corrupted Humans live in Eastport on the southern coastline. They have contact with the Pride.#WHITE#"
 	end
 ]]
 	if self:isCompleted("vor") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have destroyed Vor.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have destroyed Vor.#WHITE#"
 	else
-		desc[#desc+1] = "#SLATE#* Vor Pride, in the north east.#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* Vor Pride, in the north east.#WHITE#"
 	end
 	if self:isCompleted("grushnak") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have destroyed Grushnak.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have destroyed Grushnak.#WHITE#"
 	else
-		desc[#desc+1] = "#SLATE#* Grushnak Pride, near a small mountain range in the north west.#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* Grushnak Pride, near a small mountain range in the north west.#WHITE#"
 	end
 	if self:isCompleted("gorbat") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have destroyed Gorbat.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have destroyed Gorbat.#WHITE#"
 	else
-		desc[#desc+1] = "#SLATE#* Gorbat Pride, in a mountain range in the southern desert.#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* Gorbat Pride, in a mountain range in the southern desert.#WHITE#"
 	end
 
 	if self:isCompleted() then
-		desc[#desc+1] = ""
-		desc[#desc+1] = "#LIGHT_GREEN#* All the bastions of the Pride lie in ruins, their masters destroyed. High Sun Paladin Aeryn would surely be glad of the news!#WHITE#"
+		desc[#desc+1] = _t""
+		desc[#desc+1] = _t"#LIGHT_GREEN#* All the bastions of the Pride lie in ruins, their masters destroyed. High Sun Paladin Aeryn would surely be glad of the news!#WHITE#"
 	end
 
 	return table.concat(desc, "\n")

@@ -29,7 +29,7 @@ game.nicer_tiles:updateAround(level, x, y)
 g = level.map(x, y, engine.Map.TERRAIN)
 g.on_stand = on_stand
 g.always_remember = true g.special_minimap = colors.DARK_RED
-g.name = "spellblaze scar"
+g.name = _t"spellblaze scar"
 g:altered()
 
 if core.shader.active(4) then
@@ -43,7 +43,7 @@ for x, yy in pairs(grids) do for y, _ in pairs(yy) do
 	local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
 	g.on_stand = g.on_stand or on_stand
 	if g.on_stand == on_stand and g.type == "floor" then
-		g.name = g.name ..  " (spellblaze aura)"
+		g.name = ("%s (spellblaze aura)"):tformat(_t(g.name))
 		if not g.special_minimap then g.special_minimap = colors.VERY_DARK_RED end
 	end
 	g.always_remember = true

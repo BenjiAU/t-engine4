@@ -54,7 +54,7 @@ newTalent{
 		return ([[Conjures up a bolt of cold that moves toward the target and explodes into a chilly circle of death, doing %0.2f cold damage in a radius of %d.
 		The damage will increase with your Spellpower. 
 		Additionally, when Will o' the Wisp is sustained, minions killed by this spell will spawn Wisps.]]):
-		format(damDesc(self, DamageType.COLD, damage), radius)
+		tformat(damDesc(self, DamageType.COLD, damage), radius)
 	end,
 	callbackOnKill = function(self, t, target, death_note)
 		if not death_note then return end
@@ -84,7 +84,8 @@ newTalent{
 	summon = function(self, t, dam, src, killer, grave)
 		if not killer or not killer.faction or (self:reactionToward(killer) >= 0 and not grave) or self.dead then return end
 		local minion = require("mod.class.NPC").new{
-			name = "will o' the wisp",
+			name = _t"will o' the wisp",
+			image = "npc/undead_ghost_will_o__the_wisp.png",
 			type = "undead", subtype = "ghost",
 			blood_color = colors.GREY,
 			display = "G", color=colors.WHITE,
@@ -140,7 +141,7 @@ newTalent{
 		return ([[Surround yourself with undead energies. When one of your minions is destroyed while inside your necrotic aura, it has a %d%% chance to create a will o' the wisp.
 		The will o' the wisp will take a random target in sight and home in on it. When it reaches the target, it will explode for %0.2f cold damage.
 		The damage will increase with your Spellpower.]]):
-		format(chance, damDesc(self, DamageType.COLD, dam))
+		tformat(chance, damDesc(self, DamageType.COLD, dam))
 	end,
 }
 
@@ -195,7 +196,7 @@ newTalent{
 	end,
 	createDark = function(summoner, x, y, damage, duration, creep, creepChance, initialCreep)
 		local e = Object.new{
-			name = "cold flames",
+			name = _t"cold flames",
 			canAct = false,
 			canCreep = true,
 			x = x, y = y,
@@ -332,7 +333,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local darkCount = t.getDarkCount(self, t)
 		return ([[Cold Flames slowly spread from %d spots in a radius of %d around the targeted location. The flames deal %0.2f cold damage, and have a chance of freezing.
-		Damage improves with your Spellpower.]]):format(darkCount, radius, damDesc(self, DamageType.COLD, damage))
+		Damage improves with your Spellpower.]]):tformat(darkCount, radius, damDesc(self, DamageType.COLD, damage))
 	end,
 }
 
@@ -371,6 +372,6 @@ newTalent{
 		local chance, val = t.getParams(self, t)
 		return ([[Vampiric energies fill you; each time you deal damage, you have %d%% chance to heal for %d%% of the damage done.
 		The absorption percent will increase with your Spellpower.]]):
-		format(chance, val)
+		tformat(chance, val)
 	end,
 }

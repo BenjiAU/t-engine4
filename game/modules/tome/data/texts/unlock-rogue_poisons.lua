@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New Talent Category: #LIGHT_GREEN#Poisons",
-[[Extracted from plants, wildlife or more exotic locations, poisons have always existed.
+return _t"New Talent Category: #LIGHT_GREEN#Poisons",
+_t[[Extracted from plants, wildlife or more exotic locations, poisons have always existed.
 Many creatures use them, along with some shady people.
 
 You have made a deal with such a person and can now create new Rogue or Archer characters that can learn the #LIGHT_GREEN#Poisons talents#WHITE#.

@@ -37,8 +37,8 @@ newEntity{ define_as = "RANTHA_THE_WORM",
 	name = "Rantha the Worm",
 	display = "D", color=colors.VIOLET,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/dragon_ice_rantha_the_worm.png", display_h=2, display_y=-1}}},
-	desc = [[Claws and teeth. Ice and death. Dragons are not all extinct it seems...]],
-	killer_message = "and fed to the hatchlings",
+	desc = _t[[Claws and teeth. Ice and death. Dragons are not all extinct it seems...]],
+	killer_message = _t"and fed to the hatchlings",
 	level_range = {12, nil}, exp_worth = 2,
 	max_life = 230, life_rating = 17, fixed_rating = true,
 	max_stamina = 85,
@@ -83,7 +83,7 @@ newEntity{ define_as = "RANTHA_THE_WORM",
 	resolvers.inscriptions(1, "infusion"),
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("MASSOK", 4, 43, "I have heard there is a dragon hunter in the Daikara that is unhappy about the wyrm being already dead.")
+		game.state:activateBackupGuardian("MASSOK", 4, 43, _t"I have heard there is a dragon hunter in the Daikara that is unhappy about the wyrm being already dead.")
 		game.player:resolveSource():grantQuest("starter-zones")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "daikara")
 		
@@ -99,8 +99,8 @@ newEntity{ define_as = "VARSHA_THE_WRITHING",
 	name = "Varsha the Writhing",
 	display = "D", color=colors.VIOLET,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/dragon_fire_varsha_the_writhing.png", display_h=2, display_y=-1}}},
-	desc = [[Claws and teeth. Fire and death. Dragons are not all extinct it seems...]],
-	killer_message = "and fed to the hatchlings",
+	desc = _t[[Claws and teeth. Fire and death. Dragons are not all extinct it seems...]],
+	killer_message = _t"and fed to the hatchlings",
 	level_range = {12, nil}, exp_worth = 2,
 	max_life = 230, life_rating = 17, fixed_rating = true,
 	max_stamina = 85,
@@ -146,7 +146,7 @@ newEntity{ define_as = "VARSHA_THE_WRITHING",
 	resolvers.inscriptions(1, "infusion"),
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("MASSOK", 4, 43, "I have heard there is a dragon hunter in the Daikara that is unhappy about the wyrm being already dead.")
+		game.state:activateBackupGuardian("MASSOK", 4, 43, _t"I have heard there is a dragon hunter in the Daikara that is unhappy about the wyrm being already dead.")
 		game.player:resolveSource():grantQuest("starter-zones")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "daikara")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "daikara-volcano")
@@ -161,7 +161,7 @@ newEntity{ base="BASE_NPC_ORC_GRUSHNAK", define_as = "MASSOK",
 	allow_infinite_dungeon = true,
 	name = "Massok the Dragonslayer", color=colors.VIOLET, unique = true,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/humanoid_orc_massok_the_dragonslayer.png", display_h=2, display_y=-1}}},
-	desc = [[A huge and heavily-scarred orc with a gigantic sword. His helm is fashioned from a dragon's skull.]],
+	desc = _t[[A huge and heavily-scarred orc with a gigantic sword. His helm is fashioned from a dragon's skull.]],
 	level_range = {45, nil}, exp_worth = 3,
 	rank = 4,
 	max_life = 500, life_rating = 25, fixed_rating = true,

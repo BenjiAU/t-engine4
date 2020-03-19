@@ -128,7 +128,7 @@ local arena_3 = function(self, player)
 	game.level.arena.modeString = "3"
 	local arenashop = game:getStore("ARENA_SHOP")
 	arenashop:loadup(game.level, game.zone)
-	arenashop:interact(game.player, "Gladiator's wares")
+	arenashop:interact(game.player, _t"Gladiator's wares")
 	arenashop = nil
 end
 
@@ -138,7 +138,7 @@ local arena_30 = function(self, player)
 	game.level.arena.modeString = "30"
 	local arenashop = game:getStore("ARENA_SHOP")
 	arenashop:loadup(game.level, game.zone)
-	arenashop:interact(game.player, "Gladiator's wares")
+	arenashop:interact(game.player, _t"Gladiator's wares")
 	arenashop = nil
 end
 
@@ -148,14 +148,14 @@ local arena_60 = function(self, player)
 	game.level.arena.modeString = "60"
 	local arenashop = game:getStore("ARENA_SHOP")
 	arenashop:loadup(game.level, game.zone)
-	arenashop:interact(game.player, "Gladiator's wares")
+	arenashop:interact(game.player, _t"Gladiator's wares")
 	arenashop = nil
 end
 
 local give_bonus = function(self, player)
 	game.level.arena.bonusMin = 1.1
 	game.level.arena.bonusMultiplier = 1.1
-	game.level.arena.perk = "None"..game.level.arena.modeString
+	game.level.arena.perk = _t"None"..game.level.arena.modeString
 end
 
 local save_clear = function(self, player)
@@ -176,26 +176,26 @@ local save_clear = function(self, player)
 
 	local arenashop = game:getStore("ARENA_SHOP")
 	arenashop:loadup(game.level, game.zone)
-	arenashop:interact(game.player, "Gladiator's wares")
+	arenashop:interact(game.player, _t"Gladiator's wares")
 	arenashop = nil
 end
 
 newChat{ id="welcome",
-	text = "#LIGHT_GREEN#You take a look at the ranking boards before entering.\n"..text,
+	text = ("#LIGHT_GREEN#You take a look at the ranking boards before entering.\n%s"):tformat(text),
 	answers = {
 		--{"Enter the arena for 3 rounds[DEBUG]", action=arena_3, jump="perks"},
-		{"Enter the arena (60 waves)", action=arena_60},
-		{"Enter the arena (shorter mode, 30 rounds)", action=arena_30},
+		{_t"Enter the arena (60 waves)", action=arena_60},
+		{_t"Enter the arena (shorter mode, 30 rounds)", action=arena_30},
 		--{"Enter the arena for as long as you can last", action=arena_inf, jump="perks"},
-		{"#LIGHT_RED#[Reset all arena save data]", action=save_clear},
+		{_t"#LIGHT_RED#[Reset all arena save data]", action=save_clear},
 	}
 }
 
 newChat{ id="welcome2",
 	text = "What will you do now?",
 	answers = {
-		{"Enter the arena for 60 rounds", action=arena_60},
-		{"Enter the arena for 30 rounds", action=arena_30},
+		{_t"Enter the arena for 60 rounds", action=arena_60},
+		{_t"Enter the arena for 30 rounds", action=arena_30},
 		--{"Enter the arena for as long as you can last", action=arena_inf, jump="perks"},
 	}
 }

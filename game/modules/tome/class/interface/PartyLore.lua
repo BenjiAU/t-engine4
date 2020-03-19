@@ -131,7 +131,7 @@ function _M:learnLore(lore, nopopup, silent, nostop)
 	if learnt then if l.on_learn then l.on_learn(self:findMember{main=true}) end end
 
 	if game.player.runStop and not nostop then
-		game.player:runStop("learnt lore")
-		game.player:restStop("learnt lore")
+		game.player:runStop(_t"learnt lore")
+		game.player:restStop(_t"learnt lore")
 	end
 end

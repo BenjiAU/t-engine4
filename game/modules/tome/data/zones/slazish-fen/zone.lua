@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Slazish Fens",
+	name = _t"Slazish Fens",
 	level_range = {1, 5},
 	level_scheme = "player",
 	max_level = 3,

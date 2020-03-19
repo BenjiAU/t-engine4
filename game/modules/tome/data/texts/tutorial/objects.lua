@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[During your adventures you will find items.
+return _t[[During your adventures you will find items.
 Each item has a weight. How much you can carry depends on your Strength: this is your maximum encumbrance.
 To pickup an item, press 'g' or right click on yourself and choose 'Pickup item' while standing over it.
 To view your inventory, press 'i' or right-click on yourself and choose 'Inventory'.

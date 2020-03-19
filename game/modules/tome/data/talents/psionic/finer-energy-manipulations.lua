@@ -63,7 +63,7 @@ newTalent{
 			end
 		end
 		if known then
-			game.logSeen(self, "%s is cured!", self.name:capitalize())
+			game.logSeen(self, "%s is cured!", self:getName():capitalize())
 		end
 		
 		if core.shader.active(4) then
@@ -78,7 +78,7 @@ newTalent{
 		local cure = t.numCure(self, t)
 		return ([[Realign and readjust your body with the power of your mind, curing up to %d detrimental physical effects and healing you for %d life.
 		The life healed increases with your Mindpower.]]):
-		format(cure, heal)
+		tformat(cure, heal)
 	end,
 }
 
@@ -118,7 +118,7 @@ newTalent{
 		The accuracy and damage of any weapon will act as if it were %d higher. (Mindstars cannot be manipulated in this way because they are already in an ideal natural state.)
 		Your total armour will increase by %d and your fatigue will decrease by %d for each body armour and shield worn.
 		The effects increase with your Mindpower.]]):
-		format(weapon_boost, arm, fat)
+		tformat(weapon_boost, arm, fat)
 	end,
 }
 
@@ -134,7 +134,7 @@ newTalent{
 		return self:combatTalentMindDamage(t, 10, 40)
 	end,
 	action = function(self, t)
-		local ret = self:talentDialog(self:showInventory("Use which gem?", self:getInven("INVEN"), function(gem) return gem.type == "gem" and gem.material_level and not gem.unique end, function(gem, gem_item)
+		local ret = self:talentDialog(self:showInventory(_t"Use which gem?", self:getInven("INVEN"), function(gem) return gem.type == "gem" and gem.material_level and not gem.unique end, function(gem, gem_item)
 			self:removeObject(self:getInven("INVEN"), gem_item)
 			local amt = t.energy_per_turn(self, t)
 			local dur = 3 + 2*(gem.material_level or 0)
@@ -150,7 +150,7 @@ newTalent{
 		return ([[Matter is energy, as any good Mindslayer knows. Unfortunately, the various bonds and particles involved are just too numerous and complex to make the conversion feasible in most cases. The ordered, crystalline structure of a gem, however, make it possible to transform a small percentage of its matter into usable energy.
 		This talent consumes one gem and grants %d psi per turn for between 5 and 13 turns, depending on the quality of the gem used.
 		This process also creates a resonance field that provides the (imbued) effects of the gem to you while this effect lasts.]]):
-		format(amt)
+		tformat(amt)
 	end,
 }
 
@@ -179,6 +179,6 @@ newTalent{
 		For conventional weapons, this increases the percentage of your willpower and cunning that is used in place of strength and dexterity for all weapon attacks, from 60%% to %d%%.
 		For mindstars, this increases the chance to pull enemies to you by +%d%%.
 		For gems, this increases the bonus stats by %d.]]):
-		format(60+inc, inc, math.ceil(inc/5))
+		tformat(60+inc, inc, math.ceil(inc/5))
 	end,
 }

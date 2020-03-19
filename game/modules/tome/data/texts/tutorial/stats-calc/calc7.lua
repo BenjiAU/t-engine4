@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 Did you try shoving both the enemies blocking passage into this room? 
 
 Can you say now which #GOLD#combat stats#WHITE# get compared when you Shove somebody?

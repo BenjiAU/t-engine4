@@ -18,11 +18,11 @@
 -- darkgod@te4.org
 
 return {
-	name = "Dreams",
+	name = _t"Dreams",
 	display_name = function(x, y)
-		if game.level.level == 1 then return "Dream of vulnerability" end
-		if game.level.level == 2 then return "Dream of loss" end
-		return "Dream ???"
+		if game.level.level == 1 then return _t"Dream of vulnerability" end
+		if game.level.level == 2 then return _t"Dream of loss" end
+		return _t"Dream ???"
 	end,
 	variable_zone_name = true,
 	level_range = {1, 1},
@@ -196,7 +196,7 @@ return {
 		-- Dream of vulnerability
 		if lev == 1 then
 			game.level.data.enter_dreams{
-				name = "frail mouse", image = "npc/vermin_rodent_giant_white_mouse.png",
+				name = _t"frail mouse", image = "npc/vermin_rodent_giant_white_mouse.png",
 				type = "vermin", subtype = "rodent",
 				display = "r", color=colors.WHITE,
 				infravision = 10,
@@ -227,12 +227,12 @@ return {
 					T_NIMBLE_MOVEMENTS = 3,
 					T_PIERCING_SIGHT = 30,
 				},
-				msg =  [[The noxious fumes have invaded all your body, you suddenty fall into a deep slumber...
+				msg =  _t[[The noxious fumes have invaded all your body, you suddenty fall into a deep slumber...
 ... you feel weak ...
 ... you feel unimportant ...
 ... you feel like ... food ...
 You feel like running away!]],
-				success_msg = [[As your mind-mouse enters the dream portal you suddenly wake up.
+				success_msg = _t[[As your mind-mouse enters the dream portal you suddenly wake up.
 You feel good!]],
 				dream = "mice",
 			}
@@ -241,7 +241,7 @@ You feel good!]],
 		-- Dream of loss
 		if lev == 2 then
 			game.level.data.enter_dreams{
-				name = "lost man", image = "npc/humanoid_human_townsfolk_meanlooking_mercenary01_64.png",
+				name = _t"lost man", image = "npc/humanoid_human_townsfolk_meanlooking_mercenary01_64.png",
 				type = "humanoid", subtype = "human",
 				display = "h", color=colors.VIOLET,
 				infravision = 10,
@@ -251,12 +251,12 @@ You feel good!]],
 				max_life = 100, life_regen = 0,
 				resolvers.talents{
 				},
-				msg = [[The noxious fumes have invaded all your body, you suddenty fall into a deep slumber...
+				msg = _t[[The noxious fumes have invaded all your body, you suddenty fall into a deep slumber...
 ... you feel you forgot something ...
 ... you feel lost ...
 ... you feel sad ...
 You forgot your wife! Find her!]],
-				success_msg = [[As you enter the dream portal you suddenly wake up.
+				success_msg = _t[[As you enter the dream portal you suddenly wake up.
 You feel good!]],
 				dream = "lost",
 			}
@@ -295,7 +295,7 @@ You feel good!]],
 		f.energy.value = 1000
 		game.paused = true
 		game.player:updateMainShader()
-		require("engine.ui.Dialog"):simpleLongPopup("Deep slumber...", t.msg, 600)
+		require("engine.ui.Dialog"):simpleLongPopup(_t"Deep slumber...", t.msg, 600)
 	end,
 	leave_dreams = function(self, msg, dream)
 		local danger = game.level.data.danger
@@ -313,14 +313,14 @@ You feel good!]],
 				world:gainAchievement("ALL_DREAMS", self.summoner, dream)
 			end
 			if self.success and danger then
-				require("engine.ui.Dialog"):simpleLongPopup("Deep slumber...", msg, 600)
+				require("engine.ui.Dialog"):simpleLongPopup(_t"Deep slumber...", msg, 600)
 				game.logPlayer(game.player, msg:gsub("\n", " "))
 				game.player:setEffect(game.player.EFF_VICTORY_RUSH_ZIGUR, 4, {})
 			elseif danger then
-				local msg = [[As you die in a dream you suddenly wake up.
+				local msg = _t[[As you die in a dream you suddenly wake up.
 Poisonous fumes take their toll on your body!]]
 				game.logPlayer(game.player)
-				require("engine.ui.Dialog"):simpleLongPopup("Deep slumber...", msg, 600)
+				require("engine.ui.Dialog"):simpleLongPopup(_t"Deep slumber...", msg, 600)
 				local hit = math.max(0, game.player.life * 2 / 3)
 				game:onTickEnd(game.player:setEffect(game.player.EFF_DEATH_DREAM, 4, {power=hit/4}))
 			end

@@ -32,9 +32,9 @@ newTalent{
 	getMaxDuration = function(self, t)
 		return 8
 	end,
-	getMovementSpeedChange = function(self, t) return self:combatTalentScale(t, 1.4, 3.13, 0.75) end, --Nerf this?
-	getCombatPhysSpeedChange = function(self, t) return self:combatTalentScale(t, 0.224, 0.5, 0.75) end,
-	getCombatMindSpeedChange = function(self, t) return self:combatTalentScale(t, 0.224, 0.5, 0.75) end,
+	getMovementSpeedChange = function(self, t) return self:combatTalentScale(t, 0.885, 2.12, 0.75) end,
+	getCombatPhysSpeedChange = function(self, t) return self:combatTalentScale(t, 0.18, 0.395) end,
+	getCombatMindSpeedChange = function(self, t) return self:combatTalentScale(t, 0.18, 0.395) end,
 	on_pre_use = function(self, t, silent)
 		if self:hasEffect(self.EFF_RAMPAGE) then 
 			if not silent then game.logPlayer(self, "You are already rampaging!") end
@@ -92,7 +92,7 @@ newTalent{
 		Any talent, rune or infusion you use while rampaging becomes a distraction, and reduces the duration of the rampage by 1. Your first movement while rampaging increases the rampage duration by 1.
 		Rampage Bonus: +%d%% movement speed.
 		Rampage Bonus: +%d%% attack speed.
-		Rampage Bonus: +%d%% mind speed.]]):format(duration, maxDuration, movementSpeedChange * 100, combatPhysSpeedChange * 100, combatMindSpeedChange *100)
+		Rampage Bonus: +%d%% mind speed.]]):tformat(duration, maxDuration, movementSpeedChange * 100, combatPhysSpeedChange * 100, combatMindSpeedChange *100)
 	end,
 }
 
@@ -115,7 +115,7 @@ newTalent{
 		local combatMentalResistChange = t.getCombatMentalResistChange(self, t)
 		return ([[You attack with mindless brutality. The first critical hit inflicted while rampaging increases the rampage duration by 1.
 		Rampage Bonus: Your physical damage increases by %d%%.
-		Rampage Bonus: Your Physical Save increases by %d and Mental Save increases by %d.]]):format(physicalDamageChange, combatPhysResistChange, combatMentalResistChange)
+		Rampage Bonus: Your Physical Save increases by %d and Mental Save increases by %d.]]):tformat(physicalDamageChange, combatPhysResistChange, combatMentalResistChange)
 	end,
 }
 
@@ -140,7 +140,7 @@ newTalent{
 		local damageShieldBonus = t.getDamageShieldBonus(self, t)
 		return ([[Nothing will stop your rampage.
 		Rampage Bonus: You shrug off up to %d damage each turn during your rampage. If you shrug off more than %d damage, the rampage duration increases by 1.
-		The amount of damage you can shrug off improves with your Strength.]]):format(damageShield, damageShieldBonus)
+		The amount of damage you can shrug off improves with your Strength.]]):tformat(damageShield, damageShieldBonus)
 	end,
 }
 
@@ -188,12 +188,12 @@ newTalent{
 			local y = self.y + math.floor((i % 9) / 3) - 1
 			local target = game.level.map(x, y, Map.ACTOR)
 			if target and not target.dead and self:reactionToward(target) < 0 then
-				game.logSeen(self, "#F53CBE#%s slams %s!", self.name:capitalize(), target.name)
+				game.logSeen(self, "#F53CBE#%s slams %s!", self:getName():capitalize(), target:getName())
 				DamageType:get(DamageType.PHYSICAL).projector(self, target.x, target.y, DamageType.PHYSICAL, damage)
 				if target:canBe("stun") then
 					target:setEffect(target.EFF_STUNNED, stunDuration, {apply_power=self:combatPhysicalpower()})
 				else
-					game.logSeen(target, "#F53CBE#%s resists the stunning blow!", target.name:capitalize())
+					game.logSeen(target, "#F53CBE#%s resists the stunning blow!", target:getName():capitalize())
 				end
 			
 				hitCount = hitCount - 1
@@ -217,6 +217,6 @@ newTalent{
 		local stunDuration = t.getStunDuration(self, t)
 		local damage = t.getDamage(self, t)
 		return ([[While rampaging, you slam up to %d adjacent opponents, stunning them for %d turns and damaging them for between %d and %d physical damage. Your first slam of at least two opponents increases the rampage duration by 1.
-		Damage increases with your Physical Power.]]):format(hitCount, stunDuration, damage * 0.5, damage)
+		Damage increases with your Physical Power.]]):tformat(hitCount, stunDuration, damage * 0.5, damage)
 	end,
 }

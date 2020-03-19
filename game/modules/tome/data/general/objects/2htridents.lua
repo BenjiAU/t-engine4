@@ -30,7 +30,7 @@ newEntity{
 	metallic = true,
 	no_rust = true,
 	combat = { talented = "trident", accuracy_effect = "mace", damrange = 1.6, physspeed = 1, sound = {"actions/melee", pitch=0.6, vol=1.2}, sound_miss = {"actions/melee", pitch=0.6, vol=1.2} },
-	desc = [[A two-handed massive trident.
+	desc = _t[[A two-handed massive trident.
 Tridents require the exotic weapons mastery talent to use correctly.]],
 	twohanded = true,
 	ego_bonus_mult = 0.4,

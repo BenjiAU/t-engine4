@@ -26,21 +26,21 @@ module(..., package.seeall, class.make)
 
 --- Initializes resting
 function _M:restInit(turns, what, past, on_end, on_very_end)
-	what = what or "resting"
-	past = past or "rested"
+	what = what or _t"resting"
+	past = past or _t"rested"
 	self.resting = {
 		rest_turns = turns,
 		past = past,
 		on_end = on_end,
 		on_very_end = on_very_end,
 		cnt = 0,
-		dialog = Dialog:simplePopup(what:capitalize().."...", "You are "..what..", press Enter to stop.", function()
+		dialog = Dialog:simplePopup(("%s..."):tformat(what:capitalize()), ("You are %s, press Enter to stop."):tformat(what), function()
 			self:restStop()
 		end),
 	}
 	self.resting.dialog.__showup = nil
 
-	game.log(what:capitalize().." starts...")
+	game.log("%s starts...", what:capitalize())
 
 	self:onRestStart()
 
@@ -99,9 +99,9 @@ function _M:restStop(msg)
 	game:unregisterDialog(self.resting.dialog)
 
 	if msg then
-		game.log(self.resting.past:capitalize().." for %d turns (stop reason: %s).", self.resting.cnt, msg)
+		game.log("%s for %d turns (stop reason: %s).", self.resting.past:capitalize(), self.resting.cnt, msg)
 	else
-		game.log(self.resting.past:capitalize().." for %d turns.", self.resting.cnt)
+		game.log("%s for %d turns.", self.resting.past:capitalize(), self.resting.cnt)
 	end
 
 	local finish = self.resting.cnt and self.resting.rest_turns and self.resting.cnt > self.resting.rest_turns

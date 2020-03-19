@@ -18,23 +18,23 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*You place your hands on the orb.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*You place your hands on the orb.*#WHITE#
 You must provide 150 gold to take part in the fight.]],
 	answers = {
-		{"[Pay 150 gold]", jump="pay",
+		{_t"[Pay 150 gold]", jump="pay",
 			cond=function(npc, player)
 				return player:hasQuest("ring-of-blood") and player:hasQuest("ring-of-blood"):find_master() and player.money >= 150
 			end,
 			action=function(npc, player) player:incMoney(-150) end
 		},
-		{"[Leave]"},
+		{_t"[Leave]"},
 	}
 }
 
 newChat{ id="pay",
-	text = [[Let the fight start!]],
+	text = _t[[Let the fight start!]],
 	answers = {
-		{"Bring it on!", action=function(npc, player) player:hasQuest("ring-of-blood"):start_game() end},
+		{_t"Bring it on!", action=function(npc, player) player:hasQuest("ring-of-blood"):start_game() end},
 	}
 }
 

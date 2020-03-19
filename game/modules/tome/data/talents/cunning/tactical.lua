@@ -56,7 +56,7 @@ newTalent{
 		local defense = t.getDefense(self, t)
 		local maximum = t.getMaximum(self, t)
 		return ([[Your Defense is increased by %d for every adjacent visible foe, up to a maximum of +%d Defense.
-		The Defense increase per enemy and maximum Defense bonus will scale with your Cunning.]]):format(defense, maximum)
+		The Defense increase per enemy and maximum Defense bonus will scale with your Cunning.]]):tformat(defense, maximum)
 	end,
 }
 
@@ -102,7 +102,7 @@ newTalent{
 				end
 			end
 		else
-			game.logSeen(self, "%s counters the attack!", target.name:capitalize())
+			game.logSeen(self, "%s counters the attack!", target:getName():capitalize())
 		end
 	end,
 	on_unlearn = function(self, t)
@@ -112,7 +112,7 @@ newTalent{
 		local damage = t.getDamage(self, t) * 100
 		return ([[When you avoid a melee blow from an adjacent foe, you have a %d%% chance to get a free, automatic melee attack against the attacker for %d%% damage, up to %0.1f times per turn.
 		Unarmed fighters using it will also attempt to throw the target to the ground if the attack lands, dazing them for 2 turns or stunning them for 2 turns if the target is grappled.
-		The chance of countering and number of counter attacks increase with your Cunning.]]):format(t.counterchance(self,t), damage,  t.getCounterAttacks(self, t))
+		The chance of countering and number of counter attacks increase with your Cunning.]]):tformat(t.counterchance(self,t), damage,  t.getCounterAttacks(self, t))
 	end,
 }
 
@@ -139,7 +139,7 @@ newTalent{
 		local defense = t.getDefense(self, t)
 		return ([[Increases Defense by %d for %d turns.  When you avoid a melee blow, you set the target up, increasing the chance of you landing a critical strike on them by %d%% and reducing their saving throws by %d.
 		The effects will scale with your Cunning.]])
-		:format(defense, duration, power, power)
+		:tformat(defense, duration, power, power)
 	end,
 }
 
@@ -169,6 +169,6 @@ newTalent{
 	info = function(self, t)
 		local reduction = t.getReductionMax(self, t)
 		return ([[Systematically find the weaknesses in your opponents' physical resists, at the cost of 10%% of your physical damage.  Each time you hit an opponent with a melee attack, you reduce their physical resistance by 5%%, up to a maximum of %d%%.
-		]]):format(reduction)
+		]]):tformat(reduction)
 	end,
 }

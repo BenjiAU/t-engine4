@@ -262,10 +262,10 @@ newEntity{
 		combat_spellpower = resolvers.mbonus_material(10, 8),
 		mana_regen = resolvers.mbonus_material(50, 10, function(e, v) v=v/100 return 0, v end),
 	},
-	resolvers.charm("channel mana (increasing mana regeneration by 2000%% for 5 turns)", 30,
+	resolvers.charm(_t"channel mana (increasing mana regeneration by 2000%% for 5 turns)", 30,
 		function(self, who)
 			if who.mana_regen > 0 and not who:hasEffect(who.EFF_MANASURGE) then
-				game.logSeen(who, "%s channels mana through %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
+				game.logSeen(who, "%s channels mana through %s %s!", who:getName():capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
 				who:setEffect(who.EFF_MANASURGE, 5, {power=who.mana_regen * 20})
 			else
 				if who.mana_regen < 0 then
@@ -322,7 +322,7 @@ newEntity{
 			local radius = self.use_power.radius(self)
 			local dam = who:damDesc(damtype, self.use_power.damage(self, who))
 			local damrange = self.use_power.damrange(self, who)
-			return ("conjure elemental energy in a radius %d cone, dealing %0.2f to %0.2f %s damage"):format( radius, dam, dam*damrange, damtype.name)
+			return ("conjure elemental energy in a radius %d cone, dealing %0.2f to %0.2f %s damage"):tformat( radius, dam, dam*damrange, damtype.name)
 		end,
 		8,
 		function(self, who)
@@ -357,7 +357,7 @@ newEntity{
 			local damTyp = DamageType:get(damtype or "ARCANE")
 			dam = rng.range(dam, dam * damrange)
 			dam = who:spellCrit(dam)
-			game.logSeen(who, "%s channels a cone of %s%s#LAST# energy through %s %s!", who.name:capitalize(), damTyp.text_color, damTyp.name, who:his_her(), self:getName({no_add_name = true, do_color = true}))
+			game.logSeen(who, "%s channels a cone of %s%s#LAST# energy through %s %s!", who:getName():capitalize(), damTyp.text_color, damTyp.name, who:his_her(), self:getName({no_add_name = true, do_color = true}))
 			who:project(tg, x, y, damtype, dam, {type=explosion})
 
 			game:playSoundNear(who, "talents/arcane")

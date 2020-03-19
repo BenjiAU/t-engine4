@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 Sucker can dodge some.
 
 As you know by now, the game was comparing your #LIGHT_GREEN#Accuracy#WHITE# to the orc's #LIGHT_GREEN#Defense#WHITE# to determine whether your blows landed. Evidently, the comparison did not go well for you.

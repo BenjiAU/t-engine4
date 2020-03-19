@@ -108,7 +108,7 @@ function _M:display()
 
 	local x, y = 0, 0
 	for i, a in ipairs(l) do
-		self.surface:drawColorStringBlended(self.font, ("%s (%d)#WHITE#; distance [%s]"):format(a.name, a.nb, table.concat(a.dist, ",")), x, y, a.color[1], a.color[2], a.color[3])
+		self.surface:drawColorStringBlended(self.font, ("%s (%d)#WHITE#; distance [%s]"):tformat(a.name, a.nb, table.concat(a.dist, ",")), x, y, a.color[1], a.color[2], a.color[3])
 		y = y + self.font_h
 		if y + self.font_h >= self.h then y = 0 x = x + math.floor(self.w / self.nb_cols) end
 	end

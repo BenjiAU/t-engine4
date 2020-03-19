@@ -26,7 +26,7 @@ function _M:init()
 end
 
 function _M:addItem(id)
-	self.cart[#self.cart+1] = { name="Test", desc="Test desc", kind="cosmetic", cost=100 }
+	self.cart[#self.cart+1] = { name=_t"Test", desc="Test desc", kind="cosmetic", cost=100 }
 end
 
 function _M:purchase()

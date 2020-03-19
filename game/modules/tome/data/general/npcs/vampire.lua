@@ -23,7 +23,7 @@ newEntity{
 	define_as = "BASE_NPC_VAMPIRE",
 	type = "undead", subtype = "vampire",
 	display = "V", color=colors.WHITE,
-	desc = [[These ancient cursed beings often take the form of a bat and attack their prey.]],
+	desc = _t[[These ancient cursed beings often take the form of a bat and attack their prey.]],
 
 	combat = { dam=resolvers.levelup(resolvers.mbonus(30, 10), 1, 0.8), atk=10, apr=9, damtype=DamageType.DRAINLIFE, dammod={str=1.9} },
 
@@ -61,7 +61,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_VAMPIRE",
 	name = "lesser vampire", color=colors.SLATE, image = "npc/lesser_vampire.png",
-	desc=[[This vampire has only just begun its new life. It has not yet fathomed its newfound power, yet it still has a thirst for blood.]],
+	desc=_t[[This vampire has only just begun its new life. It has not yet fathomed its newfound power, yet it still has a thirst for blood.]],
 	level_range = {10, nil}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(40,50),
@@ -75,7 +75,7 @@ newEntity{ base = "BASE_NPC_VAMPIRE",
 
 newEntity{ base = "BASE_NPC_VAMPIRE",
 	name = "vampire", color=colors.SLATE, image = "npc/vampire.png",
-	desc=[[It is a humanoid with an aura of power. You notice a sharp set of front teeth.]],
+	desc=_t[[It is a humanoid with an aura of power. You notice a sharp set of front teeth.]],
 	level_range = {15, nil}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(70,80),
@@ -92,7 +92,7 @@ newEntity{ base = "BASE_NPC_VAMPIRE",
 newEntity{ base = "BASE_NPC_VAMPIRE",
 	name = "master vampire", color=colors.GREEN, image = "npc/master_vampire.png",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/master_vampire.png", display_h=2, display_y=-1}}},
-	desc=[[It is a humanoid form dressed in robes. Power emanates from its chilling frame.]],
+	desc=_t[[It is a humanoid form dressed in robes. Power emanates from its chilling frame.]],
 	level_range = {20, nil}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(80,90),
@@ -109,7 +109,7 @@ newEntity{ base = "BASE_NPC_VAMPIRE",
 
 newEntity{ base = "BASE_NPC_VAMPIRE",
 	name = "elder vampire", color=colors.RED, image = "npc/elder_vampire.png",
-	desc=[[A terrible robed undead figure, this creature has existed in its unlife for many centuries by stealing the life of others.
+	desc=_t[[A terrible robed undead figure, this creature has existed in its unlife for many centuries by stealing the life of others.
 It can summon the very shades of its victims from beyond the grave to come enslaved to its aid.]],
 	level_range = {25, nil}, exp_worth = 1,
 	rarity = 1,
@@ -132,7 +132,7 @@ It can summon the very shades of its victims from beyond the grave to come ensla
 
 newEntity{ base = "BASE_NPC_VAMPIRE",
 	name = "vampire lord", color=colors.BLUE, image = "npc/vampire_lord.png",
-	desc=[[A foul wind chills your bones as this ghastly figure approaches.]],
+	desc=_t[[A foul wind chills your bones as this ghastly figure approaches.]],
 	level_range = {30, nil}, exp_worth = 1,
 	rarity = 4,
 	max_life = resolvers.rngavg(100,120),

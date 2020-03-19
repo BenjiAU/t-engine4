@@ -26,7 +26,7 @@ module(..., package.seeall, class.inherit(engine.ui.Dialog))
 
 function _M:init()
 	self:generateList()
-	engine.ui.Dialog.init(self, "DEBUG -- Summon Creature", 1, 1)
+	engine.ui.Dialog.init(self, _t"DEBUG -- Summon Creature", 1, 1)
 
 	local list = List.new{width=400, height=500, list=self.list, fct=function(item) self:use(item) end}
 
@@ -153,15 +153,15 @@ function _M:generateList()
 		return a.name < b.name
 	end)
 
-	table.insert(list, 1, {name = "#YELLOW#Random Actor#LAST#", action=function(item)
+	table.insert(list, 1, {name = _t"#YELLOW#Random Actor#LAST#", action=function(item)
 		game:registerDialog(require("mod.dialogs.debug.RandomActor").new())
 	end})
 
-	table.insert(list, 1, {name = "#PINK#Test Dummy#LAST#", action=function(item)
+	table.insert(list, 1, {name = _t"#PINK#Test Dummy#LAST#", action=function(item)
 		local m = mod.class.NPC.new{define_as="TRAINING_DUMMY",
 			type = "training", subtype = "dummy",
-			name = "Test Dummy", color=colors.GREY,
-			desc = "Test dummy.", image = "npc/lure.png",
+			name = _t"Test Dummy", color=colors.GREY,
+			desc = _t"Test dummy.", image = "npc/lure.png",
 			level_range = {1, 1}, exp_worth = 0,
 			rank = 3,
 			max_life = 300000, life_rating = 0,

@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 Have you determined what's causing those new timed effects?
 
 If not, then consider the following questions:

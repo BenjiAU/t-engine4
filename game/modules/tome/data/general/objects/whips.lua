@@ -28,7 +28,7 @@ newEntity{
 	rarity = 5,
 	metallic = true,
 	combat = { talented = "whip", accuracy_effect = "sword", damrange = 1.1, physspeed = 0.8, sound = "actions/whip_hit", sound_miss = "actions/whip_miss",},
-	desc = [[Sharp, long and deadly.]],
+	desc = _t[[Sharp, long and deadly.]],
 	randart_able = "/data/general/objects/random-artifacts/generic.lua",
 	egos = "/data/general/objects/egos/weapon.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 }

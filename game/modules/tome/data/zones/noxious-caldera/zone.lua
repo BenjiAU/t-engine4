@@ -18,8 +18,8 @@
 -- darkgod@te4.org
 
 return {
-	name = "Noxious Caldera",
-	display_name = function(x, y) return "Dogroth Caldera" end,
+	name = _t"Noxious Caldera",
+	display_name = function(x, y) return _t"Dogroth Caldera" end,
 	variable_zone_name = true,
 	level_range = {25, 35},
 	level_scheme = "player",
@@ -135,7 +135,7 @@ return {
 
 		game.level.turn_counter = 60 * 10 * (game.level.level == 1 and 10 or 1)
 		game.level.max_turn_counter = 60 * 10 * (game.level.level == 1 and 10 or 1)
-		game.level.turn_counter_desc = "The noxious fumes of the caldera are slowly affecting you..."
+		game.level.turn_counter_desc = _t"The noxious fumes of the caldera are slowly affecting you..."
 	end,
 
 	on_turn = function(self)
@@ -154,7 +154,7 @@ return {
 	max_dreams = 2,
 	run_dream = function(dangerous, dream)
 		game.party:setPlayer(game:getPlayer(true))
-		if game.player.runStop then game.player:runStop("dream") end
+		if game.player.runStop then game.player:runStop(_t"dream") end
 		local Map = require "engine.Map"
 		for pmem, def in pairs(game.party.members) do
 			if pmem.x and pmem.y and game.level.map(pmem.x, pmem.y, Map.ACTOR) == pmem then

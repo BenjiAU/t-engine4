@@ -219,7 +219,7 @@ function _M:makeEndgameFixed()
 	game.zone.object_list = obj_list
 	for _, name in pairs(endgame_fixed_artifacts) do
 			local o = game.zone:makeEntityByName(game.level, "object", name)
-			if not o then game.log("Failed to generate "..name) break end
+			if not o then game.log("Failed to generate %s", name) break end
 			o:identify(true)
 			game.zone:addEntity(game.level, o, "object")
 			game.player:addObject(game.player:getInven("INVEN"), o)

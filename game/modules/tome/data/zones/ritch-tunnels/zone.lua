@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Ritches Tunnels",
+	name = _t"Ritches Tunnels",
 	level_range = {1, 5},
 	level_scheme = "player",
 	max_level = 3,

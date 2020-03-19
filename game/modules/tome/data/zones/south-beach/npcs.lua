@@ -28,7 +28,7 @@ newEntity{
 	image = "player/cornac_female_redhair.png",
 	moddable_tile = "human_female",
 	moddable_tile_base = "base_redhead_01.png",
-	desc = [[Enjoying a lovely day at the beach.]],
+	desc = _t[[Enjoying a lovely day at the beach.]],
 	autolevel = "tank",
 	ai = "move_complex", ai_state = { ai_target="target_player", talent_in=4, },
 	stats = { str=8, dex=7, mag=8, con=12 },
@@ -63,7 +63,7 @@ newEntity{
 			local DamageType = require "engine.DamageType"
 			DamageType:get(DamageType.BLIGHT).projector(self, e.x, e.y, DamageType.BLIGHT, 10000)
 		end
-		self:doEmote("What..! Please lets run!", 120)
+		self:doEmote(_t"What..! Please lets run!", 120)
 		game.player:setQuestStatus("love-melinda", engine.Quest.COMPLETED, "saved-beach")
 		game.bignews:say(120, "#DARK_GREEN#As Melinda is about to die a powerful wave of blight emanates from her!")
 	end,

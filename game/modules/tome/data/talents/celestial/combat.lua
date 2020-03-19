@@ -62,7 +62,7 @@ newTalent{
 		return ([[Infuse your weapon with the power of the Sun, adding %0.1f light damage on each melee hit.
 		Additionally, if you have a temporary damage shield active, melee hits will increase its power by %d once per turn.
 		The damage dealt and shield bonus will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHT, damage), shieldflat)
+		tformat(damDesc(self, DamageType.LIGHT, damage), shieldflat)
 	end,
 }
 
@@ -100,7 +100,7 @@ newTalent{
 			self:attackTarget(target, nil, t.getDamage(self, t), true)
 			local range = core.fov.distance(self.x, self.y, target.x, target.y)
 			if range > 1 and rng.percent(t.SecondStrikeChance(self, t, range)) then
-				game.logSeen(self, "#CRIMSON#"..self.name.."strikes twice with Wave of Power!#NORMAL#")
+				game.logSeen(self, "#CRIMSON#%sstrikes twice with Wave of Power!#NORMAL#", self:getName())
 				self:attackTarget(target, nil, t.getDamage(self, t, true), true)
 			end
 		else
@@ -114,7 +114,7 @@ newTalent{
 		If the target is outside of melee range, you have a chance to project a second attack against it for %d%% weapon damage.
 		The second strike chance (which increases with distance) is %0.1f%% at range 2 and %0.1f%% at the maximum range of %d.
 		The range will increase with your Strength.]]):
-		format(t.getDamage(self, t)*100, t.getDamage(self, t, true)*100, t.SecondStrikeChance(self, t, 2), t.SecondStrikeChance(self, t, range), range)
+		tformat(t.getDamage(self, t)*100, t.getDamage(self, t, true)*100, t.SecondStrikeChance(self, t, 2), t.SecondStrikeChance(self, t, range), range)
 	end,
 }
 
@@ -167,7 +167,7 @@ newTalent{
 		return ([[Your weapon attacks burn with righteous fury, dealing %d%% of your lost HP as additional Fire damage (up to %d, Current:  %d).
 		Targets struck are also afflicted with a Martyrdom effect that causes them to take %d%% of all damage they deal for 4 turns.
 		The bonus damage can only occur once per turn.]]):
-		format(damagepct*100, t.getMaxDamage(self, t, 10, 400), damage, martyr)
+		tformat(damagepct*100, t.getMaxDamage(self, t, 10, 400), damage, martyr)
 	end,
 }
 
@@ -199,6 +199,6 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Any attack that would drop you below 1 hit point instead triggers Second Life, deactivating the talent, setting your hit points to 1, then healing you for %d.]]):
-		format(t.getLife(self, t))
+		tformat(t.getLife(self, t))
 	end,
 }

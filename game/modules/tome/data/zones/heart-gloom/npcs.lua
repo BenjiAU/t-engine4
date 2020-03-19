@@ -30,7 +30,7 @@ if not currentZone.is_purified then
 				local list = {"T_GLOOM", "T_AGONY", "T_REPROACH", "T_DARK_TENDRILS", "T_BLINDSIDE"}
 				e[#e+1] = resolvers.talents{[ Talents[rng.table(list)] ] = {base=1, every=5, max=6}}
 				e.rarity = math.ceil(e.rarity * mult + add)
-				e.name = rng.table{"gloomy ", "deformed ", "sick "}..e.name
+				e.name = rng.table{_t"gloomy ", _t"deformed ", _t"sick "}..e:getName()
 			end
 		end
 	end
@@ -43,7 +43,7 @@ else
 				local list = {"T_PYROKINESIS", "T_DREAM_CRUSHER", "T_FORGE_SHIELD", "T_SOLIPSISM", "T_DREAM_WALK"}
 				e[#e+1] = resolvers.talents{[ Talents[rng.table(list)] ] = {base=1, every=5, max=6}}
 				e.rarity = math.ceil(e.rarity * mult + add)
-				e.name = rng.table{"dreaming ", "slumbering ", "dozing "}..e.name
+				e.name = rng.table{_t"dreaming ", _t"slumbering ", _t"dozing "}..e:getName()
 			end
 		end
 	end
@@ -60,8 +60,8 @@ newEntity{ base="BASE_NPC_CANINE", define_as = "WITHERING_THING",
 	unique = true,
 	name = "The Withering Thing", tint=colors.PURPLE,
 	color=colors.VIOLET,
-	desc = [[This deformed beast might have been a wolf before, but now it is just... terrible.]],
-	killer_message = "and corrupted into a pile of writhing worms",
+	desc = _t[[This deformed beast might have been a wolf before, but now it is just... terrible.]],
+	killer_message = _t"and corrupted into a pile of writhing worms",
 	level_range = {7, nil}, exp_worth = 2,
 	max_life = 100, life_rating = 15, fixed_rating = true,
 	stats = { str=20, dex=20, cun=12, wil=20, con=10 },
@@ -107,8 +107,8 @@ newEntity{ define_as = "DREAMING_ONE",
 	unique = true,
 	name = "The Dreaming One", tint=colors.PURPLE,
 	color=colors.VIOLET, image = "npc/seed_of_dreams.png",
-	desc = [[This strange globe of blue light seems to be alive and asleep. Nothing about it moves, yet you can feel the crushing power of its dreams assaulting your mind.]],
-	killer_message = "and absorbed into nightmares forever",
+	desc = _t[[This strange globe of blue light seems to be alive and asleep. Nothing about it moves, yet you can feel the crushing power of its dreams assaulting your mind.]],
+	killer_message = _t"and absorbed into nightmares forever",
 	level_range = {7, nil}, exp_worth = 2,
 	max_life = 70, life_rating = 10, fixed_rating = true,
 	stats = { str=10, dex=10, cun=20, wil=25, con=10 },

@@ -17,28 +17,28 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Madness of the Ages"
+name = _t"Madness of the Ages"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "The Thaloren forest is disrupted. Corruption is spreading. Norgos the guardian bear is said to have gone mad.\n"
-	desc[#desc+1] = "On the western border of the forest a gloomy aura has been set up. Things inside are... twisted.\n"
+	desc[#desc+1] = _t"The Thaloren forest is disrupted. Corruption is spreading. Norgos the guardian bear is said to have gone mad.\n"
+	desc[#desc+1] = _t"On the western border of the forest a gloomy aura has been set up. Things inside are... twisted.\n"
 	if self:isCompleted("norgos") then
 		if self:isCompleted("norgos-invaded") then
-			desc[#desc+1] = "#LIGHT_GREEN#* You have explored Norgos' Lair and stopped the shivgoroth invasion.#WHITE#"
+			desc[#desc+1] = _t"#LIGHT_GREEN#* You have explored Norgos' Lair and stopped the shivgoroth invasion.#WHITE#"
 		else
-			desc[#desc+1] = "#LIGHT_GREEN#* You have explored Norgos' Lair and put it to rest.#WHITE#"
+			desc[#desc+1] = _t"#LIGHT_GREEN#* You have explored Norgos' Lair and put it to rest.#WHITE#"
 		end
 	else
-		desc[#desc+1] = "#SLATE#* You must explore Norgos' Lair.#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* You must explore Norgos' Lair.#WHITE#"
 	end
 	if self:isCompleted("heart-gloom") then
 		if self:isCompleted("heart-gloom-purified") then
-			desc[#desc+1] = "#LIGHT_GREEN#* You have explored the Heart of the Gloom and slain the Dreaming One.#WHITE#"
+			desc[#desc+1] = _t"#LIGHT_GREEN#* You have explored the Heart of the Gloom and slain the Dreaming One.#WHITE#"
 		else
-			desc[#desc+1] = "#LIGHT_GREEN#* You have explored the Heart of the Gloom and slain the Withering Thing.#WHITE#"
+			desc[#desc+1] = _t"#LIGHT_GREEN#* You have explored the Heart of the Gloom and slain the Withering Thing.#WHITE#"
 		end
 	else
-		desc[#desc+1] = "#SLATE#* You must explore the Heart of the Gloom.#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* You must explore the Heart of the Gloom.#WHITE#"
 	end
 	return table.concat(desc, "\n")
 end

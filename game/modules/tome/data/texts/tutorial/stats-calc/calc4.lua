@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 They were more successful at hitting you, though their damage wasn't enough to be threatening. 
 
 Compare their #LIGHT_GREEN#Accuracy#WHITE#, 14, to your #LIGHT_GREEN#Defense#WHITE#.

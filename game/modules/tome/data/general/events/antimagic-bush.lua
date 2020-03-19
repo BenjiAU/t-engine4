@@ -23,7 +23,7 @@ if not x then return false end
 
 local on_stand = function(self, x, y, who) who:setEffect(who.EFF_ANTIMAGIC_BUSH, 1, {}) end
 local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
-g.name = "antimagic bush"
+g.name = _t"antimagic bush"
 g.display='~' g.color_r=0 g.color_g=255 g.color_b=100 g.notice = true
 g.special_minimap = colors.OLIVE_DRAB
 g.on_stand = on_stand
@@ -46,7 +46,7 @@ for x, yy in pairs(grids) do for y, _ in pairs(yy) do
 	local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
 	g.on_stand = g.on_stand or on_stand
 	if g.on_stand == on_stand and g.type == "floor" then
-		g.name = g.name .. " (antimagic aura)"
+		g.name = ("%s (antimagic aura)"):tformat(_t(g.name))
 		if not g.special_minimap then g.special_minimap = {b=35, g=35, r=85} end
 	end
 	g.always_remember = true

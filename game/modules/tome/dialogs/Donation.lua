@@ -35,38 +35,38 @@ _M.force_ui_inside = "microtxn"
 
 function _M:init(source)
 	self.donation_source = source or "ingame"
-	Dialog.init(self, "Donations", 600, 300)
+	Dialog.init(self, _t"Donations", 600, 300)
 
 	local desc
 	local recur = false
 
 	if not profile.auth or not tonumber(profile.auth.donated) or tonumber(profile.auth.donated) <= 1 or true then
-		local donation_features = { "#GOLD#Character cosmetic customization and special tiles#WHITE#", "#GOLD#Exploration mode (infinite lives)#WHITE#", "#GOLD#Item's appearance change (Shimmering)#WHITE#"}
+		local donation_features = { _t"#GOLD#Character cosmetic customization and special tiles#WHITE#", _t"#GOLD#Exploration mode (infinite lives)#WHITE#", _t"#GOLD#Item's appearance change (Shimmering)#WHITE#"}
 		self:triggerHook{"DonationDialog:features", list=donation_features}
 
 		-- First time donation
-		desc = Textzone.new{width=self.iw, auto_height=true, text=[[Hi, I am Nicolas (DarkGod), the maker of this game.
+		desc = Textzone.new{width=self.iw, auto_height=true, text=([[Hi, I am Nicolas (DarkGod), the maker of this game.
 It is my dearest hope that you find my game enjoyable, and that you will continue to do so for many years to come!
 
 ToME is free and open-source and will stay that way, but that does not mean I can live without money, so I have come to disturb you here and now to ask for your kindness.
 If you feel that the (many) hours you have spent having fun were worth it, please consider making a donation for the future of the game.
 
-Donators are also granted a few special features: ]]..table.concatNice(donation_features, ", ", " and ").."."}
+Donators are also granted a few special features: %s.]]):tformat(table.concatNice(donation_features, ", ", _t" and "))}
 	else
 		-- Recurring donation
 		recur = true
-		desc = Textzone.new{width=self.iw, auto_height=true, text=[[Thank you for supporting ToME, your donation was greatly appreciated.
+		desc = Textzone.new{width=self.iw, auto_height=true, text=_t[[Thank you for supporting ToME, your donation was greatly appreciated.
 If you want to continue supporting ToME you are welcome to make a new donation or even a reccuring one which helps ensure the future of the game.
 Thank you for your kindness!]]}
 	end
 
-	self.c_donate = Numberbox.new{title="Donation amount: ", number=10, max=1000, min=5, chars=5, fct=function() end}
-	self.c_recur = Checkbox.new{title="Monthly donation", default=recur, fct=function() end}
-	local euro = Textzone.new{auto_width=true, auto_height=true, text=[[euro]]}
+	self.c_donate = Numberbox.new{title=_t"Donation amount: ", number=10, max=1000, min=5, chars=5, fct=function() end}
+	self.c_recur = Checkbox.new{title=_t"Monthly donation", default=recur, fct=function() end}
+	local euro = Textzone.new{auto_width=true, auto_height=true, text=_t[[euro]]}
 	local patreon = ButtonImage.new{alpha_unfocus=1, file="ui/patreon.png", fct=function() self:patreon() end}
 	local paypal = ButtonImage.new{alpha_unfocus=1, file="ui/paypal.png", fct=function() self:paypal() end}
-	local cancel = Button.new{text="Cancel", fct=function() self:cancel() end}
-	local patreon_explain = Textzone.new{width=patreon.w, auto_height=true, text=[[You can also make a pledge on Patreon if you prefer.]]}
+	local cancel = Button.new{text=_t"Cancel", fct=function() self:cancel() end}
+	local patreon_explain = Textzone.new{width=patreon.w, auto_height=true, text=_t[[You can also make a pledge on Patreon if you prefer.]]}
 	local hsep = Separator.new{dir="horizontal", size=self.c_donate.h+paypal.h+self.c_recur.h-cancel.h}
 
 	self:loadUI{
@@ -95,7 +95,7 @@ function _M:paypal()
 
 	local inside = jit and jit.os ~= "Linux" and core.webview and true or false
 
-	if not inside then self:simplePopup("Thank you", "Thank you, a paypal page should now open in your browser.") end
+	if not inside then self:simplePopup(_t"Thank you", _t"Thank you, a paypal page should now open in your browser.") end
 
 	local url = ("https://te4.org/ingame-donate/%s/%s/%s/EUR/%s"):format(self.c_donate.number, self.c_recur.checked and "monthly" or "onetime", (profile.auth and profile.auth.drupid) and profile.auth.drupid or "0", self.donation_source)
 
@@ -106,6 +106,6 @@ end
 function _M:patreon()
 	game:unregisterDialog(self)
 
-	self:simplePopup("Thank you", "Thank you, a Patreon page should now open in your browser.")
+	self:simplePopup(_t"Thank you", _t"Thank you, a Patreon page should now open in your browser.")
 	util.browserOpenUrl("https://www.patreon.com/darkgodone", {is_external=true})
 end

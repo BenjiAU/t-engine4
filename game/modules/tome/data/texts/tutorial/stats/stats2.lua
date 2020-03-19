@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 The next three important #GOLD#combat stats#WHITE#:
 
 #LIGHT_GREEN#Physical save: #WHITE#Your ability to shrug off physical effects.

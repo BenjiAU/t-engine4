@@ -24,8 +24,8 @@
 newLore{
 	id = "fearscape-entry",
 	category = "fearscape",
-	name = "a fearsome sight",
-	lore = [[You stand in a field of fire, the flames dancing back and forth like blaze-spawned corn waving in the wind. It licks your feet, your skin, your face, and writhes around in tiny shapes which tear across your flesh and crawl down your throat. It burns and blazes through your body, and crazed thoughts fill your mind. This is Goedalath they tell you, the Fearscape, and you have no rightful place here.
+	name = _t"a fearsome sight",
+	lore = _t[[You stand in a field of fire, the flames dancing back and forth like blaze-spawned corn waving in the wind. It licks your feet, your skin, your face, and writhes around in tiny shapes which tear across your flesh and crawl down your throat. It burns and blazes through your body, and crazed thoughts fill your mind. This is Goedalath they tell you, the Fearscape, and you have no rightful place here.
 
 In the distance you see looming, demonic shapes of absolute darkness, towering above the blazing land like wardens of doom. The sky is black, but above your head hangs a round world that you recognise as Eyal. Across the burning plains gather armies of fiendish figures, and glowing eyes turn up with hateful glowers to your home world. Suddenly both you and it and seem small and frail. As the flames fill your body with pain your only thought is of escape.]],
 }
@@ -33,9 +33,9 @@ In the distance you see looming, demonic shapes of absolute darkness, towering a
 newLore{
 	id = "kryl-feijan-altar",
 	category = "fearscape",
-	name = "sacrificial altar", always_pop = true,
+	name = _t"sacrificial altar", always_pop = true,
 	image = "kryl_feijan_sacrificial_altar.png",
-	lore = [[You see a female human lying unconscious on a black altar, twisted sigils scored into her naked flesh.
+	lore = _t[[You see a female human lying unconscious on a black altar, twisted sigils scored into her naked flesh.
 Around her are several figures in dark robes.
 
 As they notice you one calls out 'Intruder! Protect the seed of Kryl-Feijan!']],

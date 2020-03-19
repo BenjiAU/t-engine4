@@ -18,9 +18,9 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[@playerdescriptor.race@, you have helped me kill the Elf-wench. The Orc Pride thanks you... for now]],
+	text = _t[[@playerdescriptor.race@, you have helped me kill the Elf-wench. The Orc Pride thanks you... for now]],
 	answers = {
-		{"I hate Elves anyway..."},
+		{_t"I hate Elves anyway..."},
 	}
 }
 

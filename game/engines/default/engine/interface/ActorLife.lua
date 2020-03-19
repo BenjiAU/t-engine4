@@ -74,7 +74,7 @@ function _M:takeHit(value, src, death_note)
 	self.changed = true
 	if self.life <= self.die_at and not self.dead then
 		if src and src.on_kill and src:on_kill(self) then return false, value end
-		game.logSeen(self, "#{bold}#%s killed %s!#{normal}#", src and src.name:capitalize() or "something", self.name)
+		game.logSeen(self, "#{bold}#%s killed %s!#{normal}#", src and src:getName():capitalize() or _t"something", self:getName())
 		return self:die(src, death_note), value
 	end
 	return false, value
@@ -99,6 +99,6 @@ end
 -- @param x placeholder
 -- @param y placeholder
 function _M:attack(target, x, y)
-	game.logSeen(target, "%s attacks %s.", self.name:capitalize(), target.name:capitalize())
+	game.logSeen(target, "%s attacks %s.", self.name:capitalize(), target:getName():capitalize())
 	target:takeHit(10, self)
 end

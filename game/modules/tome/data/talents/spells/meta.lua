@@ -115,7 +115,7 @@ newTalent{
 		At level 3, it can be targeted.
 		]]):
 		-- At level 7, it takes no turn to cast.
-		format(count)
+		tformat(count)
 	end,
 }
 
@@ -144,7 +144,7 @@ newTalent{
 		return ([[You learn to finely craft and tune your offensive spells.
 		You try to carve a hole in spells that affect an area to avoid damaging yourself.  The chance of success is %d%%.
 		In addition, you hone your damaging spells to spellshock their targets. Whenever you deal damage with a spell you attempt to spellshock them with %d more Spellpower than normal. Spellshocked targets suffer a temporary 20%% penalty to damage resistances.]]):
-		format(chance, self:combatTalentSpellDamage(t, 10, 320) / 4)
+		tformat(chance, self:combatTalentSpellDamage(t, 10, 320) / 4)
 	end,
 }
 
@@ -171,7 +171,7 @@ newTalent{
 	info = function(self, t)
 		local cooldownred = t.getCooldownReduction(self, t)
 		return ([[Reduces the cooldown of all spells by %d%%.]]):
-		format(cooldownred * 100)
+		tformat(cooldownred * 100)
 	end,
 }
 
@@ -220,6 +220,6 @@ newTalent{
 		local talentcount = t.getTalentCount(self, t)
 		local maxlevel = t.getMaxLevel(self, t)
 		return ([[Your mastery of arcane flows allow you to reset the cooldown of up to %d of your spells (that don't have a fixed cooldown) of tier %d or less.]]):
-		format(talentcount, maxlevel)
+		tformat(talentcount, maxlevel)
 	end,
 }

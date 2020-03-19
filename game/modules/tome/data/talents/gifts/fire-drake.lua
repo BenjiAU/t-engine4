@@ -79,7 +79,7 @@ newTalent{
 		Every level in Wing Buffet additionally raises your Physical Power and Accuracy by 2, passively.
 		Each point in fire drake talents also increases your fire resistance by 1%%.
 
-		This talent will also attack with your shield, if you have one equipped.]]):format(self:getTalentRadius(t),damage*100)
+		This talent will also attack with your shield, if you have one equipped.]]):tformat(self:getTalentRadius(t),damage*100)
 	end,
 }
 
@@ -89,7 +89,7 @@ newTalent{
 	require = gifts_req2,
 	points = 5,
 	random_ego = "attack",
-	message = "@Source@ roars!",
+	message = _t"@Source@ roars!",
 	equilibrium = 8,
 	cooldown = 20,
 	range = 0,
@@ -119,7 +119,7 @@ newTalent{
 		return ([[You let out a powerful roar that sends your foes in radius %d into utter confusion (power: %d%%) for 3 turns.
 		The sound wave is so strong, your foes also take %0.2f physical damage.
 		The damage improves with your Strength.
-		Each point in fire drake talents also increases your fire resistance by 1%%.]]):format(radius, power, self:combatTalentStatDamage(t, "str", 30, 380))
+		Each point in fire drake talents also increases your fire resistance by 1%%.]]):tformat(radius, power, self:combatTalentStatDamage(t, "str", 30, 380))
 	end,
 }
 
@@ -174,7 +174,7 @@ newTalent{
 		return ([[Spit a cloud of flames, doing %0.2f fire damage in a radius of %d each turn for %d turns.
 		The flames will ignore the caster, and will drain 10%% of the damage dealt as the flames consume enemies life force and transfer it to the user.
 		The damage will increase with your Mindpower, and can critical.
-		Each point in fire drake talents also increases your fire resistance by 1%%.]]):format(damDesc(self, DamageType.FIRE, dam), radius, duration)
+		Each point in fire drake talents also increases your fire resistance by 1%%.]]):tformat(damDesc(self, DamageType.FIRE, dam), radius, duration)
 	end,
 }
 
@@ -186,7 +186,7 @@ newTalent{
 	random_ego = "attack",
 	equilibrium = 20,
 	cooldown = 20,
-	message = "@Source@ breathes fire!",
+	message = _t"@Source@ breathes fire!",
 	tactical = { ATTACKAREA = { FIRE = 2 }},
 	range = 0,
 	radius = function(self, t) return math.min(13, math.floor(self:combatTalentScale(t, 5, 9))) end,
@@ -218,6 +218,6 @@ newTalent{
 	info = function(self, t)
 		return ([[You breathe fire in a frontal cone of radius %d. Any target caught in the area will take %0.2f fire damage over 3 turns.
 		The damage will increase with your Strength and the critical chance is based on your Mental crit rate.
-		Each point in fire drake talents also increases your fire resistance by 1%%.]]):format(self:getTalentRadius(t), damDesc(self, DamageType.FIRE, t.getDamage(self, t)))
+		Each point in fire drake talents also increases your fire resistance by 1%%.]]):tformat(self:getTalentRadius(t), damDesc(self, DamageType.FIRE, t.getDamage(self, t)))
 	end,
 }

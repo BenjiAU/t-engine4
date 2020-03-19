@@ -74,7 +74,7 @@ newTalent{
 		return ([[Your reflexes are lightning-fast, if you spot a projectile (arrow, shot, spell, ...) you can instantly shoot at it without taking a turn to take it down.
 		You can shoot down up to %d projectiles.
 		In addition, your heightened senses also reduce the speed of incoming projectiles by %d%%, and prevents your own projectiles from striking you.]]):
-		format(t.getNb(self, t), t.getSlow(self,t))
+		tformat(t.getNb(self, t), t.getSlow(self,t))
 	end,
 }
 
@@ -117,7 +117,7 @@ newTalent{
 		local dam = t.getDamage(self,t)*100
 		return ([[Activating this talent enhances your reflexes to incredible levels.  Each time you are attacked in melee, you have a %d%% chance to fire off a defensive shot off in time to intercept the attack, evading it and dealing %d%% archery damage.
 		This cannot damage the same target more than once per turn.]])
-		:format(chance, dam)
+		:tformat(chance, dam)
 	end,
 }
 
@@ -149,7 +149,7 @@ newTalent{
 			local t = rng.tableRemove(tids)
 			if not t then break end
 			target.talents_cd[t.id] = cdr
-			game.logSeen(target, "%s's %s is disrupted by the shot!", target.name:capitalize(), t.name)
+			game.logSeen(target, "%s's %s is disrupted by the shot!", target:getName():capitalize(), t.name)
 		end
 	end,
 	doShoot = function(self, t, eff)
@@ -173,7 +173,7 @@ newTalent{
 		local cd = t.getCooldown(self,t)
 		return ([[You take close notice of the target for the next 5 turns. If they attempt to use a non-instant talent you react with incredible speed, firing a shot dealing 25%% damage that causes the talent to fail and go on cooldown.
 This shot is instant, cannot miss, and puts %d other talents on cooldown for %d turns.]]):
-		format(nb, cd)
+		tformat(nb, cd)
 	end,
 }
 
@@ -202,6 +202,6 @@ newTalent{
 		local speed = t.getSpeed(self,t)
 		return ([[You put all your focus into escaping combat for 4 turns. While under this effect you gain %d%% increased resistance to all damage, %0.1f increased stamina regeneration, immunity to stun, pin, daze and slowing effects and %d%% increased movement speed. 
 Any action other than movement will cancel this effect.]]):
-		format(power, sta, speed)
+		tformat(power, sta, speed)
 	end,
 }

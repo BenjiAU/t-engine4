@@ -37,13 +37,13 @@ _M.slots_multiple = {
 }
 
 function _M:getShimmerName(actor, slot)
-	if slot == "SHIMMER_DOLL" then return "Character's Skin"
-	elseif slot == "SHIMMER_HAIR" then return "Character's Hair"
-	elseif slot == "SHIMMER_FACIAL" then return "Character's Facial Features"
-	elseif slot == "SHIMMER_AURA" then return "Character's Aura"
+	if slot == "SHIMMER_DOLL" then return _t"Character's Skin"
+	elseif slot == "SHIMMER_HAIR" then return _t"Character's Hair"
+	elseif slot == "SHIMMER_FACIAL" then return _t"Character's Facial Features"
+	elseif slot == "SHIMMER_AURA" then return _t"Character's Aura"
 	else
 		local object = actor:getInven(slot)[1]
-		if not object then return "unknown" end
+		if not object then return _t"unknown" end
 		return object:getName{do_color=true, no_add_name=true}
 	end
 end
@@ -89,7 +89,7 @@ function _M:applyShimmers(actor, v1, v2)
 			local object = actor:getInven(slot)
 			if object then object = object[1] end
 			if object then
-				object.shimmer_moddable = shimmer or {name="#GREY#Invisible#LAST#"}
+				object.shimmer_moddable = shimmer or {name=_t"#GREY#Invisible#LAST#"}
 			end
 		end
 	end end

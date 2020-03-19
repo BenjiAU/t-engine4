@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 -- race & classes
-newTalentType{ type="tutorial", name = "tutorial", hide = true, description = "Tutorial-specific talents." }
+newTalentType{ type="tutorial", name = _t"tutorial", hide = true, description = _t"Tutorial-specific talents." }
 
 newTalent{
 	name = "Shove", short_name = "TUTORIAL_PHYS_KB",
@@ -36,12 +36,12 @@ newTalent{
 		if self:checkHit(self:combatPhysicalpower(), target:combatPhysicalResist()) then
 			target:knockback(self.x, self.y, 1)
 		else
-			game.logSeen(target, "%s resists the shove!", target.name:capitalize())
+			game.logSeen(target, "%s resists the shove!", target:getName():capitalize())
 		end
 		return true
 	end,
 	info = function(self, t)
-		return ([[Give the target a good old-fashioned shove, knocking it back a square.]])
+		return ([[Give the target a good old-fashioned shove, knocking it back a square.]]):tformat()
 	end,
 }
 
@@ -61,16 +61,16 @@ newTalent{
 		if core.fov.distance(self.x, self.y, x, y) > self:getTalentRange(t) then return nil end
 		if self:checkHit(self:combatSpellpower(), target:combatPhysicalResist()) then
 			target:knockback(self.x, self.y, self:getTalentLevel(t))
-			game.logSeen(target, "%s is knocked back by the gale!", target.name:capitalize())
+			game.logSeen(target, "%s is knocked back by the gale!", target:getName():capitalize())
 			target:crossTierEffect(target.EFF_OFFBALANCE, self:combatSpellpower())
 		else
-			game.logSeen(target, "%s remains firmly planted in the face of the gale!", target.name:capitalize())
+			game.logSeen(target, "%s remains firmly planted in the face of the gale!", target:getName():capitalize())
 		end
 		return true
 	end,
 	info = function(self, t)
 		local dist = self:getTalentLevel(t)
-		return ([[Conjure up a powerful magical wind, pushing the target back a distance of %d.]]):format(dist)
+		return ([[Conjure up a powerful magical wind, pushing the target back a distance of %d.]]):tformat(dist)
 	end,
 }
 
@@ -90,15 +90,15 @@ newTalent{
 		if core.fov.distance(self.x, self.y, x, y) > self:getTalentRange(t) then return nil end
 		if self:checkHit(self:combatMindpower(), target:combatPhysicalResist()) then
 			target:knockback(self.x, self.y, 1)
-			game.logSeen(target, "%s is knocked back by the telekinetic blow!", target.name:capitalize())
+			game.logSeen(target, "%s is knocked back by the telekinetic blow!", target:getName():capitalize())
 			target:crossTierEffect(target.EFF_OFFBALANCE, self:combatMindpower())
 		else
-			game.logSeen(target, "%s holds its ground!", target.name:capitalize())
+			game.logSeen(target, "%s holds its ground!", target:getName():capitalize())
 		end
 		return true
 	end,
 	info = function(self, t)
-		return ([[Knock the target backwards with a powerful telekinetic blow.]])
+		return ([[Knock the target backwards with a powerful telekinetic blow.]]):tformat()
 	end,
 }
 
@@ -118,15 +118,15 @@ newTalent{
 		if core.fov.distance(self.x, self.y, x, y) > self:getTalentRange(t) then return nil end
 		if self:checkHit(self:combatSpellpower(), target:combatSpellResist()) then
 			target:knockback(self.x, self.y, 1)
-			game.logSeen(target, "%s is teleported a short distance!", target.name:capitalize())
+			game.logSeen(target, "%s is teleported a short distance!", target:getName():capitalize())
 			target:crossTierEffect(target.EFF_SPELLSHOCKED, self:combatSpellpower())
 		else
-			game.logSeen(target, "%s resists the teleportation!", target.name:capitalize())
+			game.logSeen(target, "%s resists the teleportation!", target:getName():capitalize())
 		end
 		return true
 	end,
 	info = function(self, t)
-		return ([[Attempts to magically teleport a target slightly farther from you.]])
+		return ([[Attempts to magically teleport a target slightly farther from you.]]):tformat()
 	end,
 }
 
@@ -146,15 +146,15 @@ newTalent{
 		if core.fov.distance(self.x, self.y, x, y) > self:getTalentRange(t) then return nil end
 		if self:checkHit(self:combatMindpower(), target:combatMentalResist()) then
 			target:knockback(self.x, self.y, 1)
-			game.logSeen(target, "%s retreats in terror!", target.name:capitalize())
+			game.logSeen(target, "%s retreats in terror!", target:getName():capitalize())
 			target:crossTierEffect(target.EFF_BRAINLOCKED, self:combatMindpower())
 		else
-			game.logSeen(target, "%s shakes off the fear!", target.name:capitalize())
+			game.logSeen(target, "%s shakes off the fear!", target:getName():capitalize())
 		end
 		return true
 	end,
 	info = function(self, t)
-		return ([[Attempts to briefly terrify a target into retreating.]])
+		return ([[Attempts to briefly terrify a target into retreating.]]):tformat()
 	end,
 }
 
@@ -178,7 +178,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Inflicts a 10-turn bleed effect.]])
+		return ([[Inflicts a 10-turn bleed effect.]]):tformat()
 	end,
 }
 
@@ -202,6 +202,6 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Use your mental powers to confuse the target for five turns.]])
+		return ([[Use your mental powers to confuse the target for five turns.]]):tformat()
 	end,
 }

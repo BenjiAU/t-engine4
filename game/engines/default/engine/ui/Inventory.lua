@@ -107,11 +107,11 @@ function _M:generate()
 
 
 	self.c_inven = ListColumns.new{width=self.w, height=self.h - (self.c_tabs and self.c_tabs.h or 0), floating_headers=true, sortable=true, scrollbar=true, columns=self.columns or {
-		{name="", width={33,"fixed"}, display_prop="char", sort="id"},
-		{name="", width={24,"fixed"}, display_prop="object", sort="sortname", direct_draw=function(item, h) if item.object then return item.object:getDO(h, h) end end},
-		{name="Inventory", width=72, display_prop="name", sort="sortname"},
-		{name="Category", width=20, display_prop="cat", sort="cat"},
-		{name="Enc.", width=8, display_prop="encumberance", sort="encumberance"},
+		{name=_t"", width={33,"fixed"}, display_prop="char", sort="id"},
+		{name=_t"", width={24,"fixed"}, display_prop="object", sort="sortname", direct_draw=function(item, h) if item.object then return item.object:getDO(h, h) end end},
+		{name=_t"Inventory", width=72, display_prop="name", sort="sortname"},
+		{name=_t"Category", width=20, display_prop="cat", sort="cat"},
+		{name=_t"Enc.", width=8, display_prop="encumberance", sort="encumberance"},
 	}, list={},
 		fct=function(item, sel, button, event) if self.fct then self.fct(item, button, event) end end,
 		select=self.on_select,

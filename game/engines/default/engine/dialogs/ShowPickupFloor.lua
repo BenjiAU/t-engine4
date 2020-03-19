@@ -34,18 +34,18 @@ function _M:init(title, x, y, filter, action, takeall, actor)
 	self.filter = filter
 	self.action = action
 	self.actor = actor
-	Dialog.init(self, title or "Pickup", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
+	Dialog.init(self, title or _t"Pickup", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
 
-	local takeall = Button.new{text=takeall or "(*) Take all", width=self.iw - 40, fct=function() self:takeAll() end}
+	local takeall = Button.new{text=takeall or _t"(*) Take all", width=self.iw - 40, fct=function() self:takeAll() end}
 
 	self.c_desc = TextzoneList.new{width=math.floor(self.iw / 2 - 10), height=self.ih - takeall.h, no_color_bleed=true}
 
 	self.c_list = ListColumns.new{width=math.floor(self.iw / 2 - 10), height=self.ih - 10 - takeall.h, scrollbar=true, columns={
-		{name="", width={20,"fixed"}, display_prop="char"},
-		{name="", width={24,"fixed"}, display_prop="object", sort="sortname", direct_draw=function(item, h) if item.object then return item.object:getDO(h, h) end end},
-		{name="Item", width=72, display_prop="sortname"},
-		{name="Category", width=20, display_prop="cat"},
-		{name="Enc.", width=8, display_prop="encumberance"},
+		{name=_t"", width={20,"fixed"}, display_prop="char"},
+		{name=_t"", width={24,"fixed"}, display_prop="object", sort="sortname", direct_draw=function(item, h) if item.object then return item.object:getDO(h, h) end end},
+		{name=_t"Item", width=72, display_prop="sortname"},
+		{name=_t"Category", width=20, display_prop="cat"},
+		{name=_t"Enc.", width=8, display_prop="encumberance"},
 	}, list={}, fct=function(item) self:use(item) end, select=function(item, sel) self:select(item) end}
 
 	self:generateList()
@@ -125,7 +125,7 @@ function _M:generateList()
 			local enc = 0
 			o:forAllStack(function(o) enc=enc+o.encumber end)
 
-			list[#list+1] = { char=char, name=o:getName(), sortname=o:getName():toString():removeColorCodes(), color=o:getDisplayColor(), object=o, item=idx, cat=o.subtype, encumberance=enc, desc=o:getDesc() }
+			list[#list+1] = { char=char, name=o:getName(), sortname=o:getName():toString():removeColorCodes(), color=o:getDisplayColor(), object=o, item=idx, cat=_t(o.subtype, "entity subtype"), encumberance=enc, desc=o:getDesc() }
 			i = i + 1
 		end
 		idx = idx + 1

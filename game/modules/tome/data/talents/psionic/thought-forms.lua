@@ -137,7 +137,7 @@ function setupThoughtForm(self, m, x, y, t)
 		game.party:addMember(m, {
 			control="no",
 			type="thought-form",
-			title="thought-form",
+			title=_t"thought-form",
 			orders = {target=true, leash=true, anchor=true, talents=true},
 		})
 	end
@@ -192,10 +192,10 @@ newTalent{
 	
 		local NPC = require "mod.class.NPC"
 		local m = NPC.new{ _no_upvalues_check=true,
-			name = "thought-forged bowman", summoner = self,
+			name = _t"thought-forged bowman", summoner = self,
 			color=colors.SANDY_BROWN, shader = "shadow_simulacrum",
 			shader_args = { color = {0.8, 0.8, 0.8}, base = 0.8, time_factor = 4000 },
-			desc = [[A thought-forged bowman.  It appears ready for battle.]],
+			desc = _t[[A thought-forged bowman.  It appears ready for battle.]],
 			body = { INVEN = 10, MAINHAND = 1, BODY = 1, QUIVER=1, HANDS = 1, FEET = 1},
 
 			ai = "summoned", ai_real = "tactical",
@@ -258,7 +258,7 @@ newTalent{
 		local stat = t.getStatBonus(self, t)
 		return ([[Forge a bowman, clad in leather armor, from your thoughts.  The bowman learns Bow Mastery, Combat Accuracy, Steady Shot, Crippling Shot, and Rapid Shot as it levels up, and has +%d Strength, +%d Dexterity, and +%d Constitution.
 		Activating this talent will put all other thought-forms on cooldown.
-		The stat bonuses will improve with your Mindpower.]]):format(stat/2, stat, stat/2)
+		The stat bonuses will improve with your Mindpower.]]):tformat(stat/2, stat, stat/2)
 	end,
 }
 
@@ -293,10 +293,10 @@ newTalent{
 	
 		local NPC = require "mod.class.NPC"
 		local m = NPC.new{ _no_upvalues_check=true,
-			name = "thought-forged warrior", summoner = self, 
+			name = _t"thought-forged warrior", summoner = self, 
 			color=colors.ORANGE, shader = "shadow_simulacrum",
 			shader_args = { color = {0.8, 0.8, 0.8}, base = 0.8, time_factor = 4000 },
-			desc = [[A thought-forged warrior wielding a massive battle-axe and clad in heavy armor.  It appears ready for battle.]],
+			desc = _t[[A thought-forged warrior wielding a massive battle-axe and clad in heavy armor.  It appears ready for battle.]],
 			body = { INVEN = 10, MAINHAND = 1, BODY = 1, HANDS = 1, FEET = 1},
 		
 			ai = "summoned", ai_real = "tactical",
@@ -360,7 +360,7 @@ newTalent{
 		local stat = t.getStatBonus(self, t)
 		return ([[Forge a warrior wielding a battle-axe from your thoughts.  The warrior learns Weapon Mastery, Combat Accuracy, Berserker, Death Dance, and Rush as it levels up, and has +%d Strength, +%d Dexterity, and +%d Constitution.
 		Activating this talent will put all other thought-forms on cooldown.
-		The stat bonuses will improve with your Mindpower.]]):format(stat, stat/2, stat/2)
+		The stat bonuses will improve with your Mindpower.]]):tformat(stat, stat/2, stat/2)
 	end,
 }
 
@@ -395,10 +395,10 @@ newTalent{
 	
 		local NPC = require "mod.class.NPC"
 		local m = NPC.new{ _no_upvalues_check=true,
-			name = "thought-forged defender", summoner = self,
+			name = _t"thought-forged defender", summoner = self,
 			color=colors.GOLD, shader = "shadow_simulacrum", 
 			shader_args = { color = {0.8, 0.8, 0.8}, base = 0.8, time_factor = 4000 },
-			desc = [[A thought-forged defender clad in massive armor.  It wields a sword and shield and appears ready for battle.]],
+			desc = _t[[A thought-forged defender clad in massive armor.  It wields a sword and shield and appears ready for battle.]],
 			body = { INVEN = 10, MAINHAND = 1, OFFHAND = 1, BODY = 1, HANDS = 1, FEET = 1},
 			
 			ai = "summoned", ai_real = "tactical",
@@ -464,7 +464,7 @@ newTalent{
 		local stat = t.getStatBonus(self, t)
 		return ([[Forge a defender wielding a sword and shield from your thoughts.  The solider learns Armor Training, Weapon Mastery, Combat Accuracy, Shield Pummel, and Shield Wall as it levels up, and has +%d Strength, +%d Dexterity, and +%d Constitution.
 		Activating this talent will put all other thought-forms on cooldown.
-		The stat bonuses will improve with your Mindpower.]]):format(stat/2, stat/2, stat)
+		The stat bonuses will improve with your Mindpower.]]):tformat(stat/2, stat/2, stat)
 	end,
 }
 
@@ -506,7 +506,7 @@ newTalent{
 		return([[Forge a guardian from your thoughts alone.  Your guardian's primary stat will be improved by %d, its two secondary stats by %d, and it will have Magic, Cunning, and Willpower equal to your own.
 		At talent level one, you may forge a mighty bowman clad in leather armor; at level three a powerful warrior wielding a two-handed weapon; and at level five a strong defender using a sword and shield.
 		Thought forms can only be maintained up to a range of %d, and will rematerialize next to you if this range is exceeded.
-		Only one thought-form may be active at a time, and the stat bonuses will improve with your Mindpower.]]):format(bonus, bonus/2, range)
+		Only one thought-form may be active at a time, and the stat bonuses will improve with your Mindpower.]]):tformat(bonus, bonus/2, range)
 	end,
 }
 
@@ -519,7 +519,7 @@ newTalent{
 	mode = "passive",
 	info = function(self, t)
 		local level = math.floor(self:getTalentLevel(t))
-		return([[Your thought-forms now know Lucid Dreamer, Biofeedback, and Psychometry at talent level %d.]]):format(level)
+		return([[Your thought-forms now know Lucid Dreamer, Biofeedback, and Psychometry at talent level %d.]]):tformat(level)
 	end,
 }
 
@@ -598,7 +598,7 @@ newTalent{
 		return ([[Take direct control of your active thought-form, improving its damage, attack speed, and maximum life by %d%%, but leaving your body a defenseless shell.
 		At talent level 1, any Feedback your Thought-Forms gain will be given to you as well. At level 3, your Thought-Forms gain a bonus to all saves equal to your Mental Save. At level 5, they gain a bonus to all damage equal to your bonus mind damage.
 		The secondary bonuses apply whether or not this talent is currently active.
-		The life, damage, and speed bonus will improve with your Mindpower.]]):format(bonus)
+		The life, damage, and speed bonus will improve with your Mindpower.]]):tformat(bonus)
 	end,
 }
 
@@ -617,6 +617,6 @@ newTalent{
 		local defense = t.getDefensePower(self, t)
 		local speed = t.getSpeedPower(self, t)
 		return([[You now gain %d%% mind speed while Thought-Form: Bowman is active, %d Mindpower while Thought-Form: Warrior is active, and %d%% resist all while Thought-Form: Defender is active. 
-		These bonuses scale with your Mindpower.]]):format(speed, offense, defense, speed)
+		These bonuses scale with your Mindpower.]]):tformat(speed, offense, defense, speed)
 	end,
 }

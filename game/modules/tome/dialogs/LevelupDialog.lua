@@ -86,7 +86,7 @@ function _M:init(actor, on_finish, on_birth)
 		end
 	end
 
-	Dialog.init(self, "Levelup: "..actor.name..", level "..actor.level, game.w * 0.9, game.h * 0.9, game.w * 0.05, game.h * 0.05)
+	Dialog.init(self, ("Levelup: %s, level %s"):tformat(actor:getName(), actor.level), game.w * 0.9, game.h * 0.9, game.w * 0.05, game.h * 0.05)
 	if game.w * 0.9 >= 1000 then
 		self.no_tooltip = true
 	end
@@ -126,7 +126,7 @@ function _M:init(actor, on_finish, on_birth)
 
 			if self.actor.unused_stats~=self.actor_dup.unused_stats or self.actor.unused_talents_types~=self.actor_dup.unused_talents_types or
 			self.actor.unused_talents~=self.actor_dup.unused_talents or self.actor.unused_generics~=self.actor_dup.unused_generics or self.actor.unused_prodigies~=self.actor_dup.unused_prodigies or changed then
-				self:yesnocancelPopup("Finish","Do you accept changes?", function(yes, cancel)
+				self:yesnocancelPopup(_t"Finish",_t"Do you accept changes?", function(yes, cancel)
 				if cancel then
 					return nil
 				else
@@ -181,11 +181,11 @@ local subtleMessageOtherColor = {r=255, g=215, b=0}
 function _M:finish()
 	local ok, dep_miss = self:checkDeps(true, true)
 	if not ok and not config.settings.cheat then
-		self:simpleLongPopup("Impossible", "You cannot learn this talent(s): "..dep_miss, game.w * 0.4)
+		self:simpleLongPopup(_t"Impossible", _t"You cannot learn this talent(s): "..dep_miss, game.w * 0.4)
 		return nil
 	end
 
-	local txt = "#LIGHT_BLUE#Warning: You have increased some of your statistics or talent. Talent(s) actually sustained: \n %s If these are dependent on one of the stats you changed, you need to re-use them for the changes to take effect."
+	local txt = _t"#LIGHT_BLUE#Warning: You have increased some of your statistics or talent. Talent(s) actually sustained: \n %s If these are dependent on one of the stats you changed, you need to re-use them for the changes to take effect."
 	local talents = ""
 	local reset = {}
 	for tid, act in pairs(self.actor.sustain_talents) do
@@ -249,20 +249,20 @@ end
 function _M:incStat(sid, v)
 	if v == 1 then
 		if self.actor.unused_stats <= 0 then
-			self:subtleMessage("Not enough stat points", "You have no stat points left!", subtleMessageErrorColor)
+			self:subtleMessage(_t"Not enough stat points", _t"You have no stat points left!", subtleMessageErrorColor)
 			return
 		end
 		if self.actor:getStat(sid, nil, nil, true) >= self.actor.level * 1.4 + 20 then
-			self:subtleMessage("Stat is at the maximum for your level", "You cannot increase this stat further until next level!", subtleMessageOtherColor)
+			self:subtleMessage(_t"Stat is at the maximum for your level", _t"You cannot increase this stat further until next level!", subtleMessageOtherColor)
 			return
 		end
 		if self.actor:isStatMax(sid) or self.actor:getStat(sid, nil, nil, true) >= 60 + math.max(0, (self.actor.level - 50)) then
-			self:subtleMessage("Stat is at the maximum", "You cannot increase this stat further!", subtleMessageWarningColor)
+			self:subtleMessage(_t"Stat is at the maximum", _t"You cannot increase this stat further!", subtleMessageWarningColor)
 			return
 		end
 	else
 		if self.actor_dup:getStat(sid, nil, nil, true) == self.actor:getStat(sid, nil, nil, true) then
-			self:subtleMessage("Impossible", "You cannot take out more points!", subtleMessageErrorColor)
+			self:subtleMessage(_t"Impossible", _t"You cannot take out more points!", subtleMessageErrorColor)
 			return
 		end
 	end
@@ -318,7 +318,7 @@ function _M:checkDeps(simple, ignore_special)
 		local t = self.actor:getTalentFromId(t_id)
 		local ok, reason = self.actor:canLearnTalent(t, 0, ignore_special)
 		if not ok and (self.actor:knowTalent(t) or force) then talents = talents.."\n#GOLD##{bold}#    - "..t.name.."#{normal}##LAST#("..reason..")" end
-		if reason == "not enough stat" then
+		if reason == _t"not enough stat" then
 			stats_ok = false
 		end
 
@@ -363,19 +363,19 @@ end
 function _M:learnTalent(t_id, v)
 	self.talents_learned[t_id] = self.talents_learned[t_id] or 0
 	local t = self.actor:getTalentFromId(t_id)
-	local t_type, t_index = "class", "unused_talents"
-	if t.generic then t_type, t_index = "generic", "unused_generics" end
+	local t_type, t_index = _t"class", "unused_talents"
+	if t.generic then t_type, t_index = _t"generic", "unused_generics" end
 	if v then
 		if self.actor[t_index] < 1 then
-			self:subtleMessage("Not enough "..t_type.." talent points", "You have no "..t_type.." talent points left!", subtleMessageErrorColor)
+			self:subtleMessage(("Not enough %s talent points"):tformat(t_type), ("You have no %s talent points left!"):tformat(t_type), subtleMessageErrorColor)
 			return
 		end
 		if not self.actor:canLearnTalent(t) then
-			self:subtleMessage("Cannot learn talent", "Prerequisites not met!", subtleMessageErrorColor)
+			self:subtleMessage(_t"Cannot learn talent", _t"Prerequisites not met!", subtleMessageErrorColor)
 			return
 		end
 		if self.actor:getTalentLevelRaw(t_id) >= self:getMaxTPoints(t) then
-			self:subtleMessage("Already known", "You already fully know this talent!", subtleMessageWarningColor)
+			self:subtleMessage(_t"Already known", _t"You already fully know this talent!", subtleMessageWarningColor)
 			return
 		end
 		self.actor:learnTalent(t_id, true)
@@ -385,15 +385,15 @@ function _M:learnTalent(t_id, v)
 		self.new_talents_changed = true
 	else
 		if not self.actor:knowTalent(t_id) then
-			self:subtleMessage("Impossible", "You do not know this talent!", subtleMessageErrorColor)
+			self:subtleMessage(_t"Impossible", _t"You do not know this talent!", subtleMessageErrorColor)
 			return
 		end
 		if not self:isUnlearnable(t, true) and self.actor_dup:getTalentLevelRaw(t_id) >= self.actor:getTalentLevelRaw(t_id) then
 			local _, could = self:isUnlearnable(t, true)
 			if could then
-				self:subtleMessage("Impossible here", "You must be out of combat or in a quiet place like a #{bold}#town#{normal}# to unlearn this talent.", {r=200, g=200, b=255})
+				self:subtleMessage(_t"Impossible here", _t"You must be out of combat or in a quiet place like a #{bold}#town#{normal}# to unlearn this talent.", {r=200, g=200, b=255})
 			else
-				self:subtleMessage("Impossible", "You cannot unlearn this talent!", subtleMessageErrorColor)
+				self:subtleMessage(_t"Impossible", _t"You cannot unlearn this talent!", subtleMessageErrorColor)
 			end
 			return
 		end
@@ -402,13 +402,13 @@ function _M:learnTalent(t_id, v)
 		local _, reason = self.actor:canLearnTalent(t, 0)
 		local ok, dep_miss, stats_ok = self:checkDeps(nil, true)
 		self.actor:learnTalent(t_id, true, nil, {no_unlearn=true})
-		if ok or reason == "not enough stat" or not stats_ok then
+		if ok or reason == _t"not enough stat" or not stats_ok then
 			self.actor:unlearnTalent(t_id)
 			self.actor[t_index] = self.actor[t_index] + 1
 			self.talents_learned[t_id] = self.talents_learned[t_id] - 1
 			self.new_talents_changed = true
 		else
-			self:simpleLongPopup("Impossible", "You cannot unlearn this talent because of talent(s): "..dep_miss, game.w * 0.4)
+			self:simpleLongPopup(_t"Impossible", _t"You cannot unlearn this talent because of talent(s): "..dep_miss, game.w * 0.4)
 			return
 		end
 	end
@@ -419,15 +419,15 @@ function _M:learnType(tt, v)
 	self.talent_types_learned[tt] = self.talent_types_learned[tt] or {}
 	if v then
 		if self.actor:knowTalentType(tt) and self.actor.__increased_talent_types[tt] and self.actor.__increased_talent_types[tt] >= 1 then
-			self:subtleMessage("Impossible", "You can only improve a category mastery once!", subtleMessageWarningColor)
+			self:subtleMessage(_t"Impossible", _t"You can only improve a category mastery once!", subtleMessageWarningColor)
 			return
 		end
 		if self.actor.unused_talents_types <= 0 then
-			self:subtleMessage("Not enough talent category points", "You have no category points left!", subtleMessageErrorColor)
+			self:subtleMessage(_t"Not enough talent category points", _t"You have no category points left!", subtleMessageErrorColor)
 			return
 		end
 		if not self.actor.talents_types_def[tt] or (self.actor.talents_types_def[tt].min_lev or 0) > self.actor.level then
-			self:simplePopup("Too low level", ("This talent tree only provides talents starting at level %d. Learning it now would be useless."):format(self.actor.talents_types_def[tt].min_lev))
+			self:simplePopup(_t"Too low level", ("This talent tree only provides talents starting at level %d. Learning it now would be useless."):tformat(self.actor.talents_types_def[tt].min_lev))
 			return
 		end
 		if not self.actor:knowTalentType(tt) then
@@ -443,15 +443,15 @@ function _M:learnType(tt, v)
 		self.new_talents_changed = true
 	else
 		if self.actor_dup:knowTalentType(tt) == true and self.actor:knowTalentType(tt) == true and (self.actor_dup.__increased_talent_types[tt] or 0) >= (self.actor.__increased_talent_types[tt] or 0) then
-			self:subtleMessage("Impossible", "You cannot take out more points!", subtleMessageErrorColor)
+			self:subtleMessage(_t"Impossible", _t"You cannot take out more points!", subtleMessageErrorColor)
 			return
 		end
 		if self.actor_dup:knowTalentType(tt) == true and self.actor:knowTalentType(tt) == true and (self.actor.__increased_talent_types[tt] or 0) == 0 then
-			self:subtleMessage("Impossible", "You cannot unlearn this category!", subtleMessageWarningColor)
+			self:subtleMessage(_t"Impossible", _t"You cannot unlearn this category!", subtleMessageWarningColor)
 			return
 		end
 		if not self.actor:knowTalentType(tt) then
-			self:subtleMessage("Impossible", "You do not know this category!", subtleMessageErrorColor)
+			self:subtleMessage(_t"Impossible", _t"You do not know this category!", subtleMessageErrorColor)
 			return
 		end
 
@@ -469,7 +469,7 @@ function _M:learnType(tt, v)
 				self.new_talents_changed = true
 				self.talent_types_learned[tt][1] = nil
 			else
-				self:simpleLongPopup("Impossible", "You cannot unlearn this category because of: "..dep_miss, game.w * 0.4)
+				self:simpleLongPopup(_t"Impossible", ("You cannot unlearn this category because of: %s"):tformat(dep_miss), game.w * 0.4)
 				self.actor:learnTalentType(tt)
 				return
 			end
@@ -493,12 +493,12 @@ function _M:generateList()
 			local isgeneric = self.actor.talents_types_def[tt.type].generic
 			local tshown = (self.actor.__hidden_talent_types[tt.type] == nil and ttknown) or (self.actor.__hidden_talent_types[tt.type] ~= nil and not self.actor.__hidden_talent_types[tt.type])
 			local node = {
-				name=function(item) return tstring{{"font", "bold"}, cat:capitalize().." / "..tt.name:capitalize() ..(" (%s)"):format((isgeneric and "generic" or "class")), {"font", "normal"}} end,
-				rawname=function(item) return cat:capitalize().." / "..tt.name:capitalize() ..(" (x%.2f)"):format(self.actor:getTalentTypeMastery(item.type)) end,
+				name=function(item) return tstring{{"font", "bold"}, _t(cat):capitalize().." / "..tt.name:capitalize() ..(" (%s)"):format((isgeneric and _t"generic" or _t"class")), {"font", "normal"}} end,
+				rawname=function(item) return _t(cat):capitalize().." / "..tt.name:capitalize() ..(" (x%.2f)"):format(self.actor:getTalentTypeMastery(item.type)) end,
 				type=tt.type,
 				color=function(item) return ((self.actor:knowTalentType(item.type) ~= self.actor_dup:knowTalentType(item.type)) or ((self.actor.__increased_talent_types[item.type] or 0) ~= (self.actor_dup.__increased_talent_types[item.type] or 0))) and {255, 215, 0} or self.actor:knowTalentType(item.type) and {0,200,0} or {175,175,175} end,
 				shown = tshown,
-				status = function(item) return self.actor:knowTalentType(item.type) and tstring{{"font", "bold"}, ((self.actor.__increased_talent_types[item.type] or 0) >=1) and {"color", 255, 215, 0} or {"color", 0x00, 0xFF, 0x00}, ("%.2f"):format(self.actor:getTalentTypeMastery(item.type)), {"font", "normal"}} or tstring{{"color",  0xFF, 0x00, 0x00}, "unknown"} end,
+				status = function(item) return self.actor:knowTalentType(item.type) and tstring{{"font", "bold"}, ((self.actor.__increased_talent_types[item.type] or 0) >=1) and {"color", 255, 215, 0} or {"color", 0x00, 0xFF, 0x00}, ("%.2f"):format(self.actor:getTalentTypeMastery(item.type)), {"font", "normal"}} or tstring{{"color",  0xFF, 0x00, 0x00}, _t"unknown"} end,
 				nodes = {},
 				isgeneric = isgeneric and 0 or 1,
 				order_id = i,
@@ -571,7 +571,7 @@ function _M:generateList()
 
 	for i, sid in ipairs{self.actor.STAT_STR, self.actor.STAT_DEX, self.actor.STAT_CON, self.actor.STAT_MAG, self.actor.STAT_WIL, self.actor.STAT_CUN } do
 		local s = self.actor.stats_def[sid]
-		local e = engine.Entity.new{image="stats/"..s.name:lower()..".png", is_stat=true}
+		local e = engine.Entity.new{image="stats/"..(s.original_name or s.name):lower()..".png", is_stat=true}
 		e:getMapObjects(game.uiset.hotkeys_display_icons.tiles, {}, 1)
 
 		stats[#stats+1] = {
@@ -608,32 +608,32 @@ end
 -- UI Stuff
 -----------------------------------------------------------------
 
-local _points_left = [[
+local _points_left = _t[[
 Stats points left: #00FF00#%d#LAST#
 Category points left: #00FF00#%d#LAST#
 Class talent points left: #00FF00#%d#LAST#
 Generic talent points left: #00FF00#%d#LAST#]]
 
-local desc_stats = ([[Stat points allow you to increase your core stats.
+local desc_stats = (_t[[Stat points allow you to increase your core stats.
 Each level you gain 3 new stat points to use.
 
 You may only increase stats to a natural maximum of 60 or lower (relative to your level).]]):toTString()
 
-local desc_class = ([[Class talent points allow you to learn new class talents or improve them.
+local desc_class = (_t[[Class talent points allow you to learn new class talents or improve them.
 Class talents are core to your class and can not be learnt by training.
 
 Each level you gain 1 new class point to use.
 Each five levels you gain one more.
 ]]):toTString()
 
-local desc_generic = ([[Generic talent points allow you to learn new generic talents or improve them.
+local desc_generic = (_t[[Generic talent points allow you to learn new generic talents or improve them.
 Generic talents comes from your class, your race or various outside training you can get during your adventures.
 
 Each level you gain 1 new generic point to use.
 Each five levels you gain one less.
 ]]):toTString()
 
-local desc_types = ([[Talent category points allow you to either:
+local desc_types = (_t[[Talent category points allow you to either:
 - learn a new talent (class or generic) category
 - improve a known talent category efficiency by 0.2
 - learn a new inscription slot (up to a maximum of 5, learning it is automatic when using an inscription)
@@ -641,13 +641,13 @@ local desc_types = ([[Talent category points allow you to either:
 You gain a new point at level 10, 20 and 34.
 Some races or items may increase them as well.]]):toTString()
 
-local desc_prodigies = ([[Prodigies are special talents that only the most powerful of characters can attain.
+local desc_prodigies = (_t[[Prodigies are special talents that only the most powerful of characters can attain.
 All of them require at least 50 in a core stat and many also have more special demands. You can learn a new prodigy at level 25 and 42.]]):toTString()
 
-local desc_inscriptions = ([[You can use a category point to unlock a new inscription slot (up to 5 slots).]]):toTString()
+local desc_inscriptions = (_t[[You can use a category point to unlock a new inscription slot (up to 5 slots).]]):toTString()
 
 function _M:createDisplay()
-	self.b_prodigies = Button.new{text="Prodigies", fct=function()
+	self.b_prodigies = Button.new{text=_t"Prodigies", fct=function()
 			self.on_finish_prodigies = self.on_finish_prodigies or {}
 			local d = require("mod.dialogs.UberTalent").new(self.actor, self.on_finish_prodigies)
 			game:registerDialog(d)
@@ -662,20 +662,20 @@ function _M:createDisplay()
 	end}
 
 	if self.actor.inscriptions_slots_added < 2 then
-		self.b_inscriptions = Button.new{text="Inscriptions", fct=function()
+		self.b_inscriptions = Button.new{text=_t"Inscriptions", fct=function()
 				if self.actor.inscriptions_slots_added >= 2 then
-					Dialog:simplePopup("Inscriptions", "You have learnt all the inscription slots you could.")
+					Dialog:simplePopup(_t"Inscriptions", _t"You have learnt all the inscription slots you could.")
 				else
 					if self.actor.unused_talents_types > 0 then
-						Dialog:yesnoPopup("Inscriptions", ("You can learn %d new slot(s). Do you wish to buy one with one category point?"):format(2 - self.actor.inscriptions_slots_added), function(ret) if ret then
+						Dialog:yesnoPopup(_t"Inscriptions", ("You can learn %d new slot(s). Do you wish to buy one with one category point?"):tformat(2 - self.actor.inscriptions_slots_added), function(ret) if ret then
 							self.actor.unused_talents_types = self.actor.unused_talents_types - 1
 							self.actor.max_inscriptions = self.actor.max_inscriptions + 1
 							self.actor.inscriptions_slots_added = self.actor.inscriptions_slots_added + 1
-							self.b_types.text = "Category points: "..self.actor.unused_talents_types
+							self.b_types.text = ("Category points: %s"):tformat(self.actor.unused_talents_types)
 							self.b_types:generate()
 						end end)
 					else
-						Dialog:simplePopup("Inscriptions", ("You can still learn %d new slot(s) but you need a category point."):format(2 - self.actor.inscriptions_slots_added))
+						Dialog:simplePopup(_t"Inscriptions", ("You can still learn %d new slot(s) but you need a category point."):tformat(2 - self.actor.inscriptions_slots_added))
 					end
 				end
 			end, on_select=function()
@@ -761,7 +761,7 @@ function _M:createDisplay()
 		no_tooltip = self.no_tooltip,
 	}
 
-	self.b_stat = Textzone.new{text="Stats: "..self:getColorPoints(self.actor.unused_stats), auto_width=1, auto_height=1, has_box="ui/heading", fct=function() end, on_select=function()
+	self.b_stat = Textzone.new{text=("Stats: %s"):tformat(self:getColorPoints(self.actor.unused_stats)), auto_width=1, auto_height=1, has_box="ui/heading", fct=function() end, on_select=function()
 		local str = desc_stats
 		if self.no_tooltip then
 			self.c_desc:erase()
@@ -770,7 +770,7 @@ function _M:createDisplay()
 			game:tooltipDisplayAtMap(self.b_stat.last_display_x + self.b_stat.w, self.b_stat.last_display_y, str)
 		end
 	end}
-	self.b_class = Textzone.new{text="Class points: "..self:getColorPoints(self.actor.unused_talents), auto_width=1, auto_height=1, has_box="ui/heading", fct=function() end, on_select=function()
+	self.b_class = Textzone.new{text=("Class points: %s"):tformat(self:getColorPoints(self.actor.unused_talents)), auto_width=1, auto_height=1, has_box="ui/heading", fct=function() end, on_select=function()
 		local str = desc_class
 		if self.no_tooltip then
 			self.c_desc:erase()
@@ -779,7 +779,7 @@ function _M:createDisplay()
 			game:tooltipDisplayAtMap(self.b_stat.last_display_x + self.b_stat.w, self.b_stat.last_display_y, str)
 		end
 	end}
-	self.b_generic = Textzone.new{text="Generic points: "..self:getColorPoints(self.actor.unused_generics), auto_width=1, auto_height=1, has_box="ui/heading", fct=function() end, on_select=function()
+	self.b_generic = Textzone.new{text=("Generic points: %s"):tformat(self:getColorPoints(self.actor.unused_generics)), auto_width=1, auto_height=1, has_box="ui/heading", fct=function() end, on_select=function()
 		local str = desc_generic
 		if self.no_tooltip then
 			self.c_desc:erase()
@@ -788,7 +788,7 @@ function _M:createDisplay()
 			game:tooltipDisplayAtMap(self.b_stat.last_display_x + self.b_stat.w, self.b_stat.last_display_y, str)
 		end
 	end}
-	self.b_types = Textzone.new{text="Category points: "..self:getColorPoints(self.actor.unused_talents_types), auto_width=1, auto_height=1, has_box="ui/heading", fct=function() end, on_select=function()
+	self.b_types = Textzone.new{text=("Category points: %s"):tformat(self:getColorPoints(self.actor.unused_talents_types)), auto_width=1, auto_height=1, has_box="ui/heading", fct=function() end, on_select=function()
 		local str = desc_types
 		if self.no_tooltip then
 			self.c_desc:erase()
@@ -798,7 +798,7 @@ function _M:createDisplay()
 		end
 	end}
 
-	self.c_hide_unknown = Checkbox.new{title="Hide unlearnt categories", default=self.actor.levelup_hide_unknown_catgories, fct=function() end, on_change=function(s)
+	self.c_hide_unknown = Checkbox.new{title=_t"Hide unlearnt categories", default=self.actor.levelup_hide_unknown_catgories, fct=function() end, on_change=function(s)
 		self.actor.levelup_hide_unknown_catgories = s
 		self:generateList()
 		local oldctree, oldgtree = self.c_ctree, self.c_gtree
@@ -864,57 +864,57 @@ function _M:getStatDesc(item)
 	local color = diff >= 0 and {"color", "LIGHT_GREEN"} or {"color", "RED"}
 	local dc = {"color", "LAST"}
 
-	text:add("Current value: ", {"color", "LIGHT_GREEN"}, ("%d"):format(self.actor:getStat(stat_id)), dc, true)
-	text:add("Base value: ", {"color", "LIGHT_GREEN"}, ("%d"):format(self.actor:getStat(stat_id, nil, nil, true)), dc, true, true)
+	text:add(_t"Current value: ", {"color", "LIGHT_GREEN"}, ("%d"):format(self.actor:getStat(stat_id)), dc, true)
+	text:add(_t"Base value: ", {"color", "LIGHT_GREEN"}, ("%d"):format(self.actor:getStat(stat_id, nil, nil, true)), dc, true, true)
 
-	text:add({"color", "LIGHT_BLUE"}, "Stat gives:", dc, true)
+	text:add({"color", "LIGHT_BLUE"}, _t"Stat gives:", dc, true)
 	if stat_id == self.actor.STAT_CON then
 		local multi_life = 4 + (self.actor.inc_resource_multi.life or 0)
-		text:add("Max life: ", color, ("%0.2f"):format(diff * multi_life), dc, true)
-		text:add("Physical save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
-		text:add("Healing mod: ", color, ("%0.1f%%"):format((self.actor:combatStatLimit("con", 1.5, 0, 0.5) - self.actor_dup:combatStatLimit("con", 1.5, 0, 0.5))*100), dc, true)
+		text:add(_t"Max life: ", color, ("%0.2f"):format(diff * multi_life), dc, true)
+		text:add(_t"Physical save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
+		text:add(_t"Healing mod: ", color, ("%0.1f%%"):format((self.actor:combatStatLimit("con", 1.5, 0, 0.5) - self.actor_dup:combatStatLimit("con", 1.5, 0, 0.5))*100), dc, true)
 	elseif stat_id == self.actor.STAT_WIL then
 		if self.actor:knowTalent(self.actor.T_MANA_POOL) then
 			local multi_mana = 5 + (self.actor.inc_resource_multi.mana or 0)
-			text:add("Max mana: ", color, ("%0.2f"):format(diff * multi_mana), dc, true)
+			text:add(_t"Max mana: ", color, ("%0.2f"):format(diff * multi_mana), dc, true)
 		end
 		if self.actor:knowTalent(self.actor.T_STAMINA_POOL) then
 			local multi_stamina = 2.5 + (self.actor.inc_resource_multi.stamina or 0)
-			text:add("Max stamina: ", color, ("%0.2f"):format(diff * multi_stamina), dc, true)
+			text:add(_t"Max stamina: ", color, ("%0.2f"):format(diff * multi_stamina), dc, true)
 		end
 		if self.actor:knowTalent(self.actor.T_PSI_POOL) then
 			local multi_psi = 1 + (self.actor.inc_resource_multi.psi or 0)
-			text:add("Max psi: ", color, ("%0.2f"):format(diff * multi_psi), dc, true)
+			text:add(_t"Max psi: ", color, ("%0.2f"):format(diff * multi_psi), dc, true)
 		end
-		text:add("Mindpower: ", color, ("%0.2f"):format(diff * 0.7), dc, true)
-		text:add("Mental save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
-		text:add("Spell save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
+		text:add(_t"Mindpower: ", color, ("%0.2f"):format(diff * 0.7), dc, true)
+		text:add(_t"Mental save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
+		text:add(_t"Spell save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
 --		if self.actor:attr("use_psi_combat") then
 --			text:add("Accuracy: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
 --		end
 	elseif stat_id == self.actor.STAT_STR then
-		text:add("Physical power: ", color, ("%0.2f"):format(diff), dc, true)
-		text:add("Max encumbrance: ", color, ("%0.2f"):format(diff * 1.8), dc, true)
-		text:add("Physical save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
+		text:add(_t"Physical power: ", color, ("%0.2f"):format(diff), dc, true)
+		text:add(_t"Max encumbrance: ", color, ("%0.2f"):format(diff * 1.8), dc, true)
+		text:add(_t"Physical save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
 	elseif stat_id == self.actor.STAT_CUN then
-		text:add("Crit. chance: ", color, ("%0.2f"):format(diff * 0.3), dc, true)
-		text:add("Mental save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
-		text:add("Mindpower: ", color, ("%0.2f"):format(diff * 0.4), dc, true)
+		text:add(_t"Crit. chance: ", color, ("%0.2f"):format(diff * 0.3), dc, true)
+		text:add(_t"Mental save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
+		text:add(_t"Mindpower: ", color, ("%0.2f"):format(diff * 0.4), dc, true)
 		if self.actor:attr("use_psi_combat") then
-			text:add("Accuracy: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
+			text:add(_t"Accuracy: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
 		end
 	elseif stat_id == self.actor.STAT_MAG then
-		text:add("Spell save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
-		text:add("Spellpower: ", color, ("%0.2f"):format(diff * 1), dc, true)
+		text:add(_t"Spell save: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
+		text:add(_t"Spellpower: ", color, ("%0.2f"):format(diff * 1), dc, true)
 	elseif stat_id == self.actor.STAT_DEX then
-		text:add("Defense: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
-		text:add("Ranged defense: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
-		text:add("Accuracy: ", color, ("%0.2f"):format(diff), dc, true)
-		text:add("Shrug off criticals chance: ", color, ("%0.2f%%"):format(diff * 0.3), dc, true)
+		text:add(_t"Defense: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
+		text:add(_t"Ranged defense: ", color, ("%0.2f"):format(diff * 0.35), dc, true)
+		text:add(_t"Accuracy: ", color, ("%0.2f"):format(diff), dc, true)
+		text:add(_t"Shrug off criticals chance: ", color, ("%0.2f%%"):format(diff * 0.3), dc, true)
 	end
 
 	if self.actor.player and self.desc_def and self.desc_def.getStatDesc and self.desc_def.getStatDesc(stat_id, self.actor) then
-		text:add({"color", "LIGHT_BLUE"}, "Class powers:", dc, true)
+		text:add({"color", "LIGHT_BLUE"}, _t"Class powers:", dc, true)
 		text:add(self.desc_def.getStatDesc(stat_id, self.actor))
 	end
 	return text
@@ -929,15 +929,15 @@ function _M:getTalentDesc(item)
 	text:add(true, true)
 
 	if item.type then
-		text:add({"color",0x00,0xFF,0xFF}, "Talent Category", true)
-		text:add({"color",0x00,0xFF,0xFF}, "A talent category contains talents you may learn. You gain a talent category point at level 10, 20 and 34. You may also find trainers or artifacts that allow you to learn more.\nA talent category point can be used either to learn a new category or increase the mastery of a known one.", true, true, {"color", "WHITE"})
+		text:add({"color",0x00,0xFF,0xFF}, _t"Talent Category", true)
+		text:add({"color",0x00,0xFF,0xFF}, _t"A talent category contains talents you may learn. You gain a talent category point at level 10, 20 and 34. You may also find trainers or artifacts that allow you to learn more.\nA talent category point can be used either to learn a new category or increase the mastery of a known one.", true, true, {"color", "WHITE"})
 
 		if self.actor.talents_types_def[item.type].generic then
-			text:add({"color",0x00,0xFF,0xFF}, "Generic talent tree", true)
-			text:add({"color",0x00,0xFF,0xFF}, "A generic talent allows you to perform various utility actions and improve your character. It represents a skill anybody can learn (should you find a trainer for it). You gain one point every level (except every 5th level). You may also find trainers or artifacts that allow you to learn more.", true, true, {"color", "WHITE"})
+			text:add({"color",0x00,0xFF,0xFF}, _t"Generic talent tree", true)
+			text:add({"color",0x00,0xFF,0xFF}, _t"A generic talent allows you to perform various utility actions and improve your character. It represents a skill anybody can learn (should you find a trainer for it). You gain one point every level (except every 5th level). You may also find trainers or artifacts that allow you to learn more.", true, true, {"color", "WHITE"})
 		else
-			text:add({"color",0x00,0xFF,0xFF}, "Class talent tree", true)
-			text:add({"color",0x00,0xFF,0xFF}, "A class talent allows you to perform new combat moves, cast spells, and improve your character. It represents the core function of your class. You gain one point every level and two every 5th level. You may also find trainers or artifacts that allow you to learn more.", true, true, {"color", "WHITE"})
+			text:add({"color",0x00,0xFF,0xFF}, _t"Class talent tree", true)
+			text:add({"color",0x00,0xFF,0xFF}, _t"A class talent allows you to perform new combat moves, cast spells, and improve your character. It represents the core function of your class. You gain one point every level and two every 5th level. You may also find trainers or artifacts that allow you to learn more.", true, true, {"color", "WHITE"})
 		end
 
 		text:add(self.actor:getTalentTypeFrom(item.type).description)
@@ -948,12 +948,12 @@ function _M:getTalentDesc(item)
 		local unlearnable, could_unlearn = self:isUnlearnable(t, true)
 		if unlearnable then
 			local max = tostring(self.actor:lastLearntTalentsMax(t.generic and "generic" or "class"))
-			text:add({"color","LIGHT_BLUE"}, "This talent was recently learnt; you can still unlearn it.", true, "The last ", max, t.generic and " generic" or " class", " talents you learnt are always unlearnable.", {"color","LAST"}, true, true)
+			text:add({"color","LIGHT_BLUE"}, _t"This talent was recently learnt; you can still unlearn it.", true, ("The last %d %s talents you learnt are always unlearnable."):tformat(max, t.generic and _t" generic" or _t" class"), " ", {"color","LAST"}, true, true)
 		elseif t.no_unlearn_last then
-			text:add({"color","YELLOW"}, "This talent can alter the world in a permanent way; as such, you can never unlearn it once known.", {"color","LAST"}, true, true)
+			text:add({"color","YELLOW"}, _t"This talent can alter the world in a permanent way; as such, you can never unlearn it once known.", {"color","LAST"}, true, true)
 		elseif could_unlearn then
 			local max = tostring(self.actor:lastLearntTalentsMax(t.generic and "generic" or "class"))
-			text:add({"color","LIGHT_BLUE"}, "This talent was recently learnt; you can still unlearn it if you are out of combat or in a quiet area like a #{bold}#town#{normal}#.", true, "The last ", max, t.generic and " generic" or " class", " talents you learnt are always unlearnable.", {"color","LAST"}, true, true)
+			text:add({"color","LIGHT_BLUE"}, _t"This talent was recently learnt; you can still unlearn it if you are out of combat or in a quiet area like a #{bold}#town#{normal}#.", true, ("The last %d %s talents you learnt are always unlearnable."):tformat(max, t.generic and _t" generic" or _t" class"), {"color","LAST"}, true, true)
 		end
 
 		local traw = self.actor:getTalentLevelRaw(t.id)
@@ -966,7 +966,7 @@ function _M:getTalentDesc(item)
 		if traw == 0 then
 			local req = self.actor:getTalentReqDesc(item.talent, 1):toTString():tokenize(" ()[]")
 			text:add{"color","WHITE"}
-			text:add({"font", "bold"}, "First talent level: ", tostring(traw+1), {"font", "normal"})
+			text:add({"font", "bold"}, _t"First talent level: ", tostring(traw+1), {"font", "normal"})
 			text:add(true)
 			text:merge(req)
 			text:merge(self.actor:getTalentFullDescription(t, 1000):diffWith(self.actor:getTalentFullDescription(t, 1), diff_color))
@@ -974,13 +974,13 @@ function _M:getTalentDesc(item)
 			local req = self.actor:getTalentReqDesc(item.talent):toTString():tokenize(" ()[]")
 			local req2 = self.actor:getTalentReqDesc(item.talent, 1):toTString():tokenize(" ()[]")
 			text:add{"color","WHITE"}
-			text:add({"font", "bold"}, traw == 0 and "Next talent level" or "Current talent level: ", tostring(traw), " [-> ", tostring(traw + 1), "]", {"font", "normal"})
+			text:add({"font", "bold"}, traw == 0 and _t"Next talent level" or _t"Current talent level: ", tostring(traw), " [-> ", tostring(traw + 1), "]", {"font", "normal"})
 			text:add(true)
 			text:merge(req2:diffWith(req, diff_full))
 			text:merge(self.actor:getTalentFullDescription(t, 1):diffWith(self.actor:getTalentFullDescription(t), diff_full))
 		else
 			local req = self.actor:getTalentReqDesc(item.talent):toTString():tokenize(" ()[]")
-			text:add({"font", "bold"}, "Current talent level: "..traw, {"font", "normal"})
+			text:add({"font", "bold"}, _t"Current talent level: "..traw, {"font", "normal"})
 			text:add(true)
 			text:merge(req)
 			text:merge(self.actor:getTalentFullDescription(t, 1000):diffWith(self.actor:getTalentFullDescription(t), diff_color))
@@ -1012,10 +1012,10 @@ function _M:onUseTalent(item, inc)
 		self.c_gtree:redrawAllItems()
 	end
 
-	self.b_stat:setText("Stats: "..self:getColorPoints(self.actor.unused_stats))
-	self.b_class:setText("Class points: "..self:getColorPoints(self.actor.unused_talents))
-	self.b_generic:setText("Generic points: "..self:getColorPoints(self.actor.unused_generics))
-	self.b_types:setText("Category points: "..self:getColorPoints(self.actor.unused_talents_types))
+	self.b_stat:setText(("Stats: %s"):format(self:getColorPoints(self.actor.unused_stats)))
+	self.b_class:setText(("Class points: %s"):format(self:getColorPoints(self.actor.unused_talents)))
+	self.b_generic:setText(("Generic points: %s"):format(self:getColorPoints(self.actor.unused_generics)))
+	self.b_types:setText(("Category points: %s"):format(self:getColorPoints(self.actor.unused_talents_types)))
 end
 
 function _M:updateTooltip()

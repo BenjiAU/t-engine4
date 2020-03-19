@@ -22,8 +22,8 @@ long_name = "Tales of Maj'Eyal: Age of Ascendancy"
 short_name = "tome"
 author = { "DarkGod", "darkgod@te4.org" }
 homepage = "https://te4.org/"
-version = {1,6,6}
-engine = {1,6,6,"te4"}
+version = {1,6,7}
+engine = {1,6,7,"te4"}
 description = [[
 Welcome to Maj'Eyal.
 
@@ -59,6 +59,7 @@ teams = {
 	{ "#name#-gfx.team", "optional", "/" },
 }
 
+i18n_support = true
 show_funfacts = true
 loading_wait_ticks = 800
 profile_stats_fields = {"artifacts", "characters", "deaths", "uniques", "scores", "lore", "escorts"}

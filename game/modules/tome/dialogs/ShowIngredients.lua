@@ -29,7 +29,7 @@ module(..., package.seeall, class.inherit(Dialog))
 function _M:init(party)
 	self.party = party
 
-	Dialog.init(self, "Ingredients collected", game.w * 0.8, game.h * 0.8)
+	Dialog.init(self, _t"Ingredients collected", game.w * 0.8, game.h * 0.8)
 
 	self.c_desc = TextzoneList.new{width=math.floor(self.iw / 2 - 10), scrollbar=true, height=self.ih}
 
@@ -37,9 +37,9 @@ function _M:init(party)
 
 	local vsep = Separator.new{dir="horizontal", size=self.ih - 10}
 	self.c_list = ListColumns.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=self.ih - 10, scrollbar=true, sortable=true, columns={
-		{name="Ingredient", width=50, display_prop="name", sort="name"},
-		{name="Category", width=30, display_prop="cat", sort="cat"},
-		{name="Quantity", width=20, display_prop="nb", sort="nb"},
+		{name=_t"Ingredient", width=50, display_prop="name", sort="name"},
+		{name=_t"Category", width=30, display_prop="cat", sort="cat"},
+		{name=_t"Quantity", width=20, display_prop="nb", sort="nb"},
 	}, list=self.list, fct=function(item) end, select=function(item, sel) self:select(item) end}
 
 	self:loadUI{
@@ -62,7 +62,7 @@ function _M:generateList()
 	local i = 0
 	for id, nb in pairs(self.party.ingredients) do
 		local d = self.party:getIngredient(id)
-		list[#list+1] = { dname=d.name, name=d.display_entity:getDisplayString(true):add(d.name), desc=util.getval(d.desc), cat=d.type, nb=nb==-1 and "inf" or tostring(nb) }
+		list[#list+1] = { dname=d.name, name=d.display_entity:getDisplayString(true):add(_t(d.name)), desc=util.getval(d.desc), cat=_t(d.type), nb=nb==-1 and "inf" or tostring(nb) }
 		i = i + 1
 	end
 	-- Add known artifacts
@@ -72,6 +72,6 @@ end
 
 function _M:select(item)
 	if item then
-		self.c_desc:switchItem(item, ("#GOLD#Category:#AQUAMARINE# %s\n#GOLD#Ingredient:#0080FF# %s\n#GOLD#Quantity:#0080FF# %s\n#GOLD#Text:#ANTIQUE_WHITE# %s"):format(item.cat, item.name:toString(), item.nb, item.desc))
+		self.c_desc:switchItem(item, ("#GOLD#Category:#AQUAMARINE# %s\n#GOLD#Ingredient:#0080FF# %s\n#GOLD#Quantity:#0080FF# %s\n#GOLD#Text:#ANTIQUE_WHITE# %s"):tformat(item.cat, item.name:toString(), item.nb, item.desc))
 	end
 end

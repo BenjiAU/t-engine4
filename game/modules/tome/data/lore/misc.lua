@@ -24,8 +24,8 @@
 newLore{
 	id = "temple-creation-note-1",
 	category = "temple of creation",
-	name = "tract of destruction",
-	lore = [[#{bold}#Tract of Destruction#{normal}#
+	name = _t"tract of destruction",
+	lore = _t[[#{bold}#Tract of Destruction#{normal}#
 
 Though armies would fall before the Spellblaze's might, though forests were razed and the skies bled red with fire, they always felt that the earth would endure. It seemed eternal, unmoving. Not even the fury of the Spellblaze could hope to destroy it.
 
@@ -37,8 +37,8 @@ The lands of the Nalorën had sunk beneath the waves.]],
 newLore{
 	id = "temple-creation-note-2",
 	category = "temple of creation",
-	name = "tract of anarchy",
-	lore = [[#{bold}#Tract of Anarchy#{normal}#
+	name = _t"tract of anarchy",
+	lore = _t[[#{bold}#Tract of Anarchy#{normal}#
 
 For the years following the cataclysm, chaos reigned. Their culture, their way of life, it was as broken and fractured as the land itself. Nalorë civilisation was reduced to a few isolated and feeble settlements, scratching out meagre existences as land, mind and body was warped in both shape and spirit.
 
@@ -50,8 +50,8 @@ The Nalorën received no answer.]],
 newLore{
 	id = "temple-creation-note-3",
 	category = "temple of creation",
-	name = "tract of acceptance",
-	lore = [[#{bold}#Tract of Acceptance#{normal}#
+	name = _t"tract of acceptance",
+	lore = _t[[#{bold}#Tract of Acceptance#{normal}#
 
 Betrayed by the Shalorën, wilful and destructive, and the Thalorën, aloof and suspicious, a long, seething silence fell over the remaining Nalorën people. It was during this period of grim introspection that salvation was suddenly and unexpectedly granted. The ancient Sher'Tul magicks, long pondered over by the land's mystics, would bear fruit at last.
 
@@ -61,8 +61,8 @@ The same force that destroyed the Nalorën would save them. Through the Sher'Tul
 newLore{
 	id = "temple-creation-note-4",
 	category = "temple of creation",
-	name = "personal note (Slasul)",
-	lore = [[At long last, the temple finally reveals its secrets to me, and my plans can be set in motion. Lithe in form, faultless in combat, unmatched in speed both above the waves and beneath... nature couldn't have hoped to create such a race as nagas. With the Temple of Creation now open to me however, we may become so much more. With my guidance, my careful shaping of the Sher'Tul's magicks, under my expert hand our great race shall soon reach its zenith. A new tract shall soon be written: The Tract of the Devourer.
+	name = _t"personal note (Slasul)",
+	lore = _t[[At long last, the temple finally reveals its secrets to me, and my plans can be set in motion. Lithe in form, faultless in combat, unmatched in speed both above the waves and beneath... nature couldn't have hoped to create such a race as nagas. With the Temple of Creation now open to me however, we may become so much more. With my guidance, my careful shaping of the Sher'Tul's magicks, under my expert hand our great race shall soon reach its zenith. A new tract shall soon be written: The Tract of the Devourer.
 ]],
 }
 
@@ -72,8 +72,8 @@ newLore{
 newLore{
 	id = "adventurer-letter-1",
 	category = "adventures",
-	name = "letter to Rolf (1)",
-	lore = [[Dear Rolf,
+	name = _t"letter to Rolf (1)",
+	lore = _t[[Dear Rolf,
 
 I hope this letter finds you well. I must apologise for this recent dry spell in our communication; my adventures across Maj'Eyal have taken many exciting and perilous turns as of late. What turns do I speak of, you ask? I know how you delight in reading the accounts of my exploits, so I shall waste no further time on this pre-amble.
 
@@ -86,8 +86,8 @@ Weisman]]}
 newLore{
 	id = "adventurer-letter-2",
 	category = "adventures",
-	name = "letter to Weisman (1)",
-	lore = [[Dear Weisman,
+	name = _t"letter to Weisman (1)",
+	lore = _t[[Dear Weisman,
 
 Ah! What feelings your last letters inspired within me... primarily mirth, with a good amount of scorn! Must you continuously assail me with tale after tale of your waving of wooden swords and pestering of toothless mongrels? Allow me to recount your "legends" in a much more succinct manner: One day, I failed to kill a dog. Such bravery! Such pluck and derring-do!
 
@@ -99,8 +99,8 @@ Rolf]]}
 newLore{
 	id = "adventurer-letter-3",
 	category = "adventures",
-	name = "letter to Rolf (2)",
-	lore = [[Dear Rolf the Antslayer,
+	name = _t"letter to Rolf (2)",
+	lore = _t[[Dear Rolf the Antslayer,
 
 Ha! Such trials you have overcome! Forget dragons and demons, here we have a hero who has survived against ants! I shall deliver this joyous news to Last Hope with all haste - perhaps there shall be a parade in your honour!
 
@@ -113,8 +113,8 @@ Weisman]]}
 newLore{
 	id = "adventurer-letter-4",
 	category = "adventures",
-	name = "letter to Weisman (2)",
-	lore = [[Dearest Weisman,
+	name = _t"letter to Weisman (2)",
+	lore = _t[[Dearest Weisman,
 
 Sorry to cut your birdwatching session short, but I must bring this badinage to an end. I have tolerated your ridiculous pomposity and false heroics long enough. At first, I took your over-inflated tales of bothering local wildlife with good humour but now I realise, with dread, that you are sincere; you believe your pathetic wanderings to be the stuff of legend.
 
@@ -125,8 +125,8 @@ Rolf]]}
 newLore{
 	id = "adventurer-letter-5",
 	category = "adventures",
-	name = "letter to Weisman (3)",
-	lore = [[Weisman,
+	name = _t"letter to Weisman (3)",
+	lore = _t[[Weisman,
 
 The tentacles. I still remember them. They have lashed into my mind as they lashed into my flesh. How can nature abide such a... a... being in her realm? What dark plane of existence could it have been born from? How can creation itself tolerate such an aberration?!
 
@@ -139,8 +139,8 @@ Rolf]]}
 newLore{
 	id = "adventurer-letter-6",
 	category = "adventures",
-	name = "letter to Rolf (3)",
-	lore = [[Rolf,
+	name = _t"letter to Rolf (3)",
+	lore = _t[[Rolf,
 
 I can't remember anything from the fight save the sheer terror at being near something so horrid and powerful. There is no shame in running from a foe you cannot possibly hope to defeat, is there? Maybe ale from the tavern is a good idea, but maybe it is better to conquer your fear once and for all... I hope you can forgive me, but I must defeat this monster, if it takes me the rest of my life.
 
@@ -150,8 +150,8 @@ Weisman.]]}
 newLore{
 	id = "adventurer-letter-7",
 	category = "adventures",
-	name = "letter to Weisman (4)",
-	lore = [[Weisman,
+	name = _t"letter to Weisman (4)",
+	lore = _t[[Weisman,
 
 By my ancestors' profits I hope you receive this message in good health and spirits. Please, old friend - there is no need to impress upon me your valour, I know full well how courageous you are. Please, do not go after that... that thing! If I must drag you away physically, that is what I shall do, but I beg of you, please, consider another foe to fight!
 
@@ -161,9 +161,9 @@ Rolf.]]}
 newLore{
 	id = "adventurer-letter-8",
 	category = "adventures",
-	name = "Last Will of Rolf",
+	name = _t"Last Will of Rolf",
 	bloodstains = 6,
-	lore = [[Last Will and Testament of Rolf Two-Axes
+	lore = _t[[Last Will and Testament of Rolf Two-Axes
 
 I have failed. Oh by the great wyrm's maw, I have failed! The beast Weisman set out to slay was dead already by another's hand, but its corruption remained still. When I arrived in its chamber, Weisman was already half-gone; he was hacking away at foes only he could see. When I tried to stop him, he turned his axe on me... I am beaten and broken, hiding in some crevasse away from... from my own friend, who through the corruption in this place has been perverted into a monstrosity my axes were unable to fell. I hold no doubt that this is the last time I shall put quill to parchment, as even now I can hear my old friend's perverted voice.. calling to me. I bequeathe my belongings to any who slay ...
 #{italic}#(the ink blotch seems to indicate Weisman had caught up to his old friend, one-half of that abomination)#{normal}#]]}
@@ -175,8 +175,8 @@ I have failed. Oh by the great wyrm's maw, I have failed! The beast Weisman set 
 newLore{
 	id = "creation-elf",
 	category = "myths of creation",
-	name = "memories of Artelia Firstborn",
-	lore = [[#{italic}#This scroll looks ancient, possibly going back millennia, but has been incredibly well-preserved.#{normal}#
+	name = _t"memories of Artelia Firstborn",
+	lore = _t[[#{italic}#This scroll looks ancient, possibly going back millennia, but has been incredibly well-preserved.#{normal}#
 
 I remember when I first woke, and I drew my first breath, and the fresh young air of the world filled me with vitality. I opened my eyes, and above me stood a figure of outstanding radiance. She was tall and slim, crowned in silver hair that fell to the ground in silken tresses. Her skin was pale to the point of luminance, and her eyes were brighter than the stars.
 
@@ -194,8 +194,8 @@ In all those centuries I still searched for the woman and found no trace. I know
 newLore{
 	id = "creation-human",
 	category = "myths of creation",
-	name = "human myth of creation",
-	lore = [[At the start of time Sun was born, and Moons, and Eyal raised from the Darkness.
+	name = _t"human myth of creation",
+	lore = _t[[At the start of time Sun was born, and Moons, and Eyal raised from the Darkness.
 And Gerlyk walked Eyal with his three brothers.
 But one day Gerlyk walked alone and realised he was alone, and he desired company.
 So Gerlyk took a burning coal, and put stones around it, and wrapped it in earth, and bathed it in water and breathed his breath into it, and it became alive. And Gerlyk named it Human.
@@ -214,8 +214,8 @@ But Human did not cry, for the coal in his heart burned hot, and he knew he was 
 newLore{
 	id = "creation-halfling",
 	category = "myths of creation",
-	name = "a logical analysis of creation, by philosopher Smythen",
-	lore = [[Many are the tales of how our world was made, from the absurd to the romantic to the horrific. But they are all mere myths, with no more than seeds of truth to even the most reliable. The history of our race goes back far, but it is tantalisingly scant in details from before we met the other races. Indeed, it is only through our battles with the others that we halflings have any ancient records at all.
+	name = _t"a logical analysis of creation, by philosopher Smythen",
+	lore = _t[[Many are the tales of how our world was made, from the absurd to the romantic to the horrific. But they are all mere myths, with no more than seeds of truth to even the most reliable. The history of our race goes back far, but it is tantalisingly scant in details from before we met the other races. Indeed, it is only through our battles with the others that we halflings have any ancient records at all.
 
 The elves one would suspect of having the greatest knowledge of elder times, but they are aloof and silent. One must judge from this that either they do not know, or that the truth ashames them. The latter would certainly not surprise me.
 
@@ -237,8 +237,8 @@ So what happened to these gods after they had made the races which we see today?
 newLore{
 	id = "moons-human",
 	category = "eyal",
-	name = "Tale of the Moonsisters",
-	lore = [[Eyal was raised from Darkness,
+	name = _t"Tale of the Moonsisters",
+	lore = _t[[Eyal was raised from Darkness,
 And One came who made a blinding light called Sun,
 But Eyal flinched and said, "It is too bright!"
 So Gerlyk spun Eyal around; thus his face was half-time in light and half-time in shadow,
@@ -275,23 +275,23 @@ Aye, and Gerlyk did walk abroad that night, into Darkness beyond, and has ne'er 
 newLore{
 	id = "ancient-elven-ruins-note-1",
 	category = "ancient elven ruins",
-	name = "ancient papyrus scroll",
-	lore = [[Death is nearing. I can feel her chilling breath down the back of my neck. So many of us firstborn have passed on already. I cannot allow it... I will not let myself rot into dirt like the others. I am the mightiest of the Shaloren - I have a right to life!
+	name = _t"ancient papyrus scroll",
+	lore = _t[[Death is nearing. I can feel her chilling breath down the back of my neck. So many of us firstborn have passed on already. I cannot allow it... I will not let myself rot into dirt like the others. I am the mightiest of the Shaloren - I have a right to life!
 ]],
 }
 newLore{
 	id = "ancient-elven-ruins-note-2",
 	category = "ancient elven ruins",
-	name = "ancient papyrus scroll",
-	lore = [[Death mocks my experiments. I can preserve the flesh of my servants, tightly wrapped and salted, treated with the correct chemicals. I can animate them, make them shuffle about the empty halls of my mausoleum. But they are but empty shells, devoid of any soul. Is this how my majesty is to end? I demand a greater fate...
+	name = _t"ancient papyrus scroll",
+	lore = _t[[Death mocks my experiments. I can preserve the flesh of my servants, tightly wrapped and salted, treated with the correct chemicals. I can animate them, make them shuffle about the empty halls of my mausoleum. But they are but empty shells, devoid of any soul. Is this how my majesty is to end? I demand a greater fate...
 
 My days are numbered. Each night that passes saps strength from me. I must find the way to preserve my soul within my flesh. My greatness cannot be allowed to fade.]],
 }
 newLore{
 	id = "ancient-elven-ruins-note-3",
 	category = "ancient elven ruins",
-	name = "ancient papyrus scroll",
-	lore = [[Death has met her match. My results are complete, and I am ready to step to the Beyond. I have my sword by my side, and its icy edge will freeze even the dark one in her tracks. My powers cannot be denied...
+	name = _t"ancient papyrus scroll",
+	lore = _t[[Death has met her match. My results are complete, and I am ready to step to the Beyond. I have my sword by my side, and its icy edge will freeze even the dark one in her tracks. My powers cannot be denied...
 
 Come, Death, try to lay your bony fingers on me! I will vanish before your very eyes and slice you apart! You and your agents are no threat to me. I am immortal!]],
 }
@@ -303,8 +303,8 @@ Come, Death, try to lay your bony fingers on me! I will vanish before your very 
 newLore{
 	id = "valley-moon-1",
 	category = "valley of the moon",
-	name = "Rassir's journal part 1",
-	lore = [[I have come to see the moonstone again. My younger brother Limmir understands a little of my obsession with it, yet the others do not care. I have tried to explain how it is of importance to Aeryn, but she simply asked if she could make a sword from it. Bah! Such stupidity from that grunt fighter.
+	name = _t"Rassir's journal part 1",
+	lore = _t[[I have come to see the moonstone again. My younger brother Limmir understands a little of my obsession with it, yet the others do not care. I have tried to explain how it is of importance to Aeryn, but she simply asked if she could make a sword from it. Bah! Such stupidity from that grunt fighter.
 
 Our ancestors found their powers from the intense study of the stars, yet the people these days seem only to care about their applications in battle. I know our position with the orcs is grim, but we must not forget our roots in the celestial sphere! Only by sun, moons and stars do we find knowledge and power in life.
 
@@ -315,8 +315,8 @@ Last night I spotted a red star in the early dawn. How very peculiar... Could th
 newLore{
 	id = "valley-moon-2",
 	category = "valley of the moon",
-	name = "Rassir's journal part 2",
-	lore = [[Oh, what terrible horrors! Demons, clawed creatures, dark smog, clouds of acid, skins of lava! Where did they all come from?!
+	name = _t"Rassir's journal part 2",
+	lore = _t[[Oh, what terrible horrors! Demons, clawed creatures, dark smog, clouds of acid, skins of lava! Where did they all come from?!
 
 It was when I was studying the moonstone, and as the red star was rising again before the dawn. The stone glowed blood-red and suddenly portals awakened in the rock of the valley. From them poured forth all manner of demonic creatures! I put my ring of invisibility on and fled into the caves. But now the creatures are everywhere! The caves are infested with them, prowling about like hungry animals.
 
@@ -325,8 +325,8 @@ And there is something... something terrible. In the shadows, in the darkness, I
 newLore{
 	id = "valley-moon-3",
 	category = "valley of the moon",
-	name = "Rassir's journal part 3",
-	lore = [[I fell asleep in a dark hollow, but my sleep was troubled by terrible dreams. The dreams are so vivid in my mind!
+	name = _t"Rassir's journal part 3",
+	lore = _t[[I fell asleep in a dark hollow, but my sleep was troubled by terrible dreams. The dreams are so vivid in my mind!
 
 I saw the red star, and it became a land of fire floating in the night sky, full of black creatures with yellow eyes and hungry red mouths. And beyond the red star, far beyond was a dim world, but fractured and split all about its surface. As the world spun the split continents crushed against each other, and lava spilled up, and lands sunk into the ground. Demonic mouths screamed up as they disappeared into fiery death. It was if the world was tearing itself apart, but some force of will was desperately trying to keep it held together.
 
@@ -346,8 +346,8 @@ Yes, yes, this is all clearly an illusion! A strange nightmare that I shall wake
 newLore{
 	id = "races-0",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Introduction",
-	lore = [[I set out here to give a full and complete analysis of all the intelligent races in Maj'Eyal. This is an ambitious project to say the least, but it is put together from a great many years labour, including travels across all the kingdoms and direct meetings with many of the highest rulers and most learned sages. I have drawn my findings from common knowledge, exclusive interviews, and studies of many thousands of pages of texts and histories, some going back dozens of centuries.
+	name = _t"Loremaster Greynot's Analysis of the Races - Introduction",
+	lore = _t[[I set out here to give a full and complete analysis of all the intelligent races in Maj'Eyal. This is an ambitious project to say the least, but it is put together from a great many years labour, including travels across all the kingdoms and direct meetings with many of the highest rulers and most learned sages. I have drawn my findings from common knowledge, exclusive interviews, and studies of many thousands of pages of texts and histories, some going back dozens of centuries.
 
 I myself am a Higher human, in the employ of the court of King Tolak the Fair, but I have done my best to write all accounts from a purely neutral standpoint. I leave it to my peers to judge my success.
 
@@ -368,8 +368,8 @@ Chapter 11 - Dragons
 newLore{
 	id = "races-1",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Chapter 1 - Humans",
-	lore = [[I begin my writings with a study of the humans, currently the most populous of the races in Maj'Eyal. The greatest kingdom in number are by far the Cornacs, but mention should also be made of the Sholtar and Mardrop kingdoms, and the Higher bloodline. The biggest human population centre is around the citadel of Last Hope, though many other settlements exist across all corners of Maj'Eyal.
+	name = _t"Loremaster Greynot's Analysis of the Races - Chapter 1 - Humans",
+	lore = _t[[I begin my writings with a study of the humans, currently the most populous of the races in Maj'Eyal. The greatest kingdom in number are by far the Cornacs, but mention should also be made of the Sholtar and Mardrop kingdoms, and the Higher bloodline. The biggest human population centre is around the citadel of Last Hope, though many other settlements exist across all corners of Maj'Eyal.
 
 Cornacs are normally around 5'9", with generally dark hair, brown eyes and ruddy features. Most Cornacs take up roles as tradesmen, farmers, or other manual labour jobs. It is a sad fact that the majority of bandit groups tend to be dominated by Cornacs. Cornac families tend to be large, and since the Age of Dusk their population has expanded rapidly, especially in the farming lands in the west and around Last Hope in the south.
 
@@ -384,8 +384,8 @@ All human kingdoms were united by King Toknor the Brave in the Age of Pyre, and 
 newLore{
 	id = "races-2",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Chapter 2 - Halflings",
-	lore = [[There are two main kingdoms of halflings, the Eldoral and the Nargol, though both mix often. All halflings are just under 4' tall, and are generally noted for their large feet and curly hair. Eldoral are usually fair-haired and blue-eyed. Nargol tend to be darker in hair and complexion, with hazel eyes, and oft slightly shorter than their cousins. Halflings are known for their intelligence and quick wit, but also their arrogance in dealing with other races - something they do not deny, for they say it is well-deserved.
+	name = _t"Loremaster Greynot's Analysis of the Races - Chapter 2 - Halflings",
+	lore = _t[[There are two main kingdoms of halflings, the Eldoral and the Nargol, though both mix often. All halflings are just under 4' tall, and are generally noted for their large feet and curly hair. Eldoral are usually fair-haired and blue-eyed. Nargol tend to be darker in hair and complexion, with hazel eyes, and oft slightly shorter than their cousins. Halflings are known for their intelligence and quick wit, but also their arrogance in dealing with other races - something they do not deny, for they say it is well-deserved.
 
 Halflings used to be the most dominant race in Maj'Eyal, with control of many strategic Sher'Tul ruins and rule over great swathes of land. The recorded wars between humans and halflings are numerous, and the halflings were the most often victors. However the Age of Pyre brought them great ruin, for the orcs seemed to target them more fiercely than any other race, and many of their communities were wiped out. This has forced them to rely more on trade with other races in modern times, especially with the humans.
 
@@ -399,8 +399,8 @@ The most famous of all halflings is Queen Mirvenia, most famed for her saving of
 newLore{
 	id = "races-3",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Chapter 3 - Dwarves",
-	lore = [[The dwarves are an exceptionally secretive and quiet race, reluctant to talk about themselves to outsiders unless hefty bribes are paid. Many times in their history they have cut off all contact with the other races for no known reason, shutting tight the great iron doors that cover the trade passages to their mines and their cavernous cities. However of late they have become more open with the outside world, and I have even had the pleasure of receiving the unique distinction of being allowed to enter their main city, the Iron Throne, and speaking with several of their guild leaders.
+	name = _t"Loremaster Greynot's Analysis of the Races - Chapter 3 - Dwarves",
+	lore = _t[[The dwarves are an exceptionally secretive and quiet race, reluctant to talk about themselves to outsiders unless hefty bribes are paid. Many times in their history they have cut off all contact with the other races for no known reason, shutting tight the great iron doors that cover the trade passages to their mines and their cavernous cities. However of late they have become more open with the outside world, and I have even had the pleasure of receiving the unique distinction of being allowed to enter their main city, the Iron Throne, and speaking with several of their guild leaders.
 
 Dwarves are around 5' tall, with generally brown or grey hair. They are usually stocky and muscular, and known to be very resistant to any physical suffering. Their females can be hard to distinguish from their males, but can usually be identified by the beads braided into their beards. All dwarves are highly proud of their beards, and take immaculate care of them. The greatest insult to a dwarf is to belittle his beard, and the greatest sign of suffering in a dwarf is for him to tear at his beard.
 
@@ -413,8 +413,8 @@ As well as the many merchant dwarves one may meet there are also a great deal of
 newLore{
 	id = "races-4",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Chapter 4 - Shaloren",
-	lore = [[Though the elven races look very similar in appearance, they are extremely distinct in history, culture, mindset and many subtle physical traits, so I shall write of each of them separately. All elves are marked by their long, pointed ears and high cheek-bones, but other features can vary greatly. It should be noted that they call themselves as a whole "Elore", which means "siblings", yet the interactions between these brothers and sisters are oft strained.
+	name = _t"Loremaster Greynot's Analysis of the Races - Chapter 4 - Shaloren",
+	lore = _t[[Though the elven races look very similar in appearance, they are extremely distinct in history, culture, mindset and many subtle physical traits, so I shall write of each of them separately. All elves are marked by their long, pointed ears and high cheek-bones, but other features can vary greatly. It should be noted that they call themselves as a whole "Elore", which means "siblings", yet the interactions between these brothers and sisters are oft strained.
 
 Shaloren (or Shalore - lit "siblings of grace") are on average 6'2", with bright hair and blue or purple eyes. They are usually slim and lightly built, more marked for their mental prowess than their physical strengths. They are however known to be extremely swift of movement and light of foot. But of particular note is their magical affinity, which is far stronger than any other race, and their intense powers of will.
 
@@ -427,8 +427,8 @@ They deal with other races seldom, preferring to keep a low profile, and most of
 newLore{
 	id = "races-5",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Chapter 5 - Thaloren",
-	lore = [[The Thaloren (or Thalore - lit "siblings of wrath") are on average 6'4", with dark brown hair and hazel or green eyes. They are generally of muscular build, and known for their physical prowess. They are renowned to be of a fey mindset - as quick to furious violence as they are to joyous song. Their relations with the Shaloren are particularly strained, as they strongly oppose their brethren's use of magic.
+	name = _t"Loremaster Greynot's Analysis of the Races - Chapter 5 - Thaloren",
+	lore = _t[[The Thaloren (or Thalore - lit "siblings of wrath") are on average 6'4", with dark brown hair and hazel or green eyes. They are generally of muscular build, and known for their physical prowess. They are renowned to be of a fey mindset - as quick to furious violence as they are to joyous song. Their relations with the Shaloren are particularly strained, as they strongly oppose their brethren's use of magic.
 
 Their capital city is Shatur, hidden deep within the northern woods, and they are loathe to let any outsiders even approach the surrounding forest. Archers and fighters carefully patrol their borders, ready to rain down death from the trees on any who encroach. Their leader is Queen Nessilla Tantaelen, and they are said to live in extensive dwellings carved into giant trees, but little else is known about their society.
 
@@ -439,8 +439,8 @@ The Thaloren do business very rarely with the outside world, but when they do it
 newLore{
 	id = "races-6",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Chapter 6 - Naloren (extinct)",
-	lore = [[The Naloren (or Nalore - lit "siblings of spirit") are now an extinct race, as their homeland was swept into the sea by the Cataclysm. However as a separate elf race they are worth studying, scant though the records be. Much of what is now said about the Naloren is traced with myth, but one can deduce certain facts.
+	name = _t"Loremaster Greynot's Analysis of the Races - Chapter 6 - Naloren (extinct)",
+	lore = _t[[The Naloren (or Nalore - lit "siblings of spirit") are now an extinct race, as their homeland was swept into the sea by the Cataclysm. However as a separate elf race they are worth studying, scant though the records be. Much of what is now said about the Naloren is traced with myth, but one can deduce certain facts.
 
 Naloren elves were around 5'10", with blonde hair and green eyes. They were incredibly thin, but known for their swift and dextrous capabilities. Their kingdom was located on the eastern side of Maj'Eyal, and all of their towns were on the sea or straddling major rivers. They employed themselves as fishermen, sponge-divers, sailors and musicians. They were renowned for being able to stay underwater for hours at a time, and those with arcane abilities were said to be able to stay submerged indefinitely.
 
@@ -451,8 +451,8 @@ Alas their love of the sea was to be their undoing. When the Cataclysm came the 
 newLore{
 	id = "races-ogre",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Chapter 7 - Ogres",
-	lore = [[Ogres have never been a thriving race, starting from their abrupt appearance as soldiers and laborers for the Conclave during the Allure Wars (unexplained aside from a highly implausible story from the Conclave's Overseers about a lost mountain tribe).  Left without homes or proper runic training after the war's end, they were forced to found their own tribes and rediscover the fields of rune and infusion creation for themselves, and though their numbers dropped rapidly, they enjoyed a brief period of relative success as nomadic rune-traders, virtually unaffected by the Spellblaze.  The Spellhunt nearly proved to be their undoing, as their monstrous size and rune-covered skin made them popular targets; they were thought to be extinct, and only in recent years has the city of Elvala revealed that some Ogres took refuge there during this time.  Their descendants still live today, fearful of persecution but gradually beginning to explore outside Elvala for the first time in ages.
+	name = _t"Loremaster Greynot's Analysis of the Races - Chapter 7 - Ogres",
+	lore = _t[[Ogres have never been a thriving race, starting from their abrupt appearance as soldiers and laborers for the Conclave during the Allure Wars (unexplained aside from a highly implausible story from the Conclave's Overseers about a lost mountain tribe).  Left without homes or proper runic training after the war's end, they were forced to found their own tribes and rediscover the fields of rune and infusion creation for themselves, and though their numbers dropped rapidly, they enjoyed a brief period of relative success as nomadic rune-traders, virtually unaffected by the Spellblaze.  The Spellhunt nearly proved to be their undoing, as their monstrous size and rune-covered skin made them popular targets; they were thought to be extinct, and only in recent years has the city of Elvala revealed that some Ogres took refuge there during this time.  Their descendants still live today, fearful of persecution but gradually beginning to explore outside Elvala for the first time in ages.
 
 Ogres' most striking feature is their size, by far the largest of any intelligent race; they average at roughly 8'4" tall, and most are nearly half as wide with muscle.  They have a similar range of skin tones to humans, although slightly grayer on the whole; their hair tends to be dark brown or black, and their eyes run the gamut from black to bright blue to purple, presumably a side-effect of runic mis-transcription.  Their angular facial features invite some impolite comparisons to Orcs, with strong jawlines, disproportionately large mouths and teeth, and squarish heads, but otherwise resemble those of humans.  It would be remiss of me to describe Ogres' appearance without mentioning the intricate, glowing pattern of runes covering their skin from head to toe, although the exact patterns and colors vary.  
 
@@ -465,8 +465,8 @@ Due to the safety and comfort of Elvala, and their mistrust of much of the outsi
 newLore{
 	id = "races-7",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Chapter 8 - Orcs (extinct)",
-	lore = [[The orcs are, joyfully, extinct from Maj'Eyal, following the purge instigated by King Toknor the Brave at the start of the Age of Ascendancy. But an academic study of their previous culture and civilisation is still of interest, primitive though it may have been.
+	name = _t"Loremaster Greynot's Analysis of the Races - Chapter 8 - Orcs (extinct)",
+	lore = _t[[The orcs are, joyfully, extinct from Maj'Eyal, following the purge instigated by King Toknor the Brave at the start of the Age of Ascendancy. But an academic study of their previous culture and civilisation is still of interest, primitive though it may have been.
 
 Orcs were generally around 6'1", with green or black skin. They varied greatly in physical appearance and build, most likely due to their exceptionally fast breeding rates. The majority of orcs were thick-built and heavily muscled, well remembered as the stock grunts of their terrible armies. However in the Age of Pyre a greater number of thinner, stringier orcs appeared, oft versed in destructive magics.
 
@@ -479,8 +479,8 @@ There have been no substantiated reports of orcs for over 100 years. What report
 newLore{
 	id = "races-8",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Chapter 9 - Sher'Tul (extinct)",
-	lore = [[Ah, the legendary Sher'Tul! How any scholar does love to write about them. Indeed, the texts are many, but the facts are few, as so little is known about this crucible race. The most learned and factual academic on the subject is the renowned explorer and archaeologist Darwood Oakton, but he has alas been missing for several months at the time of writing. I will attempt to summarise here some of his key discoveries.
+	name = _t"Loremaster Greynot's Analysis of the Races - Chapter 9 - Sher'Tul (extinct)",
+	lore = _t[[Ah, the legendary Sher'Tul! How any scholar does love to write about them. Indeed, the texts are many, but the facts are few, as so little is known about this crucible race. The most learned and factual academic on the subject is the renowned explorer and archaeologist Darwood Oakton, but he has alas been missing for several months at the time of writing. I will attempt to summarise here some of his key discoveries.
 
 The Sher'Tul lived over ten thousand years ago, during what is referred to as the Age of Haze. The name of the race we know from the elves, who speak of the ancient beings with awe and reverence, yet know little else about them. Ruins of fantastical Sher'Tul structures have been found all across Maj'Eyal, and some have been observed in sunken lands off the coasts, implying that in their time the Sher'Tul must have ruled unopposed all across the world.
 
@@ -493,8 +493,8 @@ What caused them to become extinct is unknown, though many theories abound. The 
 newLore{
 	id = "races-9",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Chapter 10 - Monstrous Races",
-	lore = [[No text would be complete without at least a brief note of some of the more brutish races which infest our world. These do not hold any civilised society of note, nor in general do they seem capable of any form of higher thought or culture, but they are still of interest to study for any who take delight in analysing beings of more primitive intellect.
+	name = _t"Loremaster Greynot's Analysis of the Races - Chapter 10 - Monstrous Races",
+	lore = _t[[No text would be complete without at least a brief note of some of the more brutish races which infest our world. These do not hold any civilised society of note, nor in general do they seem capable of any form of higher thought or culture, but they are still of interest to study for any who take delight in analysing beings of more primitive intellect.
 
 Trolls come in two main types - Kezrak and Moltep, or stone and forest trolls as they are colloquially known. Stone trolls infest many mountain chains to the north-east, and some have been known to wander further afield in search of food or to spread violence. They are generally over 8' high, with extremely pronounced muscular strength and a thick, solid hide which bears the appearance of coal or granite. Forest trolls are generally found in dense woods or swamps, with the Trollmire east of Derth being especially infamous. They have a more advanced form of speech than their mountain-dwelling cousins, and are known to move faster and wield more elaborate weapons, though their greenish hide is not as thick and their musculature less developed. All trolls have intensely fast metabolisms, capable of healing from grievous wounds within a matter of hours. At birth they measure just eight inches long, but within two years grow to full maturity, and rarely live beyond ten years old. They used to be considered little more than beasts, but towards the end of the Age of Pyre many were trained as fighters by the orcs, and were even taught the basics of language and certain battle tactics, making them much more dangerous. Though the orcs are gone their servants remain, and their remote breeding areas and intense birth rates have so far scampered attempts to eradicate them completely.
 
@@ -507,8 +507,8 @@ The origin of Demons is not wholly known, but it is clear that they are capable 
 newLore{
 	id = "races-10",
 	category = "races",
-	name = "Loremaster Greynot's Analysis of the Races - Chapter 11 - Dragons",
-	lore = [[The common man may scoff at the idea of classifying dragons as an intelligent race, but experienced wyrmics know otherwise. Dragons are incredibly long-lived creatures, with some known to survive for thousands of years. Though in their early life they are of a bestial nature, as they advance through the centuries they gain an ever keener and more developed intellect. The eldest of wyrms are sometimes considered the most subtle and intelligent of creatures in Maj'Eyal, capable of telepathic communication and advanced mental abilities, and wyrmics speak of them with the highest reverence.
+	name = _t"Loremaster Greynot's Analysis of the Races - Chapter 11 - Dragons",
+	lore = _t[[The common man may scoff at the idea of classifying dragons as an intelligent race, but experienced wyrmics know otherwise. Dragons are incredibly long-lived creatures, with some known to survive for thousands of years. Though in their early life they are of a bestial nature, as they advance through the centuries they gain an ever keener and more developed intellect. The eldest of wyrms are sometimes considered the most subtle and intelligent of creatures in Maj'Eyal, capable of telepathic communication and advanced mental abilities, and wyrmics speak of them with the highest reverence.
 
 Dragons come in many shapes and sizes, normally growing from 5' long hatchlings to 20' long mature drakes, with some of the greatest wyrms growing to over 40' in length. They are generally winged, with large lizard-like maws and sharp talons on both their fore and hind legs. They are often noted for the lustrous colour of their scales, normally representing an attunement to one of the key Elements of Eyal. This attunement is unseen in any other race, and some philosophers believe that dragons predate all other races, being formed as raw representations of the elements of nature at the beginning of the world. However this theory may be borne purely from the fanatical delusions of certain wyrmics who have studied the creatures for too long.
 
@@ -526,8 +526,8 @@ Dragons are regularly hunted for their thick scales and their elementally imbued
 newLore{
 	id = "thaloren-lament",
 	category = "shatur",
-	name = "Lament for Lands now Lost", always_pop = true,
-	lore = [[You see a moss covered statue of a Thalore reciting a poem, over and over.
+	name = _t"Lament for Lands now Lost", always_pop = true,
+	lore = _t[[You see a moss covered statue of a Thalore reciting a poem, over and over.
 #{italic}#"Where bright and berried yews did stand,
 Where the eldest oaks grew so grand,
 Where singing birds once flew to land,
@@ -547,8 +547,8 @@ Gone is trust, wrath is red.#{normal}#
 newLore{
 	id = "eden-guile",
 	category = "artifacts",
-	name = "Running man",
-	lore = [[Running man, running man
+	name = _t"Running man",
+	lore = _t[[Running man, running man
 Your time is ending soon
 Running man, running man
 Will not save sun nor moons
@@ -566,8 +566,8 @@ Your honour or your shoes!]] }
 newLore{
 	id = "channelers-set",
 	category = "artifacts",
-	name = "Gifts of Nature",
-	lore = [[In Age of Allure rose an archmage high
+	name = _t"Gifts of Nature",
+	lore = _t[[In Age of Allure rose an archmage high
 With power beyond compare
 And the people poor would not come nigh
 His dark and terrible lair
@@ -620,8 +620,8 @@ Now to Nature you are dust"]] }
 newLore{
 	id = "dreamscape-entry",
 	category = "dreamscape",
-	name = "If I Should Die Before I Wake",
-	lore = [[You wake suddenly from your unexpected slumber and attempt to quickly regain your bearings. However, you are not prepared for the bizarre vision that greets you: instead of land and sky you see only amorphous shapes and varying degrees of light. A strange psychedelic haze permeates the air and otherworldly colors and shadows flicker in and out of your peripheral vision. 
+	name = _t"If I Should Die Before I Wake",
+	lore = _t[[You wake suddenly from your unexpected slumber and attempt to quickly regain your bearings. However, you are not prepared for the bizarre vision that greets you: instead of land and sky you see only amorphous shapes and varying degrees of light. A strange psychedelic haze permeates the air and otherworldly colors and shadows flicker in and out of your peripheral vision. 
 As you begin to come to grips with this strange environment, you realize with horror that you cannot move! Your body feels as if it is completely without weight and try as you may you cannot budge an inch. You experience a sense of Déjà Vu as you recall past nightmares of being paralyzed. That's when it strikes you: you never woke up at all, you're still asleep! This epiphany is only reinforced when you notice a strange phenomenon: mirror copies of yourself are being slowly projected from where you stand and are moving about of their own volition.
 They all seem to be focused on something in particular, but what? Just as soon as you set your mind to discerning what your dreamselves are focusing on, you feel it. With horror, you realize that you are not alone here. 
 Somehow, your foe has invaded your very subconcious and is attacking you in your dreams. Still unable to move, your lucid mind races on how to handle such an insane and horrible situation. On a whim you concentrate on one of your projections and you find that you can control it. 
@@ -632,8 +632,8 @@ Free now to face this nightmare, you turn to find your foe. While you have a sen
 newLore{
 	id = "loot-vault-empty", always_pop = true,
 	category = "vault",
-	name = "Mocking Note",
-	lore = [[Dear graverobber,
+	name = _t"Mocking Note",
+	lore = _t[[Dear graverobber,
 
 Try to be a little faster next time.
 
@@ -643,9 +643,9 @@ Love, #{italic}#Eden#{normal}#]]
 newLore{
 	id = "nature-vs-magic",
 	category = "magic",
-	name = "Nature vs Magic",
+	name = _t"Nature vs Magic",
 	always_pop = true,
-	lore = [[Your arcane abilities have been interfered with!
+	lore = _t[[Your arcane abilities have been interfered with!
 
 Eyal is a torn world, and the forces of nature can react strongly to the arcane energies that seek to manipulate them. Some items and areas are imbued with anti-magic, a natural energy that disrupts magical abilities and effects. There are even those who have learned to harness anti-magic into their own wild abilities, and who use them to hunt down and destroy those who practise magic. So beware, caster! It is a hostile world ye wander in.]],
 }
@@ -653,8 +653,8 @@ Eyal is a torn world, and the forces of nature can react strongly to the arcane 
 newLore{
 	id = "kestin-highfin-adventuring-notes",
 	category = "highfin",
-	name = "On Adventuring",
-	lore = [[I must say, as time grows, I feel so do I grow more and more inclined to distance myself from the calling of an 'adventurer', like so many you can find roaming the countryside. I feel like the myth of a wandering hero has blinded too many with promise of easy fame and riches, with no eye for the other kind of fortune.
+	name = _t"On Adventuring",
+	lore = _t[[I must say, as time grows, I feel so do I grow more and more inclined to distance myself from the calling of an 'adventurer', like so many you can find roaming the countryside. I feel like the myth of a wandering hero has blinded too many with promise of easy fame and riches, with no eye for the other kind of fortune.
 
 Hear me out on this.
 
@@ -672,8 +672,8 @@ It is important to remember, that every artifact has a meaning, beings of great 
 newLore{
 	id = "galsame-orientation-notes",
 	category = "point zero",
-	name = "Warden-Master Galsamae's Orientation Notes",
-	lore = [[Congratulations, sir and/or madam. Whether by invitation, discovering it on your own, or simply being enough of a thorn in our side to recruit rather than dispose of, you have gained the secrets of chronomancy. The ultimate power of time - the ability to reset and try again if you fail, the ability to save time by seeing the results of investigations before they happen. Though our powers are bound to post-Spellblaze Eyal, they are those of nigh-omnipotence with enough patience.
+	name = _t"Warden-Master Galsamae's Orientation Notes",
+	lore = _t[[Congratulations, sir and/or madam. Whether by invitation, discovering it on your own, or simply being enough of a thorn in our side to recruit rather than dispose of, you have gained the secrets of chronomancy. The ultimate power of time - the ability to reset and try again if you fail, the ability to save time by seeing the results of investigations before they happen. Though our powers are bound to post-Spellblaze Eyal, they are those of nigh-omnipotence with enough patience.
 
 But trust me - "enough patience" is one nasty limiting reagent. You're going to be running out of that fast when you've spent the last week trying to dismantle an Age of Dusk-era house-of-cards system of causally interdependent tyrannies without causing dwarven extinction, and a plague just broke out right when you had things almost perfect, for the sixth time--
 
@@ -693,8 +693,8 @@ PS: You might encounter a... benefactor of sorts in your travels. You'll know it
 newLore{
 	id = "shiiak-mantra",
 	category = "spydrë",
-	name = "Mantra of a Shiiak",
-    lore = [[Each morning I wake, happy I'm alive;
+	name = _t"Mantra of a Shiiak",
+    lore = _t[[Each morning I wake, happy I'm alive;
 the traps of this tomb won't claim me today.
 Though its curse of hunger eats at my insides,
 I curse it one better by having outstayed.
@@ -720,8 +720,8 @@ they've done what they could but Spydrë is [b]ours.[/b] ]]
 newLore{
 	id = "zquikzshl",
 	category = "boss",
-	name = "Z'quikzshl",
-	lore = [[#{italic}#(The handwriting of this diary entry is poor at best. Whoever wrote this was in poor health.)
+	name = _t"Z'quikzshl",
+	lore = _t[[#{italic}#(The handwriting of this diary entry is poor at best. Whoever wrote this was in poor health.)
 
 #{bold}#53rd Allure, Year 603 of the Age of Pyre#{normal}#
 
@@ -736,8 +736,8 @@ Oh, look. He is trying to harm me with spells, but all he can manage is a corrup
 newLore{
 	id = "walrog",
 	category = "boss",
-	name = "Walrog",
-	lore = [[Dirge of the Naloren
+	name = _t"Walrog",
+	lore = _t[[Dirge of the Naloren
 
 There once was a village
 the Nalore held dear,

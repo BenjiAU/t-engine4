@@ -32,12 +32,12 @@ local Downloader = require "engine.dialogs.Downloader"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init(force_compat)
-	Dialog.init(self, "Load Game", game.w * 0.8, game.h * 0.8)
+	Dialog.init(self, _t"Load Game", game.w * 0.8, game.h * 0.8)
 
-	self.c_compat = Checkbox.new{default=force_compat, width=math.floor(self.iw / 3 - 40), title="Show older versions", on_change=function() self:switch() end}
-	self.c_force_addons = Checkbox.new{default=false, width=math.floor(self.iw / 3 - 40), title="Ignore unloadable addons"}
-	self.c_play = Button.new{text="  Play!  ", fct=function(text) self:playSave() end}
-	self.c_delete = Button.new{text="Delete", fct=function(text) self:deleteSave() end}
+	self.c_compat = Checkbox.new{default=force_compat, width=math.floor(self.iw / 3 - 40), title=_t"Show older versions", on_change=function() self:switch() end}
+	self.c_force_addons = Checkbox.new{default=false, width=math.floor(self.iw / 3 - 40), title=_t"Ignore unloadable addons"}
+	self.c_play = Button.new{text=_t"  Play!  ", fct=function(text) self:playSave() end}
+	self.c_delete = Button.new{text=_t"Delete", fct=function(text) self:deleteSave() end}
 	self.c_desc = Textzone.new{width=math.floor(self.iw / 3 * 2 - 10), height=self.ih - self.c_delete.h - 10, text=""}
 
 	local sw, sh = core.display.size()
@@ -125,7 +125,7 @@ function _M:generateList()
 				save.zone = Textzone.new{
 					width=self.c_desc.w,
 					height=self.c_desc.h,
-					text=("#{bold}##GOLD#%s: %s#WHITE##{normal}#\nGame version: %d.%d.%d\nRequires addons: %s\n\n%s"):format(mod.long_name, save.name, save.module_version and save.module_version[1] or -1, save.module_version and save.module_version[2] or -1, save.module_version and save.module_version[3] or -1, save.addons and table.concat(addons, ", ") or "none", save.description)
+					text=("#{bold}##GOLD#%s: %s#WHITE##{normal}#\nGame version: %d.%d.%d\nRequires addons: %s\n\n%s"):tformat(mod.long_name, save.name, save.module_version and save.module_version[1] or -1, save.module_version and save.module_version[2] or -1, save.module_version and save.module_version[3] or -1, save.addons and table.concat(addons, ", ") or "none", save.description)
 				}
 				if save.screenshot then
 					local sw, sh = save.screenshot:getSize()
@@ -185,40 +185,26 @@ end
 function _M:playSave(ignore_mod_compat)
 	if not self.save_sel then return end
 
-	if self.save_sel.module == "tome" and engine.version_compare(self.save_sel.module_version, {1, 2, 0}) == "lower" then
-		Dialog:yesnoLongPopup("Incompatible savefile", [[Due to huge changes in 1.2.0 all previous savefiles will not work with it.
-This savefile requires a game version lower than 1.2.0 and thus can not be loaded.
-
-But despair not, if you wish to finish it you can simply download the old version corresponding to the savefile on #{italic}##LIGHT_BLUE#https://te4.org/download#WHITE##{normal}#.
-
-We apologize for the annoyance, most of the time we try to keep compatibility but this once it was simply not possible.]],
-			700, function(ret) if ret then
-				util.browserOpenUrl("https://te4.org/download", {webview=true, steam=true})
-			end end, "Go to download in your browser", "Cancel"
-		)
-		return
-	end
-
 	local save_v = engine.version_from_string(self.save_sel.module_string)
 	local save_m = engine.version_from_string(self.save_sel.mod.version_string)
 	if not ignore_mod_compat and not engine.version_patch_same(save_m, save_v) and save_m.name == save_v.name then
-		local howgrabold = "You can simply grab an older version of the game from where you downloaded it."
+		local howgrabold = _t"You can simply grab an older version of the game from where you downloaded it."
 		if core.steam then
-			howgrabold = [[You can downgrade the version by selecting it in the Steam's "Beta" properties of the game.]]
+			howgrabold = _t[[You can downgrade the version by selecting it in the Steam's "Beta" properties of the game.]]
 		end
-		Dialog:yesnoLongPopup("Original game version not found", ("This savefile was created with game version %s. You can try loading it with the current version if you wish but it is recommended you play it with the old version to ensure compatibility\n%s"):format(self.save_sel.module_string, howgrabold), 500, function(ret)
+		Dialog:yesnoLongPopup(_t"Original game version not found", ("This savefile was created with game version %s. You can try loading it with the current version if you wish but it is recommended you play it with the old version to ensure compatibility\n%s"):tformat(self.save_sel.module_string, howgrabold), 500, function(ret)
 			if ret then
 			else
 				self:playSave(true)
 			end
-		end, "Cancel", "Run with newer version", true)
+		end, _t"Cancel", _t"Run with newer version", true)
 		return
 	end
 
 	if config.settings.cheat and not self.save_sel.cheat then
-		Dialog:yesnoPopup("Developer Mode", "#LIGHT_RED#WARNING: #LAST#Loading a savefile while in developer mode will permanently invalidate it. Proceed?", function(ret) if not ret then
+		Dialog:yesnoPopup(_t"Developer Mode", _t"#LIGHT_RED#WARNING: #LAST#Loading a savefile while in developer mode will permanently invalidate it. Proceed?", function(ret) if not ret then
 			Module:instanciate(self.save_sel.mod, self.save_sel.base_name, false)
-		end end, "Cancel", "Load anyway", true)
+		end end, _t"Cancel", _t"Load anyway", true)
 	else
 		local extra_info = nil
 		if self.c_force_addons.checked then extra_info = "ignore_addons_not_loading=true" end
@@ -229,7 +215,7 @@ end
 function _M:deleteSave()
 	if not self.save_sel then return end
 
-	Dialog:yesnoPopup("Delete savefile", "Really delete #{bold}##GOLD#"..self.cur_sel.name.."#WHITE##{normal}#", function(ret)
+	Dialog:yesnoPopup(_t"Delete savefile", ("Really delete #{bold}##GOLD#%s#WHITE##{normal}#"):tformat(self.cur_sel.name), function(ret)
 		if ret then
 			local base = Module:setupWrite(self.save_sel.mod)
 			local save = Savefile.new(self.save_sel.base_name)
@@ -243,7 +229,7 @@ function _M:deleteSave()
 			d.__showup = false
 			game:replaceDialog(self, d)
 		end
-	end, "Delete", "Cancel")
+	end, _t"Delete", _t"Cancel")
 end
 
 function _M:installOldGame(version_string)
@@ -267,7 +253,7 @@ function _M:installOldGame(version_string)
 	end
 
 	if #dls == 0 then
-		Dialog:simplePopup("Old game data", "No data available for this game version.")
+		Dialog:simplePopup(_t"Old game data", _t"No data available for this game version.")
 		return
 	end
 
@@ -276,7 +262,7 @@ function _M:installOldGame(version_string)
 	for i, dl in ipairs(dls) do
 		local modfile = "/modules/"..dl.name
 		print("[OLD MODULE] download file from", dl.url, "to", modfile)
-		local d = Downloader.new{title="Downloading old game data: #LIGHT_GREEN#"..dl.name, co=co, dest=modfile..".tmp", url=dl.url, allow_downloads={modules=true}}
+		local d = Downloader.new{title=_t"Downloading old game data: #LIGHT_GREEN#"..dl.name, co=co, dest=modfile..".tmp", url=dl.url, allow_downloads={modules=true}}
 		local ok = d:start()
 		if ok then
 			local wdir = fs.getWritePath()
@@ -290,8 +276,8 @@ function _M:installOldGame(version_string)
 		else all_ok = false
 		end
 	end
-	if all_ok then Dialog:simplePopup("Old game data", "Old game data for "..version_string.." correctly installed. You can now play.") self:regen()
-	else Dialog:simplePopup("Old game data", "Failed to install.") end
+	if all_ok then Dialog:simplePopup(_t"Old game data", ("Old game data for %s correctly installed. You can now play."):tformat(version_string)) self:regen()
+	else Dialog:simplePopup(_t"Old game data", _t"Failed to install.") end
 	end)
 	print(coroutine.resume(co))
 end

@@ -40,7 +40,7 @@ newEntity{ name = "gladiator",
 	ai = "tactical", ai_state = { ai_move = "move_complex", talent_in = 1 },
 
 	stats = { str=15, dex=15, mag=1, con=15 },
-	desc = [[A menacing man in heavy armor, wielding a mace. He looks battle-hardened.]],
+	desc = _t[[A menacing man in heavy armor, wielding a mace. He looks battle-hardened.]],
 	level_range = {5, 19}, exp_worth = 2,
 	rarity = false,
 	max_life = resolvers.rngavg(100,125),
@@ -87,7 +87,7 @@ newEntity{ name = "halfling slinger",
 	ai = "tactical", ai_state = { ai_move = "move_complex", talent_in = 1 },
 
 	stats = { str=10, dex=15, cun=15, con=8 },
-	desc = [[A Halfling slinger. He seems adept at combat.]],
+	desc = _t[[A Halfling slinger. He seems adept at combat.]],
 	level_range = {6, 20}, exp_worth = 1,
 	rarity = false,
 	max_life = resolvers.rngavg(100,110),
@@ -139,7 +139,7 @@ newEntity{ name = "arcane blade",
 	ai = "tactical", ai_state = { ai_move = "move_complex", talent_in = 1 },
 
 	stats = { str=20, dex=20, mag=8, con=16 },
-	desc = [[A Human Arcane Blade. His body shows multiple scars from battle.]],
+	desc = _t[[A Human Arcane Blade. His body shows multiple scars from battle.]],
 	level_range = {6, 21}, exp_worth = 2,
 	rarity = false,
 	max_life = resolvers.rngavg(100,130),
@@ -161,7 +161,7 @@ newEntity{ name = "arcane blade",
 	end,
 	on_die = function (self)
 		local Chat = require "engine.Chat"
-		local npc = {name="Cornac rogue"}
+		local npc = {name=_t"Cornac rogue"}
 		local chat = Chat.new("arena-unlock", npc, game.player, {npc=npc})
 		chat:invoke("win")
 	end

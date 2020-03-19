@@ -21,7 +21,7 @@ local rooms = {"random_room", {"pit",3}, {"greater_vault",7}}
 if game:isAddonActive("items-vault") then table.insert(rooms, {"!items-vault",5}) end
 
 return {
-	name = "Infinite Dungeon",
+	name = _t"Infinite Dungeon",
 	level_range = {1, 1},
 	level_scheme = "player",
 	max_level = 1000000000,
@@ -108,7 +108,7 @@ return {
 		-- Define standard floor layouts:
 		local layouts = {
 			{	id_layout_name = "default",
-				desc = ", carefully excavated area",
+				desc = _t", carefully excavated area",
 				class = "engine.generator.map.Roomer",
 				nb_rooms = 4 + math.ceil(vx * vy * 10/4900), -- 12 @ 60x60, 14 @ 70x70, 21 @ 90x90
 				rooms = {"random_room", {"pit",3}, {"greater_vault",7}},
@@ -116,7 +116,7 @@ return {
 				lite_room_chance = 50,
 			},
 			{	id_layout_name = "forest",
-				desc = " wilderness", 
+				desc = _t" wilderness", 
 				class = "engine.generator.map.Forest",
 				edge_entrances = rng.table{{2,8}, {4,6}, {6,4}, {8,2}},
 				zoom = rng.range(2,6),
@@ -129,19 +129,19 @@ return {
 				enemy_count = math.ceil(vx * vy *40/4900) -- more room for enemies and more cover on this map: avg: 30 @ 60x60, 40 @ 70x70, 67 @ 90x90
 			},
 			{	id_layout_name = "cavern",
-				desc = " cavern",
+				desc = _t" cavern",
 				class = "engine.generator.map.Cavern",
 				zoom = math.random(12, 20),
 				min_floor = math.floor(rng.range(vx * vy * 0.4 / 2, vx * vy * 0.4)),
 			},
 			{	id_layout_name = "maze",
-				desc = " network of corridors",
+				desc = _t" network of corridors",
 				class = "engine.generator.map.Maze",
 				widen_w = util.bound(rng.normal(2, 2), 1, 7),
 				widen_h = util.bound(rng.normal(2, 2), 1, 7),
 			},
 			{	id_layout_name = "town",
-				desc = ", settled area",
+				desc = _t", settled area",
 				class = "engine.generator.map.Town",
 				building_chance = math.random(50,90),
 				max_building_w = math.random(6,11), max_building_h = math.random(6,11),
@@ -151,7 +151,7 @@ return {
 				rooms_config = {forest_clearing={pit_chance=util.bound(lev, 10, 50), filters={{special=function(e) return e.rank <= 3 end}}}},
 			},
 			{	id_layout_name = "building",
-				desc = ", constructed area",
+				desc = _t", constructed area",
 				class = "engine.generator.map.Building",
 				nb_rooms = math.random(0, math.ceil(vx*vy/2000)),
 				rooms = {{"lesser_vault", math.floor(40/lev)}, "greater_vault"},
@@ -161,7 +161,7 @@ return {
 				enemy_count = math.ceil(vx * vy *60/4900) -- more room for enemies and more cover on this map: avg: 44 @ 60x60, 60 @ 70x70, 99 @ 90x90
 			},
 			{	id_layout_name = "octopus",
-				desc = ", subsided area",
+				desc = _t", subsided area",
 				class = "engine.generator.map.Octopus",
 				main_radius = {0.25, 0.35},
 				arms_radius = {0.1, 0.2},
@@ -169,7 +169,7 @@ return {
 				nb_rooms = {5, 10},
 			},
 			{	id_layout_name = "hexa",
-				desc = ", geometrically ordered area",
+				desc = _t", geometrically ordered area",
 				class = "engine.generator.map.Hexacle",
 				segment_wide_chance = 70,
 				nb_segments = 8,
@@ -183,23 +183,23 @@ return {
 
 		-- define additional grid sets:
 		local vgrids = {
-			{id_grids_name="default", floor="FLOOR", wall="WALL", door="DOOR", down="DOWN", desc="hewn"},
-			{id_grids_name="tree", floor="GRASS", wall="TREE", door="GRASS_ROCK", down="GRASS_DOWN2", desc="sylvan"},
-			{id_grids_name="underground", floor="UNDERGROUND_FLOOR", wall="UNDERGROUND_TREE", door="UNDERGROUND_ROCK", down="UNDERGROUND_LADDER_DOWN", desc="subterranean"},
-			{id_grids_name="crystals", floor="CRYSTAL_FLOOR", wall={"CRYSTAL_WALL","CRYSTAL_WALL2","CRYSTAL_WALL3","CRYSTAL_WALL4","CRYSTAL_WALL5","CRYSTAL_WALL6","CRYSTAL_WALL7","CRYSTAL_WALL8","CRYSTAL_WALL9","CRYSTAL_WALL10","CRYSTAL_WALL11","CRYSTAL_WALL12","CRYSTAL_WALL13","CRYSTAL_WALL14","CRYSTAL_WALL15","CRYSTAL_WALL16","CRYSTAL_WALL17","CRYSTAL_WALL18","CRYSTAL_WALL19","CRYSTAL_WALL20",}, door="CRYSTAL_ROCK", down="CRYSTAL_LADDER_DOWN", desc="crystalline"},
-			{id_grids_name="sand", floor="UNDERGROUND_SAND", wall="SANDWALL", door="SAND_ROCK", down="SAND_LADDER_DOWN", desc="sandy"},
-			{id_grids_name="desert", floor="SAND", wall="PALMTREE", door="DESERT_ROCK", down="SAND_DOWN2", desc="arrid"},
-			{id_grids_name="slime", floor="SLIME_FLOOR", wall="SLIME_WALL", door="SLIME_DOOR", down="SLIME_DOWN", desc="slimey"},
-			{id_grids_name="jungle", floor="JUNGLE_GRASS", wall="JUNGLE_TREE", door="JUNGLE_ROCK", down="JUNGLE_GRASS_DOWN2", desc="humid, tropical"},
-			{id_grids_name="cave", floor="CAVEFLOOR", wall="CAVEWALL", door="CAVE_ROCK", down="CAVE_LADDER_DOWN", desc="unhewn"},
-			{id_grids_name="burntland", floor="BURNT_GROUND", wall="BURNT_TREE", door="BURNT_DOOR", down="BURNT_DOWN6", desc="burned"},
-			{id_grids_name="mountain", floor="ROCKY_GROUND", wall="MOUNTAIN_WALL", door="DOOR", down="ROCKY_DOWN2", desc="mountainous"},
-			{id_grids_name="mountain_forest", floor="ROCKY_GROUND", wall="ROCKY_SNOWY_TREE", door="ROCKY_SNOWY_DOOR", down="ROCKY_DOWN2", desc="alpine"},
-			{id_grids_name="snowy_forest", floor="SNOWY_GRASS_2", wall="SNOWY_TREE_2", door="SNOWY_DOOR", down="snowy_DOWN2", desc="cold, wooded"},
-			{id_grids_name="temporal_void", floor="VOID", wall="SPACETIME_RIFT2", door="VOID", down="RIFT2", desc="empty"},
-			{id_grids_name="water", floor="WATER_FLOOR_FAKE", wall="WATER_WALL_FAKE", door="WATER_DOOR_FAKE", down="WATER_DOWN_FAKE", desc="flooded"},
-			{id_grids_name="lava", floor="LAVA_FLOOR_FAKE", wall="LAVA_WALL_FAKE", door="LAVA_ROCK", down="LAVA_DOWN_FAKE", desc="molten"},
-			{id_grids_name="autumn_forest", floor="AUTUMN_GRASS", wall="AUTUMN_TREE", door="AUTUMN_ROCK", down="AUTUMN_GRASS_DOWN2", desc="temperate"},
+			{id_grids_name="default", floor="FLOOR", wall="WALL", door="DOOR", down="DOWN", desc=_t"hewn"},
+			{id_grids_name="tree", floor="GRASS", wall="TREE", door="GRASS_ROCK", down="GRASS_DOWN2", desc=_t"sylvan"},
+			{id_grids_name="underground", floor="UNDERGROUND_FLOOR", wall="UNDERGROUND_TREE", door="UNDERGROUND_ROCK", down="UNDERGROUND_LADDER_DOWN", desc=_t"subterranean"},
+			{id_grids_name="crystals", floor="CRYSTAL_FLOOR", wall={"CRYSTAL_WALL","CRYSTAL_WALL2","CRYSTAL_WALL3","CRYSTAL_WALL4","CRYSTAL_WALL5","CRYSTAL_WALL6","CRYSTAL_WALL7","CRYSTAL_WALL8","CRYSTAL_WALL9","CRYSTAL_WALL10","CRYSTAL_WALL11","CRYSTAL_WALL12","CRYSTAL_WALL13","CRYSTAL_WALL14","CRYSTAL_WALL15","CRYSTAL_WALL16","CRYSTAL_WALL17","CRYSTAL_WALL18","CRYSTAL_WALL19","CRYSTAL_WALL20",}, door="CRYSTAL_ROCK", down="CRYSTAL_LADDER_DOWN", desc=_t"crystalline"},
+			{id_grids_name="sand", floor="UNDERGROUND_SAND", wall="SANDWALL", door="SAND_ROCK", down="SAND_LADDER_DOWN", desc=_t"sandy"},
+			{id_grids_name="desert", floor="SAND", wall="PALMTREE", door="DESERT_ROCK", down="SAND_DOWN2", desc=_t"arrid"},
+			{id_grids_name="slime", floor="SLIME_FLOOR", wall="SLIME_WALL", door="SLIME_DOOR", down="SLIME_DOWN", desc=_t"slimey"},
+			{id_grids_name="jungle", floor="JUNGLE_GRASS", wall="JUNGLE_TREE", door="JUNGLE_ROCK", down="JUNGLE_GRASS_DOWN2", desc=_t"humid, tropical"},
+			{id_grids_name="cave", floor="CAVEFLOOR", wall="CAVEWALL", door="CAVE_ROCK", down="CAVE_LADDER_DOWN", desc=_t"unhewn"},
+			{id_grids_name="burntland", floor="BURNT_GROUND", wall="BURNT_TREE", door="BURNT_DOOR", down="BURNT_DOWN6", desc=_t"burned"},
+			{id_grids_name="mountain", floor="ROCKY_GROUND", wall="MOUNTAIN_WALL", door="DOOR", down="ROCKY_DOWN2", desc=_t"mountainous"},
+			{id_grids_name="mountain_forest", floor="ROCKY_GROUND", wall="ROCKY_SNOWY_TREE", door="ROCKY_SNOWY_DOOR", down="ROCKY_DOWN2", desc=_t"alpine"},
+			{id_grids_name="snowy_forest", floor="SNOWY_GRASS_2", wall="SNOWY_TREE_2", door="SNOWY_DOOR", down="snowy_DOWN2", desc=_t"cold, wooded"},
+			{id_grids_name="temporal_void", floor="VOID", wall="SPACETIME_RIFT2", door="VOID", down="RIFT2", desc=_t"empty"},
+			{id_grids_name="water", floor="WATER_FLOOR_FAKE", wall="WATER_WALL_FAKE", door="WATER_DOOR_FAKE", down="WATER_DOWN_FAKE", desc=_t"flooded"},
+			{id_grids_name="lava", floor="LAVA_FLOOR_FAKE", wall="LAVA_WALL_FAKE", door="LAVA_ROCK", down="LAVA_DOWN_FAKE", desc=_t"molten"},
+			{id_grids_name="autumn_forest", floor="AUTUMN_GRASS", wall="AUTUMN_TREE", door="AUTUMN_ROCK", down="AUTUMN_GRASS_DOWN2", desc=_t"temperate"},
 		}
 		zone:triggerHook{"InfiniteDungeon:getGrids", grids=vgrids}
 		
@@ -309,7 +309,7 @@ return {
 				if x and y and ex and ex.change_level then -- update the exit tile
 					ex = ex:clone()
 					ex.show_tooltip = true
-					ex.desc = (ex.desc or "")..("\nEncroaching terrain:\n%s%s"):format(ae.grids.desc or "indistinct", ae.layout.desc or "continuation of the Infinite Dungeon")
+					ex.desc = (ex.desc or "")..("\nEncroaching terrain:\n%s%s"):tformat(ae.grids.desc or _t"indistinct", ae.layout.desc or _t"continuation of the Infinite Dungeon")
 					-- make sure the exit is clearly marked (in case the nice tiler hides it)
 					if ex.add_displays then -- migrate graphics up, but below actor and nice tiler 3d z levels
 						for i, d in ipairs(ex.add_displays) do

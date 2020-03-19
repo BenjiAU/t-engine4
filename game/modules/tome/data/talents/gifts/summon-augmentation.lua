@@ -36,7 +36,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Induces a killing rage in all your summons within a radius of 5 when a summon is killed, increasing all their stats by %d for 5 turns. 
-		The bonus will increase with your mindpower.]]):format(t.incStats(self, t))
+		The bonus will increase with your mindpower.]]):tformat(t.incStats(self, t))
 	end,
 }
 
@@ -121,7 +121,7 @@ newTalent{
 		- Spider: Knocks back all foes %d tiles
 		In addition, a random summon will come off cooldown.
 		Hostile effects will not hit you or your other summons.
-		The effects improve with your mindpower, and can crit.]]):format(radius, t.explodeSecondary(self,t), t.hydraAffinity(self,t), t.hydraRegen(self,t), t.explodeSecondary(self,t), t.explodeFire(self,t), t.explodeBleed(self,t) / 6, t.explodeSecondary(self,t), t.jellySlow(self,t) * 100, t.minotaurConfuse(self,t), t.golemArmour(self,t), t.golemHardiness(self,t), t.shellShielding(self,t), t.spiderKnockback(self,t)) 
+		The effects improve with your mindpower, and can crit.]]):tformat(radius, t.explodeSecondary(self,t), t.hydraAffinity(self,t), t.hydraRegen(self,t), t.explodeSecondary(self,t), t.explodeFire(self,t), t.explodeBleed(self,t) / 6, t.explodeSecondary(self,t), t.jellySlow(self,t) * 100, t.minotaurConfuse(self,t), t.golemArmour(self,t), t.golemHardiness(self,t), t.shellShielding(self,t), t.spiderKnockback(self,t)) 
 	end,
 }
 
@@ -134,7 +134,7 @@ newTalent{
 	incLife = function(self, t) return self:combatTalentLimit(t, 1, 0.05, 0.20) end,
 	incDur = function(self, t) return math.floor(self:combatTalentLimit(t, 6, 1, 2.8)) end,
 	info = function(self, t)
-		return ([[Increases all your summons' max life by %0.1f%% and extends your summons' maximum lifetime by %d turns.]]):format(100*t.incLife(self, t), t.incDur(self,t))
+		return ([[Increases all your summons' max life by %0.1f%% and extends your summons' maximum lifetime by %d turns.]]):tformat(100*t.incLife(self, t), t.incDur(self,t))
 	end,
 }
 
@@ -169,6 +169,6 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Switches places with one of your summons. This disorients your foes, granting both you and your summon 50%% evasion for %d turns.]]):format(t.getDuration(self, t))
+		return ([[Switches places with one of your summons. This disorients your foes, granting both you and your summon 50%% evasion for %d turns.]]):tformat(t.getDuration(self, t))
 	end,
 }

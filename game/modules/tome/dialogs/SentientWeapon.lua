@@ -29,7 +29,7 @@ local Separator = require "engine.ui.Separator"
 
 module(..., package.seeall, class.inherit(Dialog))
 
-local _points_text = "Points left: #00FF00#%d#WHITE#"
+local _points_text = _t"Points left: #00FF00#%d#WHITE#"
 
 
 -- This stuff is quite the mess.  I preserved Sus' Voice of Telos dialogues as much as possible but some of his stats we're simply not using
@@ -46,11 +46,11 @@ function _M:init(actor, on_finish)
 	self.actor_dup = actor.actor:clone()
 	self.unused_stats = self.o.unused_stats
 	--Dialog.init(self, self.o.name, 500, 300)
-	Dialog.init(self, self.o.name, 300, 200)
+	Dialog.init(self, _t(self.o.name), 300, 200)
 
 	self.sel = 1
 
-	self.c_tut = Textzone.new{width=math.floor(self.iw / 2 - 10), auto_height=true, no_color_bleed=true, text=[[
+	self.c_tut = Textzone.new{width=math.floor(self.iw / 2 - 10), auto_height=true, no_color_bleed=true, text=_t[[
 Keyboard: #00FF00#up key/down key#FFFFFF# to select a stat; #00FF00#right key#FFFFFF# to increase stat; #00FF00#left key#FFFFFF# to decrease a stat.
 Mouse: #00FF00#Left click#FFFFFF# to increase a stat; #00FF00#right click#FFFFFF# to decrease a stat.
 ]]}
@@ -58,19 +58,19 @@ Mouse: #00FF00#Left click#FFFFFF# to increase a stat; #00FF00#right click#FFFFFF
 	self.c_points = Textzone.new{width=math.floor(self.iw - 10), auto_height=true, no_color_bleed=true, text=_points_text:format(self.unused_stats)}
 
 	self.c_list = ListColumns.new{width=math.floor(self.iw - 10), height=self.ih - 10, all_clicks=true, columns={
-		{name="Stat", width=70, display_prop="name"},
-		{name="Value", width=30, display_prop="val"},
+		{name=_t"Stat", width=70, display_prop="name"},
+		{name=_t"Value", width=30, display_prop="val"},
 	}, list={
-		{name="Spellpower", val=self.o.wielder.combat_spellpower, stat_id = "combat_spellpower", delta = 3},
-		{name="Spellcrit", val=self.o.wielder.combat_spellcrit, stat_id = "combat_spellcrit", delta = 1},
-		--{name="Critical power", val=self.o.combat.critical_power, stat_id = "critical_power", delta = 0.1},
-		--{name="Maximum hit chance", val=self.o.combat.max_acc, stat_id = "max_acc", delta = 5},
-		--{name="Strength", val=self.actor:getStr(), stat_id=self.actor.STAT_STR},
-		--{name="Dexterity", val=self.actor:getDex(), stat_id=self.actor.STAT_DEX},
-		--{name="Magic", val=self.actor:getMag(), stat_id=self.actor.STAT_MAG},
-		--{name="Willpower", val=self.actor:getWil(), stat_id=self.actor.STAT_WIL},
-		--{name="Cunning", val=self.actor:getCun(), stat_id=self.actor.STAT_CUN},
-		--{name="Constitution", val=self.actor:getCon(), stat_id=self.actor.STAT_CON},
+		{name=_t"Spellpower", val=self.o.wielder.combat_spellpower, stat_id = "combat_spellpower", delta = 3},
+		{name=_t"Spellcrit", val=self.o.wielder.combat_spellcrit, stat_id = "combat_spellcrit", delta = 1},
+		--{name=_t"Critical power", val=self.o.combat.critical_power, stat_id = "critical_power", delta = 0.1},
+		--{name=_t"Maximum hit chance", val=self.o.combat.max_acc, stat_id = "max_acc", delta = 5},
+		--{name=_t"Strength", val=self.actor:getStr(), stat_id=self.actor.STAT_STR},
+		--{name=_t"Dexterity", val=self.actor:getDex(), stat_id=self.actor.STAT_DEX},
+		--{name=_t"Magic", val=self.actor:getMag(), stat_id=self.actor.STAT_MAG},
+		--{name=_t"Willpower", val=self.actor:getWil(), stat_id=self.actor.STAT_WIL},
+		--{name=_t"Cunning", val=self.actor:getCun(), stat_id=self.actor.STAT_CUN},
+		--{name=_t"Constitution", val=self.actor:getCon(), stat_id=self.actor.STAT_CON},
 	}, fct=function(item, _, v)
 		self:incStat(v == "left" and 1 or -1, item.stat_id)
 	--end, select=function(item, sel) self.sel = sel self.c_desc:switchItem(item, self.actor.stats_def[item.stat_id].description) end}
@@ -131,22 +131,22 @@ function _M:incStat(v, id)
 	local delta = self.delta * v
 	if v == 1 then
 		if self.o.unused_stats <= 0 then
-			self:simplePopup("Not enough stat points", "You have no stat points left!")
+			self:simplePopup(_t"Not enough stat points", _t"You have no stat points left!")
 			return
 		end
 		print(self.o.wielder[id] or "false", self.o.factory_settings.maxes[id] or "false")
 		if self.o.wielder[id] >= self.o.factory_settings.maxes[id] then
-			self:simplePopup("Stat is at the maximum", "You can not increase this stat further!")
+			self:simplePopup(_t"Stat is at the maximum", _t"You can not increase this stat further!")
 			return
 		end
 	else
 		print(self.o.wielder[id] or "false", self.o.factory_settings.mins[id] or "false")
 		if self.o.wielder[id] <= self.o.factory_settings.mins[id] then
-			self:simplePopup("Impossible", "You cannot take out more points!")
+			self:simplePopup(_t"Impossible", _t"You cannot take out more points!")
 			return
 		end
 		if self.o.wielder[id] + delta <= 0 then
-			self:simplePopup("Impossible", "You cannot take out more points!")
+			self:simplePopup(_t"Impossible", _t"You cannot take out more points!")
 			return
 		end
 	end
@@ -192,7 +192,7 @@ end
 function _M:drawDialog(s)
 	-- Description part
 	self:drawHBorder(s, self.iw / 2, 2, self.ih - 4)
-	local statshelp = ([[Keyboard: #00FF00#up key/down key#FFFFFF# to select a stat; #00FF00#right key#FFFFFF# to increase stat; #00FF00#left key#FFFFFF# to decrease a stat.
+	local statshelp = (_t[[Keyboard: #00FF00#up key/down key#FFFFFF# to select a stat; #00FF00#right key#FFFFFF# to increase stat; #00FF00#left key#FFFFFF# to decrease a stat.
 Mouse: #00FF00#Left click#FFFFFF# to increase a stat; #00FF00#right click#FFFFFF# to decrease a stat.
 ]]):splitLines(self.iw / 2 - 10, self.font)
 	local lines = self.actor.stats_def[self.sel].description:splitLines(self.iw / 2 - 10, self.font)
@@ -204,11 +204,11 @@ Mouse: #00FF00#Left click#FFFFFF# to increase a stat; #00FF00#right click#FFFFFF
 	end
 
 	-- Stats
-	s:drawColorStringBlended(self.font, "Stats points left: #00FF00#"..self.actor.unused_stats, 2, 2)
+	s:drawColorStringBlended(self.font, ("Stats points left: #00FF00#%s"):tformat(self.actor.unused_stats), 2, 2)
 	self:drawWBorder(s, 2, 20, 200)
 
 	self:drawSelectionList(s, 2, 25, self.font_h, {
-		"Strength", "Dexterity", "Magic", "Willpower", "Cunning", "Constitution"
+		_t"Strength", _t"Dexterity", _t"Magic", _t"Willpower", _t"Cunning", _t"Constitution"
 	}, self.sel)
 	self:drawSelectionList(s, 100, 25, self.font_h, {
 		self.actor:getStr(), self.actor:getDex(), self.actor:getMag(), self.actor:getWil(), self.actor:getCun(), self.actor:getCon(),

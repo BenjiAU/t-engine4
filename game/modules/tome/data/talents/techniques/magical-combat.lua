@@ -143,11 +143,11 @@ newTalent{
 		if self:isTalentActive(t.id) then
 			local talent = self:getTalentFromId(self:isTalentActive(t.id).talent)
 			if talent and talent.name then
-				talent_selected = [[
+				talent_selected = ([[
 				
-				Currently selected spell: ]] .. talent.name
+				Currently selected spell: %s]]):tformat(talent.name)
 			else
-				talent_selected = [[
+				talent_selected = _t[[
 				
 				Currently selected spell: Random]]
 			end
@@ -159,7 +159,7 @@ newTalent{
 		The chance increases with your Cunning.
 
 		Allowed spells: %s %s]]):
-		format(t.getChance(self, t), talent_list, talent_selected)
+		tformat(t.getChance(self, t), talent_list, talent_selected)
 	end,
 }
 
@@ -175,7 +175,7 @@ newTalent{
 		local spellpower = t.getSpellpower(self, t)
 		local bonus = self:getCun()*spellpower/100
 		return ([[The user gains a bonus to Spellpower equal to %d%% of your Cunning (Current bonus: %d).]]):
-		format(spellpower, bonus)
+		tformat(spellpower, bonus)
 	end,
 }
 
@@ -207,7 +207,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Regenerates %0.2f mana per turn, and increases physical and spell critical chance by %d%% while active.]]):format(t.getManaRegen(self, t), t.getCritChance(self, t))
+		return ([[Regenerates %0.2f mana per turn, and increases physical and spell critical chance by %d%% while active.]]):tformat(t.getManaRegen(self, t), t.getCritChance(self, t))
 	end,
 }
 
@@ -228,6 +228,6 @@ newTalent{
 		If you are dual wielding this will only occur 50%% of the time.
 		At level 5 the ball becomes radius 2.
 		]]):
-		format(t.getSPMult(self, t)*100, self:getMag() * t.getSPMult(self, t), self:getTalentRadius(t), damDesc(self, DamageType.ARCANE, t.getDamage(self, t)) )
+		tformat(t.getSPMult(self, t)*100, self:getMag() * t.getSPMult(self, t), self:getTalentRadius(t), damDesc(self, DamageType.ARCANE, t.getDamage(self, t)) )
 	end,
 }

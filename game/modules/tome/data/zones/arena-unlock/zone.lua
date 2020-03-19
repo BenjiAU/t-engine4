@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Derth (Southeast)",
+	name = _t"Derth (Southeast)",
 	level_range = {5, 12},
 	level_scheme = "player",
 	max_level = 1,

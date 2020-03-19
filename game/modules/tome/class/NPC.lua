@@ -53,7 +53,7 @@ function _M:actBase()
 		self.summon_time = self.summon_time - 1
 		if self.summon_time <= 0 then
 			if not self.summon_quiet then
-				game.logPlayer(self.summoner, "#PINK#Your summoned %s disappears.", self.name)
+				game.logPlayer(self.summoner, "#PINK#Your summoned %s disappears.", self:getName())
 			end
 			self:die()
 			self.dead_by_unsummon = true
@@ -281,7 +281,7 @@ function _M:checkAngered(src, set, value)
 
 	if not was_hostile and self:reactionToward(src) < 0 then
 		if self.anger_emote then
-			self:doEmote(self.anger_emote:gsub("@himher@", src.female and "her" or "him"), 30)
+			self:doEmote(self.anger_emote:gsub("@himher@", src.female and _t"her" or _t"him"), 30)
 		end
 	end
 end
@@ -322,7 +322,7 @@ function _M:onTakeHit(value, src, death_note)
 		if src then
 			if src.targetable and not self.ai_target.actor and not (self.never_anger and self:reactionToward(src) > 0) then self:setTarget(src) end
 			-- Get angry if hurt by a friend
-			if src.faction and self:reactionToward(src) >= 0 and self.fov then
+			if src.faction and self:reactionToward(src) >= 0 and self.fov and self.checkAngered then
 				self:checkAngered(src, false, -50)
 
 				-- Share reaction with allies
@@ -395,8 +395,8 @@ function _M:tooltip(x, y, seen_by)
 	
 	str:add(
 		true,
-		("Killed by you: %s"):format(killed), true,
-		"Target: ", target and target.name or "none"
+		("Killed by you: %s"):tformat(killed), true,
+		_t"Target: ", target and target:getName() or _t"none"
 	)
 	-- Give hints to stealthed/invisible players about where the NPC is looking (if they have LOS)
 	if target == game.player and (game.player:attr("stealth") or game.player:attr("invisible")) and game.player:hasLOS(self.x, self.y) then
@@ -404,14 +404,14 @@ function _M:tooltip(x, y, seen_by)
 		local dx, dy = tx - self.ai_target.actor.x, ty - self.ai_target.actor.y
 		local offset = engine.Map:compassDirection(dx, dy)
 		if offset then
-			str:add(" looking " ..offset)
+			str:add((" looking %s"):tformat(offset))
 			if config.settings.cheat then str:add((" (%+d, %+d)"):format(dx, dy)) end
 		else
-			str:add(" looking at you.")
+			str:add(_t" looking at you.")
 		end
 	end
 	if config.settings.cheat then
-		str:add(true, "UID: "..self.uid, true, self.image)
+		str:add(true, _t"UID: "..self.uid, true, self.image)
 	end
 	return str
 end
@@ -432,7 +432,7 @@ end
 
 --- Make emotes appear in the log too
 function _M:setEmote(e)
-	game.logSeen(self, "%s says: '%s'", self.name:capitalize(), e.text)
+	game.logSeen(self, "%s says: '%s'", self:getName():capitalize(), e.text)
 	mod.class.Actor.setEmote(self, e)
 end
 

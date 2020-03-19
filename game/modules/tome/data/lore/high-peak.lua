@@ -20,16 +20,16 @@
 newLore{
 	id = "closing-farportal",
 	category = "high peak",
-	name = "closing the void farportal", always_pop = true,
+	name = _t"closing the void farportal", always_pop = true,
 	image = "closing_farportal.png",
-	lore = [[The void farportal is closed, preventing untold horrors from assaulting Eyal.]],
+	lore = _t[[The void farportal is closed, preventing untold horrors from assaulting Eyal.]],
 }
 
 newLore{
     id = "argoniel-1",
     category = "high peak",
-    name = "a blood-soaked resonating diamond",
-    lore = [[#{italic}#On touching the still-wet diamond, you find yourself experiencing memories that are not your own, memories that slowly seep into your mind with increasing detail.  You cannot tell if the initial haze covering them is a side-effect of the absorption process, or if it's from being dazed and waking from unconsciousness in these memories...#{normal}#
+    name = _t"a blood-soaked resonating diamond",
+    lore = _t[[#{italic}#On touching the still-wet diamond, you find yourself experiencing memories that are not your own, memories that slowly seep into your mind with increasing detail.  You cannot tell if the initial haze covering them is a side-effect of the absorption process, or if it's from being dazed and waking from unconsciousness in these memories...#{normal}#
 
 #FIREBRICK#Pain#LAST#.  Everywhere, but where is worst...
 
@@ -49,8 +49,8 @@ I have my theories, unsettling as they are, as to what's coming over me - what I
 newLore{
     id = "elandar-1",
     category = "high peak",
-    name = "Elandar's journal (1)",
-    lore = [[I am increasingly certain that what I gave my love was not the Blood of Life.
+    name = _t"Elandar's journal (1)",
+    lore = _t[[I am increasingly certain that what I gave my love was not the Blood of Life.
 
 Her demeanor has...  changed, but not in the way one would expect.  If I had given her the essence of some god the Sher'Tul wounded and exsanguinated for a trophy, or a blight-ridden demon, or something else that would affect her mental state, I would expect her to start acting oddly - with more cruelty, more arrogance, less #{italic}#humanity.#{normal}#  Instead...  she acts like she knows the world is about to end and can't tell anyone.  She mutters about needing to use the contents of that ruin, one that we still can't even tell Angolwen #{italic}#exists#{normal}#, to bring about a new order of magocracy like the one Tannen wants "before it's too late."  Something is gnawing at her, and she dreads that I may find out what, but otherwise...  she's almost #{italic}#too#{normal}# rational.
 
@@ -60,8 +60,8 @@ She is terrified of losing me, losing this world, losing #{italic}#herself#{norm
 newLore{
     id = "argoniel-2",
     category = "high peak",
-    name = "Argoniel's blood-runed athame",
-    lore = [[#{italic}#On touching the blood-dripping knife, memories flood your mind - this time, with incredible intensity.  You drop the knife immediately, thankful you only touched the plain handle, and not the rune-lit blade or the red pool under it.  Moments later, your mind starts parsing and interpreting what it just absorbed:#{normal}#
+    name = _t"Argoniel's blood-runed athame",
+    lore = _t[[#{italic}#On touching the blood-dripping knife, memories flood your mind - this time, with incredible intensity.  You drop the knife immediately, thankful you only touched the plain handle, and not the rune-lit blade or the red pool under it.  Moments later, your mind starts parsing and interpreting what it just absorbed:#{normal}#
 
 pain.  pain loneliness and cold, so much cold and it keeps growing.  in my dreams i can't move a muscle thanks to this #{italic}##FIREBRICK#[untranslatably foul profanity]#LAST##{normal}# cage.  he never had his chance.  could've made the world in his image.  could've made a peaceful world, one of meadows and soft rolling hills, if the other gods hadn't fought with him over it.  might've made humans - in any case he watched over us, protected us from those #{italic}##FIREBRICK#[untranslatably ancient profanity]#LAST##{normal}# squid until they drove him into the void
 
@@ -81,8 +81,8 @@ it will be
 newLore{
     id = "elandar-2",
     category = "high peak",
-    name = "Elandar's journal (2)",
-    lore = [[I awoke early this morning to see the love of my life altering the unique farportal we've been building together.  Our plans are all on track so far, the Staff of Absorption has been integrated into the portal so it'll drain Gerlyk the moment it summons him, the orcs are too busy suspecting each other to bother investigating us...  and then I discover that she's sabotaged it.  This portal will #{italic}#em#{normal}#power Gerlyk when it summons him - and he surely must be insane from the loneliness of tumbling in the void of space all this time.  In any case, even a sane god would be devastating to life as we know it.
+    name = _t"Elandar's journal (2)",
+    lore = _t[[I awoke early this morning to see the love of my life altering the unique farportal we've been building together.  Our plans are all on track so far, the Staff of Absorption has been integrated into the portal so it'll drain Gerlyk the moment it summons him, the orcs are too busy suspecting each other to bother investigating us...  and then I discover that she's sabotaged it.  This portal will #{italic}#em#{normal}#power Gerlyk when it summons him - and he surely must be insane from the loneliness of tumbling in the void of space all this time.  In any case, even a sane god would be devastating to life as we know it.
     
 ...I can't bring myself to stop her.
 

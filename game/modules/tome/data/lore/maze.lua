@@ -24,8 +24,8 @@
 newLore{
 	id = "maze-note-1",
 	category = "maze",
-	name = "diary (the maze)",
-	lore = [[Dear diary,
+	name = _t"diary (the maze)",
+	lore = _t[[Dear diary,
 
 Lessons are off this week as my tutor has fallen ill, so I've decided to sneak out and have a wander round the old mazed ruins nearby. I know I'll get in trouble if I'm caught, but as long as I'm back in a couple of days no one will notice... Besides, I get so bored cooped up in those mountains! I want some fun!
 
@@ -38,9 +38,9 @@ I remember hearing that this labyrinth used to be a prison used by the halfling 
 newLore{
 	id = "maze-note-2",
 	category = "maze",
-	name = "diary (the maze)",
+	name = _t"diary (the maze)",
 	bloodstains = 7,
-	lore = [[I'm having so much fun! Probability Travel is making this little trip a breeze. And you should have seen the look on that bandit's face when I came out one wall, disappeared through another, and came around behind him! Hee hee hee...
+	lore = _t[[I'm having so much fun! Probability Travel is making this little trip a breeze. And you should have seen the look on that bandit's face when I came out one wall, disappeared through another, and came around behind him! Hee hee hee...
 
 I still remember Archmage Tarelion's lecture about the spell - "Probability effects can be employed for ease of use, but beware thee of relying on them. With ease of use comes ease of mind and a weakening of one's will and concentration. Soon one will find oneself in a situation of risk, bereft of normal judgement of danger, and low on the mental resources to save onself. Heed thee well." Bah, what tosh!!! How dumb does he really think I am?!
 
@@ -52,8 +52,8 @@ I saw something! I don't know what it was... but it was big and shadowy! But whe
 newLore{
 	id = "maze-note-trap",
 	category = "maze",
-	name = "the perfect killing device",
-	lore = [[I have now devised the perfect trap for the horned beast that walks these halls! Truly he cannot avoid this amazing contraption - the perfect blend of technical mastery and nature's lethal gifts. Ah, how I look forward to having that monster's head mounted on my walls - it shall be the pride of my collection!
+	name = _t"the perfect killing device",
+	lore = _t[[I have now devised the perfect trap for the horned beast that walks these halls! Truly he cannot avoid this amazing contraption - the perfect blend of technical mastery and nature's lethal gifts. Ah, how I look forward to having that monster's head mounted on my walls - it shall be the pride of my collection!
 
 The contraption is elegant and simple, though many months I have spent getting the formula perfect. There are two vials attached together - one containing finely ground hemlock, the other containing a carefully prepared zinc compound. When the vials are broken the materials react with the air and pump out an amazing cloud of poisonous vapour! The poison is supremely effective, killing within minutes. All I have to do is carefully hide the vials beneath a thin piece of slate and wait for my prey to step upon the trap - then POOF, it's dead!
 

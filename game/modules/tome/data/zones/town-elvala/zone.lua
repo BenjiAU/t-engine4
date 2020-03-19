@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Elvala",
+	name = _t"Elvala",
 	level_range = {1, 15},
 	level_scheme = "player",
 	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(-1,2) end,

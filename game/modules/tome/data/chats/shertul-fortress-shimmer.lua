@@ -61,33 +61,33 @@ for slot, inven in pairs(player.inven) do
 	if player.inven_def[slot].infos and player.inven_def[slot].infos.shimmerable and inven[1] then
 		local o = inven[1]
 		if o.slot then
-			answers[#answers+1] = {"[Alter the appearance of "..o:getName{do_color=true, no_add_name=true}.."]", action=shimmer(player, slot), jump="welcome"}
+			answers[#answers+1] = {("[Alter the appearance of %s]"):tformat(o:getName{do_color=true, no_add_name=true}), action=shimmer(player, slot), jump="welcome"}
 		end
 	end
 end
 if world.unlocked_shimmers and world.unlocked_shimmers.SHIMMER_DOLL then
-	answers[#answers+1] = {"[Alter the appearance of your body]", action=shimmer_other(player, "SHIMMER_DOLL"), jump="welcome"}
+	answers[#answers+1] = {_t"[Alter the appearance of your body]", action=shimmer_other(player, "SHIMMER_DOLL"), jump="welcome"}
 end
 if world.unlocked_shimmers and world.unlocked_shimmers.SHIMMER_FACIAL then
-	answers[#answers+1] = {"[Alter the appearance of your facial features]", action=shimmer_other(player, "SHIMMER_FACIAL"), jump="welcome"}
+	answers[#answers+1] = {_t"[Alter the appearance of your facial features]", action=shimmer_other(player, "SHIMMER_FACIAL"), jump="welcome"}
 end
 if world.unlocked_shimmers and world.unlocked_shimmers.SHIMMER_HAIR then
-	answers[#answers+1] = {"[Alter the appearance of your hair]", action=shimmer_other(player, "SHIMMER_HAIR"), jump="welcome"}
+	answers[#answers+1] = {_t"[Alter the appearance of your hair]", action=shimmer_other(player, "SHIMMER_HAIR"), jump="welcome"}
 end
 if world.unlocked_shimmers and world.unlocked_shimmers.SHIMMER_AURA then
-	answers[#answers+1] = {"[Alter the appearance of your cosmetic aura]", action=shimmer_other(player, "SHIMMER_AURA"), jump="welcome"}
+	answers[#answers+1] = {_t"[Alter the appearance of your cosmetic aura]", action=shimmer_other(player, "SHIMMER_AURA"), jump="welcome"}
 end
 
-answers[#answers+1] = {"[Load/Save outfit]", action=shimmer_outfits(player), jump="welcome"}
+answers[#answers+1] = {_t"[Load/Save outfit]", action=shimmer_outfits(player), jump="welcome"}
 
 if ShimmerRemoveSustains:hasRemovableAuras(player) then
-	answers[#answers+1] = {"[Disable the visual effects of your sustains]", action=sustains_aura_remove(player), jump="welcome"}
+	answers[#answers+1] = {_t"[Disable the visual effects of your sustains]", action=sustains_aura_remove(player), jump="welcome"}
 end
 
-answers[#answers+1] = {"[Leave the mirror alone]"}
+answers[#answers+1] = {_t"[Leave the mirror alone]"}
 	
 newChat{ id="welcome",
-	text = [[*#LIGHT_GREEN#As you gaze into the mirror you see an infinite number of slightly different reflections of yourself. You feel dizzy.#WHITE#*]],
+	text = _t[[*#LIGHT_GREEN#As you gaze into the mirror you see an infinite number of slightly different reflections of yourself. You feel dizzy.#WHITE#*]],
 	answers = answers
 }
 

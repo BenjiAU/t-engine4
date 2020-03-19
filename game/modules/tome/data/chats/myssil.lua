@@ -20,10 +20,10 @@
 local p = game.party:findMember{main=true}
 if not p:attr("forbid_arcane") or p:attr("forbid_arcane") < 2 then
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*A Halfling woman stands before you, clad in dark steel plate.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*A Halfling woman stands before you, clad in dark steel plate.*#WHITE#
 Take the test, and then we can talk.]],
 	answers = {
-		{"But..."},
+		{_t"But..."},
 	}
 }
 return "welcome"
@@ -32,25 +32,25 @@ end
 
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*A Halfling woman stands before you, clad in dark steel plate.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*A Halfling woman stands before you, clad in dark steel plate.*#WHITE#
 I am Protector Myssil. Welcome to Zigur.]],
 	answers = {
-		{"I require all the help I can get, not for my sake but for the town of Derth, to the northwest of here.", jump="save-derth", cond=function(npc, player) local q = player:hasQuest("lightning-overload") return q and q:isCompleted("saved-derth") and not q:isCompleted("tempest-entrance") and not q:isStatus(q.DONE) end},
-		{"Protector, I have dispatched the Tempest as you commanded.", jump="tempest-dead", cond=function(npc, player) 
+		{_t"I require all the help I can get, not for my sake but for the town of Derth, to the northwest of here.", jump="save-derth", cond=function(npc, player) local q = player:hasQuest("lightning-overload") return q and q:isCompleted("saved-derth") and not q:isCompleted("tempest-entrance") and not q:isStatus(q.DONE) end},
+		{_t"Protector, I have dispatched the Tempest as you commanded.", jump="tempest-dead", cond=function(npc, player) 
 			local q = player:hasQuest("lightning-overload") 
 			return q and q:isCompleted("tempest-urkis-slain") and not q:isCompleted("antimagic-reward")
 		end},
-		{"Farewell, Protector."},
+		{_t"Farewell, Protector."},
 	}
 }
 
 newChat{ id="save-derth",
-	text = [[Yes, we have sensed the blight of the eldritch forces there. I have people working to dispel the cloud, but the real threat is not there.
+	text = _t[[Yes, we have sensed the blight of the eldritch forces there. I have people working to dispel the cloud, but the real threat is not there.
 We know that a Tempest, a powerful Archmage who can control the storms, is responsible for the damage. Those wretched fools from Angolwen will not act. All corrupted!
 So you must act, @playername@. I will show you the location of this mage - high in the Daikara mountains.
 Erase him.]],
 	answers = {
-		{"You can count on me, Protector.", action=function(npc, player)
+		{_t"You can count on me, Protector.", action=function(npc, player)
 			player:hasQuest("lightning-overload"):create_entrance()
 			game:unlockBackground("myssil", "Protector Myssil")
 		end},
@@ -58,11 +58,11 @@ Erase him.]],
 }
 
 newChat{ id="tempest-dead",
-	text = [[So I have heard, @playername@. You prove worthy of your training. Go with the blessing of nature, @playername@ of Zigur.
+	text = _t[[So I have heard, @playername@. You prove worthy of your training. Go with the blessing of nature, @playername@ of Zigur.
 #LIGHT_GREEN#*She touches your skin. You can feel nature infusing your very being.*#WHITE#
 This shall help you on your travels. Farewell!]],
 	answers = {
-		{"Thank you, Protector.", action=function(npc, player)
+		{_t"Thank you, Protector.", action=function(npc, player)
 			player:hasQuest("lightning-overload"):create_entrance()
 			if player:knowTalentType("wild-gift/fungus") then
 				player:setTalentTypeMastery("wild-gift/fungus", player:getTalentTypeMastery("wild-gift/fungus") + 0.1)

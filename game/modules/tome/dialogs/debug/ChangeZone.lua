@@ -26,7 +26,7 @@ module(..., package.seeall, class.inherit(engine.ui.Dialog))
 
 function _M:init()
 	self:generateList()
-	engine.ui.Dialog.init(self, "DEBUG -- Change Zone", 1, 1)
+	engine.ui.Dialog.init(self, _t"DEBUG -- Change Zone", 1, 1)
 
 	local list = List.new{width=400, height=500, scrollbar=true, list=self.list, fct=function(item) self:use(item) end}
 
@@ -62,7 +62,7 @@ function _M:use(item)
 	if not item then return end
 	game:unregisterDialog(self)
 
-	game:registerDialog(GetQuantity.new("Zone: "..item.name, "Level "..item.min.."-"..item.max, 1, item.max, function(qty)
+	game:registerDialog(GetQuantity.new(("Zone: %s"):tformat(item.name), ("Level %s-%s"):tformat(item.min, item.max), 1, item.max, function(qty)
 		game:changeLevel(qty, item.zone)
 	end), 1)
 end

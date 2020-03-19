@@ -44,7 +44,7 @@ local minions_list = {
 		see_invisible = resolvers.mbonus(15, 5),
 		undead = 1,
 		name = "bone giant", color=colors.WHITE,
-		desc = [[A towering creature, made from the bones of dozens of dead bodies. It is covered by an unholy aura.]],
+		desc=_t[[A towering creature, made from the bones of dozens of dead bodies. It is covered by an unholy aura.]],
 		resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/undead_giant_bone_giant.png", display_h=2, display_y=-1}}},
 		max_life = resolvers.rngavg(100,120),
 		level_range = {1, nil}, exp_worth = 0,
@@ -79,7 +79,7 @@ local minions_list = {
 		see_invisible = resolvers.mbonus(15, 5),
 		undead = 1,
 		name = "heavy bone giant", color=colors.RED,
-		desc = [[A towering creature, made from the bones of hundreds of dead bodies. It is covered by an unholy aura.]],
+		desc=_t[[A towering creature, made from the bones of hundreds of dead bodies. It is covered by an unholy aura.]],
 		resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/undead_giant_heavy_bone_giant.png", display_h=2, display_y=-1}}},
 		level_range = {1, nil}, exp_worth = 0,
 		max_life = resolvers.rngavg(100,120),
@@ -114,7 +114,7 @@ local minions_list = {
 		see_invisible = resolvers.mbonus(15, 5),
 		undead = 1,
 		name = "eternal bone giant", color=colors.GREY,
-		desc = [[A towering creature, made from the bones of hundreds of dead bodies. It is covered by an unholy aura.]],
+		desc=_t[[A towering creature, made from the bones of hundreds of dead bodies. It is covered by an unholy aura.]],
 		resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/undead_giant_eternal_bone_giant.png", display_h=2, display_y=-1}}},
 		level_range = {1, nil}, exp_worth = 0,
 		max_life = resolvers.rngavg(100,120),
@@ -151,7 +151,7 @@ local minions_list = {
 		see_invisible = resolvers.mbonus(15, 5),
 		undead = 1,
 		name = "runed bone giant", color=colors.RED,
-		desc = [[A towering creature, made from the bones of hundreds of dead bodies, rune-etched and infused with hateful sorceries.]],
+		desc=_t[[A towering creature, made from the bones of hundreds of dead bodies, rune-etched and infused with hateful sorceries.]],
 		resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/undead_giant_runed_bone_giant.png", display_h=2, display_y=-1}}},
 		level_range = {1, nil}, exp_worth = 0,
 		rank = 3,
@@ -206,7 +206,7 @@ newTalent{
 		return ([[Minions are only tools. You may dispose of them... Violently.
 		Makes the targeted minion explode for %d%% of its maximum life in a radius of %d as blight damage.
 		Beware! Don't get caught in the blast! (unless you know Dark Empthy: %d%% chance to ignore damage)]]):
-		format(t.getDamage(self, t),t.radius(self,t), self:getTalentLevelRaw(self.T_DARK_EMPATHY) * 20)
+		tformat(t.getDamage(self, t),t.radius(self,t), self:getTalentLevelRaw(self.T_DARK_EMPATHY) * 20)
 	end,
 }
 
@@ -300,7 +300,7 @@ newTalent{
 		At level 5, it makes an eternal bone giant.
 		At level 6, it has a 20%% chance to produce a runed bone giant.
 		Only %s can be active at any time.]]):
-		format(necroEssenceDead(self, true) and "two bone giants" or "one bone giant")
+		tformat(necroEssenceDead(self, true) and _t"two bone giants" or _t"one bone giant")
 	end,
 }
 
@@ -354,7 +354,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Sacrifice a bone giant minion. Using its bones, you make a temporary shield around you that prevents any attacks from doing more than %d%% of your total life.
 		The effect lasts %d turns.]]):
-		format(t.getPower(self, t), t.getTurns(self, t))
+		tformat(t.getPower(self, t), t.getTurns(self, t))
 	end,
 }
 
@@ -366,6 +366,6 @@ newTalent{
 	mode = "passive",
 	info = function(self, t)
 		return ([[Each minion you summon has a chance to be a more advanced form of undead. Your chance for each type of minion is as follows:%s]]):
-		format(self:callTalent(self.T_CREATE_MINIONS,"MinionChancesDesc"))
+		tformat(self:callTalent(self.T_CREATE_MINIONS,"MinionChancesDesc"))
 	end,
 }

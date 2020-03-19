@@ -18,40 +18,40 @@
 -- darkgod@te4.org
 
 newChat{ id="berethh",
-	text = [[#VIOLET#*Before you stands Berethh. His face shows no emotion, but his posture is threatening.#LAST#
+	text = _t[[#VIOLET#*Before you stands Berethh. His face shows no emotion, but his posture is threatening.#LAST#
 ]],
 	answers = {
-		{"Kyless is dead.", jump="response"}
+		{_t"Kyless is dead.", jump="response"}
 	}
 }
 
 newChat{ id="response",
-	text = [[I'm not sure if you deserved your fate. Still I cannot let you live.]],
+	text = _t[[I'm not sure if you deserved your fate. Still I cannot let you live.]],
 	answers = {
 		{
-			"Then you will die like Kyless. #LIGHT_GREEN#[Attack]#LAST#",
+			_t"Then you will die like Kyless. #LIGHT_GREEN#[Attack]#LAST#",
 			action=function(npc, player)
 				player:hasQuest("keepsake"):on_evil_choice(player)
 			end
 		},
 		{
-			"I need your help. I want to overcome my curse.",
+			_t"I need your help. I want to overcome my curse.",
 			action=function(npc, player)
 				player:hasQuest("keepsake"):on_good_choice(player)
 			end,
 			jump="attack"
 		},
 		{
-			"I do not want to kill you.",
+			_t"I do not want to kill you.",
 			jump="attack"
 		}
 	}
 }
 
 newChat{ id="attack",
-	text = [[#VIOLET#*Berethh ignores your comment, unslings his bow and prepares his attack.*#LAST#]],
+	text = _t[[#VIOLET#*Berethh ignores your comment, unslings his bow and prepares his attack.*#LAST#]],
 	answers = {
-		{"#LIGHT_GREEN#[Attack]"},
+		{_t"#LIGHT_GREEN#[Attack]"},
 	}
 }
 

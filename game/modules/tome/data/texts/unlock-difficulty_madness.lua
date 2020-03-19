@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New game difficulty mode: #LIGHT_GREEN#Madness",
-[[You won the game on Insane mode.  You are one of the best players!
+return _t"New game difficulty mode: #LIGHT_GREEN#Madness",
+_t[[You won the game on Insane mode.  You are one of the best players!
 But fear not because the game is just about to get even more unfair on you!
 
 Welcome to Madness!

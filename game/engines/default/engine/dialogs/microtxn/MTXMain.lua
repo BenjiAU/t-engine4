@@ -27,7 +27,7 @@ module(..., package.seeall, class.inherit(Dialog))
 _M.force_ui_inside = "microtxn"
 
 function _M:init(mode)
-	self.base_title_text = game.__mod_info.long_name.." #GOLD#Purchasables#LAST#"
+	self.base_title_text = ("%s #GOLD#Purchasables#LAST#"):tformat(_t(game.__mod_info.long_name))
 	Dialog.init(self, self.base_title_text, 200, game.h * 0.8)
 
 	local do_purchase = ButtonImage.new{alpha_unfocus=1, file="microtxn-ui/action_purchase.png", fct=function() game:unregisterDialog(self) game.key:triggerVirtual("MTXN_PURCHASE") end}
@@ -52,7 +52,7 @@ function _M:init(mode)
 		config.settings.mtxn_explain_seen = true
 
 		Dialog:forceNextDialogUI("microtxn")
-		self:simpleLongPopup("Online Store", [[Welcome!
+		self:simpleLongPopup(_t"Online Store", _t[[Welcome!
 
 I am #{italic}##ANTIQUE_WHITE#DarkGod#LAST##{normal}#, the creator of the game and before you go on your merry way I wish to take a few seconds of your time to explain why there are microtransactions in the game.
 

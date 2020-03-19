@@ -35,6 +35,7 @@ extern "C" {
 #include "zlib.h"
 #include "main.h"
 #include "useshader.h"
+#include "utf8proc/utf8proc.h"
 #include "sdm.h"
 #include <math.h>
 #include <time.h>
@@ -1113,6 +1114,19 @@ static int font_display_split_anywhere_get(lua_State *L) {
 	return 1;
 }
 
+static int string_find_next_utf(lua_State *L) {
+	size_t str_len;
+	const char *str = luaL_checklstring(L, 1, &str_len);
+	int pos = lua_tonumber(L, 2) - 1;
+
+	int32_t _dummy_;
+	ssize_t nextutf = utf8proc_iterate((const uint8_t*)str + pos, str_len - pos, &_dummy_);
+	if (nextutf < 1) nextutf = 1;
+	if (pos + nextutf >= str_len) lua_pushboolean(L, FALSE);
+	else lua_pushnumber(L, 1 + pos + nextutf);
+	return 1;
+}
+
 extern void on_redraw();
 static int sdl_redraw_screen(lua_State *L) {
 	redraw_now(redraw_type_normal);
@@ -1452,6 +1466,7 @@ static const struct luaL_Reg displaylib[] =
 {
 	{"breakTextAllCharacter", font_display_split_anywhere},
 	{"getBreakTextAllCharacter", font_display_split_anywhere_get},
+	{"stringNextUTF", string_find_next_utf},
 	{"forceRedraw", sdl_redraw_screen},
 	{"forceRedrawForScreenshot", sdl_redraw_screen_for_screenshot},
 	{"redrawingForSavefileScreenshot", redrawing_for_savefile_screenshot},

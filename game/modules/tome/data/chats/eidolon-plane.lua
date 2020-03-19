@@ -20,14 +20,14 @@
 if game.zone.from_farportal then
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*Before you stands a humanoid shape filled with 'nothing'. It seems to stare at you.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*Before you stands a humanoid shape filled with 'nothing'. It seems to stare at you.*#WHITE#
 I am the Eidolon and you are not welcome here!
 No matter how you came to this plane, #{bold}#DO NOT COME BACK!
 NOW BEGONE!
 #{normal}#
 .]],
 	answers = {
-		{"...", action=function() game.level.data.eidolon_exit(false) end},
+		{_t"...", action=function() game.level.data.eidolon_exit(false) end},
 	}
 }
 
@@ -35,55 +35,55 @@ NOW BEGONE!
 else
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*Before you stands a humanoid shape filled with 'nothing'. It seems to stare at you.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*Before you stands a humanoid shape filled with 'nothing'. It seems to stare at you.*#WHITE#
 I have brought you here on the instant of your death. I am the Eidolon.
 I have deemed you worthy of my 'interest'. I will watch your future steps with interest.
 You may rest here, and when you are ready I will send you back to the material plane.
 But do not abuse my help. I am not your servant, and someday I might just let you die.
 As for your probable many questions, they will stay unanswered. I may help, but I am not here to explain why.]],
 	answers = {
-		{"Thank you. I will rest for a while."},
-		{"Thank you. I am ready to go back!", 
+		{_t"Thank you. I will rest for a while."},
+		{_t"Thank you. I am ready to go back!", 
 			cond=function() return game.level.source_level and not game.level.source_level.no_return_from_eidolon end,
 			action=function() game.level.data.eidolon_exit(false) end
 		},
-		{"Thank you, but I fear I will not survive anyway, can you send me back somewhere else please?",
+		{_t"Thank you, but I fear I will not survive anyway, can you send me back somewhere else please?",
 			cond=function() return game.level.source_level and not game.level.source_level.no_return_from_eidolon and (not game.level.source_level.data or not game.level.source_level.data.no_worldport) end,
 			action=function() game.level.data.eidolon_exit(true) end
 		},
-		{"Thank you, but I fear I will not survive anyway, can you send me back somewhere else on the level please?",
+		{_t"Thank you, but I fear I will not survive anyway, can you send me back somewhere else on the level please?",
 			cond=function() return game.level.source_zone and game.level.source_zone.infinite_dungeon end,
 			action=function() game.level.data.eidolon_exit("teleport") end
 		},
-		{"Thank you, I am ready to go back!",
+		{_t"Thank you, I am ready to go back!",
 			cond=function() return not game.level.source_level or game.level.source_level.no_return_from_eidolon end,
 			jump="jump_error",
 		},
-		{"Thank you, but I am weary of this life, I wish no more, please let me go.", jump="die"},
+		{_t"Thank you, but I am weary of this life, I wish no more, please let me go.", jump="die"},
 	}
 }
 
 newChat{ id="jump_error",
-	text = [[It seems the threads of time and space have been disrupted...
+	text = _t[[It seems the threads of time and space have been disrupted...
 I will try to send you to safety.]],
 	answers = {
-		{"Thanks.", action=function(npc, player) game:changeLevel(1, "wilderness") end},
+		{_t"Thanks.", action=function(npc, player) game:changeLevel(1, "wilderness") end},
 	}
 }
 
 newChat{ id="die",
-	text = [[#LIGHT_GREEN#*It seems to stare at you in weird way.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*It seems to stare at you in weird way.*#WHITE#
 I...had plans for you, but I cannot go against your free will. Know that you had a destiny waiting for you.
 Are you sure?]],
 	answers = {
-		{"Just let me go please.", action=function(npc, player)
+		{_t"Just let me go please.", action=function(npc, player)
 			local src = game.player
-			game:getPlayer(true):die(game.player, {special_death_msg=("asked the Eidolon to let %s die in peace"):format(game.player.female and "her" or "him")})
+			game:getPlayer(true):die(game.player, {special_death_msg=("asked the Eidolon to let %s die in peace"):tformat(game.player.female and _t"her" or _t"him")})
 			while game.party:findSuitablePlayer() do
-				game.player:die(src, {special_death_msg="brought down by Eidolon"})
+				game.player:die(src, {special_death_msg=_t"brought down by Eidolon"})
 			end
 		end},
-		{"No actually, perhaps life is still worth it!"},
+		{_t"No actually, perhaps life is still worth it!"},
 	}
 }
 

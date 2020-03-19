@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Caverns to the hidden valley",
+	name = _t"Caverns to the hidden valley",
 	level_range = {30, 40},
 	level_scheme = "player",
 	max_level = 2,

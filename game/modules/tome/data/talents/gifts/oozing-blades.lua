@@ -52,7 +52,7 @@ newTalent{
 		local dam = t.getDamage(self, t)
 		return ([[Channel slime through your psiblades, extending their reach to create a beam doing %0.1f Slime damage.
 		The damage increases with your Mindpower.]]):
-		format(damDesc(self, DamageType.NATURE, dam))
+		tformat(damDesc(self, DamageType.NATURE, dam))
 	end,
 }
 
@@ -76,7 +76,7 @@ newTalent{
 		When you deal Acid damage to a creature, you gain a %0.1f%% bonus to Nature damage for %d turns. 
 		This damage bonus will improve up to 4 times (no more than once each turn) with later Acid damage you do, up to a maximum of %0.1f%%.
 		The resistance and damage increase improve with your Mindpower.]]):
-		format(t.getResist(self, t), t.getNatureDamage(self, t, 1), t.getDuration(self, t), t.getNatureDamage(self, t, 5))
+		tformat(t.getResist(self, t), t.getNatureDamage(self, t, 1), t.getDuration(self, t), t.getNatureDamage(self, t, 5))
 	end,
 }
 
@@ -118,7 +118,7 @@ newTalent{
 		When it hits, it will burrow into the target's brain and stay there for 6 turns, interfering with its ability to use talents.
 		Each time a talent is used there is %d%% chance that %d talent(s) are placed on a %d turn(s) cooldown.
 		The chance will increase with your Mindpower.]]):
-		format(t.getChance(self, t), t.getNb(self, t), t.getTurns(self, t))
+		tformat(t.getChance(self, t), t.getNb(self, t), t.getTurns(self, t))
 	end,
 }
 
@@ -178,6 +178,6 @@ newTalent{
 		local chance = t.getChance(self, t)
 		return ([[Surround yourself with natural forces, ignoring %d%% nature resistance of your targets.
 		In addition, any time you deal damage with a wild gift there is a %d%% chance that one of your mucus oozes will spit at the target as a free action.]])
-		:format(ressistpen, chance)
+		:tformat(ressistpen, chance)
 	end,
 }

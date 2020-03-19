@@ -18,27 +18,27 @@
 -- darkgod@te4.org
 
 -- Quest for Trollmire & Amon Sul
-name = "Of trolls and damp caves"
+name = _t"Of trolls and damp caves"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "Explore the caves below the ruins of Kor'Pul and the Trollmire in search of treasure and glory!\n"
+	desc[#desc+1] = _t"Explore the caves below the ruins of Kor'Pul and the Trollmire in search of treasure and glory!\n"
 	if self:isCompleted("trollmire") then
 		if self:isCompleted("trollmire-flooded") then
-			desc[#desc+1] = "#LIGHT_GREEN#* You have explored the Trollmire and vanquished Shax the Troll.#WHITE#"
+			desc[#desc+1] = _t"#LIGHT_GREEN#* You have explored the Trollmire and vanquished Shax the Troll.#WHITE#"
 		else
-			desc[#desc+1] = "#LIGHT_GREEN#* You have explored the Trollmire and vanquished Prox the Troll.#WHITE#"
+			desc[#desc+1] = _t"#LIGHT_GREEN#* You have explored the Trollmire and vanquished Prox the Troll.#WHITE#"
 		end
 	else
-		desc[#desc+1] = "#SLATE#* You must explore the Trollmire and find out what lurks there and what treasures are to be gained!#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* You must explore the Trollmire and find out what lurks there and what treasures are to be gained!#WHITE#"
 	end
 	if self:isCompleted("kor-pul") then
 		if self:isCompleted("kor-pul-invaded") then
-			desc[#desc+1] = "#LIGHT_GREEN#* You have explored the ruins of Kor'Pul and vanquished the Possessed.#WHITE#"
+			desc[#desc+1] = _t"#LIGHT_GREEN#* You have explored the ruins of Kor'Pul and vanquished the Possessed.#WHITE#"
 		else
-			desc[#desc+1] = "#LIGHT_GREEN#* You have explored the ruins of Kor'Pul and vanquished the Shade.#WHITE#"
+			desc[#desc+1] = _t"#LIGHT_GREEN#* You have explored the ruins of Kor'Pul and vanquished the Shade.#WHITE#"
 		end
 	else
-		desc[#desc+1] = "#SLATE#* You must explore the ruins of Kor'Pul and find out what lurks there and what treasures are to be gained!#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* You must explore the ruins of Kor'Pul and find out what lurks there and what treasures are to be gained!#WHITE#"
 	end
 	return table.concat(desc, "\n")
 end

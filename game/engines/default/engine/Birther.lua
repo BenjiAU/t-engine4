@@ -66,7 +66,7 @@ function _M:newBirthDescriptor(t)
 	assert(t.type, "no birth type")
 	t.short_name = t.short_name or t.name
 	t.short_name = t.short_name:upper():gsub("[ ]", "_")
-	t.display_name = t.display_name or t.name
+	t.display_name = t.display_name or _t(t.name, "birth descriptor name")
 	assert(t.desc, "no birth description")
 	if type(t.desc) == "table" then t.desc = table.concat(t.desc, "\n") end
 	t.desc = t.desc:gsub("\n\t+", "\n")
@@ -103,7 +103,7 @@ function _M:init(title, actor, order, at_end, quickbirth, w, h)
 	self.order = order
 	if order.get_name then
 		self.at_end = function()
-			game:registerDialog(require('engine.dialogs.GetText').new("Enter your character's name", "Name", 2, 25, function(text)
+			game:registerDialog(require('engine.dialogs.GetText').new(_t"Enter your character's name", _t"Name", 2, 25, function(text)
 				game:setPlayerName(text)
 				at_end()
 			end, function()
@@ -114,22 +114,22 @@ function _M:init(title, actor, order, at_end, quickbirth, w, h)
 		self.at_end = at_end
 	end
 
-	Dialog.init(self, title and title or ("Character Creation: "..actor.name), w or 600, h or 400)
+	Dialog.init(self, title and title or ("Character Creation: %s"):tformat(actor:getName()), w or 600, h or 400)
 
 	self.descriptors = {}
 	self.descriptors_by_type = {}
 
-	self.c_tut = Textzone.new{width=math.floor(self.iw / 2 - 10), height=1, auto_height=true, no_color_bleed=true, text=[[
+	self.c_tut = Textzone.new{width=math.floor(self.iw / 2 - 10), height=1, auto_height=true, no_color_bleed=true, text=_t[[
 Keyboard: #00FF00#up key/down key#FFFFFF# to select an option; #00FF00#Enter#FFFFFF# to accept; #00FF00#Backspace#FFFFFF# to go back.
 Mouse: #00FF00#Left click#FFFFFF# to accept; #00FF00#right click#FFFFFF# to go back.
 ]]}
 
-	self.c_random = Button.new{text="Random", width=math.floor(self.iw / 2 - 40), fct=function() self:randomSelect() end}
-	self.c_desc = Textzone.new{width=math.floor(self.iw / 2 - 10), height=self.ih - self.c_tut.h - 20, scrollbar=true, no_color_bleed=true, text=""}
+	self.c_random = Button.new{text=_t"Random", width=math.floor(self.iw / 2 - 40), fct=function() self:randomSelect() end}
+	self.c_desc = Textzone.new{width=math.floor(self.iw / 2 - 10), height=self.ih - self.c_tut.h - 20, scrollbar=true, no_color_bleed=true, text=_t""}
 
 	self.c_list = ListColumns.new{width=math.floor(self.iw / 2 - 10), height=self.ih - 10 - self.c_random.h, scrollbar=true, all_clicks=true, columns={
-		{name="", width=8, display_prop="char"},
-		{name="", width=92, display_prop="display_name"},
+		{name=_t"", width=8, display_prop="char"},
+		{name=_t"", width=92, display_prop="display_name"},
 	}, list={}, fct=function(item, sel, button, event)
 		self.sel = sel
 		if (event == "key" or event == "button") and button == "left" then self:next()
@@ -178,12 +178,12 @@ function _M:on_register()
 			self.do_quickbirth = true
 			self:quickBirth()
 		else
-			self:yesnoPopup("Quick Birth", "Do you want to recreate the same character?", function(ret)
+			self:yesnoPopup(_t"Quick Birth", _t"Do you want to recreate the same character?", function(ret)
 				if ret then
 					self.do_quickbirth = true
 					self:quickBirth()
 				end
-			end, "Recreate", "New character")
+			end, _t"Recreate", _t"New character")
 		end
 	end
 end

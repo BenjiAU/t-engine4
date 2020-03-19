@@ -33,13 +33,16 @@ function _M:defineStat(name, short_name, default_value, min, max, desc)
 	local no_max = false
 	if type(max) == "table" then no_max = max.no_max; max = max[1] end
 	table.insert(self.stats_def, {
-		name = name,
+		name = _t(name),
 		short_name = short_name,
 		description = desc,
 		def = default_value or 10,
 		min = min or 1,
 		max = max or 100,
 		no_max = no_max,
+		-- I18N I have added a new property.
+		display_short_name = _t(short_name),
+		original_name = name,
 	})
 	self.stats_def[#self.stats_def].id = #self.stats_def
 	self.stats_def[short_name] = self.stats_def[#self.stats_def]

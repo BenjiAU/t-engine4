@@ -46,8 +46,8 @@ newEntity{ define_as = "SHARDSKIN",
 	name = "Shardskin",
 	display = "%", color=colors.VIOLET,
 	image = "npc/immovable_crystal_golden_crystal.png",
-	desc = [[This crystalline structure seems to be filled with a malevolent aura. Through the crystal surface you can still see the remains of what once was a huge tree.]],
-	killer_message = "and integrated into the crystaline structure",
+	desc = _t[[This crystalline structure seems to be filled with a malevolent aura. Through the crystal surface you can still see the remains of what once was a huge tree.]],
+	killer_message = _t"and integrated into the crystaline structure",
 	level_range = {12, nil}, exp_worth = 2,
 	max_life = 200, life_rating = 17, fixed_rating = true,
 	stats = { str=15, dex=10, cun=8, mag=20, wil=20, con=20 },
@@ -82,7 +82,7 @@ newEntity{ define_as = "SHARDSKIN",
 	resolvers.inscriptions(1, "rune"),
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("SNAPROOT", 3, 50, "Have you heard, the old forest seems to have been claimed by a new evil!")
+		game.state:activateBackupGuardian("SNAPROOT", 3, 50, _t"Have you heard, the old forest seems to have been claimed by a new evil!")
 		game.player:resolveSource():grantQuest("starter-zones")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "old-forest")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "old-forest-crystal")
@@ -96,11 +96,11 @@ newEntity{ define_as = "WRATHROOT",
 	name = "Wrathroot",
 	display = "#", color=colors.VIOLET,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/giant_treant_wrathroot.png", display_h=2, display_y=-1}}},
-	desc = [[The ancient grey willow tree, ruler of the Old Forest. He despises trespassers in his territory.]],
+	desc = _t[[The ancient grey willow tree, ruler of the Old Forest. He despises trespassers in his territory.]],
 	sound_moam = "creatures/treant/treeant_2",
 	sound_die = {"creatures/treant/treeant_death_%d", 1, 2},
 	sound_random = {"creatures/treant/treeant_%d", 1, 3},
-	killer_message = "and digested by treants",
+	killer_message = _t"and digested by treants",
 	level_range = {12, nil}, exp_worth = 2,
 	max_life = 200, life_rating = 17, fixed_rating = true,
 	max_stamina = 85,
@@ -133,7 +133,7 @@ newEntity{ define_as = "WRATHROOT",
 	resolvers.inscriptions(1, "infusion"),
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("SNAPROOT", 3, 50, "Have you heard, the old forest seems to have been claimed by a new evil!")
+		game.state:activateBackupGuardian("SNAPROOT", 3, 50, _t"Have you heard, the old forest seems to have been claimed by a new evil!")
 		game.player:resolveSource():grantQuest("starter-zones")
 		game.player:resolveSource():setQuestStatus("starter-zones", engine.Quest.COMPLETED, "old-forest")
 	end,
@@ -143,8 +143,8 @@ newEntity{ define_as = "WRATHROOT",
 newEntity{ base = "BASE_NPC_RODENT",
 	allow_infinite_dungeon = true,
 	name = "cute little bunny", color=colors.SALMON,
-	desc = [[It looks at you with cute little eyes before jumping at you with razor sharp teeth.]],
-	killer_message = "(how pathetic)",
+	desc = _t[[It looks at you with cute little eyes before jumping at you with razor sharp teeth.]],
+	killer_message = _t"(how pathetic)",
 	level_range = {1, 15}, exp_worth = 3,
 	rarity = 200,
 	max_life = resolvers.rngavg(15,20),
@@ -161,7 +161,7 @@ newEntity{ define_as = "SNAPROOT", -- backup guardian
 	sound_die = {"creatures/treants/treeant_death_%d", 1, 2},
 	sound_random = {"creatures/treants/treeant_%d", 1, 3},
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/giant_treant_snaproot.png", display_h=2, display_y=-1}}},
-	desc = [[This ancient Treant's bark is scorched almost black. It sees humanity as a scourge, to be purged.]],
+	desc = _t[[This ancient Treant's bark is scorched almost black. It sees humanity as a scourge, to be purged.]],
 	level_range = {50, nil}, exp_worth = 3,
 
 	max_life = 1000, life_rating = 40, fixed_rating = true,

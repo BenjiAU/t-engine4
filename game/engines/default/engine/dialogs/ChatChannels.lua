@@ -27,13 +27,13 @@ local Textzone = require "engine.ui.Textzone"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init(chat)
-	Dialog.init(self, "Chat channels", 500, 400)
+	Dialog.init(self, _t"Chat channels", 500, 400)
 	local mod = game.__mod_info.short_name
 
 	local list = {
-		{name = "Global", kind = "global"},
-		{name = game.__mod_info.long_name, kind = mod},
-		{name = game.__mod_info.long_name.." [spoilers]", kind = mod.."-spoiler"},
+		{name = _t"Global", kind = "global"},
+		{name = _t(game.__mod_info.long_name), kind = mod},
+		{name = _t(game.__mod_info.long_name).._t" [spoilers]", kind = mod.."-spoiler"},
 	}
 	for i, l in pairs(profile.chat.channels) do
 		if i ~= "global" and i ~= mod and i ~= mod.."-spoiler" then
@@ -41,7 +41,7 @@ function _M:init(chat)
 		end
 	end
 
-	local c_desc = Textzone.new{width=self.iw - 10, height=1, auto_height=true, text="Select which channels to listen to. You can join new channels by typing '/join <channelname>' in the talkbox and leave channels by typing '/part <channelname>'"}
+	local c_desc = Textzone.new{width=self.iw - 10, height=1, auto_height=true, text=_t"Select which channels to listen to. You can join new channels by typing '/join <channelname>' in the talkbox and leave channels by typing '/part <channelname>'"}
 	local uis = { {left=0, top=0, ui=c_desc} }
 	for i, l in ipairs(list) do
 		local l = l

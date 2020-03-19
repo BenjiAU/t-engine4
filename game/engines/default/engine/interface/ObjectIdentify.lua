@@ -34,7 +34,7 @@ end
 --- Defines the default IDed status
 function _M:resolveIdentify()
 	if not self.unided_name then
-		self.unided_name = self.name
+		self.unided_name = _t(self.name)
 	end
 end
 

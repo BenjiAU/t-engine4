@@ -18,28 +18,28 @@
 -- darkgod@te4.org
 
 -- Cunning talents
-newTalentType{ allow_random=true, type="cunning/stealth-base", name = "stealth", description = "Allows the user to enter stealth." }
-newTalentType{ allow_random=true, type="cunning/stealth", name = "stealth", description = "Allows the user to enter stealth." }
-newTalentType{ allow_random=true, type="cunning/trapping", name = "trapping", description = "The knowledge of trap laying and assorted trickeries." }
-newTalentType{ allow_random=true, type="cunning/traps", name = "traps", description = "Collection of known traps." }
-newTalentType{ allow_random=true, type="cunning/poisons", name = "poisons", description = "The knowledge of poisons and how to apply them to 'good' effects." }
-newTalentType{ allow_random=true, type="cunning/poisons-effects", name = "poisons", description = "Collection of known poisons." }
-newTalentType{ allow_random=true, type="cunning/dirty", name = "dirty fighting", description = "Teaches various talents to cripple your foes." }
-newTalentType{ allow_random=true, type="cunning/lethality", generic = true, name = "lethality", description = "How to make your foes feel the pain." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="cunning/shadow-magic", name = "shadow magic", description = "Blending magic and shadows." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="cunning/ambush", name = "ambush", min_lev = 10, description = "Using darkness and a bit of magic, you manipulate the shadows." }
-newTalentType{ allow_random=true, type="cunning/survival", name = "survival", generic = true, description = "The knowledge of the dangers of the world, and how to best avoid them." }
-newTalentType{ allow_random=true, type="cunning/tactical", name = "tactical", description = "Tactical combat abilities." }
-newTalentType{ allow_random=true, type="cunning/scoundrel", name = "scoundrel", generic = true, description = "The use of ungentlemanly techniques." }
-newTalentType{ allow_random=true, type="cunning/artifice", name = "artifice", min_lev = 10, description = "Create and use cunning tools." }
-newTalentType{ allow_random=true, type="cunning/tools", name = "tools", description = "Artificer's tools." }
+newTalentType{ allow_random=true, type="cunning/stealth-base", name = _t"stealth", description = _t"Allows the user to enter stealth." }
+newTalentType{ allow_random=true, type="cunning/stealth", name = _t"stealth", description = _t"Allows the user to enter stealth." }
+newTalentType{ allow_random=true, type="cunning/trapping", name = _t"trapping", description = _t"The knowledge of trap laying and assorted trickeries." }
+newTalentType{ allow_random=true, type="cunning/traps", name = _t"traps", description = _t"Collection of known traps." }
+newTalentType{ allow_random=true, type="cunning/poisons", name = _t"poisons", description = _t"The knowledge of poisons and how to apply them to 'good' effects." }
+newTalentType{ allow_random=true, type="cunning/poisons-effects", name = _t"poisons", description = _t"Collection of known poisons." }
+newTalentType{ allow_random=true, type="cunning/dirty", name = _t"dirty fighting", description = _t"Teaches various talents to cripple your foes." }
+newTalentType{ allow_random=true, type="cunning/lethality", generic = true, name = _t"lethality", description = _t"How to make your foes feel the pain." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="cunning/shadow-magic", name = _t"shadow magic", description = _t"Blending magic and shadows." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="cunning/ambush", name = _t"ambush", min_lev = 10, description = _t"Using darkness and a bit of magic, you manipulate the shadows." }
+newTalentType{ allow_random=true, type="cunning/survival", name = _t"survival", generic = true, description = _t"The knowledge of the dangers of the world, and how to best avoid them." }
+newTalentType{ allow_random=true, type="cunning/tactical", name = _t"tactical", description = _t"Tactical combat abilities." }
+newTalentType{ allow_random=true, type="cunning/scoundrel", name = _t"scoundrel", generic = true, description = _t"The use of ungentlemanly techniques." }
+newTalentType{ allow_random=true, type="cunning/artifice", name = _t"artifice", min_lev = 10, description = _t"Create and use cunning tools." }
+newTalentType{ allow_random=true, type="cunning/tools", name = _t"tools", description = _t"Artificer's tools." }
 
 -- Skirmisher
 newTalentType {
   type = "cunning/called-shots",
-  name = "Called Shots",
+  name = _t"Called Shots",
   allow_random = true,
-  description = "Inflict maximum pain to specific places on your enemies.",
+  description = _t"Inflict maximum pain to specific places on your enemies.",
 }
 
 -- Generic requires for cunning based on talent level
@@ -86,7 +86,7 @@ cuns_req_high5 = {
 
 -- talents that require unlocking (specific poisons, traps)
 cuns_req_unlock = {
-	special = {desc="Talent not unlocked", fct=function(self, t, offset)
+	special = {desc=_t"Talent not unlocked", fct=function(self, t, offset)
 		return game.state:unlockTalentCheck(t.id, self)
 	end}
 }

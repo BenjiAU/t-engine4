@@ -28,11 +28,11 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[The rift leads... somewhere.]],
+	desc=_t[[The rift leads... somewhere.]],
 	change_level = 1, change_zone = "temporal-rift",
 	change_level_check = function() -- Forbid going back
 		if not game.player:hasQuest("temporal-rift") then
-			require("engine.ui.Dialog"):yesnoPopup("Temporal Rift", "Are you sure you want to enter? There's no telling where you will end up or if you will be able to make it back.", function(ret)
+			require("engine.ui.Dialog"):yesnoPopup(_t"Temporal Rift", _t"Are you sure you want to enter? There's no telling where you will end up or if you will be able to make it back.", function(ret)
 				if ret then game:changeLevel(1, "temporal-rift") end
 			end)
 			return true

@@ -137,7 +137,7 @@ end
 function _M:makePortrait(a, current, x, y)
 	local def = game.party.members[a]
 
-	self:mouseTooltip("#GOLD##{bold}#"..a.name.."\n#WHITE##{normal}#Life: "..math.floor(100 * a.life / a.max_life).."%\nLevel: "..a.level.."\n"..def.title, 40, 40, x, y, function()
+	self:mouseTooltip(("#GOLD##{bold}#%s\n#WHITE##{normal}#Life: %d%%\nLevel: %d\n%s"):tformat(a.name, math.floor(100 * a.life / a.max_life), a.level, def.title), 40, 40, x, y, function()
 		if def.control == "full" then
 			game.party:select(a)
 		end
@@ -174,16 +174,16 @@ function _M:handleEffect(eff_id, e, p, ex, h)
 	local dur = p.dur + 1
 	local name = e.desc
 	local desc = nil
-	local eff_subtype = table.concat(table.keys(e.subtype), "/")
+	local eff_subtype = table.concat(table.ts(table.keys(e.subtype), "effect subtype"), "/")
 	if e.display_desc then name = e.display_desc(self, p) end
 	if p.save_string and p.amount_decreased and p.maximum and p.total_dur then
-		desc = ("#{bold}##GOLD#%s\n(%s: %s)#WHITE##{normal}#\n"):format(name, e.type, eff_subtype)..e.long_desc(player, p).." "..("%s reduced the duration of this effect by %d turns, from %d to %d."):format(p.save_string, p.amount_decreased, p.maximum, p.total_dur)
+		desc = ("#{bold}##GOLD#%s\n(%s: %s)#WHITE##{normal}#\n"):tformat(name, _t(e.type), eff_subtype)..e.long_desc(player, p).." "..("%s reduced the duration of this effect by %d turns, from %d to %d."):tformat(p.save_string, p.amount_decreased, p.maximum, p.total_dur)
 	else
-		desc = ("#{bold}##GOLD#%s\n(%s: %s)#WHITE##{normal}#\n"):format(name, e.type, eff_subtype)..e.long_desc(player, p)
+		desc = ("#{bold}##GOLD#%s\n(%s: %s)#WHITE##{normal}#\n"):tformat(name, _t(e.type), eff_subtype)..e.long_desc(player, p)
 	end
 
 	local remove_fct = function(button) if button == "right" then
-		Dialog:yesnoPopup(name, "Really cancel "..name.."?", function(ret)
+		Dialog:yesnoPopup(name, ("Really cancel %s?"):tformat(name), function(ret)
 			if ret then
 				player:removeEffect(eff_id)
 			end
@@ -258,21 +258,21 @@ function _M:display()
 		local fw = self.font:size("LEVELUP!")
 		self:makeTexture("LEVELUP!", self.w - fw, h, colors.VIOLET.r, colors.VIOLET.g, colors.VIOLET.b, fw)
 		self.items[#self.items].glow = true
-		self:mouseTooltip(("#GOLD##{bold}#%s\n#WHITE##{normal}#Unused stats: %d\nUnused class talents: %d\nUnused generic talents: %d\nUnused categories: %d"):format(player.name, player.unused_stats, player.unused_talents, player.unused_generics, player.unused_talents_types), self.w, self.font_h, 0, h, function()
+		self:mouseTooltip(("#GOLD##{bold}#%s\n#WHITE##{normal}#Unused stats: %d\nUnused class talents: %d\nUnused generic talents: %d\nUnused categories: %d"):tformat(player.name, player.unused_stats, player.unused_talents, player.unused_generics, player.unused_talents_types), self.w, self.font_h, 0, h, function()
 			game.key:triggerVirtual("LEVELUP")
 		end)
 		h = h + self.font_h
 	end
 
 	self.font:setStyle("bold")
-	self:makeTexture(("%s#{normal}#"):format(player.name), 0, h, colors.GOLD.r, colors.GOLD.g, colors.GOLD.b, self.w) h = h + self.font_h
+	self:makeTexture(("%s#{normal}#"):tformat(player.name), 0, h, colors.GOLD.r, colors.GOLD.g, colors.GOLD.b, self.w) h = h + self.font_h
 	self.font:setStyle("normal")
 
-	self:mouseTooltip(self.TOOLTIP_LEVEL, self:makeTexture(("Level / Exp: #00ff00#%s / %2d%%"):format(player.level, 100 * cur_exp / max_exp), x, h, 255, 255, 255)) h = h + self.font_h
-	self:mouseTooltip(self.TOOLTIP_GOLD, self:makeTexture(("Gold: #00ff00#%0.2f"):format(player.money or 0), x, h, 255, 255, 255)) h = h + self.font_h
+	self:mouseTooltip(self.TOOLTIP_LEVEL, self:makeTexture(("Level / Exp: #00ff00#%s / %2d%%"):tformat(player.level, 100 * cur_exp / max_exp), x, h, 255, 255, 255)) h = h + self.font_h
+	self:mouseTooltip(self.TOOLTIP_GOLD, self:makeTexture(("Gold: #00ff00#%0.2f"):tformat(player.money or 0), x, h, 255, 255, 255)) h = h + self.font_h
 
 	--Display attack, defense, spellpower, mindpower, and saves.
-	local attack_stats = {{"combatAttack", "TOOLTIP_COMBAT_ATTACK", "Accuracy:"}, {"combatPhysicalpower", "TOOLTIP_COMBAT_PHYSICAL_POWER", "P. power:"}, {"combatSpellpower", "TOOLTIP_SPELL_POWER", "S. power:"}, {"combatMindpower", "TOOLTIP_MINDPOWER", "M. power:"}, {"combatDefense", "TOOLTIP_DEFENSE", "Defense:"}, {"combatPhysicalResist", "TOOLTIP_PHYS_SAVE", "P. save:"}, {"combatSpellResist", "TOOLTIP_SPELL_SAVE", "S. save:"}, {"combatMentalResist", "TOOLTIP_MENTAL_SAVE", "M. save:"}}
+	local attack_stats = {{"combatAttack", "TOOLTIP_COMBAT_ATTACK", _t"Accuracy:"}, {"combatPhysicalpower", "TOOLTIP_COMBAT_PHYSICAL_POWER", _t"P. power:"}, {"combatSpellpower", "TOOLTIP_SPELL_POWER", _t"S. power:"}, {"combatMindpower", "TOOLTIP_MINDPOWER", _t"M. power:"}, {"combatDefense", "TOOLTIP_DEFENSE", _t"Defense:"}, {"combatPhysicalResist", "TOOLTIP_PHYS_SAVE",_t"P. save:"}, {"combatSpellResist", "TOOLTIP_SPELL_SAVE", _t"S. save:"}, {"combatMentalResist", "TOOLTIP_MENTAL_SAVE", _t"M. save:"}}
 
 	local attack_stat_color = "#FFD700#"
 	local defense_stat_color = "#0080FF#"
@@ -287,32 +287,32 @@ function _M:display()
 	h = h + self.font_h
 
 	if game.level and game.level.turn_counter then
-		self:makeTexture(("Turns remaining: %d"):format(game.level.turn_counter / 10), x, h, 255, 0, 0) h = h + self.font_h
+		self:makeTexture(("Turns remaining: %d"):tformat(game.level.turn_counter / 10), x, h, 255, 0, 0) h = h + self.font_h
 		h = h + self.font_h
 	end
 
 	if player:getAir() < player.max_air then
-		self:mouseTooltip(self.TOOLTIP_AIR, self:makeTexture(("Air level: %d/%d"):format(player:getAir(), player:getMaxAir()), x, h, 255, 0, 0)) h = h + self.font_h
+		self:mouseTooltip(self.TOOLTIP_AIR, self:makeTexture(("Air level: %d/%d"):tformat(player:getAir(), player:getMaxAir()), x, h, 255, 0, 0)) h = h + self.font_h
 		h = h + self.font_h
 	end
 
 	if player:attr("encumbered") then
-		self:mouseTooltip(self.TOOLTIP_ENCUMBERED, self:makeTexture(("Encumbered! (%d/%d)"):format(player:getEncumbrance(), player:getMaxEncumbrance()), x, h, 255, 0, 0)) h = h + self.font_h
+		self:mouseTooltip(self.TOOLTIP_ENCUMBERED, self:makeTexture(("Encumbered! (%d/%d)"):tformat(player:getEncumbrance(), player:getMaxEncumbrance()), x, h, 255, 0, 0)) h = h + self.font_h
 		h = h + self.font_h
 	end
 
-	self:mouseTooltip(self.TOOLTIP_STRDEXCON, self:makeTexture(("Str/Dex/Con: #00ff00#%3d/%3d/%3d"):format(player:getStr(), player:getDex(), player:getCon()), x, h, 255, 255, 255)) h = h + self.font_h
-	self:mouseTooltip(self.TOOLTIP_MAGWILCUN, self:makeTexture(("Mag/Wil/Cun: #00ff00#%3d/%3d/%3d"):format(player:getMag(), player:getWil(), player:getCun()), x, h, 255, 255, 255)) h = h + self.font_h
+	self:mouseTooltip(self.TOOLTIP_STRDEXCON, self:makeTexture(("Str/Dex/Con: #00ff00#%3d/%3d/%3d"):tformat(player:getStr(), player:getDex(), player:getCon()), x, h, 255, 255, 255)) h = h + self.font_h
+	self:mouseTooltip(self.TOOLTIP_MAGWILCUN, self:makeTexture(("Mag/Wil/Cun: #00ff00#%3d/%3d/%3d"):tformat(player:getMag(), player:getWil(), player:getCun()), x, h, 255, 255, 255)) h = h + self.font_h
 	h = h + self.font_h
 
-	self:mouseTooltip(self.TOOLTIP_LIFE, self:makeTextureBar("#c00000#Life    :", nil, player.life, player.max_life, player.life_regen * util.bound((player.healing_factor or 1), 0, 2.5), x, h, 255, 255, 255, colors.DARK_RED, colors.VERY_DARK_RED)) h = h + self.font_h
+	self:mouseTooltip(self.TOOLTIP_LIFE, self:makeTextureBar(_t"#c00000#Life    :", nil, player.life, player.max_life, player.life_regen * util.bound((player.healing_factor or 1), 0, 2.5), x, h, 255, 255, 255, colors.DARK_RED, colors.VERY_DARK_RED)) h = h + self.font_h
 
 	local shield, max_shield = 0, 0
 	if player:attr("time_shield") then shield = shield + player.time_shield_absorb max_shield = max_shield + player.time_shield_absorb_max end
 	if player:attr("damage_shield") then shield = shield + player.damage_shield_absorb max_shield = max_shield + player.damage_shield_absorb_max end
 	if player:attr("displacement_shield") then shield = shield + player.displacement_shield max_shield = max_shield + player.displacement_shield_max end
 	if max_shield > 0 then
-		self:mouseTooltip(self.TOOLTIP_DAMAGE_SHIELD, self:makeTextureBar("#WHITE#Shield:", nil, shield, max_shield, nil, x, h, 255, 255, 255, {r=colors.GREY.r / 3, g=colors.GREY.g / 3, b=colors.GREY.b / 3}, {r=colors.GREY.r / 6, g=colors.GREY.g / 6, b=colors.GREY.b / 6})) h = h + self.font_h
+		self:mouseTooltip(self.TOOLTIP_DAMAGE_SHIELD, self:makeTextureBar(_t"#WHITE#Shield:", nil, shield, max_shield, nil, x, h, 255, 255, 255, {r=colors.GREY.r / 3, g=colors.GREY.g / 3, b=colors.GREY.b / 3}, {r=colors.GREY.r / 6, g=colors.GREY.g / 6, b=colors.GREY.b / 6})) h = h + self.font_h
 	end
 
 	-- Resources
@@ -322,7 +322,7 @@ function _M:display()
 			if not tooltip then
 				tooltip = ([[#GOLD#%s#LAST#
 %s
-]]):format(res_def.name, res_def.description or "no description")
+]]):tformat(res_def.name, res_def.description or _t"no description")
 			end
 			-- get resource color
 			local res_color = res_def.color or "#WHITE#"
@@ -335,7 +335,7 @@ function _M:display()
 				r, g, b = r*255, g*255, b*255
 			end
 				local status_text = res_def.status_text and res_def.status_text(player)
-				self:mouseTooltip(tooltip, self:makeTextureBar((res_def.color or "#WHITE#")..("%-8.8s:"):format(res_def.name), status_text, player[res_def.getFunction](player), player[res_def.getMaxFunction](player) or 100, not status_text and player[res_def.regen_prop] or 0, x, h, 
+				self:mouseTooltip(tooltip, self:makeTextureBar((res_def.color or "#WHITE#")..("%-8.8s:"):tformat(res_def.name), status_text, player[res_def.getFunction](player), player[res_def.getMaxFunction](player) or 100, not status_text and player[res_def.regen_prop] or 0, x, h, 
 				255, 255, 255,
 					{r=r/2, g=g/2, b=b/2},
 					{r=r/5, g=g/5, b=b/5}
@@ -346,7 +346,7 @@ function _M:display()
 	
 	-- special resources
 	if player:knowTalent(player.T_FEEDBACK_POOL) then
-		self:mouseTooltip(self.TOOLTIP_FEEDBACK, self:makeTextureBar("#7fffd4#Feedback:", nil, player:getFeedback(), player:getMaxFeedback(), player:getFeedbackDecay(), x, h, 255, 255, 255,
+		self:mouseTooltip(self.TOOLTIP_FEEDBACK, self:makeTextureBar(_t"#7fffd4#Feedback:", nil, player:getFeedback(), player:getMaxFeedback(), player:getFeedbackDecay(), x, h, 255, 255, 255,
 			{r=colors.YELLOW.r / 2, g=colors.YELLOW.g / 2, b=colors.YELLOW.b / 2},
 			{r=colors.YELLOW.r / 5, g=colors.YELLOW.g / 5, b=colors.YELLOW.b / 5}
 		)) h = h + self.font_h
@@ -354,12 +354,12 @@ function _M:display()
 	if (player.unnatural_body_heal  or 0) > 0 and player:knowTalent(player.T_UNNATURAL_BODY) then
 		local t = player:getTalentFromId(player.T_UNNATURAL_BODY)
 		local regen = t.getRegenRate(player, t)
-		self:mouseTooltip(self.TOOLTIP_UNNATURAL_BODY, self:makeTextureBar("#c00000#Un.body :", ("%0.1f (%0.1f/turn)"):format(player.unnatural_body_heal, math.min(regen, player.unnatural_body_heal)), regen, player.unnatural_body_heal, nil, x, h, 255, 255, 255, colors.DARK_RED, colors.VERY_DARK_RED)) h = h + self.font_h
+		self:mouseTooltip(self.TOOLTIP_UNNATURAL_BODY, self:makeTextureBar(_t"#c00000#Un.body :", ("%0.1f (%0.1f/turn)"):tformat(player.unnatural_body_heal, math.min(regen, player.unnatural_body_heal)), regen, player.unnatural_body_heal, nil, x, h, 255, 255, 255, colors.DARK_RED, colors.VERY_DARK_RED)) h = h + self.font_h
 	end
 	if player.is_fortress then
 		local q = game:getPlayer(true):hasQuest("shertul-fortress")
 		if q then
-			self:mouseTooltip(self.TOOLTIP_FORTRESS_ENERGY, self:makeTextureBar("#LIGHT_GREEN#Fortress:", "%d", q.shertul_energy, 1000, 0, x, h, 255, 255, 255,
+			self:mouseTooltip(self.TOOLTIP_FORTRESS_ENERGY, self:makeTextureBar(_t"#LIGHT_GREEN#Fortress:", "%d", q.shertul_energy, 1000, 0, x, h, 255, 255, 255,
 				{r=colors.LIGHT_GREEN.r / 2, g=colors.LIGHT_GREEN.g / 2, b=colors.LIGHT_GREEN.b / 2},
 				{r=colors.LIGHT_GREEN.r / 5, g=colors.LIGHT_GREEN.g / 5, b=colors.LIGHT_GREEN.b / 5}
 			)) h = h + self.font_h
@@ -376,15 +376,15 @@ function _M:display()
 	local ammo = quiver and quiver[1]
 	if ammo then
 		if ammo.type == "alchemist-gem" then
-			self:mouseTooltip(self.TOOLTIP_COMBAT_AMMO, self:makeTexture(("#ANTIQUE_WHITE#Ammo    :       #ffffff#%d"):format(ammo:getNumber()), 0, h, 255, 255, 255)) h = h + self.font_h
+			self:mouseTooltip(self.TOOLTIP_COMBAT_AMMO, self:makeTexture(("#ANTIQUE_WHITE#Ammo    :       #ffffff#%d"):tformat(ammo:getNumber()), 0, h, 255, 255, 255)) h = h + self.font_h
 		else
-			self:mouseTooltip(self.TOOLTIP_COMBAT_AMMO, self:makeTexture(("#ANTIQUE_WHITE#Ammo    :       #ffffff#%d/%d"):format(ammo.combat.shots_left, ammo.combat.capacity), 0, h, 255, 255, 255)) h = h + self.font_h
+			self:mouseTooltip(self.TOOLTIP_COMBAT_AMMO, self:makeTexture(("#ANTIQUE_WHITE#Ammo    :       #ffffff#%d/%d"):tformat(ammo.combat.shots_left, ammo.combat.capacity), 0, h, 255, 255, 255)) h = h + self.font_h
 		end
 	end
 
 	if savefile_pipe.saving then
 		h = h + self.font_h
-		self:makeTextureBar("Saving:", "%d%%", 100 * savefile_pipe.current_nb / savefile_pipe.total_nb, 100, nil, x, h, colors.YELLOW.r, colors.YELLOW.g, colors.YELLOW.b,
+		self:makeTextureBar(_t"Saving:", "%d%%", 100 * savefile_pipe.current_nb / savefile_pipe.total_nb, 100, nil, x, h, colors.YELLOW.r, colors.YELLOW.g, colors.YELLOW.b,
 			{r=0x95 / 3, g=0xa2 / 3,b= 0x80 / 3},
 			{r=0x68 / 6, g=0x72 / 6, b=0x00 / 6}
 		)
@@ -399,7 +399,7 @@ function _M:display()
 			local t = player:getTalentFromId(tid)
 			local displayName = t.name
 			if t.getDisplayName then displayName = t.getDisplayName(player, t, player:isTalentActive(tid)) end
-			local desc = "#GOLD##{bold}#"..displayName.."#{normal}##WHITE#\n"..tostring(player:getTalentFullDescription(t))
+			local desc = ("#GOLD##{bold}#%s#{normal}##WHITE#\n"):tformat(displayName)..tostring(player:getTalentFullDescription(t))
 
 			if config.settings.tome.effects_icons and t.display_entity then
 				self:makeEntityIcon(t.display_entity, game.uiset.hotkeys_display_icons.tiles, ex, h, desc, nil, self.icon_yellow)
@@ -432,39 +432,39 @@ function _M:display()
 		h = h + self.font_h
 		local arena = game.level.arena
 		if arena.score > world.arena.scores[1].score then
-			self:makeTexture(("Score(TOP): %d"):format(arena.score), x, h, 255, 255, 100) h = h + self.font_h
+			self:makeTexture(("Score(TOP): %d"):tformat(arena.score), x, h, 255, 255, 100) h = h + self.font_h
 		else
-			self:makeTexture(("Score: %d"):format(arena.score), x, h, 255, 255, 255) h = h + self.font_h
+			self:makeTexture(("Score: %d"):tformat(arena.score), x, h, 255, 255, 255) h = h + self.font_h
 		end
 		if arena.currentWave > world.arena.bestWave then
-			self:makeTexture(("Wave(TOP) %d"):format(arena.currentWave), x, h, 255, 255, 100)
+			self:makeTexture(("Wave(TOP) %d"):tformat(arena.currentWave), x, h, 255, 255, 100)
 		elseif arena.currentWave > world.arena.lastScore.wave then
-			self:makeTexture(("Wave %d"):format(arena.currentWave), x, h, 100, 100, 255)
+			self:makeTexture(("Wave %d"):tformat(arena.currentWave), x, h, 100, 100, 255)
 		else
-			self:makeTexture(("Wave %d"):format(arena.currentWave), x, h, 255, 255, 255)
+			self:makeTexture(("Wave %d"):tformat(arena.currentWave), x, h, 255, 255, 255)
 		end
 		if arena.event > 0 then
 			if arena.event == 1 then
-				self:makeTexture((" [MiniBoss]"), x + (self.font_w * 13), h, 255, 255, 100)
+				self:makeTexture((_t" [MiniBoss]"), x + (self.font_w * 13), h, 255, 255, 100)
 			elseif arena.event == 2 then
-				self:makeTexture((" [Boss]"), x + (self.font_w * 13), h, 255, 0, 255)
+				self:makeTexture((_t" [Boss]"), x + (self.font_w * 13), h, 255, 0, 255)
 			elseif arena.event == 3 then
-				self:makeTexture((" [Final]"), x + (self.font_w * 13), h, 255, 10, 15)
+				self:makeTexture((_t" [Final]"), x + (self.font_w * 13), h, 255, 10, 15)
 			end
 		end
 		h = h + self.font_h
 		if arena.pinch == true then
-			self:makeTexture(("Bonus: %d (x%.1f)"):format(arena.bonus, arena.bonusMultiplier), x, h, 255, 50, 50) h = h + self.font_h
+			self:makeTexture(("Bonus: %d (x%.1f)"):tformat(arena.bonus, arena.bonusMultiplier), x, h, 255, 50, 50) h = h + self.font_h
 		else
-			self:makeTexture(("Bonus: %d (x%.1f)"):format(arena.bonus, arena.bonusMultiplier), x, h, 255, 255, 255) h = h + self.font_h
+			self:makeTexture(("Bonus: %d (x%.1f)"):tformat(arena.bonus, arena.bonusMultiplier), x, h, 255, 255, 255) h = h + self.font_h
 		end
 		if arena.display then
 			h = h + self.font_h
 			self:makeTexture(arena.display[1], x, h, 255, 0, 255) h = h + self.font_h
-			self:makeTexture(" VS", x, h, 255, 0, 255) h = h + self.font_h
+			self:makeTexture(_t" VS", x, h, 255, 0, 255) h = h + self.font_h
 			self:makeTexture(arena.display[2], x, h, 255, 0, 255) h = h + self.font_h
 		else
-			self:makeTexture("Rank: "..arena.printRank(arena.rank, arena.ranks), x, h, 255, 255, 255) h = h + self.font_h
+			self:makeTexture(("Rank: %s"):tformat(arena.printRank(arena.rank, arena.ranks)), x, h, 255, 255, 255) h = h + self.font_h
 		end
 		h = h + self.font_h
 	end

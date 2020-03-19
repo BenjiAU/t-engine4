@@ -32,7 +32,7 @@ newEntity{
 	archery = "sling",
 	require = { talent = { Talents.T_SHOOT }, },
 	proj_image = resolvers.image_material("shot_s", "metal"),
-	desc = [[Slings are used to hurl stones or metal shots at your foes.]],
+	desc = _t[[Slings are used to hurl stones or metal shots at your foes.]],
 	randart_able = "/data/general/objects/random-artifacts/ranged.lua",
 	egos = "/data/general/objects/egos/sling.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 }
@@ -107,7 +107,7 @@ newEntity{
 	combat = { talented = "sling", accuracy_effect = "mace", damrange = 1.2},
 	proj_image = resolvers.image_material("shot_s", "metal"),
 	archery_ammo = "sling",
-	desc = [[Shots are used with slings to pummel your foes to death.]],
+	desc = _t[[Shots are used with slings to pummel your foes to death.]],
 	randart_able = "/data/general/objects/random-artifacts/ammo.lua",
 	egos = "/data/general/objects/egos/ammo.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 	resolvers.shooter_capacity(),

@@ -35,7 +35,7 @@ function _M:init(title, actor)
 	local nb = 0
 	for id, data in pairs(actor.lore_known) do nb = nb + 1 end
 
-	Dialog.init(self, (title or "Lore").." ("..nb.."/"..total..")", game.w * 0.8, game.h * 0.8)
+	Dialog.init(self, (title or _t"Lore").." ("..nb.."/"..total..")", game.w * 0.8, game.h * 0.8)
 
 	local vsep = Separator.new{dir="horizontal", size=self.ih - 10}
 	self.c_desc = TextzoneList.new{width=math.floor(self.iw / 2 - vsep.w / 2), scrollbar=true, height=self.ih}
@@ -44,12 +44,12 @@ function _M:init(title, actor)
 
 	self:generateList()
 
-	self.c_search = Textbox.new{title="Search: ", text="", chars=20, max_len=60, fct=function() end, on_change=function(text) self:search(text) end}
+	self.c_search = Textbox.new{title=_t"Search: ", text="", chars=20, max_len=60, fct=function() end, on_change=function(text) self:search(text) end}
 
 	self.c_list = ListColumns.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=self.ih - 10 - self.c_search.h, scrollbar=true, sortable=true, columns={
-		{name="", width={40,"fixed"}, display_prop="order", sort="order"},
-		{name="Lore", width=60, display_prop="name", sort="name"},
-		{name="Category", width=40, display_prop="cat", sort="cat"},
+		{name=_t"", width={40,"fixed"}, display_prop="order", sort="order"},
+		{name=_t"Lore", width=60, display_prop="name", sort="name"},
+		{name=_t"Category", width=40, display_prop="cat", sort="cat"},
 	}, list=self.list, fct=function(item) self:popup(item) end, select=function(item, sel) self:select(item) end}
 
 	self:loadUI{
@@ -86,7 +86,7 @@ function _M:generateList()
 	for id, _ in pairs(self.actor.lore_known) do
 		local l = self.actor:getLore(id)
 		if self:matchSearch(tostring(l.order)) or self:matchSearch(l.name) or self:matchSearch(l.category) then
-			list[#list+1] = { name=l.name, desc=util.getval(l.lore), cat=l.category, order=l.order, image=l.image, lore=l }
+			list[#list+1] = { name=l.name, desc=util.getval(l.lore), cat=_t(l.category), order=l.order, image=l.image, lore=l }
 		end
 	end
 	-- Add known artifacts
@@ -103,7 +103,7 @@ end
 
 function _M:select(item)
 	if item then
-		self.c_desc:switchItem(item, ("#GOLD#Category:#AQUAMARINE# %s\n#GOLD#Found as:#0080FF# %s\n#GOLD#Text:#ANTIQUE_WHITE# %s"):format(item.cat, item.name, item.desc))
+		self.c_desc:switchItem(item, ("#GOLD#Category:#AQUAMARINE# %s\n#GOLD#Found as:#0080FF# %s\n#GOLD#Text:#ANTIQUE_WHITE# %s"):tformat(item.cat, item.name, item.desc))
 		if item.image and type(item.image) == "string" then
 			local image = Image.new{file="lore/"..item.image, auto_width=true, auto_height=true}
 			local r = image.w / image.h

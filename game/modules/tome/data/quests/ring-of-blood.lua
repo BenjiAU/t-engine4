@@ -17,17 +17,17 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Till the Blood Runs Clear"
+name = _t"Till the Blood Runs Clear"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You have found a slavers' compound and entered it."
+	desc[#desc+1] = _t"You have found a slavers' compound and entered it."
 	if self:isCompleted("won-fight") then
-		desc[#desc+1] = ""
-		desc[#desc+1] = "You decided to join the slavers and take part in their game. You won the ring of blood!"
+		desc[#desc+1] = _t""
+		desc[#desc+1] = _t"You decided to join the slavers and take part in their game. You won the ring of blood!"
 	end
 	if self:isCompleted("killall") then
-		desc[#desc+1] = ""
-		desc[#desc+1] = "You decided you cannot let slavers continue their dirty work and destroyed them!"
+		desc[#desc+1] = _t""
+		desc[#desc+1] = _t"You decided you cannot let slavers continue their dirty work and destroyed them!"
 	end
 	return table.concat(desc, "\n")
 end
@@ -63,7 +63,7 @@ start_game = function(self)
 	game.zone:addEntity(game.level, slave, "actor", spot.x, spot.y)
 
 	game.party:addMember(slave, {
-		control="full", type="slave", title=p.name.."'s slave",
+		control="full", type="slave", title=("%s's slave"):tformat(p:getName()),
 		orders = {target=true, leash=true, anchor=true, talents=true, behavior=true},
 	})
 	game.party:setPlayer(slave)

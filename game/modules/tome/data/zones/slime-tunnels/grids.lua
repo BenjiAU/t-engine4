@@ -28,9 +28,9 @@ local orb_activate = function(self, x, y, who, act, couldpass)
 	local owner, orb = game.party:findInAllPartyInventoriesBy("define_as", self.define_as)
 
 	if not orb then
-		require("engine.ui.Dialog"):simplePopup("Strange Pedestal", "This pedestal looks old, you can see the shape of an orb carved on it.")
+		require("engine.ui.Dialog"):simplePopup(_t"Strange Pedestal", _t"This pedestal looks old, you can see the shape of an orb carved on it.")
 	else
-		require("engine.ui.Dialog"):yesnoLongPopup("Strange Pedestal", "The pedestal seems to react to something in your bag. After some tests you notice it is the "..tostring(orb:getName{do_color=true})..".\nDo you wish to use the orb on the pedestal?", 400, function(ret)
+		require("engine.ui.Dialog"):yesnoLongPopup(_t"Strange Pedestal", ("The pedestal seems to react to something in your bag. After some tests you notice it is the %s.\nDo you wish to use the orb on the pedestal?"):tformat(tostring(orb:getName{do_color=true})), 400, function(ret)
 			if ret then game.player:useCommandOrb(orb, x, y) end
 		end)
 	end
@@ -61,7 +61,7 @@ newEntity{
 		summon = {
 			base_list="mod.class.NPC:/data/general/npcs/multihued-drake.lua",
 			type="dragon", subtype="multihued", name="greater multi-hued wyrm",
-			random_boss = {name_scheme="#rng# the Fearsome", class_filter=function(d) return d.name == "Archmage" end},
+			random_boss = {name_scheme=_t"#rng# the Fearsome", class_filter=function(d) return d.name == "Archmage" end},
 			add_levels = 12,
 		},
 		special = orb_summon,
@@ -81,7 +81,7 @@ newEntity{
 		summon = {
 			base_list="mod.class.NPC:/data/general/npcs/lich.lua",
 			type="undead", subtype="lich", name="archlich",
-			random_boss = {name_scheme="#rng# the Neverdead", class_filter=function(d) return d.name == "Necromancer" end},
+			random_boss = {name_scheme=_t"#rng# the Neverdead", class_filter=function(d) return d.name == "Necromancer" end},
 			add_levels = 12,
 		},
 		special = orb_summon,
@@ -101,7 +101,7 @@ newEntity{
 		summon = {
 			base_list="mod.class.NPC:/data/general/npcs/gwelgoroth.lua",
 			type="elemental", subtype="air", name="ultimate gwelgoroth",
-			random_boss = {name_scheme="#rng# the Silent Death", class_filter=function(d) return d.name == "Shadowblade" end},
+			random_boss = {name_scheme=_t"#rng# the Silent Death", class_filter=function(d) return d.name == "Shadowblade" end},
 			add_levels = 12,
 		},
 		special = orb_summon,
@@ -121,7 +121,7 @@ newEntity{
 		summon = {
 			base_list="mod.class.NPC:/data/general/npcs/major-demon.lua",
 			type="demon", subtype="major", name="forge-giant",
-			random_boss = {name_scheme="#rng# the Crusher", class_filter=function(d) return d.name == "Corruptor" end},
+			random_boss = {name_scheme=_t"#rng# the Crusher", class_filter=function(d) return d.name == "Corruptor" end},
 			add_levels = 12,
 		},
 		special = orb_summon,
@@ -156,10 +156,10 @@ newEntity{
 	change_level=1, change_zone="high-peak",
 	change_level_check = function()
 		if not game.player:hasQuest("orb-command") or not game.player:isQuestStatus("orb-command", engine.Quest.DONE) then
-			require("engine.ui.Dialog"):simplePopup("High Peak", 'The way forward is blocked. There must be some way around here to unlock those doors.')
+			require("engine.ui.Dialog"):simplePopup(_t"High Peak", _t'The way forward is blocked. There must be some way around here to unlock those doors.')
 			return true
 		end
-		require("engine.ui.Dialog"):yesnoLongPopup("High Peak", 'As you stand on the stairs you can feel this is a "do or die" one way trip. If you enter there will be no coming back.\nEnter?', 500, function(ret) if ret then
+		require("engine.ui.Dialog"):yesnoLongPopup(_t"High Peak", _t'As you stand on the stairs you can feel this is a "do or die" one way trip. If you enter there will be no coming back.\nEnter?', 500, function(ret) if ret then
 			game:changeLevel(1, "high-peak")
 		end end)
 		return true

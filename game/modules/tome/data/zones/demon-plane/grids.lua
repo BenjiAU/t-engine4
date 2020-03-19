@@ -27,11 +27,11 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[This portal seems to be connected with Maj'Eyal; you could probably use it to go back.]],
+	desc=_t[[This portal seems to be connected with Maj'Eyal; you could probably use it to go back.]],
 
 	on_move = function(self, x, y, who)
 		if who == game.player then
-			require("engine.ui.Dialog"):yesnoPopup("Back and there again", "Enter the portal back to Maj'Eyal? (Warning loot Draebor first)", function(ret)
+			require("engine.ui.Dialog"):yesnoPopup(_t"Back and there again", _t"Enter the portal back to Maj'Eyal? (Warning loot Draebor first)", function(ret)
 				if not ret then
 					game:onLevelLoad("wilderness-1", function(zone, level)
 						local p = game:getPlayer(true)
@@ -41,7 +41,7 @@ newEntity{
 					game:changeLevel(1, "wilderness")
 					game.logPlayer(who, "#VIOLET#You enter the swirling portal and in the blink of an eye you are back to Maj'Eyal, near the Daikara.")
 				end
-			end, "Stay", "Enter")
+			end, _t"Stay", _t"Enter")
 		end
 	end,
 }

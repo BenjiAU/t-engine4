@@ -21,7 +21,7 @@ local layout = game.state:alternateZoneTier1(short_name, {"INVADED", 1})
 local is_invaded = layout == "INVADED"
 
 return {
-	name = "Norgos Lair",
+	name = _t"Norgos Lair",
 	level_range = {1, 7},
 	level_scheme = "player",
 	max_level = 3,

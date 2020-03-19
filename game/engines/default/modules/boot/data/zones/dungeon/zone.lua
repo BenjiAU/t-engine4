@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Forest",
+	name = _t"Forest",
 	level_range = {1, 5},
 	level_scheme = "player",
 	max_level = 5,

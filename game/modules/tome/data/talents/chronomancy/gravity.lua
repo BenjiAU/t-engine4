@@ -76,15 +76,15 @@ newTalent{
 							slam = true
 							self:project({type="hit"}, target.x, target.y, DamageType.GRAVITY, bonus_dam)
 							self:project({type="hit"}, x, y, DamageType.GRAVITY, bonus_dam)
-							game.logSeen(target, "%s slams into something solid!", target.name:capitalize())
+							game.logSeen(target, "%s slams into something solid!", target:getName():capitalize())
 						end
 					end)
 					
 					tgts[#tgts+1] = target
-					if not slam then game.logSeen(target, "%s is knocked back!", target.name:capitalize()) end
+					if not slam then game.logSeen(target, "%s is knocked back!", target:getName():capitalize()) end
 					target:crossTierEffect(target.EFF_OFFBALANCE, getParadoxSpellpower(self, t))
 				else
-					game.logSeen(target, "%s resists the knockback!", target.name:capitalize())
+					game.logSeen(target, "%s resists the knockback!", target:getName():capitalize())
 				end
 				
 			end
@@ -100,7 +100,7 @@ newTalent{
 		return ([[Sends out a blast wave of gravity in a radius %d cone, dealing %0.2f base physical (gravity) damage and knocking back targets caught in the area.
 		Targets knocked into walls or other targets take 25%% additional damage and deal 25%% damage to targets they're knocked into.
 		Closer targets will be knocked back further and the damage will scale with your Spellpower.]]):
-		format(radius, damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)))
+		tformat(radius, damDesc(self, DamageType.PHYSICAL, t.getDamage(self, t)))
 	end,
 }
 
@@ -142,13 +142,13 @@ newTalent{
 					if target:checkHit(getParadoxSpellpower(self, t), target:combatPhysicalResist(), 0, 95) and target:canBe("knockback") then -- Deprecated Checkhit call
 						return true
 					else
-						game.logSeen(target, "%s resists the knockback!", target.name:capitalize())
+						game.logSeen(target, "%s resists the knockback!", target:getName():capitalize())
 					end
 				end
 				if can(target) then
 					target:pull(x, y, tg.radius, can)
 					tgts[#tgts+1] = target
-					game.logSeen(target, "%s is drawn in by the singularity!", target.name:capitalize())
+					game.logSeen(target, "%s is drawn in by the singularity!", target:getName():capitalize())
 					target:crossTierEffect(target.EFF_OFFBALANCE, getParadoxSpellpower(self, t))
 				end
 			end
@@ -179,7 +179,7 @@ newTalent{
 		Each target moved beyond the first increases the damage by %0.2f (up to a maximum of %0.2f bonus damage).
 		Targets take reduced damage the further they are from the epicenter (20%% less per tile).
 		The damage dealt will scale with your Spellpower.]])
-		:format(radius, damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.PHYSICAL, damage/8), damDesc(self, DamageType.PHYSICAL, damage/2))
+		:tformat(radius, damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.PHYSICAL, damage/8), damDesc(self, DamageType.PHYSICAL, damage/2))
 	end,
 }
 
@@ -217,7 +217,7 @@ newTalent{
 		local proj = t.getSlow(self, t)
 		local anti = t.getAnti(self, t)
 		return ([[Create a gravity field around you that converts %d%% all damage you deal into physical damage, slows incoming projectiles by %d%%, and protects you from all gravity damage and effects.
-		Additionally, damage dealt by Repulsion Blast has a %d%% chance to reduce the target's knockback resistance by half for two turns.]]):format(conv, proj, anti)
+		Additionally, damage dealt by Repulsion Blast has a %d%% chance to reduce the target's knockback resistance by half for two turns.]]):tformat(conv, proj, anti)
 	end,
 }
 
@@ -264,6 +264,6 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		local slow = t.getSlow(self, t)
 		return ([[Increases local gravity in a radius of %d for %d turns, dealing %0.2f physical (gravity) damage as well as decreasing the global speed of all affected targets by %d%%.
-		The damage done will scale with your Spellpower.]]):format(radius, duration, damDesc(self, DamageType.PHYSICAL, damage), slow*100)
+		The damage done will scale with your Spellpower.]]):tformat(radius, duration, damDesc(self, DamageType.PHYSICAL, damage), slow*100)
 	end,
 }

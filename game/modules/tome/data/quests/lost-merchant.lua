@@ -17,11 +17,11 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Trapped!"
+name = _t"Trapped!"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You heard a plea for help and decided to investigate..."
-	desc[#desc+1] = "Only to find yourself trapped inside an unknown tunnel complex."
+	desc[#desc+1] = _t"You heard a plea for help and decided to investigate..."
+	desc[#desc+1] = _t"Only to find yourself trapped inside an unknown tunnel complex."
 	return table.concat(desc, "\n")
 end
 

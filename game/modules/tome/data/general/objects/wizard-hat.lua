@@ -26,7 +26,7 @@ newEntity{
 	moddable_tile = resolvers.moddable_tile("wizard_hat"),
 	encumber = 2,
 	rarity = 6,
-	desc = [[A pointy cloth hat, very wizardly...]],
+	desc = _t[[A pointy cloth hat, very wizardly...]],
 	randart_able = "/data/general/objects/random-artifacts/generic.lua",
 	egos = "/data/general/objects/egos/wizard-hat.lua", egos_chance = { prefix=resolvers.mbonus(40, 5), suffix=resolvers.mbonus(40, 5) },
 }

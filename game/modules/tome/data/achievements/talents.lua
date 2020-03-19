@@ -19,7 +19,7 @@
 
 newAchievement{
 	name = "Pyromancer",
-	desc = [[Unlocked Archmage class and did over one million fire damage (with any item/talent/class).]],
+	desc = _t[[Unlocked Archmage class and did over one million fire damage (with any item/talent/class).]],
 	show = "full",
 	mode = "world",
 	can_gain = function(self, who, dam)
@@ -40,7 +40,7 @@ newAchievement{
 }
 newAchievement{
 	name = "Cryomancer",
-	desc = [[Unlocked Archmage class and did over one million cold damage (with any item/talent/class).]],
+	desc = _t[[Unlocked Archmage class and did over one million cold damage (with any item/talent/class).]],
 	show = "full",
 	mode = "world",
 	can_gain = function(self, who, dam)
@@ -61,12 +61,12 @@ newAchievement{
 }
 newAchievement{
 	name = "Lichform",
-	desc = [[Achieved your wild dreams of power and eternal life: you turned into a Lich!]],
+	desc = _t[[Achieved your wild dreams of power and eternal life: you turned into a Lich!]],
 	show = "name",
 }
 newAchievement{
 	name = "Best album ever!", id = "THE_CURE",
-	desc = [[Removed 89 beneficial effects from enemies via Disintegration.]],
+	desc = _t[[Removed 89 beneficial effects from enemies via Disintegration.]],
 	show = "full", 	mode = "player",
 	can_gain = function(self, who)
 		self.nb = (self.nb or 0) + 1

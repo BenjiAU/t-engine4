@@ -26,7 +26,7 @@ load("/data/general/objects/objects-maj-eyal.lua")
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE",
 	name = "journal page", lore="old-forest-note-5",
-	desc = [[A paper scrap, left by an adventurer.]],
+	desc = _t[[A paper scrap, left by an adventurer.]],
 	rarity = false,
 	encumberance = 0,
 }

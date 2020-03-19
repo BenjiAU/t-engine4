@@ -54,7 +54,7 @@ newTalent{
 		end
 	end,
 	info = function(self, t)
-		return ([[Improve your predation by learning from past hunts. You gain %0.2f accuracy and %0.2f armor penetration against foes for each foe of that type you have previously slain, to a maximum of %d accuracy and %d apr.]]):format(t.getATK(self, t), t.getAPR(self, t), t.getATK(self, t) * t.getTypeKillMax(self, t), t.getAPR(self, t) * t.getTypeKillMax(self, t), t.getTypeKillMax(self, t))
+		return ([[Improve your predation by learning from past hunts. You gain %0.2f accuracy and %0.2f armor penetration against foes for each foe of that type you have previously slain, to a maximum of %d accuracy and %d apr.]]):tformat(t.getATK(self, t), t.getAPR(self, t), t.getATK(self, t) * t.getTypeKillMax(self, t), t.getAPR(self, t) * t.getTypeKillMax(self, t), t.getTypeKillMax(self, t))
 	end,
 }
 
@@ -103,7 +103,7 @@ newTalent{
 	end,
 	createDark = function(summoner, x, y, damage, duration, creep, creepChance, initialCreep)
 		local e = Object.new{
-			name = summoner.name:capitalize() .. "'s cursed miasma",
+			name = ("%s's cursed miasma"):tformat(summoner:getName():capitalize()),
 			block_sight=function(self, x, y, who)
 				if who and who.attr and who:attr("pierce_cursed_miasma") and x and who.x and core.fov.distance(x, y, who.x, who.y) <= 10 then
 					return false
@@ -239,7 +239,7 @@ newTalent{
 		return ([[Upon making a critical melee attack the savagery of your predation causes a Cursed Miasma to begin permeating your hunting grounds.
 		The miasma will seep from %d locations, including your own, within radius %d, deals %0.2f damage split between Darkness and Mind and blocks sight.
 		Prey lost within your miasma have a %d%% chance to lose track of you and may mistake friends for foe.
-		Savage Hunter costs #ffa0ff#8 Hate#LAST# on trigger and does not trigger when you're in Cursed Miasma.]]):format(t.getMiasmaCount(self, t), self:getTalentRadius(t), self:damDesc(DamageType.DARKNESS, t.getDamage(self, t)/2) + self:damDesc(DamageType.MIND, t.getDamage(self, t)/2), t.getChance(self, t))
+		Savage Hunter costs #ffa0ff#8 Hate#LAST# on trigger and does not trigger when you're in Cursed Miasma.]]):tformat(t.getMiasmaCount(self, t), self:getTalentRadius(t), self:damDesc(DamageType.DARKNESS, t.getDamage(self, t)/2) + self:damDesc(DamageType.MIND, t.getDamage(self, t)/2), t.getChance(self, t))
 	end,
 }
 
@@ -264,7 +264,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[While shrouded in cursed miasma you gain stealth (%d power) and %d physical power.
-		The stealth power and physical power will increase with your mindpower.]]):format(t.getStealthPower(self, t), t.getPhysPower(self, t))
+		The stealth power and physical power will increase with your mindpower.]]):tformat(t.getStealthPower(self, t), t.getPhysPower(self, t))
 	end,
 }
 
@@ -325,6 +325,6 @@ newTalent{
 	end,
 
 	info = function(self, t)
-		return([[Focus your predation on the most worthy prey. Upon entering a level for the first time, up to %d foes are marked as your prey. You gain vision of them, wherever they are. Additionally, all damage you receive from their subtype is reduced by %d%%.]]):format(t.getCount(self, t), t.getPower(self, t))
+		return([[Focus your predation on the most worthy prey. Upon entering a level for the first time, up to %d foes are marked as your prey. You gain vision of them, wherever they are. Additionally, all damage you receive from their subtype is reduced by %d%%.]]):tformat(t.getCount(self, t), t.getPower(self, t))
 	end,
 }

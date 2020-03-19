@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Blighted Ruins",
+	name = _t"Blighted Ruins",
 	level_range = {1, 5},
 	level_scheme = "player",
 	max_level = 3,

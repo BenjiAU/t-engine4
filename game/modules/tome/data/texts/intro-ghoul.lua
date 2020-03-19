@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[Welcome #LIGHT_GREEN#@name@#WHITE#.
+return _t[[Welcome #LIGHT_GREEN#@name@#WHITE#.
 You died ages ago, but that did not stop you. You were raised as an undead ghoul.
 
 Your Necromancer master has plans for you, but something is wrong: you seem to have kept your free will.

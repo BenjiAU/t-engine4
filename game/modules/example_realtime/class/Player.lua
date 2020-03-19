@@ -97,12 +97,12 @@ end
 
 --- Called before taking a hit, overload mod.class.Actor:onTakeHit() to stop resting and running
 function _M:onTakeHit(value, src)
-	self:runStop("taken damage")
-	self:restStop("taken damage")
+	self:runStop(_t"taken damage")
+	self:restStop(_t"taken damage")
 	local ret = mod.class.Actor.onTakeHit(self, value, src)
 	if self.life < self.max_life * 0.3 then
 		local sx, sy = game.level.map:getTileToScreen(self.x, self.y)
-		game.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, 2, "LOW HEALTH!", {255,0,0}, true)
+		game.flyers:add(sx, sy, 30, (rng.range(0,2)-1) * 0.5, 2, _t"LOW HEALTH!", {255,0,0}, true)
 	end
 	return ret
 end
@@ -136,7 +136,7 @@ function _M:levelup()
 	mod.class.Actor.levelup(self)
 
 	local x, y = game.level.map:getTileToScreen(self.x, self.y)
-	game.flyers:add(x, y, 80, 0.5, -2, "LEVEL UP!", {0,255,255})
+	game.flyers:add(x, y, 80, 0.5, -2, _t"LEVEL UP!", {0,255,255})
 	game.log("#00ffff#Welcome to level %d.", self.level)
 end
 

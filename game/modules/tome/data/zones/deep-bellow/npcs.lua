@@ -28,8 +28,8 @@ newEntity{ base="BASE_NPC_CORRUPTED_HORROR", define_as = "THE_MOUTH",
 	unique = true,
 	name = "The Mouth", tint=colors.PURPLE,
 	color=colors.VIOLET,
-	desc = [["From bellow, it devours."]],
-	killer_message = "and revived as a screeching drem bat",
+	desc = _t[["From bellow, it devours."]],
+	killer_message = _t"and revived as a screeching drem bat",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_corrupted_the_mouth.png", display_h=2, display_y=-1}}},
 	level_range = {7, nil}, exp_worth = 2,
 	max_life = 10000, life_rating = 0, fixed_rating = true,
@@ -60,7 +60,7 @@ newEntity{ base="BASE_NPC_CORRUPTED_HORROR", define_as = "THE_MOUTH",
 
 	on_takehit = function(self, value)
 		if value <= 500 then
-			game.logSeen(self, "#CRIMSON#%s seems invulnerable, there must be an other way to kill it!", self.name:capitalize())
+			game.logSeen(self, "#CRIMSON#%s seems invulnerable, there must be an other way to kill it!", self:getName():capitalize())
 			return 0
 		end
 		return value
@@ -80,7 +80,7 @@ newEntity{ base="BASE_NPC_CORRUPTED_HORROR", define_as = "THE_MOUTH",
 
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("deep-bellow", engine.Quest.COMPLETED)
-		game.state:activateBackupGuardian("ABOMINATION", 3, 35, "I have heard a dwarf whispering about some abomination in the deep bellow.")
+		game.state:activateBackupGuardian("ABOMINATION", 3, 35, _t"I have heard a dwarf whispering about some abomination in the deep bellow.")
 
 		if game:getPlayer(true).female then
 			game:setAllowedBuild("cosmetic_race_dwarf_female_beard", true)
@@ -91,7 +91,7 @@ newEntity{ base="BASE_NPC_CORRUPTED_HORROR", define_as = "THE_MOUTH",
 newEntity{ base="BASE_NPC_CORRUPTED_HORROR", define_as = "SLIMY_CRAWLER",
 	name = "slimy crawler",
 	color = colors.GREEN,
-	desc = [[This disgusting... thing crawls on the floor toward you with great speed.
+	desc = _t[[This disgusting... thing crawls on the floor toward you with great speed.
 It seems to come from the digestive system of the mouth.]],
 	level_range = {4, nil}, exp_worth = 0,
 	max_life = 80, life_rating = 10, fixed_rating = true,
@@ -136,7 +136,7 @@ newEntity{ base="BASE_NPC_CORRUPTED_HORROR", define_as = "ABOMINATION",
 	name = "The Abomination",
 	display = "h", color=colors.VIOLET,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_corrupted_the_abomination.png", display_h=2, display_y=-1}}},
-	desc = [[A horrid mass of pustulent flesh, sinew, and bone; this creature seems to constantly be in pain. Two heads glare malevolently at you, an intruder in its domain.]],
+	desc = _t[[A horrid mass of pustulent flesh, sinew, and bone; this creature seems to constantly be in pain. Two heads glare malevolently at you, an intruder in its domain.]],
 	level_range = {35, nil}, exp_worth = 3,
 	max_life = 350, life_rating = 23, fixed_rating = true,
 	life_regen = 30,

@@ -25,9 +25,9 @@ local Talents = require("engine.interface.ActorTalents")
 
 newEntity{ define_as="SUBJECT_Z",
 	name = "Subject Z", color=colors.VIOLET, display = "p", unique = true,
-	desc = "This seems to be the 'subject Z' the notes spoke about. He looks human, but this cannot be -- he would be about five thousand years old!",
+	desc = _t"This seems to be the 'subject Z' the notes spoke about. He looks human, but this cannot be -- he would be about five thousand years old!",
 	type = "humanoid", subtype = "human",
-	killer_message = "and bloodily smeared across the granite walls",
+	killer_message = _t"and bloodily smeared across the granite walls",
 	level_range = {10, nil}, exp_worth = 2,
 	rank = 4,
 	autolevel = "roguemage",
@@ -82,15 +82,15 @@ newEntity{ define_as="SUBJECT_Z",
 
 		wayist:setTarget(self)
 		self:setTarget(wayist)
-		wayist:doEmote("Sacrifice for the Way!", 60)
+		wayist:doEmote(_t"Sacrifice for the Way!", 60)
 
 		-- Warning for our good yeek folks to GTFOH
 		if game:getPlayer(true) and game:getPlayer(true).starting_zone == "town-irkkk" then
-			require("engine.ui.Dialog"):yesnoLongPopup("#LIGHT_RED#Intense fight", "As you approach you come upon an other Wayist and receive a very clear mental message:\n#{italic}##UMBER#RUN AWAY! I am done for but you can save yourself still!#{normal}#", 600, function(ret) if ret then
+			require("engine.ui.Dialog"):yesnoLongPopup(_t"#LIGHT_RED#Intense fight", _t"As you approach you come upon an other Wayist and receive a very clear mental message:\n#{italic}##UMBER#RUN AWAY! I am done for but you can save yourself still!#{normal}#", 600, function(ret) if ret then
 				who:setEffect(who.EFF_RECALL, 5, {})
 				game.bignews:say(120, "#GOLD#You hastily activate your Rod of Recall, vowing to come back later!")
 				game.logPlayer(who, "Space around you starts to dissolve...")
-			end end, "Emergency recall", "Stay and fight!")
+			end end, _t"Emergency recall", _t"Stay and fight!")
 		end
 	end,
 
@@ -102,13 +102,13 @@ newEntity{ define_as="SUBJECT_Z",
 		local p = game.party:findMember{main=true}
 		-- Yeeks really, really, really, hate halflings
 		if p.descriptor.race == "Halfling" then
-			wayist:doEmote("Halfling?! DIE!!!!!", 70)
+			wayist:doEmote(_t"Halfling?! DIE!!!!!", 70)
 			wayist:checkAngered(p, false, -200)
 		elseif p.descriptor.race == "Yeek" then
-			wayist:doEmote("The Way sent you?", 70)
+			wayist:doEmote(_t"The Way sent you?", 70)
 			wayist.can_talk = "yeek-wayist"
 		else
-			wayist:doEmote("You.. saved me?", 70)
+			wayist:doEmote(_t"You.. saved me?", 70)
 			wayist.can_talk = "yeek-wayist"
 		end
 	end,
@@ -116,7 +116,7 @@ newEntity{ define_as="SUBJECT_Z",
 
 newEntity{ define_as="YEEK_WAYIST",
 	name = "Yeek Wayist", color=colors.VIOLET, display = "y", unique = true,
-	desc = "This creature is about as tall as a halfling. It is covered in white silky fur and has a disproportionate head. The weirdest thing about it though, its weapon simply floats in front of it.",
+	desc = _t"This creature is about as tall as a halfling. It is covered in white silky fur and has a disproportionate head. The weirdest thing about it though, its weapon simply floats in front of it.",
 	type = "humanoid", subtype = "yeek",
 	level_range = {10, nil},
 	rank = 3,

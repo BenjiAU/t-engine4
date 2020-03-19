@@ -45,7 +45,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_HORROR",
 	name = "worm that walks", color=colors.SANDY_BROWN,
-	desc = [[A bulging rotten robe seems to tear at the seams, with masses of bloated worms spilling out all around the moving form.  Two arm-like appendages, each made up of overlapping mucous-drenched maggots, grasp tightly around the handles of bile-coated waraxes.
+	desc = _t[[A bulging rotten robe seems to tear at the seams, with masses of bloated worms spilling out all around the moving form.  Two arm-like appendages, each made up of overlapping mucous-drenched maggots, grasp tightly around the handles of bile-coated waraxes.
 Each swing drips pustulant fluid before it, and each droplet writhes and wriggles in the air before splashing against the ground.]],
 	level_range = {25, nil}, exp_worth = 1,
 	rarity = 5,
@@ -106,7 +106,7 @@ Each swing drips pustulant fluid before it, and each droplet writhes and wriggle
 		if value >= (self.max_life * 0.1) then
 			local t = self:getTalentFromId(self.T_WORM_ROT)
 			t.spawn_carrion_worm(self, self, t)
-			game.logSeen(self, "#LIGHT_RED#A carrion worm mass has spawned from %s' wounds!", self.name)
+			game.logSeen(self, "#LIGHT_RED#A carrion worm mass has spawned from %s' wounds!", self:getName())
 		end
 		return value
 	end,
@@ -114,7 +114,7 @@ Each swing drips pustulant fluid before it, and each droplet writhes and wriggle
 
 newEntity{ base = "BASE_NPC_HORROR",
 	name = "bloated horror", color=colors.WHITE,
-	desc ="A bulbous humanoid form floats here. Its bald, child-like head is disproportionately large compared to its body, and its skin is pock-marked with nasty red sores.",
+	desc =_t"A bulbous humanoid form floats here. Its bald, child-like head is disproportionately large compared to its body, and its skin is pock-marked with nasty red sores.",
 	level_range = {10, nil}, exp_worth = 1,
 	rarity = 1,
 	rank = 2,
@@ -143,7 +143,7 @@ newEntity{ base = "BASE_NPC_HORROR",
 
 newEntity{ base = "BASE_NPC_HORROR",
 	name = "nightmare horror", color=colors.DARK_GREY,
-	desc ="A shifting form of darkest night that seems to reflect your deepest fears.",
+	desc =_t"A shifting form of darkest night that seems to reflect your deepest fears.",
 	level_range = {35, nil}, exp_worth = 1,
 	mana_regen = 10,
 	negative_regen = 10,
@@ -193,7 +193,7 @@ newEntity{ base = "BASE_NPC_HORROR",
 ------------------------------------------------------------------------
 newEntity{ base = "BASE_NPC_HORROR",
 	name = "headless horror", color=colors.TAN,
-	desc ="A headless, gangly humanoid with a large distended stomach.",
+	desc =_t"A headless, gangly humanoid with a large distended stomach.",
 	level_range = {30, nil}, exp_worth = 1,
 	rarity = 5,
 	rank = 3,
@@ -253,14 +253,14 @@ newEntity{ base = "BASE_NPC_HORROR",
 			if not eye.dead then eye:die(src) nb = nb + 1 end
 		end
 		if nb > 0 then
-			game.logSeen(self, "#AQUAMARINE#As %s falls all its eyes fall to the ground!", self.name)
+			game.logSeen(self, "#AQUAMARINE#As %s falls all its eyes fall to the ground!", self:getName())
 		end
 	end,
 }
 
 newEntity{ base = "BASE_NPC_HORROR", define_as = "BASE_NPC_ELDRICTH_EYE",
 	name = "eldritch eye", color=colors.SLATE, is_eldritch_eye=true,
-	desc ="A small bloodshot eye floats here.",
+	desc =_t"A small bloodshot eye floats here.",
 	level_range = {30, nil}, exp_worth = 1,
 	life_rating = 7,
 	rank = 2,
@@ -286,9 +286,9 @@ newEntity{ base = "BASE_NPC_HORROR", define_as = "BASE_NPC_ELDRICTH_EYE",
 		end
 		if nb == 0 and self.summoner and self.summoner.is_headless_horror then
 			local sx, sy = game.level.map:getTileToScreen(self.summoner.x, self.summoner.y, true)
-			game.flyers:add(sx, sy, 20, (rng.range(0,2)-1) * 0.5, -3, "+Blind", {255,100,80})
+			game.flyers:add(sx, sy, 20, (rng.range(0,2)-1) * 0.5, -3, _t"+Blind", {255,100,80})
 			self.summoner.blind = 1
-			game.logSeen(self.summoner, "%s is blinded by the loss of all its eyes.", self.summoner.name:capitalize())
+			game.logSeen(self.summoner, "%s is blinded by the loss of all its eyes.", self.summoner:getName():capitalize())
 		end
 	end,
 }
@@ -406,7 +406,7 @@ newEntity{ base = "BASE_NPC_ELDRICTH_EYE",
 -- TODO: Make Luminous and Radiant Horrors cooler
 newEntity{ base = "BASE_NPC_HORROR",
 	name = "luminous horror", color=colors.YELLOW,
-	desc ="A lanky humanoid shape composed of yellow light.",
+	desc =_t"A lanky humanoid shape composed of yellow light.",
 	level_range = {20, nil}, exp_worth = 1,
 	rarity = 2,
 	autolevel = "caster",
@@ -441,7 +441,7 @@ newEntity{ base = "BASE_NPC_HORROR",
 
 newEntity{ base = "BASE_NPC_HORROR",
 	name = "radiant horror", color=colors.GOLD,
-	desc ="A lanky four-armed humanoid shape composed of bright golden light.  It's so bright it's hard to look at, and you can feel heat radiating outward from it.",
+	desc =_t"A lanky four-armed humanoid shape composed of bright golden light.  It's so bright it's hard to look at, and you can feel heat radiating outward from it.",
 	level_range = {35, nil}, exp_worth = 1,
 	rarity = 8,
 	rank = 3,
@@ -482,7 +482,7 @@ newEntity{ base = "BASE_NPC_HORROR",
 newEntity{ base = "BASE_NPC_HORROR",
 	subtype = "eldritch",
 	name = "devourer", color=colors.CRIMSON,
-	desc = "A headless, round creature with stubby legs and arms.  Its body seems to be all teeth.",
+	desc = _t"A headless, round creature with stubby legs and arms.  Its body seems to be all teeth.",
 	level_range = {10, nil}, exp_worth = 1,
 	rarity = 2,
 	rank = 2,
@@ -512,7 +512,7 @@ newEntity{ base = "BASE_NPC_HORROR",
 --Blade horror, psionic horror surrounded by countless telekinetic blades.
 newEntity{ base = "BASE_NPC_HORROR",
 	name = "blade horror", color=colors.GREY, define_as="BLADEHORROR",
-	desc = "Blades whirl in the air around this thin, floating figure. The air around it swirls with force, threatening to tear apart anything that approches, if the blades don't do it first.",
+	desc = _t"Blades whirl in the air around this thin, floating figure. The air around it swirls with force, threatening to tear apart anything that approches, if the blades don't do it first.",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_eldritch_blade_horror.png", display_h=2, display_y=-1}}},
 	level_range = {15, nil}, exp_worth = 1,
 	rarity = 2,
@@ -553,7 +553,7 @@ newEntity{ base = "BASE_NPC_HORROR",
 newEntity{ base = "BASE_NPC_HORROR",
 	subtype = "eldritch",
 	name = "oozing horror", color=colors.GREEN,
-	desc = "A massive, amorphous blob of green slime crawls on the ground towards you. Eyes drift through the viscous mass, scanning for potential prey.",
+	desc = _t"A massive, amorphous blob of green slime crawls on the ground towards you. Eyes drift through the viscous mass, scanning for potential prey.",
 	level_range = {16, nil}, exp_worth = 1,
 	rarity = 7,
 	rank = 3,
@@ -612,7 +612,7 @@ newEntity{ base = "BASE_NPC_HORROR",
 newEntity{ base = "BASE_NPC_HORROR",
 	subtype = "eldritch",
 	name = "umbral horror", color=colors.BLACK,
-	desc = "A dark shifting shape stalks through the shadows, blending in seamlessly.",
+	desc = _t"A dark shifting shape stalks through the shadows, blending in seamlessly.",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/horror_eldritch_umbral_horror.png", display_h=2, display_y=-1}}},
 	level_range = {16, nil}, exp_worth = 1,
 	rarity = 8,
@@ -655,7 +655,7 @@ newEntity{ base = "BASE_NPC_HORROR",
 -- Dream Horror
 newEntity{ base = "BASE_NPC_HORROR",
 	name = "dreaming horror", color=colors.ORCHID,
-	desc =[[A vaguely tentacled yet constantly changing form rests here apparently oblivious to your existence.
+	desc =_t[[A vaguely tentacled yet constantly changing form rests here apparently oblivious to your existence.
 With each slow breath it takes reality distorts around it.  Blue twirls into red, green twists into yellow, and the air sings softly before bursting into a myriad of pastel shapes and colors.]],
 	resolvers.nice_tile{tall=1},
 	shader = "shadow_simulacrum",
@@ -730,9 +730,9 @@ With each slow breath it takes reality distorts around it.  Blue twirls into red
 
 	custom_tooltip = function(self)
 		if self.dreamer_sleep_state then
-			return tstring{{"color", "LIGHT_BLUE"}, "It looks asleep and dreamy."}
+			return tstring{{"color", "LIGHT_BLUE"}, _t"It looks asleep and dreamy."}
 		else
-			return tstring{{"color", "LIGHT_RED"}, "It looks awake, beware!"}
+			return tstring{{"color", "LIGHT_RED"}, _t"It looks awake, beware!"}
 		end
 	end,
 
@@ -761,7 +761,7 @@ With each slow breath it takes reality distorts around it.  Blue twirls into red
 				game.zone:addEntity(game.level, m, "actor", x, y)
 				
 				game.level.map:particleEmitter(x, y, 1, "generic_teleport", {rm=225, rM=255, gm=225, gM=255, bm=225, bM=255, am=35, aM=90})
-				game.logSeen(self, "#LIGHT_BLUE#A dream seed escapes %s's sleeping mind.", self.name:capitalize())
+				game.logSeen(self, "#LIGHT_BLUE#A dream seed escapes %s's sleeping mind.", self:getName():capitalize())
 			end
 		-- Script the AI to encourage opening with dream scape
 		--[[  Disabled temporarily due to unknown bugs with Dreamscape
@@ -779,7 +779,7 @@ With each slow breath it takes reality distorts around it.  Blue twirls into red
 	on_takehit = function(self, value, src)
 		if value > 0 and self.dreamer_sleep_state then
 			self.dreamer_sleep_state = nil
-			self.desc = [[A vaguely tentacled yet rapidly changing shape floats here.  With each breath you can feel reality twist, shatter, and break. 
+			self.desc = _t[[A vaguely tentacled yet rapidly changing shape floats here.  With each breath you can feel reality twist, shatter, and break. 
 Blue burns into red, green bursts into yellow, and the air crackles and hisses before exploding into a thousand fragments of sharp shapes and colors.]]
 			self:removeParticles(self.sleep_particle)
 			game.logSeen(self, "#LIGHT_BLUE#The sleeper stirs...")
@@ -790,7 +790,7 @@ Blue burns into red, green bursts into yellow, and the air crackles and hisses b
 
 newEntity{ base = "BASE_NPC_HORROR", define_as = "DREAM_SEED",
 	name = "dream seed", color=colors.PINK, image = "npc/dream_seed.png",
-	desc ="A pinkish bubble floats here, reflecting the world not as it is, but as it would be in that surreal place that exists only in our dreams.",
+	desc =_t"A pinkish bubble floats here, reflecting the world not as it is, but as it would be in that surreal place that exists only in our dreams.",
 	level_range = {20, nil}, exp_worth = 1,
 	rarity = 30,  -- Very rare; but they do spawn on their own to keep the players on thier toes
 	rank = 2,
@@ -829,7 +829,7 @@ newEntity{ base = "BASE_NPC_HORROR", define_as = "DREAM_SEED",
 newEntity{ base = "BASE_NPC_HORROR",
 	name = "maelstrom", color=colors.CADET_BLUE,
 	resolvers.nice_tile{tall=1},
-	desc = [[This powerful vortex of ice and lightning somehow gives you the impression of claws, teeth and intense hunger...]],
+	desc = _t[[This powerful vortex of ice and lightning somehow gives you the impression of claws, teeth and intense hunger...]],
 	level_range = {30, nil}, exp_worth = 1,
 	rarity = 20,
 	rank = 3,
@@ -878,7 +878,7 @@ newEntity{ base = "BASE_NPC_HORROR",
 newEntity{ base = "BASE_NPC_HORROR",
 	name = "parasitic horror", color=colors.DARK_GREEN,
 	resolvers.nice_tile{tall=1},
-	desc ="You don't want to think about what sort of creature this lamprey-like horror was feeding on to grow so large.  Its skin pulsates and writhes, like things are moving underneath...",
+	desc =_t"You don't want to think about what sort of creature this lamprey-like horror was feeding on to grow so large.  Its skin pulsates and writhes, like things are moving underneath...",
 	level_range = {35, nil}, exp_worth = 1,
 	rarity = 20,
 	rank = 3,
@@ -918,7 +918,7 @@ newEntity{ base = "BASE_NPC_HORROR",
 					game.zone:addEntity(game.level, m, "actor", x, y)
 				end
 			end
-			game.logSeen(self, "%s's severed flesh starts crawling!", self.name:capitalize())
+			game.logSeen(self, "%s's severed flesh starts crawling!", self:getName():capitalize())
 		end
 		return value
 	end,
@@ -929,7 +929,7 @@ newEntity{ base = "BASE_NPC_HORROR",
 newEntity{ base="BASE_NPC_HORROR", define_as = "HORROR_PARASITIC_LEECHES",
 	name = "mass of parasitic leeches",
 	color = colors.LIGHT_GREEN,
-	desc = "Dozens - hundreds maybe? - of blood-gorged worms, of varying shapes and sizes, making a writhing, ichor-soaked sea of tooth-lined maws and sickly green skin, ready to latch onto you and drink until they burst or your veins run dry.",
+	desc = _t"Dozens - hundreds maybe? - of blood-gorged worms, of varying shapes and sizes, making a writhing, ichor-soaked sea of tooth-lined maws and sickly green skin, ready to latch onto you and drink until they burst or your veins run dry.",
 	level_range = {25, nil}, exp_worth = 1,
 	rarity = 10,
 	rank = 2,
@@ -970,7 +970,7 @@ newEntity{ base="BASE_NPC_HORROR",
 	color = colors.DARK_GREY, image = "npc/horror_eldritch_grgglck.png",
 	resolvers.nice_tile{tall=1},
 	rarity = 50,
-	desc = [[A horror from the deepest pits of the earth. It looks like a huge pile of tentacles all trying to reach for you.
+	desc = _t[[A horror from the deepest pits of the earth. It looks like a huge pile of tentacles all trying to reach for you.
 You can discern a huge round mouth covered in razor-sharp teeth.]],
 	level_range = {20, nil}, exp_worth = 2,
 	max_life = 300, life_rating = 25, fixed_rating = true,
@@ -1021,7 +1021,7 @@ You can discern a huge round mouth covered in razor-sharp teeth.]],
 newEntity{ base="BASE_NPC_HORROR", define_as = "GRGGLCK_TENTACLE",
 	name = "Grgglck's Tentacle",
 	color = colors.GREY,
-	desc = [[This is one of Grgglck's tentacles. It looks more vulnerable than the main body.]],
+	desc = _t[[This is one of Grgglck's tentacles. It looks more vulnerable than the main body.]],
 	level_range = {20, nil}, exp_worth = 0,
 	max_life = 100, life_rating = 3, fixed_rating = true,
 	equilibrium_regen = -20,
@@ -1061,7 +1061,7 @@ newEntity{ base="BASE_NPC_HORROR", define_as = "GRGGLCK_TENTACLE",
 
 newEntity{ base = "BASE_NPC_HORROR",
 	name = "Ak'Gishil", color=colors.GREY, unique = true,
-	desc = "This Blade Horror has been infused with intense temporal magic, causing its power to increase dramatically. Rifts in space open around it constantly, summoning and banishing blades before vanishing as quickly as they appear.",
+	desc = _t"This Blade Horror has been infused with intense temporal magic, causing its power to increase dramatically. Rifts in space open around it constantly, summoning and banishing blades before vanishing as quickly as they appear.",
 	resolvers.nice_tile{tall=1},
 	level_range = {30, nil}, exp_worth = 2,
 	rarity = 45,
@@ -1134,7 +1134,7 @@ newEntity{ base="BASE_NPC_HORROR", define_as = "ANIMATED_BLADE",
 	type = "construct", subtype = "weapon", image="object/magical_animated_sword.png",
 	name = "Animated Sword",
 	color = colors.GREY,
-	desc = [[Time seems to warp and bend around this floating weapon.]],
+	desc = _t[[Time seems to warp and bend around this floating weapon.]],
 	level_range = {30, nil}, exp_worth = 0,
 	max_life = 75, life_rating = 4, fixed_rating=true,
 	rank = 2,
@@ -1183,7 +1183,7 @@ newEntity{ base="BASE_NPC_HORROR", define_as = "ANIMATED_BLADE",
 
 	on_act = function(self)
 		if self.summoner and self.summoner:attr("dead") then
-			game.logSeen(self, "#AQUAMARINE#The %s no longer seems to be controlled and clatters to the ground before vanishing into a rift.", self.name:capitalize())
+			game.logSeen(self, "#AQUAMARINE#The %s no longer seems to be controlled and clatters to the ground before vanishing into a rift.", self:getName():capitalize())
 			self:die()
 		end
 	end,
@@ -1193,7 +1193,7 @@ newEntity{ base="BASE_NPC_HORROR", define_as = "DISTORTED_BLADE",
 	type = "construct", subtype = "weapon", image="object/artifact/distorted_animated_sword.png",
 	name = "Distorted Animated Sword", unique=true,
 	color = colors.GREY,
-	desc = [[This floating weapon shifts and shimmers, time and space warping and bending as it moves. It appears to vibrate, as if it may explode at any moment.]],
+	desc = _t[[This floating weapon shifts and shimmers, time and space warping and bending as it moves. It appears to vibrate, as if it may explode at any moment.]],
 	level_range = {30, nil}, exp_worth = 0,
 	max_life = 100, life_rating = 10,
 	rank = 3.5,
@@ -1246,7 +1246,7 @@ newEntity{ base="BASE_NPC_HORROR", define_as = "DISTORTED_BLADE",
 	on_act = function(self)
 		self.paradox = self.paradox + 20
 		if self.summoner and self.summoner:attr("dead") then
-			game.logSeen(self, "#AQUAMARINE#The %s no longer seems to be controlled and clatters to the ground before vanishing into a rift.", self.name:capitalize())
+			game.logSeen(self, "#AQUAMARINE#The %s no longer seems to be controlled and clatters to the ground before vanishing into a rift.", self:getName():capitalize())
 			self:die()
 		end
 	end,

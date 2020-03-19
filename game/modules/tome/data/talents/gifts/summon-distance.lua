@@ -22,7 +22,7 @@ newTalent{ short_name = "RITCH_FLAMESPITTER_BOLT",
 	type = {"wild-gift/other",1},
 	points = 5,
 	equilibrium = 2,
-	message = "@Source@ spits flames!",
+	message = _t"@Source@ spits flames!",
 	range = 10,
 	reflectable = true,
 	requires_target = true,
@@ -37,7 +37,7 @@ newTalent{ short_name = "RITCH_FLAMESPITTER_BOLT",
 	end,
 	info = function(self, t)
 		return ([[Spits a bolt of fire, doing %0.2f fire damage.
-		The damage will increase with your Mindpower.]]):format(damDesc(self, DamageType.FIRE, self:combatTalentMindDamage(t, 8, 120)))
+		The damage will increase with your Mindpower.]]):tformat(damDesc(self, DamageType.FIRE, self:combatTalentMindDamage(t, 8, 120)))
 	end,
 }
 
@@ -46,7 +46,7 @@ newTalent{ short_name = "WILD_RITCH_FLAMESPITTER_BOLT",
 	type = {"wild-gift/other",1},
 	points = 5,
 	equilibrium = 2,
-	message = "@Source@ spits flames!",
+	message = _t"@Source@ spits flames!",
 	range = 10,
 	reflectable = true,
 	requires_target = true,
@@ -62,7 +62,7 @@ newTalent{ short_name = "WILD_RITCH_FLAMESPITTER_BOLT",
 	end,
 	info = function(self, t)
 		return ([[Spits a bolt of fire, doing %0.2f fire damage.
-		The damage will increase with your Mindpower.]]):format(damDesc(self, DamageType.FIRE, self:combatTalentMindDamage(t, 8, 120)))
+		The damage will increase with your Mindpower.]]):tformat(damDesc(self, DamageType.FIRE, self:combatTalentMindDamage(t, 8, 120)))
 	end,
 }
 
@@ -93,7 +93,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local radius = self:getTalentRadius(t)
 		return ([[A wave of fire emanates from you with radius %d, knocking back anything caught inside and setting them ablaze and doing %0.2f fire damage over 3 turns.
-		The damage will increase with your Mindpower.]]):format(radius, damDesc(self, DamageType.FIRE, damage))
+		The damage will increase with your Mindpower.]]):tformat(radius, damDesc(self, DamageType.FIRE, damage))
 	end,
 }
 
@@ -104,7 +104,7 @@ newTalent{
 	points = 5,
 	equilibrium = 10,
 	cooldown = 8,
-	message = "@Source@ breathes acid!",
+	message = _t"@Source@ breathes acid!",
 	tactical = { ATTACKAREA = { ACID = 2 } },
 	range = 0,
 	radius = 5,
@@ -125,7 +125,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Breathe acid on your foes, doing %0.2f damage.
-		The damage will increase with your Willpower.]]):format(damDesc(self, DamageType.ACID, self:combatTalentStatDamage(t, "wil", 30, 430)))
+		The damage will increase with your Willpower.]]):tformat(damDesc(self, DamageType.ACID, self:combatTalentStatDamage(t, "wil", 30, 430)))
 	end,
 }
 
@@ -136,7 +136,7 @@ newTalent{
 	points = 5,
 	equilibrium = 10,
 	cooldown = 8,
-	message = "@Source@ spits acid!",
+	message = _t"@Source@ spits acid!",
 	tactical = { ATTACK = { ACID = 2 } },
 	range = 5,
 	requires_target = true,
@@ -155,7 +155,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Spit acid on a foe, doing %0.2f damage.
-		The damage will increase with your Willpower.]]):format(damDesc(self, DamageType.ACID, self:combatTalentStatDamage(t, "wil", 30, 430)))
+		The damage will increase with your Willpower.]]):tformat(damDesc(self, DamageType.ACID, self:combatTalentStatDamage(t, "wil", 30, 430)))
 	end,
 }
 
@@ -166,7 +166,7 @@ newTalent{
 	points = 5,
 	equilibrium = 10,
 	cooldown = 8,
-	message = "@Source@ breathes lightning!",
+	message = _t"@Source@ breathes lightning!",
 	tactical = { ATTACKAREA = { LIGHTNING = 2 } },
 	range = 0,
 	radius = 5,
@@ -191,7 +191,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Breathe lightning on your foes, doing %d to %d damage.
 		The damage will increase with your Willpower.]]):
-		format(
+		tformat(
 			damDesc(self, DamageType.LIGHTNING, (self:combatTalentStatDamage(t, "wil", 30, 500)) / 3),
 			damDesc(self, DamageType.LIGHTNING, self:combatTalentStatDamage(t, "wil", 30, 500))
 		)
@@ -205,7 +205,7 @@ newTalent{
 	points = 5,
 	equilibrium = 10,
 	cooldown = 8,
-	message = "@Source@ spits lightning!",
+	message = _t"@Source@ spits lightning!",
 	tactical = { ATTACK = { LIGHTNING = 2 } },
 	range = 5,
 	requires_target = true,
@@ -226,7 +226,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Spit lightning on your foe, doing %d to %d damage.
 		The damage will increase with your Willpower.]]):
-		format(
+		tformat(
 			damDesc(self, DamageType.LIGHTNING, (self:combatTalentStatDamage(t, "wil", 30, 500)) / 3),
 			damDesc(self, DamageType.LIGHTNING, self:combatTalentStatDamage(t, "wil", 30, 500))
 		)
@@ -240,7 +240,7 @@ newTalent{
 	points = 5,
 	equilibrium = 10,
 	cooldown = 8,
-	message = "@Source@ breathes poison!",
+	message = _t"@Source@ breathes poison!",
 	tactical = { ATTACKAREA = { NATURE = 1, poison = 1 } },
 	range = 0,
 	radius = 5,
@@ -261,7 +261,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Breathe poison on your foes, doing %d damage over a few turns.
-		The damage will increase with your Willpower.]]):format(damDesc(self, DamageType.NATURE, self:combatTalentStatDamage(t, "wil", 30, 460)))
+		The damage will increase with your Willpower.]]):tformat(damDesc(self, DamageType.NATURE, self:combatTalentStatDamage(t, "wil", 30, 460)))
 	end,
 }
 
@@ -272,7 +272,7 @@ newTalent{
 	points = 5,
 	equilibrium = 10,
 	cooldown = 8,
-	message = "@Source@ spits poison!",
+	message = _t"@Source@ spits poison!",
 	tactical = { ATTACK = { NATURE = 1, poison = 1 } },
 	range = 5,
 	requires_target = true,
@@ -291,7 +291,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Spit poison on your foes, doing %d damage over a few turns.
-		The damage will increase with your Willpower.]]):format(damDesc(self, DamageType.NATURE, self:combatTalentStatDamage(t, "wil", 30, 460)))
+		The damage will increase with your Willpower.]]):tformat(damDesc(self, DamageType.NATURE, self:combatTalentStatDamage(t, "wil", 30, 460)))
 	end,
 }
 
@@ -335,7 +335,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[A furious ice storm rages around the user doing %0.2f cold damage in a radius of 3 each turn for %d turns.
 		It has 25%% chance to freeze damaged targets.
-		The damage and duration will increase with your Willpower.]]):format(damDesc(self, DamageType.COLD, damage), duration)
+		The damage and duration will increase with your Willpower.]]):tformat(damDesc(self, DamageType.COLD, damage), duration)
 	end,
 }
 
@@ -375,7 +375,7 @@ newTalent{
 		return ([[Grab a target and pull it next to you, covering it with frost while reducing its movement speed by 50%% for %d turns.
 		The ice will also deal %0.2f cold damage.
 		The damage and chance to slow will increase with your Mindpower.]]):
-		format(t.getDuration(self, t), damDesc(self, DamageType.COLD, self:combatTalentMindDamage(t, 5, 140)))
+		tformat(t.getDuration(self, t), damDesc(self, DamageType.COLD, self:combatTalentMindDamage(t, 5, 140)))
 	end,
 }
 
@@ -385,7 +385,7 @@ newTalent{
 	require = gifts_req1,
 	points = 5,
 	random_ego = "attack",
-	message = "@Source@ summons a Ritch Flamespitter!",
+	message = _t"@Source@ summons a Ritch Flamespitter!",
 	equilibrium = 2,
 	cooldown = 10,
 	range = 5,
@@ -444,7 +444,7 @@ newTalent{
 			type = "insect", subtype = "ritch",
 			display = "I", color=colors.LIGHT_RED, image = "npc/summoner_ritch.png",
 			name = "ritch flamespitter", faction = self.faction,
-			desc = [[]],
+			desc = _t[[]],
 			autolevel = "none",
 			ai = "summoned", ai_real = "tactical", ai_state = { talent_in=1, ally_compassion=10},
 			ai_tactic = resolvers.tactic"ranged",
@@ -471,7 +471,7 @@ newTalent{
 			ai_target = {actor=target}
 		}
 		if self:attr("wild_summon") and rng.percent(self:attr("wild_summon")) then
-			m.name = m.name.." (wild summon)"
+			m.name = ("%s (wild summon)"):tformat(_t(m.name))
 			m[#m] = resolvers.talents{ [self.T_WILD_RITCH_FLAMESPITTER_BOLT]=self:getTalentLevelRaw(t) }
 		end
 		m.is_nature_summon = true
@@ -492,7 +492,7 @@ newTalent{
 		It will get %d Willpower, %d Cunning and %d Constitution.
 		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		Their Willpower and Cunning will increase with your Mindpower.]])
-		:format(t.summonTime(self, t), incStats.wil, incStats.cun, incStats.con)
+		:tformat(t.summonTime(self, t), incStats.wil, incStats.cun, incStats.con)
 	end,
 }
 
@@ -502,7 +502,7 @@ newTalent{
 	require = gifts_req2,
 	points = 5,
 	random_ego = "attack",
-	message = "@Source@ summons a 3-headed hydra!",
+	message = _t"@Source@ summons a 3-headed hydra!",
 	equilibrium = 5,
 	cooldown = 18,
 	range = 5,
@@ -569,7 +569,7 @@ newTalent{
 			type = "hydra", subtype = "3head",
 			display = "M", color=colors.GREEN, image = "npc/summoner_hydra.png",
 			name = "3-headed hydra", faction = self.faction,
-			desc = [[A strange reptilian creature with three smouldering heads.]],
+			desc = _t[[A strange reptilian creature with three smouldering heads.]],
 			autolevel = "none",
 			ai = "summoned", ai_real = "tactical", ai_state = { talent_in=1, ally_compassion=10},
 
@@ -597,7 +597,7 @@ newTalent{
 			ai_target = {actor=target}
 		}
 		if self:attr("wild_summon") and rng.percent(self:attr("wild_summon")) then
-			m.name = m.name.." (wild summon)"
+			m.name = ("%s (wild summon)"):tformat(_t(m.name))
 			m[#m+1] = resolvers.talents{ [self.T_LIGHTNING_SPIT_HYDRA]=self:getTalentLevelRaw(t) }
 			m[#m+1] = resolvers.talents{ [self.T_ACID_SPIT_HYDRA]=self:getTalentLevelRaw(t) }
 			m[#m+1] = resolvers.talents{ [self.T_POISON_SPIT_HYDRA]=self:getTalentLevelRaw(t) }
@@ -620,7 +620,7 @@ newTalent{
 		It will get %d Willpower, %d Constitution and 18 Strength.
 		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		Their Willpower will increase with your Mindpower.]])
-		:format(t.summonTime(self, t), incStats.wil, incStats.con, incStats.str)
+		:tformat(t.summonTime(self, t), incStats.wil, incStats.con, incStats.str)
 	end,
 }
 
@@ -630,7 +630,7 @@ newTalent{
 	require = gifts_req3,
 	points = 5,
 	random_ego = "attack",
-	message = "@Source@ summons a Rimebark!",
+	message = _t"@Source@ summons a Rimebark!",
 	equilibrium = 8,
 	cooldown = 10,
 	range = 5,
@@ -689,7 +689,7 @@ newTalent{
 			display = "#", color=colors.WHITE,
 			name = "rimebark", faction = self.faction, image = "npc/immovable_plants_rimebark.png",
 			resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/immovable_plants_rimebark.png", display_h=2, display_y=-1}}},
-			desc = [[This huge treant-like being is embedded with the fury of winter itself.]],
+			desc = _t[[This huge treant-like being is embedded with the fury of winter itself.]],
 			autolevel = "none",
 			ai = "summoned", ai_real = "dumb_talented_simple", ai_state = { talent_in=1, ally_compassion=10},
 			ai_tactic = resolvers.tactic"ranged",
@@ -716,7 +716,7 @@ newTalent{
 			ai_target = {actor=target}
 		}
 		if self:attr("wild_summon") and rng.percent(self:attr("wild_summon")) then
-			m.name = m.name.." (wild summon)"
+			m.name = ("%s (wild summon)"):tformat(_t(m.name))
 			m[#m+1] = resolvers.talents{ [self.T_WINTER_S_GRASP]=self:getTalentLevelRaw(t) }
 		end
 		m.is_nature_summon = true
@@ -737,7 +737,7 @@ newTalent{
 		It will get %d Willpower, %d Cunning and %d Constitution.
 		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		Their Willpower and Cunning will increase with your Mindpower.]])
-		:format(t.summonTime(self, t), incStats.wil, incStats.cun, incStats.con)
+		:tformat(t.summonTime(self, t), incStats.wil, incStats.cun, incStats.con)
 	end,
 }
 
@@ -747,7 +747,7 @@ newTalent{
 	require = gifts_req4,
 	points = 5,
 	random_ego = "attack",
-	message = "@Source@ summons a Fire Drake!",
+	message = _t"@Source@ summons a Fire Drake!",
 	equilibrium = 15,
 	cooldown = 10,
 	range = 5,
@@ -785,7 +785,7 @@ newTalent{
 				type = "dragon", subtype = "fire",
 				display = "d", color=colors.RED, image = "npc/dragon_fire_fire_drake_hatchling.png",
 				name = "fire drake hatchling", faction = self.faction,
-				desc = [[A mighty fire drake.]],
+				desc = _t[[A mighty fire drake.]],
 				autolevel = "none",
 				ai = "summoned", ai_real = "tactical", ai_state = { talent_in=1, ally_compassion=10},
 				stats = {str=0, dex=0, con=0, cun=0, wil=0, mag=0},
@@ -849,7 +849,7 @@ newTalent{
 			type = "dragon", subtype = "fire",
 			display = "D", color=colors.RED, image = "npc/dragon_fire_fire_drake.png",
 			name = "fire drake", faction = self.faction,
-			desc = [[A mighty fire drake.]],
+			desc = _t[[A mighty fire drake.]],
 			autolevel = "none",
 			ai = "summoned", ai_real = "tactical", ai_state = { talent_in=1, ally_compassion=10},
 			stats = {str=0, dex=0, con=0, cun=0, wil=0, mag=0},
@@ -879,7 +879,7 @@ newTalent{
 			ai_target = {actor=target}
 		}
 		if self:attr("wild_summon") and rng.percent(self:attr("wild_summon")) then
-			m.name = m.name.." (wild summon)"
+			m.name = ("%s (wild summon)"):tformat(_t(m.name))
 			m[#m+1] = resolvers.talents{ [self.T_AURA_OF_SILENCE]=self:getTalentLevelRaw(t) }
 		end
 		m.is_nature_summon = true
@@ -900,6 +900,6 @@ newTalent{
 		It will get %d Strength, %d Constitution and 38 Willpower.
 		Your summons inherit some of your stats: increased damage%%, resistance penetration %%, stun/pin/confusion/blindness resistance, armour penetration.
 		Their Strength and Constitution will increase with your Mindpower.]])
-		:format(t.summonTime(self, t), incStats.str, incStats.con)
+		:tformat(t.summonTime(self, t), incStats.str, incStats.con)
 	end,
 }

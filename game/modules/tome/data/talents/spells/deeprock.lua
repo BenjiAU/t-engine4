@@ -43,21 +43,21 @@ newTalent{
 		local xsi = ""
 		if self:knowTalent(self.T_VOLCANIC_ROCK) then
 			xs = xs..(", Arcane damage by %0.1f%% and Arcane damage penetration by %0.1f%%"):
-			format(self:callTalent(self.T_VOLCANIC_ROCK, "getDam"), self:callTalent(self.T_VOLCANIC_ROCK, "getPen"))
+			tformat(self:callTalent(self.T_VOLCANIC_ROCK, "getDam"), self:callTalent(self.T_VOLCANIC_ROCK, "getPen"))
 		end
 		if self:knowTalent(self.T_BOULDER_ROCK) then
 			xs = (", Nature damage by %0.1f%% and Nature damage penetration by %0.1f%%"):
-			format(self:callTalent(self.T_BOULDER_ROCK, "getDam"), self:callTalent(self.T_BOULDER_ROCK, "getPen"))..xs
+			tformat(self:callTalent(self.T_BOULDER_ROCK, "getDam"), self:callTalent(self.T_BOULDER_ROCK, "getPen"))..xs
 		end
 		if self:knowTalent(self.T_MOUNTAINHEWN) then
 			xsi = (" and %d%% bleeding, poison, disease, and stun immunity"):
-			format(self:callTalent(self.T_MOUNTAINHEWN, "getImmune")*100)
+			tformat(self:callTalent(self.T_MOUNTAINHEWN, "getImmune")*100)
 		end
 		return ([[You call upon the very core of the world, harnessing its power to transform your body.
 		For %d turns you become a Deeprock Elemental, gaining two size categories%s.
 		This increases your Physical damage by %0.1f%% and Physical damage penetration by %0.1f%%%s, and armour by %d.%s
 		The effects increase with spellpower.]])
-		:format(t.getTime(self, t), xsi, t.getDam(self, t),t.getPen(self, t), xs, t.getArmor(self, t), self:getTalentLevel(self.T_MOUNTAINHEWN) >=5 and "\nIn addition, you use your physical resistance versus all damage against you." or "")
+		:tformat(t.getTime(self, t), xsi, t.getDam(self, t),t.getPen(self, t), xs, t.getArmor(self, t), self:getTalentLevel(self.T_MOUNTAINHEWN) >=5 and _t"\nIn addition, you use your physical resistance versus all damage against you." or "")
 	end,
 }
 
@@ -73,7 +73,7 @@ newTalent{
 		local tv = self:getTalentFromId(self.T_VOLCANO)
 		return ([[When you turn into a Deeprock elemental your Arcane damage is increased by %0.1f%%, Arcane damage penetration by %0.1f%% and you gain the power to invoke volcanos:
 		%s]]):
-		format(t.getDam(self, t),t.getPen(self, t), self:getTalentFullDescription(tv, self:getTalentLevelRaw(t) * 2):toString()) -- rescale volcano talent levels?
+		tformat(t.getDam(self, t),t.getPen(self, t), self:getTalentFullDescription(tv, self:getTalentLevelRaw(t) * 2):toString()) -- rescale volcano talent levels?
 	end,
 }
 
@@ -89,7 +89,7 @@ newTalent{
 		local tv = self:getTalentFromId(self.T_THROW_BOULDER)
 		return ([[When you turn into a Deeprock elemental your Nature damage is increased by %0.1f%%, Nature damage penetration by %0.1f%% and you gain the power to throw boulders:
 		%s]]):
-		format(t.getDam(self, t),t.getPen(self, t), self:getTalentFullDescription(tv, self:getTalentLevelRaw(t) * 2):toString())
+		tformat(t.getDam(self, t),t.getPen(self, t), self:getTalentFullDescription(tv, self:getTalentLevelRaw(t) * 2):toString())
 	end,
 }
 
@@ -103,6 +103,6 @@ newTalent{
 	info = function(self, t)
 		return ([[While in deeprock form, you become indomitable, granting you %d%% resistance to cuts, poisons, diseases and stuns.
 		At level 5 and higher, while Deeprock Form is active, all incoming damage is applied against physical resistance instead of the normal resistance type.]]):
-		format(t.getImmune(self, t)*100)
+		tformat(t.getImmune(self, t)*100)
 	end,
 }

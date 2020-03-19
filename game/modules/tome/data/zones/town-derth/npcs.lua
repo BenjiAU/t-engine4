@@ -26,7 +26,7 @@ newEntity{
 	type = "humanoid", subtype = "human",
 	display = "p", color=colors.WHITE,
 	faction = "allied-kingdoms",
-	anger_emote = "Catch @himher@!",
+	anger_emote = _t"Catch @himher@!",
 	exp_worth = 0,
 	combat = { dam=resolvers.rngavg(1,2), atk=2, apr=0, dammod={str=0.4} },
 
@@ -55,7 +55,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_DERTH_TOWN",
 	name = "derth guard", color=colors.LIGHT_UMBER,
-	desc = [[A stern-looking guard, he will not let you disturb the town.]],
+	desc = _t[[A stern-looking guard, he will not let you disturb the town.]],
 	level_range = {1, nil}, exp_worth = 0,
 	rarity = 3,
 	max_life = resolvers.rngavg(70,80),
@@ -70,7 +70,7 @@ newEntity{ base = "BASE_NPC_DERTH_TOWN",
 newEntity{ base = "BASE_NPC_DERTH_TOWN",
 	name = "halfling slinger", color=colors.UMBER,
 	subtype = "halfling",
-	desc = [[A Halfling, with a sling. Beware.]],
+	desc = _t[[A Halfling, with a sling. Beware.]],
 	level_range = {1, nil}, exp_worth = 0,
 	rarity = 3,
 	max_life = resolvers.rngavg(50,60),
@@ -82,7 +82,7 @@ newEntity{ base = "BASE_NPC_DERTH_TOWN",
 
 newEntity{ base = "BASE_NPC_DERTH_TOWN",
 	name = "human farmer", color=colors.WHITE,
-	desc = [[A weather-worn Human farmer.]],
+	desc = _t[[A weather-worn Human farmer.]],
 	level_range = {1, nil}, exp_worth = 0,
 	rarity = 1,
 	max_life = resolvers.rngavg(30,40),
@@ -92,7 +92,7 @@ newEntity{ base = "BASE_NPC_DERTH_TOWN",
 newEntity{ base = "BASE_NPC_DERTH_TOWN",
 	name = "halfling gardener", color=colors.WHITE,
 	subtype = "halfling",
-	desc = [[A Halfling, he seems to be looking for plants.]],
+	desc = _t[[A Halfling, he seems to be looking for plants.]],
 	level_range = {1, nil}, exp_worth = 0,
 	rarity = 1,
 	max_life = resolvers.rngavg(30,40),
@@ -110,7 +110,7 @@ newEntity{ base = "BASE_NPC_DERTH_TOWN",
 	seen_by = function(self, who)
 		if not game.party:hasMember(who) then return end
 		self.seen_by = nil
-		self:doEmote("Hey you. Come here.", 60)
+		self:doEmote(_t"Hey you. Come here.", 60)
 	end,
 	on_die = false,
 }

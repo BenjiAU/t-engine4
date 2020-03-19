@@ -65,7 +65,7 @@ function _M:use(item)
 
 	if act == "use" then
 		if self.object:wornInven() and not self.object.wielded and not self.object.use_no_wear then
-			self:simplePopup("Impossible", "You must wear this object to use it!")
+			self:simplePopup(_t"Impossible", _t"You must wear this object to use it!")
 		else
 			self.actor:playerUseItem(self.object, self.item, self.inven, self.onuse)
 			self.onuse(self.inven, self.item, self.object, true)
@@ -75,7 +75,7 @@ function _M:use(item)
 		self.onuse(self.inven, self.item, self.object, false)
 	elseif act == "drop" then
 		if self.object:getNumber() > 1 then
-			game:registerDialog(GetQuantity.new("Drop how many?", "1 to "..self.object:getNumber(), self.object:getNumber(), self.object:getNumber(), function(qty)
+			game:registerDialog(GetQuantity.new(_t"Drop how many?", ("1 to %d"):tformat(self.object:getNumber()), self.object:getNumber(), self.object:getNumber(), function(qty)
 				qty = util.bound(qty, 1, self.object:getNumber())
 				self.actor:doDrop(self.inven, self.item, function() self.onuse(self.inven, self.item, self.object, false) end, qty)
 			end, 1))
@@ -114,16 +114,16 @@ function _M:use(item)
 		end
 		if #list == 1 then doit(list[1])
 		elseif #list == 0 then
-			self:simplePopup("Attach to item", "You do not have any equipped items that it can be attached to.")
+			self:simplePopup(_t"Attach to item", _t"You do not have any equipped items that it can be attached to.")
 		else
-			self:listPopup("Attach to item", "Select which item to attach it to:", list, 300, 400, doit)
+			self:listPopup(_t"Attach to item", _t"Select which item to attach it to:", list, 300, 400, doit)
 		end
 	elseif act == "transfer" then
 		game:registerDialog(PartySendItem.new(self.actor, self.object, self.inven, self.item, function()
 			self.onuse(self.inven, self.item, self.object, false)
 		end))		
 	elseif act == "transmo" then
-		self:yesnoPopup(self.actor:transmoGetWord():capitalize(), "Really "..self.actor:transmoGetWord().." "..self.object:getName{}, function(ret)
+		self:yesnoPopup(self.actor:transmoGetWord():capitalize(), ("Really %s %s"):tformat(self.actor:transmoGetWord(), self.object:getName{}), function(ret)
 			if not ret then return end
 			self.actor:transmoInven(self.inven, self.item, self.object)
 			self.onuse(self.inven, self.item, self.object, false)
@@ -136,7 +136,7 @@ function _M:use(item)
 		self.object.__tagged = nil
 		self.onuse(self.inven, self.item, self.object, false)
 	elseif act == "tag" then
-		local d = require("engine.dialogs.GetText").new("Tag object (tagged objects can not be destroyed or dropped)", "Tag:", 2, 25, function(tag) if tag then
+		local d = require("engine.dialogs.GetText").new(_t"Tag object (tagged objects can not be destroyed or dropped)", _t"Tag:", 2, 25, function(tag) if tag then
 			self.object.__tagged = tag
 			self.object.__transmo = false
 			self.onuse(self.inven, self.item, self.object, false)
@@ -161,21 +161,21 @@ function _M:generateList()
 
 	local transmo_chest = self.actor:attr("has_transmo")
 
-	if not self.object:isIdentified() and self.actor:attr("auto_id") and self.actor:attr("auto_id") >= 2 then list[#list+1] = {name="Identify", action="identify"} end
-	if not self.dst_actor and self.object.__transmo then list[#list+1] = {name="Move to normal inventory", action="toinven"} end
-	if not self.dst_actor and not self.object.__transmo and not self.no_use_allowed then if self.object:canUseObject() then list[#list+1] = {name="Use", action="use"} end end
-	if self.inven == self.actor.INVEN_INVEN and self.object:wornInven() and self.actor:getInven(self.object:wornInven()) then list[#list+1] = {name="Wield/Wear", action="wear"} end
-	if not self.object.__transmo then if self.inven ~= self.actor.INVEN_INVEN and self.object:wornInven() then list[#list+1] = {name="Take off", action="takeoff"} end end
-	if not self.object.__transmo then if self.inven ~= self.actor.INVEN_INVEN and self.object.is_tinker and self.object.tinkered then list[#list+1] = {name="Detach from item", action="tinker-remove"} end end
-	if not self.object.__transmo then if self.inven == self.actor.INVEN_INVEN and self.object.is_tinker and not self.object.tinkered then list[#list+1] = {name="Attach to item", action="tinker-add"} end end
-	if not self.object.__transmo and self.object.tinker then list[#list+1] = { name = 'Detach tinker', action='tinker-detach' } end
-	if not self.dst_actor and not self.object.__tagged and self.inven == self.actor.INVEN_INVEN then list[#list+1] = {name="Drop", action="drop"} end
-	if not self.dst_actor and self.inven == self.actor.INVEN_INVEN and not self.object.plot and not self.object.quest and game.party:countInventoryAble() >= 2 then list[#list+1] = {name="Transfer to party", action="transfer"} end
-	if not self.dst_actor and not self.object.__tagged and self.inven == self.actor.INVEN_INVEN and transmo_chest and self.actor:transmoFilter(self.object) then list[#list+1] = {name=self.actor:transmoGetWord():capitalize().." now", action="transmo"} end
-	if profile.auth and profile.hash_valid then list[#list+1] = {name="Link item in chat", action="chat-link"} end
-	if config.settings.cheat then list[#list+1] = {name="Lua inspect", action="debug-inspect", color=colors.simple(colors.LIGHT_BLUE)} end
-	if not self.object.__tagged then list[#list+1] = {name="Tag", action="tag"} end
-	if self.object.__tagged then list[#list+1] = {name="Untag", action="untag"} end
+	if not self.object:isIdentified() and self.actor:attr("auto_id") and self.actor:attr("auto_id") >= 2 then list[#list+1] = {name=_t"Identify", action="identify"} end
+	if not self.dst_actor and self.object.__transmo then list[#list+1] = {name=_t"Move to normal inventory", action="toinven"} end
+	if not self.dst_actor and not self.object.__transmo and not self.no_use_allowed then if self.object:canUseObject() then list[#list+1] = {name=_t"Use", action="use"} end end
+	if self.inven == self.actor.INVEN_INVEN and self.object:wornInven() and self.actor:getInven(self.object:wornInven()) then list[#list+1] = {name=_t"Wield/Wear", action="wear"} end
+	if not self.object.__transmo then if self.inven ~= self.actor.INVEN_INVEN and self.object:wornInven() then list[#list+1] = {name=_t"Take off", action="takeoff"} end end
+	if not self.object.__transmo then if self.inven ~= self.actor.INVEN_INVEN and self.object.is_tinker and self.object.tinkered then list[#list+1] = {name=_t"Detach from item", action="tinker-remove"} end end
+	if not self.object.__transmo then if self.inven == self.actor.INVEN_INVEN and self.object.is_tinker and not self.object.tinkered then list[#list+1] = {name=_t"Attach to item", action="tinker-add"} end end
+	if not self.object.__transmo and self.object.tinker then list[#list+1] = { name = _t'Detach tinker', action='tinker-detach' } end
+	if not self.dst_actor and not self.object.__tagged and self.inven == self.actor.INVEN_INVEN then list[#list+1] = {name=_t"Drop", action="drop"} end
+	if not self.dst_actor and self.inven == self.actor.INVEN_INVEN and not self.object.plot and not self.object.quest and game.party:countInventoryAble() >= 2 then list[#list+1] = {name=_t"Transfer to party", action="transfer"} end
+	if not self.dst_actor and not self.object.__tagged and self.inven == self.actor.INVEN_INVEN and transmo_chest and self.actor:transmoFilter(self.object) then list[#list+1] = {name=("%s now"):tformat(self.actor:transmoGetWord():capitalize()), action="transmo"} end
+	if profile.auth and profile.hash_valid then list[#list+1] = {name=_t"Link item in chat", action="chat-link"} end
+	if config.settings.cheat then list[#list+1] = {name=_t"Lua inspect", action="debug-inspect", color=colors.simple(colors.LIGHT_BLUE)} end
+	if not self.object.__tagged then list[#list+1] = {name=_t"Tag", action="tag"} end
+	if self.object.__tagged then list[#list+1] = {name=_t"Untag", action="untag"} end
 
 	self:triggerHook{"UseItemMenu:generate", actor=self.actor, object=self.object, inven=self.inven, item=self.item, menu=list}
 

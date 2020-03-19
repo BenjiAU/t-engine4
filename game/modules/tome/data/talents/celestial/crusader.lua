@@ -58,7 +58,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[You strike your foe with your two handed weapon, dealing %d%% weapon damage.
 		If the attack hits, all foes in radius 2 will have their light resistance reduced by %d%% and their damage reduced by %d%% for 5 turns.]]):
-		format(100 * damage, t.getWeakness(self, t), t.getNumb(self, t))
+		tformat(100 * damage, t.getWeakness(self, t), t.getNumb(self, t))
 	end,
 }
 
@@ -87,7 +87,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[You mark a target with light for 3 turns, causing all melee hits you deal to it to heal you for %d%% of the damage done.]]):
-		format(t.getPower(self, t))
+		tformat(t.getPower(self, t))
 	end,
 }
 
@@ -123,7 +123,7 @@ newTalent{
 		return ([[While wielding a two handed weapon, your critical strike chance is increased by %d%%, and your melee criticals instill you with righteous strength, increasing all physical and light damage you deal by %d%%, stacking up to 3 times.
 		In addition, your melee critical strikes leave a lasting lightburn on the target, dealing %0.2f light damage over 5 turns and reducing opponents armour by %d.
 		The damage increases with your Spellpower.]]):
-		format(t.getCrit(self, t), t.getPower(self, t), damDesc(self, DamageType.LIGHT, t.getDamage(self, t)), t.getArmor(self, t))
+		tformat(t.getCrit(self, t), t.getPower(self, t), damDesc(self, DamageType.LIGHT, t.getDamage(self, t)), t.getArmor(self, t))
 	end,
 }
 
@@ -177,6 +177,6 @@ newTalent{
 		All creatures in radius one take %d%% weapon damage.
 		In addition while spinning your weapon shines so much it deals %d%% light weapon damage to all foes in radius 2.
 		At level 4 your spinning blade creates a shield that blocks all damage for 1 turn.]]):
-		format(t.get1Damage(self, t) * 100, t.get2Damage(self, t) * 100)
+		tformat(t.get1Damage(self, t) * 100, t.get2Damage(self, t) * 100)
 	end,
 }

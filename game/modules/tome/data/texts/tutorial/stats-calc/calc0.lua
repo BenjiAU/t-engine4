@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 It's finally time to stab something.
 
 There's an orc up ahead; make sure you're wearing your #GOLD#Helmet of Accuracy (+6)#WHITE# from earlier, and go attack him!

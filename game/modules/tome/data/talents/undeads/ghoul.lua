@@ -33,7 +33,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Improves your ghoulish body, increasing Strength and Constitution by %d.
 		Your body also becomes incredibly resilient to damage; you can never take a blow that deals more than %d%% of your maximum life.]])
-		:format(t.statBonus(self, t), t.getMaxDamage(self, t))
+		:tformat(t.statBonus(self, t), t.getMaxDamage(self, t))
 	end,
 }
 
@@ -85,7 +85,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Leap toward your target.
-		When you land your global speed is increased by %d%% for 4 turns.]]):format(t.getSpeed(self, t))
+		When you land your global speed is increased by %d%% for 4 turns.]]):tformat(t.getSpeed(self, t))
 	end,
 }
 
@@ -124,7 +124,7 @@ newTalent{
 			MapEffect.new{color_br=30, color_bg=180, color_bb=60, effect_shader="shader_images/retch_effect.png"},
 			nil
 		)
-		game.logSeen(self, "%s #YELLOW_GREEN#VOMITS#LAST# on the ground!", self.name:capitalize())
+		game.logSeen(self, "%s #YELLOW_GREEN#VOMITS#LAST# on the ground!", self:getName():capitalize())
 		game:playSoundNear(self, "talents/cloud")
 		return true
 	end,
@@ -133,7 +133,7 @@ newTalent{
 		return ([[Vomit on the ground around you, healing any undead in the area and damaging anyone else.
 		Lasts %d turns and deals %d blight damage or heals %d life.
 		Creatures standing in the retch also have %d%% chance to remove a physical effect each turn; undeads will be stripped from a detrimental effect while others will be stripped from a beneficial effect.
-		When you stand in your own retch your racial -20%% global speed is cancelled.]]):format(t.getduration(self, t), damDesc(self, DamageType.BLIGHT, dam), dam * 1.5, t.getPurgeChance(self, t))
+		When you stand in your own retch your racial -20%% global speed is cancelled.]]):tformat(t.getduration(self, t), damDesc(self, DamageType.BLIGHT, dam), dam * 1.5, t.getPurgeChance(self, t))
 	end,
 }
 
@@ -159,9 +159,9 @@ newTalent{
 		local ghoul = NPC.new{
 			type = "undead", subtype = "ghoul",
 			display = "z",
-			name = "Risen Ghoul", color=colors.TAN,
+			name = _t"Risen Ghoul", color=colors.TAN,
 			image="npc/undead_ghoul_ghoul.png",
-			desc = [[Flesh is falling off in chunks from this decaying abomination.]],
+			desc = _t[[Flesh is falling off in chunks from this decaying abomination.]],
 			faction = self.faction,
 			level_range = {1, nil}, exp_worth = 0,
 			life_rating = 10,
@@ -218,7 +218,7 @@ newTalent{
 			game.party:addMember(ghoul, {
 				control="no",
 				type="minion",
-				title="Ghoulish Minion",
+				title=_t"Ghoulish Minion",
 				orders = {target=true},
 			})
 		end
@@ -237,7 +237,7 @@ newTalent{
 					target:setEffect(target.EFF_GHOUL_ROT, t.getDuration(self,t), {src=self, apply_power=self:combatPhysicalpower(), dam=t.getDiseaseDamage(self, t),  make_ghoul=1})
 				end
 			else
-				game.logSeen(target, "%s resists the disease!", target.name:capitalize())
+				game.logSeen(target, "%s resists the disease!", target:getName():capitalize())
 			end
 		end
 
@@ -253,6 +253,6 @@ newTalent{
 		Targets suffering from Ghoul Rot rise as friendly ghouls when slain.
 		Ghouls last for %d turns and can use Gnaw, Ghoulish Leap, Stun, and Rotting Disease.
 		The blight damage scales with your Constitution.]]):
-		format(100 * damage, duration, damDesc(self, DamageType.BLIGHT, disease_damage), ghoul_duration)
+		tformat(100 * damage, duration, damDesc(self, DamageType.BLIGHT, disease_damage), ghoul_duration)
 	end,
 }

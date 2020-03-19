@@ -23,32 +23,32 @@ end
 local read = player:attr("speaks_shertul")
 
 newChat{ id="welcome",
-	text = [[*#LIGHT_GREEN#This orb seems to represent the world of Eyal as a whole. It is also probably used for controlling the fortress.
-]]..(not read and [[You do not understand the inscriptions there.#WHITE#*
-#{italic}#"Rokzan krilt copru."#{normal}#]] or [[#WHITE#*#{italic}#"Insert control rod."#{normal}#]]),
+	text = _t[[*#LIGHT_GREEN#This orb seems to represent the world of Eyal as a whole. It is also probably used for controlling the fortress.
+]]..(not read and _t[[You do not understand the inscriptions there.#WHITE#*
+#{italic}#"Rokzan krilt copru."#{normal}#]] or _t[[#WHITE#*#{italic}#"Insert control rod."#{normal}#]]),
 	answers = {
-		{"[Examine the orb]", jump="examine", cond=has_rod},
-		{"[Fly the fortress -- #LIGHT_RED#FOR TESTING ONLY#LAST#]", action=function(npc, player) player:hasQuest("shertul-fortress"):fly() end, cond=function() return config.settings.cheat end},
-		{"[Begin the Lichform ceremory]", cond=function(npc, player) local q = player:hasQuest("lichform") return q and q:check_lichform(player) end, action=function(npc, player) player:setQuestStatus("lichform", engine.Quest.COMPLETED) end},
-		{"[Leave the orb alone]"},
+		{_t"[Examine the orb]", jump="examine", cond=has_rod},
+		{_t"[Fly the fortress -- #LIGHT_RED#FOR TESTING ONLY#LAST#]", action=function(npc, player) player:hasQuest("shertul-fortress"):fly() end, cond=function() return config.settings.cheat end},
+		{_t"[Begin the Lichform ceremory]", cond=function(npc, player) local q = player:hasQuest("lichform") return q and q:check_lichform(player) end, action=function(npc, player) player:setQuestStatus("lichform", engine.Quest.COMPLETED) end},
+		{_t"[Leave the orb alone]"},
 	}
 }
 
 newChat{ id="examine",
-	text = [[*#LIGHT_GREEN#The device seems to be made of pure crystal. It projects a very accurate map of the known world - including the forbidden continent of the south.
+	text = _t[[*#LIGHT_GREEN#The device seems to be made of pure crystal. It projects a very accurate map of the known world - including the forbidden continent of the south.
 There seems to be a hole about the size and form of your Rod of Recall.#WHITE#*]],
 	answers = {
-		{"[Insert the rod]", jump="activate"},
-		{"[Leave the orb alone]"},
+		{_t"[Insert the rod]", jump="activate"},
+		{_t"[Leave the orb alone]"},
 	}
 }
 newChat{ id="activate",
-	text = [[*#LIGHT_GREEN#As you take the rod close to the orb it seems to vibrate and react.
+	text = _t[[*#LIGHT_GREEN#As you take the rod close to the orb it seems to vibrate and react.
 A shadow appears in a corner of the room! You retract the rod immediately but the shadow stays.
 It looks like the horrors you fought when coming inside, only less degenerated.
 The thing looks roughly humanoid, but it has no head and its limbs look like tentacles. It does not seem hostile.#WHITE#*]],
 	answers = {
-		{"[Leave the orb alone]", action=function(npc, player)
+		{_t"[Leave the orb alone]", action=function(npc, player)
 			if not player:hasQuest("shertul-fortress") then player:grantQuest("shertul-fortress") end
 			player:hasQuest("shertul-fortress"):spawn_butler()
 		end,},

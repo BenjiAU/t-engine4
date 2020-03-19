@@ -20,25 +20,25 @@
 use_ui = "quest-main"
 
 -- Main quest: the Staff of Absorption
-name = "A mysterious staff"
+name = _t"A mysterious staff"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "Deep in the Dreadfell you fought and destroyed the Master, a powerful vampire."
+	desc[#desc+1] = _t"Deep in the Dreadfell you fought and destroyed the Master, a powerful vampire."
 	if self:isCompleted("ambush") and not self:isCompleted("ambush-died") then
-		desc[#desc+1] = "On your way out of the Dreadfell you were ambushed by a band of orcs."
-		desc[#desc+1] = "They asked about the staff."
+		desc[#desc+1] = _t"On your way out of the Dreadfell you were ambushed by a band of orcs."
+		desc[#desc+1] = _t"They asked about the staff."
 	elseif self:isCompleted("ambush-died") and not self:isCompleted("survived-ukruk") then
-		desc[#desc+1] = "On your way out of the Dreadfell you were ambushed by a band of orcs and left for dead."
-		desc[#desc+1] = "They asked about the staff and stole it from you."
-		desc[#desc+1] = "#LIGHT_GREEN#Go at once to Last Hope to report those events!"
+		desc[#desc+1] = _t"On your way out of the Dreadfell you were ambushed by a band of orcs and left for dead."
+		desc[#desc+1] = _t"They asked about the staff and stole it from you."
+		desc[#desc+1] = _t"#LIGHT_GREEN#Go at once to Last Hope to report those events!"
 	elseif not self:isCompleted("ambush-died") and self:isCompleted("survived-ukruk") then
-		desc[#desc+1] = "On your way out of the Dreadfell you were ambushed by a band of orcs."
-		desc[#desc+1] = "They asked about the staff and stole it from you."
-		desc[#desc+1] = "You told them nothing and vanquished them."
-		desc[#desc+1] = "#LIGHT_GREEN#Go at once to Last Hope to report those events!"
+		desc[#desc+1] = _t"On your way out of the Dreadfell you were ambushed by a band of orcs."
+		desc[#desc+1] = _t"They asked about the staff and stole it from you."
+		desc[#desc+1] = _t"You told them nothing and vanquished them."
+		desc[#desc+1] = _t"#LIGHT_GREEN#Go at once to Last Hope to report those events!"
 	else
-		desc[#desc+1] = "In its remains, you found a strange staff. It radiates power and danger and you dare not use it yourself."
-		desc[#desc+1] = "You should bring it to the elders of Last Hope in the southeast."
+		desc[#desc+1] = _t"In its remains, you found a strange staff. It radiates power and danger and you dare not use it yourself."
+		desc[#desc+1] = _t"You should bring it to the elders of Last Hope in the southeast."
 	end
 	return table.concat(desc, "\n")
 end
@@ -86,7 +86,7 @@ start_ambush = function(self, who)
 			o:removed()
 		end
 
-		require("engine.ui.Dialog"):simpleLongPopup("Ambush", [[You wake up after a few hours, surprised to be alive, but the staff is gone!
+		require("engine.ui.Dialog"):simpleLongPopup(_t"Ambush", _t[[You wake up after a few hours, surprised to be alive, but the staff is gone!
 #VIOLET#Go at once to Last Hope to report those events!]], 600)
 		
 		local oe = game.level.map(self.x, self.y, engine.Map.TERRAIN)
@@ -100,14 +100,14 @@ start_ambush = function(self, who)
 	end
 
 	local Chat = require("engine.Chat")
-	local chat = Chat.new("dreadfell-ambush", {name="Ukruk the Fierce"}, who)
+	local chat = Chat.new("dreadfell-ambush", {name=_t"Ukruk the Fierce"}, who)
 	chat:invoke()
 end
 
 killed_ukruk = function(self, who)
 	game.player.die = nil
 
-	require("engine.ui.Dialog"):simpleLongPopup("Ambush", [[You are surprised to still be alive.
+	require("engine.ui.Dialog"):simpleLongPopup(_t"Ambush", _t[[You are surprised to still be alive.
 #VIOLET#Go at once to Last Hope to report those events!]], 600)
 
 	local oe = game.level.map(who.x, who.y, engine.Map.TERRAIN)

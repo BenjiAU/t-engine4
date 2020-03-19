@@ -17,18 +17,18 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Spellblaze Fallouts"
+name = _t"Spellblaze Fallouts"
 stables = 0
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "The Abashed Expanse is a part of Eyal torn apart by the Spellblaze and thrown into the void between the stars.\n"
-	desc[#desc+1] = "It has recently begun to destabilize, threatening to crash onto Eyal, destroying everything in its path.\n"
-	desc[#desc+1] = "You have entered it and must now stabilize three wormholes by firing any spell at them.\n"
-	desc[#desc+1] = "Remember, the floating islands are not stable and might teleport randomly. However, the disturbances also help you: your Phase Door spell is fully controllable even if not of high level yet.\n"
+	desc[#desc+1] = _t"The Abashed Expanse is a part of Eyal torn apart by the Spellblaze and thrown into the void between the stars.\n"
+	desc[#desc+1] = _t"It has recently begun to destabilize, threatening to crash onto Eyal, destroying everything in its path.\n"
+	desc[#desc+1] = _t"You have entered it and must now stabilize three wormholes by firing any spell at them.\n"
+	desc[#desc+1] = _t"Remember, the floating islands are not stable and might teleport randomly. However, the disturbances also help you: your Phase Door spell is fully controllable even if not of high level yet.\n"
 	if self:isCompleted("abashed") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have explored the expanse and closed all three wormholes.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have explored the expanse and closed all three wormholes.#WHITE#"
 	else
-		desc[#desc+1] = "#SLATE#* You have closed "..self.stables.." wormhole(s).#WHITE#"
+		desc[#desc+1] = ("#SLATE#* You have closed %s wormhole(s).#WHITE#"):tformat(self.stables)
 	end
 	return table.concat(desc, "\n")
 end

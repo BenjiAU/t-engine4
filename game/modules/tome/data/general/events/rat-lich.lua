@@ -33,7 +33,7 @@ local changer = function(id)
 	local terrains = mod.class.Grid:loadList("/data/general/grids/basic.lua")
 	terrains.UP_WILDERNESS.change_level_shift_back = true
 	terrains.UP_WILDERNESS.change_zone_auto_stairs = true
-	terrains.UP_WILDERNESS.name = "way up to "..game.zone.name
+	terrains.UP_WILDERNESS.name = ("way up to %s"):tformat(game.zone.name)
 	terrains.UP_WILDERNESS.change_zone = game.zone.short_name
 	terrains.UP_WILDERNESS.change_level = 1
 	terrains.UP_WILDERNESS.change_level_check = function(self)
@@ -47,14 +47,14 @@ local changer = function(id)
 		unique = true,
 		slot = "TOOL",
 		type = "tool", subtype="skull", image = "object/artifact/skull_of_the_rat_lich.png",
-		unided_name = "dusty rat skull",
-		name = "Skull of the Rat Lich",
+		unided_name = _t"dusty rat skull",
+		name = _t"Skull of the Rat Lich",
 		display = "*", color=colors.BLACK,
 		level_range = {10, 25},
 		cost = 150,
 		encumber = 1,
 		material_level = 3,
-		desc = [[This ancient skull is all that remains of the Rat Lich. Some fragments of its power remain and a faint red light still glows within its eye sockets.]],
+		desc = _t[[This ancient skull is all that remains of the Rat Lich. Some fragments of its power remain and a faint red light still glows within its eye sockets.]],
 
 		wielder = {
 			combat_spellpower = 10,
@@ -62,7 +62,7 @@ local changer = function(id)
 			on_melee_hit = {[engine.DamageType.DARKNESS]=12},
 		},
 		max_power = 70, power_regen = 1,
-		use_power = { name = "raise one or two undead rats to fight beside you", power = 70,
+		use_power = { name = _t"raise one or two undead rats to fight beside you", power = 70,
 			tactical = {ATTACK = 2},
 			use = function(self, who)
 			if not who:canBe("summon") then game.logPlayer(who, "You cannot summon; you are suppressed!") return end
@@ -70,7 +70,7 @@ local changer = function(id)
 			local NPC = require "mod.class.NPC"
 			local list = NPC:loadList("/data/general/npcs/undead-rat.lua")
 
-			game.logSeen(who, "%s raises %s %s, and a red light flashes from it's eye sockets!", who.name:capitalize(), who:his_her(), self:getName({do_color=true, no_add_name=true}))
+			game.logSeen(who, "%s raises %s %s, and a red light flashes from it's eye sockets!", who:getName():capitalize(), who:his_her(), self:getName({do_color=true, no_add_name=true}))
 			for i = 1, 2 do
 				-- Find space
 				local x, y = util.findFreeGrid(who.x, who.y, 5, true, {[engine.Map.ACTOR]=true})
@@ -99,7 +99,7 @@ local changer = function(id)
 	}
 
 	local zone = mod.class.Zone.new(id, {
-		name = "Forsaken Crypt",
+		name = _t"Forsaken Crypt",
 		level_range = game.zone.actor_adjust_level and {math.floor(game.zone:actor_adjust_level(game.level, game.player)*1.05),
 			math.ceil(game.zone:actor_adjust_level(game.level, game.player)*1.15)} or {game.zone.base_level, game.zone.base_level}, -- 5-15% higher levels
 		__applied_difficulty = true, --Difficulty already applied to parent zone
@@ -149,9 +149,9 @@ local changer = function(id)
 end
 
 local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
-g.name = "stairway leading downwards"
+g.name = _t"stairway leading downwards"
 g.always_remember = true
-g.desc = [[Stairs seem to lead into some kind of crypt.]]
+g.desc=_t[[Stairs seem to lead into some kind of crypt.]]
 g.show_tooltip = true
 g.display='>' g.color_r=0 g.color_g=0 g.color_b=255 g.notice = true
 g.change_level=1 g.change_zone=id g.glow=true
@@ -165,11 +165,11 @@ g:initGlow()
 g.real_change = changer
 g.change_level_check = function(self)
 	game:changeLevel(1, self.real_change(self.change_zone), {temporary_zone_shift=true, direct_switch=true})
-	require("engine.ui.Dialog"):simplePopup("Forsaken Crypt", "You hear squeaks and the sounds of clicking bone echo around you... Pure death awaits. Flee!")
+	require("engine.ui.Dialog"):simplePopup(_t"Forsaken Crypt", _t"You hear squeaks and the sounds of clicking bone echo around you... Pure death awaits. Flee!")
 	self.change_level_check = nil
 	self.change_level = nil
-	self.name = "collapsed forsaken crypt"
-	self.desc = [[Stairs lead downwards into rubble.]]
+	self.name = _t"collapsed forsaken crypt"
+	self.desc=_t[[Stairs lead downwards into rubble.]]
 	self.autoexplore_ignore = true
 	self.special_minimap = colors.VIOLET
 	return true

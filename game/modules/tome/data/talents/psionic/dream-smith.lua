@@ -113,7 +113,7 @@ newTalent{
 		The base power, Accuracy, Armour penetration, and critical strike chance of the weapon will scale with your Mindpower.
 		
 		Current Dream Hammer Stats:
-		%s]]):format(damage * 100, tostring(weapon_stats))
+		%s]]):tformat(damage * 100, tostring(weapon_stats))
 	end,
 }
 
@@ -129,7 +129,7 @@ newTalent{
 	requires_target = true,
 	proj_speed = 10,
 	target = function(self, t)
-		return {type="beam", range=self:getTalentRange(t), selffire=false, talent=t, display={display='', particle="arrow", particle_args={tile="shockbolt/object/dream_hammer"}, trail="firetrail"}}
+		return {type="beam", range=self:getTalentRange(t), selffire=false, talent=t, nolock=true, display={display='', particle="arrow", particle_args={tile="shockbolt/object/dream_hammer"}, trail="firetrail"}}
 	end,
 	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1, 1.5) end,
 	getAttack = function(self, t) return self:getTalentLevel(t) * 10 end, -- Used for the talent display
@@ -158,7 +158,7 @@ newTalent{
 			if x == px and y == py and self and self.x and self.y then
 				print("[Dream Hammer Return] Projection from", x, y, "to", self.x, self.y)
 				local tgr = tg
-				tgr.name = "Hammer Toss"
+				tgr.name = _t"Hammer Toss"
 				tgr.x, tgr.y = px, py
 				self:projectile(tgr, self.x, self.y, function(px, py, tgr, self)
 					local tmp_target = game.level.map(px, py, engine.Map.ACTOR)
@@ -177,7 +177,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local attack_bonus = t.getAttack(self, t)
 		return ([[Throw your Dream Hammer at a distant location, inflicting %d%% weapon damage on all targets between you and it.  After reaching its destination, the Dream Hammer will return, potentially hitting targets a second time.
-		Learning this talent increases the Accuracy of your Dream Hammer by %d.]]):format(damage * 100, attack_bonus)
+		Learning this talent increases the Accuracy of your Dream Hammer by %d.]]):tformat(damage * 100, attack_bonus)
 	end,
 }
 
@@ -192,7 +192,7 @@ newTalent{
 	tactical = { ATTACK = { [hammer_tactical] = 1 }, DISABLE = { stun = 2 } },
 	getWeaponDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1, 1.5) end,
 	getDamage = function(self, t) return 30 end,
-	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 2 end,
+	getPercentInc = function(self, t) return math.sqrt(self:getTalentLevel(t) / 5) / 1.5 end,
 	getStun = function(self, t) return math.floor(self:combatTalentScale(t, 3, 7)) end,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
 	range = 1,
@@ -208,7 +208,7 @@ newTalent{
 			if target:canBe("stun") then
 				target:setEffect(target.EFF_STUNNED, t.getStun(self, t), {apply_power=self:combatMindpower()})
 			else
-				game.logSeen(target, "%s resists the stunning blow!", target.name:capitalize())
+				game.logSeen(target, "%s resists the stunning blow!", target:getName():capitalize())
 			end
 			if rng.percent(50) then
 				game.level.map:particleEmitter(target.x, target.y, 1, "generic_discharge", {rm=225, rM=255, gm=0, gM=0, bm=0, bM=0, am=35, aM=90})
@@ -226,7 +226,7 @@ newTalent{
 		local stun = t.getStun(self, t)
 		return ([[Crush your enemy with your Dream Hammer, inflicting %d%% weapon damage.  If the attack hits, the target is stunned for %d turns.
 		Stun chance improves with your Mindpower.  Learning this talent increases your Physical Power for Dream Hammer damage calculations by %d and all damage with Dream Hammer attacks by %d%%.
-		]]):format(damage * 100, stun, power, percent * 100)
+		]]):tformat(damage * 100, stun, power, percent * 100)
 	end,
 }
 
@@ -281,6 +281,6 @@ newTalent{
 		local project = t.getProject(self, t) /2
 		return ([[Strike an adjacent target with a mighty blow from the forge, inflicting %d%% weapon damage.  If the attack hits, the echo of the attack will lash out at all enemies in a %d radius of the impact.
 		Learning this talent adds %0.2f mind damage and %0.2f burning damage to your Dream Hammer strikes.
-		The mind and fire damage will scale with your Mindpower.]]):format(damage * 100, radius, damDesc(self, DamageType.MIND, project), damDesc(self, DamageType.FIRE, project))
+		The mind and fire damage will scale with your Mindpower.]]):tformat(damage * 100, radius, damDesc(self, DamageType.MIND, project), damDesc(self, DamageType.FIRE, project))
 	end,
 }

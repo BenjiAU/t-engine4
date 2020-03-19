@@ -18,26 +18,26 @@
 -- darkgod@te4.org
 
 newChat{ id="ambush",
-	text = [[#VIOLET#*As you come out of the Dreadfell, you encounter a band of orcs*#LAST#
+	text = _t[[#VIOLET#*As you come out of the Dreadfell, you encounter a band of orcs*#LAST#
 You! Give us the staff NOW and we might offer you a quick death!]],
 	answers = {
-		{"What are you talking about?", jump="what"},
-		{"Why would you want it?", jump="why"},
-		{"#LIGHT_GREEN#[Attack]"},
+		{_t"What are you talking about?", jump="what"},
+		{_t"Why would you want it?", jump="why"},
+		{_t"#LIGHT_GREEN#[Attack]"},
 	}
 }
 
 newChat{ id="what",
-	text = [[Do not play dumb with Ukruk! ATTACK!]],
+	text = _t[[Do not play dumb with Ukruk! ATTACK!]],
 	answers = {
-		{"#LIGHT_GREEN#[Attack]"},
+		{_t"#LIGHT_GREEN#[Attack]"},
 	}
 }
 
 newChat{ id="why",
-	text = [[That is not your concern! ATTACK!]],
+	text = _t[[That is not your concern! ATTACK!]],
 	answers = {
-		{"#LIGHT_GREEN#[Attack]"},
+		{_t"#LIGHT_GREEN#[Attack]"},
 	}
 }
 

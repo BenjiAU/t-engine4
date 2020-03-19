@@ -35,7 +35,7 @@ newTalent{
 		local tune = t.getTuning(self, t)
 		return ([[You automatically adjust your Paradox %0.2f points towards your preferred Paradox each turn.
 		While using Spacetime Tuning twice this value will instead be added to the amount you would normally tune.]]):
-		format(tune)
+		tformat(tune)
 	end,
 }
 
@@ -65,7 +65,7 @@ newTalent{
 		Each turn the restoration field is active, you get healed for 10%% of the absorbed damage.
 		While under the effect of Time Shield, all newly applied magical, physical and mental effects will have their durations reduced by %d%%.
 		The shield's max absorption will increase with your Spellpower.]]):
-		format(maxabsorb, duration, time_reduc)
+		tformat(maxabsorb, duration, time_reduc)
 	end,
 }
 
@@ -115,7 +115,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[Inflicts %0.2f temporal damage, and attempts to stun all targets in a radius %d ball for %d turns.
 		The damage will scale with your Spellpower.]]):
-		format(damDesc(self, DamageType.TEMPORAL, damage), radius, duration)
+		tformat(damDesc(self, DamageType.TEMPORAL, damage), radius, duration)
 	end,
 }
 
@@ -138,6 +138,6 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[For the next %d turns you may not create minor anomalies.  You do not regain Paradox or lose the spell you're casting if a random anomaly would normally occur.
 		This spell has no effect on major anomalies.]]):
-		format(duration)
+		tformat(duration)
 	end,
 }

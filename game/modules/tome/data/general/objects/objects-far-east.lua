@@ -31,7 +31,7 @@ loadIfNot("/data/general/objects/boss-artifacts-far-east.lua")
 -- This one starts a quest it has a level and rarity so it can drop randomly, but there are places where it is more likely to appear
 newEntity{ base = "BASE_SCROLL", define_as = "JEWELER_TOME", subtype="tome", no_unique_lore=true,
 	unique = true, quest=true,
-	unided_name = "ancient tome",
+	unided_name = _t"ancient tome",
 	name = "Ancient Tome titled 'Gems and their uses'", image = "object/artifact/ancient_tome_gems_and_their_uses.png",
 	level_range = {30, 40}, rarity = 120,
 	color = colors.VIOLET,

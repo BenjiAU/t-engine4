@@ -18,18 +18,18 @@
 -- darkgod@te4.org
 
 newChat{ id="caravan",
-	text = [[#VIOLET#*As the last member of the caravan lies dying, you look at him and see the hate that fills his eyes.*#LAST#
+	text = _t[[#VIOLET#*As the last member of the caravan lies dying, you look at him and see the hate that fills his eyes.*#LAST#
 We should have finished you off that day. You deserved no mercy!]],
 	answers = {
 		{
-			"And I will show you no mercy. #LIGHT_GREEN#[Kill him]#LAST#",
+			_t"And I will show you no mercy. #LIGHT_GREEN#[Kill him]#LAST#",
 			action=function(npc, player)
 				player:hasQuest("keepsake"):on_evil_choice(player)
 				player:hasQuest("keepsake"):on_caravan_destroyed_chat_over(player)
 			end
 		},
 		{
-			"I am sorry. #LIGHT_GREEN#[Help him]#LAST#",
+			_t"I am sorry. #LIGHT_GREEN#[Help him]#LAST#",
 			action=function(npc, player)
 				player:hasQuest("keepsake"):on_good_choice(player)
 			end,
@@ -39,10 +39,10 @@ We should have finished you off that day. You deserved no mercy!]],
 }
 
 newChat{ id="apology",
-	text = [[#VIOLET#*Before you can help him, he collapses to the ground and dies.*#LAST#]],
+	text = _t[[#VIOLET#*Before you can help him, he collapses to the ground and dies.*#LAST#]],
 	answers = {
 		{
-			"...",
+			_t"...",
 			action=function(npc, player)
 				player:hasQuest("keepsake"):on_caravan_destroyed_chat_over(player)
 			end,

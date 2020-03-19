@@ -115,7 +115,7 @@ newTalent{
 		local hateGain = t.getHateGain(self, t)
 		return ([[Feed from the essence of your enemy. Draws %0.1f hate per turn from a targeted foe, as long as they remain in your line of sight.
 			If you aren't already feeding this will be automatically applied to the nearest enemy.
-		Hate gain improves with your Mindpower.]]):format(hateGain)
+		Hate gain improves with your Mindpower.]]):tformat(hateGain)
 	end,
 }
 
@@ -131,7 +131,7 @@ newTalent{
 	info = function(self, t)
 		local regen = t.getLifeRegen(self, t)
 		return ([[Devours life from the target of your feeding reducing their life regeneration by %d and adding half of that to yours.
-		Improves with your Mindpower.]]):format(regen)
+		Improves with your Mindpower.]]):tformat(regen)
 	end,
 }
 
@@ -159,7 +159,7 @@ newTalent{
 		local constitutionGain = t.getConstitutionGain(self, t)
 		local lifeRegenGain = t.getLifeRegenGain(self, t)
 		return ([Enhances your feeding by transferring %d constitution and %0.1f life per turn from a targeted foe to you.
-		Improves with the Willpower stat.]):format(constitutionGain, lifeRegenGain)
+		Improves with the Willpower stat.]):tformat(constitutionGain, lifeRegenGain)
 	end,
 }
 ]]
@@ -175,7 +175,7 @@ newTalent{
 	info = function(self, t)
 		local damageGain = t.getDamageGain(self, t)
 		return ([[Enhances your feeding by reducing your targeted foe's damage by %d%%, and increasing yours by the same amount.
-		Improves with your Mindpower.]]):format(damageGain)
+		Improves with your Mindpower.]]):tformat(damageGain)
 	end,
 }
 
@@ -191,6 +191,6 @@ newTalent{
 	info = function(self, t)
 		local resistGain = t.getResistGain(self, t)
 		return ([[Enhances your feeding by reducing your targeted foe's resistances, multiplying them by %0.2f and increasing your resistances by the amount drained. Resistance to "all" is not affected.
-		Improves with your Mindpower.]]):format((1-(resistGain/100)))
+		Improves with your Mindpower.]]):tformat((1-(resistGain/100)))
 	end,
 }

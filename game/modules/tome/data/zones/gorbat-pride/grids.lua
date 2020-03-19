@@ -124,7 +124,7 @@ newEntity{
 	block_sight = true,
 	block_sense = true,
 	block_esp = true,
-	door_player_stop = "This rock seems to have been sealed off. You need to find a way to open it.",
+	door_player_stop = _t"This rock seems to have been sealed off. You need to find a way to open it.",
 	is_door = true,
 	door_opened = "FLOOR",
 	on_lever_change = function(self, x, y, who, val, oldval)

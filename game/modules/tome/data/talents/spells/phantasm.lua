@@ -65,7 +65,7 @@ newTalent{
 		return ([[Creates a globe of pure light within a radius of %d that illuminates the area.
 		At level 3, it also blinds all who see it (except the caster) for %d turns.
 		At level 4, it also deals %0.2f light damage.]]):
-		format(radius, turn, damDesc(self, DamageType.LIGHT, dam))
+		tformat(radius, turn, damDesc(self, DamageType.LIGHT, dam))
 	end,
 }
 
@@ -95,7 +95,7 @@ newTalent{
 		local defence = t.getDefense(self, t)
 		return ([[The caster's image blurs, granting a %d bonus to Defense.
 		The bonus will increase with your Spellpower.]]):
-		format(defence)
+		tformat(defence)
 	end,
 }
 
@@ -129,7 +129,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[The caster is surrounded by a phantasmal shield granting 10%% chance to evade weapon attacks. If hit in melee, the shield will deal %d light damage to the attacker.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.LIGHT, damage))
+		tformat(damDesc(self, DamageType.LIGHT, damage))
 	end,
 }
 
@@ -178,6 +178,6 @@ newTalent{
 		As you become invisible, you fade out of phase with reality. All your damage is reduced by 70%%.
 		This powerful spell constantly drains your mana (2 per turn) while active.
 		The invisibility bonus will increase with your Spellpower.]]):
-		format(invisi)
+		tformat(invisi)
 	end,
 }

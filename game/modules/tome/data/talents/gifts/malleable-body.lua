@@ -39,7 +39,7 @@ newTalent{
 		Your two selves share the same healthpool.
 		While you are split both of you gain %d%% all resistances.
 		Resistances will increase with Mindpower.]]):
-		format(dur, 10 + self:combatTalentMindDamage(t, 5, 200) / 10)
+		tformat(dur, 10 + self:combatTalentMindDamage(t, 5, 200) / 10)
 	end,
 }
 
@@ -56,7 +56,7 @@ newTalent{
 		return ([[Improve your fungus to allow it to take a part of any healing you receive and improve it.
 		Each time you are healed you get a regeneration effect for 6 turns that heals you of %d%% of the direct heal you received.
 		The effect will increase with your Mindpower.]]):
-		format(p)
+		tformat(p)
 	end,
 }
 
@@ -76,7 +76,7 @@ newTalent{
 		return ([[Both of you swap place in an instant, creatures attacking one will target the other.
 		While swaping you briefly merge together, boosting all your nature and acid damage by %d%% for 6 turns and healing you for %d.
 		Damage and healing increase with Mindpower.]]):
-		format(15 + self:combatTalentMindDamage(t, 5, 300) / 10, 40 + self:combatTalentMindDamage(t, 5, 300))
+		tformat(15 + self:combatTalentMindDamage(t, 5, 300) / 10, 40 + self:combatTalentMindDamage(t, 5, 300))
 	end,
 }
 
@@ -95,6 +95,6 @@ newTalent{
 	info = function(self, t)
 		return ([[Your body's internal organs are melted together, making it much harder to suffer critical hits.
 		All direct critical hits (physical, mental, spells) against you have a %d%% chance to instead do their normal damage.]]):
-		format(self:getTalentLevelRaw(t) * 15)
+		tformat(self:getTalentLevelRaw(t) * 15)
 	end,
 }

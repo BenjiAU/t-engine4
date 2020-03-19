@@ -28,11 +28,11 @@ uberTalent{
 		self:setEffect(self.EFF_DRACONIC_WILL, 5, {})
 		return true
 	end,
-	require = { special={desc="Be close to the draconic world", fct=function(self) return game.state.birth.ignore_prodigies_special_reqs or (self:attr("drake_touched") and self:attr("drake_touched") >= 2) end} },
+	require = { special={desc=_t"Be close to the draconic world", fct=function(self) return game.state.birth.ignore_prodigies_special_reqs or (self:attr("drake_touched") and self:attr("drake_touched") >= 2) end} },
 	info = function(self, t)
 		return ([[Your body is like that of a drake, easily resisting detrimental effects.
 		For 5 turns, no detrimental effects may target you.]])
-		:format()
+		:tformat()
 	end,
 }
 
@@ -42,7 +42,7 @@ uberTalent{
 	cooldown = 15,
 	getDamage = function(self, t) return math.max(50 + self:combatSpellpower() * 5, 50 + self:combatMindpower() * 5) end,
 	getLava = function(self, t) return math.max(self:combatSpellpower() + 30, self:combatMindpower() + 30) end,
-	require = { special={desc="Have witnessed a meteoric crash", fct=function(self) return game.state.birth.ignore_prodigies_special_reqs or self:attr("meteoric_crash") end} },
+	require = { special={desc=_t"Have witnessed a meteoric crash", fct=function(self) return game.state.birth.ignore_prodigies_special_reqs or self:attr("meteoric_crash") end} },
 	passives = function(self, t, tmptable)
 		self:talentTemporaryValue(tmptable, "auto_highest_inc_damage", {[DamageType.FIRE] = 1})
 		self:talentTemporaryValue(tmptable, "auto_highest_resists_pen", {[DamageType.FIRE] = 1})
@@ -108,15 +108,14 @@ uberTalent{
 					game.level:addEntity(g)
 				end
 
-				src:project({type="ball", radius=2, selffire=false, friendlyfire=false}, x, y, engine.DamageType.FIRE, dam/2)
-				src:project({type="ball", radius=2, selffire=false, friendlyfire=false}, x, y, engine.DamageType.PHYSICAL, dam/2)
+				src:project({type="ball", radius=2, selffire=false, friendlyfire=false}, x, y, engine.DamageType.METEOR, dam)
 				src:project({type="ball", radius=2, selffire=false, friendlyfire=false}, x, y, function(px, py)
 					local target = game.level.map(px, py, engine.Map.ACTOR)
 					if target then
 						if target:canBe("stun") then
 							target:setEffect(target.EFF_STUNNED, 3, {apply_power=math.max(src:combatSpellpower(), src:combatMindpower())})
 						else
-							game.logSeen(target, "%s resists the stun!", target.name:capitalize())
+							game.logSeen(target, "%s resists the stun!", target:getName():capitalize())
 						end
 					end
 				end)
@@ -141,7 +140,7 @@ uberTalent{
 
 		Additionally, your fire damage bonus and resistance penetration is set to your current highest damage bonus and resistance penetration. This applies to all fire damage you deal.
 		The damage scales with your Spellpower or Mindpower.]])
-		:format(damDesc(self, DamageType.FIRE, dam), damDesc(self, DamageType.PHYSICAL, dam), damDesc(self, DamageType.FIRE, t.getLava(self, t)))
+		:tformat(damDesc(self, DamageType.FIRE, dam), damDesc(self, DamageType.PHYSICAL, dam), damDesc(self, DamageType.FIRE, t.getLava(self, t)))
 	end,
 }
 
@@ -159,7 +158,7 @@ uberTalent{
 		self.inc_damage_actor_type.humanoid = (self.inc_damage_actor_type.humanoid or 0) - 20
 		self.inc_damage_actor_type.humanoid = (self.inc_damage_actor_type.giant or 0) - 20
 	end,
-	require = { special={desc="Possess and wear two of Garkul's artifacts and know all about Garkul's life", fct=function(self)
+	require = { special={desc=_t"Possess and wear two of Garkul's artifacts and know all about Garkul's life", fct=function(self)
 		local o1 = self:findInAllInventoriesBy("define_as", "SET_GARKUL_TEETH")
 		local o2 = self:findInAllInventoriesBy("define_as", "HELM_OF_GARKUL")
 		return o1 and o2 and o1.wielded and o2.wielded and (game.state.birth.ignore_prodigies_special_reqs or (
@@ -172,7 +171,7 @@ uberTalent{
 	end} },
 	info = function(self, t)
 		return ([[Garkul's spirit is with you. You now deal 1000%% more damage to constructs and 20%% more damage to humanoids and giants.]])
-		:format()
+		:tformat()
 	end,
 }
 
@@ -192,18 +191,18 @@ uberTalent{
 		self:setEffect(self.EFF_HIDDEN_RESOURCES, 5, {})
 		return true
 	end,
-	require = { special={desc="Have been close to death(killed a foe while below 1 HP)", fct=function(self) return self:attr("barely_survived") end} },
+	require = { special={desc=_t"Have been close to death(killed a foe while below 1 HP)", fct=function(self) return self:attr("barely_survived") end} },
 	info = function(self, t)
 		return ([[You focus your mind on the task at hand, regardless of how dire the situation is.
 		For 5 turns, none of your talents use any resources.]])
-		:format()
+		:tformat()
 	end,
 }
 
 uberTalent{
 	name = "Lucky Day",
 	mode = "passive",
-	require = { special={desc="Be lucky already (at least +5 luck)", fct=function(self) return self:getLck() >= 55 end} },
+	require = { special={desc=_t"Be lucky already (at least +5 luck)", fct=function(self) return self:getLck() >= 55 end} },
 	on_learn = function(self, t)
 		self.inc_stats[self.STAT_LCK] = (self.inc_stats[self.STAT_LCK] or 0) + 40
 		self:onStatChange(self.STAT_LCK, 40)
@@ -216,7 +215,7 @@ uberTalent{
 	end,
 	info = function(self, t)
 		return ([[Every day is your lucky day! You gain a permanent +40 luck bonus and 10%% to move out of the way of every attack.]])
-		:format()
+		:tformat()
 	end,
 }
 
@@ -226,13 +225,13 @@ uberTalent{
 	cooldown = 5,
 	trigger = function(self, t)
 		self:startTalentCooldown(t)
-		game.logSeen(self, "#LIGHT_BLUE#%s's unbreakable will shrugs off the effect!", self.name:capitalize())
+		game.logSeen(self, "#LIGHT_BLUE#%s's unbreakable will shrugs off the effect!", self:getName():capitalize())
 		return true
 	end,
 	info = function(self, t)
 		return ([[Your will is so strong that you simply ignore mental effects used against you.
 		This effect can only occur once every 5 turns.]])
-		:format()
+		:tformat()
 	end,
 }
 
@@ -240,10 +239,10 @@ uberTalent{
 	name = "Spell Feedback",
 	mode = "passive",
 	cooldown = 9,
-	require = { special={desc="Antimagic", fct=function(self) return self:knowTalentType("wild-gift/antimagic") end} },
+	require = { special={desc=_t"Antimagic", fct=function(self) return self:knowTalentType("wild-gift/antimagic") end} },
 	trigger = function(self, t, target, source_t)
 		self:startTalentCooldown(t)
-		self:logCombat(target, "#LIGHT_BLUE##Source# punishes #Target# for casting a spell!", self.name:capitalize(), target.name)
+		self:logCombat(target, "#LIGHT_BLUE##Source# punishes #Target# for casting a spell!", self:getName():capitalize(), target:getName())
 		DamageType:get(DamageType.MIND).projector(self, target.x, target.y, DamageType.MIND, 20 + self:getWil() * 2)
 
 		local dur = target:getTalentCooldown(source_t)
@@ -257,7 +256,7 @@ uberTalent{
 		Each time that you take damage from a spell, you punish the spellcaster with %0.2f mind damage.
 		Also, they will suffer a 35%% spell failure chance (with duration equal to the cooldown of the spell they used on you).
 		Note: this talent has a cooldown.]])
-		:format(damDesc(self, DamageType.MIND, 20 + self:getWil() * 2))
+		:tformat(damDesc(self, DamageType.MIND, 20 + self:getWil() * 2))
 	end,
 }
 
@@ -267,7 +266,7 @@ uberTalent{
 	require = { },
 	cooldown = 20,
 	tactical = { BUFF = 3 },
-	require = { special={desc="Have dealt over 50000 mind damage", fct=function(self) return 
+	require = { special={desc=_t"Have dealt over 50000 mind damage", fct=function(self) return 
 		self.damage_log and (
 			(self.damage_log[DamageType.MIND] and self.damage_log[DamageType.MIND] >= 50000)
 		)
@@ -292,6 +291,6 @@ uberTalent{
 		return ([[Transcend the physical and rule over all with an iron will!
 		While this sustain is active, 33%% of your damage is converted into mind damage.
 		Additionally, you gain +30%% mind resistance penetration, and +10%% mind damage.]]):
-		format()
+		tformat()
 	end,
 }

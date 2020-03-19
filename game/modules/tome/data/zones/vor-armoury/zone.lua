@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Vor Armoury",
+	name = _t"Vor Armoury",
 	level_range = {30, 40},
 	level_scheme = "player",
 	max_level = 2,

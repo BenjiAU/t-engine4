@@ -26,7 +26,7 @@ module(..., package.seeall, class.inherit(engine.ui.Dialog))
 
 function _M:init()
 	self:generateList()
-	engine.ui.Dialog.init(self, "Debug/Cheat! It's BADDDD!", 1, 1)
+	engine.ui.Dialog.init(self, _t"Debug/Cheat! It's BADDDD!", 1, 1)
 
 	local list = List.new{scrollbar=true, width=400, height=500, list=self.list, fct=function(item) self:use(item) end}
 
@@ -97,7 +97,7 @@ function _M:use(item)
 			range = 200,
 		})
 	elseif act == "change_level" then
-		game:registerDialog(GetQuantity.new("Zone: "..game.zone.name, "Level 1-"..game.zone.max_level, game.level.level, game.zone.max_level, function(qty)
+		game:registerDialog(GetQuantity.new(("Zone: %s"):tformat(game.zone.name), ("Level 1-%s"):tformat(game.zone.max_level), game.level.level, game.zone.max_level, function(qty)
 			game:changeLevel(qty)
 		end), 1)
 	elseif act == "shertul-energy" then
@@ -119,7 +119,7 @@ function _M:use(item)
 			end
 		end end
 	elseif act == "remove-all" then
-		local d = require"engine.ui.Dialog":yesnocancelPopup("Kill or Remove", "Remove all (non-party) creatures or kill them for the player (awards experience and drops loot)?",
+		local d = require"engine.ui.Dialog":yesnocancelPopup(_t"Kill or Remove", _t"Remove all (non-party) creatures or kill them for the player (awards experience and drops loot)?",
 			function(remove_all, escape)
 				if escape then return end
 				local l = {}
@@ -137,9 +137,9 @@ function _M:use(item)
 					end
 					count = count + 1
 				end
-				game.log("#LIGHT_BLUE#%s %d creatures.", remove_all and "Removed" or "Killed", count)
+				game.log("#LIGHT_BLUE#%s %d creatures.", remove_all and _t"Removed" or _t"Killed", count)
 			end
-		, "Remove", "Kill", "Cancel", false)
+		, _t"Remove", _t"Kill", _t"Cancel", false)
 	elseif act == "all-ingredients" then
 		game.party:giveAllIngredients(100)
 		-- Gems count too
@@ -163,26 +163,26 @@ end
 function _M:generateList()
 	local list = {}
 
-	list[#list+1] = {name="Change Zone", dialog="ChangeZone"}
-	list[#list+1] = {name="Change Level", action="change_level"}
-	list[#list+1] = {name="Reveal all map", action="magic_map"}
-	list[#list+1] = {name="Toggle Demi-Godmode", action="demigodmode"}
-	list[#list+1] = {name="Toggle Godmode", action="godmode"}
-	list[#list+1] = {name="Alter Faction", dialog="AlterFaction"}
-	list[#list+1] = {name="Summon a Creature", dialog="SummonCreature"}
-	list[#list+1] = {name="Create Items", dialog="CreateItem"}
-	list[#list+1] = {name="Create a Trap", dialog="CreateTrap"}
-	list[#list+1] = {name="Grant/Alter Quests", dialog="GrantQuest"}
-	list[#list+1] = {name="Advance Player", dialog="AdvanceActor"}
-	list[#list+1] = {name="Remove or Kill all creatures", action="remove-all"}
-	list[#list+1] = {name="Give Sher'tul fortress energy", action="shertul-energy"}
-	list[#list+1] = {name="Give all ingredients", action="all-ingredients"}
-	list[#list+1] = {name="Weakdamage", action="weakdamage"}
-	list[#list+1] = {name="Spawn Event", dialog="SpawnEvent"}
-	list[#list+1] = {name="Endgamify", class="Endgamify"}
-	list[#list+1] = {name="Reload/regenerate Zone and level", class="ReloadZone"}
-	list[#list+1] = {name="Automatically Clear Zones", class="AdvanceZones"}
-	list[#list+1] = {name="Particles Editor", action="particles-editor"}
+	list[#list+1] = {name=_t"Change Zone", dialog="ChangeZone"}
+	list[#list+1] = {name=_t"Change Level", action="change_level"}
+	list[#list+1] = {name=_t"Reveal all map", action="magic_map"}
+	list[#list+1] = {name=_t"Toggle Demi-Godmode", action="demigodmode"}
+	list[#list+1] = {name=_t"Toggle Godmode", action="godmode"}
+	list[#list+1] = {name=_t"Alter Faction", dialog="AlterFaction"}
+	list[#list+1] = {name=_t"Summon a Creature", dialog="SummonCreature"}
+	list[#list+1] = {name=_t"Create Items", dialog="CreateItem"}
+	list[#list+1] = {name=_t"Create a Trap", dialog="CreateTrap"}
+	list[#list+1] = {name=_t"Grant/Alter Quests", dialog="GrantQuest"}
+	list[#list+1] = {name=_t"Advance Player", dialog="AdvanceActor"}
+	list[#list+1] = {name=_t"Remove or Kill all creatures", action="remove-all"}
+	list[#list+1] = {name=_t"Give Sher'tul fortress energy", action="shertul-energy"}
+	list[#list+1] = {name=_t"Give all ingredients", action="all-ingredients"}
+	list[#list+1] = {name=_t"Weakdamage", action="weakdamage"}
+	list[#list+1] = {name=_t"Spawn Event", dialog="SpawnEvent"}
+	list[#list+1] = {name=_t"Endgamify", class="Endgamify"}
+	list[#list+1] = {name=_t"Reload/regenerate Zone and level", class="ReloadZone"}
+	list[#list+1] = {name=_t"Automatically Clear Zones", class="AdvanceZones"}
+	list[#list+1] = {name=_t"Particles Editor", action="particles-editor"}
 	self:triggerHook{"DebugMain:generate", menu=list}
 
 	local chars = {}

@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New game difficulty mode: #LIGHT_GREEN#Insane",
-[[You won the game on Nightmare mode.  You are a big tough player!
+return _t"New game difficulty mode: #LIGHT_GREEN#Insane",
+_t[[You won the game on Nightmare mode.  You are a big tough player!
 You thought you had seen it all, done it all...
 
 But no! If nightmare mode couldn't bring you down, Insane mode will!

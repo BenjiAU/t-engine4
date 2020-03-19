@@ -37,7 +37,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[A farportal is a way to travel incredible distances in the blink of an eye. They usually require an external item to use. You have no idea if it is even two-way.
+	desc = _t[[A farportal is a way to travel incredible distances in the blink of an eye. They usually require an external item to use. You have no idea if it is even two-way.
 This one seems to go near the Gates of Morning in the Far East.]],
 
 	orb_portal = {
@@ -46,7 +46,7 @@ This one seems to go near the Gates of Morning in the Far East.]],
 		change_wilderness = {
 			spot = {type="farportal-end", subtype="gates-of-morning"},
 		},
-		message = "#VIOLET#You enter the swirling portal and in the blink of an eye you set foot in sight of the Gates of Morning, with no trace of the portal...",
+		message = _t"#VIOLET#You enter the swirling portal and in the blink of an eye you set foot in sight of the Gates of Morning, with no trace of the portal...",
 		on_use = function(self, who)
 		end,
 	},

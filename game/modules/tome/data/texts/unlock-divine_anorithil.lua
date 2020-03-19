@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New Class: #LIGHT_GREEN#Anorithil (Celestial)",
-[[
+return _t"New Class: #LIGHT_GREEN#Anorithil (Celestial)",
+_t[[
 In the uttermost east, on the continent known only as the Far East, dwell the last remnants of Elves and Humans, fighting the Orc Pride and the many perils of the Far East.
 
 Anorithil are mages who are trained in special magic to focus the powers of the Sun and Moons.

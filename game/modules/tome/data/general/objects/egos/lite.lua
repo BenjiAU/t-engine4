@@ -92,6 +92,8 @@ newEntity{
 	},
 }
 
+-- this makes the item worse
+--[[
 newEntity{
 	power_source = {technique=true},
 	name = "burglar's ", prefix=true, instant_resolve=true,
@@ -108,6 +110,7 @@ newEntity{
 		infravision = resolvers.mbonus_material(5, 4),
 	},
 }
+]]
 
 newEntity{
 	power_source = {psionic=true},

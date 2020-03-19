@@ -67,7 +67,7 @@ newTalent{
 		--mindpower check
 		local mindpower = self:combatMindpower()
 		if not target:checkHit(mindpower, target:combatMentalResist()) then
-			game.logSeen(target, "%s resists the fear!", target.name:capitalize())
+			game.logSeen(target, "%s resists the fear!", target:getName():capitalize())
 			return nil
 		end
 
@@ -83,7 +83,7 @@ newTalent{
 
 		--fear res check & heighten fear bypass
 		if not no_fearRes and not target:canBe("fear") then
-			game.logSeen(target, "#F53CBE#%s resists the fear!", target.name:capitalize())
+			game.logSeen(target, "#F53CBE#%s resists the fear!", target:getName():capitalize())
 			return true
 		end
 
@@ -194,7 +194,7 @@ newTalent{
 		#ORANGE#Despair:#LAST# Reduces mind resist, mindsave, armour and defence by %d.
 		#ORANGE#Terrified:#LAST# Deals %0.2f mind and %0.2f darkness damage per turn and increases cooldowns by %d%%.
 		#ORANGE#Haunted:#LAST# Causes the target to suffer %0.2f mind and %0.2f darkness damage for each detrimental mental effect every turn.
-		]]):format(self:getTalentRadius(t), damDesc(self, DamageType.MIND, damInstil), damDesc(self, DamageType.DARKNESS, damInstil), t.getDuration(self, t),
+		]]):tformat(self:getTalentRadius(t), damDesc(self, DamageType.MIND, damInstil), damDesc(self, DamageType.DARKNESS, damInstil), t.getDuration(self, t),
 		t.getParanoidAttackChance(self, t),
 		-t.getDespairStatChange(self, t),
 		damDesc(self, DamageType.MIND, damTerri), damDesc(self, DamageType.DARKNESS, damTerri), t.getTerrifiedPower(self, t),
@@ -230,7 +230,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Heighten the fears of those near to you. Any foe you attempt to inflict a fear upon and who remains in a radius of %d and in sight of you for %d (non-consecutive) turns, will take %0.2f mind and %0.2f darkness damage and gain a new fear that lasts for %d turns.
 			This effect completely ignores fear resistance, but can be saved against.]]):
-			format(range, turnsUntilTrigger, damDesc(self, DamageType.MIND, t.getDamage(self, t) / 2), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t) / 2 ), duration)
+			tformat(range, turnsUntilTrigger, damDesc(self, DamageType.MIND, t.getDamage(self, t) / 2), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t) / 2 ), duration)
 	end,
 }
 
@@ -251,7 +251,7 @@ newTalent{
 	getExtendChance = function(self, t) return self:combatTalentLimit(t, 60, 20, 50) end,
 	info = function(self, t)
 		return ([[Impose your tyranny on the minds of those who fear you. When a foe gains a new fear, you have a %d%% chance to increase the duration of their heightened fear and one random existing fear effect by %d turns, to a maximum of 8 turns.
-		Additionally, you gain %d Mindpower and Physical power for 5 turns every time you apply a fear, stacking up to %d times.]]):format(t. getExtendChance(self, t), t.getExtendFear(self, t), t.getTyrantPower(self, t), t.getMaxStacks(self, t))
+		Additionally, you gain %d Mindpower and Physical power for 5 turns every time you apply a fear, stacking up to %d times.]]):tformat(t. getExtendChance(self, t), t.getExtendFear(self, t), t.getTyrantPower(self, t), t.getMaxStacks(self, t))
 	end,
 }
 
@@ -281,11 +281,11 @@ newTalent{
 				local actor = game.level.map(px, py, engine.Map.ACTOR)
 				if actor and self:reactionToward(actor) < 0 and actor ~= self then
 					if not actor:canBe("fear") then
-						game.logSeen(actor, "#F53CBE#%s ignores the panic!", actor.name:capitalize())
+						game.logSeen(actor, "#F53CBE#%s ignores the panic!", actor:getName():capitalize())
 					elseif actor:checkHit(self:combatMindpower(), actor:combatMentalResist(), 0, 95) then
 						actor:setEffect(actor.EFF_PANICKED, duration, {src=self, range=10, chance=chance, tyrantPower=tyrantPower, maxStacks=maxStacks, tyrantDur=tyrantDur})
 					else
-						game.logSeen(actor, "#F53CBE#%s resists the panic!", actor.name:capitalize())
+						game.logSeen(actor, "#F53CBE#%s resists the panic!", actor:getName():capitalize())
 					end
 				end
 			end,
@@ -296,6 +296,6 @@ newTalent{
 		local range = self:getTalentRange(t)
 		local duration = t.getDuration(self, t)
 		local chance = t.getChance(self, t)
-		return ([[Panic your enemies within a range of %d for %d turns. Anyone who fails to make a mental save against your Mindpower has a %d%% chance each turn of trying to run away from you.]]):format(range, duration, chance)
+		return ([[Panic your enemies within a range of %d for %d turns. Anyone who fails to make a mental save against your Mindpower has a %d%% chance each turn of trying to run away from you.]]):tformat(range, duration, chance)
 	end,
 }

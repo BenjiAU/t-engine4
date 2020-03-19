@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Fearscape",
+	name = _t"Fearscape",
 	level_range = {30, 40},
 	level_scheme = "player",
 	max_level = 1,

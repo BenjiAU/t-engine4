@@ -102,10 +102,10 @@ end
 --- Try to disarm the trap
 function _M:disarm(x, y, who)
 	if not self:canDisarm(x, y, who) then
-		if not self.no_disarm_message then game.logSeen(who, "%s fails to disarm a trap (%s).", who.name:capitalize(), self:getName()) end
+		if not self.no_disarm_message then game.logSeen(who, "%s fails to disarm a trap (%s).", who:getName():capitalize(), self:getName()) end
 		return false
 	end
-	game.logSeen(who, "%s disarms a trap (%s).", who.name:capitalize(), self:getName())
+	game.logSeen(who, "%s disarms a trap (%s).", who:getName():capitalize(), self:getName())
 	game.level.map:remove(x, y, Map.TRAP)
 	if self.removed then
 		self:removed(x, y, who)
@@ -127,11 +127,11 @@ function _M:trigger(x, y, who)
 	if not self:canTrigger(x, y, who) then return end
 
 	if self.message == nil then
-		game.logSeen(who, "%s triggers a trap (%s)!", who.name:capitalize(), self:getName())
+		game.logSeen(who, "%s triggers a trap (%s)!", who:getName():capitalize(), self:getName())
 	elseif self.message == false then
 		-- Nothing
 	else
-		local tname = who.name
+		local tname = who:getName()
 		local str =self.message
 		str = str:gsub("@target@", tname)
 		str = str:gsub("@Target@", tname:capitalize())

@@ -23,8 +23,8 @@ self:defineTile('"', "HARDWALL")
 self:defineTile('t', "TRAINING_DUMMY")
 self:defineTile('b', "FLOOR", nil, "ORC_ELITE_BERSERKER")
 self:defineTile('f', "FLOOR", nil, "ORC_ELITE_FIGHTER")
-self:defineTile("B", "FLOOR", nil, {random_filter={define_as="ORC_ELITE_BERSERKER", random_boss={name_scheme="Combat Trainer #rng#", force_classes={Berserker=true}, nb_classes=1, loot_quality="store", loot_quantity=1, rank=3.5}}})
-self:defineTile("F", "FLOOR", nil, {random_filter={define_as="ORC_ELITE_FIGHTER", random_boss={name_scheme="Combat Trainer #rng#", force_classes={Bulwark=true}, nb_classes=1, loot_quality="store", loot_quantity=1, loot_unique=true, no_loot_randart=true, rank=3.5}}})
+self:defineTile("B", "FLOOR", nil, {random_filter={define_as="ORC_ELITE_BERSERKER", random_boss={name_scheme=_t"Combat Trainer #rng#", force_classes={Berserker=true}, nb_classes=1, class_filter=function(d) return d.name ~= "Berserker" end, loot_quality="store", loot_quantity=1, rank=3.5}}})
+self:defineTile("F", "FLOOR", nil, {random_filter={define_as="ORC_ELITE_FIGHTER", random_boss={name_scheme=_t"Combat Trainer #rng#", force_classes={Bulwark=true}, nb_classes=1, class_filter=function(d) return d.name ~= "Bulwark" end, loot_quality="store", loot_quantity=1, loot_unique=true, no_loot_randart=true, rank=3.5}}})
 
 -- Make the barracks
 local bsp = BSP.new(5, 5, 6):make(30, 30, '.', '#')
@@ -75,6 +75,11 @@ tm:applyOnGroups(bsp.rooms, function(room, idx)
 		end
 	end
 end, true)
+
+if rng.percent(22) and not game.state:doneEvent("grushnak-armory") then 
+	game.state:doneEvent("grushnak-armory",1) -- special vault! can only show once per game and only in grushnak pride; contains exceptionally difficult foes and exceptional loot
+	game.level.data.generator.map.greater_vaults_list = {"grushnak-armory"}
+end
 
 -- Ensure enough size
 if tm:eliminateByFloodfill{'#', '"', 'T'} < 350 then return self:redo() end

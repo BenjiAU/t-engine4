@@ -105,7 +105,7 @@ newEntity{
 	block_sense = true,
 	block_esp = true,
 	is_door = true,
-	door_player_check = "This door seems to have been sealed off. You think you can open it.",
+	door_player_check = _t"This door seems to have been sealed off. You think you can open it.",
 	door_opened = "BONE_VAULT_DOOR_OPEN",
 	dig = "BONEFLOOR",
 }
@@ -138,7 +138,7 @@ newEntity{
 	block_sense = true,
 	block_esp = true,
 	force_clone = true,
-	door_player_stop = "This door seems to have been sealed off. You need to find a way to open it.",
+	door_player_stop = _t"This door seems to have been sealed off. You need to find a way to open it.",
 	is_door = true,
 	door_opened = "BONE_GENERIC_LEVER_DOOR_OPEN",
 	on_lever_change = function(self, x, y, who, val, oldval)
@@ -163,7 +163,7 @@ newEntity{
 	always_remember = true,
 	is_door = true,
 	door_closed = "BONE_GENERIC_LEVER_DOOR",
-	door_player_stop = "This door seems to have been sealed off. You need to find a way to close it.",
+	door_player_stop = _t"This door seems to have been sealed off. You need to find a way to close it.",
 	on_lever_change = function(self, x, y, who, val, oldval)
 		local toggle = game.level.map.attrs(x, y, "lever_toggle")
 		local trigger = game.level.map.attrs(x, y, "lever_action")

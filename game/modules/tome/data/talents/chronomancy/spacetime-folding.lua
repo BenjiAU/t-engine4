@@ -31,8 +31,8 @@ makeWarpMine = function(self, t, x, y, type, dam)
 	
 	-- Our Mines
 	local mine = Trap.new{
-		name = ("warp mine: %s"):format(type),
-		type = "temporal", id_by_type=true, unided_name = "trap",
+		name = ("warp mine: %s"):tformat(type == "toward" and _t"toward" or _t"away"),
+		type = "temporal", id_by_type=true, unided_name = _t"trap",
 		display = '^', color=colors.BLUE, image = ("trap/chronomine_%s_0%d.png"):format(type == "toward" and "blue" or "red", rng.avg(1, 4, 3)),
 		shader = "shadow_simulacrum", shader_args = { color = {0.2, 0.2, 0.2}, base = 0.8, time_factor = 1500 },
 		temporary = duration,
@@ -84,7 +84,7 @@ makeWarpMine = function(self, t, x, y, type, dam)
 						game:playSoundNear(self, "talents/teleport")
 					end
 				else
-					game.logSeen(who, "%s resists the teleport!", who.name:capitalize())
+					game.logSeen(who, "%s resists the teleport!", who:getName():capitalize())
 				end					
 			end
 	
@@ -151,7 +151,7 @@ newTalent{
 		return ([[Lay Warp Mines in a radius of 1 that teleport enemies to you and inflict %0.2f physical and %0.2f temporal (warp) damage.
 		The mines are hidden traps (%d detection and %d disarm power based on your Magic) and last for %d turns.
 		The damage caused by your Warp Mines will improve with your Spellpower.]]):
-		format(damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.TEMPORAL, damage), detect, disarm, duration)
+		tformat(damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.TEMPORAL, damage), detect, disarm, duration)
 	end,
 }
 
@@ -201,7 +201,7 @@ newTalent{
 		return ([[Lay Warp Mines in a radius of 1 that teleport enemies away from you and inflict %0.2f physical and %0.2f temporal (warp) damage.
 		The mines are hidden traps (%d detection and %d disarm power based on your Magic) and last for %d turns.
 		The damage caused by your Warp Mines will improve with your Spellpower.]]):
-		format(damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.TEMPORAL, damage), detect, disarm, duration) 
+		tformat(damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.TEMPORAL, damage), detect, disarm, duration) 
 	end,
 }
 
@@ -240,7 +240,7 @@ newTalent{
 		Investing in this talent improves the range of all Spacetime Folding talents and the damage caused by your Warp Mines will improve with your Spellpower.
 		
 		Current Spacetime Folding Range: %d]]):
-		format(damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.TEMPORAL, damage), detect, disarm, duration, range) --I5
+		tformat(damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.TEMPORAL, damage), detect, disarm, duration, range) --I5
 	end,
 }
 
@@ -284,7 +284,7 @@ newTalent{
 		-- Make our tether
 		local tether = mod.class.Object.new{
 			old_feat = oe, type = "temporal", subtype = "tether",
-			name = self.name:capitalize() .. "'s spatial tether", add_mos = {{image="object/temporal_instability.png"}},
+			name = ("%s's spatial tether"):tformat(self:getName():capitalize()), add_mos = {{image="object/temporal_instability.png"}},
 			display = '&', color=colors.LIGHT_BLUE,
 			temporary = t.getDuration(self, t), 
 			power = power, dest_power = dest_power, chance = chance,
@@ -332,7 +332,7 @@ newTalent{
 								target:setEffect(target.EFF_CONTINUUM_DESTABILIZATION, 100, {power=self.dest_power})
 							end
 							game:playSoundNear(self, "talents/teleport")
-							game.logSeen(target, "#CRIMSON#%s has been yanked back to the tether!", target.name:capitalize())
+							game.logSeen(target, "#CRIMSON#%s has been yanked back to the tether!", target:getName():capitalize())
 						end
 						
 						-- Secondary blast, this occurs as long as the teleport is not resisted, even if it fails, say from Anchor
@@ -347,7 +347,7 @@ newTalent{
 						end
 
 					else
-						game.logSeen(target, "%s resists the teleport!", target.name:capitalize())
+						game.logSeen(target, "%s resists the teleport!", target:getName():capitalize())
 					end
 					
 				end
@@ -389,7 +389,7 @@ newTalent{
 		return ([[Tether the target to the location for %d turns.  
 		Each turn the target has a %d%% chance per tile it's travelled away from the tether to be teleported back, inflicting %0.2f physical and %0.2f temporal (warp) damage to all enemies in a radius of %d at both the entrance and exit locations.
 		The damage will scale with your Spellpower.]])
-		:format(duration, chance, damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.TEMPORAL, damage), radius)
+		:tformat(duration, chance, damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.TEMPORAL, damage), radius)
 	end,
 }
 
@@ -423,14 +423,14 @@ newTalent{
 			game.level.map:particleEmitter(target.x, target.y, 1, "temporal_teleport")
 			if self:checkHit(getParadoxSpellpower(self, t), target:combatSpellResist() + (target:attr("continuum_destabilization") or 0)) and target:canBe("teleport") then
 				if not target:teleportRandom(self.x, self.y, t.getTeleport(self, t), t.getTeleport(self, t)/2) then
-					game.logSeen(target, "The spell fizzles on %s!", target.name:capitalize())
+					game.logSeen(target, "The spell fizzles on %s!", target:getName():capitalize())
 				else
 					target:setEffect(target.EFF_CONTINUUM_DESTABILIZATION, 100, {power=getParadoxSpellpower(self, t, 0.3)})
 					game.level.map:particleEmitter(target.x, target.y, 1, "temporal_teleport")
-					game.logSeen(target, "#CRIMSON#%s has been banished!", target.name:capitalize())
+					game.logSeen(target, "#CRIMSON#%s has been banished!", target:getName():capitalize())
 				end
 			else
-				game.logSeen(target, "%s resists the banishment!", target.name:capitalize())
+				game.logSeen(target, "%s resists the banishment!", target:getName():capitalize())
 			end
 			-- random warp
 			DamageType:get(DamageType.RANDOM_WARP).projector(self, target.x, target.y, DamageType.RANDOM_WARP, {dur=t.getDuration(self, t), apply_power=getParadoxSpellpower(self, t)})
@@ -444,7 +444,7 @@ newTalent{
 		local range = t.getTeleport(self, t)
 		local duration = t.getDuration(self, t)
 		return ([[Randomly teleports all enemies within a radius of three.  Enemies will be teleported between %d and %d tiles from you and may be stunned, blinded, confused, or pinned for %d turns.
-		The chance of teleportion will scale with your Spellpower.]]):format(range / 2, range, duration)
+		The chance of teleportion will scale with your Spellpower.]]):tformat(range / 2, range, duration)
 	end,
 }
 
@@ -502,6 +502,6 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[Create a radius three anti-teleport field for %d turns and daze all enemies in the area of effect for two turns.
 		Enemies attempting to teleport while anchored take %0.2f physical and %0.2f temporal (warp) damage.
-		The damage will scale with your Spellpower.]]):format(duration, damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.TEMPORAL, damage))
+		The damage will scale with your Spellpower.]]):tformat(duration, damDesc(self, DamageType.PHYSICAL, damage), damDesc(self, DamageType.TEMPORAL, damage))
 	end,
 }

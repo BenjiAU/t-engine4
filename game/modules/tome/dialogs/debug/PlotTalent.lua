@@ -29,12 +29,12 @@ _M.last_max_tl = 10
 
 function _M:init(actor, t)
 	actor = actor:cloneFull()
-	engine.ui.Dialog.init(self, ("Values plot for: %s (mastery %0.1f)"):format(t.name, actor:getTalentMastery(t)), game.w * 0.8, game.h * 0.8)
+	engine.ui.Dialog.init(self, ("Values plot for: %s (mastery %0.1f)"):tformat(t.name, actor:getTalentMastery(t)), game.w * 0.8, game.h * 0.8)
 	self.vos = {}
 	self.points_texts = {}
 
 	self:generatePlot(actor, t, _M.last_max_tl)
-	local tlbox = Textbox.new{title="TL: ", text=tostring(_M.last_max_tl), chars=5, max_len=3, fct=function() end, on_change=function(text) self:generatePlot(actor, t, util.bound(tonumber(text) or 20, 5, 500)) end}
+	local tlbox = Textbox.new{title=_t"TL: ", text=tostring(_M.last_max_tl), chars=5, max_len=3, fct=function() end, on_change=function(text) self:generatePlot(actor, t, util.bound(tonumber(text) or 20, 5, 500)) end}
 	self:loadUI{
 		{left=0, top=0, ui=tlbox}
 	}
@@ -84,7 +84,7 @@ function _M:generatePlot(actor, t, nb_tl)
 	end
 	table.sort(vars)
 
-	local allcolors = {colors.GREEN, colors.LIGHT_BLUE, colors.LIGHT_RED, colors.ORANGE}
+	local allcolors = {colors.LIGHT_GREEN, colors.LIGHT_BLUE, colors.LIGHT_RED, colors.ORANGE, colors.PURPLE, colors.ANTIQUE_WHITE, colors.DARK_UMBER, colors.GREEN, colors.CYAN, colors.CRIMSON}
 	for _, var in ipairs(vars) do
 		local vo = core.display.newVO()
 		local color = table.remove(allcolors)

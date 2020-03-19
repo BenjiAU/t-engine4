@@ -43,7 +43,7 @@ newTalent{
 		local heal = t.getHeal(self, t)
 		return ([[An invigorating ray of Sunlight shines upon you, healing your body for %d life.
 		The amount healed will increase with your Spellpower.]]):
-		format(heal)
+		tformat(heal)
 	end,
 }
 
@@ -88,7 +88,7 @@ newTalent{
 		If the same shield is refreshed 20 times it will become unstable and explode, removing it.
 		It also lights up the affected area.
 		The amount healed will increase with the Magic stat]]):
-		format(radius, heal, heal_fact*100, duration)
+		tformat(radius, heal, heal_fact*100, duration)
 	end,
 }
 
@@ -111,7 +111,7 @@ newTalent{
 		local absorb = t.getAbsorb(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100
 		return ([[A protective shield forms around you that lasts for up to 10 turns and negates %d damage.
  		The total damage the barrier can absorb will increase with your Spellpower and can crit.]]):
-		format(absorb)
+		tformat(absorb)
 	end,
 }
 
@@ -133,7 +133,7 @@ newTalent{
 	info = function(self, t)
 		local duration = t.getDuration(self, t)
 		return ([[Places you under the protection of a ray of sunlight. For %d turns, the light removes a single negative effect from you every turn.]]):
-		format(duration)
+		tformat(duration)
 	end,
 }
 

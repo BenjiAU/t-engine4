@@ -110,8 +110,8 @@ function _M:gainPersonalAchievement(silent, id, src, ...)
 	src.achievements[id] = {turn=game.turn, who=self:achievementWho(src), when=os.date("%Y-%m-%d %H:%M:%S")}
 	if not silent then
 		local color = a.huge and "GOLD" or "LIGHT_GREEN"
-		game.log("#"..color.."#Personal New Achievement: %s!", a.name)
-		self:showAchievement("Personal New Achievement: #"..color.."#"..a.name, a)
+		game.log("#%s#Personal New Achievement: %s!", color, a.name)
+		self:showAchievement(("Personal New Achievement: #%s#%s"):tformat(color, a.name), a)
 		if not a.no_chat_broadcast then profile.chat:achievement(a.name, a.huge, false) end
 	end
 	if a.on_gain then a:on_gain(src, true) end
@@ -152,8 +152,8 @@ function _M:gainAchievement(id, src, ...)
 	self.achieved[id] = {turn=game.turn, who=self:achievementWho(src), when=os.date("%Y-%m-%d %H:%M:%S")}
 	if not config.settings.cheat then profile:saveModuleProfile("achievements", {id=id, turn=game.turn, who=self:achievementWho(src), gained_on=os.date("%Y-%m-%d %H:%M:%S")}) end
 	local color = a.huge and "GOLD" or "LIGHT_GREEN"
-	game.log("#"..color.."#New Achievement: %s!", a.name)
-	self:showAchievement("New Achievement: #"..color.."#"..a.name, a)
+	game.log("#%s#New Achievement: %s!", color, a.name)
+	self:showAchievement(("New Achievement: #%s#%s"):tformat(color, a.name), a)
 	if not a.no_chat_broadcast then profile.chat:achievement(a.name, a.huge, true) end
 
 	if a.on_gain then a:on_gain(src) end
@@ -174,7 +174,7 @@ end
 --- Show an achievement gain dialog
 function _M:showAchievement(title, a)
 	if not config.settings.cheat then
-		game:registerDialog(Achievement.new("New Achievement", a))
+		game:registerDialog(Achievement.new(_t"New Achievement", a))
 	end
 end
 

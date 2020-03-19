@@ -37,8 +37,8 @@ newEntity{ define_as = "THE_MASTER",
 	type = "undead", subtype = "vampire", unique = true, image = "npc/the_master.png",
 	name = "The Master",
 	display = "V", color=colors.VIOLET,
-	desc = [[A terrifying vampiric figure of power, with flowing robes and an intense aura of fright.  His cold, sinewy flesh seems to cling to this world through greed and malice, and his eyes betray a strength of mind beyond any puny mortal.  All nearby are utterly subservient to his will, though he stands aloof from them, as if to say he needs not the pathetic meddling of minions to help him overcome his foes.  Your eyes are drawn to a dark staff in his hands which seems to suck the very life from the air around it.  It looks ancient and dangerous and terrible, and the sight of it fills you with fervent desire.]],
-	killer_message = "and raised as his tortured undead thrall",
+	desc = _t[[A terrifying vampiric figure of power, with flowing robes and an intense aura of fright.  His cold, sinewy flesh seems to cling to this world through greed and malice, and his eyes betray a strength of mind beyond any puny mortal.  All nearby are utterly subservient to his will, though he stands aloof from them, as if to say he needs not the pathetic meddling of minions to help him overcome his foes.  Your eyes are drawn to a dark staff in his hands which seems to suck the very life from the air around it.  It looks ancient and dangerous and terrible, and the sight of it fills you with fervent desire.]],
+	killer_message = _t"and raised as his tortured undead thrall",
 	not_power_source = {nature=true},
 	level_range = {23, nil}, exp_worth = 2,
 	max_life = 350, life_rating = 19, fixed_rating = true,
@@ -113,7 +113,7 @@ newEntity{ define_as = "THE_MASTER",
 	resolvers.inscriptions(1, {"manasurge rune"}),
 
 	on_die = function(self, who)
-		game.state:activateBackupGuardian("PALE_DRAKE", 1, 40, "It has been months since the hero cleansed the Dreadfell, yet rumours are growing: evil is back.")
+		game.state:activateBackupGuardian("PALE_DRAKE", 1, 40, _t"It has been months since the hero cleansed the Dreadfell, yet rumours are growing: evil is back.")
 
 		world:gainAchievement("VAMPIRE_CRUSHER", game.player:resolveSource())
 		game.player:resolveSource():grantQuest("dreadfell")
@@ -138,7 +138,7 @@ newEntity{ define_as = "PALE_DRAKE",
 	name = "Pale Drake",
 	display = "s", color=colors.VIOLET,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/undead_skeleton_pale_drake.png", display_h=2, display_y=-1}}},
-	desc = [[A malevolent skeleton archmage that has taken control of the Dreadfell since the Master's demise.]],
+	desc = _t[[A malevolent skeleton archmage that has taken control of the Dreadfell since the Master's demise.]],
 	level_range = {40, nil}, exp_worth = 3,
 	not_power_source = {nature=true},
 	max_life = 450, life_rating = 21, fixed_rating = true,
@@ -209,9 +209,9 @@ newEntity{ define_as = "BORFAST",
 	type = "undead", subtype = "ghoul", unique = true,
 	name = "Borfast the Broken",
 	display = "g", color=colors.VIOLET,
-	desc = [[Thick skin hangs loosely from this short, shambling form. Tufts of hair sticking out from its chin give evidence of a once magnificent dwarven beard. Half its face seems to have been seared in acid at some point, the flesh melted away from the skull and an eyeball drooping low from its socket. There is a unique sadness to its eyes, and a slump of resignation to its gait.
+	desc = _t[[Thick skin hangs loosely from this short, shambling form. Tufts of hair sticking out from its chin give evidence of a once magnificent dwarven beard. Half its face seems to have been seared in acid at some point, the flesh melted away from the skull and an eyeball drooping low from its socket. There is a unique sadness to its eyes, and a slump of resignation to its gait.
 What proud hero of renown was this before he was condemned to such a terrible fate?]],
-	killer_message = "and offered to his dark Master",
+	killer_message = _t"and offered to his dark Master",
 	not_power_source = {nature=true},
 	level_range = {20, nil}, exp_worth = 2,
 	max_life = 350, life_rating = 19, fixed_rating = true,
@@ -281,9 +281,9 @@ newEntity{ define_as = "ALETTA",
 	type = "undead", subtype = "ghost", unique = true,
 	name = "Aletta Soultorn", female=1,
 	display = "G", color=colors.VIOLET,
-	desc = [[What once must have been an enchantingly beautiful Higher woman now looks to be a ghost of utter despair. Her thin, elegant form ripples gently in the air, whilst her tattered robes seem oddly still. The ghost's face looks jittery and pained whilst her wild, glowing eyes move rapidly back and forth in their sockets.
+	desc = _t[[What once must have been an enchantingly beautiful Higher woman now looks to be a ghost of utter despair. Her thin, elegant form ripples gently in the air, whilst her tattered robes seem oddly still. The ghost's face looks jittery and pained whilst her wild, glowing eyes move rapidly back and forth in their sockets.
 Now and then she seems to see something and her jaw pulls back, her whole face splitting apart as she shrieks an unholy cry of pain and torment.]],
-	killer_message = "and offered to her dark Master",
+	killer_message = _t"and offered to her dark Master",
 	not_power_source = {nature=true},
 	level_range = {20, nil}, exp_worth = 2,
 	max_life = 150, life_rating = 10, fixed_rating = true,
@@ -357,9 +357,9 @@ newEntity{ define_as = "FILIO",
 	type = "undead", subtype = "skeleton", unique = true,
 	name = "Filio Flightfond",
 	display = "s", color=colors.VIOLET,
-	desc = [[A short, furtive-looking skeleton with padded feet. He moves quickly and silently, and seems to meld into the shadows with ease. In one hand he holds a sling, and the other a short dagger.
+	desc = _t[[A short, furtive-looking skeleton with padded feet. He moves quickly and silently, and seems to meld into the shadows with ease. In one hand he holds a sling, and the other a short dagger.
 There is a cunning air to his hollow skull, and his empty sockets reveal nothing of what tricks and tactics he has planned.]],
-	killer_message = "and offered to his dark Master",
+	killer_message = _t"and offered to his dark Master",
 	not_power_source = {nature=true},
 	level_range = {20, nil}, exp_worth = 2,
 	max_life = 250, life_rating = 15, fixed_rating = true,

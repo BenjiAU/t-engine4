@@ -43,7 +43,7 @@ newTalent{
 		local heal = t.getHeal(self, t)
 		return ([[Imbues your body with arcane forces, reconstructing it to a default state, healing for %d life.
 		The life healed will increase with your Spellpower.]]):
-		format(heal)
+		tformat(heal)
 	end,
 }
 
@@ -82,7 +82,7 @@ newTalent{
 		Every damage shield, time shield, displacement shield, and disruption shield affecting you has its power increased by %d%%.
 		At level 5, it also increases the duration of all shields by 1 turn.
 		The shield value will increase with your Spellpower.]]):
-		format(shield, dur)
+		tformat(shield, dur)
 	end,
 }
 
@@ -116,7 +116,7 @@ newTalent{
 		Each time you receive a direct heal (not a life regeneration effect), you automatically gain a damage shield equal to %d%% of the heal value for 3 turns.
 		This will replace an existing damage shield if the new shield value and duration would be greater than or equal to the old.
 		The shield value will increase with your Spellpower.]]):
-		format(shield)
+		tformat(shield)
 	end,
 }
 
@@ -175,6 +175,6 @@ newTalent{
 		Damage Shield, Time Shield, Displacement Shield:  Increase the damage absorption value by %d%%.
 		Disruption Shield: Tap into the stored energies to restore the shield (at a rate of 2 energy per 1 shield power). Any leftover energy is converted back into mana at a rate of %0.2f energy per mana.
 		The charging will increase with your Spellpower.]]):
-		format(t.getNumEffects(self, t), shield, 100 / t.getDisruption(self, t))
+		tformat(t.getNumEffects(self, t), shield, 100 / t.getDisruption(self, t))
 	end,
 }

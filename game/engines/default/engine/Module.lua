@@ -502,6 +502,11 @@ function _M:loadAddon(mod, add, hashlist, hooks_list)
 		elseif add.teaa then fs.mount("subdir:/data/|"..fs.getRealPath(add.teaa), "/data-"..add.short_name, true)
 		else fs.mount(base.."/data", "/data-"..add.short_name, true)
 		end
+
+		-- Load localizations, addons just need to provide the file and it's autoloaded
+		if mod.i18n_support and config.settings.locale then
+			I18N:loadLocale("/data-"..add.short_name.."/locales/"..config.settings.locale..".lua")
+		end
 	end
 	if add.superload then 
 		print(" * with superload")
@@ -912,7 +917,7 @@ function _M:instanciate(mod, name, new_game, no_reboot, extra_module_info)
 	core.game.resetLocale()
 
 	-- Reset white space breaking
-	core.display.breakTextAllCharacter(false)
+	core.display.breakTextAllCharacter(true)
 
 	-- Turn based by default
 	core.game.setRealtime(0)
@@ -933,9 +938,8 @@ function _M:instanciate(mod, name, new_game, no_reboot, extra_module_info)
 	mod.load("setup")
 
 	-- Load localizations
-	if mod.i18n_support then
-		I18N:loadLocale("/data/i18n/"..config.settings.locale..".lua")
-		I18N:setLocale(config.settings.locale or "en_US")
+	if mod.i18n_support and config.settings.locale then
+		I18N:loadLocale("/data/locales/"..config.settings.locale..".lua")
 	end
 
 	-- Load font packages

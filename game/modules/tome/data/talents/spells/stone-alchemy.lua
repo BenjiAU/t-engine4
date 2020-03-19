@@ -40,7 +40,7 @@ newTalent{
 		return gem
 	end,
 	action = function(self, t)
-		local ret = self:talentDialog(self:showEquipInven("Use which gem?", function(o) return not o.unique and o.type == "gem" and not o.__tagged end, function(o, inven, item)
+		local ret = self:talentDialog(self:showEquipInven(_t"Use which gem?", function(o) return not o.unique and o.type == "gem" and not o.__tagged end, function(o, inven, item)
 			if not o then return end
 			local gem = t.make_gem(self, t, o.define_as)
 			if not gem then return end
@@ -58,7 +58,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Carve 40 to 80 alchemist gems out of a natural gemstone.
-		Alchemist gems are used for many other spells, and each gem type creates a different effect.]]):format()
+		Alchemist gems are used for many other spells, and each gem type creates a different effect.]]):tformat()
 	end,
 }
 
@@ -98,18 +98,18 @@ newTalent{
 		return true
 	end,
 	action = function(self, t)
-		if not self:talentDialog(self:showEquipInven("Try to extract gems from which metallic item?", function(o) return t.filterGem(self, t, o) end, function(o, inven, item) return t.extractGem(self, t, o, inven, item, d) end)) then return nil end
+		if not self:talentDialog(self:showEquipInven(_t"Try to extract gems from which metallic item?", function(o) return t.filterGem(self, t, o) end, function(o, inven, item) return t.extractGem(self, t, o, inven, item, d) end)) then return nil end
 		return true
 	end,
 	info = function(self, t)
 		local material = ""
-		if self:getTalentLevelRaw(t) >=1 then material=material.."	-Iron\n" end
-		if self:getTalentLevelRaw(t) >=2 then material=material.."	-Steel\n" end
-		if self:getTalentLevelRaw(t) >=3 then material=material.."	-Dwarven-steel\n" end
-		if self:getTalentLevelRaw(t) >=4 then material=material.."	-Stralite\n" end
-		if self:getTalentLevelRaw(t) >=5 then material=material.."	-Voratun" end
+		if self:getTalentLevelRaw(t) >=1 then material=material.._t"	-Iron\n" end
+		if self:getTalentLevelRaw(t) >=2 then material=material.._t"	-Steel\n" end
+		if self:getTalentLevelRaw(t) >=3 then material=material.._t"	-Dwarven-steel\n" end
+		if self:getTalentLevelRaw(t) >=4 then material=material.._t"	-Stralite\n" end
+		if self:getTalentLevelRaw(t) >=5 then material=material.._t"	-Voratun" end
 		return ([[Extract magical gems from metal weapons and armours. At this skill level you can work with:
-		%s]]):format(material)
+		%s]]):tformat(material)
 	end,
 }
 
@@ -123,14 +123,14 @@ newTalent{
 	no_npc_use = true,
 	no_unlearn_last = true,
 	action = function(self, t)
-		local ret = self:talentDialog(self:showInventory("Use which gem?", self:getInven("INVEN"), function(gem) return gem.type == "gem" and gem.imbue_powers and gem.material_level and gem.material_level <= self:getTalentLevelRaw(t) end, function(gem, gem_item)
-			local nd = self:showInventory("Imbue which armour?", self:getInven("INVEN"), function(o) return o.type == "armor" and (o.slot == "BODY" or (self:knowTalent(self.T_CRAFTY_HANDS) and (o.slot == "HEAD" or o.slot == "BELT"))) and not o.been_imbued end, function(o, item)
+		local ret = self:talentDialog(self:showInventory(_t"Use which gem?", self:getInven("INVEN"), function(gem) return gem.type == "gem" and gem.imbue_powers and gem.material_level and gem.material_level <= self:getTalentLevelRaw(t) end, function(gem, gem_item)
+			local nd = self:showInventory(_t"Imbue which armour?", self:getInven("INVEN"), function(o) return o.type == "armor" and (o.slot == "BODY" or (self:knowTalent(self.T_CRAFTY_HANDS) and (o.slot == "HEAD" or o.slot == "BELT"))) and not o.been_imbued end, function(o, item)
 				self:removeObject(self:getInven("INVEN"), gem_item)
 				-- create an ego
 				local Entity = require("engine.Entity")
 				local ego = Entity.new{
-					name = "imbue "..gem.name,
-					display_string = " <"..gem.name..">",
+					name = ("imbue %s"):tformat(gem:getName()),
+					display_string = " <"..gem:getName()..">",
 					been_imbued = true,
 					wielder = table.clone(gem.imbue_powers),
 					talent_on_spell = gem.talent_on_spell,
@@ -150,7 +150,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Imbue %s with a gem (up to tier %d), granting it additional powers.
-		You can only imbue items once, and it is permanent.]]):format(self:knowTalent(self.T_CRAFTY_HANDS) and "body armour, a belt, or a head piece" or "a body armour", self:getTalentLevelRaw(t))
+		You can only imbue items once, and it is permanent.]]):tformat(self:knowTalent(self.T_CRAFTY_HANDS) and _t"body armour, a belt, or a head piece" or _t"a body armour", self:getTalentLevelRaw(t))
 	end,
 }
 newTalent{
@@ -191,7 +191,7 @@ newTalent{
 	info = function(self, t)
 		local range = t.getRange(self, t)
 		return ([[Crush 5 alchemist gems into dust to mark impassable terrain next to you. You immediately enter it and appear on the other side of the obstacle, up to %d grids away.]]):
-		format(range)
+		tformat(range)
 	end,
 }
 
@@ -238,6 +238,6 @@ newTalent{
 		Stoned creatures are highly resistant to fire and lightning, and somewhat resistant to physical attacks.
 		At level 3 the touch will become a beam.
 		This spell may fail against creatures resistant to being stunned, that are specifically immune to stoning, or certain bosses.]]):
-		format(duration)
+		tformat(duration)
 	end,
 }

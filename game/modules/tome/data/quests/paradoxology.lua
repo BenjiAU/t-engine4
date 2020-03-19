@@ -17,13 +17,13 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "The Way We Weren't"
+name = _t"The Way We Weren't"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You have met what seems to be a future version of yourself.\n"
-	if self:isCompleted("combat") then desc[#desc+1] = "You tried to kill yourself to prevent you from doing something, or going somewhere... you were not very clear.\n" end
-	if self:isCompleted("now-died") then desc[#desc+1] = "You were killed by your future self, and thus this event never occured.\n" end
-	if self:isCompleted("future-died") then desc[#desc+1] = "You killed your future self. In the future, you might wish to avoid time-traveling back to this moment...\n" end
+	desc[#desc+1] = _t"You have met what seems to be a future version of yourself.\n"
+	if self:isCompleted("combat") then desc[#desc+1] = _t"You tried to kill yourself to prevent you from doing something, or going somewhere... you were not very clear.\n" end
+	if self:isCompleted("now-died") then desc[#desc+1] = _t"You were killed by your future self, and thus this event never occured.\n" end
+	if self:isCompleted("future-died") then desc[#desc+1] = _t"You killed your future self. In the future, you might wish to avoid time-traveling back to this moment...\n" end
 	return table.concat(desc, "\n")
 end
 
@@ -43,9 +43,9 @@ generate = function(self, player, x, y)
 		level_range=self.level_range,
 		faction = "enemies",
 		life=plr.max_life*2, max_life=plr.max_life*2, max_level=table.NIL_MERGE,
-		name = plr.name.." the Paradox Mage",
-		desc = ([[A later (less fortunate?) version of %s, possibly going mad.]]):format(plr.name),
-		killer_message = "but nobody knew why #sex# suddenly became evil",
+		name = ("%s the Paradox Mage"):tformat(plr:getName()),
+		desc = ([[A later (less fortunate?) version of %s, possibly going mad.]]):tformat(plr.name),
+		killer_message = _t"but nobody knew why #sex# suddenly became evil",
 		color_r=250, color_g=50, color_b=250,
 		ai = "tactical", ai_state = {talent_in=1},
 		}))
@@ -93,7 +93,7 @@ generate = function(self, player, x, y)
 	end
 	a.on_takehit = function(self, val)
 		if not self.half_life_check and (self.life - val < self.max_life / 2) then
-			self:doEmote("Meet the guardian!")
+			self:doEmote(_t"Meet the guardian!")
 			game:onTickEnd(function()
 				game:changeLevel(1, "paradox-plane")
 			end)

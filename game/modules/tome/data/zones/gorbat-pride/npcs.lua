@@ -34,8 +34,8 @@ newEntity{ base="BASE_NPC_ORC_GORBAT", define_as = "GORBAT",
 	allow_infinite_dungeon = true,
 	name = "Gorbat, Supreme Wyrmic of the Pride", color=colors.VIOLET, unique = true,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/humanoid_orc_gorbat__supreme_wyrmic_of_the_pride.png", display_h=2, display_y=-1}}},
-	desc = [[An orc with scaly skin, claws and a pair of small wings on his back.]],
-	killer_message = "and fed to the hatchlings",
+	desc = _t[[An orc with scaly skin, claws and a pair of small wings on his back.]],
+	killer_message = _t"and fed to the hatchlings",
 	level_range = {40, nil}, exp_worth = 1,
 	rank = 5,
 	max_life = 250, life_rating = 29, fixed_rating = true,
@@ -80,9 +80,12 @@ newEntity{ base="BASE_NPC_ORC_GORBAT", define_as = "GORBAT",
 
 		[Talents.T_RIMEBARK]={base=7, every=6, max=10},
 		[Talents.T_RITCH_FLAMESPITTER]={base=10, every=6, max=12},
+		[Talents.T_RAGE]={base=5, every=6, max=7},
 		[Talents.T_RESILIENCE]={base=5, every=6, max=7},
 		[Talents.T_MASTER_SUMMONER]={base=5, every=6, max=7},
 		[Talents.T_WILD_SUMMON]={base=5, every=6, max=7},
+		[Talents.T_GRAND_ARRIVAL]={base=2, every=18, max=4},
+		
 
 		[Talents.T_HOWL]=3,
 
@@ -94,7 +97,6 @@ newEntity{ base="BASE_NPC_ORC_GORBAT", define_as = "GORBAT",
 
 		[Talents.T_SPELL_FEEDBACK]=1,
 		[Talents.T_MASSIVE_BLOW]=1,
-		[Talents.T_BLIGHTED_SUMMONING]=1,
 	},
 
 	auto_classes={

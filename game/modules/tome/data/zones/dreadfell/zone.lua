@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Dreadfell",
+	name = _t"Dreadfell",
 	level_range = {15, 26},
 	level_scheme = "player",
 	max_level = 9,

@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Ithilthum, Valley of the Moon",
+	name = _t"Ithilthum, Valley of the Moon",
 	level_range = {35, 45},
 	level_scheme = "player",
 	max_level = 1,

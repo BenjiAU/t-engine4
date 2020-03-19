@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 There's an orc ahead with some prodigous health regeneration.
 
 Compare your #LIGHT_GREEN#Accuracy#WHITE# and #LIGHT_GREEN#Defense#WHITE# to its #LIGHT_GREEN#Defense#WHITE# and #LIGHT_GREEN#Accuracy#WHITE#.

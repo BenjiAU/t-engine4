@@ -107,7 +107,7 @@ newTalent{
 		return ([[Fires a beam that turns matter into dust, inflicting %0.2f temporal damage and %0.2f physical (warp) damage.
 		Alternatively you may target yourself, creating a field of radius %d around you that will inflict the damage over three turns.
 		The damage will scale with your Spellpower.]]):
-		format(damDesc(self, DamageType.TEMPORAL, damage / 2), damDesc(self, DamageType.PHYSICAL, damage / 2), radius)
+		tformat(damDesc(self, DamageType.TEMPORAL, damage / 2), damDesc(self, DamageType.PHYSICAL, damage / 2), radius)
 	end,
 }
 
@@ -150,7 +150,7 @@ newTalent{
 		local immune = t.getImmunity(self, t) * 100
 		return ([[Weave matter into your flesh, becoming incredibly resilient to damage.  While active you gain %d armour, %d%% resistance to stunning, and %d%% resistance to cuts.
 		The bonus to armour will scale with your Magic.]]):
-		format(armor, immune, immune)
+		tformat(armor, immune, immune)
 	end,
 }
 
@@ -189,11 +189,11 @@ newTalent{
 			if not oe or oe:attr("temporary") or game.level.map:checkAllEntities(px, py, "block_move") then return end
 				local e = Object.new{
 					old_feat = oe,
-					name = "materialize barrier", image = "terrain/rocky_mountain.png",
+					name = _t"materialize barrier", image = "terrain/rocky_mountain.png",
 					display = '#', color_r=255, color_g=255, color_b=255, back_color=colors.GREY,
 					shader = "shadow_simulacrum",
 					shader_args = { color = {0.6, 0.6, 0.2}, base = 0.9, time_factor = 1500 },
-					desc = "a summoned wall of stone",
+					desc = _t"a summoned wall of stone",
 					type = "wall", --subtype = "floor",
 					always_remember = true,
 					can_pass = {pass_wall=1},
@@ -255,7 +255,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[Create a tightly bound matter wall of up to a length of %d that lasts %d turns.
 		If any part of this wall is dug out it will explode, causing targets in a radius of %d to bleed for %0.2f physical damage over six turns.]])
-		:format(length, duration, radius, damDesc(self, DamageType.PHYSICAL, damage))
+		:tformat(length, duration, radius, damDesc(self, DamageType.PHYSICAL, damage))
 	end,
 }
 
@@ -291,7 +291,7 @@ newTalent{
 				local eff = rng.tableRemove(effs)
 				if eff[1] == "effect" then
 					target:removeEffect(eff[2])
-					game.logSeen(self, "#CRIMSON#%s's beneficial effect was stripped!#LAST#", target.name:capitalize())
+					game.logSeen(self, "#CRIMSON#%s's beneficial effect was stripped!#LAST#", target:getName():capitalize())
 					if what == "physical" then p.physical[target] = true end
 					if what == "magical" then p.magical[target] = true end
 					
@@ -333,6 +333,6 @@ newTalent{
 		return ([[While active your physical and temporal damage has a %d%% chance to remove one beneficial physical or magical temporary effect (respectively) from targets you hit.
 		Only one physical and one magical effect may be removed per turn from each target.
 		Additionally your Dust to Dust spell now digs up to %d tiles into walls.]]):
-		format(chance, digs)
+		tformat(chance, digs)
 	end,
 }

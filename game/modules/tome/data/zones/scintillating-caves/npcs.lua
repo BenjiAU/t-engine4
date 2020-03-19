@@ -32,8 +32,8 @@ newEntity{ base="BASE_NPC_CRYSTAL", define_as = "SPELLBLAZE_CRYSTAL",
 	unique = true,
 	name = "Spellblaze Crystal", tint=colors.PURPLE, image = "npc/spellblaze_crystal.png",
 	color=colors.VIOLET,
-	desc = [[A formation of purple crystal. It seems strangely aware.]],
-	killer_message = "and vaporised into nothingness",
+	desc = _t[[A formation of purple crystal. It seems strangely aware.]],
+	killer_message = _t"and vaporised into nothingness",
 	level_range = {7, nil}, exp_worth = 2,
 	max_life = 150, life_rating = 12, fixed_rating = true,
 	mana_regen = 3,
@@ -68,7 +68,7 @@ newEntity{ base="BASE_NPC_CRYSTAL", define_as = "SPELLBLAZE_CRYSTAL",
 
 	on_die = function(self, who)
 		game.player:resolveSource():setQuestStatus("start-shaloren", engine.Quest.COMPLETED, "spellblaze")
-		game.state:activateBackupGuardian("SPELLBLAZE_SIMULACRUM", 3, 35, "I heard that some old crystals are nearly alive now in the scintillating caves.")
+		game.state:activateBackupGuardian("SPELLBLAZE_SIMULACRUM", 3, 35, _t"I heard that some old crystals are nearly alive now in the scintillating caves.")
 	end,
 }
 
@@ -78,8 +78,8 @@ newEntity{ base="BASE_NPC_CRYSTAL", define_as = "SPELLBLAZE_SIMULACRUM",
 	name = "Spellblaze Simulacrum", display = "g", image = "npc/spellblaze_simulacrum.png",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/spellblaze_simulacrum.png", display_h=2, display_y=-1}}},
 	color=colors.VIOLET,
-	desc = [[A formation of purple crystal, but where the others could only be described as polyhedral, this construct seems to strangely resemble... you, if you were much, much larger.]],
-	killer_message = "and vaporised into nothingness",
+	desc = _t[[A formation of purple crystal, but where the others could only be described as polyhedral, this construct seems to strangely resemble... you, if you were much, much larger.]],
+	killer_message = _t"and vaporised into nothingness",
 	level_range = {35, nil}, exp_worth = 3,
 	max_life = 300, life_rating = 25, fixed_rating = true,
 	life_regen = 0,

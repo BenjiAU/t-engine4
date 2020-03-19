@@ -28,7 +28,7 @@ newEntity{ define_as = "DRAEBOR",
 	type = "demon", subtype = "minor", unique = true,
 	name = "Draebor, the Imp",
 	display = "u", color=colors.VIOLET,
-	desc = [[An intensely irritating git of a monster.]],
+	desc = _t[[An intensely irritating git of a monster.]],
 	faction = "fearscape",
 	level_range = {35, nil}, exp_worth = 3,
 	max_life = 300, life_rating = 22, fixed_rating = true,
@@ -79,7 +79,7 @@ newEntity{ define_as = "DRAEBOR",
 	resolvers.inscriptions(1, {"manasurge rune"}),
 
 	on_die = function(self, who)
-		require("engine.ui.Dialog"):simplePopup("Back and there again", "As the annoying imp falls a portal appears under its corpse.")
+		require("engine.ui.Dialog"):simplePopup(_t"Back and there again", _t"As the annoying imp falls a portal appears under its corpse.")
 		local g = game.zone:makeEntityByName(game.level, "terrain", "PORTAL_BACK")
 		game.zone:addEntity(game.level, g, "terrain", self.x, self.y)
 	end,

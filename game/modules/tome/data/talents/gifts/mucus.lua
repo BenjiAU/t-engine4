@@ -81,7 +81,7 @@ newTalent{
 		Your mucus will poison all foes crossing it, dealing %0.1f nature damage every turn for 5 turns (stacking).
 		In addition, each turn, you will restore %0.1f Equilibrium while in your own mucus, and other friendly creatures in your mucus will restore 1 Equilibrium both for you and for themselves.
 		The Poison damage and Equilibrium regeneration increase with your Mindpower, and laying down more mucus in the same spot will intensify its effects and refresh its duration.]]):
-		format(dur, dur, damDesc(self, DamageType.NATURE, dam), equi)
+		tformat(dur, dur, damDesc(self, DamageType.NATURE, dam), equi)
 	end,
 }
 
@@ -146,7 +146,7 @@ newTalent{
 		return ([[Calling upon nature, you cause the ground to erupt in an radius %d acidic explosion, dealing %0.1f acid damage to all creatures and creating mucus in the area.
 		Any Mucus Oozes you have active will, if in line of sight, instantly spit slime (at reduced power) at one of the targets hit by the splash.
 		The damage increases with your Mindpower.]]):
-		format(self:getTalentRadius(t), damDesc(self, DamageType.ACID, dam))
+		tformat(self:getTalentRadius(t), damDesc(self, DamageType.ACID, dam))
 	end,
 }
 
@@ -172,7 +172,7 @@ newTalent{ short_name = "MUCUS_OOZE_SPIT",
 	end,
 	info = function(self, t)
 		return ([[Spits a beam of slime doing %0.2f slime damage.
-		The damage will increase with mindpower.]]):format(damDesc(self, DamageType.SLIME, self:combatTalentMindDamage(t, 8, 80)))
+		The damage will increase with mindpower.]]):tformat(damDesc(self, DamageType.SLIME, self:combatTalentMindDamage(t, 8, 80)))
 	end,
 }
 
@@ -204,9 +204,9 @@ newTalent{
 		local m = mod.class.NPC.new{
 			type = "vermin", subtype = "oozes",
 			display = "j", color=colors.GREEN, image = "npc/vermin_oozes_green_ooze.png",
-			name = self.name:bookCapitalize().."'s mucus ooze",
+			name = ("%s's mucus ooze"):tformat(self:getName():bookCapitalize()),
 			faction = self.faction,
-			desc = "It's made from mucus and it's oozing.",
+			desc = _t"It's made from mucus and it's oozing.",
 			sound_moam = {"creatures/jelly/jelly_%d", 1, 3},
 			sound_die = {"creatures/jelly/jelly_die_%d", 1, 2},
 			sound_random = {"creatures/jelly/jelly_%d", 1, 3},
@@ -262,7 +262,7 @@ newTalent{
 		You may have up to %d Mucus Oozes active at any time (based on your Cunning).
 		Any time you deal a mental critical, the remaining time on all of your Mucus Oozes will increase by 2.
 		The spawn chance increases with your Mindpower.]]):
-		format(t.getChance(self, t), t.getSummonTime(self, t), t.getMax(self, t))
+		tformat(t.getChance(self, t), t.getSummonTime(self, t), t.getMax(self, t))
 	end,
 }
 
@@ -313,6 +313,6 @@ newTalent{
 		return ([[You temporarily merge with your mucus, cleansing yourself of %d physical or magical detrimental effects.
 		You can then reemerge on any tile within sight and range that is also covered by mucus.
 		This is quick, performed in only %d%% of the normal time, but you must be in contact with your mucus.]]):
-		format(nb, (energy) * 100)
+		tformat(nb, (energy) * 100)
 	end,
 }

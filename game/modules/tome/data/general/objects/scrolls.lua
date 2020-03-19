@@ -20,7 +20,7 @@
 newEntity{
 	define_as = "BASE_SCROLL",
 	type = "scroll", subtype="scroll",
-	unided_name = "scroll", id_by_type = true,
+	unided_name = _t"scroll", id_by_type = true,
 	display = "?", color=colors.WHITE, image="object/scroll.png",
 	encumber = 0.1,
 	stacking = true,
@@ -28,26 +28,26 @@ newEntity{
 	use_no_blind = true,
 	use_no_silence = true,
 	fire_destroy = {{10,1}, {20,2}, {40,5}, {60,10}, {120,20}},
-	desc = [[Magical scrolls can have wildly different effects!]],
+	desc = _t[[Magical scrolls can have wildly different effects!]],
 	egos = "/data/general/objects/egos/scrolls.lua", egos_chance = resolvers.mbonus(10, 5),
 }
 
 newEntity{
 	define_as = "BASE_INFUSION",
 	type = "scroll", subtype="infusion", add_name = " (#INSCRIPTION#)",
-	unided_name = "infusion", id_by_type = true,
+	unided_name = _t"infusion", id_by_type = true,
 	display = "?", color=colors.LIGHT_GREEN, image="object/rune_green.png",
 	encumber = 0.1,
 	use_sound = "actions/read",
 	use_no_blind = true,
 	use_no_silence = true,
 	fire_destroy = {{100,1}, {200,2}, {400,5}, {600,10}, {1200,20}},
-	desc = [[Natural infusions may be grafted onto your body, granting you an on-demand nature talent.]],
+	desc = _t[[Natural infusions may be grafted onto your body, granting you an on-demand nature talent.]],
 	egos = "/data/general/objects/egos/infusions.lua", egos_chance = resolvers.mbonus(30, 5),
 	material_level_min_only = true,
 
 	power_source = {nature=true},
-	use_simple = { name="inscribe your skin with the infusion", use = function(self, who, inven, item)
+	use_simple = { name=_t"inscribe your skin with the infusion", use = function(self, who, inven, item)
 		if who:setInscription(nil, self.inscription_talent, self.inscription_data, true, true, {obj=self, inven=inven, item=item}) then
 			return {used=true, id=true, destroy=true}
 		end
@@ -57,19 +57,19 @@ newEntity{
 newEntity{
 	define_as = "BASE_RUNE",
 	type = "scroll", subtype="rune", add_name = " (#INSCRIPTION#)",
-	unided_name = "rune", id_by_type = true,
+	unided_name = _t"rune", id_by_type = true,
 	display = "?", color=colors.LIGHT_BLUE, image="object/rune_red.png",
 	encumber = 0.1,
 	use_sound = "actions/read",
 	use_no_blind = true,
 	use_no_silence = true,
 	fire_destroy = {{10,1}, {20,2}, {40,5}, {60,10}, {120,20}},
-	desc = [[Magical runes may be inscribed onto your body, granting you an on-demand spell talent.]],
+	desc = _t[[Magical runes may be inscribed onto your body, granting you an on-demand spell talent.]],
 	egos = "/data/general/objects/egos/infusions.lua", egos_chance = resolvers.mbonus(30, 5),
 	material_level_min_only = true,
 
 	power_source = {arcane=true},
-	use_simple = { name="inscribe your skin with the rune", use = function(self, who, inven, item)
+	use_simple = { name=_t"inscribe your skin with the rune", use = function(self, who, inven, item)
 		if who:setInscription(nil, self.inscription_talent, self.inscription_data, true, true, {obj=self, inven=inven, item=item}) then
 			return {used=true, id=true, destroy=true}
 		end
@@ -79,18 +79,18 @@ newEntity{
 newEntity{
 	define_as = "BASE_TAINT",
 	type = "scroll", subtype="taint", add_name = " (#INSCRIPTION#)",
-	unided_name = "taint", id_by_type = true,
+	unided_name = _t"taint", id_by_type = true,
 	display = "?", color=colors.LIGHT_BLUE, image="object/rune_yellow.png",
 	encumber = 0.1,
 	use_sound = "actions/read",
 	use_no_blind = true,
 	use_no_silence = true,
 	fire_destroy = {{10,1}, {20,2}, {40,5}, {60,10}, {120,20}},
-	desc = [[Corrupted taints may be inscribed onto your body, granting you an on-demand ability.]],
+	desc = _t[[Corrupted taints may be inscribed onto your body, granting you an on-demand ability.]],
 	egos = "/data/general/objects/egos/infusions.lua", egos_chance = resolvers.mbonus(30, 5),
 
 	power_source = {arcane=true},
-	use_simple = { name="inscribe your skin with the taint", use = function(self, who, inven, item)
+	use_simple = { name=_t"inscribe your skin with the taint", use = function(self, who, inven, item)
 		if who:setInscription(nil, self.inscription_talent, self.inscription_data, true, true, {obj=self, inven=inven, item=item}) then
 			return {used=true, id=true, destroy=true}
 		end
@@ -100,12 +100,12 @@ newEntity{
 newEntity{
 	define_as = "BASE_LORE",
 	type = "lore", subtype="lore", not_in_stores=true, no_unique_lore=true,
-	unided_name = "scroll", identified=true,
+	unided_name = _t"scroll", identified=true,
 	display = "?", color=colors.ANTIQUE_WHITE, image="object/scroll-lore.png",
 	encumber = 0,
 	checkFilter = function(self) if self.lore and game.party.lore_known and game.party.lore_known[self.lore] then print('[LORE] refusing', self.lore) return false else return true end end,
-	desc = [[This parchment contains some lore.]],
-	use_simple = { name="read it", use = function(self, who, inven, item)
+	desc = _t[[This parchment contains some lore.]],
+	use_simple = { name=_t"read it", use = function(self, who, inven, item)
 		game.party:learnLore(self.lore)
 		return {used=true, id=true, destroy=true}
 	end}
@@ -114,12 +114,12 @@ newEntity{
 newEntity{
 	define_as = "BASE_LORE_RANDOM",
 	type = "lore", subtype="lore", not_in_stores=true, no_unique_lore=true,
-	unided_name = "scroll", identified=true,
+	unided_name = _t"scroll", identified=true,
 	display = "?", color=colors.ANTIQUE_WHITE, image="object/scroll.png",
 	encumber = 0,
 	checkFilter = function(self) if self.lore and game.party.lore_known and game.party.lore_known[self.lore] then print('[LORE] refusing', self.lore) return false else return true end end,
-	desc = [[This parchment contains some lore.]],
-	use_simple = { name="read it", use = function(self, who, inven, item)
+	desc = _t[[This parchment contains some lore.]],
+	use_simple = { name=_t"read it", use = function(self, who, inven, item)
 		game.party:learnLore(self.lore)
 		return {used=true, id=true, destroy=true}
 	end}

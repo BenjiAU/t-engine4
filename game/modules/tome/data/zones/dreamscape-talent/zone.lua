@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Dreamscape",
+	name = _t"Dreamscape",
 	level_range = {1, 100},
 	level_scheme = "player",
 	max_level = 1,

@@ -62,7 +62,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		local spreadFactor = t.getSpreadFactor(self, t)
 		return ([[You unleash your hateful mind on any who dare approach you, inflicing %d mind damage. The attack will hit multiple targets, but each additional target will further reduce damage by %d%%.
-		25%% chance to brainlock. The damage increases with your Mindpower.]]):format(damDesc(self, DamageType.MIND, damage), (1 - spreadFactor) * 100)
+		25%% chance to brainlock. The damage increases with your Mindpower.]]):tformat(damDesc(self, DamageType.MIND, damage), (1 - spreadFactor) * 100)
 	end,
 }
 
@@ -135,7 +135,7 @@ newTalent{
 		local jumpChance = t.getJumpChance(self, t)
 		local hateGain = t.getHateGain(self, t)
 		return ([[Send a whisper filled with hate to spread throughout your foes. When the whisper is first heard, they will suffer %d mind damage and feed you %d hate. For the first %d turns, the whisper will travel from the original victim to a new one within a range of %0.1f. Every victim of the whisper has a %d%% chance of spreading it to another victim every turn.
-		25%% chance to brainlock. The damage increases with your Mindpower.]]):format(damDesc(self, DamageType.MIND, damage), hateGain, jumpCount, jumpRange, jumpChance)
+		25%% chance to brainlock. The damage increases with your Mindpower.]]):tformat(damDesc(self, DamageType.MIND, damage), hateGain, jumpCount, jumpRange, jumpChance)
 	end,
 }
 
@@ -190,7 +190,7 @@ newTalent{
 		local tr = Trap.new{
 			type = "elemental",
 			id_by_type=true,
-			unided_name = "trap",
+			unided_name = _t"trap",
 			name = "cursed ground",
 			color={48,48,132},
 			display = '^',
@@ -252,7 +252,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		local stunDuration = t.getStunDuration(self, t)
 		return ([You mark the ground at your feet with a terrible curse. Anyone passing the mark suffers %d mind damage and has a chance to be stunned for %d turns. The mark lasts for %d turns but the will weaken each time it is triggered. (%d mindpower vs mental resistance)
-		The damage and mindpower will increase with the Willpower stat.]):format(damDesc(self, DamageType.MIND, damage), stunDuration, duration, mindpower)
+		The damage and mindpower will increase with the Willpower stat.]):tformat(damDesc(self, DamageType.MIND, damage), stunDuration, duration, mindpower)
 	end,
 }
 ]]
@@ -298,7 +298,7 @@ newTalent{
 		local maxDamage = t.getDamage(self, t)
 		local minDamage = maxDamage / duration
 		return ([[Unleash agony upon your target. The pain will grow over the course of %d turns. The first turn will inflict %d damage, and slowly increase to %d on the last turn (%d total).
-		25%% chance of brainlock. The damage will increase with your Mindpower.]]):format(duration, damDesc(self, DamageType.MIND, minDamage), damDesc(self, DamageType.MIND, maxDamage), maxDamage * (duration + 1) / 2)
+		25%% chance of brainlock. The damage will increase with your Mindpower.]]):tformat(duration, damDesc(self, DamageType.MIND, minDamage), damDesc(self, DamageType.MIND, maxDamage), maxDamage * (duration + 1) / 2)
 	end,
 }
 
@@ -336,7 +336,7 @@ newTalent{
 	info = function(self, t)
 		local chance = t.getChance(self, t)
 		local mindResistChange = t.getMindResistChange(self, t)
-		return ([[Every time you inflict mind damage, there is a %d%% chance that your foe must save against your Mindpower or go mad. Madness can cause them to become confused, slowed or stunned for 3 turns, and lowers resistance to mind damage by %d%%.]]):format(chance, -mindResistChange)
+		return ([[Every time you inflict mind damage, there is a %d%% chance that your foe must save against your Mindpower or go mad. Madness can cause them to become confused, slowed or stunned for 3 turns, and lowers resistance to mind damage by %d%%.]]):tformat(chance, -mindResistChange)
 	end,
 }
 
@@ -376,7 +376,7 @@ newTalent{
 							target:setEffect(target.EFF_DAZED, duration, {src=self})
 							game.level.map:particleEmitter(x, y, 1, "cursed_ground", {})
 						else
-							game.logSeen(self, "%s holds on to its sanity.", self.name:capitalize())
+							game.logSeen(self, "%s holds on to its sanity.", self:getName():capitalize())
 						end
 					end
 				end
@@ -390,7 +390,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		local chance = t.getChance(self, t)
 		return ([Your will reaches into the minds of all nearby enemies and tortures their sanity. Anyone within range who fails a mental save has a %d%% chance of being dazed for %d turns (%d mindpower vs mental resistance).
-		The mindpower will increase with the Willpower stat.]):format(chance, duration, mindpower)
+		The mindpower will increase with the Willpower stat.]):tformat(chance, duration, mindpower)
 	end,
 }
 ]]

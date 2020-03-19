@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[Melee attacks work like movement. Just move in your foe's direction, or click it, to attack it.
+return _t[[Melee attacks work like movement. Just move in your foe's direction, or click it, to attack it.
 If it is not hostile you will talk to it, or switch places with it.
 
 Melee combat mainly uses five stats:

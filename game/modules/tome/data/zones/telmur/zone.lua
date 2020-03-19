@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Ruins of Telmur",
+	name = _t"Ruins of Telmur",
 	level_range = {30, 40},
 	level_scheme = "player",
 	max_level = 5,
@@ -59,7 +59,7 @@ return {
 	},
 	on_enter = function(lev, old_lev, newzone)
 		if newzone and not game.level.shown_warning then
-			require("engine.ui.Dialog"):simplePopup("Telmur", "As you approach the tower you notice it is utterly destroyed, only the basement remaining.")
+			require("engine.ui.Dialog"):simplePopup(_t"Telmur", _t"As you approach the tower you notice it is utterly destroyed, only the basement remaining.")
 			game.level.shown_warning = true
 		end
 	end,

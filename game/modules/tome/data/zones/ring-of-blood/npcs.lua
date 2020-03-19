@@ -26,7 +26,7 @@ newEntity{ define_as = "RING_MASTER",
 	name = "Blood Master",
 	display = "@", color=colors.VIOLET,
 	blood_color = colors.BLUE,
-	desc = [[This small humanoid is covered in silky white fur. Its bulging eyes stare deep into your mind.]],
+	desc = _t[[This small humanoid is covered in silky white fur. Its bulging eyes stare deep into your mind.]],
 	level_range = {14, nil}, exp_worth = 2,
 	max_life = 150, life_rating = 12, fixed_rating = true,
 	rank = 3.5,
@@ -83,14 +83,14 @@ newEntity{ define_as = "SPECTATOR",
 	female = resolvers.rngtable{false, true},
 	image = resolvers.rngtable{"npc/humanoid_human_spectator.png","npc/humanoid_human_spectator02.png","npc/humanoid_human_spectator03.png",},
 	display = "p", resolvers.rngcolor{colors.BLUE, colors.LIGHT_BLUE, colors.RED, colors.LIGHT_RED, colors.ORANGE, colors.YELLOW, colors.GREEN, colors.LIGHT_GREEN, colors.PINK, },
-	desc = [[A spectator, who probably paid a lot to watch this bloody "game".]],
+	desc = _t[[A spectator, who probably paid a lot to watch this bloody "game".]],
 	level_range = {1, nil}, exp_worth = 0,
 	max_life = 100, life_rating = 12,
 	faction = "neutral",
 	emote_random = resolvers.emote_random{
-		"Blood!", "Fight!", "To the death!",
-		"Oh this is great", "I love the smell of death...",
-		"Slavers forever!",
+		_t"Blood!", _t"Fight!", _t"To the death!",
+		_t"Oh this is great", _t"I love the smell of death...",
+		_t"Slavers forever!",
 	},
 }
 
@@ -100,7 +100,7 @@ newEntity{ define_as = "PLAYER_SLAVE",
 	type = "humanoid", subtype = "human",
 	name = "slave combatant",
 	display = "@", color=colors.UMBER,
-	desc = [[This humanoid has been enslaved by the yaech's mental powers.]],
+	desc = _t[[This humanoid has been enslaved by the yaech's mental powers.]],
 	level_range = {9, 9}, exp_worth = 0,
 	max_life = 120, life_rating = 12, fixed_rating = true,
 	rank = 3,
@@ -172,7 +172,7 @@ newEntity{
 newEntity{ base = "BASE_NPC_SLAVER",
 	name = "slaver", color=colors.TEAL,
 	subtype = "yaech",
-	desc = [[A slaver.]],
+	desc = _t[[A slaver.]],
 	level_range = {10, nil}, exp_worth = 1,
 	rarity = 1,
 	max_life = resolvers.rngavg(80,90), life_rating = 11,
@@ -195,7 +195,7 @@ newEntity{ base = "BASE_NPC_SLAVER",
 				if self.master and self.master:attr("dead") then
 					self.faction = "neutral"
 					self:removeAllEffects()
-					self:doEmote(rng.table{"I am free!", "At last, freedom!", "Thanks for this!", "The mental hold is gone!"}, 60)
+					self:doEmote(rng.table{_t"I am free!", _t"At last, freedom!", _t"Thanks for this!", _t"The mental hold is gone!"}, 60)
 					self.on_act = nil
 					self.master = nil
 					world:gainAchievement("RING_BLOOD_FREED", game:getPlayer(true))
@@ -208,7 +208,7 @@ newEntity{ base = "BASE_NPC_SLAVER",
 newEntity{ base = "BASE_NPC_SLAVER",
 	name = "enthralled slave", color=colors.KHAKI,
 	subtype = "human",
-	desc = [[A slave.]],
+	desc = _t[[A slave.]],
 	level_range = {10, nil}, exp_worth = 0,
 	rarity = 20,
 	max_life = resolvers.rngavg(80,90), life_rating = 13,

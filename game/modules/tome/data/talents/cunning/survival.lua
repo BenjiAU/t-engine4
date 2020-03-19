@@ -44,7 +44,7 @@ newTalent{
 		This is not telepathy, however, and it is still limited to line of sight.
 		Also, your attention to detail increases stealth detection and invisibility detection by %d, and you gain the ability to detect traps (+%d detect 'power').
 		The detection abilities improve with Cunning.]]):
-		format(t.sense(self,t), t.seePower(self,t), t.trapDetect(self, t))
+		tformat(t.sense(self,t), t.seePower(self,t), t.trapDetect(self, t))
 	end,
 }
 
@@ -70,7 +70,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Your cunning manipulations allow you to use charms (wands, totems and torques) more efficiently, reducing their cooldowns and the power cost of all usable items by %d%%.
 		In addition your knowledge of devices allows you to disarm known traps (%d disarm 'power', improves with Cunning).]]):
-		format(t.cdReduc(self, t), t.trapDisarm(self, t))
+		tformat(t.cdReduc(self, t), t.trapDisarm(self, t))
 	end,
 }
 
@@ -96,7 +96,7 @@ newTalent{
 	info = function(self, t)
 		local rad = self:getTalentRadius(t)
 		return ([[Sense foes around you in a radius of %d for %d turns.
-		The radius will increase with your Cunning.]]):format(rad, t.getDuration(self, t))
+		The radius will increase with your Cunning.]]):tformat(rad, t.getDuration(self, t))
 	end,
 }
 
@@ -134,7 +134,7 @@ newTalent{
 		Attacks against you have a %0.1f%% reduced chance to be critical hits, and damage bonuses attackers gain against you for being unseen are reduced by %d%%.
 		You also gain an additional chance (at your normal save %+d, effective) to resist detrimental status effects that can be resisted.
 		The detection and additional save chance improve with Cunning.]]):
-		format(t.trapDetect(self, t), t.critResist(self, t), t.getUnseenReduction(self, t)*100, -t.savePenalty(self, t))
+		tformat(t.trapDetect(self, t), t.critResist(self, t), t.getUnseenReduction(self, t)*100, -t.savePenalty(self, t))
 	end,
 }
 
@@ -160,7 +160,7 @@ newTalent{
 		
 		dir = util.getDir(x, y, self.x, self.y)
 		x, y = util.coordAddDir(self.x, self.y, dir)
-		print("Requesting disarm trap", self.name, t.id, x, y)
+		print("Requesting disarm trap", self:getName(), t.id, x, y)
 		local t_det = self:attr("see_traps") or 0
 		local trap = game.level.map(x, y, engine.Map.TRAP)
 		if trap and not trap:knownBy(self) then trap = self:detectTrap(nil, x, y, t_det) end
@@ -188,7 +188,7 @@ newTalent{
 		local t_det, t_dis = self:attr("see_traps") or 0, tdm.trapDisarm(self, tdm)
 		return ([[You search a nearby grid for a hidden trap (%d detection 'power') and disarm it if possible (%d disarm 'power', based on your skill with %s).
 		Disarming a trap requires at least a minimum skill level, and you must be able to enter the trap's grid to manipulate it, though you stay in your current location.  A failed attempt to disarm a trap may trigger it.
-		Your skill improves with your your Cunning.]]):format(t_det, t_dis, tdm.name)
+		Your skill improves with your your Cunning.]]):tformat(t_det, t_dis, tdm.name)
 	end,
 }
 

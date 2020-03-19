@@ -43,7 +43,7 @@ newTalent{
 		return ([[When you throw your alchemist bombs, you infuse them with cold damage that can freeze your foes.
 		In addition all cold damage you do is increased by %d%%.
 		You cannot have more than one alchemist infusion sustain active at once.]]):
-		format(daminc)
+		tformat(daminc)
 	end,
 }
 
@@ -69,7 +69,7 @@ newTalent{
 		return ([[While Frost Infusion is active, your bombs deposit a layer of ice on your golem for %d turns when they hit it.
 		This ice provides your golem with %d additional armour, melee attacks against it deal %0.1f Cold damage to the attacker, and 50%% of its damage is converted to Cold.
 		The effects increase with your talent level and with the Spellpower and damage modifiers of your golem.]]):
-		format(duration, armor, dam)
+		tformat(duration, armor, dam)
 	end,
 }
 
@@ -101,7 +101,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[Invoke a blast of cold all around you with a radius of %d, doing %0.1f Cold damage and freezing creatures to the ground for %d turns.
 		Affected creatures can still act, but cannot move.
-		The duration will increase with your Spellpower.]]):format(radius, damDesc(self, DamageType.COLD, t.getDamage(self, t)), t.getDuration(self, t))
+		The duration will increase with your Spellpower.]]):tformat(radius, damDesc(self, DamageType.COLD, t.getDamage(self, t)), t.getDuration(self, t))
 	end,
 }
 
@@ -139,6 +139,6 @@ newTalent{
 		return ([[Turn your body into pure ice, increasing your Cold damage affinity by %d%% and your physical resistance by %d%%.
 		You have a %d%% chance to shrug off all direct critical hits (physical, mental, spell).
 		The effects increase with your Spellpower.]]):
-		format(t.getAffinity(self, t), resist, crit)
+		tformat(t.getAffinity(self, t), resist, crit)
 	end,
 }

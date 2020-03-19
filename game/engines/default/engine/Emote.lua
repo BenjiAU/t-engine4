@@ -19,6 +19,7 @@
 
 require "engine.class"
 local Base = require "engine.ui.Base"
+local FontPackage = require "engine.FontPackage"
 
 --- Emotes for actors
 -- @classmod engine.Emote
@@ -38,12 +39,14 @@ function _M:init(text, dur, color, font)
 	self.color = color or colors.BLACK
 	self.use_font = font
 
-	Base.init(self, {font = self.use_font or {"/data/font/DroidSans-Bold.ttf", 16}})
+	-- I18N emote font.
+	Base.init(self, {font = self.use_font or {FontPackage:getFont("bold"), 16}})
 end
 
 --- on loaded
 function _M:loaded()
-	Base.init(self, {font = self.use_font or {"/data/font/DroidSans-Bold.ttf", 16}})
+	-- I18N emote font.
+	Base.init(self, {font = self.use_font or {FontPackage:getFont("bold"), 16}})
 end
 
 --- Serialization

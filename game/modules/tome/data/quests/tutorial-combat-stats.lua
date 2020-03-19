@@ -17,23 +17,23 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Tutorial: combat stats"
+name = _t"Tutorial: combat stats"
 desc = function(self, who)
 
 	local desc = {}
 --[=[
 	if self:isCompleted("started-basic-gameplay") and not self:isCompleted("finished-basic-gameplay") then
-		desc[#desc+1] = "You must venture in the heart of the forest and kill the Lone Wolf, who randomly attacks villagers."
+		desc[#desc+1] = _t"You must venture in the heart of the forest and kill the Lone Wolf, who randomly attacks villagers."
 	end
 	if self:isCompleted("finished-basic-gameplay") then
-		desc[#desc+1] = "#LIGHT_GREEN#You have defeated the Lone Wolf!#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#You have defeated the Lone Wolf!#WHITE#"
 	end
 ]=]
 	if not self:isCompleted("finished-combat-stats") then
-		desc[#desc+1] = "Explore the Dungeon of Adventurer Enlightenment to learn about ToME's combat mechanics."
+		desc[#desc+1] = _t"Explore the Dungeon of Adventurer Enlightenment to learn about ToME's combat mechanics."
 	end
 	if self:isCompleted("finished-combat-stats") then
-		desc[#desc+1] = "#LIGHT_GREEN#You have navigated the Dungeon of Adventurer Enlightenment!#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#You have navigated the Dungeon of Adventurer Enlightenment!#WHITE#"
 	end
 	return table.concat(desc, "\n")
 end
@@ -48,7 +48,7 @@ end
 final_message = function(self)
 	if self:isCompleted("finished-basic-gameplay") and self:isCompleted("finished-combat-stats") then
 		game.player:resolveSource():setQuestStatus("tutorial", engine.Quest.COMPLETED)
-		local d = require("engine.dialogs.ShowText").new("Tutorial Finished", "tutorial/done")
+		local d = require("engine.dialogs.ShowText").new(_t"Tutorial Finished", "tutorial/done")
 		game:registerDialog(d)
 	end
 end

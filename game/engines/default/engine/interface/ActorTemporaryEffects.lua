@@ -53,6 +53,9 @@ function _M:newEffect(t)
 	t.status = t.status or "detrimental"
 	t.decrease = t.decrease or 1
 
+	-- I18N
+	t.desc = _t(t.desc)
+
 	self.tempeffect_def["EFF_"..t.name] = t
 	t.id = "EFF_"..t.name
 	self["EFF_"..t.name] = "EFF_"..t.name
@@ -145,7 +148,7 @@ function _M:setEffect(eff_id, dur, p, silent)
 		local ret, fly = ed.on_gain(self, p)
 		if not silent and not had then
 			if ret then
-				game.logSeen(self, ret:gsub("#Target#", self.name:capitalize()):gsub("#target#", self.name):gsub("#himher#", self.female and "her" or "him"):gsub("#hisher#", self.female and "her" or "his"))
+				game.logSeen(self, ret:noun_sub("#Target#", self:getName():capitalize()):noun_sub("#target#", self:getName()):gsub("#himher#", self:him_her()):gsub("#hisher#", self:his_her()))
 			end
 			if fly and game.flyers and self.x and self.y and game.level.map.seens(self.x, self.y) then
 				if fly == true then fly = "+"..ed.desc end
@@ -206,7 +209,7 @@ function _M:removeEffect(eff, silent, force)
 		local ret, fly = ed.on_lose(self, p)
 		if not silent then
 			if ret then
-				game.logSeen(self, ret:gsub("#Target#", self.name:capitalize()):gsub("#target#", self.name):gsub("#himher#", self.female and "her" or "him"))
+				game.logSeen(self, ret:noun_sub("#Target#", self:getName():capitalize()):noun_sub("#target#", self:getName()):gsub("#himher#", self:him_her()))
 			end
 			if fly and game.flyers and self.x and self.y then
 				if fly == true then fly = "-"..ed.desc end

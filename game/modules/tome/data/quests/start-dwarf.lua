@@ -17,15 +17,15 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Reknor is lost!"
+name = _t"Reknor is lost!"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You were part of a group of dwarves sent to investigate the situation of the kingdom of Reknor."
-	desc[#desc+1] = "When you arrived there you found nothing but orcs, well organized and very powerful."
-	desc[#desc+1] = "Most of your team was killed there and now you and Norgan (the sole survivor besides you) must hurry back to the Iron Council to bring the news."
-	desc[#desc+1] = "Let nothing stop you."
+	desc[#desc+1] = _t"You were part of a group of dwarves sent to investigate the situation of the kingdom of Reknor."
+	desc[#desc+1] = _t"When you arrived there you found nothing but orcs, well organized and very powerful."
+	desc[#desc+1] = _t"Most of your team was killed there and now you and Norgan (the sole survivor besides you) must hurry back to the Iron Council to bring the news."
+	desc[#desc+1] = _t"Let nothing stop you."
 	if self:isCompleted("norgan-survived") then
-		desc[#desc+1] = "Both Norgan and you made it home."
+		desc[#desc+1] = _t"Both Norgan and you made it home."
 	end
 	return table.concat(desc, "\n")
 end
@@ -44,7 +44,7 @@ on_grant = function(self, who)
 	game.zone:addEntity(game.level, norgan, "actor", x, y)
 
 	game.party:addMember(norgan, {
-		control="order", type="squadmate", title="Norgan",
+		control="order", type="squadmate", title=_t"Norgan",
 		orders = {leash=true, anchor=true}, -- behavior=true},
 	})
 end

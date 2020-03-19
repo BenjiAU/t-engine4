@@ -20,15 +20,15 @@
 load("/data/general/traps/natural_forest.lua")
 
 newEntity{ define_as = "TRAP_TUTORIAL",
-	type = "tutorial", subtype="tutorial", id_by_type=true, unided_name = "tutorial",
+	type = "tutorial", subtype="tutorial", id_by_type=true, unided_name = _t"tutorial",
 	detect_power = 999999, disarm_power = 999999,
-	desc = [[A tutorial]],
+	desc=_t[[A tutorial]],
 	display = ' ', color=colors.WHITE,
 	message = false,
 	triggered = function(self, x, y, who)
 		if who.player then
 			game.player:runStop()
-			local d = require("engine.dialogs.ShowText").new("Tutorial: "..self.name, "tutorial/"..self.text)
+			local d = require("engine.dialogs.ShowText").new(("Tutorial: %s"):tformat(_t(self.name)), "tutorial/"..self.text)
 			game:registerDialog(d)
 		end
 		return false, false

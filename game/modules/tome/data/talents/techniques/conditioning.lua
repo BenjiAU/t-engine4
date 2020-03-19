@@ -43,7 +43,7 @@ newTalent{
 		return ([[You recover faster from poisons, diseases and wounds, reducing the duration of all such effects by %d%%.  
 			Whenever your life falls below 50%%, your life regeneration increases by %0.1f for %d turns (%d total). This effect can only happen once every %d turns.
 		The regeneration scales with your Constitution.]]):
-		format(wounds, baseheal, duration, baseheal*duration, self:getTalentCooldown(t))
+		tformat(wounds, baseheal, duration, baseheal*duration, self:getTalentCooldown(t))
 	end,
 }
 
@@ -66,11 +66,11 @@ newTalent{
 					effs[#effs+1] = {"effect", eff_id, priority=2}
 				elseif e.subtype.confusion and self:getTalentLevel(t) >=3 then
 					effs[#effs+1] = {"effect", eff_id, priority=3}
-				elseif e.subtype.pin and self:getTalentLevel(t) >=4 then
+				elseif e.subtype.pin and self:getTalentLevel(t) >=3 then
 					effs[#effs+1] = {"effect", eff_id, priority=4}
-				elseif e.subtype.slow and self:getTalentLevel(t) >=5 then
+				elseif e.subtype.disarm and self:getTalentLevel(t) >=4 then
 					effs[#effs+1] = {"effect", eff_id, priority=5}
-				elseif e.subtype.disarm and self:getTalentLevel(t) >=5 then
+				elseif e.subtype.slow and self:getTalentLevel(t) >=4 then
 					effs[#effs+1] = {"effect", eff_id, priority=6}
 				end
 			end
@@ -82,17 +82,17 @@ newTalent{
 			local eff = effs[1]
 			if eff[1] == "effect" and rng.percent(t.getChance(self, t)) then
 				self:removeEffect(eff[2])
-				game.logSeen(self, "#ORCHID#%s has recovered!#LAST#", self.name:capitalize())
+				game.logSeen(self, "#ORCHID#%s has recovered!#LAST#", self:getName():capitalize())
 			end
 		end
 	end,
 	info = function(self, t)
 		local chance = t.getChance(self, t)
 		return ([[You've learned to recover quickly from effects that would disable you. Each turn, you have a %d%% chance to recover from a single stun effect.
-		At talent level 2 you may also recover from blindness, at level 3 confusion, level 4 pins, and level 5 disarms and slows.
-		Effects will be cleansed with the priority order Stun > Blind > Confusion > Pin > Slow > Disarm.
+		At talent level 2 you may also recover from Blindness, at level 3 Confusion and Pins, and level 4 Disarms and Slows.
+		Effects will be cleansed with the priority order Stun > Blind > Confusion > Pin > Disarm > Slow.
 		Only one effect may be recovered from each turn, and the chance to recover from an effect scales with your Constitution.]]):
-		format(chance)
+		tformat(chance)
 	end,
 }
 
@@ -136,7 +136,7 @@ newTalent{
 		return ([[Enemies are intimidated by your very presence.
 		Enemies within radius %d have their Physical Power, Mindpower, and Spellpower reduced by %d.
 		The power of the intimidation effect improves with your Physical power]]):
-		format(radius, penalty)
+		tformat(radius, penalty)
 	end,
 }
 
@@ -165,6 +165,6 @@ newTalent{
 		You may continue to use stamina based talents while at zero stamina at the cost of life.
 		The Physical Power increase will scale with your Constitution.
 		Using this talent does not take a turn.]]):
-		format(attack_power, duration)
+		tformat(attack_power, duration)
 	end,
 }

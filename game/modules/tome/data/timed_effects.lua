@@ -46,7 +46,7 @@ end
 local getName = function(self)
 	local name = self.effect_id and mod.class.Actor.tempeffect_def[self.effect_id].desc or "effect"
 	if self.src and self.src.name then
-		return name .." from "..self.src.name:capitalize()
+		return ("%s from %s"):tformat(name, self.src:getName():capitalize())
 	else
 		return name
 	end

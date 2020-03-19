@@ -133,9 +133,9 @@ _M.useObjectBaseTalent ={
 	innate = true, -- make sure this talent can't be put on cooldown by other talents or effects
 	display_name = function(self, t)
 		local data = self.object_talent_data and self.object_talent_data[t.id]
-		if not (data and data.obj and data.obj:isIdentified()) then return "Activate an object" end
+		if not (data and data.obj and data.obj:isIdentified()) then return _t"Activate an object" end
 		local objname = data.obj:getName({no_add_name = true, do_color = true})
-		return "Activate: "..objname
+		return ("Activate: %s"):tformat(objname)
 	end,
 	no_message = true, --messages handled by object code or action function
 	is_object_use = true, -- flag for npc control and removing from prompts
@@ -211,7 +211,7 @@ _M.useObjectBaseTalent ={
 		local ret
 		local co = coroutine.create(function()
 			if data.tid then -- replace normal talent use message
-				game.logSeen(self, "%s activates %s %s!", self.name:capitalize(), self:his_her(), data.obj:getName({no_add_name=true, do_color = true}))
+				game.logSeen(self, "%s activates %s %s!", self:getName():capitalize(), self:his_her(), data.obj:getName({no_add_name=true, do_color = true}))
 				t.message = self:callObjectTalent(t.id, "message")
 				local msg = self:useTalentMessage(t)
 				t.message = nil
@@ -235,16 +235,16 @@ _M.useObjectBaseTalent ={
 	end,
 	info = function(self, t)
 		local o = t.getObject(self, t)
-		if not (o and o:isIdentified()) then return "Activate an object." end
-		local objname = o:getName({do_color = true}) or "(unknown object)"
+		if not (o and o:isIdentified()) then return _t"Activate an object." end
+		local objname = o:getName({do_color = true}) or _t"(unknown object)"
 		local usedesc = o and o:getUseDesc(self) or ""
 		return ([[Use %s:
 
-%s]]):format(objname, usedesc)
+%s]]):tformat(objname, usedesc)
 	end,
 	short_info = function(self, t)
 		local obj = t.getObject(self, t)
-		return ([[Activate %s]]):format(obj and obj:getName({do_color = true}) or "nothing")
+		return ([[Activate %s]]):tformat(obj and obj:getName({do_color = true}) or _t"nothing")
 	end,
 }
 

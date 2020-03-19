@@ -55,7 +55,7 @@ newTalent{
 		local dur = t.getDuration(self, t)
 		return ([[Bind the target in crushing bands of telekinetic force, immobilizing it for %d turns. 
 		The duration will improve with your Mindpower.]]):
-		format(dur)
+		tformat(dur)
 	end,
 }
 
@@ -80,6 +80,6 @@ newTalent{
 		Allows %d%% of Willpower and Cunning (instead of the usual 60%%) to be substituted for Strength and Dexterity for the purposes of determining damage done by telekinetically-wielded weapons.
 		At talent level 5, telekinetically wielded gems and mindstars will be treated as one material level higher than they actually are.
 		]]):
-		format(t.getImmune(self, t)*100, boost)
+		tformat(t.getImmune(self, t)*100, boost)
 	end,
 }

@@ -24,8 +24,8 @@
 newLore{
 	id = "halfling-research-note-1",
 	category = "age of allure",
-	name = "research log of halfling mage Hompalan",
-	lore = [[
+	name = _t"research log of halfling mage Hompalan",
+	lore = _t[[
 #{bold}#Hompalan's Log Entry1#{normal}#
 #{italic}#Age of Allure Year 4537#{normal}#
 
@@ -49,8 +49,8 @@ Third test confirms it - the orb allows transition between portal gates. This is
 newLore{
 	id = "halfling-research-note-2",
 	category = "age of allure",
-	name = "research log of halfling mage Hompalan",
-	lore = [[
+	name = _t"research log of halfling mage Hompalan",
+	lore = _t[[
 #{bold}#Hompalan's Log Entry 4#{normal}#
 #{italic}#Age of Allure 4544#{normal}#
 
@@ -84,8 +84,8 @@ We're really getting somewhere here... Just a shame humans are such messy creatu
 newLore{
 	id = "halfling-research-note-3",
 	category = "age of allure",
-	name = "research log of halfling mage Hompalan",
-	lore = [[
+	name = _t"research log of halfling mage Hompalan",
+	lore = _t[[
 #{bold}#Hompalan's Log Entry 7#{normal}#
 #{italic}#Age of Allure 4547#{normal}#
 
@@ -115,9 +115,9 @@ Subject Z currently raving, but I believe this is due to stressful conditions, n
 newLore{
 	id = "halfling-research-note-4",
 	category = "age of allure",
-	name = "research log of halfling mage Hompalan",
+	name = _t"research log of halfling mage Hompalan",
 	bloodstains = 7,
-	lore = [[
+	lore = _t[[
 #{bold}#Hompalan's Log Entry 9#{normal}#
 #{italic}#Age of Allure 4549#{normal}#
 
@@ -142,8 +142,8 @@ The military are annoying me to no end. I told them to find me more test subject
 newLore{
 	id = "conclave-vault-start",
 	category = "age of allure",
-	name = "order for director Hompalan",
-	lore = [[#{italic}#To: Research Director Hompalan - #{bold}#TOP PRIORITY#{normal}#
+	name = _t"order for director Hompalan",
+	lore = _t[[#{italic}#To: Research Director Hompalan - #{bold}#TOP PRIORITY#{normal}#
 
 Thanks to one of our scouting parties catching a Conclave lieutenant's squad off-guard, we have found directions to a noteworthy laboratory hidden underground, in what's newly Nargol territory.  Unfortunately, the long-legs scuttled the entrances before we could arrive, and it'd take us years to dig ourselves in, even if we could afford recalling our geomancers from the front lines to work on it - which we can't.  
 
@@ -164,7 +164,7 @@ I know you think yourself "above" such "petty politics" like how vital this faci
 			if not spot then return end
 
 			local g = game.level.map(spot.x, spot.y, engine.Map.TERRAIN):cloneFull()
-			g.name = "Door to an old Conclave vault"
+			g.name = _t"Door to an old Conclave vault"
 			g.display='>' g.color_r=100 g.color_g=0 g.color_b=255 g.notice = true
 			g.change_level=1 g.change_zone="conclave-vault" g.glow=true
 			g.add_displays = g.add_displays or {}
@@ -174,7 +174,7 @@ I know you think yourself "above" such "petty politics" like how vital this faci
 			g.on_move = function(self, x, y, who)
 				if not who or not who.player then return end
 				self.on_move = nil
-				require("engine.ui.Dialog"):simpleLongPopup("Conclave Vault", [[Arriving at the location given by the coordinates, you see an enormous crack in the ground; peering down, the gleam of exposed metal catches your eye, and you recognize it as a massive door.  It would seem that the Cataclysm's tectonic upheaval has carved a path right to one of its entrances, bypassing the ruined tunnels entirely. You climb down, just outside the door.]], 400)
+				require("engine.ui.Dialog"):simpleLongPopup(_t"Conclave Vault", _t[[Arriving at the location given by the coordinates, you see an enormous crack in the ground; peering down, the gleam of exposed metal catches your eye, and you recognize it as a massive door.  It would seem that the Cataclysm's tectonic upheaval has carved a path right to one of its entrances, bypassing the ruined tunnels entirely. You climb down, just outside the door.]], 400)
 			end
 			game.zone:addEntity(game.level, g, "terrain", spot.x, spot.y)
 			print("[WORLDMAP] conclave vault at", spot.x, spot.y)
@@ -185,8 +185,8 @@ I know you think yourself "above" such "petty politics" like how vital this faci
 newLore{
 	id = "conclave-vault-1",
 	category = "age of allure",
-	name = "healer Astelrid log 1",
-	lore = [[Work in a hospital like this is more draining than I thought it'd be.  I thought I'd have no trouble with motivation, helping our wounded get back to health again, but seeing so many of them, and knowing there are some I cannot help...  it weighs heavily on my mind.  It would be difficult to go on, if I did not keep a few things in mind: 
+	name = _t"healer Astelrid log 1",
+	lore = _t[[Work in a hospital like this is more draining than I thought it'd be.  I thought I'd have no trouble with motivation, helping our wounded get back to health again, but seeing so many of them, and knowing there are some I cannot help...  it weighs heavily on my mind.  It would be difficult to go on, if I did not keep a few things in mind: 
 
 One, that I am truly doing the best I can to minimize the world's suffering, both directly by healing, and indirectly by ensuring that the world will be united under the wise, thoughtful rule of the Conclave.  Ready access to regeneration infusions ensures that even the most dire of wounds can be healed in a matter of days, and the soldiers can return to the battlefield; furthermore, the Overseers have granted us access to their amnesia-inducing spells, allowing us to properly treat those who have been traumatized by the horrors of battle.  May the eyes of the Higher watch over this world for thousands of years to come.
 
@@ -202,8 +202,8 @@ After waging a war of trickery and deceit, those halflings think they can bluff 
 newLore{
 	id = "conclave-vault-2",
 	category = "age of allure",
-	name = "healer Astelrid log 2",
-	lore = [[The Nargol were not bluffing, and what they did was worse than anything we could've imagined.  The details coming from the survivors - of which there are both far too many and far too few - are conflicting at times, but from what I can tell...
+	name = _t"healer Astelrid log 2",
+	lore = _t[[The Nargol were not bluffing, and what they did was worse than anything we could've imagined.  The details coming from the survivors - of which there are both far too many and far too few - are conflicting at times, but from what I can tell...
 
 As our forces began their final push, the ground began to rumble and give way behind them, and the bones of the war's fallen (halflings and Conclave alike) began to rise up, then draw their once-discarded weapons and rush at our soldiers in a frenzy.  There were so many...  those who were on higher ground when it happened said it was like a sea of bones and rotting flesh.  Outnumbered, our forces broke ranks and tried to retreat, but with the halflings in front of them and the abominations behind them, we took tremendous losses...  and our humble medical center is overflowing with the gravely wounded.  Many come to us with a terrible sickness passed on by the Nargol's ghouls; there is no cure for this, and I have already had to "mercifully" end the lives of over a dozen men and women to save them from a long, drawn-out death, ending in their transfiguration into one of those horrid creatures...  including--
 
@@ -217,8 +217,8 @@ May the Conclave prevail, and may the Empire's fate serve as a warning to all wh
 newLore{
 	id = "conclave-vault-3",
 	category = "age of allure",
-	name = "healer Astelrid log 3",
-	lore = [[The Overseers were ecstatic about my ideas!  Our staff have been relocated to a more secure location, deep underground with several extensive tunnels leading in from different locations.  Although this means we can no longer leave to harvest herbs for our infusions, the increased budget the Overseers have given us does more than enough to compensate.  Many wounded are still brought to me through the tunnels, but now our goal is not simply to make them as strong and healthy as they were before, but far stronger and far healthier than they could've dreamed.  They are brought to us unconscious, with amnesia spells already applied to ensure they do not resist our experiments; although they are not told they will be test subjects before being brought here, we are sure they would consent to these experiments, if they knew how valuable they were to help the Conclave.  As such, although this process violates several oaths we have taken as healers, I ultimately do not see any moral problem with this, and nobody else at this facility has expressed any concerns to me.  After all, those who join the Conclave as soldiers have already volunteered to give their lives in service to the Overseers' enlightened rule, and this is surely a much more productive way to do so than dying to a Nargol sling-bullet.
+	name = _t"healer Astelrid log 3",
+	lore = _t[[The Overseers were ecstatic about my ideas!  Our staff have been relocated to a more secure location, deep underground with several extensive tunnels leading in from different locations.  Although this means we can no longer leave to harvest herbs for our infusions, the increased budget the Overseers have given us does more than enough to compensate.  Many wounded are still brought to me through the tunnels, but now our goal is not simply to make them as strong and healthy as they were before, but far stronger and far healthier than they could've dreamed.  They are brought to us unconscious, with amnesia spells already applied to ensure they do not resist our experiments; although they are not told they will be test subjects before being brought here, we are sure they would consent to these experiments, if they knew how valuable they were to help the Conclave.  As such, although this process violates several oaths we have taken as healers, I ultimately do not see any moral problem with this, and nobody else at this facility has expressed any concerns to me.  After all, those who join the Conclave as soldiers have already volunteered to give their lives in service to the Overseers' enlightened rule, and this is surely a much more productive way to do so than dying to a Nargol sling-bullet.
 
 With access to better components, we can make the same basic improvements to their strength as we could before, but the changes do not stop there!  With so many subjects to work with, and the Overseers' encouragement to take risks, we've made them much larger (with associated multiplying effects on their effectiveness in combat), and reinforced their constitution to be capable of bearing more inscriptions without collapsing under the stress.  A fellow researcher had the brilliant idea to use this runic affinity to both enhance their connection to magic's weave, and make them biologically and structurally dependent on it; now, our front-line soldiers can conjure devastating fireballs with little training, and should those hairy-footed vermin attempt to raise one of these soldiers from the dead, they will collapse, having lost the magic that kept them intact when they still lived.  
 
@@ -233,8 +233,8 @@ For the most part, though, our research work is done.  All that's left to do is 
 newLore{
 	id = "conclave-vault-4",
 	category = "age of allure",
-	name = "healer Astelrid log 4",
-	lore = [[Announcement to All Staff:
+	name = _t"healer Astelrid log 4",
+	lore = _t[[Announcement to All Staff:
 
 I'm sure you've all heard the rumors about what our scryers saw, and why we've been on lockdown the past few days; it is with a heavy heart that I must confirm that they are true.  The Nargol have taken the land above our facility, and are combing the area with golems to find the entrances.  We've already lost one entrance to the failsafe explosive-rune traps set in place to collapse it, and now they'll be looking to defuse those as well.  In short, we have no means of escape, and if allowed the time, they will find the way in, kill us, and steal our precious work for themselves.  The Empire has been enough of a problem without Ogres; we CANNOT take the risk of them finding us and tipping the balance in their favor.
 
@@ -257,8 +257,8 @@ Healer Astelrid]],
 newLore{
 	id = "conclave-vault-song",
 	category = "age of allure",
-	name = "investigator Churrack note",
-	lore = [[FROM: Investigator Churrack
+	name = _t"investigator Churrack note",
+	lore = _t[[FROM: Investigator Churrack
 TO: Whoever holds the position of High Overseer of Loyalty when we're let out
 
 Though I'm trapped in here with these healers, I haven't stopped prying to determine if their loyalties lie with us or with themselves. This case has more layers than a damn onion; while Astelrid did disobey a direct order (and several more by revealing the existence of that order), her alternative seems to fit our goals nonetheless. Response from staff has been mixed.  While most are reluctantly going along with her plan for lack of other options, some seem to follow her lead enthusiastically, and have been singing this song as they wait in line for their treatment:

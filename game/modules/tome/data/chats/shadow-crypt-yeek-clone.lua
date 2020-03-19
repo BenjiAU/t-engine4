@@ -23,42 +23,42 @@ for uid, e in pairs(game.level.entities) do if e.define_as == "CULTIST_RAK_SHOR"
 if cultist then
 
 newChat{ id="welcome",
-	text = [[No time to talk fellow Wayist! ATTACK! FOR THE WAY!]],
+	text = _t[[No time to talk fellow Wayist! ATTACK! FOR THE WAY!]],
 	answers = {
-		{"[leave]"},
+		{_t"[leave]"},
 	}
 }
 
 else 
 
 newChat{ id="welcome",
-	text = [[The foolish cultist that created me is no more. What am I to do now...]],
+	text = _t[[The foolish cultist that created me is no more. What am I to do now...]],
 	answers = {
-		{"You are me, come with me!", jump="nocome"},
-		{"You should head back to Irkkk.", jump="irkkk"},
+		{_t"You are me, come with me!", jump="nocome"},
+		{_t"You should head back to Irkkk.", jump="irkkk"},
 	}
 }
 
 newChat{ id="nocome",
-	text = [[I fear that would get confusing very fast. I think I will go back to Irkkk. Farewell my clone!]],
+	text = _t[[I fear that would get confusing very fast. I think I will go back to Irkkk. Farewell my clone!]],
 	answers = {
-		{"Clone? No you are the clone.", jump="clone"},
-		{"Farewell.", action=function(npc, player) npc:disappear() end},
+		{_t"Clone? No you are the clone.", jump="clone"},
+		{_t"Farewell.", action=function(npc, player) npc:disappear() end},
 	}
 }
 
 newChat{ id="clone",
-	text = [[Sure... if you prefer to think about it this way. We are all part of The Way anyway.]],
+	text = _t[[Sure... if you prefer to think about it this way. We are all part of The Way anyway.]],
 	answers = {
-		{"Farewell.", action=function(npc, player) npc:disappear() end},
+		{_t"Farewell.", action=function(npc, player) npc:disappear() end},
 	}
 }
 
 newChat{ id="irkkk",
-	text = [[I think so too, farewell my clone.]],
+	text = _t[[I think so too, farewell my clone.]],
 	answers = {
-		{"Clone? No you are the clone.", jump="clone"},
-		{"Farewell.", action=function(npc, player) npc:disappear() end},
+		{_t"Clone? No you are the clone.", jump="clone"},
+		{_t"Farewell.", action=function(npc, player) npc:disappear() end},
 	}
 }
 

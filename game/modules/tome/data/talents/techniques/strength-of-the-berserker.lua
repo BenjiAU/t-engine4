@@ -22,7 +22,7 @@ newTalent{
 	type = {"technique/strength-of-the-berserker",1},
 	require = techs_req1,
 	points = 5,
-	message = function(self) if self.subtype == "rodent" then return "@Source@ uses Warsqueak." else return "@Source@ uses Warshout." end end ,
+	message = function(self) if self.subtype == "rodent" then return _t"@Source@ uses Warsqueak." else return _t"@Source@ uses Warshout." end end ,
 	stamina = 30,
 	cooldown = 18,
 	tactical = { ATTACKAREA = { confusion = 1 }, DISABLE = { confusion = 3 } },
@@ -53,7 +53,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Shout your warcry in a frontal cone of radius %d. Any targets caught inside will be confused (50%% confusion power) for %d turns.]]):
-		format(self:getTalentRadius(t), t.getDuration(self, t))
+		tformat(self:getTalentRadius(t), t.getDuration(self, t))
 	end,
 }
 
@@ -139,7 +139,7 @@ newTalent{
 		Sustaining this rage takes its toll on your body, decreasing your life by 2%% each turn, but for every 1%% of life missing you gain 0.5%% critical hit chance.
 		Even when sustained, this talent is only active when foes are in sight.
 		The Accuracy bonus increases with your Dexterity, and the Physical Power bonus with your Strength.]]):
-		format( t.getAtk(self, t), t.getDam(self, t), t.getImmune(self, t)*100)
+		tformat( t.getAtk(self, t), t.getDam(self, t), t.getImmune(self, t)*100)
 	end,
 }
 
@@ -154,7 +154,7 @@ newTalent{
 	tactical = { ATTACK = { weapon = 2 }, DISABLE = 2 },
 	range = 1,
 	is_melee = true,
-	target = function(self ,t) return {type="hit", range=self:getTalentRange(t)} end,
+	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
 	on_pre_use = function(self, t, silent) if not self:hasTwoHandedWeapon() then if not silent then game.logPlayer(self, "You require a two handed weapon to use this talent.") end return false end return true end,
 	getShatter = function(self, t) return self:combatTalentLimit(t, 100, 10, 85) end,
 	getDuration = function(self, t) return math.floor(self:combatTalentScale(t, 5, 9)) end,
@@ -188,7 +188,7 @@ newTalent{
 					local eff = rng.tableRemove(effs)
 
 					if eff[1] == "effect" then
-						game.logSeen(self, "#CRIMSON#%s shatters %s shield!", self.name:capitalize(), target.name)
+						game.logSeen(self, "#CRIMSON#%s shatters %s shield!", self:getName():capitalize(), target:getName())
 						target:removeEffect(eff[2])
 					end
 				end
@@ -201,7 +201,7 @@ newTalent{
 		return ([[Hits the target with your weapon, doing %d%% damage. If the attack hits, the target's armour and saves are reduced by %d for %d turns.
 		Also if the target is protected by a temporary damage shield there is %d%% chance to shatter it.
 		Armor reduction chance increases with your Physical Power.]])
-		:format(100 * self:combatTalentWeaponDamage(t, 0.8, 1.5), t.getArmorReduc(self, t), t.getDuration(self, t), t.getShatter(self, t))
+		:tformat(100 * self:combatTalentWeaponDamage(t, 0.8, 1.5), t.getArmorReduc(self, t), t.getDuration(self, t), t.getShatter(self, t))
 	end,
 }
 
@@ -235,6 +235,6 @@ newTalent{
 		For %d turns you gain %d stamina per turn and %d%% movement and attack speed.
 		Only usable at 30%% or lower stamina.
 		Stamina regeneration is based on your Constitution stat.]]):
-		format(t.getDur(self, t), t.getStamina(self, t), t.getSpeed(self, t))
+		tformat(t.getDur(self, t), t.getStamina(self, t), t.getSpeed(self, t))
 	end,
 }

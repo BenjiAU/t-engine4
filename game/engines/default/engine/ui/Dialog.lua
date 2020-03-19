@@ -122,7 +122,7 @@ function _M:simplePopup(title, text, fct, no_leave, any_leave)
 	if not no_leave then
 		d.key:addBind("EXIT", function() game:unregisterDialog(d) if fct then fct() end end)
 		if any_leave then d.key:addCommand("__DEFAULT", function() game:unregisterDialog(d) if fct then fct() end end) end
-		local close = require("engine.ui.Button").new{text="Close", fct=function() d.key:triggerVirtual("EXIT") end}
+		local close = require("engine.ui.Button").new{text=_t"Close", fct=function() d.key:triggerVirtual("EXIT") end}
 		d:loadUI{no_reset=true, {hcenter = 0, bottom = 3, ui=close}}
 		d:setFocus(close)
 	end
@@ -143,7 +143,7 @@ function _M:simpleLongPopup(title, text, w, fct, no_leave, force_height)
 	d:loadUI{{left = 3, top = 3, ui=textzone}}
 	if not no_leave then
 		d.key:addBind("EXIT", function() game:unregisterDialog(d) if fct then fct() end end)
-		local close = require("engine.ui.Button").new{text="Close", fct=function() d.key:triggerVirtual("EXIT") end}
+		local close = require("engine.ui.Button").new{text=_t"Close", fct=function() d.key:triggerVirtual("EXIT") end}
 		d:loadUI{no_reset=true, {hcenter = 0, bottom = 3, ui=close}}
 		d:setFocus(close)
 	end
@@ -158,8 +158,8 @@ function _M:yesnoPopup(title, text, fct, yes_text, no_text, no_leave, escape, pr
 	local d = new(title, 1, 1)
 
 --	d.key:addBind("EXIT", function() game:unregisterDialog(d) fct(false) end)
-	local ok = require("engine.ui.Button").new{text=yes_text or "Yes", fct=function() if preexit_fct then preexit_fct(true) end game:unregisterDialog(d) fct(true) end}
-	local cancel = require("engine.ui.Button").new{text=no_text or "No", fct=function() if preexit_fct then preexit_fct(false) end game:unregisterDialog(d) fct(false) end}
+	local ok = require("engine.ui.Button").new{text=yes_text or _t"Yes", fct=function() if preexit_fct then preexit_fct(true) end game:unregisterDialog(d) fct(true) end}
+	local cancel = require("engine.ui.Button").new{text=no_text or _t"No", fct=function() if preexit_fct then preexit_fct(false) end game:unregisterDialog(d) fct(false) end}
 	if not no_leave then d.key:addBind("EXIT", function() if preexit_fct then preexit_fct(escape) end game:unregisterDialog(d) fct(escape) end) end
 	d:loadUI{
 		{left = 3, top = 3, ui=require("engine.ui.Textzone").new{width=w+20, height=h+5, text=text}},
@@ -176,8 +176,8 @@ end
 --- Requests a long yes-no dialog
 function _M:yesnoLongPopup(title, text, w, fct, yes_text, no_text, no_leave, escape, preexit_fct)
 	local d
-	local ok = require("engine.ui.Button").new{text=yes_text or "Yes", fct=function() if preexit_fct then preexit_fct(true) end game:unregisterDialog(d) fct(true) end}
-	local cancel = require("engine.ui.Button").new{text=no_text or "No", fct=function() if preexit_fct then preexit_fct(false) end game:unregisterDialog(d) fct(false) end}
+	local ok = require("engine.ui.Button").new{text=yes_text or _t"Yes", fct=function() if preexit_fct then preexit_fct(true) end game:unregisterDialog(d) fct(true) end}
+	local cancel = require("engine.ui.Button").new{text=no_text or _t"No", fct=function() if preexit_fct then preexit_fct(false) end game:unregisterDialog(d) fct(false) end}
 
 	w = math.max(w + 20, ok.w + cancel.w + 10)
 
@@ -203,9 +203,9 @@ function _M:yesnocancelPopup(title, text, fct, yes_text, no_text, cancel_text, n
 	local d = new(title, 1, 1)
 
 --	d.key:addBind("EXIT", function() game:unregisterDialog(d) fct(false) end)
-	local ok = require("engine.ui.Button").new{text=yes_text or "Yes", fct=function() if preexit_fct then preexit_fct(true, false) end game:unregisterDialog(d) fct(true, false) end}
-	local no = require("engine.ui.Button").new{text=no_text or "No", fct=function() if preexit_fct then preexit_fct(false, false) end game:unregisterDialog(d) fct(false, false) end}
-	local cancel = require("engine.ui.Button").new{text=cancel_text or "Cancel", fct=function() if preexit_fct then preexit_fct(false, true) end game:unregisterDialog(d) fct(false, true) end}
+	local ok = require("engine.ui.Button").new{text=yes_text or _t"Yes", fct=function() if preexit_fct then preexit_fct(true, false) end game:unregisterDialog(d) fct(true, false) end}
+	local no = require("engine.ui.Button").new{text=no_text or _t"No", fct=function() if preexit_fct then preexit_fct(false, false) end game:unregisterDialog(d) fct(false, false) end}
+	local cancel = require("engine.ui.Button").new{text=cancel_text or _t"Cancel", fct=function() if preexit_fct then preexit_fct(false, true) end game:unregisterDialog(d) fct(false, true) end}
 	if not no_leave then d.key:addBind("EXIT", function() if preexit_fct then preexit_fct(false, not escape) end game:unregisterDialog(d) fct(false, not escape) end) end
 	d:loadUI{
 		{left = 3, top = 3, ui=require("engine.ui.Textzone").new{width=w+20, height=h + 5, text=text}},
@@ -225,9 +225,9 @@ function _M:yesnocancelLongPopup(title, text, w, fct, yes_text, no_text, cancel_
 	local d = new(title, 1, 1)
 
 --	d.key:addBind("EXIT", function() game:unregisterDialog(d) fct(false) end)
-	local ok = require("engine.ui.Button").new{text=yes_text or "Yes", fct=function() if preexit_fct then preexit_fct(true, false) end game:unregisterDialog(d) fct(true, false) end}
-	local no = require("engine.ui.Button").new{text=no_text or "No", fct=function() if preexit_fct then preexit_fct(false, false) end game:unregisterDialog(d) fct(false, false) end}
-	local cancel = require("engine.ui.Button").new{text=cancel_text or "Cancel", fct=function() if preexit_fct then preexit_fct(false, true) end game:unregisterDialog(d) fct(false, true) end}
+	local ok = require("engine.ui.Button").new{text=yes_text or _t"Yes", fct=function() if preexit_fct then preexit_fct(true, false) end game:unregisterDialog(d) fct(true, false) end}
+	local no = require("engine.ui.Button").new{text=no_text or _t"No", fct=function() if preexit_fct then preexit_fct(false, false) end game:unregisterDialog(d) fct(false, false) end}
+	local cancel = require("engine.ui.Button").new{text=cancel_text or _t"Cancel", fct=function() if preexit_fct then preexit_fct(false, true) end game:unregisterDialog(d) fct(false, true) end}
 	if not no_leave then d.key:addBind("EXIT", function() game:unregisterDialog(d) if preexit_fct then preexit_fct(false, not escape) end game:unregisterDialog(d) fct(false, not escape) end) end
 	d:loadUI{
 		{left = 3, top = 3, ui=require("engine.ui.Textzone").new{width=w+20, auto_height=true, text=text}},
@@ -346,7 +346,7 @@ function _M:webPopup(url)
 			local url = w.cur_url:gsub("%?_te4&", "?"):gsub("%?_te4", ""):gsub("&_te4", "")
 			core.key.setClipboard(url)
 			print("[WEBVIEW] url copy", url)
-			self:simplePopup("Copy URL", "URL copied to your clipboard.")
+			self:simplePopup(_t"Copy URL", _t"URL copied to your clipboard.")
 		end
 	end}
 	w.on_title = function(title) d:updateTitle(title) end

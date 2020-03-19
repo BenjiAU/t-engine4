@@ -52,9 +52,9 @@ newEntity{
 	-- Dig only makes unstable tunnels
 	dig = function(src, x, y, old)
 		local sand = require("engine.Object").new{
-			name = "unstable sand tunnel", image = "terrain/sand.png",
+			name = _t"unstable sand tunnel", image = "terrain/sand.png",
 			show_tooltip = true,
-			desc = [[Loose sand is steadily filling this void, which could collapse suddenly and completely.]],
+			desc=_t[[Loose sand is steadily filling this void, which could collapse suddenly and completely.]],
 			display = '.', color={r=203,g=189,b=72}, back_color={r=93,g=79,b=22},
 			canAct = false,
 			act = function(self)
@@ -69,7 +69,7 @@ newEntity{
 					local a = game.level.map(self.x, self.y, engine.Map.ACTOR)
 					if a and not a:attr("sand_dweller") then
 						game.logPlayer(a, "You are crushed by the collapsing tunnel! You suffocate!")
-						a:suffocate(30, self, "was buried alive")
+						a:suffocate(30, self, _t"was buried alive")
 						engine.DamageType:get(engine.DamageType.PHYSICAL).projector(self, self.x, self.y, engine.DamageType.PHYSICAL, a.life / 2)
 					end
 				end

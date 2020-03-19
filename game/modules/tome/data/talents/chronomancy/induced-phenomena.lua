@@ -143,7 +143,7 @@ newTalent{
 		local will = t.getWillMultiplier(self, t) * 100
 		return ([[Tune yourself into the ebb and flow of spacetime.  When your Paradox crosses a 100 point threshold, your Cosmic Cycle gains or loses one radius.
 		While Cosmic Cycle is expanding, your temporal resistance penetration will be increased by %d%%.  While it's contracting, your Willpower for Paradox calculations will be increased by %d%%.]]):
-		format(paradox, will)
+		tformat(paradox, will)
 	end,
 }
 
@@ -179,7 +179,7 @@ newTalent{
 				local proj = require("mod.class.Projectile"):makeHoming(
 						self,
 						{particle="arrow", particle_args={tile=("particles_images/alt_temporal_bolt_0%d"):format(rng.range(1, 7)), proj_x=tx, proj_y=ty, src_x=self.x, src_y=self.y},  trail="trail_paradox"},
-						{speed=1, name="Polarity Bolt", dam=dam, movedam=dam},
+						{speed=1, name=_t"Polarity Bolt", dam=dam, movedam=dam},
 						target,
 						self:getTalentRadius(t),
 						function(self, src)
@@ -224,7 +224,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[Reverses the polarity of your Cosmic Cycle.  If it's currently contracting, it will begin to expand, firing a homing missile at each target within the radius that deals %0.2f temporal damage.
 		If it's currently expanding, it will begin to contract, braiding the lifelines of all targets within the radius for %d turns.  Braided targets take %d%% of all damage dealt to other braided targets.
-		The damage will scale with your Spellpower.]]):format(damDesc(self, DamageType.TEMPORAL, damage), duration, braid)
+		The damage will scale with your Spellpower.]]):tformat(damDesc(self, DamageType.TEMPORAL, damage), duration, braid)
 	end,
 }
 
@@ -273,7 +273,7 @@ newTalent{
 		local reduction = t.getReduction(self, t)
 		return ([[When a creature enters your expanding Cosmic Cycle, you heal %d life at the start of your next turn.
 		When a creature leaves your contracting Cosmic Cycle, you reduce the duration of one detrimental effect on you by %d at the start of your next turn.
-		The healing will scale with your Spellpower.]]):format(heal, reduction)
+		The healing will scale with your Spellpower.]]):tformat(heal, reduction)
 	end,
 }
 
@@ -302,19 +302,19 @@ newTalent{
 					if target:canBe("blind") then
 						target:setEffect(target.EFF_BLINDED, 3, {apply_power=getParadoxSpellpower(self, t), no_ct_effect=true})
 					else
-						game.logSeen(target, "%s resists the blindness!", target.name:capitalize())
+						game.logSeen(target, "%s resists the blindness!", target:getName():capitalize())
 					end
 				elseif effect == 2 then
 					if target:canBe("pin") then
 						target:setEffect(target.EFF_PINNED, 3, {apply_power=getParadoxSpellpower(self, t), no_ct_effect=true})
 					else
-						game.logSeen(target, "%s resists the pin!", target.name:capitalize())
+						game.logSeen(target, "%s resists the pin!", target:getName():capitalize())
 					end
 				elseif effect == 3 then
 					if target:canBe("confusion") then
 						target:setEffect(target.EFF_CONFUSED, 3, {power=50, apply_power=getParadoxSpellpower(self, t), no_ct_effect=true})
 					else
-						game.logSeen(target, "%s resists the confusion!", target.name:capitalize())
+						game.logSeen(target, "%s resists the confusion!", target:getName():capitalize())
 					end
 				end
 			end
@@ -334,6 +334,6 @@ newTalent{
 		local aging = t.getAgingChance(self, t)
 		return ([[While your cosmic cycle is expanding, creatures in its radius have a %d%% chance to suffer the effects of aging; pinning, blinding, or confusing them for 3 turns.
 		While your cosmic cycle is contracting, creatures in its radius suffer from age regression; reducing their three highest stats by %d.
-		The chance and stat reduction will scale with your Spellpower.]]):format(aging, regress)
+		The chance and stat reduction will scale with your Spellpower.]]):tformat(aging, regress)
 	end,
 }

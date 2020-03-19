@@ -36,7 +36,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Concentrate on your blows; for %d turns, each strike you land on your target in melee range has a %d%% chance to trigger another, similar strike.
 		This works for all blows, even those from other talents and from shield bashes, but you can gain no more than one extra blow with each weapon during a turn.
-		The chance increases with your Dexterity.]]):format(t.getdur(self, t), t.getchance(self, t))
+		The chance increases with your Dexterity.]]):tformat(t.getdur(self, t), t.getchance(self, t))
 	end,
 }
 
@@ -49,7 +49,7 @@ newTalent{ -- Doesn't scale past level 5, could use some bonus for higher talent
 	info = function(self, t)
 		return ([[After killing a foe, you have a %d%% chance to gain a 1000%% movement speed bonus for 1 game turn.
 		The bonus disappears as soon as any action other than moving is done.
-		Note: since you will be moving very fast, game turns will pass very slowly.]]):format(math.min(100, self:getTalentLevelRaw(t) * 20))
+		Note: since you will be moving very fast, game turns will pass very slowly.]]):tformat(math.min(100, self:getTalentLevelRaw(t) * 20))
 	end,
 }
 
@@ -93,7 +93,7 @@ newTalent{
 		local heal = t.healloss(self,t)
 		return ([[Lashes at the target, doing %d%% weapon damage.
 		If the attack hits, the target will bleed for %d%% weapon damage over 7 turns, and all healing will be reduced by %d%%.]]):
-		format(100 * self:combatTalentWeaponDamage(t, 1, 1.7), 100 * self:combatTalentWeaponDamage(t, 2, 3.2), heal)
+		tformat(100 * self:combatTalentWeaponDamage(t, 1, 1.7), 100 * self:combatTalentWeaponDamage(t, 2, 3.2), heal)
 	end,
 }
 
@@ -171,6 +171,6 @@ newTalent{
 		In addition, your all damage resistance cap increases %0.1f%% closer to 100%%.
 		This consumes stamina rapidly the longer it is sustained (%0.1f stamina/turn, increasing by 0.3/turn).
 		The resist is recalculated each time you take damage.]]):
-		format(resistC, resistC*0.7, t.getCapApproach(self, t)*100, drain)
+		tformat(resistC, resistC*0.7, t.getCapApproach(self, t)*100, drain)
 	end,
 }

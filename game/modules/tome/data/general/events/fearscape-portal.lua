@@ -34,7 +34,7 @@ local changer = function(id)
 	terrains.PORTAL_BACK = mod.class.Grid.new{
 		type = "floor", subtype = "floor",
 		display = "&", color = colors.BLUE,
-		name = "portal back to "..game.zone.name,
+		name = ("portal back to %s"):tformat(game.zone.name),
 		image = "terrain/red_floating_rocks05_01.png",
 		add_displays = { mod.class.Grid.new{image="terrain/demon_portal3.png"} },
 		change_level = 1,
@@ -48,7 +48,7 @@ local changer = function(id)
 		end
 	}
 	local zone = mod.class.Zone.new(id, {
-		name = "orbital fearscape platform",
+		name = _t"orbital fearscape platform",
 		level_range = game.zone.actor_adjust_level and {math.floor(game.zone:actor_adjust_level(game.level, game.player)*1.05),
 			math.ceil(game.zone:actor_adjust_level(game.level, game.player)*1.15)} or {game.zone.base_level, game.zone.base_level}, -- 5-15% higher levels
 		__applied_difficulty = true, -- Difficulty already applied to parent zone
@@ -77,7 +77,7 @@ local changer = function(id)
 			actor = {
 				class = "mod.class.generator.actor.Random",
 				nb_npc = {12, 12},
-				guardian = {random_elite={life_rating=function(v) return v * 1.5 + 4 end, name_scheme="#rng# the Invader", on_die=function(self) world:gainAchievement("EVENT_FEARSCAPE", game:getPlayer(true)) end,
+				guardian = {random_elite={life_rating=function(v) return v * 1.5 + 4 end, name_scheme=_t"#rng# the Invader", on_die=function(self) world:gainAchievement("EVENT_FEARSCAPE", game:getPlayer(true)) end,
 				nb_rares=(rng.percent(resolvers.current_level-50) and 5 or 4),
 				nb_classes=(rng.percent(resolvers.current_level-50) and 2 or 1)
 				}}
@@ -121,7 +121,7 @@ local changer = function(id)
 end
 
 local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
-g.name = "fearscape invasion portal"
+g.name = _t"fearscape invasion portal"
 g.always_remember = true
 g.show_tooltip = true
 g.display='&' g.color_r=0 g.color_g=0 g.color_b=255 g.notice = true
@@ -141,7 +141,7 @@ g.real_change = changer
 g.break_portal = function(self)
 	self.broken = true
 	game.log("#VIOLET#The portal is broken!")
-	self.name = "broken fearscape invasion portal"
+	self.name = _t"broken fearscape invasion portal"
 	self.change_level = nil
 	self.autoexplore_ignore = true
 	self.show_tooltip = false
@@ -159,7 +159,7 @@ g.on_move = function(self, x, y, who, act, couldpass)
 		return false
 	end
 
-	require("engine.ui.Dialog"):yesnoPopup("Fearscape Portal", "Do you wish to enter the portal, destroy it, or ignore it (press escape)?", function(ret)
+	require("engine.ui.Dialog"):yesnoPopup(_t"Fearscape Portal", _t"Do you wish to enter the portal, destroy it, or ignore it (press escape)?", function(ret)
 		if ret == "Quit" then
 			game.log("#VIOLET#Ignoring the portal...")
 			return
@@ -168,7 +168,7 @@ g.on_move = function(self, x, y, who, act, couldpass)
 			self:change_level_check()
 		else self:break_portal()
 		end
-	end, "Destroy", "Enter", false, "Quit")
+	end, _t"Destroy", _t"Enter", false, _t"Quit")
 	
 	return false
 end

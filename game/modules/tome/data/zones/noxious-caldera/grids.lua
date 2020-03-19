@@ -34,7 +34,7 @@ newEntity{
 	next_dream = 1,
 	block_move = function(self, x, y, who, act)
 		if who == game.player and act then
-			require("engine.ui.Dialog"):yesnoLongPopup("Altar of Dreams", "Looking into the altar will let you experience a dream. Without the influence of Mindworm, it'll however have no power over your body. Do you wish to look?", 400, function(ret)
+			require("engine.ui.Dialog"):yesnoLongPopup(_t"Altar of Dreams", _t"Looking into the altar will let you experience a dream. Without the influence of Mindworm, it'll however have no power over your body. Do you wish to look?", 400, function(ret)
 				if ret then
 					local dream = self.next_dream
 					self.next_dream = util.boundWrap(self.next_dream+1, 1, game.zone.max_dreams)

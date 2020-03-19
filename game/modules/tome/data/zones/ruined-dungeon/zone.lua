@@ -20,7 +20,7 @@
 local layout = game.state:alternateZoneTier1(short_name, {"ALT1", 1})
 
 return {
-	name = "Ruined Dungeon",
+	name = _t"Ruined Dungeon",
 	level_range = {10, 30},
 	level_scheme = "player",
 	max_level = 1,
@@ -78,11 +78,11 @@ return {
 		end
 
 		-- Pop guardians
-		local guardian_filter = {not_properties = {"unique"}, random_elite={name_scheme="#rng# the Guardian", on_die=function(self)
+		local guardian_filter = {not_properties = {"unique"}, random_elite={name_scheme=_t"#rng# the Guardian", on_die=function(self)
 			local spot = game.level:pickSpotRemove{type="portal", subtype="portal"}
 			if spot then
 				game.level.map(spot.x, spot.y, engine.Map.TERRAIN).orb_allowed = true
-				require("engine.ui.Dialog"):simplePopup("Guardian", "You can hear a magical trigger firing off.")
+				require("engine.ui.Dialog"):simplePopup(_t"Guardian", _t"You can hear a magical trigger firing off.")
 			end
 		end}, add_levels=5}
 		local _, guardians = level:pickSpot{type="spawn", subtype="guardian"}
@@ -110,7 +110,7 @@ return {
 			-- Failed!
 			if o[i] ~= order[i] then
 				game.level.orbs_touched = {}
-				Dialog:simplePopup("Strange Orb", "The orb seems to react badly to your touch, there is a high shriek!")
+				Dialog:simplePopup(_t"Strange Orb", _t"The orb seems to react badly to your touch, there is a high shriek!")
 				for i = 1, 4 do
 					-- Find space
 					local x, y = util.findFreeGrid(sx, sy, 10, true, {[game.level.map.ACTOR]=true})
@@ -132,13 +132,13 @@ return {
 		end
 		-- Success
 		if #o == #order then
-			Dialog:simplePopup("Strange Orb", "The orb glows brightly. There is a loud crack coming from the northern central chamber.")
+			Dialog:simplePopup(_t"Strange Orb", _t"The orb glows brightly. There is a loud crack coming from the northern central chamber.")
 			local spot = game.level:pickSpot{type="door", subtype="sealed"}
 			local g = game.zone:makeEntityByName(game.level, "terrain", "OLD_FLOOR")
 			game.zone:addEntity(game.level, g, "terrain", spot.x, spot.y)
 			game.level.orbs_used = true
 		else
-			Dialog:simplePopup("Strange Orb", "The orb glows brightly.")
+			Dialog:simplePopup(_t"Strange Orb", _t"The orb glows brightly.")
 		end
 	end,
 }

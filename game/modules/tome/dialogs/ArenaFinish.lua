@@ -29,7 +29,7 @@ module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init(actor)
 	self.actor = actor
-	Dialog.init(self, "Arena mode", 500, 300)
+	Dialog.init(self, _t"Arena mode", 500, 300)
 
 	actor:saveUUID()
 
@@ -49,16 +49,15 @@ end
 
 function _M:printRanking()
 	local scores = world.arena.scores
-	if not scores[1].name then return "#LIGHT_GREEN#No high scores. This should not happen."
+	if not scores[1].name then return _t"#LIGHT_GREEN#No high scores. This should not happen."
 	else
 		local text = ""
 		local tmp = ""
 		local line = function (txt, col) return " "..col..txt.."\n" end
-		local stri = "%s (%s %s %s)\n Score %d[%s]) - Wave: %d"
 		local i = 1
 		while(scores[i] and scores[i].name) do
 			p = scores[i]
-			tmp = stri:format((p.name or "unknown"):capitalize(), p.sex or "unknown", p.race or "unknown", p.class or "unknown", p.score or "unknown", p.perk or "unknown", p.wave or -1)
+			tmp = ("%s (%s %s %s)\n Score %d[%s]) - Wave: %d"):tformat((p.name or _t"unknown"):capitalize(), p.sex or _t"unknown", p.race or _t"unknown", p.class or _t"unknown", p.score or _t"unknown", p.perk or _t"unknown", p.wave or -1)
 			if p.name == world.arena.lastScore.name and p.score == world.arena.lastScore.score and p.wave == world.arena.lastScore.wave and p.perk == world.arena.lastScore.perk then
 				text = text..line(tmp, "#YELLOW#")
 			else
@@ -149,7 +148,7 @@ function _M:use(item)
 	elseif act == "dump" then
 		game:registerDialog(require("mod.dialogs.CharacterSheet").new(self.actor))
 	elseif act == "log" then
-		game:registerDialog(require("mod.dialogs.ShowChatLog").new("Message Log", 0.6, game.uiset.logdisplay, profile.chat))
+		game:registerDialog(require("mod.dialogs.ShowChatLog").new(_t"Message Log", 0.6, game.uiset.logdisplay, profile.chat))
 	elseif act == "lichform" then
 		local t = self.actor:getTalentFromId(self.actor.T_LICHFORM)
 
@@ -166,12 +165,12 @@ end
 function _M:generateList()
 	local list = {}
 
-	if config.settings.cheat then list[#list+1] = {name="Resurrect by cheating", action="cheat"} end
-	list[#list+1] = {name=(not profile.auth and "Message Log" or "Message/Chat log (allows to talk)"), action="log"}
-	list[#list+1] = {name="Character dump", action="dump"}
-	list[#list+1] = {name="Restart the same character", action="exit", subaction="restart"}
-	list[#list+1] = {name="Restart with a new character", action="exit", subaction="restart-new"}
-	list[#list+1] = {name="Exit to main menu", action="exit", subaction="none"}
+	if config.settings.cheat then list[#list+1] = {name=_t"Resurrect by cheating", action="cheat"} end
+	list[#list+1] = {name=(not profile.auth and _t"Message Log" or _t"Message/Chat log (allows to talk)"), action="log"}
+	list[#list+1] = {name=_t"Character dump", action="dump"}
+	list[#list+1] = {name=_t"Restart the same character", action="exit", subaction="restart"}
+	list[#list+1] = {name=_t"Restart with a new character", action="exit", subaction="restart-new"}
+	list[#list+1] = {name=_t"Exit to main menu", action="exit", subaction="none"}
 
 	self.list = list
 	if self.actor:isTalentActive(self.actor.T_LICHFORM) then

@@ -71,7 +71,7 @@ newTalent{
 		local regenRate = t.getRegenRate(self, t)
 
 		return ([[Your body's strength is fed by your hatred. This causes most forms of healing to be between 50%% effective (at 0 Hate) to 100%% effective (at 100+ Hate). In addition, after each kill, you store the waning life force to invigorate yourself, restoring %d life (limited by the foe's maximum life, up to a maximum of %d at any time).  You can heal no more than %0.1f life per turn this way, and it is not affected by your hatred level or other effects.
-		Healing from kills improves with your Willpower.]]):format(healPerKill, maxUnnaturalBodyHeal, regenRate)
+		Healing from kills improves with your Willpower.]]):tformat(healPerKill, maxUnnaturalBodyHeal, regenRate)
 	end,
 }
 
@@ -89,7 +89,7 @@ newTalent{
 		self:talentTemporaryValue(p, "stun_immune", t.getImmune(self, t))
 	end,
 	info = function(self, t)
-		return ([[Your thirst for blood drives your movements. You gain +%d%% confusion, fear, knockback and stun immunity.]]):format(t.getImmune(self, t)*100)
+		return ([[Your thirst for blood drives your movements. You gain +%d%% confusion, fear, knockback and stun immunity.]]):tformat(t.getImmune(self, t)*100)
 	end,
 }
 
@@ -104,7 +104,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		local incDamageChangeMax = t.getIncDamageChange(self, t, 5)
-		return ([[You have learned to hold onto your hate and use your suffering to fuel your body's rage. Every turn you take damage, the damage you inflict increases, until it reaches a maximum of +%d%% after 5 turns. Any turn in which you do not take damage will reduce the bonus.]]):format(incDamageChangeMax)
+		return ([[You have learned to hold onto your hate and use your suffering to fuel your body's rage. Every turn you take damage, the damage you inflict increases, until it reaches a maximum of +%d%% after 5 turns. Any turn in which you do not take damage will reduce the bonus.]]):tformat(incDamageChangeMax)
 	end
 }
 
@@ -119,7 +119,7 @@ newTalent{
 	info = function(self, t)
 		local statChangeMax = t.getStatChange(self, t, 5)
 		local neutralizeChance = t.getNeutralizeChance(self, t)
-		return ([[You rise to meet the pain that others would inflict on you. Every turn you take damage, your Strength and Willpower increase until they reach a maximum of +%d after 5 turns. Any turn in which you do not take damage will reduce the bonus. While in effect, your body also has a %d%% chance to overcome poisons and diseases each turn.]]):format(statChangeMax, neutralizeChance)
+		return ([[You rise to meet the pain that others would inflict on you. Every turn you take damage, your Strength and Willpower increase until they reach a maximum of +%d after 5 turns. Any turn in which you do not take damage will reduce the bonus. While in effect, your body also has a %d%% chance to overcome poisons and diseases each turn.]]):tformat(statChangeMax, neutralizeChance)
 	end,
 }
 

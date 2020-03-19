@@ -26,7 +26,7 @@ newEntity{
 	type = "humanoid", subtype = "human",
 	display = "p", color=colors.UMBER,
 	faction = "zigur",
-	killer_message = "and burned on a pyre",
+	killer_message = _t"and burned on a pyre",
 
 	combat = { dam=resolvers.rngavg(5,12), atk=2, apr=6, physspeed=2 },
 
@@ -54,7 +54,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_ZIGURANTH",
 	name = "ziguranth warrior", color=colors.CRIMSON,
-	desc = [[A Ziguranth warrior, clad in heavy armour.]],
+	desc = _t[[A Ziguranth warrior, clad in heavy armour.]],
 	subtype = "dwarf",
 	level_range = {20, nil}, exp_worth = 1,
 	rarity = 1,
@@ -78,7 +78,7 @@ newEntity{ base = "BASE_NPC_ZIGURANTH",
 
 newEntity{ base = "BASE_NPC_ZIGURANTH",
 	name = "ziguranth summoner", color=colors.CRIMSON,
-	desc = [[A Ziguranth wilder, attuned to nature.]],
+	desc = _t[[A Ziguranth wilder, attuned to nature.]],
 	subtype = "thalore",
 	level_range = {20, nil}, exp_worth = 1,
 	rarity = 2,
@@ -109,7 +109,7 @@ newEntity{ base = "BASE_NPC_ZIGURANTH",
 
 newEntity{ base = "BASE_NPC_ZIGURANTH",
 	name = "ziguranth wyrmic", color=colors.CRIMSON,
-	desc = [[A Ziguranth wilder, attuned to nature.]],
+	desc = _t[[A Ziguranth wilder, attuned to nature.]],
 	level_range = {20, nil}, exp_worth = 1,
 	rarity = 2,
 	rank = 3,

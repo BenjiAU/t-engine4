@@ -33,7 +33,7 @@ newTalent{
 		if self.player and not self:attr("no_lichform_quest") and not self:hasQuest("lichform") and not self:attr("undead") then
 			self:grantQuest("lichform")
 			if not game:isCampaign("Maj'Eyal") then self:setQuestStatus("lichform", engine.Quest.DONE) end
-			require("engine.ui.Dialog"):simplePopup("Lichform", "You have mastered the lesser arts of overcoming death, but your true goal is before you: the true immortality of Lichform!")
+			require("engine.ui.Dialog"):simplePopup(_t"Lichform", _t"You have mastered the lesser arts of overcoming death, but your true goal is before you: the true immortality of Lichform!")
 		end
 
 		local ret = {
@@ -47,7 +47,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[The line between life and death blurs for you; you can only die when you reach -%d life.]]):
-		format(t.lifeBonus(self, t))
+		tformat(t.lifeBonus(self, t))
 	end,
 }
 
@@ -59,8 +59,8 @@ newTalent{
 	mana = 60,
 	cooldown = 25,
 	tactical = { ATTACK = { ARCANE = 3 }, DISABLE = 2 },
-	rnd_boss_restrict = function(self, t)
-		return self.level < 15
+	rnd_boss_restrict = function(self, t, data)
+		return data.level < 15
 	end,
 	range = 7,
 	requires_target = true,
@@ -82,7 +82,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Your target's doom draws near. Its healing factor is reduced by 80%%, and will take %d%% of its remaining life (or %0.2f, whichever is lower) over 10 turns as arcane damage.
 		The damage will increase with your Spellpower.]]):
-		format(t.getDamage(self, t), t.getMax(self, t))
+		tformat(t.getDamage(self, t), t.getMax(self, t))
 	end,
 }
 
@@ -153,7 +153,7 @@ newTalent{
 		local heal = t.getHeal(self, t)
 		return ([[Absorb up to %d%% of the maximum life of each of your necrotic minions (even negative life, possibly destroying them). This will heal you for the greatest amount absorbed.
 		The healing will increase with your Spellpower.]]):
-		format(heal)
+		tformat(heal)
 	end,
 }
 
@@ -163,7 +163,7 @@ newTalent{
 	require = {
 		stat = { mag=function(level) return 40 + (level-1) * 2 end },
 		level = function(level) return 20 + (level-1)  end,
-		special = { desc="'From Death, Life' quest completed and not already undead", fct=function(self, t) return not self:attr("undead") and (self:isQuestStatus("lichform", engine.Quest.DONE) or game.state.birth.ignore_prodigies_special_reqs) end},
+		special = { desc=_t"'From Death, Life' quest completed and not already undead", fct=function(self, t) return not self:attr("undead") and (self:isQuestStatus("lichform", engine.Quest.DONE) or game.state.birth.ignore_prodigies_special_reqs) end},
 	},
 	mode = "sustained",
 	points = 5,
@@ -250,11 +250,11 @@ newTalent{
 		if not self.has_custom_tile then
 			self:removeAllMOs()
 			self:updateModdableTile()
-			require("engine.ui.Dialog"):yesnoLongPopup("Lichform", "#GREY#You feel your life slip away, only to be replaced by pure arcane forces! Your flesh starts to rot on your bones, and your eyes fall apart as you are reborn into a Lich!\n\n#{italic}#You may now choose to customize the appearance of your Lich, this can not be changed afterwards.", 600, function(ret) if ret then
+			require("engine.ui.Dialog"):yesnoLongPopup(_t"Lichform", _t"#GREY#You feel your life slip away, only to be replaced by pure arcane forces! Your flesh starts to rot on your bones, and your eyes fall apart as you are reborn into a Lich!\n\n#{italic}#You may now choose to customize the appearance of your Lich, this can not be changed afterwards.", 600, function(ret) if ret then
 				require("mod.dialogs.Birther"):showCosmeticCustomizer(self, "Lich Cosmetic Options")
-			end end, "Customize Appearance", "Use Default", true)
+			end end, _t"Customize Appearance", _t"Use Default", true)
 		else
-			require("engine.ui.Dialog"):simplePopup("Lichform", "#GREY#You feel your life slip away, only to be replaced by pure arcane forces! Your flesh starts to rot on your bones, and your eyes fall apart as you are reborn into a Lich!")
+			require("engine.ui.Dialog"):simplePopup(_t"Lichform", _t"#GREY#You feel your life slip away, only to be replaced by pure arcane forces! Your flesh starts to rot on your bones, and your eyes fall apart as you are reborn into a Lich!")
 		end
 
 		game.level.map:particleEmitter(self.x, self.y, 1, "demon_teleport")
@@ -292,6 +292,6 @@ newTalent{
 		The undead cannot use this talent.
 		While active, it will drain 4 mana per turn.
 		Once you die and turn into a Lich you can not invest any more in this talent.]]):
-		format()
+		tformat()
 	end,
 }

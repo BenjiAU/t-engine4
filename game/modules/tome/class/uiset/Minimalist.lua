@@ -49,13 +49,13 @@ function _M:switchLocked()
 	if self.locked then
 		game.key = self.unlock_game_key_save
 		game.key:setCurrent()
-		game.bignews:say(60, "#CRIMSON#Interface locked, keyboard and mouse enabled.")
+		game.bignews:say(60, _t"#CRIMSON#Interface locked, keyboard and mouse enabled.")
 	else
 		self.unlock_game_key_save = game.key
 		local key = KeyBind.new()
 		game.key = key
 		game.key:setCurrent()
-		game.bignews:say(60, "#CRIMSON#Interface unlocked, keyboard and mouse disabled.")
+		game.bignews:say(60, _t"#CRIMSON#Interface unlocked, keyboard and mouse disabled.")
 
 		key:addCommand(key._ESCAPE, nil, function() self:switchLocked() end)
 	end
@@ -77,7 +77,7 @@ end
 
 function _M:getMainMenuItems()
 	return {
-		{"Reset interface positions", function() Dialog:yesnoPopup("Reset UI", "Reset all the interface?", function(ret) if ret then
+		{_t"Reset interface positions", function() Dialog:yesnoPopup(_t"Reset UI", _t"Reset all the interface?", function(ret) if ret then
 			self:resetPlaces()
 		end end) end},
 	}

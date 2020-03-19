@@ -97,11 +97,11 @@ local trigger = function(self, who)
 			if not tx then
 				game.logPlayer(who, "#YELLOW#The Portal repels you briefly before becoming quiescent.  The other side seems to be blocked.")
 			else
-				require("engine.ui.Dialog"):yesnoPopup("Malevolent Portal", "An ominous aura emanates from this portal. Are you sure you want to go through?", function(ret) if ret then
+				require("engine.ui.Dialog"):yesnoPopup(_t"Malevolent Portal", _t"An ominous aura emanates from this portal. Are you sure you want to go through?", function(ret) if ret then
 					game.logPlayer(who, "#YELLOW#You overcome intense #LIGHT_BLUE#REPULSIVE FORCES#LAST# as you traverse the Portal.")
 					game:playSoundNear(who, "talents/distortion")
 					who:move(tx, ty, true)
-				end end, "Teleport", "Cancel")
+				end end, _t"Teleport", _t"Cancel")
 			end
 		end
 	else
@@ -129,8 +129,8 @@ TeleportIn = mod.class.Grid.new{
 	define_as = "VAULT_TELEPORTER_IN",
 	__position_aware = true,
 	type = "floor", subtype = "floor",
-	name = "Portal", image = "terrain/marble_floor.png", add_displays={mod.class.Grid.new{z=5, image = "terrain/demon_portal.png"}},
-	desc = "A strange portal to some place else.",
+	name = _t"Portal", image = "terrain/marble_floor.png", add_displays={mod.class.Grid.new{z=5, image = "terrain/demon_portal.png"}},
+	desc = _t"A strange portal to some place else.",
 	show_tooltip = true, always_remember = true, notice = true,
 	display='&', color_r=225, color_g=0, color_b=255,
 	on_move = move_trigger,
@@ -147,8 +147,8 @@ TeleportOut = mod.class.Grid.new{
 	define_as = "VAULT_TELEPORTER_OUT",
 	__position_aware = true,
 	type = "floor", subtype = "floor",
-	name = "Portal", image = "terrain/marble_floor.png", add_displays={mod.class.Grid.new{z=5, image = "terrain/demon_portal4.png"}},
-	desc = "A portal out of this place.",
+	name = _t"Portal", image = "terrain/marble_floor.png", add_displays={mod.class.Grid.new{z=5, image = "terrain/demon_portal4.png"}},
+	desc = _t"A portal out of this place.",
 	show_tooltip = true, always_remember = true, notice = true,
 	display='&', color_r=225, color_g=0, color_b=255,
 	on_move = move_trigger,

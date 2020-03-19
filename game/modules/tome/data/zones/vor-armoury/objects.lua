@@ -22,12 +22,12 @@ load("/data/general/objects/objects-far-east.lua")
 newEntity{ define_as = "ATHAME",
 	quest=true, unique=true, identified=true, no_unique_lore=true,
 	type = "misc", subtype="misc",
-	unided_name = "athame",
+	unided_name = _t"athame",
 	name = "Blood-Runed Athame", image = "object/artifact/blood_runed_athame.png",
 	level_range = {50, 50},
 	display = "|", color=colors.VIOLET,
 	encumber = 1,
-	desc = [[An athame, covered in blood runes. It radiates power.]],
+	desc = _t[[An athame, covered in blood runes. It radiates power.]],
 
 	on_pickup = function(self, who)
 		if who == game.player then

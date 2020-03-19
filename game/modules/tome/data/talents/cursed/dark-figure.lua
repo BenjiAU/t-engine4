@@ -49,7 +49,7 @@ newTalent{
 	info = function(self, t)
 		local radius = t.getRadius(self, t)
 		local duration = t.getDuration(self, t)
-		return ([[Fear radiates from your target in a radius of %d for %d turns driving all others away.]]):format(radius, duration)
+		return ([[Fear radiates from your target in a radius of %d for %d turns driving all others away.]]):tformat(radius, duration)
 	end,
 }
 
@@ -66,7 +66,7 @@ newTalent{
 	getPercent = function(self, t) return 15 + math.floor(self:getTalentLevel(t) * 10) end,
 	info = function(self, t)
 		local percent = t.getPercent(self, t)
-		return ([[The time you have spent suppressing the curse has taught you self control. The duration of most non-magical effects are reduced by %d%%.]]):format(percent)
+		return ([[The time you have spent suppressing the curse has taught you self control. The duration of most non-magical effects are reduced by %d%%.]]):tformat(percent)
 	end,
 }
 
@@ -90,7 +90,7 @@ newTalent{
 	info = function(self, t)
 		local speed = t.getSpeed(self, t)
 		local duration = t.getDuration(self, t)
-		return ([[You are invigorated by the death around you. Each life you take grants %d%% speed for %d more turns.]]):format(100 + speed, duration)
+		return ([[You are invigorated by the death around you. Each life you take grants %d%% speed for %d more turns.]]):tformat(100 + speed, duration)
 	end,
 }
 
@@ -140,7 +140,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		local range = t.range(self, t)
-		return ([[You hide your terrible nature behind a pitiful figure. Those that see you from a distance of %d will ignore you. If you attack or use a talent they will see you for what you are and pity will be deactivated.]]):format(range)
+		return ([[You hide your terrible nature behind a pitiful figure. Those that see you from a distance of %d will ignore you. If you attack or use a talent they will see you for what you are and pity will be deactivated.]]):tformat(range)
 	end,
 }
 

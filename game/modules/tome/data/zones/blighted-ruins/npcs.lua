@@ -31,7 +31,7 @@ newEntity{
 	type = "humanoid", subtype = "human",
 	display = "p", color=colors.DARK_GREY,
 	name = "Necromancer", color=colors.DARK_GREY,
-	desc = [[A Human dressed in black robes. He mumbles in a harsh tongue. He seems to think you are his slave.]],
+	desc = _t[[A Human dressed in black robes. He mumbles in a harsh tongue. He seems to think you are his slave.]],
 	level_range = {1, nil}, exp_worth = 1,
 
 	combat = { dam=resolvers.rngavg(5,12), atk=2, apr=6, physspeed=2 },
@@ -73,7 +73,7 @@ newEntity{
 newEntity{ base = "BASE_NPC_BONE_GIANT", define_as = "HALF_BONE_GIANT",
 	allow_infinite_dungeon = true,
 	name = "Half-Finished Bone Giant", color=colors.VIOLET, unique=true,
-	desc = [[A towering creature, made from the bones of hundreds of dead bodies. It is covered by an unholy aura.
+	desc = _t[[A towering creature, made from the bones of hundreds of dead bodies. It is covered by an unholy aura.
 This specimen looks like it was hastily assembled and is not really complete yet.]],
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/undead_giant_half_finished_bone_giant.png", display_h=2, display_y=-1}}},
 	level_range = {7, nil}, exp_worth = 1,
@@ -126,7 +126,7 @@ This specimen looks like it was hastily assembled and is not really complete yet
 
 newEntity{ base = "BASE_NPC_HORROR_UNDEAD",
 	name = "fleshy experiment", color=colors.DARK_GREEN,
-	desc ="This pile of rotting flesh twitches and makes horrid noises.",
+	desc =_t"This pile of rotting flesh twitches and makes horrid noises.",
 	level_range = {1, 5}, exp_worth = 1,
 	rarity = 1,
 	rank = 2,
@@ -157,7 +157,7 @@ newEntity{ base = "BASE_NPC_HORROR_UNDEAD",
 
 newEntity{ base = "BASE_NPC_HORROR_UNDEAD",
 	name = "boney experiment", color=colors.WHITE,
-	desc ="This pile of bones appears to move on its own, but it can't seem to organise itself into something dangerous.",
+	desc =_t"This pile of bones appears to move on its own, but it can't seem to organise itself into something dangerous.",
 	level_range = {1, 5}, exp_worth = 1,
 	rarity = 1,
 	rank = 2,
@@ -189,7 +189,7 @@ newEntity{ base = "BASE_NPC_HORROR_UNDEAD",
 
 newEntity{ base = "BASE_NPC_HORROR_UNDEAD",
 	name = "sanguine experiment", color=colors.RED,
-	desc ="It looks like a giant blood clot. Is that what its creator intended?",
+	desc =_t"It looks like a giant blood clot. Is that what its creator intended?",
 	level_range = {1, 5}, exp_worth = 1,
 	rarity = 1,
 	rank = 2, life_rating = 10,

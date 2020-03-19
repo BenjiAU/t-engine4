@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Fortress Gladium",
+	name = _t"Fortress Gladium",
 	level_range = {1, 1},
 	level_scheme = "player",
 	max_level = 1,

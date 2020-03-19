@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[During your adventures you will encounter a variety of terrains you can pass on: grass, sand, water, lava, ...
+return _t[[During your adventures you will encounter a variety of terrains you can pass on: grass, sand, water, lava, ...
 
 Some of those terrains have innate penalties or tricks. You will have to learn them and how to deal with them.
 

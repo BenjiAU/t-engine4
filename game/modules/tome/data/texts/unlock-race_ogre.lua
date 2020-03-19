@@ -17,8 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return "New Race: #LIGHT_GREEN#Ogre",
-[[
+return _t"New Race: #LIGHT_GREEN#Ogre",
+_t[[
 Ogres are magically-altered Humans, taking refuge in Elvala among the Shalore. 
 Their enormous bodies, bolstered by (and dependent on) an intricate web of glowing runes covering their skin, make them an intimidating sight that belies their conscientious and modest nature.
 Ogres were created (and subsequently abandoned) by the Conclave during the Allure Wars, to serve as their warriors and workers.  Their massive size and glowing runes made it impossible for them to hide during the Spellhunt, and only those who fled to Shalore lands survived extermination.

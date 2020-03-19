@@ -47,12 +47,12 @@ local name_rules = {
 
 local possible_types = {
 	{ name="lost warrior", random="male", chance=70,
-		text = [[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
+		text = _t[[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
 		actor = {
 			type = "humanoid", subtype = "human", image = "player/higher_male.png",
 			display = "@", color=colors.UMBER,
-			name = "%s, the lost warrior",
-			desc = [[He looks tired and wounded.]],
+			name = _t"%s, the lost warrior",
+			desc = _t[[He looks tired and wounded.]],
 			autolevel = "warrior",
 			ai = "escort_quest", ai_state = { talent_in=4, },
 			stats = { str=18, dex=13, mag=5, con=15 },
@@ -74,12 +74,12 @@ local possible_types = {
 		},
 	},
 	{ name="injured seer", random="female", chance=70,
-		text = [[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I will not be able to continue the road alone. Would you help me?]],
+		text = _t[[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I will not be able to continue the road alone. Would you help me?]],
 		actor = {
-			name = "%s, the injured seer",
+			name = _t"%s, the injured seer",
 			type = "humanoid", subtype = "elf", female=true, image = "player/halfling_female.png",
 			display = "@", color=colors.LIGHT_BLUE,
-			desc = [[She looks tired and wounded.]],
+			desc = _t[[She looks tired and wounded.]],
 			autolevel = "caster",
 			ai = "escort_quest", ai_state = { talent_in=4, },
 			stats = { str=8, dex=7, mag=18, con=12 },
@@ -100,12 +100,12 @@ local possible_types = {
 		},
 	},
 	{ name="repented thief", random="male", chance=70,
-		text = [[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
+		text = _t[[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
 		actor = {
-			name = "%s, the repented thief",
+			name = _t"%s, the repented thief",
 			type = "humanoid", subtype = "halfling", image = "player/cornac_male.png",
 			display = "@", color=colors.BLUE,
-			desc = [[He looks tired and wounded.]],
+			desc = _t[[He looks tired and wounded.]],
 			autolevel = "rogue",
 			ai = "escort_quest", ai_state = { talent_in=4, },
 			stats = { str=8, dex=7, mag=18, con=12 },
@@ -127,12 +127,12 @@ local possible_types = {
 		},
 	},
 	{ name="lone alchemist", random="male", chance=70,
-		text = [[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
+		text = _t[[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
 		actor = {
-			name = "%s, the lone alchemist",
+			name = _t"%s, the lone alchemist",
 			type = "humanoid", subtype = "human", image = "player/shalore_male.png",
 			display = "@", color=colors.AQUAMARINE,
-			desc = [[He looks tired and wounded.]],
+			desc = _t[[He looks tired and wounded.]],
 			autolevel = "rogue",
 			ai = "escort_quest", ai_state = { talent_in=4, },
 			stats = { str=8, dex=7, mag=18, con=12 },
@@ -153,12 +153,12 @@ local possible_types = {
 		},
 	},
 	{ name="lost sun paladin", random="female", chance=70,
-		text = [[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
+		text = _t[[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
 		actor = {
-			name = "%s, the lost sun paladin",
+			name = _t"%s, the lost sun paladin",
 			type = "humanoid", subtype = "human", female=true, image = "player/higher_female.png",
 			display = "@", color=colors.GOLD,
-			desc = [[She looks tired and wounded.]],
+			desc = _t[[She looks tired and wounded.]],
 			autolevel = "warriormage",
 			ai = "escort_quest", ai_state = { talent_in=4, },
 			stats = { str=18, dex=7, mag=18, con=12 },
@@ -180,12 +180,12 @@ local possible_types = {
 		},
 	},
 	{ name="lost defiler", random="female", chance=70,
-		text = [[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
+		text = _t[[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
 		actor = {
-			name = "%s, the lost defiler",
+			name = _t"%s, the lost defiler",
 			type = "humanoid", subtype = "human", female=true, image = "player/higher_female.png",
 			display = "@", color=colors.YELLOW,
-			desc = [[She looks tired and wounded.]],
+			desc = _t[[She looks tired and wounded.]],
 			autolevel = "caster",
 			ai = "escort_quest", ai_state = { talent_in=4, },
 			stats = { str=8, dex=7, mag=18, con=12 },
@@ -205,15 +205,15 @@ local possible_types = {
 			reward_type = "defiler",
 		},
 	},
-	{ name="temporal explorer", random="player", portal="temporal portal", chance=30,
-		text = [[Oh but you are ... are you ?! ME?!
+	{ name="temporal explorer", random="player", portal=_t"temporal portal", chance=30,
+		text = _t[[Oh but you are ... are you ?! ME?!
 So I was right, this is not my original time-thread!
 Please help me! I am afraid I lost myself in this place. I know there is a temporal portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me? Would you help .. yourself?]],
 		actor = {
-			name = "%s, temporal explorer",
+			name = _t"%s, temporal explorer",
 			type = "humanoid", subtype = "human", female=true, image = "player/higher_female.png",
 			display = "@", color=colors.YELLOW,
-			desc = [[She looks tired and wounded. She is so similar to you and yet completely different. Weird.]],
+			desc = _t[[She looks tired and wounded. She is so similar to you and yet completely different. Weird.]],
 			autolevel = "caster",
 			ai = "escort_quest", ai_state = { talent_in=4, },
 			stats = { str=8, dex=7, mag=18, con=12 },
@@ -234,12 +234,12 @@ Please help me! I am afraid I lost myself in this place. I know there is a tempo
 		},
 	},
 	{ name="worried loremaster", random="female", chance=30,
-		text = [[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
+		text = _t[[Please help me! I am afraid I lost myself in this place. I know there is a recall portal left around here by a friend, but I have fought too many battles, and I fear I will not make it. Would you help me?]],
 		actor = {
-			name = "%s, the worried loremaster",
+			name = _t"%s, the worried loremaster",
 			type = "humanoid", subtype = "human", female=true, image = "player/thalore_female.png",
 			display = "@", color=colors.LIGHT_GREEN,
-			desc = [[She looks tired and wounded.]],
+			desc = _t[[She looks tired and wounded.]],
 			autolevel = "wildcaster",
 			ai = "escort_quest", ai_state = { talent_in=4, },
 			stats = { str=8, dex=7, mag=18, con=12 },
@@ -272,22 +272,22 @@ id = "escort-duty-"..game.zone.short_name.."-"..game.level.level
 
 kind = {}
 
-name = ""
+name = _t""
 desc = function(self, who)
 	local desc = {}
 	if self:isStatus(engine.Quest.DONE) then
-		desc[#desc+1] = "You successfully escorted the "..self.kind.name.." to the recall portal on level "..self.level_name.."."
+		desc[#desc+1] = ("You successfully escorted the %s to the recall portal on level %s."):tformat(_t(self.kind.name), self.level_name)
 		if self.reward_message then
-			desc[#desc+1] = ("As a reward you %s."):format(self.reward_message)
+			desc[#desc+1] = ("As a reward you %s."):tformat(self.reward_message)
 		end
 	elseif self:isStatus(engine.Quest.FAILED) then
 		if self.abandoned then
-			desc[#desc+1] = "You abandoned "..self.kind.name.." to death."
+			desc[#desc+1] = ("You abandoned %s, to death."):tformat(_t(self.kind.name))
 		else
-			desc[#desc+1] = "You failed to protect the "..self.kind.name.." from death by "..(self.killing_npc or "???").."."
+			desc[#desc+1] = ("You failed to protect the %s from death by %s."):tformat(_t(self.kind.name), self.killing_npc or "???")
 		end
 	else
-		desc[#desc+1] = "Escort the "..self.kind.name.." to the recall portal on level "..self.level_name.."."
+		desc[#desc+1] = ("Escort the %s to the recall portal on level %s."):tformat(_t(self.kind.name), self.level_name)
 	end
 	return table.concat(desc, "\n")
 end
@@ -373,9 +373,9 @@ on_grant = function(self, who)
 	self.kind.actor.remove_from_party_on_death = true
 	self.kind.actor.on_die = function(self, who)
 		if self.sunwall_query then game.state.found_sunwall_west_died = true end
-		game.logPlayer(game.player, "#LIGHT_RED#%s is dead, quest failed!", self.name:capitalize())
+		game.logPlayer(game.player, "#LIGHT_RED#%s is dead, quest failed!", self:getName():capitalize())
 		game.player:setQuestStatus(self.quest_id, engine.Quest.FAILED)
-		game.player:hasQuest(self.quest_id).killing_npc = who and who.name or "something"
+		game.player:hasQuest(self.quest_id).killing_npc = who and who.name or _t"something"
 		if who.resolveSource and who:resolveSource().player then
 			world:gainAchievement("ESCORT_KILL", game.player)
 			game.player:registerEscorts("betrayed")
@@ -398,7 +398,7 @@ on_grant = function(self, who)
 	g = g:cloneFull()
 	g.__nice_tile_base = nil
 	g.show_tooltip = true
-	g.name = (self.kind.portal or "Recall Portal")..": "..npc.name
+	g.name = (self.kind.portal or _t"Recall Portal")..": "..npc.name
 	g.display = '&'
 	g.color_r = colors.VIOLET.r
 	g.color_g = colors.VIOLET.g
@@ -430,8 +430,8 @@ on_grant = function(self, who)
 	game.zone:addEntity(game.level, npc, "actor", x, y)
 
 	-- Setup quest
-	self.level_name = game.level.level.." of "..game.zone.name
-	self.name = "Escort: "..self.kind.name.." (level "..self.level_name..")"
+	self.level_name = ("%s of %s"):tformat(game.level.level, game.zone.name)
+	self.name = ("Escort: %s (level %s)"):tformat(_t(self.kind.name), self.level_name)
 
 	local Chat = require "engine.Chat"
 	Chat.new("escort-quest-start", npc, game.player, {text=self.kind.text, npc=npc}):invoke()

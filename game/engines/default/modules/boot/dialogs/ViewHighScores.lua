@@ -33,7 +33,7 @@ require "engine.PlayerProfile"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init()
-	Dialog.init(self, "View High Scores", game.w * 0.8, game.h * 0.8)
+	Dialog.init(self, _t"View High Scores", game.w * 0.8, game.h * 0.8)
 
 	-- high score table on right
 	self.c_desc = Textzone.new{width=math.floor(self.iw / 3 * 2 - 10), height=self.ih, text=""}
@@ -43,13 +43,13 @@ function _M:init()
 	self:generateList()
 
 	self.c_list = ListColumns.new{width=math.floor(self.iw / 3 - 10), height=math.floor(self.ih / 2), scrollbar=true, columns={
-		{name="Game Module", width=80, display_prop="name"},
-		{name="Version", width=20, display_prop="version_txt"},
+		{name=_t"Game Module", width=80, display_prop="name"},
+		{name=_t"Version", width=20, display_prop="version_txt"},
 	}, list=self.list, fct=function(item) end, select=function(item, sel) self:changemodules(item) end}
 
 	-- list of campaigns/worlds on left (bottom)
 	self.c_sublist = ListColumns.new{width=math.floor(self.iw / 3 - 10), height=math.floor(self.ih / 2),
-		columns = {{name="World",width=100,display_prop="world"}},
+		columns = {{name=_t"World",width=100,display_prop="world"}},
 		list={}, select=function(item,sel) self:changeworlds(item) end, fct=function(item) end}
 
 	local sep = Separator.new{dir="horizontal", size=self.ih - 10}
@@ -94,7 +94,7 @@ function _M:generateList()
 						mod.highscores[world] = HighScores.createHighScoreTable(world,formatter)
 					end
 				end
-				mod.zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text="#{bold}##GOLD#"..mod.long_name.."#GREEN# High Scores#WHITE##{normal}#\n\n"}
+				mod.zone = Textzone.new{width=self.c_desc.w, height=self.c_desc.h, text=("#{bold}##GOLD#%s#GREEN# High Scores#WHITE##{normal}#\n\n"):tformat(mod.long_name)}
 				table.insert(self.list, mod)
 			end
 		end
@@ -111,7 +111,7 @@ function _M:changemodules(item)
 		self.c_sublist:setList(worlds)
 		if #worlds > 0 then
 			-- show text from first world
-			item.zone.text = "#{bold}##GOLD#"..item.long_name.."("..worlds[1].world..")".."#GREEN# High Scores#WHITE##{normal}#\n\n"
+			item.zone.text = ("#{bold}##GOLD#%s(%s)#GREEN# High Scores#WHITE##{normal}#\n\n"):tformat(item.long_name, worlds[1].world)
 			item.zone.text = item.zone.text .. item.highscores[worlds[1].world]
 			item.zone:generate()
 		end
@@ -121,7 +121,7 @@ end
 function _M:changeworlds(item)
 	if item and self.uis[2] then
 		world = item.world;
-		self.cur_sel.zone.text = "#{bold}##GOLD#"..self.cur_sel.long_name.."("..world..")".."#GREEN# High Scores#WHITE##{normal}#\n\n"
+		self.cur_sel.zone.text = ("#{bold}##GOLD#%s(%s)#GREEN# High Scores#WHITE##{normal}#\n\n"):tformat(self.cur_sel.long_name, world)
 		self.cur_sel.zone.text = self.cur_sel.zone.text .. self.cur_sel.highscores[world]
 		self.cur_sel.zone:generate()
 	end

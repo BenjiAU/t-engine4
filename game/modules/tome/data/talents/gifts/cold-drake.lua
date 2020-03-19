@@ -72,7 +72,7 @@ newTalent{
 		Every level in Ice Claw additionally raises your Physical Save by 2.
 		Each point in cold drake talents also increases your cold resistance by 1%%.
 
-		This talent will also attack with your shield, if you have one equipped.]]):format(100 * t.damagemult(self, t), self:getTalentRadius(t))
+		This talent will also attack with your shield, if you have one equipped.]]):tformat(100 * t.damagemult(self, t), self:getTalentRadius(t))
 	end,
 }
 
@@ -109,7 +109,7 @@ newTalent{
 		return ([[Your skin forms icy scales and your flesh toughens, increasing your Maximum Life by %d%% and your Armour by %d.
 		You also deal %0.2f cold damage to any enemies that physically strike you.
 		Each point in cold drake talents also increases your cold resistance by 1%%.
-		The life increase will scale with your Talent Level, and your Armour and retaliation cold damage will scale with Mindpower.]]):format(life * 100, t.getArmor(self, t), damDesc(self, DamageType.COLD, t.getDamageOnMeleeHit(self, t)))
+		The life increase will scale with your Talent Level, and your Armour and retaliation cold damage will scale with Mindpower.]]):tformat(life * 100, t.getArmor(self, t), damDesc(self, DamageType.COLD, t.getDamageOnMeleeHit(self, t)))
 	end,
 }
 
@@ -152,8 +152,8 @@ newTalent{
 			if not oe or oe:attr("temporary") or game.level.map:checkAllEntities(px, py, "block_move") then return end
 			local e = Object.new{
 				old_feat = oe,
-				name = "ice wall", image = "npc/iceblock.png",
-				desc = "a summoned, transparent wall of ice",
+				name = _t"ice wall", image = "npc/iceblock.png",
+				desc = _t"a summoned, transparent wall of ice",
 				type = "wall",
 				display = '#', color=colors.LIGHT_BLUE, back_color=colors.BLUE,
 				always_remember = true,
@@ -202,7 +202,7 @@ newTalent{
 		local icedam = t.getIceDamage(self, t)
 		return ([[Summons an icy wall of %d length for %d turns. Ice walls are transparent, but block projectiles and enemies.
 		Ice walls also emit freezing cold, dealing %0.2f damage for each ice wall within radius %d of an enemy, and with each wall giving a 25%% chance to freeze an enemy. This cold cannot hurt the talent user or their allies.
-		Each point in cold drake talents also increases your cold resistance by 1%%.]]):format(3 + math.floor(self:getTalentLevel(t) / 2) * 2, t.getDuration(self, t), damDesc(self, DamageType.COLD, icedam),  icerad)
+		Each point in cold drake talents also increases your cold resistance by 1%%.]]):tformat(3 + math.floor(self:getTalentLevel(t) / 2) * 2, t.getDuration(self, t), damDesc(self, DamageType.COLD, icedam),  icerad)
 	end,
 }
 
@@ -214,7 +214,7 @@ newTalent{
 	random_ego = "attack",
 	equilibrium = 20,
 	cooldown = 20,
-	message = "@Source@ breathes ice!",
+	message = _t"@Source@ breathes ice!",
 	tactical = { ATTACKAREA = { COLD = 2 }, DISABLE = { stun = 1 } },
 	range = 0,
 	radius = function(self, t) return math.min(13, math.floor(self:combatTalentScale(t, 5, 9))) end,
@@ -243,7 +243,7 @@ newTalent{
 			if target:canBe("stun") then
 				target:setEffect(target.EFF_FROZEN, 3, {hp=damage, apply_power = self:combatMindpower()})
 			else
-				game.logSeen(target, "%s resists the freeze!", target.name:capitalize())
+				game.logSeen(target, "%s resists the freeze!", target:getName():capitalize())
 			end
 		end, t.getDamage(self, t), {type="freeze"})
 
@@ -259,6 +259,6 @@ newTalent{
 	info = function(self, t)
 		return ([[You breathe ice in a frontal cone of radius %d. Any target caught in the area will take %0.2f cold damage and be frozen for 3 turns.
 		The damage will increase with your Strength, the critical chance is based on your Mental crit rate, and the Freeze apply power is based on your Mindpower.
-		Each point in cold drake talents also increases your cold resistance by 1%%.]]):format( self:getTalentRadius(t), damDesc(self, DamageType.COLD, t.getDamage(self, t)))
+		Each point in cold drake talents also increases your cold resistance by 1%%.]]):tformat( self:getTalentRadius(t), damDesc(self, DamageType.COLD, t.getDamage(self, t)))
 	end,
 }

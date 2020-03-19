@@ -37,7 +37,7 @@ local energycount = function(self)
 		if not q:isCompleted("chat-energy") and q.shertul_energy <= 0 then return end
 		if not tex or lastenergy ~= q.shertul_energy then 
 			lastenergy = q.shertul_energy
-			local text = ("%0.2f Energy Stored"):format(q.shertul_energy)
+			local text = ("%0.2f Energy Stored"):tformat(q.shertul_energy)
 			tex, nblines, wline = font:draw(text, text:toTString():maxWidth(font), 0, 255, 128)
 		end
 
@@ -111,7 +111,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[A farportal is a way to travel incredible distances in the blink of an eye. They were left behind by the powerful Sher'tul race.
+	desc = _t[[A farportal is a way to travel incredible distances in the blink of an eye. They were left behind by the powerful Sher'tul race.
 This farportal is not connected to any other portal. It is made for exploration; you cannot know where it will send you.
 It should automatically create a portal back, but it might not be near your arrival zone.]],
 
@@ -143,11 +143,11 @@ It should automatically create a portal back, but it might not be near your arri
 		if not who.player then return end
 		local Dialog = require "engine.ui.Dialog"
 		local q = who:hasQuest("shertul-fortress")
-		if not q then Dialog:simplePopup("Exploratory Farportal", "The farportal seems to be inactive") return end
-		if q:isCompleted("farportal-broken") then Dialog:simplePopup("Exploratory Farportal", "The farportal is broken and will not be usable anymore.") return end
-		if not q:exploratory_energy(true) then Dialog:simplePopup("Exploratory Farportal", "The fortress does not have enough energy to power a trip through the portal.") return end
+		if not q then Dialog:simplePopup(_t"Exploratory Farportal", _t"The farportal seems to be inactive") return end
+		if q:isCompleted("farportal-broken") then Dialog:simplePopup(_t"Exploratory Farportal", _t"The farportal is broken and will not be usable anymore.") return end
+		if not q:exploratory_energy(true) then Dialog:simplePopup(_t"Exploratory Farportal", _t"The fortress does not have enough energy to power a trip through the portal.") return end
 
-		Dialog:yesnoPopup("Exploratory Farportal", "Do you want to travel in the farportal? You cannot know where you will end up.", function(ret) if ret then
+		Dialog:yesnoPopup(_t"Exploratory Farportal", _t"Do you want to travel in the farportal? You cannot know where you will end up.", function(ret) if ret then
 			if not game:changeLevelCheck(1, {}, {direct_switch=true}) then return end
 			if self:checkSpecialLocation(who, q) then return end
 
@@ -165,14 +165,14 @@ It should automatically create a portal back, but it might not be near your arri
 				g:removeAllMOs(true)
 				g:altered()
 				g.show_tooltip = true
-				g.name = "Exploratory Farportal exit"
+				g.name = _t"Exploratory Farportal exit"
 				g.display = '&' g.color_r = colors.VIOLET.r g.color_g = colors.VIOLET.g g.color_b = colors.VIOLET.b
 				g.add_displays = g.add_displays or {}
 				g.add_displays[#g.add_displays+1] = mod.class.Grid.new{image="terrain/maze_teleport.png"}
 				g.notice = true
 				g.change_level = 1 g.change_zone = "shertul-fortress"
 				game.zone:addEntity(game.level, g, "terrain", x, y)
-				if self then game.logSeen(self, "#VIOLET#As %s falls you notice a portal appearing.", self.name)
+				if self then game.logSeen(self, "#VIOLET#As %s falls you notice a portal appearing.", self:getName())
 				else game.logSeen(p, "#VIOLET#Your rod of recall shakes, a portal appears beneath you.") end
 			end
 			zone.on_turn = function(zone)
@@ -227,7 +227,7 @@ newEntity{
 			local nb = 0
 			if profile.mod.lore then for lore, _ in pairs(profile.mod.lore.lore) do if game.party:isLoreShareable(lore) then nb = nb + 1 end end end
 
-			local popup = require("engine.ui.Dialog"):simpleWaiter("Yiilkgur's Library of Lost Mysteries", "Receiving the lost knowledge of the universe...", nil, nil, nb)
+			local popup = require("engine.ui.Dialog"):simpleWaiter(_t"Yiilkgur's Library of Lost Mysteries", _t"Receiving the lost knowledge of the universe...", nil, nil, nb)
 			core.wait.enableManualTick(true)
 			core.display.forceRedraw()
 
@@ -244,7 +244,7 @@ newEntity{
 
 			popup:done()
 
-			game:registerDialog(require("mod.dialogs.ShowLore").new("Yiilkgur's Library of Lost Mysteries", game.party))
+			game:registerDialog(require("mod.dialogs.ShowLore").new(_t"Yiilkgur's Library of Lost Mysteries", game.party))
 		end
 		return true
 	end,
@@ -294,7 +294,7 @@ local dcb = function(self)
 			local turns = (game.turn - data.start_turn) / 10
 			local text
 			if self.monitor_mode == "global" then
-				text = ("Turns: %d\nTotal Damage: %d\nDamage/turns: %d"):format(turns, data.total, data.total / turns)
+				text = ("Turns: %d\nTotal Damage: %d\nDamage/turns: %d"):tformat(turns, data.total, data.total / turns)
 				data.changed = false
 			else
 				text = {}

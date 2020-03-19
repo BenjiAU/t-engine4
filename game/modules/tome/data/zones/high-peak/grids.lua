@@ -30,7 +30,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[A farportal is a way to travel incredible distances in the blink of an eye. They usually require an external item to use. You have no idea if it is even two-way.
+	desc = _t[[A farportal is a way to travel incredible distances in the blink of an eye. They usually require an external item to use. You have no idea if it is even two-way.
 This one seems to go to the Far East.]],
 
 	orb_portal = {
@@ -39,7 +39,7 @@ This one seems to go to the Far East.]],
 		change_wilderness = {
 			spot = {type="farportal-end", subtype="fareast"},
 		},
-		message = "#VIOLET#You enter the swirling portal and in the blink of an eye you set foot on the Far East, with no trace of the portal...",
+		message = _t"#VIOLET#You enter the swirling portal and in the blink of an eye you set foot on the Far East, with no trace of the portal...",
 		on_use = function(self, who)
 		end,
 	},
@@ -62,7 +62,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[A farportal is a way to travel incredible distances in the blink of an eye. They usually require an external item to use. You have no idea if it is even two-way.
+	desc = _t[[A farportal is a way to travel incredible distances in the blink of an eye. They usually require an external item to use. You have no idea if it is even two-way.
 This one seems to go to the Iron Throne in the West.]],
 
 	orb_portal = {
@@ -71,7 +71,7 @@ This one seems to go to the Iron Throne in the West.]],
 		change_wilderness = {
 			spot = {type="farportal-end", subtype="iron-throne"},
 		},
-		message = "#VIOLET#You enter the swirling portal and in the blink of an eye you set foot on the slopes of the Iron Throne, with no trace of the portal...",
+		message = _t"#VIOLET#You enter the swirling portal and in the blink of an eye you set foot on the slopes of the Iron Throne, with no trace of the portal...",
 		on_use = function(self, who)
 		end,
 	},
@@ -94,7 +94,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[A farportal is a way to travel incredible distances in the blink of an eye. They usually require an external item to use. You have no idea if it is even two-way.
+	desc = _t[[A farportal is a way to travel incredible distances in the blink of an eye. They usually require an external item to use. You have no idea if it is even two-way.
 This one seems to go to an unknown place, seemingly out of this world. You dare not use it.]],
 }
 newEntity{ base = "VOID_PORTAL", define_as = "CVOID_PORTAL",
@@ -116,7 +116,7 @@ local invocation_close = function(self, who)
 	game.logPlayer(who, "#LIGHT_BLUE#You use the orb on the portal, shutting it down easily.")
 	for i = 1, #game.level.spots do if game.level.spots[i] == spot then table.remove(game.level.spots, i) break end end
 	local g = game.level.map(spot.x, spot.y, engine.Map.TERRAIN)
-	g.name = g.name .. " (disabled)"
+	g.name = ("%s (disabled)"):tformat(_t(g.name))
 	g.color_r = colors.WHITE.r
 	g.color_g = colors.WHITE.g
 	g.color_b = colors.WHITE.b
@@ -132,7 +132,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[An invocation portal, perpetually summoning beings through it.]],
+	desc = _t[[An invocation portal, perpetually summoning beings through it.]],
 	orb_command = {
 		summon = "undead",
 		special = invocation_close,
@@ -146,7 +146,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[An invocation portal, perpetually summoning beings through it.]],
+	desc = _t[[An invocation portal, perpetually summoning beings through it.]],
 	orb_command = {
 		summon = "elemental",
 		special = invocation_close,
@@ -160,7 +160,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[An invocation portal, perpetually summoning beings through it.]],
+	desc = _t[[An invocation portal, perpetually summoning beings through it.]],
 	orb_command = {
 		summon = "dragon",
 		special = invocation_close,
@@ -174,7 +174,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[An invocation portal, perpetually summoning beings through it.]],
+	desc = _t[[An invocation portal, perpetually summoning beings through it.]],
 	orb_command = {
 		summon = "demon",
 		special = invocation_close,
@@ -188,17 +188,17 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	show_tooltip = true,
-	desc = [[This portal seems to connect to another part of this level.]],
+	desc = _t[[This portal seems to connect to another part of this level.]],
 	change_level_check = function() game.bignews:say(60, "#GOLD#This portal looks like it reacts only to the Orb of Many Ways.") return true end,
 	change_level = 1,
 	orb_portal = {
 		nothing = true,
-		message = "#VIOLET#You enter the swirling portal and appear in a large room with other portals and the two wizards.",
+		message = _t"#VIOLET#You enter the swirling portal and appear in a large room with other portals and the two wizards.",
 		on_use = function()
 			game:changeLevel(11, nil, {direct_switch=true}) -- Special level, can not get to it any other way
 			if game.player:hasQuest("high-peak"):isCompleted("sanctum-chat") then return end
 			local Chat = require "engine.Chat"
-			local chat = Chat.new("sorcerer-fight", {name="Elandar"}, game.player)
+			local chat = Chat.new("sorcerer-fight", {name=_t"Elandar"}, game.player)
 			chat:invoke()
 			game.player:hasQuest("high-peak"):setStatus(engine.Quest.COMPLETED, "sanctum-chat")
 			game.player:hasQuest("high-peak"):start_end_combat()

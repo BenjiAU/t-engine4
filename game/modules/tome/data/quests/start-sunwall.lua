@@ -17,20 +17,20 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Serpentine Invaders"
+name = _t"Serpentine Invaders"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "Nagas are invading the slazish fens. The Sunwall cannot fight on two fronts; you need to stop the invaders before it is too late.\n Locate and destroy the invaders' portal."
+	desc[#desc+1] = _t"Nagas are invading the slazish fens. The Sunwall cannot fight on two fronts; you need to stop the invaders before it is too late.\n Locate and destroy the invaders' portal."
 	if self:isCompleted("slazish") then
-		desc[#desc+1] = "#LIGHT_GREEN#* You have destroyed the naga portal. The invasion is stopped.#WHITE#"
+		desc[#desc+1] = _t"#LIGHT_GREEN#* You have destroyed the naga portal. The invasion is stopped.#WHITE#"
 
 		if self:isCompleted("return") then
-			desc[#desc+1] = "#LIGHT_GREEN#* You are back in Var'Eyal, the Far East as the people from the west call it.#WHITE#"
+			desc[#desc+1] = _t"#LIGHT_GREEN#* You are back in Var'Eyal, the Far East as the people from the west call it.#WHITE#"
 		else
-			desc[#desc+1] = "#SLATE#* However, you were teleported to a distant land. You must find a way back to the Gates of Morning.#WHITE#"
+			desc[#desc+1] = _t"#SLATE#* However, you were teleported to a distant land. You must find a way back to the Gates of Morning.#WHITE#"
 		end
 	else
-		desc[#desc+1] = "#SLATE#* You must stop the nagas.#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* You must stop the nagas.#WHITE#"
 	end
 	return table.concat(desc, "\n")
 end

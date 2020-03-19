@@ -612,3 +612,7 @@ function _M:him_her() return string.him_her(self) end
 --- he/she/self formatting
 -- @return string.his_her_self(self)
 function _M:his_her_self() return string.his_her_self(self) end
+
+function _M:getName()
+	return _t(self.name)
+end

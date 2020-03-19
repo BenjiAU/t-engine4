@@ -160,7 +160,7 @@ newTalent{
 				end
 			end
 		else
-			game.logSeen(target, "%s resists the vile poison!", target.name:capitalize())
+			game.logSeen(target, "%s resists the vile poison!", target:getName():capitalize())
 		end
 	end,
 	callbackOnMeleeAttack = function(self, t, target, hitted, crit, weapon, damtype, mult, dam)
@@ -186,7 +186,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Learn how to coat your melee weapons, throwing knives, sling and bow ammo with poison, giving your attacks a %d%% chance to poison the target for %d nature damage per turn for %d turns. Every application of the poison stacks, up to a maximum of %d nature damage per turn.
 		The damage scales with your Cunning.]]):
-		format(t.getChance(self,t), damDesc(self, DamageType.NATURE, t.getDamage(self, t)), t.getDuration(self, t), damDesc(self, DamageType.NATURE, t.getDamage(self, t)*4))
+		tformat(t.getChance(self,t), damDesc(self, DamageType.NATURE, t.getDamage(self, t)), t.getDuration(self, t), damDesc(self, DamageType.NATURE, t.getDamage(self, t)*4))
 	end,
 }
 
@@ -212,7 +212,7 @@ newTalent{
 		if to_spread > 0 then
 			local tg = {type="ball", range = 10, radius=t.getRadius(self, t), selffire = false, friendlyfire = false, talent=t}
 			target.dead = false -- for combat log purposes
-			game.logSeen(target, "#GREEN#Poison bursts out of %s's corpse!", target.name:capitalize())
+			game.logSeen(target, "#GREEN#Poison bursts out of %s's corpse!", target:getName():capitalize())
 			game.level.map:particleEmitter(target.x, target.y, tg.radius, "slime")
 			self:project(tg, target.x, target.y, function(tx, ty)
 				local target2 = game.level.map(tx, ty, Map.ACTOR)
@@ -226,7 +226,7 @@ newTalent{
 		end
 	end,
 	info = function(self, t)
-		return ([[When you kill a creature, all of your poisons affecting it will spread to foes in a radius of %d.]]):format(t.getRadius(self, t))
+		return ([[When you kill a creature, all of your poisons affecting it will spread to foes in a radius of %d.]]):tformat(t.getRadius(self, t))
 	end,
 }
 
@@ -277,7 +277,7 @@ info = function(self, t)
 	Also increases the effectiveness of your poisons by %d%%. (The effect varies for each poison.)
 	Adjusting your weapon coating takes no time and does not break stealth.
 	You may only have two poison enhancements active at once; applying a third will randomly cause one of the existing ones to be cancelled.]]):
-	format(self:getTalentLevel(t) * 20)
+	tformat(self:getTalentLevel(t) * 20)
 end,
 }
 
@@ -336,7 +336,7 @@ newTalent{
 				local t = rng.tableRemove(tids)
 				if not t then break end
 				target.talents_cd[t.id] = cdr
-				game.logSeen(target, "#GREEN#%s's %s is disrupted by crippling poison!", target.name:capitalize(), t.name)
+				game.logSeen(target, "#GREEN#%s's %s is disrupted by crippling poison!", target:getName():capitalize(), t.name)
 				count = count + 1
 			end		
 		end
@@ -376,7 +376,7 @@ newTalent{
 		Leeching Poison - Heals you for %d.
 		Volatile Poison - Deals a further %0.2f nature damage to foes in a radius %d ball.
 		]]):
-		format(power*100, damDesc(self, DamageType.NATURE, idam), nb, math.floor(nb*1.5), heal, damDesc(self, DamageType.NATURE, vdam), nb)
+		tformat(power*100, damDesc(self, DamageType.NATURE, idam), nb, math.floor(nb*1.5), heal, damDesc(self, DamageType.NATURE, vdam), nb)
 	end,
 	info = function(self, t)
 		local dam = 100 * t.getDamage(self,t)
@@ -386,7 +386,7 @@ newTalent{
 		%s
 		Learning this talent in addition to the Throwing Knives talent allows you to learn the Venomous Throw talent, which can be used to throw poisoned daggers at your foes, but is put on cooldown when this talent is used.
 		]]):
-		format(dam, desc)
+		tformat(dam, desc)
 	end,
 }
 
@@ -422,7 +422,7 @@ newTalent{
 	end,
 	info = function(self, t)
 	return ([[Enhances your Deadly Poison with a numbing agent, causing the poison to reduce all damage the target deals by %d%%.]]):
-	format(t.getEffect(self, t))
+	tformat(t.getEffect(self, t))
 	end,
 }
 
@@ -454,7 +454,7 @@ newTalent{
 	end,
 	info = function(self, t)
 	return ([[Enhances your Deadly Poison with an insidious agent, causing it to reduce the healing taken by enemies by %d%%.]]):
-	format(t.getEffect(self, t))
+	tformat(t.getEffect(self, t))
 	end	
 }
 
@@ -486,7 +486,7 @@ newTalent{
 	end,
 	info = function(self, t)
 	return ([[Enhances your Deadly Poison with a crippling agent, giving enemies a %d%% chance on using a talent to fail and lose a turn.]]):
-	format(t.getEffect(self, t))
+	tformat(t.getEffect(self, t))
 	end,
 }
 
@@ -518,7 +518,7 @@ newTalent{
 	end,
 	info = function(self, t)
 	return ([[Enhances your Deadly Poison with a leeching agent, causing it to heal you for %d%% of the damage it does to its target.]]):
-	format(t.getEffect(self, t))
+	tformat(t.getEffect(self, t))
 	end,
 }
 
@@ -555,7 +555,7 @@ newTalent{
 	end,
 	info = function(self, t)
 	return ([[Enhances your Deadly Poison with a volatile agent, causing the poison to deal %d%% increased damage to the victim and damage all of your enemies adjacent to it for 50%%.]]):
-	format(t.getEffect(self, t))
+	tformat(t.getEffect(self, t))
 	end,
 }
 
@@ -569,7 +569,7 @@ newTalent{
 	getDamage = function(self, t) return self:combatStatScale("mag", 20, 50, 0.75) end,
 	info = function(self, t)
 	return ([[Whenever you apply Deadly Poison, you also apply an unresistable magical poison dealing %0.2f arcane damage (based on your Magic) each turn. This poison reduces all damage resistance by 10%% and poison immunity by 50%%.]]):
-	format(damDesc(self, DamageType.ARCANE, t.getDamage(self,t)))
+	tformat(damDesc(self, DamageType.ARCANE, t.getDamage(self,t)))
 	end,
 }
 
@@ -630,6 +630,6 @@ newTalent{
 		return ([[Enhance your Deadly Poison with a stoning agent.  Whenever you apply Deadly Poison, you afflict your target with an additional earth-based poison that inflicts %d nature damage per turn (stacking up to %d damage per turn) for %d turns.
 		After either %d turns or the poison has run its course (<100%% chance, see effect description), the target will be turned to stone for %d turns.
 		The damage scales with your Cunning.]]):
-		format(dam, dam*4, t.getDuration(self, t), t.stoneTime(self, t), t.getEffect(self, t))
+		tformat(dam, dam*4, t.getDuration(self, t), t.stoneTime(self, t), t.getEffect(self, t))
 	end,
 }

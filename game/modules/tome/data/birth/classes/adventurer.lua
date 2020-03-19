@@ -22,8 +22,8 @@ newBirthDescriptor{
 	name = "Adventurer",
 	locked = function() return profile.mod.allow_build.adventurer and true or "hide"  end,
 	desc = {
-		"Adventurers can learn to do a bit of everything, getting training in whatever they happen to find.",
-		"#{bold}##GOLD#This is a bonus class for winning the game.  It is by no means balanced.#WHITE##{normal}#",
+		_t"Adventurers can learn to do a bit of everything, getting training in whatever they happen to find.",
+		_t"#{bold}##GOLD#This is a bonus class for winning the game.  It is by no means balanced.#WHITE##{normal}#",
 	},
 	descriptor_choices =
 	{
@@ -44,13 +44,13 @@ newBirthDescriptor{
 	name = "Adventurer",
 	locked = function() return profile.mod.allow_build.adventurer and true or "hide"  end,
 	desc = {
-		"Adventurers can learn to do a bit of everything, getting training in whatever they happen to find.",
-		"#{bold}##GOLD#This is a bonus class for winning the game.  It is by no means balanced.#WHITE##{normal}#",
-		"Their most important stats depend on what they wish to do.",
-		"#GOLD#Stat modifiers:",
-		"#LIGHT_BLUE# * +2 Strength, +2 Dexterity, +2 Constitution",
-		"#LIGHT_BLUE# * +2 Magic, +2 Willpower, +2 Cunning",
-		"#GOLD#Life per level:#LIGHT_BLUE# +0",
+		_t"Adventurers can learn to do a bit of everything, getting training in whatever they happen to find.",
+		_t"#{bold}##GOLD#This is a bonus class for winning the game.  It is by no means balanced.#WHITE##{normal}#",
+		_t"Their most important stats depend on what they wish to do.",
+		_t"#GOLD#Stat modifiers:",
+		_t"#LIGHT_BLUE# * +2 Strength, +2 Dexterity, +2 Constitution",
+		_t"#LIGHT_BLUE# * +2 Magic, +2 Willpower, +2 Cunning",
+		_t"#GOLD#Life per level:#LIGHT_BLUE# +0",
 	},
 	not_on_random_boss = true,
 	stats = { str=2, con=2, dex=2, mag=2, wil=2, cun=2 },

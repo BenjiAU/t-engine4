@@ -33,17 +33,17 @@ local autoMark = require("engine.Entity").new({image = "ui/hotkeys/mainmenu.png"
 
 -- generate talent status separately to enable quicker refresh of Dialog
 local function TalentStatus(who,t) 
-	local status = tstring{{"color", "LIGHT_GREEN"}, "Active"} 
+	local status = tstring{{"color", "LIGHT_GREEN"}, _t"Active"} 
 	if who:isTalentCoolingDown(t) then
-		status = tstring{{"color", "LIGHT_RED"}, who:isTalentCoolingDown(t).." turns"}
+		status = tstring{{"color", "LIGHT_RED"}, ("%s turns"):tformat(who:isTalentCoolingDown(t))}
 	elseif not who:preUseTalent(t, true, true) then
-		status = tstring{{"color", "GREY"}, "Unavailable"}
+		status = tstring{{"color", "GREY"}, _t"Unavailable"}
 	elseif t.is_object_use then
-		status = tstring{{"color", "SALMON"}, "Object"}
+		status = tstring{{"color", "SALMON"}, _t"Object"}
 	elseif t.mode == "sustained" then
-		status = who:isTalentActive(t.id) and tstring{{"color", "YELLOW"}, "Sustaining"} or tstring{{"color", "LIGHT_GREEN"}, "Sustain"}
+		status = who:isTalentActive(t.id) and tstring{{"color", "YELLOW"}, _t"Sustaining"} or tstring{{"color", "LIGHT_GREEN"}, _t"Sustain"}
 	elseif t.mode == "passive" then
-		status = tstring{{"color", "LIGHT_BLUE"}, "Passive"}
+		status = tstring{{"color", "LIGHT_BLUE"}, _t"Passive"}
 	end
 	if who:isTalentAuto(t.id) then 
 		status:add(autoMark:getDisplayString())
@@ -57,10 +57,10 @@ end
 function _M:init(actor)
 	self.actor = actor
 	actor.hotkey = actor.hotkey or {}
-	Dialog.init(self, "Use Talents: "..actor.name, game.w * 0.8, game.h * 0.8)
+	Dialog.init(self, ("Use Talents: %s"):tformat(actor:getName()), game.w * 0.8, game.h * 0.8)
 
 	local vsep = Separator.new{dir="horizontal", size=self.ih - 10}
-	self.c_tut = Textzone.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=1, auto_height=true, no_color_bleed=true, text=[[
+	self.c_tut = Textzone.new{width=math.floor(self.iw / 2 - vsep.w / 2), height=1, auto_height=true, no_color_bleed=true, text=_t[[
 You can bind a non-passive talent to a hotkey by pressing the corresponding hotkey while selecting a talent or by right-clicking on the talent.
 Check out the keybinding screen in the game menu to bind hotkeys to a key (default is 1-0 plus control, shift, or alt).
 Right click or press '~' to configure talent confirmation and automatic use.
@@ -70,13 +70,13 @@ Right click or press '~' to configure talent confirmation and automatic use.
 	self:generateList()
 
 	local cols = {
-		{name="", width={40,"fixed"}, display_prop="char"},
-		{name="Talent", width=80, display_prop="name"},
-		{name="Status", width=20, display_prop=function(item)
+		{name=_t"", width={40,"fixed"}, display_prop="char"},
+		{name=_t"Talent", width=80, display_prop="name"},
+		{name=_t"Status", width=20, display_prop=function(item)
 			if item.talent then return TalentStatus(actor, actor:getTalentFromId(item.talent)) else return "" end
 		end},
-		{name="Hotkey", width={75,"fixed"}, display_prop="hotkey"},
-		{name="Mouse Click", width={60,"fixed"}, display_prop=function(item)
+		{name=_t"Hotkey", width={75,"fixed"}, display_prop="hotkey"},
+		{name=_t"Mouse Click", width={60,"fixed"}, display_prop=function(item)
 			if item.talent and item.talent == self.actor.auto_shoot_talent then return "LeftClick"
 			elseif item.talent and item.talent == self.actor.auto_shoot_midclick_talent then return "MiddleClick"
 			else return "" end
@@ -129,7 +129,7 @@ function _M:defineHotkey(id)
 	end
 
 	self.actor.hotkey[id] = {"talent", item.talent}
-	self:simplePopup("Hotkey "..id.." assigned", t.name:capitalize().." assigned to hotkey "..id)
+	self:simplePopup(("Hotkey %s assigned"):tformat(id), ("%s assigned to hotkey %s"):tformat(t.name:capitalize(), id))
 	self.c_list:regenerate()
 	self.actor.changed = true
 end
@@ -166,41 +166,41 @@ function _M:use(item, button)
 	if t.mode == "passive" then return end
 	if button == "right" then
 		local list = {
-			{name="Unbind", what="unbind"},
-			{name="Bind to left mouse click (on a target)", what="left"},
-			{name="Bind to middle mouse click (on a target)", what="middle"},
+			{name=_t"Unbind", what="unbind"},
+			{name=_t"Bind to left mouse click (on a target)", what="left"},
+			{name=_t"Bind to middle mouse click (on a target)", what="middle"},
 		}
-		if profile.auth and profile.hash_valid then table.insert(list, {name="Link in chat", what="chat-link"}) end
+		if profile.auth and profile.hash_valid then table.insert(list, {name=_t"Link in chat", what="chat-link"}) end
 
 		if self.actor:isTalentConfirmable(t) then
-			table.insert(list, 1, {name="#YELLOW#Disable talent confirmation", what="unset-confirm"})
+			table.insert(list, 1, {name=_t"#YELLOW#Disable talent confirmation", what="unset-confirm"})
 		else
-			table.insert(list, 1, {name=confirmMark:getDisplayString().."Request confirmation before using this talent", what="set-confirm"})
+			table.insert(list, 1, {name=("%sRequest confirmation before using this talent"):tformat(confirmMark:getDisplayString()), what="set-confirm"})
 		end
 		local automode = self.actor:isTalentAuto(t)
-		local ds = "#YELLOW#Disable "
-		table.insert(list, 2, {name=autoMark:getDisplayString()..(automode==1 and ds or "").."Auto-use when available", what=(automode==1 and "auto-dis" or "auto-en-1")})
-		table.insert(list, 2, {name=autoMark:getDisplayString()..(automode==2 and ds or "").."Auto-use when no enemies are visible", what=(automode==2 and "auto-dis" or "auto-en-2")})
-		table.insert(list, 2, {name=autoMark:getDisplayString()..(automode==3 and ds or "").."Auto-use when enemies are visible", what=(automode==3 and "auto-dis" or "auto-en-3")})
-		table.insert(list, 2, {name=autoMark:getDisplayString()..(automode==4 and ds or "").."Auto-use when enemies are visible and adjacent", what=(automode==4 and "auto-dis" or "auto-en-4")})
-		table.insert(list, 2, {name=autoMark:getDisplayString()..(automode==5 and ds or "").."Auto-use when out of combat", what=(automode==5 and "auto-dis" or "auto-en-5")})				
+		local ds = _t"#YELLOW#Disable "
+		table.insert(list, 2, {name=autoMark:getDisplayString()..(automode==1 and ds or "").._t"Auto-use when available", what=(automode==1 and "auto-dis" or "auto-en-1")})
+		table.insert(list, 2, {name=autoMark:getDisplayString()..(automode==2 and ds or "").._t"Auto-use when no enemies are visible", what=(automode==2 and "auto-dis" or "auto-en-2")})
+		table.insert(list, 2, {name=autoMark:getDisplayString()..(automode==3 and ds or "").._t"Auto-use when enemies are visible", what=(automode==3 and "auto-dis" or "auto-en-3")})
+		table.insert(list, 2, {name=autoMark:getDisplayString()..(automode==4 and ds or "").._t"Auto-use when enemies are visible and adjacent", what=(automode==4 and "auto-dis" or "auto-en-4")})
+		table.insert(list, 2, {name=autoMark:getDisplayString()..(automode==5 and ds or "").._t"Auto-use when out of combat", what=(automode==5 and "auto-dis" or "auto-en-5")})				
 		self:triggerHook{"UseTalents:generate", actor=self.actor, talent=t, menu=list}
 
-		for i = 1, 12 * self.actor.nb_hotkey_pages do list[#list+1] = {name="Hotkey "..i, what=i} end
-		Dialog:listPopup("Bind talent: "..item.name:toString(), "How do you want to bind this talent?", list, 400, 500, function(b)
+		for i = 1, 12 * self.actor.nb_hotkey_pages do list[#list+1] = {name=_t"Hotkey "..i, what=i} end
+		Dialog:listPopup(("Bind talent: %s"):tformat(item.name:toString()), _t"How do you want to bind this talent?", list, 400, 500, function(b)
 			if not b then return end
 			if type(b.what) == "number" then
 				for i = 1, 12 * self.actor.nb_hotkey_pages do
 					if self.actor.hotkey[i] and self.actor.hotkey[i][1] == "talent" and self.actor.hotkey[i][2] == item.talent then self.actor.hotkey[i] = nil end
 				end
 				self.actor.hotkey[b.what] = {"talent", item.talent}
-				self:simplePopup("Hotkey "..b.what.." assigned", self.actor:getTalentFromId(item.talent).name:capitalize().." assigned to hotkey "..b.what)
+				self:simplePopup(("Hotkey %s assigned"):tformat(b.what), ("%s assigned to hotkey %s"):tformat(self.actor:getTalentFromId(item.talent).name:capitalize(), b.what))
 			elseif b.what == "middle" then
 				self.actor.auto_shoot_midclick_talent = item.talent
-				self:simplePopup("Middle mouse click assigned", self.actor:getTalentFromId(item.talent).name:capitalize().." assigned to middle mouse click on an hostile target.")
+				self:simplePopup(_t"Middle mouse click assigned", ("%s assigned to middle mouse click on an hostile target."):tformat(self.actor:getTalentFromId(item.talent).name:capitalize()))
 			elseif b.what == "left" then
 				self.actor.auto_shoot_talent = item.talent
-				self:simplePopup("Left mouse click assigned", self.actor:getTalentFromId(item.talent).name:capitalize().." assigned to left mouse click on an hostile target.")
+				self:simplePopup(_t"Left mouse click assigned", ("%s assigned to left mouse click on an hostile target."):tformat(self.actor:getTalentFromId(item.talent).name:capitalize()))
 			elseif b.what == "unbind" then
 				if self.actor.auto_shoot_talent == item.talent then self.actor.auto_shoot_talent = nil end
 				if self.actor.auto_shoot_midclick_talent == item.talent then self.actor.auto_shoot_midclick_talent = nil end
@@ -281,7 +281,7 @@ function _M:generateList()
 		if added then
 			table.insert(list, where+1, {
 				char="",
-				name=tstring{{"font","bold"}, cat:capitalize().." / "..tt.name:capitalize(), {"font","normal"}},
+				name=tstring{{"font","bold"}, _t(cat):capitalize().." / "..tt.name:capitalize(), {"font","normal"}},
 				type=tt.type,
 				color=function() return {0x80, 0x80, 0x80} end,
 				status="",
@@ -349,13 +349,13 @@ function _M:generateList()
 	for i, node in ipairs(passives) do node.char = "" end
 
 	list = {
-		{ char='', name=('#{bold}#Activable talents#{normal}#'):toTString(), status='', hotkey='', desc="All activable talents you can currently use.", color=function() return colors.simple(colors.LIGHT_GREEN) end, nodes=actives, shown=true },
-		{ char='', name=('#{bold}#Object powers#{normal}#'):toTString(), status='', hotkey='', desc="Object powers that can be activated automatically.  Most usable objects will appear here unless they are on cooldown or have ai restrictions.", color=function() return colors.simple(colors.SALMON) end, nodes=objects, shown=true },
-		{ char='', name=('#{bold}#Sustainable talents#{normal}#'):toTString(), status='', hotkey='', desc="All sustainable talents you can currently use.", color=function() return colors.simple(colors.LIGHT_GREEN) end, nodes=sustains, shown=true },
-		{ char='', name=('#{bold}#Sustained talents#{normal}#'):toTString(), status='', hotkey='', desc="All sustainable talents you currently sustain, using them will de-activate them.", color=function() return colors.simple(colors.YELLOW) end, nodes=sustained, shown=true },
-		{ char='', name=('#{bold}#Cooling down talents#{normal}#'):toTString(), status='', hotkey='', desc="All talents you have used that are still cooling down.", color=function() return colors.simple(colors.LIGHT_RED) end, nodes=cooldowns, shown=true },
-		{ char='', name=('#{bold}#Unavailable talents#{normal}#'):toTString(), status='', hotkey='', desc="All talents you have that do not have enough resources, or satisfy other dependencies.", color=function() return colors.simple(colors.GREY) end, nodes=unavailables, shown=true },
-		{ char='', name=('#{bold}#Passive talents#{normal}#'):toTString(), status='', hotkey='', desc="All your passive talents, they are always active.", color=function() return colors.simple(colors.WHITE) end, nodes=passives, shown=true },
+		{ char='', name=(_t'#{bold}#Activable talents#{normal}#'):toTString(), status='', hotkey='', desc=_t"All activable talents you can currently use.", color=function() return colors.simple(colors.LIGHT_GREEN) end, nodes=actives, shown=true },
+		{ char='', name=(_t'#{bold}#Object powers#{normal}#'):toTString(), status='', hotkey='', desc=_t"Object powers that can be activated automatically.  Most usable objects will appear here unless they are on cooldown or have ai restrictions.", color=function() return colors.simple(colors.SALMON) end, nodes=objects, shown=true },
+		{ char='', name=(_t'#{bold}#Sustainable talents#{normal}#'):toTString(), status='', hotkey='', desc=_t"All sustainable talents you can currently use.", color=function() return colors.simple(colors.LIGHT_GREEN) end, nodes=sustains, shown=true },
+		{ char='', name=(_t'#{bold}#Sustained talents#{normal}#'):toTString(), status='', hotkey='', desc=_t"All sustainable talents you currently sustain, using them will de-activate them.", color=function() return colors.simple(colors.YELLOW) end, nodes=sustained, shown=true },
+		{ char='', name=(_t'#{bold}#Cooling down talents#{normal}#'):toTString(), status='', hotkey='', desc=_t"All talents you have used that are still cooling down.", color=function() return colors.simple(colors.LIGHT_RED) end, nodes=cooldowns, shown=true },
+		{ char='', name=(_t'#{bold}#Unavailable talents#{normal}#'):toTString(), status='', hotkey='', desc=_t"All talents you have that do not have enough resources, or satisfy other dependencies.", color=function() return colors.simple(colors.GREY) end, nodes=unavailables, shown=true },
+		{ char='', name=(_t'#{bold}#Passive talents#{normal}#'):toTString(), status='', hotkey='', desc=_t"All your passive talents, they are always active.", color=function() return colors.simple(colors.WHITE) end, nodes=passives, shown=true },
 		chars = chars,
 	}
 	self.list = list

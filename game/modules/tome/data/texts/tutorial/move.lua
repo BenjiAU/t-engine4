@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[Movement is simple. You can use the keyboard, the mouse, or both.
+return _t[[Movement is simple. You can use the keyboard, the mouse, or both.
 
 #GOLD#Keyboard:#WHITE#
 - Press the arrow keys or keypad to move in the given direction.

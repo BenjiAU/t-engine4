@@ -24,8 +24,8 @@
 newLore{
 	id = "grand-corruptor-draft",
 	category = "spellblaze",
-	name = "draft letter (mark of the spellblaze)",
-	lore = [[Dear Father,
+	name = _t"draft letter (mark of the spellblaze)",
+	lore = _t[[Dear Father,
 
 How glad you must be to hear from your "renegade" son. Do not worry overmuch; I keep myself and my group well hidden from your petty Council. I know how you fret about your status amongst those fools.
 

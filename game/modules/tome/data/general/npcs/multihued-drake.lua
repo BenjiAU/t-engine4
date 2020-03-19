@@ -45,7 +45,7 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_MULTIHUED_DRAKE",
 	name = "multi-hued drake hatchling", color=colors.PURPLE, display="d",
-	desc = [[A drake hatchling. Not too powerful by itself, but it usually comes with its brothers and sisters.]],
+	desc = _t[[A drake hatchling. Not too powerful by itself, but it usually comes with its brothers and sisters.]],
 	level_range = {15, nil}, exp_worth = 1,
 	rarity = 1,
 	rank = 1, size_category = 2,
@@ -66,7 +66,7 @@ newEntity{ base = "BASE_NPC_MULTIHUED_DRAKE",
 
 newEntity{ base = "BASE_NPC_MULTIHUED_DRAKE",
 	name = "multi-hued drake", color=colors.PURPLE, display="D",
-	desc = [[A mature multi-hued drake, armed with many deadly breath weapons and nasty claws.]],
+	desc = _t[[A mature multi-hued drake, armed with many deadly breath weapons and nasty claws.]],
 	level_range = {25, nil}, exp_worth = 1,
 	rarity = 3,
 	max_life = resolvers.rngavg(150,170),
@@ -98,7 +98,7 @@ newEntity{ base = "BASE_NPC_MULTIHUED_DRAKE",
 newEntity{ base = "BASE_NPC_MULTIHUED_DRAKE", define_as = "GREATER_MULTI_HUED_WYRM",
 	name = "greater multi-hued wyrm", color=colors.PURPLE, display="D",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/dragon_multihued_greater_multi_hued_wyrm.png", display_h=2, display_y=-1}}},
-	desc = [[An old and powerful multi-hued drake, armed with many deadly breath weapons and nasty claws.]],
+	desc = _t[[An old and powerful multi-hued drake, armed with many deadly breath weapons and nasty claws.]],
 	level_range = {35, nil}, exp_worth = 1,
 	rarity = 8,
 	rank = 3,
@@ -140,7 +140,7 @@ newEntity{ base = "BASE_NPC_MULTIHUED_DRAKE",
 	unique = true,
 	name = "Ureslak the Prismatic", color=colors.VIOLET, display="D",
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/drake_multi_ureslak.png", display_h=2, display_y=-1}}},
-	desc = [[A huge multi-hued drake. It seems to shift color rapidly.]],
+	desc = _t[[A huge multi-hued drake. It seems to shift color rapidly.]],
 	level_range = {35, nil}, exp_worth = 4,
 	rarity = 50,
 	rank = 3.5,
@@ -213,7 +213,7 @@ newEntity{ base = "BASE_NPC_MULTIHUED_DRAKE",
 			self.resists = t[2].resists
 			self.talents = t[2].talents
 			self.changed = true
-			game.logSeen(self, "#YELLOW#%s's skin turns %s!", self.name:capitalize(), t[1])
+			game.logSeen(self, "#YELLOW#%s's skin turns %s!", self:getName():capitalize(), t[1])
 		end
 	end,
 }

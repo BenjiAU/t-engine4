@@ -36,6 +36,8 @@ _M.factions = {}
 function _M:add(t)
 	assert(t.name, "no faction name")
 	t.short_name = t.short_name or t.name:lower():gsub(" ", "-")
+	-- I18N faction
+	t.name = _t(t.name)
 	if self.factions[t.short_name] then print("[FACTION] tried to redefine", t.name) return t.short_name end
 
 	local r = {}

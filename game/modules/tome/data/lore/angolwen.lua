@@ -23,8 +23,8 @@
 newLore{
 	id = "angolwen-linaniil-lecture",
 	category = "angolwen",
-	name = "Lecture on Humility by Archmage Linaniil",
-	lore = [[It were some years now since twain of our brightest students left Angolwen, sullied by our veil of secrecy and our silent duty. It still lies heavy on mine heart to think of what they could accomplish within our private circle. I but hope that one day they whilst return, and they whilst understand the reasons behind our solemn mission.
+	name = _t"Lecture on Humility by Archmage Linaniil",
+	lore = _t[[It were some years now since twain of our brightest students left Angolwen, sullied by our veil of secrecy and our silent duty. It still lies heavy on mine heart to think of what they could accomplish within our private circle. I but hope that one day they whilst return, and they whilst understand the reasons behind our solemn mission.
 
 But I must think of the future, for too many are the regrets of mine long past, and to hold their burdens overlong is to be crushed. I must think of ye, young acolytes, who start now in the learning of our lores. I must explain to ye our mission, our purpose, our justification, so that ye understand all what we do and why. In secrecy we operate, trying to heal the harms of our past, trying to build a better future. For our penance is great, and never should it be forgotten in all Eyal the terrors of the Spellblaze.
 
@@ -46,8 +46,8 @@ Our mission is to help the world. Our penance is to act in secret. Old wounds re
 newLore{
 	id = "angolwen-tarelion-magic",
 	category = "angolwen",
-	name = "Lecture on the nature of magic by Archmage Tarelion",
-	lore = [[#{bold}#"What is Magic?"
+	name = _t"Lecture on the nature of magic by Archmage Tarelion",
+	lore = _t[[#{bold}#"What is Magic?"
 #{italic}#A study by Archmage Tazimar Tarelion#{normal}#
 
 How uncouth and common a question it must seem, and yet it is the one I am asked most often, even by some of our most learned students. Too often we teach The Art by practice and imitation and concentration on the end effects, without teaching in greater detail of the underlying principles. Just as a musician may merrily play on his harp without knowing how the sound arises from the vibration of the strings, so a mage may make use of magic without realising the true forces at work. In this document I hope to give learning on the nature of magic, and how the underlying effects give rise to all the wondrous fruits we can produce.
@@ -69,8 +69,8 @@ Some believe that magic is inherently wrong, that the so-called twisting of the 
 newLore{
 	id = "spellblade",
 	category = "angolwen",
-	name = "The spellblade",
-	lore = [[From the desk of Archmage Varil,
+	name = _t"The spellblade",
+	lore = _t[[From the desk of Archmage Varil,
 Another day dawns on Angolwen. I hesitate to write this, but it almost feels as if peace is once again returning to Eyal. Saying this, I almost expect war and destruction to erupt immediately - fate is anything if not spiteful. Regardless, my sleep grows less disturbed by my memories of the Spellhunt day by day, and I can now devote myself wholly to the betterment of our cloistered community here in the mountains.
 
 This is not to say that life has been without conflict at all. An agent of the Ziguranth infiltrated Angolwen under the guise of a travelling alchemist a few days ago; an unhappy first, I'm afraid. Having used choking powder to incapacitate the guards and rob the surrounding mages of their voices, things may have turned ugly if Linaniil hadn't been passing by on one of her walks. Little was left of that man... or the tree he hid behind... or many of the surrounding buildings, to be honest.
@@ -81,9 +81,9 @@ In a way, the incident lit a fire under me to pursue my studies and develop my p
 newLore{
 	id = "angolwen-fountain",
 	category = "angolwen",
-	name = "Angolwen Fountain",
+	name = _t"Angolwen Fountain",
 	always_pop = true,
-	lore = [[#{italic}#(You see here a large, elaborate fountain.  A statue of Linaniil stands in the center, her arms outstretched to welcome all; around the outside of the fountain stand statues of a dwarf manipulating earthen runes, a human with a simple healer's crosier, an elf with a tall, elaborate staff, and a halfling with a scepter in one hand and a fireball hovering over the other.  The runes and the fireball are not connected to anything, and float in a fixed position in the air.  You see a carving repeating along the border of the fountain, in small print.)#{normal}#
+	lore = _t[[#{italic}#(You see here a large, elaborate fountain.  A statue of Linaniil stands in the center, her arms outstretched to welcome all; around the outside of the fountain stand statues of a dwarf manipulating earthen runes, a human with a simple healer's crosier, an elf with a tall, elaborate staff, and a halfling with a scepter in one hand and a fireball hovering over the other.  The runes and the fireball are not connected to anything, and float in a fixed position in the air.  You see a carving repeating along the border of the fountain, in small print.)#{normal}#
 
 ALL ARE WELCOME WHO LEARN FROM THE MISTAKES OF THE PAST
 

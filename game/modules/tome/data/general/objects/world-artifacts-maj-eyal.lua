@@ -25,11 +25,11 @@ newEntity{ base = "BASE_STAFF",
 	unique = true,
 	name = "Penitence",
 	flavor_name = "harmonystaff",
-	unided_name = "glowing staff", image = "object/artifact/staff_penitence.png",
+	unided_name = _t"glowing staff", image = "object/artifact/staff_penitence.png",
 	level_range = {10, 18},
 	color=colors.VIOLET,
 	rarity = 200,
-	desc = [[A powerful staff sent in secret to Angolwen by the Shaloren, to aid their fighting of the plagues following the Spellblaze. Its power is not to harm, but to heal and protect.]],
+	desc = _t[[A powerful staff sent in secret to Angolwen by the Shaloren, to aid their fighting of the plagues following the Spellblaze. Its power is not to harm, but to heal and protect.]],
 	cost = math.random(125,200),
 	material_level = 2,
 
@@ -70,7 +70,7 @@ newEntity{ base = "BASE_STAFF",
 	},
 	max_power = 60, power_regen = 1,
 	use_power = {
-		name = function(self, who) return ("cure up to %d diseases or poisons (based on Magic)"):format(self.use_power.cures(self, who)) end,
+		name = function(self, who) return ("cure up to %d diseases or poisons (based on Magic)"):tformat(self.use_power.cures(self, who)) end,
 		power = 10,
 		tactical = {CURE = function(who, t, aitarget) -- count number of disease and poisons
 			local nb = 0
@@ -90,7 +90,7 @@ newEntity{ base = "BASE_STAFF",
 			local effs = {}
 			local known = false
 
-			game.logSeen(who, "%s uses %s %s, curing %s afflictions!", who.name:capitalize(), who:his_her(), self:getName({do_color=true, no_add_name = true}), who:his_her())
+			game.logSeen(who, "%s uses %s %s, curing %s afflictions!", who:getName():capitalize(), who:his_her(), self:getName({do_color=true, no_add_name = true}), who:his_her())
 			-- Create list of poison/disease effects
 			for eff_id, p in pairs(target.tmp) do
 				local e = target.tempeffect_def[eff_id]
@@ -129,13 +129,13 @@ newEntity{ base = "BASE_STAFF", define_as = "STAFF_TARELION",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Lost Staff of Archmage Tarelion", image = "object/artifact/staff_lost_staff_archmage_tarelion.png",
-	unided_name = "shining staff",
+	unided_name = _t"shining staff",
 	flavor_name = "magestaff",
 	flavors = {magestaff=true},
 	level_range = {37, 50},
 	color=colors.VIOLET,
 	rarity = 250,
-	desc = [[Archmage Tarelion travelled the world in his youth. But the world is not a nice place and it seems he had to run fast.]],
+	desc = _t[[Archmage Tarelion travelled the world in his youth. But the world is not a nice place and it seems he had to run fast.]],
 	cost = math.random(700,1100),
 	material_level = 5,
 
@@ -170,8 +170,8 @@ newEntity{ base = "BASE_AMULET",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Spellblaze Echoes", color = colors.DARK_GREY, image = "object/artifact/amulet_spellblaze_echoes.png",
-	unided_name = "deep black amulet",
-	desc = [[This ancient charm still retains a distant echo of the destruction wrought by the Spellblaze]],
+	unided_name = _t"deep black amulet",
+	desc = _t[[This ancient charm still retains a distant echo of the destruction wrought by the Spellblaze]],
 	level_range = {30, 39},
 	rarity = 290,
 	cost = 500,
@@ -186,7 +186,7 @@ newEntity{ base = "BASE_AMULET",
 	},
 	max_power = 60, power_regen = 1,
 	use_power = { name = function(self, who)
-			return ("unleash a destructive wail, destroying terrain and dealing %0.2f physical damage (based on Magic) in a radius of %d"):format(engine.interface.ActorTalents.damDesc(who, engine.DamageType.PHYSICAL, self.use_power.damage(who)), self.use_power.radius)
+			return ("unleash a destructive wail, destroying terrain and dealing %0.2f physical damage (based on Magic) in a radius of %d"):tformat(engine.interface.ActorTalents.damDesc(who, engine.DamageType.PHYSICAL, self.use_power.damage(who)), self.use_power.radius)
 		end,
 		power = 60,
 		radius = 3,
@@ -197,7 +197,7 @@ newEntity{ base = "BASE_AMULET",
 			who:project({type="ball", range=0, selffire=false, radius=3}, who.x, who.y, engine.DamageType.DIG, 1)
 			who:project({type="ball", range=0, selffire=false, radius=3}, who.x, who.y, engine.DamageType.DIG, 1)
 			who:project({type="ball", range=0, selffire=false, radius=3}, who.x, who.y, engine.DamageType.PHYSICAL, self.use_power.damage(who))
-			game.logSeen(who, "%s uses the %s!", who.name:capitalize(), self:getName())
+			game.logSeen(who, "%s uses the %s!", who:getName():capitalize(), self:getName())
 			return {id=true, used=true}
 		end
 	},
@@ -207,8 +207,8 @@ newEntity{ base = "BASE_AMULET",
 	power_source = {technique=true},
 	unique = true,
 	name = "Daneth's Neckguard", color = colors.STEEL_BLUE, image = "object/artifact/daneths_neckguard.png",
-	unided_name = "a thick steel gorget",
-	desc = [[A thick steel gorget designed to protect its wearer from fatal attacks to the neck.  This particular gorget was worn by the Halfling General Daneth Tendermourn during the pyre wars, and judging by the marks along its surface may have saved the General's life on more than one occasion.]],
+	unided_name = _t"a thick steel gorget",
+	desc = _t[[A thick steel gorget designed to protect its wearer from fatal attacks to the neck.  This particular gorget was worn by the Halfling General Daneth Tendermourn during the pyre wars, and judging by the marks along its surface may have saved the General's life on more than one occasion.]],
 	level_range = {20, 30},
 	rarity = 300,
 	cost = 300,
@@ -238,8 +238,8 @@ newEntity{ base = "BASE_AMULET",
 -- Vaguely AM oriented, about on par with above average randarts unless you use both damage types
 newEntity{ base = "BASE_LONGBOW",
 	power_source = {nature=true},
-	name = "Thaloren-Tree Longbow", unided_name = "glowing elven-wood longbow", unique=true, image = "object/artifact/thaloren_tree_longbow.png",
-	desc = [[In the aftermath of the Spellblaze, the Thaloren had to defend their forests against foes and fires alike. Many of the trees died despite the efforts of the Elves to save them. Their wood was fashioned into a bow to be wielded against the darkness.]],
+	name = "Thaloren-Tree Longbow", unided_name = _t"glowing elven-wood longbow", unique=true, image = "object/artifact/thaloren_tree_longbow.png",
+	desc = _t[[In the aftermath of the Spellblaze, the Thaloren had to defend their forests against foes and fires alike. Many of the trees died despite the efforts of the Elves to save them. Their wood was fashioned into a bow to be wielded against the darkness.]],
 	level_range = {40, 50},
 	rarity = 200,
 	require = { stat = { dex=36 }, },
@@ -271,8 +271,8 @@ newEntity{ base = "BASE_LONGBOW",
 
 newEntity{ base = "BASE_LONGBOW",
 	power_source = {arcane=true, nature=true},
-	name = "Corpsebow", unided_name = "rotting longbow", unique=true, image = "object/artifact/bow_corpsebow.png",
-	desc = [[A lost artifact of the Age of Dusk, the Corpsebow is filled with a lingering essence of that era's terrible plagues. Those struck by arrows fired from its rotten string find themselves afflicted by echoes of ancient sickness.]],
+	name = "Corpsebow", unided_name = _t"rotting longbow", unique=true, image = "object/artifact/bow_corpsebow.png",
+	desc = _t[[A lost artifact of the Age of Dusk, the Corpsebow is filled with a lingering essence of that era's terrible plagues. Those struck by arrows fired from its rotten string find themselves afflicted by echoes of ancient sickness.]],
 	level_range = {10, 20},
 	rarity = 200,
 	require = { stat = { dex=16 }, },
@@ -306,13 +306,13 @@ newEntity{ base = "BASE_LONGSWORD",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Spellblade", image = "object/artifact/weapon_spellblade.png",
-	unided_name = "glowing long sword",
+	unided_name = _t"glowing long sword",
 	moddable_tile = "special/%s_weapon_spellblade",
 	moddable_tile_big = true,
 	level_range = {35, 50},
 	color=colors.AQUAMARINE,
 	rarity = 250,
-	desc = [[Mages sometimes have funny ideas. Archmage Varil once learned how to handle a sword and found he preferred wielding it instead of his staff.]],
+	desc = _t[[Mages sometimes have funny ideas. Archmage Varil once learned how to handle a sword and found he preferred wielding it instead of his staff.]],
 	on_id_lore = "spellblade",
 	cost = math.random(700,1100),
 
@@ -346,11 +346,11 @@ newEntity{ base = "BASE_GREATSWORD",
 	power_source = {nature=true, technique=true},
 	unique = true,
 	name = "Genocide",
-	unided_name = "pitch black blade", image = "object/artifact/weapon_sword_genocide.png",
+	unided_name = _t"pitch black blade", image = "object/artifact/weapon_sword_genocide.png",
 	level_range = {25, 35},
 	color=colors.GRAY,
 	rarity = 300,
-	desc = [[Farian was King Toknor's captain, and fought by his side in the great Battle of Last Hope.  However, when he returned after the battle to find his hometown burnt in an orcish pyre, a madness overtook him.  The desire for vengeance made him quit the army and strike out on his own, lightly armoured and carrying nought but his sword.  Most thought him dead until the reports came back of a fell figure tearing through the orcish encampments, slaughtering all before him and mercilessly butchering the corpses after.  It is said his blade drank the blood of 100 orcs each day until finally all of Maj'Eyal was cleared of their presence.  When the final orc was slain and no more were to be found, Farian at the last turned the blade on himself and stuck it through his chest.  Those nearby said his body shook with convulsions as he did so, though they could not tell whether he was laughing or crying.]],
+	desc = _t[[Farian was King Toknor's captain, and fought by his side in the great Battle of Last Hope.  However, when he returned after the battle to find his hometown burnt in an orcish pyre, a madness overtook him.  The desire for vengeance made him quit the army and strike out on his own, lightly armoured and carrying nought but his sword.  Most thought him dead until the reports came back of a fell figure tearing through the orcish encampments, slaughtering all before him and mercilessly butchering the corpses after.  It is said his blade drank the blood of 100 orcs each day until finally all of Maj'Eyal was cleared of their presence.  When the final orc was slain and no more were to be found, Farian at the last turned the blade on himself and stuck it through his chest.  Those nearby said his body shook with convulsions as he did so, though they could not tell whether he was laughing or crying.]],
 	cost = 400,
 	require = { stat = { str=40, wil=20 }, },
 	material_level = 3,
@@ -375,11 +375,11 @@ newEntity{ base = "BASE_STAFF",
 	unique = true,
 	name = "Bolbum's Big Knocker", image = "object/artifact/staff_bolbums_big_knocker.png",
 	moddable_tile = "special/%s_staff_bolbums_big_knocker",
-	unided_name = "thick staff",
+	unided_name = _t"thick staff",
 	level_range = {20, 35},
 	color=colors.UMBER,
 	rarity = 220,
-	desc = [[A thick staff with a heavy knob on the end.  It was said to be used by the grand alchemist Bolbum in the Age of Allure.  Much renowned is the fear of his students for their master, and the high rate of cranial injuries amongst them.  Bolbum died with seven daggers in his back and his much-cursed staff went missing after.]],
+	desc = _t[[A thick staff with a heavy knob on the end.  It was said to be used by the grand alchemist Bolbum in the Age of Allure.  Much renowned is the fear of his students for their master, and the high rate of cranial injuries amongst them.  Bolbum died with seven daggers in his back and his much-cursed staff went missing after.]],
 	cost = 300,
 	material_level = 3,
 
@@ -410,12 +410,12 @@ newEntity{ base = "BASE_LITE",
 	power_source = {nature=true, antimagic=true},
 	unique = true,
 	name = "Guidance", image = "object/artifact/guidance.png",
-	unided_name = "a softly glowing crystal",
+	unided_name = _t"a softly glowing crystal",
 	level_range = {38, 50},
 	color = colors.YELLOW,
 	encumber = 1,
 	rarity = 300,
-	desc = [[Said to have once belonged to Inquisitor Marcus Dunn during the Spellhunt this fist sized quartz crystal glows constantly with a soft white light and was rumoured to be a great aid in meditation, helping focus the mind, body, and soul of the owner as well as protecting them from the foulest of magics.
+	desc = _t[[Said to have once belonged to Inquisitor Marcus Dunn during the Spellhunt this fist sized quartz crystal glows constantly with a soft white light and was rumoured to be a great aid in meditation, helping focus the mind, body, and soul of the owner as well as protecting them from the foulest of magics.
 It seems somebody well versed in antimagic could use it to its fullest potential.]],
 	cost = math.random(700,1100),
 	material_level = 5,
@@ -437,9 +437,9 @@ It seems somebody well versed in antimagic could use it to its fullest potential
 
 			self:specialWearAdd({"wielder","inc_stats"}, { [Stats.STAT_WIL] = 6, [Stats.STAT_CUN] = 6, [Stats.STAT_CON] = 6})
 			self:specialWearAdd({"wielder","combat_spellresist"}, 15)
-			self:specialSetAdd({"wielder","equilibrium_regen"}, -1)
-			self:specialSetAdd({"wielder","resists"}, {[engine.DamageType.ARCANE]=40})
-			self:specialSetAdd({"wielder","resists_cap"}, {[engine.DamageType.ARCANE]=10})			
+			self:specialWearAdd({"wielder","equilibrium_regen"}, -1)
+			self:specialWearAdd({"wielder","resists"}, {[engine.DamageType.ARCANE]=40})
+			self:specialWearAdd({"wielder","resists_cap"}, {[engine.DamageType.ARCANE]=10})			
 			game.logPlayer(who, "#LIGHT_BLUE#You feel a great hero guiding you!")
 		end
 	end,
@@ -449,9 +449,9 @@ newEntity{ base = "BASE_SLING",
 	power_source = {technique=true},
 	unique = true,
 	name = "Eldoral Last Resort", image = "object/artifact/sling_eldoral_last_resort.png",
-	unided_name = "well-made sling",
-	desc = [[A sling with an inscription on its handle: 'May the wielder be granted cunning in his fight against the darkness'.]],
-	special_desc = function(self) return "When dropping below 30% max HP, you gain 20% attack speed, lose 100% fatigue, and your shots don't consume ammo for 5 turns. 30 turns cd." end,
+	unided_name = _t"well-made sling",
+	desc = _t[[A sling with an inscription on its handle: 'May the wielder be granted cunning in his fight against the darkness'.]],
+	special_desc = function(self) return _t"When dropping below 30% max HP, you gain 20% attack speed, lose 100% fatigue, and your shots don't consume ammo for 5 turns. 30 turns cd." end,
 	level_range = {15, 25},
 	rarity = 200,
 	require = { stat = { dex=26 }, },
@@ -488,10 +488,10 @@ newEntity{ base = "BASE_KNIFE",
 	power_source = {technique=true},
 	unique = true,
 	name = "Orc Feller", image = "object/artifact/dagger_orc_feller.png",
-	unided_name = "shining dagger",
+	unided_name = _t"shining dagger",
 	moddable_tile = "special/%s_dagger_orc_feller",
 	moddable_tile_big = true,
-	desc = [[During the invasion of Eldoral the Halfling Rogue Herah is said to have slain over one hundred orcs while defending a group of refugees.]],
+	desc = _t[[During the invasion of Eldoral the Halfling Rogue Herah is said to have slain over one hundred orcs while defending a group of refugees.]],
 	level_range = {40, 50},
 	rarity = 300,
 	require = { stat = { dex=44 }, },
@@ -527,10 +527,10 @@ newEntity{ base = "BASE_MACE",
 	power_source = {nature=true, antimagic=true},
 	unique = true,
 	name = "Nature's Vengeance", color = colors.BROWN, image = "object/artifact/mace_natures_vengeance.png",
-	unided_name = "thick wooden mace",
+	unided_name = _t"thick wooden mace",
 	moddable_tile = "special/%s_mace_natures_vengeance",
 	moddable_tile_big = true,
-	desc = [[This thick-set mace was used by the Spellhunter Vorlan, who crafted it from the wood of an ancient oak that was uprooted during the Spellblaze.  Many were the wizards and witches felled by this weapon, brought to justice for the crimes they committed against nature.]],
+	desc = _t[[This thick-set mace was used by the Spellhunter Vorlan, who crafted it from the wood of an ancient oak that was uprooted during the Spellblaze.  Many were the wizards and witches felled by this weapon, brought to justice for the crimes they committed against nature.]],
 	level_range = {20, 34},
 	rarity = 340,
 	require = { stat = { str=42 } },
@@ -565,8 +565,8 @@ newEntity{ base = "BASE_GAUNTLETS",
 	define_as = "GAUNTLETS_SCORPION",
 	unique = true,
 	name = "Fists of the Desert Scorpion", color = colors.STEEL_BLUE, image = "object/artifact/scorpion_gauntlets.png",
-	unided_name = "viciously spiked gauntlets",
-	desc = [[These wickedly spiked gauntlets belonged to an orc captain in the Age of Pyre who conquered the western sands, using them as a base to lay raids on Elvala to the south.  Known as The Scorpion, he seemed unconquerable in battle, able to pull enemies towards him with vicious mental force and lay down lethal blows on them.  Often a flurry of these yellow and black gauntlets would be the last thing great Shaloren mages would see before having the life crushed from them.
+	unided_name = _t"viciously spiked gauntlets",
+	desc = _t[[These wickedly spiked gauntlets belonged to an orc captain in the Age of Pyre who conquered the western sands, using them as a base to lay raids on Elvala to the south.  Known as The Scorpion, he seemed unconquerable in battle, able to pull enemies towards him with vicious mental force and lay down lethal blows on them.  Often a flurry of these yellow and black gauntlets would be the last thing great Shaloren mages would see before having the life crushed from them.
 
 Finally The Scorpion was defeated by the alchemist Nessylia, who went to face the fiendish orc alone.  The captain pulled the elf towards him with a brutish cackle, but before he could batter the life from her flesh she tore off her robes, revealing eighty incendiary bombs strapped to her flesh.  With a spark from her fingers she triggered an explosion that could be seen for miles around.  To this day Nessylia is still remembered in song for the sacrifice of her immortal life to protect her people.]],
 	level_range = {20, 40},
@@ -599,8 +599,8 @@ newEntity{ base = "BASE_CLOAK",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Wind's Whisper", image="object/artifact/cloak_winds_whisper.png",
-	unided_name = "flowing light cloak",
-	desc = [[When the enchanter Razeen was cornered by Spellhunters near the Daikara mountain pass she wrapped her cloak about her and fled down a narrow ravine.  The hunters fired volley after volley of arrows at her, but by miracle or magic they all missed.  Razeen was able to escape and flee to the hidden city in the west.]],
+	unided_name = _t"flowing light cloak",
+	desc = _t[[When the enchanter Razeen was cornered by Spellhunters near the Daikara mountain pass she wrapped her cloak about her and fled down a narrow ravine.  The hunters fired volley after volley of arrows at her, but by miracle or magic they all missed.  Razeen was able to escape and flee to the hidden city in the west.]],
 	level_range = {15, 25},
 	rarity = 400,
 	cost = 250,
@@ -619,9 +619,9 @@ newEntity{ base = "BASE_CLOAK",
 
 newEntity{ base = "BASE_ROD",
 	power_source = {arcane=true},
-	unided_name = "glowing rod",
+	unided_name = _t"glowing rod",
 	name = "Gwai's Burninator", color=colors.LIGHT_RED, unique=true, image = "object/artifact/wand_gwais_burninator.png",
-	desc = [[Gwai, a Pyromanceress that lived during the Spellhunt, was cornered by group of mage hunters. She fought to her last breath and is said to have killed at least ten people with this wand before she fell.]],
+	desc = _t[[Gwai, a Pyromanceress that lived during the Spellhunt, was cornered by group of mage hunters. She fought to her last breath and is said to have killed at least ten people with this wand before she fell.]],
 	cost = 600,
 	rarity = 220,
 	level_range = {25, 35},
@@ -637,13 +637,13 @@ newEntity{ base = "BASE_ROD",
 		target = function(self, who) return {type="cone", range=self.use_power.range, radius=self.use_power.radius} end,
 		tactical = {ATTACKAREA = {FIRE = 2}},
 		name = function(self, who)
-			return ("shoot a cone of flames (radius %d) for %0.2f fire damage (based on Magic)"):format(self.use_power.radius, engine.interface.ActorTalents.damDesc(who, engine.DamageType.FIRE, self.use_power.damage(self, who)))
+			return ("shoot a cone of flames (radius %d) for %0.2f fire damage (based on Magic)"):tformat(self.use_power.radius, engine.interface.ActorTalents.damDesc(who, engine.DamageType.FIRE, self.use_power.damage(self, who)))
 		end,
 		use = function(self, who)
 			local tg = self.use_power.target(self, who)
 			local x, y = who:getTarget(tg)
 			if not x or not y then return nil end
-			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
+			game.logSeen(who, "%s activates %s %s!", who:getName():capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
 			who:project(tg, x, y, engine.DamageType.FIRE, self.use_power.damage(self, who), {type="flame"})
 			return {id=true, used=true}
 		end
@@ -653,12 +653,12 @@ newEntity{ base = "BASE_ROD",
 newEntity{ base = "BASE_BATTLEAXE",
 	power_source = {technique=true},
 	unique = true,
-	unided_name = "viciously sharp battle axe",
+	unided_name = _t"viciously sharp battle axe",
 	name = "Drake's Bane", image = "object/artifact/axe_drakes_bane.png",
 	moddable_tile = "special/%s_axe_drakes_bane",
 	moddable_tile_big = true,
 	color = colors.RED,
-	desc = [[The killing of Kroltar, mightiest of wyrms, took seven months and the lives of 20,000 dwarven warriors.  Finally the beast was worn down and mastersmith Gruxim, standing atop the bodies of his fallen comrades, was able slit its throat with this axe crafted purely for the purpose of penetrating the wyrm's hide.]],
+	desc = _t[[The killing of Kroltar, mightiest of wyrms, took seven months and the lives of 20,000 dwarven warriors.  Finally the beast was worn down and mastersmith Gruxim, standing atop the bodies of his fallen comrades, was able slit its throat with this axe crafted purely for the purpose of penetrating the wyrm's hide.]],
 	require = { stat = { str=16 }, },
 	rarity = 300,
 	cost = 400,
@@ -684,10 +684,10 @@ newEntity{ base = "BASE_WARAXE",
 	power_source = {technique=true, nature=true},
 	unique = true,
 	name = "Blood-Letter", image = "object/artifact/weapon_axe_blood_letter.png",
-	unided_name = "glacial hatchet",
+	unided_name = _t"glacial hatchet",
 	moddable_tile = "special/%s_weapon_axe_blood_letter",
 	moddable_tile_big = true,
-	desc = [[A hand axe carved out of the most frozen parts of the northern wasteland.]],
+	desc = _t[[A hand axe carved out of the most frozen parts of the northern wasteland.]],
 	level_range = {25, 35},
 	rarity = 235,
 	require = { stat = { str=40, dex=24 }, },
@@ -716,11 +716,11 @@ newEntity{ base = "BASE_WARAXE",
 newEntity{ base = "BASE_GEM", define_as = "GEM_TELOS",
 	power_source = {arcane=true},
 	unique = true,
-	unided_name = "scintillating white crystal",
+	unided_name = _t"scintillating white crystal",
 	name = "Telos's Staff Crystal", subtype = "multi-hued", image = "object/artifact/telos_staff_crystal.png",
 	color = colors.WHITE,
 	level_range = {35, 50},
-	desc = [[A closer look at this pure white crystal reveals that it is really a plethora of colors swirling and scintillating.]],
+	desc = _t[[A closer look at this pure white crystal reveals that it is really a plethora of colors swirling and scintillating.]],
 	rarity = 240,
 	identified = false,
 	cost = 200,
@@ -750,8 +750,8 @@ newEntity{ base = "BASE_GEM", define_as = "GEM_TELOS",
 	},
 
 	max_power = 1, power_regen = 1,
-	use_power = { name = "combine with a staff", power = 1, use = function(self, who, gem_inven, gem_item)
-		who:showInventory("Fuse with which staff?", who:getInven("INVEN"), function(o) return o.type == "weapon" and o.subtype == "staff" and not o.egoed and not o.unique end, function(o, item)
+	use_power = { name = _t"combine with a staff", power = 1, use = function(self, who, gem_inven, gem_item)
+		who:showInventory(_t"Fuse with which staff?", who:getInven("INVEN"), function(o) return o.type == "weapon" and o.subtype == "staff" and not o.egoed and not o.unique end, function(o, item)
 			local voice = game.zone:makeEntityByName(game.level, "object", "VOICE_TELOS")
 			if voice then
 				local oldname = o:getName{do_color=true}
@@ -794,13 +794,13 @@ newEntity{ base = "BASE_GEM", define_as = "GEM_TELOS",
 	on_wear = function(self, who)
 		if who.is_alchemist_golem then
 			self.old_golem_name = who.name
-			who.name = "Telos Golem (reluctant follower of "..who.summoner.name..")"
-			game.log("#ROYAL_BLUE#The golem decides to change it's name to #{bold}#%s#{normal}#.", who.name)
+			who.name = ("Telos Golem (reluctant follower of %s)"):tformat(who.summoner:getName())
+			game.log("#ROYAL_BLUE#The golem decides to change it's name to #{bold}#%s#{normal}#.", who:getName())
 		end
 	end,
 	on_takeoff = function(self, who)
 		if who.is_alchemist_golem then
-			who.name = self.old_golem_name or "I feel lost!"
+			who.name = self.old_golem_name or _t"I feel lost!"
 		end
 	end,
 }
@@ -810,10 +810,10 @@ newEntity{ base = "BASE_STAFF", define_as = "VOICE_TELOS",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Voice of Telos",
-	unided_name = "scintillating white staff", image="object/artifact/staff_voice_of_telos.png",
+	unided_name = _t"scintillating white staff", image="object/artifact/staff_voice_of_telos.png",
 	color = colors.VIOLET,
 	rarity = false,
-	desc = [[A closer look at this pure white staff reveals that it is really a plethora of colors swirling and scintillating.]],
+	desc = _t[[A closer look at this pure white staff reveals that it is really a plethora of colors swirling and scintillating.]],
 	cost = 500,
 	material_level = 5,
 
@@ -836,8 +836,8 @@ newEntity{ base = "BASE_LEATHER_BELT",
 	power_source = {nature=true},
 	unique = true,
 	name = "Rope Belt of the Thaloren", image = "object/artifact/rope_belt_of_the_thaloren.png",
-	unided_name = "short length of rope",
-	desc = [[The simplest of belts, worn for centuries by Nessilla Tantaelen as she tended to her people and forests. Some of her wisdom and power have settled permanently into its fibers.]],
+	unided_name = _t"short length of rope",
+	desc = _t[[The simplest of belts, worn for centuries by Nessilla Tantaelen as she tended to her people and forests. Some of her wisdom and power have settled permanently into its fibers.]],
 	color = colors.LIGHT_RED,
 	level_range = {16, 30},
 	rarity = 200,
@@ -865,8 +865,8 @@ newEntity{ base = "BASE_LEATHER_BELT",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Neira's Memory", image = "object/artifact/neira_memory.png",
-	unided_name = "crackling belt",
-	desc = [[Ages ago this belt was worn by Linaniil herself in her youth, using its power she shielded herself from the Spellblaze rain of fire, but naught could she do for her sister Neira.]],
+	unided_name = _t"crackling belt",
+	desc = _t[[Ages ago this belt was worn by Linaniil herself in her youth, using its power she shielded herself from the Spellblaze rain of fire, but naught could she do for her sister Neira.]],
 	color = colors.GOLD,
 	level_range = {20, 30},
 	rarity = 200,
@@ -880,11 +880,11 @@ newEntity{ base = "BASE_LEATHER_BELT",
 	},
 	max_power = 20, power_regen = 1,
 	use_power = {
-		name = function(self, who) return ("surround yourself with a magical shield (strength %d, based on Magic) for 10 turns"):format(self.use_power.shield(self, who)) end,
+		name = function(self, who) return ("surround yourself with a magical shield (strength %d, based on Magic) for 10 turns"):tformat(self.use_power.shield(self, who)) end,
 		power = 20,
 		shield = function(self, who) return 100 + who:getMag(250) * (100 + (who:attr("shield_factor") or 0)) / 100 end,
 		use = function(self, who)
-			game.logSeen(who, "%s invokes the memory of Neira!", who.name:capitalize())
+			game.logSeen(who, "%s invokes the memory of Neira!", who:getName():capitalize())
 			who:setEffect(who.EFF_DAMAGE_SHIELD, 10, {power=self.use_power.shield(self, who)})
 			game:playSoundNear(who, "talents/arcane")
 			return {id=true, used=true}
@@ -896,8 +896,8 @@ newEntity{ base = "BASE_LIGHT_ARMOR",
 	power_source = {nature=true, antimagic=true},
 	unique = true,
 	name = "Nature's Blessing", image = "object/artifact/armor_natures_blessing.png",
-	unided_name = "supple leather armour entwined with willow bark",
-	desc = [[Worn by Protector Ardon, who first formed the Ziguranth during the mage wars between the Humans and the Halflings.  This armour is infused with the powers of nature, and protected against the disruptive forces of magic.]],
+	unided_name = _t"supple leather armour entwined with willow bark",
+	desc = _t[[Worn by Protector Ardon, who first formed the Ziguranth during the mage wars between the Humans and the Halflings.  This armour is infused with the powers of nature, and protected against the disruptive forces of magic.]],
 	color = colors.BROWN,
 	level_range = {15, 30},
 	rarity = 350,
@@ -938,8 +938,8 @@ newEntity{ base = "BASE_MASSIVE_ARMOR",
 	power_source = {technique=true},
 	unique = true,
 	name = "Plate Armor of the King", image = "object/artifact/plate_armor_of_the_king.png",
-	unided_name = "suit of gleaming voratun plate",
-	desc = [[Beautifully detailed with images of King Toknor's defence of Last Hope. Despair fills the hearts of even the blackest villains at the sight of it.]],
+	unided_name = _t"suit of gleaming voratun plate",
+	desc = _t[[Beautifully detailed with images of King Toknor's defence of Last Hope. Despair fills the hearts of even the blackest villains at the sight of it.]],
 	color = colors.WHITE,
 	level_range = {45, 50},
 	rarity = 390,
@@ -972,10 +972,10 @@ newEntity{ base = "BASE_LONGSWORD",
 	power_source = {nature=true, antimagic=true},
 	unique = true,
 	name = "Witch-Bane", color = colors.LIGHT_STEEL_BLUE, image = "object/artifact/sword_witch_bane.png",
-	unided_name = "an ivory handled voratun longsword",
+	unided_name = _t"an ivory handled voratun longsword",
 	moddable_tile = "special/%s_sword_witch_bane",
 	moddable_tile_big = true,
-	desc = [[A thin voratun blade with an ivory handle wrapped in purple cloth.  The weapon is nearly as legendary as its former owner, Marcus Dunn, and was thought to have been destroyed after Marcus was slain near the end of the Spellhunt.
+	desc = _t[[A thin voratun blade with an ivory handle wrapped in purple cloth.  The weapon is nearly as legendary as its former owner, Marcus Dunn, and was thought to have been destroyed after Marcus was slain near the end of the Spellhunt.
 It seems somebody well versed in antimagic could use it to its fullest potential.]],
 	level_range = {38, 50},
 	rarity = 250,
@@ -1019,12 +1019,12 @@ newEntity{ base = "BASE_STAFF", define_as = "SET_STAFF_CHANNELERS",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Staff of Arcane Supremacy",
-	unided_name = "silver-runed staff",
+	unided_name = _t"silver-runed staff",
 	flavor_name = "magestaff",
 	level_range = {20, 40},
 	color=colors.BLUE, image = "object/artifact/staff_of_arcane_supremacy.png",
 	rarity = 300,
-	desc = [[A long slender staff, made of ancient dragon-bone, with runes emblazoned all over its surface in bright silver.
+	desc = _t[[A long slender staff, made of ancient dragon-bone, with runes emblazoned all over its surface in bright silver.
 It hums faintly, as if great power is locked within, yet alone it seems incomplete.]],
 	cost = 200,
 	material_level = 3,
@@ -1051,7 +1051,7 @@ It hums faintly, as if great power is locked within, yet alone it seems incomple
 	use_talent = { id = Talents.T_ARCANE_SUPREMACY, level = 3, power = 20 },
 	set_list = { {"define_as", "SET_HAT_CHANNELERS"} },
 	set_desc = {
-		channelers = "A true understanding of the arcane is needed to release its full power.",
+		channelers = _t"A true understanding of the arcane is needed to release its full power.",
 	},
 	on_set_complete = function(self, who)
 		self:specialSetAdd({"wielder","max_mana"}, 100)
@@ -1063,8 +1063,8 @@ newEntity{ base = "BASE_WIZARD_HAT", define_as = "SET_HAT_CHANNELERS",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Hat of Arcane Understanding",
-	unided_name = "silver-runed hat",
-	desc = [[A traditional pointed wizard's hat, made of fine purple elven-silk and decorated with bright silver runes. You sense it has been passed from ancient times, and has been born on the heads of great mages.
+	unided_name = _t"silver-runed hat",
+	desc = _t[[A traditional pointed wizard's hat, made of fine purple elven-silk and decorated with bright silver runes. You sense it has been passed from ancient times, and has been born on the heads of great mages.
 Touching the cloth you feel a sense of knowledge and power from bygone ages, yet it is partly sealed away, waiting for a trigger to release it.]],
 	color = colors.BLUE, image = "object/artifact/wizard_hat_of_arcane_understanding.png",
 	level_range = {20, 40},
@@ -1087,7 +1087,7 @@ Touching the cloth you feel a sense of knowledge and power from bygone ages, yet
 	max_power = 40, power_regen = 1,
 	set_list = { {"define_as", "SET_STAFF_CHANNELERS"} },
 	set_desc = {
-		channelers = "Only supremacy of the arcane can release its full power.",
+		channelers = _t"Only supremacy of the arcane can release its full power.",
 	},
 	on_set_complete = function(self, who)
 		local Talents = require "engine.interface.ActorTalents"
@@ -1104,8 +1104,8 @@ newEntity{ base = "BASE_AMULET", --Thanks Grayswandir!
 	power_source = {arcane=true},
 	unique = true,
 	name = "Mirror Shards",
-	unided_name = "mirror lined chain", image = "object/artifact/mirror_shards.png",
-	desc = [[Said to have been created by a powerful mage after his home was destroyed by a mob following the Spellblaze. Though he fled, his possessions were crushed, burned, and smashed. When he returned to the ruins, he made this amulet from the remains of his shattered mirror.]],
+	unided_name = _t"mirror lined chain", image = "object/artifact/mirror_shards.png",
+	desc = _t[[Said to have been created by a powerful mage after his home was destroyed by a mob following the Spellblaze. Though he fled, his possessions were crushed, burned, and smashed. When he returned to the ruins, he made this amulet from the remains of his shattered mirror.]],
 	color = colors.LIGHT_RED,
 	level_range = {18, 30},
 	rarity = 220,
@@ -1123,11 +1123,11 @@ newEntity{ base = "BASE_AMULET", --Thanks Grayswandir!
 	},
 	max_power = 24, power_regen = 1,
 	use_power = {
-		name = function(self, who) return ("create a reflective shield (50%% reflection rate, %d strength, based on Magic) for 5 turns"):format(self.use_power.shield(self, who) * (100 + (who:attr("shield_factor") or 0)) / 100) end,
+		name = function(self, who) return ("create a reflective shield (50%% reflection rate, %d strength, based on Magic) for 5 turns"):tformat(self.use_power.shield(self, who) * (100 + (who:attr("shield_factor") or 0)) / 100) end,
 		power = 24,
 		shield = function(self, who) return 150 + 2*who:getMag(100) end,
 		use = function(self, who)
-			game.logSeen(who, "%s activates %s, forging a reflective barrier!", who.name:capitalize(), self:getName({no_add_name = true}))
+			game.logSeen(who, "%s activates %s, forging a reflective barrier!", who:getName():capitalize(), self:getName({no_add_name = true}))
 			who:setEffect(who.EFF_DAMAGE_SHIELD, 5, {power=self.use_power.shield(self, who), reflect = 50})
 			game:playSoundNear(who, "talents/arcane")
 			return {id=true, used=true}
@@ -1139,8 +1139,8 @@ newEntity{ base = "BASE_CLOAK",
 	power_source = {nature=true},
 	unique = true,
 	name = "Destala's Scales", image = "object/artifact/destalas_scales.png",
-	unided_name = "green dragon-scale cloak",
-	desc = [[This cloak is made from the scales of an infamous Venom Drake that terrorized the country side towards the end of the Age of Dusk. It was slain by a party led by Kestin Highfin, who had this cloak fashioned personally.]],
+	unided_name = _t"green dragon-scale cloak",
+	desc = _t[[This cloak is made from the scales of an infamous Venom Drake that terrorized the country side towards the end of the Age of Dusk. It was slain by a party led by Kestin Highfin, who had this cloak fashioned personally.]],
 	level_range = {20, 30},
 	rarity = 240,
 	cost = 200,
@@ -1162,10 +1162,10 @@ newEntity{ base = "BASE_KNIFE", -- Thanks Grayswandir!
 	power_source = {arcane=true},
 	unique = true,
 	name = "Spellblaze Shard", image = "object/artifact/spellblaze_shard.png",
-	unided_name = "crystalline dagger",
+	unided_name = _t"crystalline dagger",
 	moddable_tile = "special/%s_spellblaze",
 	moddable_tile_big = true,
-	desc = [[This jagged crystal glows with an unnatural light. A strap of cloth is wrapped around one end, as a handle.]],
+	desc = _t[[This jagged crystal glows with an unnatural light. A strap of cloth is wrapped around one end, as a handle.]],
 	level_range = {12, 25},
 	rarity = 200,
 	require = { stat = { dex=17 }, },
@@ -1194,10 +1194,10 @@ newEntity{ base = "BASE_KNIFE", --Razakai's idea, slightly modified
 	power_source = {psionic=true},
 	unique = true,
 	name = "Mercy", image = "object/artifact/mercy.png",
-	unided_name = "wickedly sharp dagger",
+	unided_name = _t"wickedly sharp dagger",
 	moddable_tile = "special/%s_mercy",
 	moddable_tile_big = true,
-	desc = [[This dagger was used by a nameless healer during the Age of Dusk. The plagues that ravaged his town were beyond the ability of mortal man to treat, so he took to using his dagger to as an act of mercy when faced with hopeless patients. Despite his good intentions, it is now cursed with dark power, letting it kill in a single stroke against those already weakened.]],
+	desc = _t[[This dagger was used by a nameless healer during the Age of Dusk. The plagues that ravaged his town were beyond the ability of mortal man to treat, so he took to using his dagger to as an act of mercy when faced with hopeless patients. Despite his good intentions, it is now cursed with dark power, letting it kill in a single stroke against those already weakened.]],
 	level_range = {30, 40},
 	rarity = 250,
 	require = { stat = { dex=42 }, },
@@ -1208,7 +1208,7 @@ newEntity{ base = "BASE_KNIFE", --Razakai's idea, slightly modified
 		apr = 9,
 		physcrit = 15,
 		dammod = {str=0.45, dex=0.55},
-		special_on_hit = {desc="deals 60 physical damage increased by 1% for each 1% life the target has lost", fct=function(combat, who, target)
+		special_on_hit = {desc=_t"deals 60 physical damage increased by 1% for each 1% life the target has lost", fct=function(combat, who, target)
 			local tg = {type="ball", range=10, radius=0, selffire=false}
 			local bonus = 1 + (1 - target.life / target.max_life)
 			who:project(tg, target.x, target.y, engine.DamageType.PHYSICAL, 60*bonus)
@@ -1224,8 +1224,8 @@ newEntity{ base = "BASE_MASSIVE_ARMOR", -- Thanks SageAcrin!
 	power_source = {technique = true, nature = true},
 	unique = true,
 	name = "Thalore-Wood Cuirass", image = "object/artifact/thalore_wood_cuirass.png",
-	unided_name = "thick wooden plate armour",
-	desc = [[Expertly hewn from the bark of trees, this wooden armor provides excellent protection at a low weight.]],
+	unided_name = _t"thick wooden plate armour",
+	desc = _t[[Expertly hewn from the bark of trees, this wooden armor provides excellent protection at a low weight.]],
 	color = colors.WHITE,
 	level_range = {10, 24},
 	rarity = 220,

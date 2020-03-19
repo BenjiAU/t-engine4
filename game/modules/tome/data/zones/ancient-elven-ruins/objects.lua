@@ -27,7 +27,7 @@ for i = 1, 3 do
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE"..i,
 	name = "ancient papyrus scroll", lore="ancient-elven-ruins-note-"..i,
-	desc = [[This seems to be an account of the last days of a great Shaloren mage.]],
+	desc = _t[[This seems to be an account of the last days of a great Shaloren mage.]],
 	rarity = false,
 }
 end
@@ -36,8 +36,8 @@ newEntity{ base = "BASE_MUMMY_WRAPPING", define_as = "BINDINGS_ETERNAL_NIGHT",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Bindings of Eternal Night", image = "object/artifact/bindings_of_eternal_night.png",
-	unided_name = "blackened, slithering mummy wrappings",
-	desc = [[Woven through with fell magics of undeath, these bindings suck the light and life out of everything they touch. Any who don them will find themselves suspended in a nightmarish limbo between life and death.]],
+	unided_name = _t"blackened, slithering mummy wrappings",
+	desc = _t[[Woven through with fell magics of undeath, these bindings suck the light and life out of everything they touch. Any who don them will find themselves suspended in a nightmarish limbo between life and death.]],
 	color = colors.DARK_GREY,
 	level_range = {1, 50},
 	rarity = 20, -- not particularly rare, to be loaded only with mummy NPCs
@@ -66,7 +66,7 @@ newEntity{ base = "BASE_MUMMY_WRAPPING", define_as = "BINDINGS_ETERNAL_NIGHT",
 
 	set_list = { {"define_as","CROWN_ETERNAL_NIGHT"} },
 	set_desc = {
-		eternalnight = "A complementing item would be your crowning glory.",
+		eternalnight = _t"A complementing item would be your crowning glory.",
 	},
 	on_set_complete = function(self, who)
 		self.use_talent = { id = "T_ABYSSAL_SHROUD", level = 2, power = 47 }
@@ -80,8 +80,8 @@ newEntity{ base = "BASE_LEATHER_CAP", define_as = "CROWN_ETERNAL_NIGHT",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Crown of Eternal Night", image = "object/artifact/crown_of_eternal_night.png",
-	unided_name = "blackened crown",
-	desc = [[This crown looks useless, yet you can feel it is woven with fell magics of undeath. Maybe it has a use.]],
+	unided_name = _t"blackened crown",
+	desc = _t[[This crown looks useless, yet you can feel it is woven with fell magics of undeath. Maybe it has a use.]],
 	color = colors.DARK_GREY,
 	level_range = {1, 50},
 	cost = 100,
@@ -98,7 +98,7 @@ newEntity{ base = "BASE_LEATHER_CAP", define_as = "CROWN_ETERNAL_NIGHT",
 
 	set_list = { {"define_as","BINDINGS_ETERNAL_NIGHT"} },
 	set_desc = {
-		eternalnight = "You need to find something to bind its powers.",
+		eternalnight = _t"You need to find something to bind its powers.",
 	},
 	on_set_complete = function(self, who)
 		self:specialSetAdd({"wielder","lite"}, -1)

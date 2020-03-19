@@ -217,6 +217,8 @@ void DORText::parseText() {
 
 	last_glyph = 0;
 
+	// DGDGDGDG: handle draw_string_split_anywhere for I18N needs
+
 	while (true)
 	{
 		if ((*next == '\n') || (*next == ' ') || (*next == '\0') || (*next == '#'))

@@ -21,7 +21,7 @@ local layout = game.state:alternateZone(short_name, {"COLLAPSED", 2})
 if layout == "COLLAPSED" then
 
 return {
-	name = "The Maze",
+	name = _t"The Maze",
 	level_range = {7, 16},
 	level_scheme = "player",
 	max_level = 4,
@@ -133,7 +133,7 @@ return {
 elseif layout == "DEFAULT" then
 
 return {
-	name = "The Maze",
+	name = _t"The Maze",
 	level_range = {7, 16},
 	level_scheme = "player",
 	max_level = 2,

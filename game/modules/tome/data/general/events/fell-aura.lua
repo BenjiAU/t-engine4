@@ -34,7 +34,7 @@ for x, yy in pairs(grids) do for y, _ in pairs(yy) do
 	local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
 	g.on_stand = g.on_stand or on_stand
 	if g.on_stand == on_stand and g.type == "floor" then
-		g.name = g.name .. " (fell aura)"
+		g.name = ("%s (fell aura)"):tformat(_t(g.name))
 		if not g.special_minimap then g.special_minimap = {b=99, g=99, r=60} end
 	end
 	g.always_remember = true

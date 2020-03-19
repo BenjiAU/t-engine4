@@ -49,7 +49,7 @@ newTalent{
 		local save = t.getSaveBonus(self, t)
 		return ([[Each time you would take damage from someone else you gain one Spin, increasing your defense and saves by %d for three turns.
 		This effect may occur once per turn and stacks up to three Spin (for a maximum bonus of %d).]]):
-		format(save, save * 3)
+		tformat(save, save * 3)
 	end,
 }
 
@@ -75,7 +75,7 @@ newTalent{
 		local chance = t.getChance(self, t)
 		return ([[Activate to Seal Fate for %d turns.  When you damage a target while Seal Fate is active you gain Spin and have a %d%% chance to increase the duration of one detrimental status effect on it by one turn.
 		If you have Spin Fate active the chance will be increased by 33%% per Spin (for %d%% at three Spin.)
-		The duration increase can occur up to %d times per turn and the bonus Spin once per turn.]]):format(duration, chance, chance * 2, procs)
+		The duration increase can occur up to %d times per turn and the bonus Spin once per turn.]]):tformat(duration, chance, chance * 2, procs)
 	end,
 }
 
@@ -95,7 +95,7 @@ newTalent{
 	info = function(self, t)
 		local power = t.getPowerBonus(self, t)
 		return ([[You now gain %d combat accuracy, physical power, spellpower, and mindpower per Spin.]]):
-		format(power)
+		tformat(power)
 	end,
 }
 
@@ -121,6 +121,6 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[For the next %d turns you displace %d%% of any damage you receive onto a random enemy.
 		While Webs of Fate is active you may gain one additional Spin per turn and your maximum Spin is doubled.]])
-		:format(duration, power)
+		:tformat(duration, power)
 	end,
 }

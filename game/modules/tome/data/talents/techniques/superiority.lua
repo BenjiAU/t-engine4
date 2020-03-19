@@ -37,7 +37,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Concentrate on the battle, ignoring some of the damage you take.
 		Improves physical damage reduction by %d%% and provides a %d%% chance to shrug off critical damage for 20 turns.]]):
-		format(t.getResist(self,t), t.critResist(self, t))
+		tformat(t.getResist(self,t), t.critResist(self, t))
 	end,
 }
 
@@ -67,7 +67,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Take an offensive stance. As you attack your foes, you knock your target and foes adjacent to them in a frontal arc back (up to %d grids).
 		This consumes stamina rapidly (-1 stamina/turn).]]):
-		format(t.range(self, t))
+		tformat(t.range(self, t))
 	end,
 }
 
@@ -96,13 +96,13 @@ newTalent{
 			local tx, ty = util.findFreeGrid(self.x, self.y, 5, true, {[Map.ACTOR]=true})
 			if tx and ty and target:canBe("teleport") then
 				target:move(tx, ty, true)
-				game.logSeen(target, "%s is called to battle!", target.name:capitalize())
+				game.logSeen(target, "%s is called to battle!", target:getName():capitalize())
 			end
 		end)
 		return true
 	end,
 	info = function(self, t)
-		return ([[Call all foes in a radius of %d around you into battle, getting them into melee range in an instant.]]):format(t.radius(self,t))
+		return ([[Call all foes in a radius of %d around you into battle, getting them into melee range in an instant.]]):tformat(t.radius(self,t))
 	end,
 }
 
@@ -129,6 +129,6 @@ newTalent{
 	info = function(self, t)
 		return ([[Put all of your strength into your weapon blows, creating shockwaves that deal %d%% Physical weapon damage to all nearby targets.  Only one shockwave will be created per action, and the primary target does not take extra damage.
 		Each shattering impact will drain 8 stamina.]]):
-		format(100*t.weaponDam(self, t))
+		tformat(100*t.weaponDam(self, t))
 	end,
 }

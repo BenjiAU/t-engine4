@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 To summarize the information thus far:
 
 Every being in ToME has eight important #GOLD#combat stats#WHITE# that determine combat success.

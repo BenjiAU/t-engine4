@@ -31,7 +31,7 @@ local GetText = require "engine.dialogs.GetText"
 module(..., package.seeall, class.inherit(Dialog))
 
 function _M:init(key_source, force_all, gesture_source)
-	Dialog.init(self, "Key bindings", 800, game.h * 0.9)
+	Dialog.init(self, _t"Key bindings", 800, game.h * 0.9)
 	self.gesture = gesture_source
 	self.key_source = key_source
 
@@ -79,7 +79,7 @@ function _M:use(item)
 	-- Make a dialog to ask for the key
 	--
 	if curcol == 1 or curcol == 2 then
-		local title = "      Press a key (escape to cancel, backspace to remove) for: "..tostring(t.name)
+		local title = ("      Press a key (escape to cancel, backspace to remove) for: %s"):tformat(tostring(t.name))
 		local font = self.font
 		local w, h = font:size(title:removeColorCodes())
 		local d = Dialog.new(title, w + 20, h + 25, nil, nil, nil, nil, false)
@@ -134,11 +134,11 @@ function _M:use(item)
 		}
 		game:registerDialog(d)
 	elseif curcol == 3 then
-		local title = "Make gesture (using right mouse button) or type it (or escape) for: "..tostring(t.name)
+		local title = ("Make gesture (using right mouse button) or type it (or escape) for: %s"):tformat(tostring(t.name))
 		local font = self.font
 		local w, h = font:size(title)
 		-- DGDGDGDG check this still works
-		local d = GetText.new(title, "Gesture", 0, 10,
+		local d = GetText.new(title, _t"Gesture", 0, 10,
 			function(gesture)
 				if item.g and item.g ~= "--" then
 					self.gesture:removeGesture(item.g)

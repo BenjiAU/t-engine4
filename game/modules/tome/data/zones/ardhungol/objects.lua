@@ -24,14 +24,14 @@ for i = 1, 3 do
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE"..i,
 	name = "diary page", lore="ardhungol-"..i,
-	desc = [[A page of a diary.]],
+	desc = _t[[A page of a diary.]],
 	rarity = false,
 	encumberance = 0,
 }
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE4",
 	name = "scrap of paper", lore="ardhungol-4",
-	desc = [[A scrap of paper.]],
+	desc = _t[[A scrap of paper.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -40,15 +40,15 @@ end
 newEntity{ base = "BASE_ROD",
 	power_source = {nature=true},
 	define_as = "ROD_SPYDRIC_POISON",
-	unided_name = "poison dripping wand", image = "object/artifact/rod_of_spydric_poison.png",
+	unided_name = _t"poison dripping wand", image = "object/artifact/rod_of_spydric_poison.png",
 	name = "Rod of Spydric Poison", color=colors.LIGHT_GREEN, unique=true,
-	desc = [[This rod carved out of a giant spider fang continuously drips venom.]],
+	desc = _t[[This rod carved out of a giant spider fang continuously drips venom.]],
 	cost = 50,
 	elec_proof = true,
 	max_power = 25, power_regen = 1,
 	use_power = {
 		name = function(self, who) return ("shoot a bolt of spydric poison out to range %d, dealing %0.2f nature damage (based on Magic) over %d turns while rendering the target unable to move"):
-			format(self.use_power.range, engine.interface.ActorTalents.damDesc(who, engine.DamageType.NATURE, self.use_power.damage(self, who)), self.use_power.duration)
+			tformat(self.use_power.range, engine.interface.ActorTalents.damDesc(who, engine.DamageType.NATURE, self.use_power.damage(self, who)), self.use_power.duration)
 		end,
 		power = 25,
 		damage = function(self, who) return 200 + who:getMag() * 4 end,
@@ -61,7 +61,7 @@ newEntity{ base = "BASE_ROD",
 			local tg = self.use_power.target(self, who)
 			local x, y = who:getTarget(tg)
 			if not x or not y then return nil end
-			game.logSeen(who, "%s activates %s %s!", who.name:capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
+			game.logSeen(who, "%s activates %s %s!", who:getName():capitalize(), who:his_her(), self:getName({no_add_name = true, do_color = true}))
 			who:project(tg, x, y, engine.DamageType.SPYDRIC_POISON, {dam=self.use_power.damage(self, who), dur=self.use_power.duration}, {type="slime"})
 			return {id=true, used=true}
 		end

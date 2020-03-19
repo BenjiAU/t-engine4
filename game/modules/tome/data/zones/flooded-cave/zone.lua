@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Flooded Cave",
+	name = _t"Flooded Cave",
 	level_range = {30, 40},
 	level_scheme = "player",
 	max_level = 2,

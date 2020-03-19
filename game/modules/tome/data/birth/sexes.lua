@@ -23,8 +23,8 @@ newBirthDescriptor{
 	name = "Female",
 	desc =
 	{
-		"You are a female of the species.",
-		"There is no in-game difference between the two sexes.",
+		_t"You are a female of the species.",
+		_t"There is no in-game difference between the two sexes.",
 	},
 	copy = { female=true, },
 }
@@ -34,8 +34,8 @@ newBirthDescriptor{
 	name = "Male",
 	desc =
 	{
-		"You are a male of the species.",
-		"There is no in-game difference between the two sexes.",
+		_t"You are a male of the species.",
+		_t"There is no in-game difference between the two sexes.",
 	},
 	copy = { male=true, },
 }

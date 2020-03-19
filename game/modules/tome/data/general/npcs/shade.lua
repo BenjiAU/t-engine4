@@ -96,18 +96,18 @@ newEntity{
 
 newEntity{ base = "BASE_NPC_SHADE",
 	rarity = 1, level_range = {30, nil},
-	desc = [[Through some terrible process that remains mysterious, this creature's shadow has been torn from its body and given unlife.]],
+	desc = _t[[Through some terrible process that remains mysterious, this creature's shadow has been torn from its body and given unlife.]],
 	shade_filter = {type="animal", special_rarity="shade_rarity"},
 }
 
 newEntity{ base = "BASE_NPC_SHADE",
 	rarity = 1, level_range = {30, nil},
-	desc = [[Through some terrible process that remains mysterious, this creature's shadow has been torn from its body and given unlife.]],
+	desc = _t[[Through some terrible process that remains mysterious, this creature's shadow has been torn from its body and given unlife.]],
 	shade_filter = {type="humanoid", special_rarity="shade_rarity"},
 }
 
 newEntity{ base = "BASE_NPC_SHADE",
 	rarity = 1, level_range = {30, nil},
-	desc = [[Through some terrible process that remains mysterious, this creature's shadow has been torn from its body and given unlife.]],
+	desc = _t[[Through some terrible process that remains mysterious, this creature's shadow has been torn from its body and given unlife.]],
 	shade_filter = {type="giant", special_rarity="shade_rarity"},
 }

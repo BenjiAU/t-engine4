@@ -87,6 +87,6 @@ newEntity{ base = "BASE_NPC_WORM", define_as = "CARRION_WORM_MASS",
 			5, nil,
 			engine.MapEffect.new{color_br=150, color_bg=255, color_bb=150, effect_shader="shader_images/poison_effect.png"}
 		)
-		game.logSeen(self, "%s exudes a corrupted gas as it dies.", self.name:capitalize())
+		game.logSeen(self, "%s exudes a corrupted gas as it dies.", self:getName():capitalize())
 	end,
 }

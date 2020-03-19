@@ -24,8 +24,8 @@ if not x then return false end
 local g = game.level.map(x, y, engine.Map.TERRAIN):cloneFull()
 g = require("mod.class.Object").new(g)
 g.identified = true
-g.name = "glimmerstone"
-g.desc = "It shimmers and changes the light all around. This is dazling!"
+g.name = _t"glimmerstone"
+g.desc = _t"It shimmers and changes the light all around. This is dazling!"
 g.display='&' g.color_r=255 g.color_g=255 g.color_b=255 g.notice = true
 g.always_remember = true
 g:removeAllMOs()
@@ -47,7 +47,7 @@ g.act = function(self)
 			local target = game.level.map(x, y, engine.Map.ACTOR)
 			if target then
 				target:setEffect(target.EFF_DAZING_DAMAGE, 1, {})
-				game.logSeen(target, "%s is affected by the glimmerstone!", target.name:capitalize())
+				game.logSeen(target, "%s is affected by the glimmerstone!", target:getName():capitalize())
 			end
 		end
 	end end

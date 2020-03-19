@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 Their melee attacks seem to sometimes apply the "Off-balance" effect, but not always.
 
 Can you figure out when it gets applied and when it doesn't?

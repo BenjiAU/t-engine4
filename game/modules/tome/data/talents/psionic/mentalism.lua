@@ -54,7 +54,7 @@ newTalent{
 	info = function(self, t)
 		local max = t.getPsychometryCap(self, t)
 		return ([[Resonate with psionic, nature, and anti-magic powered objects you wear, increasing your physical and mind power by %0.2f or %d%% of the object's material level (whichever is lower).
-		This effect stacks and applies for each qualifying object worn.]]):format(max, 100*t.getMaterialMult(self,t))
+		This effect stacks and applies for each qualifying object worn.]]):tformat(max, 100*t.getMaterialMult(self,t))
 	end,
 }
 
@@ -106,13 +106,13 @@ newTalent{
 			self:setEffect(self.EFF_CLEAR_MIND, 6, {power=count})
 		end
 		
-		game.logSeen(self, "%s's mind is clear!", self.name:capitalize())
+		game.logSeen(self, "%s's mind is clear!", self:getName():capitalize())
 		game:playSoundNear(self, "talents/heal")
 		return true
 	end,
 	info = function(self, t)
 		local count = t.getRemoveCount(self, t)
-		return ([[Clears your mind of current mental effects, and blocks additional ones over 6 turns.  At most, %d mental effects will be affected.]]):format(count)
+		return ([[Clears your mind of current mental effects, and blocks additional ones over 6 turns.  At most, %d mental effects will be affected.]]):tformat(count)
 	end,
 }
 
@@ -143,8 +143,8 @@ newTalent{
 			ai_target={actor=table.NIL_MERGE},
 			ai = "summoned", ai_real = "tactical",
 			subtype = "ghost", is_psychic_projection = 1,
-			name = "Projection of "..self.name,
-			desc = [[A ghostly figure.]],
+			name = ("Projection of %s"):tformat(self:getName()),
+			desc = _t[[A ghostly figure.]],
 			lite=0,
 		}
 		m:removeTimedEffectsOnClone()
@@ -179,7 +179,7 @@ newTalent{
 			game.party:addMember(m, {
 				control="full",
 				type = m.type, subtype="ghost",
-				title="Projection of "..self.name,
+				title=("Projection of %s"):tformat(self:getName()),
 				temporary_level=1,
 				orders = {target=true},
 				on_control = function(self)
@@ -209,7 +209,7 @@ newTalent{
 		local duration = t.getDuration(self, t)
 		return ([[Activate to project your mind from your body for %d turns.  In this state you're invisible (+%d power), can see invisible and stealthed creatures (+%d detection power), can move through walls, and do not need air to survive.
 		All damage you suffer is shared with your physical body, and while in this form you may only deal damage to 'ghosts' or through an active mind link (mind damage only in the second case.)
-		To return to your body, simply release control of the projection.]]):format(duration, power/2, power)
+		To return to your body, simply release control of the projection.]]):tformat(duration, power/2, power)
 	end,
 }
 
@@ -277,6 +277,6 @@ newTalent{
 		local range = self:getTalentRange(t) * 2
 		return ([[Link minds with the target.  While your minds are linked, you'll inflict %d%% more mind damage to the target and gain telepathy for its creature type.
 		Only one mindlink can be maintained at a time, and the effect will break if the target dies or goes beyond range (%d)).
-		The mind damage bonus will scale with your Mindpower.]]):format(damage, range)
+		The mind damage bonus will scale with your Mindpower.]]):tformat(damage, range)
 	end,
 }

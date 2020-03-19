@@ -20,7 +20,7 @@
 local basetrap = function(self, t, x, y, dur, add)
 	local Trap = require "mod.class.Trap"
 	local trap = {
-		id_by_type=true, unided_name = "trap",
+		id_by_type=true, unided_name = _t"trap",
 		display = '^',
 		disarmable = false,
 		no_disarm_message = true,
@@ -69,7 +69,7 @@ newTalent{
 		if game.level.map:checkEntity(x, y, Map.TERRAIN, "block_move") then game.logPlayer(self, "You somehow fail to set the aether beam.") return nil end
 
 		local t = basetrap(self, t, x, y, 44, {
-			type = "aether", name = "aether beam", color=colors.VIOLET, image = "trap/aether_beam.png",
+			type = "aether", name = _t"aether beam", color=colors.VIOLET, image = "trap/aether_beam.png",
 			dam = self:spellCrit(t.getDamage(self, t)),
 			triggered = function(self, x, y, who) return true, true end,
 			combatSpellpower = function(self) return self.summoner:combatSpellpower() end,
@@ -139,7 +139,7 @@ newTalent{
 		The beam will also damage its epicenter each turn for 10%% of the damage (but it will not silence).
 		The beam spins with incredible speed (1600%%) and can only hit the same target up to 3 times inbetween their turns.
 		The damage will increase with your Spellpower.]]):
-		format(damDesc(self, DamageType.ARCANE, dam))
+		tformat(damDesc(self, DamageType.ARCANE, dam))
 	end,
 }
 
@@ -184,7 +184,7 @@ newTalent{
 		Each explosion does %0.2f arcane damage in radius 2, and will each trigger at one turn intervals.
 		Subsequent casts will stack but the explosions will still only occur once per turn and will be centered at the last area targeted.
 		The damage will increase with your Spellpower.]]):
-		format(t.getNb(self, t), damDesc(self, DamageType.ARCANE, damage))
+		tformat(t.getNb(self, t), damDesc(self, DamageType.ARCANE, damage))
 	end,
 }
 
@@ -212,7 +212,7 @@ newTalent{
 		if self:attr("force_talent_ignore_ressources") then return end
 		if self.turn_procs.aether_avatar_penalty then return end
 		self:incMana(-50)
-		game.logSeen(self, "#VIOLET#%s loses 50 mana from using a non-Arcane talent!#LAST#", self.name:capitalize())
+		game.logSeen(self, "#VIOLET#%s loses 50 mana from using a non-Arcane talent!#LAST#", self:getName():capitalize())
 
 		self.turn_procs.aether_avatar_penalty = true
 	end,
@@ -237,7 +237,7 @@ newTalent{
 		local list = {}
 		for i = 1, 10 do if levels[i] then
 			table.sort(levels[i])
-			list[#list+1] = ("At level %d: #AQUAMARINE#%s#LAST#"):format(i, table.concatNice(levels[i], '#LAST#, #AQUAMARINE#', '#LAST# and #AQUAMARINE#'))
+			list[#list+1] = ("At level %d: #AQUAMARINE#%s#LAST#"):tformat(i, table.concatNice(levels[i], '#LAST#, #AQUAMARINE#', _t'#LAST# and #AQUAMARINE#'))
 		end end
 		return table.concat(list, "\n")
 	end,
@@ -257,7 +257,7 @@ newTalent{
 		
 		Spells considered arcane for the purpose of not-losing mana are:
 		%s]]):
-		format(t.getNb(self, t), t.getSpellsList(self, t))
+		tformat(t.getNb(self, t), t.getSpellsList(self, t))
 	end,
 }
 
@@ -301,6 +301,6 @@ newTalent{
 		local ressistpen = t.getResistPenalty(self, t)
 		return ([[Surround yourself with Pure Aether, increasing all your arcane damage by %0.1f%% and ignoring %d%% arcane resistance of your targets.
 		At level 5 casting Aether Avatar removes up to %d magical or physical detrimental effects.]])
-		:format(damageinc, ressistpen, t.getNbRemove(self, t))
+		:tformat(damageinc, ressistpen, t.getNbRemove(self, t))
 	end,
 }

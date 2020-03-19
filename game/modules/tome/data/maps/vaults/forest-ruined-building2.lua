@@ -58,7 +58,7 @@ if vaultvariations == 1 then -- Gloomy theme
       end,
       random_filter={name="honey tree", add_levels=4}}
    )
-   defineTile('P', "FLOOR", nil,
+   defineTile('P', "GRASS", nil,
       {entity_mod=function(e)
          e.make_escort = nil
          e.name = rng.table{"gloomy ", "deformed ", "sick "}..e.name
@@ -81,11 +81,11 @@ if vaultvariations == 1 then -- Gloomy theme
    return {
    [[,,,,,,,,,,,,,,,,,,,,,]],
    [[,#################X,,]],
-   [[,#....#.....,,#,X,,X,]],
-   [[,#P...+......,+,...#,]],
+   [[,#i...#.....,,#,X,,X,]],
+   [[,#P...+......,+,..i#,]],
    [[,######...T...######,]],
    [[,#.,,,,.......+..i.#,]],
-   [[,#..,,#,,.....#B...#,]],
+   [[,#i.,B#,,.....#B...#,]],
    [[,########+#+########,]],
    [[,,,,,,,,,,,,,,,,,,,,,]],
    }
@@ -121,27 +121,27 @@ elseif vaultvariations == 2 then -- FLooded theme
    [[,,,,,,,,,,,,,,,,,,~~~]],
    [[,#################X~~]],
    [[,#~P~~#~~~~~~~#~~~~X~]],
-   [[,#~~~,+,~~~~~~X~~~~#,]],
+   [[,#~~~,+,~~~~~~X~~P~#,]],
    [[,######,~~T~~~######,]],
    [[,#~~i,+,~~~~~,+,~~~#,]],
-   [[,#~~~,#,,,,,,,#~~~B#,]],
+   [[,#B~~,#i,,,,,i#~~~B#,]],
    [[,########+#+########,]],
    [[,,,,,,,,,,,,,,,,,,,,,]],
    }
 
 else -- Normal theme
    defineTile('T', "GRASS", nil, {random_filter={name="honey tree", add_levels=4}})
-   defineTile('P', "FLORR", nil, {random_filter={name="giant venus flytrap", add_levels=4}})
+   defineTile('P', "GRASS", nil, {random_filter={name="giant venus flytrap", add_levels=4}})
    defineTile('B', "FLOOR", nil, {random_filter={name="brown bear", add_levels=4}})
    defineTile('i', "FLOOR", {random_filter={add_levels=4, tome_mod="vault"}})
    return {
    [[,,,,,,,,,,,,,,,,,,,,,]],
    [[,#################X,,]],
-   [[,#....#.,..,..#.X.,X,]],
-   [[,#.i..+..,,,..+..,.#,]],
+   [[,#B...#.,..,..#iX.,X,]],
+   [[,#.i..+..,,,..+..,P#,]],
    [[,######..,T,,.######,]],
-   [[,#....+.,,,,..+....#,]],
-   [[,#P...#....,,.#B...#,]],
+   [[,#i...+.,,,,..+...P#,]],
+   [[,#P...#....,,.#B..i#,]],
    [[,########+#+########,]],
    [[,,,,,,,,,,,,,,,,,,,,,]],
    }

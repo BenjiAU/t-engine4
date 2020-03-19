@@ -22,7 +22,7 @@ newTalent{
 	name = "Life Tap", short_name = "GOLEMANCY_LIFE_TAP",
 	type = {"spell/advanced-golemancy", 1},
 	require = {
-		special = { desc="Having an Alchemist Golem", fct=function(self, t) return self.alchemy_golem end},
+		special = { desc=_t"Having an Alchemist Golem", fct=function(self, t) return self.alchemy_golem end},
 		stat = { mag=function(level) return 22 + (level-1) * 2 end },
 		level = function(level) return 10 + (level-1)  end,
 	},
@@ -56,7 +56,7 @@ newTalent{
 	info = function(self, t)
 		local power=t.getPower(self, t)
 		return ([[You tap into your golem's life energies to replenish your own. Drains %d life.]]):
-		format(power)
+		tformat(power)
 	end,
 }
 
@@ -70,7 +70,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Insert a pair of gems into your golem, providing it with the gem bonuses and changing its melee attack damage type. You may remove the gems and insert different ones; this does not destroy the gems you remove.
 		Gem level usable: %d
-		Gem changing is done in the golem's inventory.]]):format(self:getTalentLevelRaw(t))
+		Gem changing is done in the golem's inventory.]]):tformat(self:getTalentLevelRaw(t))
 	end,
 }
 
@@ -121,7 +121,7 @@ newTalent{
 		return ([[You activate a special mode of your golem, boosting its regeneration rate by %0.2f life per turn for %d turns.
 		If your golem was dead, it is instantly brought back to life with %d%% life.
 		While supercharged, your golem is enraged and deals 25%% more damage.]]):
-		format(regen, turns, life)
+		tformat(regen, turns, life)
 	end,
 }
 
@@ -161,6 +161,6 @@ newTalent{
 		return ([[Increases your golem's life, mana and stamina regeneration rates by %0.2f.
 		At level 1, 3 and 5, the golem also gains a new rune slot.
 		Even without this talent, Golems start with three rune slots.]]):
-		format(self:getTalentLevelRaw(t))
+		tformat(self:getTalentLevelRaw(t))
 	end,
 }

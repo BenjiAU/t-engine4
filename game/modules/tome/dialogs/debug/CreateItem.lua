@@ -31,10 +31,10 @@ module(..., package.seeall, class.inherit(Dialog, Focusable, UIGroup))
 function _M:init()
 	self.actor = game.player
 	self:generateList()
-	Dialog.init(self, "DEBUG -- Create Object", 1, 1)
+	Dialog.init(self, _t"DEBUG -- Create Object", 1, 1)
 	self.list_width = 500
 	
-	local get_global = Checkbox.new{title="Load from other zones ", default=false, check_last=false,
+	local get_global = Checkbox.new{title=_t"Load from other zones ", default=false, check_last=false,
 		fct=function(checked)
 			self:setFocus(self.o_list)
 		end,
@@ -113,7 +113,7 @@ function _M:init()
 	}
 	self.get_global = get_global
 
-	local id_check = Checkbox.new{title="Generate examples (right-click refreshes) ", text="Text", default=false, check_last=false,
+	local id_check = Checkbox.new{title=_t"Generate examples (right-click refreshes) ", text="Text", default=false, check_last=false,
 		fct=function(checked)
 			self.do_ids = checked
 			self:setFocus(self.o_list)
@@ -206,14 +206,14 @@ function _M:list_select(item, sel)
 				local od = item.obj:getDesc({do_color=true}, nil, true, self.actor)
 				if type(od) == "string" then od = od:toTString() end
 				table.insert(od, 1, true)
-				table.insert(od, 1, "#CRIMSON#==Resolved Example==#LAST#")
+				table.insert(od, 1, _t"#CRIMSON#==Resolved Example==#LAST#")
 				item.desc = tostring(od)
 			end, debug.traceback)
 			if not ok then
 				print("[DEBUG] Item generation error:", ret)
 				item.error = ret
 				game.log("#LIGHT_BLUE#Object %s could not be generated or identified. Error:\n%s", item.e.name, ret)
-				item.desc = tstring{("#GOLD#%s#LAST#"):format(item.e.name), true, "Object could not be resolved/identified.", true, ("Error:\n%s"):format(ret)}
+				item.desc = tstring{("#GOLD#%s#LAST#"):tformat(item.e.name), true, _t"Object could not be resolved/identified.", true, ("Error:\n%s"):tformat(ret)}
 			end
 		end
 		game:tooltipDisplayAtMap(game.w, game.h, item.desc or "")
@@ -253,21 +253,21 @@ function _M:acceptObject(obj, actor)
 		obj = obj:cloneFull()
 		actor = actor or self.actor or game.player
 		-- choose where to put object (default is current actor's inventory)
-		local d = Dialog:multiButtonPopup("Place Object", "Place the object where?",
-			{{name=("Inventory of %s%s"):format( actor.name, actor.player and " #LIGHT_GREEN#(player)#LAST#" or ""), choice="player", fct=function(sel)
+		local d = Dialog:multiButtonPopup(_t"Place Object", _t"Place the object where?",
+			{{name=("Inventory of %s%s"):tformat( actor:getName(), actor.player and _t" #LIGHT_GREEN#(player)#LAST#" or ""), choice="player", fct=function(sel)
 				-- if not obj.quest and not obj.plot then obj.__transmo = true end
 				actor:addObject(actor.INVEN_INVEN, obj)
 				game.zone:addEntity(game.level, obj, "object")
 				_M.findObject(self, obj, actor)
 			end},
-			{name=("Drop @ (%s, %s)%s"):format(actor.x, actor.y, actor.player and " #LIGHT_GREEN#(player)#LAST#" or ""), choice="drop", fct=function(sel)
+			{name=("Drop @ (%s, %s)%s"):tformat(actor.x, actor.y, actor.player and _t" #LIGHT_GREEN#(player)#LAST#" or ""), choice="drop", fct=function(sel)
 				game.zone:addEntity(game.level, obj, "object", actor.x, actor.y)
 				game.log("#LIGHT_BLUE#Dropped %s at (%d, %d)", obj:getName({do_color=true}), actor.x, actor.y)
 			end},
-			{name=("NPC Inventory"):format(), choice="npc", fct=function(sel)
+			{name=("NPC Inventory"):tformat(), choice="npc", fct=function(sel)
 				local x, y, act = _M.objectToTarget(self, obj)
 			end},
-			{name=("Cancel"):format(), choice="cancel", fct=function(sel)
+			{name=("Cancel"):tformat(), choice="cancel", fct=function(sel)
 			end}
 			},
 			nil, nil, -- autosize
@@ -283,7 +283,7 @@ end
 function _M:findObject(obj, actor)
 	if not (obj and actor) then return end
 	local inv, slot, attached = actor:searchAllInventories(obj, function(o, who, inven, slot, attached)
-		game.log("#LIGHT_BLUE#OBJECT:#LAST# %s%s: #LIGHT_BLUE#[%s] %s {%s, slot %s} at (%s, %s)#LAST#", o:getName({do_color=true, no_add_name=true}), attached and (" (attached to: %s)"):format(attached:getName({do_color=true, no_add_name=true})) or "", who.uid, who.name, inven.name, slot, who.x, who.y)
+		game.log("#LIGHT_BLUE#OBJECT:#LAST# %s%s: #LIGHT_BLUE#[%s] %s {%s, slot %s} at (%s, %s)#LAST#", o:getName({do_color=true, no_add_name=true}), attached and (" (attached to: %s)"):format(attached:getName({do_color=true, no_add_name=true})) or "", who.uid, who:getName(), inven.name, slot, who.x, who.y)
 	end)
 	return inv, slot, attached
 end
@@ -309,12 +309,12 @@ function _M:use(item)
 		end
 	else
 		local example = item.obj and not item.error
-		game:registerDialog(GetQuantity.new("Number of items to make", "Enter 1-100"..(example and ", or 0 for the example item" or ""), 20, 100, function(qty)
+		game:registerDialog(GetQuantity.new(_t"Number of items to make", ("Enter 1-100%s"):tformat(example and _t", or 0 for the example item" or ""), 20, 100, function(qty)
 			if qty == 0 and item.obj and not item.error then
 				self:acceptObject(item.obj)
 			else
 				game.log("#LIGHT_BLUE# Creating %d items:", qty)
-				Dialog:yesnoPopup("Ego", "Add an ego enhancement if possible?", function(ret)
+				Dialog:yesnoPopup(_t"Ego", _t"Add an ego enhancement if possible?", function(ret)
 					if not ret then
 						for i = 1, qty do
 							local n = game.zone:finishEntity(game.level, "object", item.e, {ego_chance=-1000})
@@ -323,7 +323,7 @@ function _M:use(item)
 							game.log("#LIGHT_BLUE#Created %s", n:getName({do_color=true}))
 						end
 					else
-						Dialog:yesnoPopup("Greater Ego", "Add a greater ego enhancement if possible?", function(ret)
+						Dialog:yesnoPopup(_t"Greater Ego", _t"Add a greater ego enhancement if possible?", function(ret)
 							local f
 							if not ret then
 								f = {ego_chance=1000}
@@ -361,7 +361,7 @@ function _M:generateList(obj_list)
 		return a.name < b.name
 	end)
 
-	table.insert(list, 1, {name = " #GOLD#All Artifacts#LAST#", action=function(item)
+	table.insert(list, 1, {name = _t" #GOLD#All Artifacts#LAST#", action=function(item)
 		game.log("#LIGHT_BLUE#Creating All Artifacts.")
 		local count = 0
 		for i, e in ipairs(obj_list) do
@@ -381,7 +381,7 @@ function _M:generateList(obj_list)
 		end
 		game.log("#LIGHT_BLUE#%d artifacts created.", count)
 	end})
-	table.insert(list, 1, {name = " #YELLOW#Random Object#LAST#", action=function(item)
+	table.insert(list, 1, {name = _t" #YELLOW#Random Object#LAST#", action=function(item)
 		game:unregisterDialog(self)
 		local d = require("mod.dialogs.debug.RandomObject").new()
 		game:registerDialog(d)

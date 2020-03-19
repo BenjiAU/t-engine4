@@ -28,11 +28,11 @@ newEntity{ base = "BASE_STAFF", define_as = "TELOS_SPIRE",
 	power_source = {arcane=true},
 	unique = true,
 	name = "Telos Spire of Power", image = "object/artifact/telos_spire_of_power.png",
-	unided_name = "pulsing staff",
+	unided_name = _t"pulsing staff",
 	level_range = {37, 50},
 	color=colors.VIOLET,
 	rarity = false,
-	desc = [[Telos was an extremely powerful mage during the Age of Dusk, hated by his peers and feared by the common folk; he was hunted for a long while. He finally fell from his place of power, Telmur, but his spirit still lingers.]],
+	desc = _t[[Telos was an extremely powerful mage during the Age of Dusk, hated by his peers and feared by the common folk; he was hunted for a long while. He finally fell from his place of power, Telmur, but his spirit still lingers.]],
 	cost = 400,
 	material_level = 5,
 	plot = true,
@@ -67,7 +67,7 @@ newEntity{ base = "BASE_STAFF", define_as = "TELOS_SPIRE",
 		learn_talent = {[Talents.T_COMMAND_STAFF] = 1,},
 	},
 	max_power = 15, power_regen = 1,
-	use_power = { name = "turn into a corrupted losgoroth (poison, disease, cut and confusion immune; converts half damage into life drain; does not require breath) for 10 turns",
+	use_power = { name = _t"turn into a corrupted losgoroth (poison, disease, cut and confusion immune; converts half damage into life drain; does not require breath) for 10 turns",
 		power = 15,
 		tactical = {BUFF = 2, HEAL = 2,
 			DEFEND = function(who, t, aitarget) -- if the target can debuff us with things this item can prevent,  prepare
@@ -96,7 +96,7 @@ newEntity{ base = "BASE_STAFF", define_as = "TELOS_SPIRE",
 			end},
 		on_pre_use_ai = function(self, who) return not who:hasEffect(who.EFF_CORRUPT_LOSGOROTH_FORM) end,
 		use = function(self, who)
-			game.logSeen(who, "%s brandishes %s %s, turning into a corrupted losgoroth!", who.name:capitalize(), who:his_her(), self:getName({do_color = true, no_add_name =true}))
+			game.logSeen(who, "%s brandishes %s %s, turning into a corrupted losgoroth!", who:getName():capitalize(), who:his_her(), self:getName({do_color = true, no_add_name =true}))
 			who:setEffect(who.EFF_CORRUPT_LOSGOROTH_FORM, 10, {})
 			return {id=true, used=true}
 		end

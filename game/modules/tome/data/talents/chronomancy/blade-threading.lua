@@ -63,7 +63,7 @@ newTalent{
 		return ([[Attack with your melee weapons for %d%% weapon damage as physical and temporal (warp) damage. If either attack hits you may stun, blind, pin, or confuse the target for %d turns.
 		
 		Blade Threading talents will freely swap to your dual-weapons when activated if you have them in your secondary slots.  Additionally you may use the Attack talent in a similar manner.]])
-		:format(damage, duration)
+		:tformat(damage, duration)
 	end
 }
 
@@ -168,7 +168,7 @@ newTalent{
 		local damage = t.getDamage(self, t) * 100
 		return ([[Teleport to the target and attack with your melee weapons for %d%% damage.  Then teleport next to a second random enemy, attacking for %d%% damage.
 		Blink Blade can hit the same target multiple times.]])
-		:format(damage, damage)
+		:tformat(damage, damage)
 	end
 }
 
@@ -238,10 +238,10 @@ newTalent{
 				if target and self:reactionToward(target) < 0 then
 					if target:checkHit(getParadoxSpellpower(self, t), target:combatPhysicalResist(), 0, 95, 15) and target:canBe("instakill") and target.life > 0 and target.life < target.max_life * 0.2 then
 						-- KILL IT !
-						game.logSeen(target, "%s has been cut from the timeline!", target.name:capitalize())
+						game.logSeen(target, "%s has been cut from the timeline!", target:getName():capitalize())
 						target:die(self)
 					elseif target.life > 0 and target.life < target.max_life * 0.2 then
-						game.logSeen(target, "%s resists the temporal shear!", target.name:capitalize())
+						game.logSeen(target, "%s resists the temporal shear!", target:getName():capitalize())
 					end
 				end
 			end)
@@ -258,7 +258,7 @@ newTalent{
 		return ([[Attack up to three adjacent targets for %d%% weapon damage.  If any attack hits you'll create a temporal shear dealing %0.2f temporal damage in a radius %d cone.
 		Each target you hit with your weapons beyond the first increases the damage of the shear by 25%%.  Targets reduced below 20%% of maximum life by the shear may be instantly slain.
 		The cone damage improves with your Spellpower.]])
-		:format(damage, damDesc(self, DamageType.TEMPORAL, shear), radius)
+		:tformat(damage, damDesc(self, DamageType.TEMPORAL, shear), radius)
 	end
 }
 
@@ -272,7 +272,7 @@ newTalent{
 	info = function(self, t)
 		local chance = t.getChance(self, t)
 		return ([[While dual-wielding you have a %d%% chance of completely parrying melee attacks made against you.]])
-		:format(chance)
+		:tformat(chance)
 	end
 }
 
@@ -341,6 +341,6 @@ newTalent{
 		If two or more targets are hit by the beam you'll braid their lifelines for %d turns.
 		Braided targets take %d%% of all damage dealt to other braided targets.
 		The damage transferred by the braid effect and beam damage scales with your Spellpower.]])
-		:format(damage, duration, power)
+		:tformat(damage, duration, power)
 	end
 }]=]

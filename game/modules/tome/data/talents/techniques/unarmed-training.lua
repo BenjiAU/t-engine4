@@ -49,7 +49,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Grants %d Physical Power when fighting unarmed (or with gloves or gauntlets).
 		This talent's effects will scale with your level.]]):
-		format(damage)
+		tformat(damage)
 	end,
 }
 
@@ -66,7 +66,7 @@ newTalent{
 		local inc = t.getPercentInc(self, t)
 		return ([[Increases all unarmed damage by %d%% and physical power by 30 (including grapples and kicks).
 		Note that brawlers naturally gain 0.5 Physical Power per character level while unarmed (current brawler physical power bonus: %0.1f) and attack 20%% faster while unarmed.]]):
-		format(100*inc, self.level * 0.5)
+		tformat(100*inc, self.level * 0.5)
 	end,
 }
 
@@ -88,7 +88,7 @@ newTalent{
 		end
 	end,
 	info = function(self, t)
-		return ([[Your mastery of unarmed combat unifies your body. Increases your Strength by %d based on Cunning and your Constitution by %d based on Dexterity.]]):format(t.getStr(self, t), t.getCon(self, t))
+		return ([[Your mastery of unarmed combat unifies your body. Increases your Strength by %d based on Cunning and your Constitution by %d based on Dexterity.]]):tformat(t.getStr(self, t), t.getCon(self, t))
 	end
 }
 
@@ -105,7 +105,7 @@ newTalent{
 	info = function(self, t)
 		local power = t.getPower(self, t)
 		return ([[When you're targeted by a projectile, your global speed is increased by %d%% for 1 turn.  Taking any action other than movement will break the effect.]]):
-		format(power * 100)
+		tformat(power * 100)
 	end,
 }
 
@@ -122,7 +122,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Your understanding of physiology allows you to apply your reflexes in new ways, increasing the flat damage reduction granted by Striking Stance by %d%% and causing direct critical hits (physical, mental, spells) against you to have a %d%% lower Critical multiplier (but always do at least normal damage).]]):
-		format(t.getFlatReduction(self,t), t.critResist(self,t) )
+		tformat(t.getFlatReduction(self,t), t.critResist(self,t) )
 	end
 }
 

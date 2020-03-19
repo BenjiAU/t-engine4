@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Illusory Castle",
+	name = _t"Illusory Castle",
 	level_range = {25, 30},
 	level_scheme = "player",
 	max_level = 5,

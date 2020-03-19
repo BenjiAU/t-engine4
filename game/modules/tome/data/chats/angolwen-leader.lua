@@ -18,27 +18,27 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[#LIGHT_GREEN#*A tall woman stands before you. Her fair skin radiates incredible power through her white robe.*#WHITE#
+	text = _t[[#LIGHT_GREEN#*A tall woman stands before you. Her fair skin radiates incredible power through her white robe.*#WHITE#
 I am Linaniil of the Kar'Krul. Welcome to our city, @playerdescriptor.subclass@. What may I do for thee?]],
 	answers = {
-		{"I require all the help I can get, not for my sake but for the town of Derth, to the northeast of here.", jump="save-derth", cond=function(npc, player) local q = player:hasQuest("lightning-overload") return q and q:isCompleted("saved-derth") and not q:isCompleted("tempest-located") and not q:isStatus(q.DONE) end},
-		{"I am ready! Send me to Urkis!", jump="teleport-urkis", cond=function(npc, player) local q = player:hasQuest("lightning-overload") return q and not q:isEnded("tempest-located") and q:isCompleted("tempest-located") and not q:isCompleted("angolwen-reward") end},
-		{"Urkis has been slain.", jump="reward-urkis", cond=function(npc, player) 
+		{_t"I require all the help I can get, not for my sake but for the town of Derth, to the northeast of here.", jump="save-derth", cond=function(npc, player) local q = player:hasQuest("lightning-overload") return q and q:isCompleted("saved-derth") and not q:isCompleted("tempest-located") and not q:isStatus(q.DONE) end},
+		{_t"I am ready! Send me to Urkis!", jump="teleport-urkis", cond=function(npc, player) local q = player:hasQuest("lightning-overload") return q and not q:isEnded("tempest-located") and q:isCompleted("tempest-located") and not q:isCompleted("angolwen-reward") end},
+		{_t"Urkis has been slain.", jump="reward-urkis", cond=function(npc, player) 
 			local q = player:hasQuest("lightning-overload") 
 			return q and q:isCompleted("tempest-urkis-slain") and not q:isCompleted("angolwen-reward") and not q:isStatus(q.DONE) end},
-		{"Nothing for now. Sorry to have taken your time. Farewell, my lady."},
+		{_t"Nothing for now. Sorry to have taken your time. Farewell, my lady."},
 	}
 }
 
 newChat{ id="save-derth",
-	text = [[Yes, we have noticed the devastation that happened there. I have sent some friends thence to disperse the cloud, but the true threat lies not there.
+	text = _t[[Yes, we have noticed the devastation that happened there. I have sent some friends thence to disperse the cloud, but the true threat lies not there.
 He who created this abomination is Urkis. He is a Tempest, a powerful Archmage who channels the storms.
 Years ago he went rogue, severing himself from Angolwen. At first he remained quiet, and thus we withheld action, but it seems we have no choice now.
 Cleansing the skies will take much time. In the meanwhile, if thou art willing, we can send thee to Urkis' lair to face him.
 I will not lie to thee: we can send thee thence, but this could be a death trap, and we have no means for thou to depart his lair, as he lives atop a tall peak in the Daikara mountains.]],
 	answers = {
-		{"I need to prepare myself. I will be back soon.", action=function(npc, player) player:setQuestStatus("lightning-overload", engine.Quest.COMPLETED, "tempest-located") end},
-		{"I am ready. Send me. I will not let the good people of Derth down.", action=function(npc, player)
+		{_t"I need to prepare myself. I will be back soon.", action=function(npc, player) player:setQuestStatus("lightning-overload", engine.Quest.COMPLETED, "tempest-located") end},
+		{_t"I am ready. Send me. I will not let the good people of Derth down.", action=function(npc, player)
 			player:setQuestStatus("lightning-overload", engine.Quest.COMPLETED, "tempest-located")
 			player:hasQuest("lightning-overload"):teleport_urkis()
 			game:unlockBackground("linaniil", "Archmage Linaniil")
@@ -47,9 +47,9 @@ I will not lie to thee: we can send thee thence, but this could be a death trap,
 }
 
 newChat{ id="teleport-urkis",
-	text = [[Good luck to thee. Thou hast the blessings of Angolwen.]],
+	text = _t[[Good luck to thee. Thou hast the blessings of Angolwen.]],
 	answers = {
-		{"Thank you.", action=function(npc, player)
+		{_t"Thank you.", action=function(npc, player)
 			player:hasQuest("lightning-overload"):teleport_urkis()
 			game:unlockBackground("linaniil", "Archmage Linaniil")
 		end},
@@ -57,9 +57,9 @@ newChat{ id="teleport-urkis",
 }
 
 newChat{ id="reward-urkis",
-	text = [[I see the storm is calmed.  Take this rune as a token of my appreciation.]],
+	text = _t[[I see the storm is calmed.  Take this rune as a token of my appreciation.]],
 	answers = {
-		{"Thank you.", action=function(npc, player)
+		{_t"Thank you.", action=function(npc, player)
 			local o = game.zone:makeEntityByName(game.level, "object", "RUNE_DISSIPATION")
 			if not o then return end
 			o:identify(true)

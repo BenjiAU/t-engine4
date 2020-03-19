@@ -18,39 +18,39 @@
 -- darkgod@te4.org
 
 -- Class Trees
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/blade-threading", name = "Blade Threading", description = "A blend of chronomancy and dual-weapon combat." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/bow-threading", name = "Bow Threading", description = "A blend of chronomancy and ranged combat." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/temporal-combat", name = "Temporal Combat", description = "A blend of chronomancy and physical combat." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/guardian", name = "Temporal Guardian", description = "Warden combat training and techniques." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/threaded-combat", name = "Threaded Combat", min_lev = 10, description = "A blend of ranged and dual-weapon combat." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/temporal-hounds", name = "Temporal Hounds", min_lev = 10, description = "Call temporal hounds to aid you in combat." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/blade-threading", name = _t"Blade Threading", description = _t"A blend of chronomancy and dual-weapon combat." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/bow-threading", name = _t"Bow Threading", description = _t"A blend of chronomancy and ranged combat." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/temporal-combat", name = _t"Temporal Combat", description = _t"A blend of chronomancy and physical combat." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/guardian", name = _t"Temporal Guardian", description = _t"Warden combat training and techniques." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/threaded-combat", name = _t"Threaded Combat", min_lev = 10, description = _t"A blend of ranged and dual-weapon combat." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/temporal-hounds", name = _t"Temporal Hounds", min_lev = 10, description = _t"Call temporal hounds to aid you in combat." }
 
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/flux", name = "flux", description = "Fluctuate spacetime." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/gravity", name = "gravity", description = "Call upon the force of gravity to crush, push, and pull your foes." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/matter", name = "matter", description = "Change and shape matter itself." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/spacetime-folding", name = "Spacetime Folding", description = "Mastery of folding points in space." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/speed-control", name = "Speed Control", description = "Control how fast objects and creatures move through spacetime." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/stasis", name = "stasis", description = "Stabilize spacetime." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/timeline-threading", name = "Timeline Threading", min_lev = 10, description = "Examine and alter the timelines that make up the spacetime continuum." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/timetravel", name = "timetravel", description = "Directly manipulate the flow of time" }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/spellbinding", name = "Spellbinding", min_lev = 10, description = "Manipulate chronomantic spells." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/flux", name = _t"flux", description = _t"Fluctuate spacetime." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/gravity", name = _t"gravity", description = _t"Call upon the force of gravity to crush, push, and pull your foes." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/matter", name = _t"matter", description = _t"Change and shape matter itself." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/spacetime-folding", name = _t"Spacetime Folding", description = _t"Mastery of folding points in space." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/speed-control", name = _t"Speed Control", description = _t"Control how fast objects and creatures move through spacetime." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/stasis", name = _t"stasis", description = _t"Stabilize spacetime." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/timeline-threading", name = _t"Timeline Threading", min_lev = 10, description = _t"Examine and alter the timelines that make up the spacetime continuum." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/timetravel", name = _t"timetravel", description = _t"Directly manipulate the flow of time" }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/spellbinding", name = _t"Spellbinding", min_lev = 10, description = _t"Manipulate chronomantic spells." }
 
 -- Generic Chronomancy
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/chronomancy", name = "Chronomancy", generic = true, description = "Allows you to glimpse the future, or become more aware of the present." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/energy", name = "energy", generic = true, description = "Manipulate raw energy by addition or subtraction." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/fate-weaving", name = "Fate Weaving", generic = true, description = "Weave the threads of fate." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/spacetime-weaving", name = "Spacetime Weaving", generic = true, description = "Weave the threads of spacetime." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/chronomancy", name = _t"Chronomancy", generic = true, description = _t"Allows you to glimpse the future, or become more aware of the present." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/energy", name = _t"energy", generic = true, description = _t"Manipulate raw energy by addition or subtraction." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/fate-weaving", name = _t"Fate Weaving", generic = true, description = _t"Weave the threads of fate." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/spacetime-weaving", name = _t"Spacetime Weaving", generic = true, description = _t"Weave the threads of spacetime." }
 
 -- Misc and Outdated Trees
-newTalentType{ no_silence=true, is_spell=true, type="chronomancy/manifold", name = "Manifold", generic = true, description = "Passive effects that Weapon Folding can trigger." }
-newTalentType{ no_silence=true, is_spell=true, type="chronomancy/other", name = "Other", generic = true, description = "Miscellaneous Chronomancy effects." }
+newTalentType{ no_silence=true, is_spell=true, type="chronomancy/manifold", name = _t"Manifold", generic = true, description = _t"Passive effects that Weapon Folding can trigger." }
+newTalentType{ no_silence=true, is_spell=true, type="chronomancy/other", name = _t"Other", generic = true, description = _t"Miscellaneous Chronomancy effects." }
 
-newTalentType{ no_silence=true, is_spell=true, type="chronomancy/age-manipulation", name = "Age Manipulation", description = "Manipulate the age of creatures you encounter." }
-newTalentType{ no_silence=true, is_spell=true, type="chronomancy/temporal-archery", name = "Temporal Archery", description = "A blend of chronomancy and ranged combat." }
-newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/paradox", name = "paradox", description = "Break the laws of spacetime." }
+newTalentType{ no_silence=true, is_spell=true, type="chronomancy/age-manipulation", name = _t"Age Manipulation", description = _t"Manipulate the age of creatures you encounter." }
+newTalentType{ no_silence=true, is_spell=true, type="chronomancy/temporal-archery", name = _t"Temporal Archery", description = _t"A blend of chronomancy and ranged combat." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="chronomancy/paradox", name = _t"paradox", description = _t"Break the laws of spacetime." }
 
 -- Anomalies are not learnable but can occur instead of an intended spell when paradox gets to high.
-newTalentType{ no_silence=true, is_spell=true, type="chronomancy/anomalies", name = "anomalies", description = "Spacetime anomalies that can randomly occur when paradox is to high." }
+newTalentType{ no_silence=true, is_spell=true, type="chronomancy/anomalies", name = _t"anomalies", description = _t"Spacetime anomalies that can randomly occur when paradox is to high." }
 
 -- Generic requires for chronomancy spells based on talent level
 chrono_req1 = {
@@ -254,8 +254,8 @@ makeParadoxClone = function(self, target, duration, alt_nodes)
 	end
 
 	-- force some values in the clone
-	local clone_copy = {name=""..target.name.."'s temporal clone",
-		desc = [[A creature from another timeline.]],
+	local clone_copy = {name=("%s's temporal clone"):tformat(target:getName()),
+		desc=_t[[A creature from another timeline.]],
 		faction=target.faction, exp_worth=0,
 		life=util.bound(target.life, target.die_at, target.max_life),
 		summoner=target, summoner_gain_exp=true, summon_time=duration,

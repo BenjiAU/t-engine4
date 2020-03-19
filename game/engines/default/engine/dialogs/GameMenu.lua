@@ -50,6 +50,12 @@ end
 function _M:generateList(actions)
 	local default_actions = {
 		resume = { _t"Resume", function() game:unregisterDialog(self) end },
+		language = { _t"Language", function()
+			game:unregisterDialog(self)
+			package.loaded["engine.dialogs.LanguageSelect"] = nil
+			local menu = require("engine.dialogs.LanguageSelect").new()
+			game:registerDialog(menu)
+		end },
 		keybinds = { _t"Key Bindings", function()
 			game:unregisterDialog(self)
 			local menu = require("engine.dialogs.KeyBinder").new(game.normal_key, nil, game.gestures)
@@ -90,7 +96,7 @@ function _M:generateList(actions)
 			local menu = require("engine.dialogs.SteamOptions").new()
 			game:registerDialog(menu)
 		end },
-		cheatmode = { "#GREY#".._t"Developer Mode", function()
+		cheatmode = { _t"#GREY#Developer Mode", function()
 			game:unregisterDialog(self)
 			if config.settings.cheat then
 				Dialog:yesnoPopup(_t"Developer Mode", _t"Disable developer mode?", function(ret) if ret then
@@ -110,7 +116,7 @@ When activated you will have access to special commands:
 					config.settings.cheat = true
 					game:saveSettings("cheat", "cheat = true\n")
 					util.showMainMenu()
-				end end, "No", "Yes", true)
+				end end, _t"No", _t"Yes", true)
 		
 			end
 		end },

@@ -18,21 +18,21 @@
 -- darkgod@te4.org
 
 newChat{ id="welcome",
-	text = [[Welcome @playername@ to my shop.]],
+	text = _t[[Welcome @playername@ to my shop.]],
 	answers = {
-		{"Let me see your wares.", action=function(npc, player)
+		{_t"Let me see your wares.", action=function(npc, player)
 			npc.store:loadup(game.level, game.zone)
 			npc.store:interact(player)
 		end},
-		{"I am looking for martial training.", jump="training"},
-		{"Sorry, I have to go!"},
+		{_t"I am looking for martial training.", jump="training"},
+		{_t"Sorry, I have to go!"},
 	}
 }
 
 newChat{ id="training",
-	text = [[I can indeed offer some martial training (talent category Technique/Combat-training) for a fee of 50 gold pieces; or the basic usage of bows and slings (Shoot talent) for 8 gold pieces.]],
+	text = _t[[I can indeed offer some martial training (talent category Technique/Combat-training) for a fee of 50 gold pieces; or the basic usage of bows and slings (Shoot talent) for 8 gold pieces.]],
 	answers = {
-		{"Please train me in generic weapons and armour usage.", action=function(npc, player)
+		{_t"Please train me in generic weapons and armour usage.", action=function(npc, player)
 			game.logPlayer(player, "The smith spends some time with you, teaching you the basics of armour and weapon usage.")
 			player:incMoney(-50)
 			player:learnTalentType("technique/combat-training", true)
@@ -42,7 +42,7 @@ newChat{ id="training",
 			if player:knowTalentType("technique/combat-training") then return end
 			return true
 		end},
-		{"Please train me in the basic usage of bows and slings.", action=function(npc, player)
+		{_t"Please train me in the basic usage of bows and slings.", action=function(npc, player)
 			game.logPlayer(player, "The smith spends some time with you, teaching you the basics of bows and slings.")
 			player:incMoney(-8)
 			player:learnTalent(player.T_SHOOT, true, nil, {no_unlearn=true})
@@ -52,7 +52,7 @@ newChat{ id="training",
 			if player:knowTalent(player.T_SHOOT) then return end
 			return true
 		end},
-		{"No thanks."},
+		{_t"No thanks."},
 	}
 }
 

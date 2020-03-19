@@ -22,8 +22,8 @@ load("/data/general/objects/objects-maj-eyal.lua")
 for i = 1, 3 do
 newEntity{ base = "BASE_LORE",
 	define_as = "NOTE"..i,
-	name = "Deep Bellow excavation report "..i, lore="deep-bellow-"..i,
-	desc = [[A paper scrap.]],
+	name = ("Deep Bellow excavation report %d"):tformat(i), lore="deep-bellow-"..i,
+	desc = _t[[A paper scrap.]],
 	rarity = false,
 	encumberance = 0,
 }
@@ -32,18 +32,18 @@ end
 newEntity{ base = "BASE_LORE",
 	define_as = "ADV_LTR_6",
 	name = "letter to Rolf (3)", lore="adventurer-letter-6",
-	desc = [[A paper scrap.]],
+	desc = _t[[A paper scrap.]],
 	rarity = false,
 }
 newEntity{ base = "BASE_LORE",
 	define_as = "ADV_LTR_7",
 	name = "letter to Weisman (4)", lore="adventurer-letter-7",
-	desc = [[A paper scrap.]],
+	desc = _t[[A paper scrap.]],
 	rarity = false,
 }
 newEntity{ base = "BASE_LORE",
 	define_as = "ADV_LTR_8",
 	name = "Last Will of Rolf", lore="adventurer-letter-8",
-	desc = [[A paper scrap.]],
+	desc = _t[[A paper scrap.]],
 	rarity = false,
 }

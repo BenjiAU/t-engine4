@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Elven Ruins",
+	name = _t"Elven Ruins",
 	level_range = {43,52},
 	level_scheme = "player",
 	max_level = 3,

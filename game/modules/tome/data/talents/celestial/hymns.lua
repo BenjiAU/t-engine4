@@ -105,7 +105,7 @@ newTalent{
 		This increases your movement speed by %d%% and your spell speed by %d%%.
 		You may only have one Hymn active at once.
 		The effects will increase with your Spellpower.]]):
-		format(t.moveSpeed(self, t), t.castSpeed(self, t))
+		tformat(t.moveSpeed(self, t), t.castSpeed(self, t))
 	end,
 }
 
@@ -210,7 +210,7 @@ newTalent{
 		You may also attack creatures you cannot see without penalty and your critical hits do %d%% more damage.
 		You may only have one Hymn active at once.
 		The stealth and invisibility detection will increase with your Spellpower.]]):
-		format(stealth, invis, t.critPower(self, t))
+		tformat(stealth, invis, t.critPower(self, t))
 	end,
 }
 
@@ -277,7 +277,7 @@ newTalent{
 		local immunities = t.getImmunities(self, t)
 		return ([[Chant the glory of the Moons, granting you %d%% stun, blindness and confusion resistance.
 		You may only have one Hymn active at once.]]):
-		format(100 * (immunities))
+		tformat(100 * (immunities))
 	end,
 }
 
@@ -336,12 +336,12 @@ newTalent{
 	sustain_slots = 'celestial_hymn',
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/spell_generic")
-		game.logSeen(self, "#DARK_GREY#A shroud of shadow dances around %s!", self.name)
-		return { name=self.name:capitalize().."'s "..t.name
+		game.logSeen(self, "#DARK_GREY#A shroud of shadow dances around %s!", self:getName())
+		return { name=("%s's %s"):tformat(self:getName():capitalize(), t.name)
 		}
 	end,
 	deactivate = function(self, t, p)
-		game.logSeen(self, "#DARK_GREY#The shroud of shadows around %s disappears.", self.name)
+		game.logSeen(self, "#DARK_GREY#The shroud of shadows around %s disappears.", self:getName())
 		return true
 	end,
 	info = function(self, t)
@@ -353,7 +353,7 @@ newTalent{
 		This powerful spell will drain %0.1f negative energy for each beam; no beam will fire if your negative energy is too low.
 		You may only have one Hymn active at once.
 		The damage will increase with your Spellpower.]]):
-		format(targetcount, damDesc(self, DamageType.DARKNESS, damage), drain)
+		tformat(targetcount, damDesc(self, DamageType.DARKNESS, damage), drain)
 	end,
 }
 
@@ -398,7 +398,7 @@ Hymn of Detection: Increases your ability to see stealthy creatures by %d and in
 Hymn of Perseverance: Increases your resistance to stun, confusion and blinding by %d%%.
 
 You may only have one Hymn active at a time.]]):
-			format(t1.moveSpeed(self, t1), t1.castSpeed(self, t1), t2.getSeeStealth(self, t2), t2.getSeeInvisible(self, t2), t2.critPower(self, t2), t3.getImmunities(self, t3)*100)
+			tformat(t1.moveSpeed(self, t1), t1.castSpeed(self, t1), t2.getSeeStealth(self, t2), t2.getSeeInvisible(self, t2), t2.critPower(self, t2), t3.getImmunities(self, t3)*100)
 		end)
 		self.talents[self.T_HYMN_OF_SHADOWS] = old1
 		self.talents[self.T_HYMN_OF_DETECTION] = old2
@@ -417,7 +417,7 @@ newTalent{
 	getDarkDamageIncrease = function(self, t) return self:combatTalentSpellDamage(t, 10, 30) end,
 	info = function(self, t)
 		return ([[Your Hymns now focus darkness near you, which increases your darkness damage by %d%% and does %0.2f darkness damage to anyone who hits you in melee.
-		These values scale with your Spellpower.]]):format(t.getDarkDamageIncrease(self, t), damDesc(self, DamageType.DARKNESS, t.getDamageOnMeleeHit(self, t)))
+		These values scale with your Spellpower.]]):tformat(t.getDarkDamageIncrease(self, t), damDesc(self, DamageType.DARKNESS, t.getDamageOnMeleeHit(self, t)))
 	end,
 }
 
@@ -439,7 +439,7 @@ newTalent{
 		Also, when you end a Hymn, you will gain a buff of a type based on which Hymn you ended.
 		Hymn of Shadows increases your movement speed by %d%% for one turn.
 		Hymn of Detection makes you invisible (power %d) for %d turns.
-		Hymn of Perseverance grants a damage shield (power %d) for %d turns.]]):format(t.getBonusInfravision(self, t), t.getSpeed(self, t),
+		Hymn of Perseverance grants a damage shield (power %d) for %d turns.]]):tformat(t.getBonusInfravision(self, t), t.getSpeed(self, t),
 			t.invisPower(self, t), t.invisDur(self, t), t.shieldPower(self, t), t.shieldDur(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100)
 	end,
 }
@@ -524,6 +524,6 @@ newTalent{
 		return ([[Your passion for singing the praises of the Moons reaches its zenith.
 		Your Hymns now fire shadowy beams that will hit up to %d of your foes within radius 5 for 1 to %0.2f damage, with a 20%% chance of blinding.
 		This powerful effect will drain %0.1f negative energy each time it fires at at least 1 target; no beam will fire if your negative energy is too low.
-		These values scale with your Spellpower.]]):format(t.getTargetCount(self, t), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t)), t.getNegativeDrain(self, t))
+		These values scale with your Spellpower.]]):tformat(t.getTargetCount(self, t), damDesc(self, DamageType.DARKNESS, t.getDamage(self, t)), t.getNegativeDrain(self, t))
 	end,
 }

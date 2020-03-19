@@ -23,10 +23,10 @@ newBirthDescriptor{
 	type = "class",
 	name = "Wilder",
 	locked = function() return profile.mod.allow_build.wilder_wyrmic or profile.mod.allow_build.wilder_summoner or profile.mod.allow_build.wilder_stone_warden end,
-	locked_desc = "Natural abilities can go beyond mere skill. Experience the true powers of nature to learn of its amazing gifts.",
+	locked_desc = _t"Natural abilities can go beyond mere skill. Experience the true powers of nature to learn of its amazing gifts.",
 	desc = {
-		"Wilders are one with nature, in one manner or another. There are as many different Wilders as there are aspects of nature.",
-		"They can take on the aspects of creatures, summon creatures to them, feel the druidic call, ...",
+		_t"Wilders are one with nature, in one manner or another. There are as many different Wilders as there are aspects of nature.",
+		_t"They can take on the aspects of creatures, summon creatures to them, feel the druidic call, ...",
 	},
 	descriptor_choices =
 	{
@@ -47,20 +47,20 @@ newBirthDescriptor{
 	type = "subclass",
 	name = "Summoner",
 	locked = function() return profile.mod.allow_build.wilder_summoner end,
-	locked_desc = "Not all might comes from within. Hear the invocations of nature, hear its calling power. See that from without we can find our true strengths.",
+	locked_desc = _t"Not all might comes from within. Hear the invocations of nature, hear its calling power. See that from without we can find our true strengths.",
 	desc = {
-		"Summoners never fight alone. They are always ready to summon one of their many minions to fight at their side.",
-		"Summons can range from a combat hound to a fire drake.",
-		"Their most important stats are: Willpower and Cunning",
-		"#GOLD#Stat modifiers:",
-		"#LIGHT_BLUE# * +0 Strength, +1 Dexterity, +0 Constitution",
-		"#LIGHT_BLUE# * +0 Magic, +5 Willpower, +3 Cunning",
-		"#GOLD#Life per level:#LIGHT_BLUE# +0",
+		_t"Summoners never fight alone. They are always ready to summon one of their many minions to fight at their side.",
+		_t"Summons can range from a combat hound to a fire drake.",
+		_t"Their most important stats are: Willpower and Cunning",
+		_t"#GOLD#Stat modifiers:",
+		_t"#LIGHT_BLUE# * +0 Strength, +1 Dexterity, +0 Constitution",
+		_t"#LIGHT_BLUE# * +0 Magic, +5 Willpower, +3 Cunning",
+		_t"#GOLD#Life per level:#LIGHT_BLUE# +0",
 	},
 	power_source = {nature=true},
 	getStatDesc = function(stat, actor)
 		if stat == actor.STAT_CUN then
-			return "Max summons: "..math.floor(actor:getCun()/10)
+			return ("Max summons: %d"):tformat(math.floor(actor:getCun()/10))
 		end
 	end,
 	stats = { wil=5, cun=3, dex=1, },
@@ -109,15 +109,15 @@ newBirthDescriptor{
 	type = "subclass",
 	name = "Wyrmic",
 	locked = function() return profile.mod.allow_build.wilder_wyrmic end,
-	locked_desc = "Sleek, majestic, powerful... In the path of dragons we walk, and their breath is our breath. See their beating hearts with your eyes and taste their majesty between your teeth.",
+	locked_desc = _t"Sleek, majestic, powerful... In the path of dragons we walk, and their breath is our breath. See their beating hearts with your eyes and taste their majesty between your teeth.",
 	desc = {
-		"Wyrmics are fighters who have learnt how to mimic some of the aspects of the dragons.",
-		"They have access to talents normally belonging to the various kind of drakes.",
-		"Their most important stats are: Strength and Willpower",
-		"#GOLD#Stat modifiers:",
-		"#LIGHT_BLUE# * +5 Strength, +0 Dexterity, +1 Constitution",
-		"#LIGHT_BLUE# * +0 Magic, +3 Willpower, +0 Cunning",
-		"#GOLD#Life per level:#LIGHT_BLUE# +2",
+		_t"Wyrmics are fighters who have learnt how to mimic some of the aspects of the dragons.",
+		_t"They have access to talents normally belonging to the various kind of drakes.",
+		_t"Their most important stats are: Strength and Willpower",
+		_t"#GOLD#Stat modifiers:",
+		_t"#LIGHT_BLUE# * +5 Strength, +0 Dexterity, +1 Constitution",
+		_t"#LIGHT_BLUE# * +0 Magic, +3 Willpower, +0 Cunning",
+		_t"#GOLD#Life per level:#LIGHT_BLUE# +2",
 	},
 	birth_example_particles = {
 		function(actor) if core.shader.active(4) then local x, y = actor:attachementSpot("back", true) actor:addParticles(Particles.new("shader_wings", 1, {x=x, y=y, life=18, fade=-0.006, deploy_speed=14})) end end,
@@ -180,21 +180,21 @@ newBirthDescriptor{
 	type = "subclass",
 	name = "Oozemancer",
 	locked = function() return profile.mod.allow_build.wilder_oozemancer end,
-	locked_desc = "Magic must fail, magic must lose, nothing arcane can face the ooze...",
+	locked_desc = _t"Magic must fail, magic must lose, nothing arcane can face the ooze...",
 	desc = {
-		"Oozemancers separate themselves from normal civilisation so that they be more in harmony with Nature. Arcane force are reviled by them, and their natural attunement to the wilds lets them do battle with abusive magic-users on an equal footing.",
-		"They can spawn oozes to protect and attack from a distance while also being adept at harnessing the power of mindstars and psiblades.",
-		"Their most important stats are: Willpower and Cunning",
-		"#GOLD#Stat modifiers:",
-		"#LIGHT_BLUE# * +0 Strength, +0 Dexterity, +0 Constitution",
-		"#LIGHT_BLUE# * +0 Magic, +5 Willpower, +4 Cunning",
-		"#GOLD#Life per level:#LIGHT_BLUE# -3",
+		_t"Oozemancers separate themselves from normal civilisation so that they be more in harmony with Nature. Arcane force are reviled by them, and their natural attunement to the wilds lets them do battle with abusive magic-users on an equal footing.",
+		_t"They can spawn oozes to protect and attack from a distance while also being adept at harnessing the power of mindstars and psiblades.",
+		_t"Their most important stats are: Willpower and Cunning",
+		_t"#GOLD#Stat modifiers:",
+		_t"#LIGHT_BLUE# * +0 Strength, +0 Dexterity, +0 Constitution",
+		_t"#LIGHT_BLUE# * +0 Magic, +5 Willpower, +4 Cunning",
+		_t"#GOLD#Life per level:#LIGHT_BLUE# -3",
 	},
 	power_source = {nature=true, antimagic=true},
 	random_rarity = 3,
 	getStatDesc = function(stat, actor)
 		if stat == actor.STAT_CUN then
-			return "Max summons: "..math.floor(actor:getCun()/10)
+			return ("Max summons: %d"):tformat(math.floor(actor:getCun()/10))
 		end
 	end,
 	birth_example_particles = {
@@ -257,16 +257,16 @@ newBirthDescriptor{
 	type = "subclass",
 	name = "Stone Warden",
 	locked = function() return profile.mod.allow_build.wilder_stone_warden end,
-	locked_desc = "The Spellblaze's scars may be starting to heal,\nbut little can change how the partisans feel.\nNature and arcane could bridge their divide -\nand when it comes down to it, gold won't take sides...",
+	locked_desc = _t"The Spellblaze's scars may be starting to heal,\nbut little can change how the partisans feel.\nNature and arcane could bridge their divide -\nand when it comes down to it, gold won't take sides...",
 	desc = {
-		"Stone Wardens are dwarves trained in both the eldritch arts and the worship of nature.",
-		"While other races are stuck in their belief that arcane forces and natural forces are meant to oppose, dwarves have found a way to combine them in harmony.",
-		"Stone Wardens are armoured fighters, dual wielding shields to channel many of their powers.",
-		"Their most important stats are: Strength, Magic and Willpower",
-		"#GOLD#Stat modifiers:",
-		"#LIGHT_BLUE# * +2 Strength, +0 Dexterity, +0 Constitution",
-		"#LIGHT_BLUE# * +4 Magic, +3 Willpower, +0 Cunning",
-		"#GOLD#Life per level:#LIGHT_BLUE# +2",
+		_t"Stone Wardens are dwarves trained in both the eldritch arts and the worship of nature.",
+		_t"While other races are stuck in their belief that arcane forces and natural forces are meant to oppose, dwarves have found a way to combine them in harmony.",
+		_t"Stone Wardens are armoured fighters, dual wielding shields to channel many of their powers.",
+		_t"Their most important stats are: Strength, Magic and Willpower",
+		_t"#GOLD#Stat modifiers:",
+		_t"#LIGHT_BLUE# * +2 Strength, +0 Dexterity, +0 Constitution",
+		_t"#LIGHT_BLUE# * +4 Magic, +3 Willpower, +0 Cunning",
+		_t"#GOLD#Life per level:#LIGHT_BLUE# +2",
 	},
 	special_check = function(birth)
 		if birth.descriptors_by_type.race ~= "Dwarf" then return false end

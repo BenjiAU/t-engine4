@@ -1,5 +1,5 @@
 return {
-	name = "Tranquil Meadow",
+	name = _t"Tranquil Meadow",
 	level_range = {15, 25},
 	level_scheme = "player",
 	actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(-1,2) end,

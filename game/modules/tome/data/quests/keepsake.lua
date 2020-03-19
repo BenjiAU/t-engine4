@@ -19,38 +19,38 @@
 
 -- Keepsake
 
-name = "Keepsake"
+name = _t"Keepsake"
 id = "keepsake"
 
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You have begun to look for a way to overcome the curse that afflicts you."
+	desc[#desc+1] = _t"You have begun to look for a way to overcome the curse that afflicts you."
 	if self:isCompleted("berethh-killed-good") then
-		desc[#desc+1] = "You have found a small iron acorn which you keep as a reminder of your past."
-		desc[#desc+1] = "You have destroyed the merchant caravan that you once considered family."
-		desc[#desc+1] = "Kyless, the one who brought the curse, is dead by your hand."
-		desc[#desc+1] = "Berethh is dead, may he rest in peace."
-		desc[#desc+1] = "Your curse has changed the iron acorn which now serves as a cruel reminder of your past and present."
+		desc[#desc+1] = _t"You have found a small iron acorn which you keep as a reminder of your past."
+		desc[#desc+1] = _t"You have destroyed the merchant caravan that you once considered family."
+		desc[#desc+1] = _t"Kyless, the one who brought the curse, is dead by your hand."
+		desc[#desc+1] = _t"Berethh is dead, may he rest in peace."
+		desc[#desc+1] = _t"Your curse has changed the iron acorn which now serves as a cruel reminder of your past and present."
 	elseif self:isCompleted("berethh-killed-evil") then
-		desc[#desc+1] = "You have found a small iron acorn which you keep as a reminder of your past"
-		desc[#desc+1] = "You have destroyed the merchant caravan that you once considered family."
-		desc[#desc+1] = "Kyless, the one who brought the curse, is dead by your hand."
-		desc[#desc+1] = "Berethh is dead, may he rest in peace."
-		desc[#desc+1] = "Your curse has defiled the iron acorn which now serves as a reminder of your vile nature."
+		desc[#desc+1] = _t"You have found a small iron acorn which you keep as a reminder of your past"
+		desc[#desc+1] = _t"You have destroyed the merchant caravan that you once considered family."
+		desc[#desc+1] = _t"Kyless, the one who brought the curse, is dead by your hand."
+		desc[#desc+1] = _t"Berethh is dead, may he rest in peace."
+		desc[#desc+1] = _t"Your curse has defiled the iron acorn which now serves as a reminder of your vile nature."
 	elseif self:isCompleted("kyless-killed") then
-		desc[#desc+1] = "You have found a small iron acorn which you keep as a reminder of your past."
-		desc[#desc+1] = "You have destroyed the merchant caravan that you once considered family."
-		desc[#desc+1] = "Kyless, the one who brought the curse, is dead by your hand."
-		desc[#desc+1] = "#LIGHT_GREEN#You need to find Berethh, the last person who may be able to help you."
+		desc[#desc+1] = _t"You have found a small iron acorn which you keep as a reminder of your past."
+		desc[#desc+1] = _t"You have destroyed the merchant caravan that you once considered family."
+		desc[#desc+1] = _t"Kyless, the one who brought the curse, is dead by your hand."
+		desc[#desc+1] = _t"#LIGHT_GREEN#You need to find Berethh, the last person who may be able to help you."
 	elseif self:isCompleted("caravan-destroyed") then
-		desc[#desc+1] = "You have found a small iron acorn which you keep as a reminder of your past."
-		desc[#desc+1] = "You have destroyed the merchant caravan that you once considered family."
-		desc[#desc+1] = "#LIGHT_GREEN#Seek out Kyless' cave in the northern part of the meadow and end him. Perhaps the curse will end with him."
+		desc[#desc+1] = _t"You have found a small iron acorn which you keep as a reminder of your past."
+		desc[#desc+1] = _t"You have destroyed the merchant caravan that you once considered family."
+		desc[#desc+1] = _t"#LIGHT_GREEN#Seek out Kyless' cave in the northern part of the meadow and end him. Perhaps the curse will end with him."
 	elseif self:isCompleted("acorn-found") then
-		desc[#desc+1] = "You have found a small iron acorn which you keep as a reminder of your past."
-		desc[#desc+1] = "#LIGHT_GREEN#Discover the meaning of the acorn and the dream."
+		desc[#desc+1] = _t"You have found a small iron acorn which you keep as a reminder of your past."
+		desc[#desc+1] = _t"#LIGHT_GREEN#Discover the meaning of the acorn and the dream."
 	else
-		desc[#desc+1] = "#LIGHT_GREEN#You may have to revist your past to unlock some secret buried there."
+		desc[#desc+1] = _t"#LIGHT_GREEN#You may have to revist your past to unlock some secret buried there."
 	end
 	return table.concat(desc, "\n")
 end
@@ -124,7 +124,7 @@ end
 
 on_caravan_destroyed = function(self, who)
 	local Chat = require "engine.Chat"
-	local chat = Chat.new("keepsake-caravan-destroyed", {name="Last of the Caravan"}, game.player)
+	local chat = Chat.new("keepsake-caravan-destroyed", {name=_t"Last of the Caravan"}, game.player)
 	chat:invoke()
 end
 
@@ -136,7 +136,7 @@ on_caravan_destroyed_chat_over = function(self, who)
 	local g = mod.class.Grid.new{
 		show_tooltip=true, always_remember = true,
 		type="floor", subtype="grass",
-		name="secret path to the cave",
+		name=_t"secret path to the cave",
 		image = "terrain/grass.png", add_mos = {{image="terrain/way_next_8.png"}},
 		display = '>', color_r=255, color_g=255, color_b=0,
 		notice = true, always_remember = true,
@@ -203,7 +203,7 @@ on_vault_trigger = function(self, who)
 end
 
 on_dog_vault = function(self, who)
-	require("engine.ui.Dialog"):simplePopup("A Second Vault", "You recoginize this door as the entrance to a second vault. There are some scuffling noises and heavy breathing coming from the other side of the door.")
+	require("engine.ui.Dialog"):simplePopup(_t"A Second Vault", _t"You recoginize this door as the entrance to a second vault. There are some scuffling noises and heavy breathing coming from the other side of the door.")
 end
 
 on_kyless_encounter = function(self, who)
@@ -213,7 +213,7 @@ end
 
 on_kyless_death = function(self, who, kyless)
 	local Chat = require "engine.Chat"
-	local chat = Chat.new("keepsake-kyless-death", {name="Death of Kyless"}, game.player)
+	local chat = Chat.new("keepsake-kyless-death", {name=_t"Death of Kyless"}, game.player)
 	chat:invoke()
 
 	who:setQuestStatus("keepsake", engine.Quest.COMPLETED, "kyless-killed")
@@ -244,7 +244,7 @@ end
 
 on_berethh_encounter = function(self, who, berethh)
 	local Chat = require "engine.Chat"
-	local chat = Chat.new("keepsake-berethh-encounter", {name="Berethh"}, game.player)
+	local chat = Chat.new("keepsake-berethh-encounter", {name=_t"Berethh"}, game.player)
 	chat:invoke()
 end
 

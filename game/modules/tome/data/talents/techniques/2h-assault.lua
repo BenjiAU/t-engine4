@@ -47,7 +47,7 @@ newTalent{
 				if target:canBe("stun") then
 					target:setEffect(target.EFF_STUNNED, t.getDuration(self, t), {apply_power=self:combatPhysicalpower()})
 				else
-					game.logSeen(target, "%s resists the stunning blow!", target.name:capitalize())
+					game.logSeen(target, "%s resists the stunning blow!", target:getName():capitalize())
 				end
 			end
 		end
@@ -57,7 +57,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Hit the target twice with your two-handed weapon, doing %d%% damage. Each hit will try to stun the target for %d turns.
 		The stun chance increases with your Physical Power.]])
-		:format(100 * self:combatTalentWeaponDamage(t, 0.5, 0.7), t.getDuration(self, t))
+		:tformat(100 * self:combatTalentWeaponDamage(t, 0.5, 0.7), t.getDuration(self, t))
 	end,
 }
 
@@ -106,7 +106,7 @@ newTalent{
 	info = function(self, t)
 	local damage = t.getDamage(self, t) * 100
 		return ([[Take a step toward your foes then use the momentum to cleave all creatures adjacent to you for %d%% weapon damage.]])
-		:format(damage)
+		:tformat(damage)
 	end,
 }
 
@@ -157,7 +157,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Spin around, extending your weapon in radius %d and damaging all targets around you for %d%% weapon damage.
-		At level 3 all damage done will also make the targets bleed for an additional %d%% damage over 5 turns]]):format(self:getTalentRadius(t), 100 * self:combatTalentWeaponDamage(t, 1.4, 2.1), t.getBleed(self, t) * 100)
+		At level 3 all damage done will also make the targets bleed for an additional %d%% damage over 5 turns]]):tformat(self:getTalentRadius(t), 100 * self:combatTalentWeaponDamage(t, 1.4, 2.1), t.getBleed(self, t) * 100)
 	end,
 }
 
@@ -199,6 +199,6 @@ newTalent{
 		return ([[Takes advantage of a wounded foe to perform a killing strike.  This attack is an automatic critical hit that does %0.1f%% extra weapon damage for each %% of life the target is below maximum.
 		(A victim with 30%% remaining life (70%% damaged) would take %0.1f%% weapon damage.)
 		If an enemy dies from this attack then two of your talent cooldowns are reduced by 2 turns and Execution's cooldown is reset.]]):
-		format(t.getPower(self, t), 100 + t.getPower(self, t) * 70)
+		tformat(t.getPower(self, t), 100 + t.getPower(self, t) * 70)
 	end,
 }

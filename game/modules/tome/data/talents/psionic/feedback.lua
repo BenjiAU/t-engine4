@@ -33,7 +33,7 @@ newTalent{
 		local newDecay = decaySpeed*0.1
 		local netHeal = newDecay*heal
 		return ([[Your Feedback decay now heals you for %0.1f times the loss, and the decay rate is reduced to %d%% of the normal rate (up to %0.1f%% per turn).  As a result, you are healed for %0.2f%% of your feedback pool each turn.
-		The healing effect improves with your Willpower.]]):format(heal, decaySpeed*100, newDecay*100, netHeal*100)
+		The healing effect improves with your Willpower.]]):tformat(heal, decaySpeed*100, newDecay*100, netHeal*100)
 	end,
 }
 
@@ -56,7 +56,7 @@ newTalent{
 	info = function(self, t)
 		local shield_power = t.getShieldPower(self, t)
 		return ([[Activate to create a resonance field that will absorb 50%% of all damage you take (%d max absorption).  The field will not interfere with Feedback gain.
-		The max absorption value will scale with your Mindpower, and the effect lasts up to ten turns.]]):format(shield_power)
+		The max absorption value will scale with your Mindpower, and the effect lasts up to ten turns.]]):tformat(shield_power)
 	end,
 }
 
@@ -82,14 +82,14 @@ newTalent{
 		local max_feedback = t.getMaxFeedback(self, t)
 		local gain = t.getFeedbackGain(self, t)
 		return ([[Increases your maximum Feedback by %d, and increases your base Feedback gain ratio to %d%%.
-		The Feedback gain will scale with your Mindpower.]]):format(max_feedback, gain * 100)
+		The Feedback gain will scale with your Mindpower.]]):tformat(max_feedback, gain * 100)
 	end,
 	info = function(self, t)
 		local max_feedback = t.getMaxFeedback(self, t)
 		local gain = t.getFeedbackGain(self, t)
 		local feedbackratio = self:callTalent(self.T_FEEDBACK_POOL, "getFeedbackRatio")
 		return ([[Increases your maximum Feedback by %d, and increases the Feedback you gain from damage by %0.1f%% (to %0.1f%% of damage received).
-		The Feedback gain will scale with your Mindpower.]]):format(max_feedback, gain*100, feedbackratio*100)
+		The Feedback gain will scale with your Mindpower.]]):tformat(max_feedback, gain*100, feedbackratio*100)
 	end,
 }
 
@@ -137,6 +137,6 @@ newTalent{
 	info = function(self, t)
 		local data = t.getData(self, t)
 		return ([[Use Feedback to replenish yourself.  This heals you for %d life, and restores %d stamina, %d mana, %d equilibrium, %d vim, %d positive and negative energies, %d psi energy, and %d hate.
-		The heal and resource gain will improve with your Mindpower.]]):format(data.heal, data.stamina, data.mana, -data.equilibrium, data.vim, data.positive, data.psi, data.hate)
+		The heal and resource gain will improve with your Mindpower.]]):tformat(data.heal, data.stamina, data.mana, -data.equilibrium, data.vim, data.positive, data.psi, data.hate)
 	end,
 }

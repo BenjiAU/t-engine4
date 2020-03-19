@@ -39,10 +39,10 @@ function _M:init(title, equip_actor, filter, action, on_select, inven_actor)
 		print("[ShowEquipInven] initiating inventory INVEN_INVEN for", inven_actor.name, inven_actor.uid)
 		inven_actor.inven[inven_actor.INVEN_INVEN] = {worn=false, id=inven_actor.INVEN_INVEN, name="INVEN", max = 10}
 	end
-	Dialog.init(self, title or "Inventory", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
+	Dialog.init(self, title or _t"Inventory", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
 
-	self.c_main_set = Tab.new{title="Main Set", default=not equip_actor.off_weapon_slots, fct=function() end, on_change=function(s) if s then self:switchSets("main") end end}
-	self.c_off_set = Tab.new{title="Off Set", default=equip_actor.off_weapon_slots, fct=function() end, on_change=function(s) if s then self:switchSets("off") end end}
+	self.c_main_set = Tab.new{title=_t"Main Set", default=not equip_actor.off_weapon_slots, fct=function() end, on_change=function(s) if s then self:switchSets("main") end end}
+	self.c_off_set = Tab.new{title=_t"Off Set", default=equip_actor.off_weapon_slots, fct=function() end, on_change=function(s) if s then self:switchSets("off") end end}
 
 	local vsep = Separator.new{dir="horizontal", size=self.ih - 10}
 
@@ -126,7 +126,7 @@ function _M:init(title, equip_actor, filter, action, on_select, inven_actor)
 		if not game.tooltip.empty then
 			game.tooltip.locked = not game.tooltip.locked
 			game.tooltip.container.focused = game.tooltip.locked
-			game.log("Tooltip %s", game.tooltip.locked and "locked" or "unlocked")
+			game.log("Tooltip %s", game.tooltip.locked and _t"locked" or _t"unlocked")
 			if game.tooltip.locked then
 				self.old_areas_name = self.mouse.areas_name
 				self.old_areas = self.mouse.areas
@@ -211,7 +211,7 @@ end
 
 function _M:on_register()
 	if not self.inven_actor:getInven("INVEN") then
-		Dialog:simplePopup("No Inventory", self.inven_actor.name:capitalize().." Has no defined main inventory")
+		Dialog:simplePopup(_t"No Inventory", ("%s Has no defined main inventory"):tformat(self.inven_actor:getName():capitalize()))
 		game:unregisterDialog(self)
 	else
 		game:onTickEnd(function() self.key:unicodeInput(true) end)
@@ -229,7 +229,7 @@ function _M:defineHotkey(id)
 	if not item or not item.object then return end
 
 	self.equip_actor.hotkey[id] = {"inventory", item.object:getName{no_add_name=true, no_count=true}}
-	self:simplePopup("Hotkey "..id.." assigned", item.object:getName{no_add_name=true, no_count=true}:capitalize().." assigned to hotkey "..id)
+	self:simplePopup(("Hotkey %s assigned"):tformat(id), item.object:getName{no_add_name=true, no_count=true}:capitalize().." assigned to hotkey "..id)
 	self.equip_actor.changed = true
 end
 

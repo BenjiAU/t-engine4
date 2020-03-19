@@ -27,8 +27,8 @@ newEntity{ define_as = "UNGOLE", base = "BASE_NPC_SPIDER",
 	allow_infinite_dungeon = true,
 	name = "Ungolë", color=colors.VIOLET, unique = true,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/spiderkin_spider_ungole.png", display_h=2, display_y=-1}}},
-	desc = [[A huge spider, shrouded in darkness, her red glowing eyes darting to fix on you. She looks hungry.]],
-	killer_message = "and devoured alongside a Sun Paladin",
+	desc = _t[[A huge spider, shrouded in darkness, her red glowing eyes darting to fix on you. She looks hungry.]],
+	killer_message = _t"and devoured alongside a Sun Paladin",
 	level_range = {30, nil}, exp_worth = 2,
 	female = 1,
 	max_life = 450, life_rating = 15, fixed_rating = true,
@@ -67,7 +67,7 @@ newEntity{ define_as = "UNGOLE", base = "BASE_NPC_SPIDER",
 
 	on_die = function(self, who)
 		local Chat = require"engine.Chat"
-		local chat = Chat.new("ardhungol-end", {name="Sun Paladin Rashim"}, game.player:resolveSource())
+		local chat = Chat.new("ardhungol-end", {name=_t"Sun Paladin Rashim"}, game.player:resolveSource())
 		chat:invoke()
 	end,
 }
@@ -75,7 +75,7 @@ newEntity{ define_as = "UNGOLE", base = "BASE_NPC_SPIDER",
 -- Now a couple humanoid spiderkins because ... well, you'll see later !
 newEntity{ base = "BASE_NPC_SPIDER",
 	subtype = "xhaiak", name = "xhaiak arachnomancer", color={0,0,0},  -- spider night, don't change the color
-	desc = [[A strange looking humanoid spiderkin, its body half covered by a light flowing robe. It looks like tiny spiders are crawling on his skin.]],
+	desc = _t[[A strange looking humanoid spiderkin, its body half covered by a light flowing robe. It looks like tiny spiders are crawling on his skin.]],
 	resolvers.nice_tile{tall=1},
 	level_range = {38, nil}, exp_worth = 1,
 	rarity = 2,
@@ -105,7 +105,7 @@ newEntity{ base = "BASE_NPC_SPIDER",
 
 newEntity{ base = "BASE_NPC_SPIDER",
 	subtype = "shiaak", name = "shiaak venomblade", color=colors.GREEN,
-	desc = [[A strange looking humanoid, covered in black chitinous skin. He dual wields sinuous daggers and seems bent on plunging them in your body.]],
+	desc = _t[[A strange looking humanoid, covered in black chitinous skin. He dual wields sinuous daggers and seems bent on plunging them in your body.]],
 	resolvers.nice_tile{tall=1},
 	level_range = {35, nil}, exp_worth = 1,
 	rarity = 4,

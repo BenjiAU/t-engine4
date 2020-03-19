@@ -44,7 +44,7 @@
 --		return true
 --	end,
 --	info = function(self, t)
---		return ([[Jump away %d grids from your target.]]):format(t.getDist(self, t))
+--		return ([[Jump away %d grids from your target.]]):tformat(t.getDist(self, t))
 --	end,
 --}
 --
@@ -69,7 +69,7 @@
 --	info = function(self, t)
 --		local rad = self:getTalentRadius(t)
 --		return ([[Sense foes around you in a radius of %d for %d turns.
---		The radius will increase with your Cunning.]]):format(rad, 3 + self:getTalentLevel(t))
+--		The radius will increase with your Cunning.]]):tformat(rad, 3 + self:getTalentLevel(t))
 --	end,
 --}
 
@@ -96,7 +96,7 @@ newTalent{
 			if target:checkHit(math.max(self:combatAttack(), self:combatPhysicalpower()), target:combatPhysicalResist(), 0, 95) and target:canBe("knockback") then -- Deprecated Checkhit call
 				return true
 			else
-				game.logSeen(target, "%s resists the knockback!", target.name:capitalize())
+				game.logSeen(target, "%s resists the knockback!", target:getName():capitalize())
 			end
 		end
 
@@ -111,7 +111,7 @@ newTalent{
 		return ([[A mighty kick that pushes your target away %d grids.
 		If another creature is in the way, it will also be pushed away.
 		The Knockback chance increases with your Accuracy or your Physical Power, whichever is greater.]])
-		:format(t.getDist(self, t))
+		:tformat(t.getDist(self, t))
 	end,
 }
 
@@ -137,6 +137,6 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Your great dexterity allows you to see incoming projectiles (spells, arrows, ...), effectively slowing them down by %d%%.]]):
-		format(math.min(90, 15 + self:getDex(10, true) * self:getTalentLevel(t)))
+		tformat(math.min(90, 15 + self:getDex(10, true) * self:getTalentLevel(t)))
 	end,
 }

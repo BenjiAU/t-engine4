@@ -60,7 +60,7 @@ newTalent{
 				self:logCombat(target, "#Source# delivers a Coup de Grace against #Target#!")
 				target:die(self)
 			elseif target.life > 0 and target.life < target.max_life * 0.2 then
-				game.logSeen(target, "%s resists the Coup de Grace!", target.name:capitalize())
+				game.logSeen(target, "%s resists the Coup de Grace!", target:getName():capitalize())
 			end
 		end
 
@@ -69,7 +69,7 @@ newTalent{
 				if not self:isTalentActive(self.T_STEALTH) then
 					self.hide_chance = 1000
 					self.talents_cd["T_STEALTH"] = 0
-					game.logSeen(self, "#GREY#%s slips into shadow.", self.name:capitalize())
+					game.logSeen(self, "#GREY#%s slips into shadow.", self:getName():capitalize())
 					self:forceUseTalent(self.T_STEALTH, {ignore_energy=true, silent = true})
 					self.hide_chance = nil
 				end
@@ -82,7 +82,7 @@ newTalent{
 		perc = t.getPercent(self,t)*100
 		return ([[Attempt to finish off a wounded enemy, striking them with both weapons for %d%% increased by 50%% if their life is below 30%%.  A target brought below 20%% of its maximum life must make a physical save against your Accuracy or be instantly slain.
 		You may take advantage of finishing your foe this way to activate stealth (if known).]]):
-		format(dam, perc)
+		tformat(dam, perc)
 	end,
 }
 
@@ -108,7 +108,7 @@ newTalent{
 		return ([[When you exit stealth, you reveal yourself dramatically, intimidating foes around you. 
 		All foes within radius %d that witness you leaving stealth will be stricken with terror, which randomly inflicts stun, slow (40%% power), or confusion (50%% power) for %d turns.
 		The chance to terrorize improves with your combat accuracy.]])
-		:format(radius, duration)
+		:tformat(radius, duration)
 	end,
 }
 
@@ -148,7 +148,7 @@ newTalent{
 		return ([[When attacking from stealth, you slip a garrote over the target’s neck (or other vulnerable part).  This strangles for %d turns and silences for %d turns.  Strangled targets are pinned and suffer an automatic unarmed attack for %d%% damage each turn. 
 		Your chance to apply the garrote increases with your Accuracy and you must stay adjacent to your target to maintain it.
 		This talent has a cooldown.]])
-		:format(dur, sdur, damage)
+		:tformat(dur, sdur, damage)
 	end,
 }
 
@@ -190,6 +190,6 @@ newTalent{
 		If a target dies while marked, the cooldown of this ability is reset and the cost refunded.
 		This ability can be used without breaking stealth.
 		The base damage dealt will increase with your Dexterity.]]):
-		format(power, damDesc(self, DamageType.PHYSICAL, dam), perc)
+		tformat(power, damDesc(self, DamageType.PHYSICAL, dam), perc)
 	end,
 }

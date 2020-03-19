@@ -47,13 +47,13 @@ local turret = function(version)
 		level_range = {1, nil}, exp_worth = 1,
 		stats = { mag=16, con=22 },
 		size_category = 2,
-		name = "elemental crystal", color=colors.BLUE,
+		name = _t"elemental crystal", color=colors.BLUE,
 		combat = { dam=resolvers.rngavg(1,2), atk=2, apr=0, dammod={str=0.4} },
 		combat_armor = 10, combat_def = 0,
 		talent_cd_reduction={[Talents.T_ELEMENTAL_BOLT]=3, },
 
 		resolvers.talents{
-			[Talents.T_ELEMENTAL_BOLT]={base=1, every=5, max=9},
+			[Talents.T_ELEMENTAL_BOLT]={base=2, every=4, max=8},
 		},
 
 		ai = "dumb_talented_simple", ai_state = { ai_move="move_complex", talent_in=3, },
@@ -63,11 +63,12 @@ end
 local stairs = function()
 	local terrains = mod.class.Grid:loadList("/data/general/grids/basic.lua")
 	return game.state:dynamicZoneEntry(terrains.UP, "collapsed-tower", {
-		name = "collapsed tower",
+		name = _t"collapsed tower",
 		level_range = {game.zone.base_level, game.zone.base_level},
 		__applied_difficulty = true, -- Difficulty already applied to parent zone
 		level_scheme = "player",
 		max_level = 1,
+		actor_adjust_level = function(zone, level, e) return zone.base_level + e:getRankLevelAdjust() + level.level-1 + rng.range(0,4) end,
 		width = 20, height = 20,
 		ambient_music = "Swashing the buck.ogg",
 		persistent = "zone",
@@ -91,7 +92,7 @@ local stairs = function()
 		trap_list = {"/data/general/traps/natural_forest.lua"},
 	},
 	function(zone, goback)
-		goback("stairs back to %s", zone.grid_list.DOWN)
+		goback(_t"stairs back to %s", zone.grid_list.DOWN)
 	end)
 end
 

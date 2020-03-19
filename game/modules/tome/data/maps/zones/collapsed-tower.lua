@@ -47,13 +47,13 @@ local turret = function()
 	level_range = {1, nil}, exp_worth = 1,
 	stats = { mag=16, con=22 },
 	size_category = 2,
-	name = "arcane crystal", color=colors.BLUE,
+	name = _t"arcane crystal", color=colors.BLUE,
 	combat = { dam=resolvers.rngavg(1,2), atk=2, apr=0, dammod={str=0.4} },
 	combat_armor = 10, combat_def = 0,
 	talent_cd_reduction={[Talents.T_ELEMENTAL_BOLT]=3, },
 
 	resolvers.talents{
-		[Talents.T_ELEMENTAL_BOLT]={base=1, every=5, max=10},
+		[Talents.T_ELEMENTAL_BOLT]={base=3, every=3, max=8},
 	},
 
 	ai = "dumb_talented_simple", ai_state = { ai_move="move_complex", talent_in=3, },
@@ -75,20 +75,23 @@ defineTile('.', "FLOOR")
 defineTile('#', "HARDWALL")
 defineTile('+', "DOOR")
 defineTile('!', "DOOR_VAULT")
-defineTile('>', "DOWN")
+defineTile('>', "DYNAMIC_ZONE_EXIT")
 
 
-defineTile('b', "FLOOR", {random_filter={add_levels=10, tome_mod="gvault"}}, {random_filter={add_levels=5, name="skeleton magus"}})
+defineTile('b', "FLOOR", {random_filter={add_levels=20, tome_mod="gvault"}}, {random_filter={add_levels=5, name="skeleton magus"}})
 defineTile('$', "FLOOR", {random_filter={add_levels=25, type="money"}})
-defineTile('t', "FLOOR", nil, turret())
+defineTile('j', "FLOOR", {random_filter={add_levels=10, type="jewelry", tome_mod="gvault"}})
+defineTile('t', "FLOOR", {random_filter={add_levels=5, tome_mod="gvault"}}, turret())
 
 local def = {
 [[##############]],
-[[##############]],
-[[##.##.$...####]],
-[[#t.....>..####]],
+[[#tjj##########]],
+[[#b$$##########]],
+[[##.##t$..t####]],
+[[#t.+...>..####]],
 [[##.##...$.####]],
-[[#b$##$....####]],
+[[#b$$#$...t####]],
+[[#tjj##########]],
 [[##############]],
 }
 

@@ -71,7 +71,9 @@ function RoomInstance:build()
 	if account_for_border == nil then account_for_border = false end
 
 	local map = mapscript:makeTemporaryMap(room.w, room.h, function(map)
+		mapscript.dont_add_vault_check = true
 		mapscript:roomPlace(room, id, 0, 0)
+		mapscript.dont_add_vault_check = nil
 	end)
 	mapscript.maps_registers[id] = map
 	mapscript.maps_positions[id] = account_for_border and self:point(0, 0) or self:point(1, 1)

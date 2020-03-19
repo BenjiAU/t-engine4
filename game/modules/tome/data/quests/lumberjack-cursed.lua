@@ -17,12 +17,12 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "The beast within"
+name = _t"The beast within"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You met a half-mad lumberjack fleeing a small village, rambling about an untold horror lurking there, slaughtering people."
+	desc[#desc+1] = _t"You met a half-mad lumberjack fleeing a small village, rambling about an untold horror lurking there, slaughtering people."
 	if self.lumberjacks_died > 0 then
-		desc[#desc+1] = self.lumberjacks_died.." lumberjacks have died."
+		desc[#desc+1] = ("%d lumberjacks have died."):tformat(self.lumberjacks_died)
 	end
 
 	return table.concat(desc, "\n")
@@ -32,7 +32,7 @@ on_grant = function(self, who)
 	-- Reveal entrances
 	local g = mod.class.Grid.new{
 		show_tooltip=true, always_remember = true,
-		name="Small lumberjack village",
+		name=_t"Small lumberjack village",
 		display='*', color=colors.WHITE,
 		notice = true, image="terrain/grass.png", add_mos={{image="terrain/town1.png"}},
 		change_level=1, glow=true, change_zone="town-lumberjack-village",
@@ -52,7 +52,7 @@ on_status_change = function(self, who, status, sub)
 		local money = math.max(0, (20 - self.lumberjacks_died) * 1.2)
 		if money > 0 then
 			who:incMoney(money)
-			require("engine.ui.Dialog"):simplePopup("Thanks", ("The remaining lumberjacks collect some gold to thank you (%0.2f)."):format(money))
+			require("engine.ui.Dialog"):simplePopup(_t"Thanks", ("The remaining lumberjacks collect some gold to thank you (%0.2f)."):tformat(money))
 		end
 		if self.lumberjacks_died < 7 then
 			local o = game.zone:makeEntity(game.level, "object", {type="tool", subtype="digger", tome_drops="boss"}, nil, true)
@@ -60,7 +60,7 @@ on_status_change = function(self, who, status, sub)
 				game:addEntity(game.level, o, "object")
 				o:identify(true)
 				who:addObject(who.INVEN_INVEN, o)
-				require("engine.ui.Dialog"):simplePopup("Thanks", ("You saved %s of us, please take this as a reward. (They give you %s)"):format(self.lumberjacks_died == 0 and "all" or "most", o:getName{do_color=true}))
+				require("engine.ui.Dialog"):simplePopup(_t"Thanks", ("You saved %s of us, please take this as a reward. (They give you %s)"):tformat(self.lumberjacks_died == 0 and _t"all" or _t"most", o:getName{do_color=true}))
 			end
 		end
 		who:setQuestStatus(self.id, engine.Quest.DONE)

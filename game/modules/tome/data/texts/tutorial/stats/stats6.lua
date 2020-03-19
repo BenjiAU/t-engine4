@@ -17,7 +17,7 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-return [[
+return _t[[
 Suppose you're a berserker, and you attempt to stun an enemy. If you're to succeed, two things must happen:
 
 First, your attack needs to hit! That means comparing your #LIGHT_GREEN#Accuracy#WHITE# to the target's #LIGHT_GREEN#Defense#WHITE#.

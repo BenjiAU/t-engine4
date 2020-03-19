@@ -17,24 +17,24 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Melinda, lucky girl"
+name = _t"Melinda, lucky girl"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "After rescuing Melinda from Kryl-Feijan and the cultists you met her again in Last Hope."
+	desc[#desc+1] = _t"After rescuing Melinda from Kryl-Feijan and the cultists you met her again in Last Hope."
 	if self:isCompleted("saved-beach") then
-		desc[#desc+1] = "Melinda was saved from the brink of death at the beach, by a strange wave of blight."
+		desc[#desc+1] = _t"Melinda was saved from the brink of death at the beach, by a strange wave of blight."
 	end
 	if self:isCompleted("death-beach") then
-		desc[#desc+1] = "Melinda died to a Yaech raiding party at the beach."
+		desc[#desc+1] = _t"Melinda died to a Yaech raiding party at the beach."
 	end
 	if self:isCompleted("can_come_fortress") then
-		desc[#desc+1] = "The Fortress Shadow said she could be cured."
+		desc[#desc+1] = _t"The Fortress Shadow said she could be cured."
 	end
 	if self:isCompleted("moved-in") then
-		desc[#desc+1] = "Melinda decided to come live with you in your Fortress."
+		desc[#desc+1] = _t"Melinda decided to come live with you in your Fortress."
 	end
 	if self:isCompleted("portal-done") then
-		desc[#desc+1] = "The Fortress Shadow has established a portal for her so she can come and go freely."
+		desc[#desc+1] = _t"The Fortress Shadow has established a portal for her so she can come and go freely."
 	end
 	return table.concat(desc, "\n")
 end
@@ -50,14 +50,14 @@ end
 
 function spawnFortress(self, who) game:onTickEnd(function()
 	local melinda = require("mod.class.NPC").new{
-		name = "Melinda", define_as = "MELINDA_NPC",
+		name = _t"Melinda", define_as = "MELINDA_NPC",
 		type = "humanoid", subtype = "human", female=true,
 		display = "@", color=colors.LIGHT_BLUE,
 		image = "player/cornac_female_redhair.png",
 		moddable_tile = "human_female",
 		moddable_tile_base = "base_redhead_01.png",
 		moddable_tile_ornament = {female="braid_redhead_01"},
-		desc = [[You saved her from the depth of a cultists' lair and fell in love with her. She has moved into the Fortress to see you more often.]],
+		desc = _t[[You saved her from the depth of a cultists' lair and fell in love with her. She has moved into the Fortress to see you more often.]],
 		autolevel = "tank",
 		ai = "none",
 		stats = { str=8, dex=7, mag=8, con=12 },
@@ -91,7 +91,7 @@ end) end
 function melindaCompanion(self, who, c, sc)
 	for uid, e in pairs(game.level.entities) do if e.define_as == "MELINDA_NPC" then e:disappear() end end
 
-	local melinda = require("mod.class.Player").new{name="Melinda"}
+	local melinda = require("mod.class.Player").new{name=_t"Melinda"}
 	local birth = require("mod.dialogs.Birther").new("", melinda, {}, function() end)
 	birth:setDescriptor("sex", "Female")
 	birth:setDescriptor("world", "Maj'Eyal")
@@ -114,7 +114,7 @@ function melindaCompanion(self, who, c, sc)
 	melinda:forceLevelup(who.level)
 
 	game.party:addMember(melinda, {
-		control="full", type="companion", title="Melinda",
+		control="full", type="companion", title=_t"Melinda",
 		orders = {target=true, leash=true, anchor=true, talents=true, behavior=true},
 	})
 end

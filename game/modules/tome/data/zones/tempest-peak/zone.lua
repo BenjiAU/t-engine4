@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Tempest Peak",
+	name = _t"Tempest Peak",
 	level_range = {15, 22},
 	level_scheme = "player",
 	max_level = 2,

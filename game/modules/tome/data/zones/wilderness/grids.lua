@@ -508,17 +508,17 @@ newEntity{ base="JUNGLE_PLAINS", define_as = "JUNGLE_TOWN", notice = true, chang
 
 newEntity{ base="TOWN", define_as = "TOWN_DERTH",
 	name = "Derth (Town)", add_mos = {{image="terrain/village_01.png"}},
-	desc = "A quiet town at the crossroads of the north",
+	desc = _t"A quiet town at the crossroads of the north",
 	change_zone="town-derth",
 }
 newEntity{ base="TOWN", define_as = "TOWN_LAST_HOPE",
 	name = "Last Hope (Town)", add_displays = {class.new{image="terrain/last_hope.png", display_w=2, display_x=-0.5, z=5}, class.new{image="terrain/last_hope_up.png", display_w=2, display_x=-0.5, display_h=2, display_y=-2, z=16}},
-	desc = "Capital city of the Allied Kingdoms ruled by King Tolak",
+	desc = _t"Capital city of the Allied Kingdoms ruled by King Tolak",
 	change_zone="town-last-hope",
 }
 newEntity{ base="TOWN", define_as = "TOWN_ANGOLWEN",
 	name = "Angolwen, the hidden city of magic", add_displays = {mod.class.Grid.new{z=5, image="terrain/town1.png"}},
-	desc = "Secret place of magic, set apart from the world to protect it.\nLead by the Supreme Archmage Linaniil.",
+	desc = _t"Secret place of magic, set apart from the world to protect it.\nLead by the Supreme Archmage Linaniil.",
 	change_zone="town-angolwen",
 }
 newEntity{ base="TOWN", define_as = "TOWN_ANGOLWEN_PORTAL",
@@ -530,28 +530,28 @@ newEntity{ base="TOWN", define_as = "TOWN_ANGOLWEN_PORTAL",
 }
 newEntity{ base="TOWN", define_as = "TOWN_SHATUR",
 	name = "Shatur (Town)", add_mos = {{image="terrain/town1.png"}},
-	desc = "Capital city of Thaloren lands, ruled by Nessilla Tantaelen",
+	desc = _t"Capital city of Thaloren lands, ruled by Nessilla Tantaelen",
 	change_zone="town-shatur",
 }
 newEntity{ base="TOWN", define_as = "TOWN_ELVALA",
 	name = "Elvala (Town)", add_mos = {{image="terrain/village_01.png"}},
-	desc = "Capital city of Shaloren lands, ruled by Aranion Gayaeil",
+	desc = _t"Capital city of Shaloren lands, ruled by Aranion Gayaeil",
 	change_zone="town-elvala",
 }
 newEntity{ base="TOWN", define_as = "TOWN_GATES_OF_MORNING",
 	name = "Gates of Morning (Town)",
-	desc = "A massive hole in the Sunwall.",
+	desc = _t"A massive hole in the Sunwall.",
 	add_displays = {class.new{image="terrain/golden_cave_entrance02.png", z=8}},
 	change_zone="town-gates-of-morning",
 }
 newEntity{ base="JUNGLE_TOWN", define_as = "TOWN_IRKKK",
 	name = "Irkkk (Town)", add_mos = {{image="terrain/village_01.png"}},
-	desc = "Yeek Wayist main village",
+	desc = _t"Yeek Wayist main village",
 	change_zone="town-irkkk",
 }
 newEntity{ base="TOWN", define_as = "TOWN_ZIGUR",
 	name = "Zigur (Town)", add_mos = {{image="terrain/village_01.png"}},
-	desc = "Ziguranth main training ground",
+	desc = _t"Ziguranth main training ground",
 	change_zone="town-zigur",
 	change_level_check = function()
 		local p = game.party:findMember{main=true}
@@ -559,7 +559,7 @@ newEntity{ base="TOWN", define_as = "TOWN_ZIGUR",
 			return false
 		end
 		if p:attr("has_arcane_knowledge") or p:attr("undead") then
-			require("engine.ui.Dialog"):simplePopup("Zigur", "Somehow as magic user you feel this place is not safe for you.")
+			require("engine.ui.Dialog"):simplePopup(_t"Zigur", _t"Somehow as magic user you feel this place is not safe for you.")
 			return true
 		end
 		return false
@@ -568,7 +568,7 @@ newEntity{ base="TOWN", define_as = "TOWN_ZIGUR",
 newEntity{ base="TOWN", define_as = "TOWN_IRON_COUNCIL",
 	name = "Iron Council (Town)",
 	add_displays = {class.new{image="terrain/cave_entrance_closed02.png", z=5}},
-	desc = "Heart of the dwarven Empire",
+	desc = _t"Heart of the dwarven Empire",
 	change_zone="town-iron-council", change_zone_auto_stairs = true,
 }
 
@@ -684,7 +684,7 @@ newEntity{ base="ZONE_JUNGLE_PLAINS", define_as = "REL_TUNNEL",
 	colors.LIGHT_BLUE,
 	add_mos={{image="terrain/ruin_entrance01.png"}},
 	force_down=true, change_level=4, change_zone="halfling-ruins",
-	change_level_check = function() local p = game.party:findMember{main=true} if p:hasQuest("start-yeek") and not p:isQuestStatus("start-yeek", engine.Quest.DONE) then require("engine.ui.Dialog"):simplePopup("Long tunnel", "You cannot abandon the yeeks of Rel to the dangers that lie within the island.") return true end p:setQuestStatus("rel-tunnel", engine.Quest.DONE) return false end,
+	change_level_check = function() local p = game.party:findMember{main=true} if p:hasQuest("start-yeek") and not p:isQuestStatus("start-yeek", engine.Quest.DONE) then require("engine.ui.Dialog"):simplePopup(_t"Long tunnel", _t"You cannot abandon the yeeks of Rel to the dangers that lie within the island.") return true end p:setQuestStatus("rel-tunnel", engine.Quest.DONE) return false end,
 }
 
 newEntity{ base="ZONE_PLAINS", define_as = "UNREMARKABLE_CAVE",
@@ -723,7 +723,7 @@ newEntity{ base="ZONE_PLAINS", define_as = "TEMPEST_PEAK",
 	change_level_check = function()
 		game.turn = game.turn + 5 * game.calendar.HOUR
 		if not game.player:hasQuest("lightning-overload").walked then
-			require("engine.ui.Dialog"):simpleLongPopup("Danger...", [[After walking many hours, you finally reach the end of the way. You are nearly on top of one of the highest peaks you can see.
+			require("engine.ui.Dialog"):simpleLongPopup(_t"Danger...", _t[[After walking many hours, you finally reach the end of the way. You are nearly on top of one of the highest peaks you can see.
 The storm is raging above your head.]], 400)
 			game.player:hasQuest("lightning-overload").walked = true
 		end

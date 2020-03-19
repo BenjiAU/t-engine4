@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Slime Tunnels",
+	name = _t"Slime Tunnels",
 	level_range = {45, 55},
 	level_scheme = "player",
 	max_level = 1,

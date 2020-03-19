@@ -238,9 +238,8 @@ newEntity{
 			[Stats.STAT_DEX] = resolvers.mbonus_material(5, 1),
 			[Stats.STAT_CON] = resolvers.mbonus_material(5, 1),
 		},
-		combat_spellresist = resolvers.mbonus_material(20, 10, function(e, v) return 0, -v end),
+		combat_spellresist = resolvers.mbonus_material(12, 3, function(e, v) return 0, v end),
 		stamina_regen = resolvers.mbonus_material(12, 3, function(e, v) v=v/10 return 0, v end),
-		mana_regen = resolvers.mbonus_material(50, 10, function(e, v) v=v/100 return 0, -v end),
 		talents_types_mastery = {
 			["technique/combat-training"] = resolvers.mbonus_material(2, 2, function(e, v) v=v/10 return 0, v end),
 		},
@@ -422,7 +421,7 @@ newEntity{
 		},
 	},
 	charm_power_def = {add=5, max=10, floor=true},
-	resolvers.charm("blink randomly (up to range 8) within 2 spaces of a target hostile creature", 10, function(self, who)
+	resolvers.charm(_t"blink randomly (up to range 8) within 2 spaces of a target hostile creature", 10, function(self, who)
 		local tg = self.use_power.target(self, who)
 		local x, y = who:getTarget(tg)
 		if not x or not y then return nil end
@@ -433,7 +432,7 @@ newEntity{
 		game.level.map:particleEmitter(who.x, who.y, 1, "teleport")
 		who:teleportRandom(target.x, target.y, 2)
 		game.level.map:particleEmitter(who.x, who.y, 1, "teleport")
-		game.logSeen(who, "%s uses %s!", who.name:capitalize(), self:getName{no_add_name=true, do_color=true})
+		game.logSeen(who, "%s uses %s!", who:getName():capitalize(), self:getName{no_add_name=true, do_color=true})
 		return {id=true, used=true}
 		end,
 		"T_GLOBAL_CD",

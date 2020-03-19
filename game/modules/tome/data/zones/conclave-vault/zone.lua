@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Old Conclave Vault",
+	name = _t"Old Conclave Vault",
 	level_range = {20, 30},
 	level_scheme = "player",
 	max_level = 4,

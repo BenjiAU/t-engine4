@@ -21,51 +21,51 @@ defineAction{
 	default = { "sym:=i:false:false:false:false", },
 	type = "SHOW_INVENTORY",
 	group = "inventory",
-	name = "Show inventory",
+	name = _t"Show inventory",
 }
 defineAction{
 	default = { "sym:=e:false:false:false:false", },
 	type = "SHOW_EQUIPMENT",
 	group = "inventory",
-	name = "Show equipment",
+	name = _t"Show equipment",
 }
 
 defineAction{
 	default = { "sym:=g:false:false:false:false" },
 	type = "PICKUP_FLOOR",
 	group = "inventory",
-	name = "Pickup items",
+	name = _t"Pickup items",
 }
 defineAction{
 	default = { "sym:=d:false:false:false:false" },
 	type = "DROP_FLOOR",
 	group = "inventory",
-	name = "Drop items",
+	name = _t"Drop items",
 }
 
 defineAction{
 	default = { "sym:=w:false:false:false:false", },
 	type = "WEAR_ITEM",
 	group = "inventory",
-	name = "Wield/wear items",
+	name = _t"Wield/wear items",
 }
 defineAction{
 	default = { "sym:=t:false:false:false:false", },
 	type = "TAKEOFF_ITEM",
 	group = "inventory",
-	name = "Takeoff items",
+	name = _t"Takeoff items",
 }
 
 defineAction{
 	default = { "sym:=u:false:false:false:false", },
 	type = "USE_ITEM",
 	group = "inventory",
-	name = "Use items",
+	name = _t"Use items",
 }
 
 defineAction{
 	default = { "sym:=q:false:false:false:false", },
 	type = "QUICK_SWITCH_WEAPON",
 	group = "inventory",
-	name = "Quick switch weapons set",
+	name = _t"Quick switch weapons set",
 }

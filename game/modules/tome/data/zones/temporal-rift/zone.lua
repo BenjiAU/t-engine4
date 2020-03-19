@@ -18,13 +18,13 @@
 -- darkgod@te4.org
 
 return {
-	name = "Temporal Rift",
+	name = _t"Temporal Rift",
 	display_name = function(x, y)
-		if game.level.level == 2 then return "Temporal Rift: Lumberjack village"
-		elseif game.level.level == 3 then return "Temporal Rift: Daikara"
-		elseif game.level.level == 4 then return "Temporal Rift: Lake of Nur"
+		if game.level.level == 2 then return _t"Temporal Rift: Lumberjack village"
+		elseif game.level.level == 3 then return _t"Temporal Rift: Daikara"
+		elseif game.level.level == 4 then return _t"Temporal Rift: Lake of Nur"
 		end
-		return "Temporal Rift"
+		return _t"Temporal Rift"
 	end,
 	variable_zone_name = true,
 	level_range = {16, 30},
@@ -132,18 +132,18 @@ return {
 
 		local Dialog = require("engine.ui.Dialog")
 		if lev == 1 and not game.level.shown_warning then
-			Dialog:simplePopup("Temporal Rift", "Space and time distort and lose meaning as you pass through the rift. This place is alien.")
+			Dialog:simplePopup(_t"Temporal Rift", _t"Space and time distort and lose meaning as you pass through the rift. This place is alien.")
 			game.level.shown_warning = true
 		elseif lev == 2 and not game.level.shown_warning then
-			Dialog:simplePopup("Temporal Rift", "This looks like Maj'Eyal's forest but it looks strangely distorted, beware...")
+			Dialog:simplePopup(_t"Temporal Rift", _t"This looks like Maj'Eyal's forest but it looks strangely distorted, beware...")
 			game.level.shown_warning = true
 			require("mod.class.generator.actor.Random").new(game.zone, game.level.map, game.level, {}):generateGuardian("BEN_CRUTHDAR_ABOMINATION")
 		elseif lev == 3 and not game.level.shown_warning then
-			Dialog:simplePopup("Temporal Rift", "As you pass the rift you see what seems to be the Daikara mountains, yet they are not.")
+			Dialog:simplePopup(_t"Temporal Rift", _t"As you pass the rift you see what seems to be the Daikara mountains, yet they are not.")
 			game.level.shown_warning = true
 			require("mod.class.generator.actor.Random").new(game.zone, game.level.map, game.level, {}):generateGuardian("ABOMINATION_RANTHA")
 		elseif lev == 4 and not game.level.shown_warning then
-			Dialog:simplePopup("Temporal Rift", "The peace of this place has been disturbed.")
+			Dialog:simplePopup(_t"Temporal Rift", _t"The peace of this place has been disturbed.")
 			game.level.shown_warning = true
 
 			local m1 = game.zone:makeEntityByName(game.level, "actor", "CHRONOLITH_TWIN")

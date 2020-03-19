@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	name = "Old ruins",
+	name = _t"Old ruins",
 	level_range = {1, 1},
 	max_level = 10,
 	decay = {300, 800},

@@ -22,56 +22,56 @@ defineAction{
 	default = { "sym:_LEFT:false:false:false:false", "sym:_KP_4:false:false:false:false" },
 	type = "MOVE_LEFT",
 	group = "movement",
-	name = "Move left",
+	name = _t"Move left",
 }
 defineAction{
 	default = { "sym:_RIGHT:false:false:false:false", "sym:_KP_6:false:false:false:false" },
 	type = "MOVE_RIGHT",
 	group = "movement",
-	name = "Move right",
+	name = _t"Move right",
 }
 defineAction{
 	default = { "sym:_UP:false:false:false:false", "sym:_KP_8:false:false:false:false" },
 	type = "MOVE_UP",
 	group = "movement",
-	name = "Move up",
+	name = _t"Move up",
 }
 defineAction{
 	default = { "sym:_DOWN:false:false:false:false", "sym:_KP_2:false:false:false:false" },
 	type = "MOVE_DOWN",
 	group = "movement",
-	name = "Move down",
+	name = _t"Move down",
 }
 defineAction{
 	default = { "sym:_KP_7:false:false:false:false" },
 	type = "MOVE_LEFT_UP",
 	group = "movement",
-	name = "Move diagonally left and up",
+	name = _t"Move diagonally left and up",
 }
 defineAction{
 	default = { "sym:_KP_9:false:false:false:false" },
 	type = "MOVE_RIGHT_UP",
 	group = "movement",
-	name = "Move diagonally right and up",
+	name = _t"Move diagonally right and up",
 }
 defineAction{
 	default = { "sym:_KP_1:false:false:false:false" },
 	type = "MOVE_LEFT_DOWN",
 	group = "movement",
-	name = "Move diagonally left and down",
+	name = _t"Move diagonally left and down",
 }
 defineAction{
 	default = { "sym:_KP_3:false:false:false:false" },
 	type = "MOVE_RIGHT_DOWN",
 	group = "movement",
-	name = "Move diagonally right and down",
+	name = _t"Move diagonally right and down",
 }
 
 defineAction{
 	default = { "sym:_KP_5:false:false:false:false" },
 	type = "MOVE_STAY",
 	group = "movement",
-	name = "Stay for a turn",
+	name = _t"Stay for a turn",
 }
 
 -- Running
@@ -79,61 +79,61 @@ defineAction{
 	default = { "sym:=.:false:false:false:false" },
 	type = "RUN",
 	group = "movement",
-	name = "Run",
+	name = _t"Run",
 }
 defineAction{
 	default = { "sym:_LEFT:false:true:false:false", "sym:_KP_4:false:true:false:false" },
 	type = "RUN_LEFT",
 	group = "movement",
-	name = "Run left",
+	name = _t"Run left",
 }
 defineAction{
 	default = { "sym:_RIGHT:false:true:false:false", "sym:_KP_6:false:true:false:false" },
 	type = "RUN_RIGHT",
 	group = "movement",
-	name = "Run right",
+	name = _t"Run right",
 }
 defineAction{
 	default = { "sym:_UP:false:true:false:false", "sym:_KP_8:false:true:false:false" },
 	type = "RUN_UP",
 	group = "movement",
-	name = "Run up",
+	name = _t"Run up",
 }
 defineAction{
 	default = { "sym:_DOWN:false:true:false:false", "sym:_KP_2:false:true:false:false" },
 	type = "RUN_DOWN",
 	group = "movement",
-	name = "Run down",
+	name = _t"Run down",
 }
 defineAction{
 	default = { "sym:_KP_7:false:true:false:false" },
 	type = "RUN_LEFT_UP",
 	group = "movement",
-	name = "Run diagonally left and up",
+	name = _t"Run diagonally left and up",
 }
 defineAction{
 	default = { "sym:_KP_9:false:true:false:false" },
 	type = "RUN_RIGHT_UP",
 	group = "movement",
-	name = "Run diagonally right and up",
+	name = _t"Run diagonally right and up",
 }
 defineAction{
 	default = { "sym:_KP_1:false:true:false:false" },
 	type = "RUN_LEFT_DOWN",
 	group = "movement",
-	name = "Run diagonally left and down",
+	name = _t"Run diagonally left and down",
 }
 defineAction{
 	default = { "sym:_KP_3:false:true:false:false" },
 	type = "RUN_RIGHT_DOWN",
 	group = "movement",
-	name = "Run diagonally right and down",
+	name = _t"Run diagonally right and down",
 }
 defineAction{
 	default = { "sym:_z:false:false:false:false" },
 	type = "RUN_AUTO",
 	group = "movement",
-	name = "Auto-explore",
+	name = _t"Auto-explore",
 }
 
 -- Character movements with classic WASD

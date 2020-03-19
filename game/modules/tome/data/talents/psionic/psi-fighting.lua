@@ -61,7 +61,7 @@ newTalent{
 		If your mainhand weapon hits, you will also stun the target for %d turns.
 		This attack uses 60%% of your Willpower and Cunning instead of Strength and Dexterity to determine weapon damage and accuracy, for both attacks.
 		Any active Aura damage bonusses will extend to the weapons used for this attack.]]):
-		format(100 * self:combatTalentWeaponDamage(t, 0.9, 1.5), t.duration(self,t))
+		tformat(100 * self:combatTalentWeaponDamage(t, 0.9, 1.5), t.duration(self,t))
 	end,
 }
 
@@ -107,7 +107,7 @@ newTalent{
 		return ([[While active, you give your flesh and blood body a boost in the form of precisely applied mental forces. Increases Strength and Dexterity by %d%% of your Willpower and Cunning, respectively.
 		Strength increased by %d
 		Dexterity increased by %d]]):
-		format(inc*100, str_power, dex_power)
+		tformat(inc*100, str_power, dex_power)
 	end,
 }
 
@@ -132,7 +132,7 @@ newTalent{
 		At raw talent level 3 you will also disarm the attacker for 3 turns.
 		At raw talent level 5 you will be able to reflexively block up to one attack per turn with a %d%% chance, based on your cunning. Each trigger requires and uses 10 Psi.
 		This requires a telekinetically-wielded weapon.]]):
-		format(100 * t.getWeaponDamage(self, t), t.getChance(self, t))
+		tformat(100 * t.getWeaponDamage(self, t), t.getChance(self, t))
 	end,
 }
 
@@ -183,7 +183,7 @@ newTalent{
 				local eff = rng.tableRemove(effs)
 
 				if eff[1] == "effect" then
-					game.logSeen(self, "#CRIMSON#%s shatters %s shield!", self.name:capitalize(), target.name)
+					game.logSeen(self, "#CRIMSON#%s shatters %s shield!", self:getName():capitalize(), target:getName())
 					target:removeEffect(eff[2])
 				end
 			end
@@ -195,6 +195,6 @@ newTalent{
 		This deals %d%% weapon damage and then causes the victim to bleed for %0.1f Physical damage over four turns.
 		At level 3 the thrust is so powerful that it has %d%% chance to shatter a temporary damage shield if one exists.
 		The bleeding damage increases with your Mindpower.]]):
-		format(100 * t.getWeaponDamage(self, t), damDesc(self, DamageType.PHYSICAL, t.getDamage(self,t)), t.getShatter(self, t))
+		tformat(100 * t.getWeaponDamage(self, t), damDesc(self, DamageType.PHYSICAL, t.getDamage(self,t)), t.getShatter(self, t))
 	end,
 }

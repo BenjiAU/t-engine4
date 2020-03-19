@@ -17,10 +17,10 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "Back and Back and Back to the Future"
+name = _t"Back and Back and Back to the Future"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "After passing through some kind of time anomaly you met a temporal warden who told you to destroy the abominations of this alternate timeline.\n"
+	desc[#desc+1] = _t"After passing through some kind of time anomaly you met a temporal warden who told you to destroy the abominations of this alternate timeline.\n"
 	return table.concat(desc, "\n")
 end
 
@@ -29,7 +29,7 @@ on_status_change = function(self, who, status, sub)
 		if self:isCompleted("twin") and self:isCompleted("clone") then
 			who:setQuestStatus(self.id, engine.Quest.DONE)
 			local Chat = require "engine.Chat"
-			local chat = Chat.new("temporal-rift-end", {name="Temporal Warden"}, who)
+			local chat = Chat.new("temporal-rift-end", {name=_t"Temporal Warden"}, who)
 			chat:invoke()
 		end
 	end

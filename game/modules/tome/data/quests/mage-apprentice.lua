@@ -17,14 +17,14 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
-name = "An apprentice task"
+name = _t"An apprentice task"
 desc = function(self, who)
 	local desc = {}
-	desc[#desc+1] = "You met a novice mage who was tasked to collect an arcane powered artifact."
-	desc[#desc+1] = "He asked for your help, should you collect some that you do not need."
+	desc[#desc+1] = _t"You met a novice mage who was tasked to collect an arcane powered artifact."
+	desc[#desc+1] = _t"He asked for your help, should you collect some that you do not need."
 	if self:isCompleted() then
 	else
-		desc[#desc+1] = "#SLATE#* Collect an artifact arcane powered item.#WHITE#"
+		desc[#desc+1] = _t"#SLATE#* Collect an artifact arcane powered item.#WHITE#"
 	end
 	return table.concat(desc, "\n")
 end
@@ -42,7 +42,7 @@ on_status_change = function(self, who, status, sub)
 end
 
 collect_staff_unique = function(self, npc, who, dialog)
-	who:showInventory("Offer which item?", who:getInven("INVEN"),
+	who:showInventory(_t"Offer which item?", who:getInven("INVEN"),
 		function(o) return (o.power_source and o.power_source.arcane and o.unique) or (o.define_as == "STAFF_ABSORPTION")
 		end,
 		function(o, item)

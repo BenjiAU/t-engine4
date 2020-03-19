@@ -32,18 +32,18 @@ function _M:init(on_change)
 
 	local w, h, fullscreen, borderless = core.display.size()
 
-	Dialog.init(self, "Switch Resolution", 300, 20)
+	Dialog.init(self, _t"Switch Resolution", 300, 20)
 
 	self.c_list = List.new{width=self.iw, nb_items=#self.list, list=self.list, fct=function(item) self:use(item) end}
-	self.c_fs = Checkbox.new{title="Fullscreen", default=fullscreen,
+	self.c_fs = Checkbox.new{title=_t"Fullscreen", default=fullscreen,
 		fct=function() end,
 		on_change=function(s) if s then self.c_wn.checked = false self.c_bl.checked = false  end end
 	}
-	self.c_bl = Checkbox.new{title="Borderless", default=borderless,
+	self.c_bl = Checkbox.new{title=_t"Borderless", default=borderless,
 		fct=function() end,
 		on_change=function(s) if s then self.c_wn.checked = false self.c_fs.checked = false end end
 	}
-	self.c_wn = Checkbox.new{title="Windowed", default=not borderless and not fullscreen,
+	self.c_wn = Checkbox.new{title=_t"Windowed", default=not borderless and not fullscreen,
 		fct=function() end,
 		on_change=function(s) if s then self.c_fs.checked = false self.c_bl.checked = false end end
 	}
@@ -73,12 +73,12 @@ function _M:use(item)
 	-- See if we need a restart (confirm).
 	if core.display.setWindowSizeRequiresRestart(w, h, self.c_fs.checked
 		, self.c_bl.checked) then
-		Dialog:yesnoPopup("Engine Restart Required"
-			, "Continue?" .. (game.creating_player and "" or " (progress will be saved)")
+		Dialog:yesnoPopup(_t"Engine Restart Required"
+			, ("Continue? %s"):tformat(game.creating_player and "" or _t" (progress will be saved)")
 			, function(restart)
 				if restart then
-					local resetPos = Dialog:yesnoPopup("Reset Window Position?"
-						, "Simply restart or restart+reset window position?"
+					local resetPos = Dialog:yesnoPopup(_t"Reset Window Position?"
+						, _t"Simply restart or restart+reset window position?"
 						, function(simplyRestart)
 							if not simplyRestart then
 								core.display.setWindowPos(0, 0)
@@ -90,9 +90,9 @@ function _M:use(item)
 							util.showMainMenu(false, nil, nil
 								, game.__mod_info.short_name, game.save_name
 								, false)
-						end, "Restart", "Restart with reset")
+						end, _t"Restart", _t"Restart with reset")
 				end
-			end, "Yes", "No")
+			end, _t"Yes", _t"No")
 	else
 		game:setResolution(r, true)
 	end

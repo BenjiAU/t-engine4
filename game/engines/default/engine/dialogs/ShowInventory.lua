@@ -33,16 +33,16 @@ function _M:init(title, inven, filter, action, actor)
 	self.filter = filter
 	self.action = action
 	self.actor = actor
-	Dialog.init(self, title or "Inventory", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
+	Dialog.init(self, title or _t"Inventory", math.max(800, game.w * 0.8), math.max(600, game.h * 0.8))
 
 	self.c_desc = TextzoneList.new{width=math.floor(self.iw / 2 - 10), height=self.ih, no_color_bleed=true}
 
 	self.c_list = ListColumns.new{width=math.floor(self.iw / 2 - 10), height=self.ih - 10, sortable=true, scrollbar=true, columns={
-		{name="", width={20,"fixed"}, display_prop="char", sort="id"},
-		{name="", width={24,"fixed"}, display_prop="object", sort="sortname", direct_draw=function(item, x, y) item.object:toScreen(nil, x+4, y, 16, 16) end},
-		{name="Inventory", width=72, display_prop="name", sort="sortname"},
-		{name="Category", width=20, display_prop="cat", sort="cat"},
-		{name="Enc.", width=8, display_prop="encumberance", sort="encumberance"},
+		{name=_t"", width={20,"fixed"}, display_prop="char", sort="id"},
+		{name=_t"", width={24,"fixed"}, display_prop="object", sort="sortname", direct_draw=function(item, x, y) item.object:toScreen(nil, x+4, y, 16, 16) end},
+		{name=_t"Inventory", width=72, display_prop="name", sort="sortname"},
+		{name=_t"Category", width=20, display_prop="cat", sort="cat"},
+		{name=_t"Enc.", width=8, display_prop="encumberance", sort="encumberance"},
 	}, list={}, fct=function(item) self:use(item) end, select=function(item, sel) self:select(item) end}
 
 	self:generateList()
@@ -98,7 +98,7 @@ function _M:generateList()
 			local enc = 0
 			o:forAllStack(function(o) enc=enc+o.encumber end)
 
-			list[#list+1] = { id=i, char=char, name=o:getName(), sortname=o:getName():toString():removeColorCodes(), color=o:getDisplayColor(), object=o, item=item, cat=o.subtype, encumberance=enc, desc=o:getDesc() }
+			list[#list+1] = { id=i, char=char, name=o:getName(), sortname=o:getName():toString():removeColorCodes(), color=o:getDisplayColor(), object=o, item=item, cat=_t(o.subtype, "entity subtype"), encumberance=enc, desc=o:getDesc() }
 			list.chars[char] = #list
 			i = i + 1
 		end

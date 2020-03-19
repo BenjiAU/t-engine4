@@ -48,11 +48,11 @@ function _M:init(title, store_inven, actor_inven, store_filter, actor_filter, ac
 	local vsep = Separator.new{dir="horizontal", size=self.ih - 10}
 	self.c_inven = Inventory.new{actor=actor_actor, inven=actor_inven, filter=actor_filter, width=math.floor(self.iw / 2 - vsep.w / 2), height=self.ih - 10,
 		columns={
-			{name="", width={30,"fixed"}, display_prop="char", sort="id"},
-			{name="", width={24,"fixed"}, display_prop="object", direct_draw=function(item, h) if item.object then return item.object:getDO(h, h) end end},
-			{name="Inventory", width=80, display_prop="name", sort="name"},
-			{name="Category", width=20, display_prop="cat", sort="cat"},
-			{name="Price", width={70,"fixed"}, display_prop=function(item) return self.descprice("sell", item.object) end, sort=function(a, b) return descprice("sell", a.object) < descprice("sell", b.object) end},
+			{name=_t"", width={30,"fixed"}, display_prop="char", sort="id"},
+			{name=_t"", width={24,"fixed"}, display_prop="object", direct_draw=function(item, h) if item.object then return item.object:getDO(h, h) end end},
+			{name=_t"Inventory", width=80, display_prop="name", sort="name"},
+			{name=_t"Category", width=20, display_prop="cat", sort="cat"},
+			{name=_t"Price", width={70,"fixed"}, display_prop=function(item) return self.descprice("sell", item.object) end, sort=function(a, b) return descprice("sell", a.object) < descprice("sell", b.object) end},
 		},
 		fct=function(item, sel, button, event) self:use(item, button, event) end,
 		select=function(item, sel) self:select(item) end,
@@ -63,11 +63,11 @@ function _M:init(title, store_inven, actor_inven, store_filter, actor_filter, ac
 
 	self.c_store = Inventory.new{actor=store_actor, inven=store_inven, filter=store_filter, width=math.floor(self.iw / 2 - vsep.w / 2), height=self.ih - 10, tabslist=false,
 		columns={
-			{name="", width={30,"fixed"}, display_prop="char", sort="id"},
-			{name="", width={24,"fixed"}, display_prop="object", direct_draw=function(item, h) if item.object then return item.object:getDO(h, h) end end},
-			{name="Store", width=80, display_prop="name"},
-			{name="Category", width=20, display_prop="cat"},
-			{name="Price", width={70,"fixed"}, display_prop=function(item) return self.descprice("buy", item.object) end, sort=function(a, b) return descprice("buy", a.object) < descprice("buy", b.object) end},
+			{name=_t"", width={30,"fixed"}, display_prop="char", sort="id"},
+			{name=_t"", width={24,"fixed"}, display_prop="object", direct_draw=function(item, h) if item.object then return item.object:getDO(h, h) end end},
+			{name=_t"Store", width=80, display_prop="name"},
+			{name=_t"Category", width=20, display_prop="cat"},
+			{name=_t"Price", width={70,"fixed"}, display_prop=function(item) return self.descprice("buy", item.object) end, sort=function(a, b) return descprice("buy", a.object) < descprice("buy", b.object) end},
 		},
 		fct=function(item, sel, button, event) self:use(item, button, event) end,
 		select=function(item, sel) self:select(item) end,
@@ -149,7 +149,7 @@ function _M:on_register()
 end
 
 function _M:getStoreTitle()
-	return self.base_title..(" (pays up to %0.2f gold, Your Gold: %0.2f)"):format(self.store_actor.store.purse, self.actor_actor.money)
+	return self.base_title..(" (pays up to %0.2f gold, Your Gold: %0.2f)"):tformat(self.store_actor.store.purse, self.actor_actor.money)
 end
 
 function _M:updateStore()
