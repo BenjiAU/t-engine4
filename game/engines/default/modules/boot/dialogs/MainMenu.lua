@@ -218,7 +218,7 @@ function _M:updateUI()
 ----------------------------
 ----------------------------DGDGDGDG remove this
 ----------------------------
--- [[
+--[[
 	local LayoutContainer = require "engine.ui.LayoutContainer"
 
 	local tree = {}
@@ -255,14 +255,14 @@ function _M:updateUI()
 		{left=0, top=0, ui=lay},
 		{right=0, top=0, ui=lay2},
 	}
-
 	self.allow_scroll = true
-	self:loadUI(uis)
-	self:setupUI(true, false)
 --]]
 ----------------------------
 ----------------------------
 ----------------------------
+
+	self:loadUI(uis)
+	self:setupUI(true, false)
 
 
 	-- self:loadUI(uis)
