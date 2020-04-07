@@ -917,7 +917,7 @@ function _M:instanciate(mod, name, new_game, no_reboot, extra_module_info)
 	core.game.resetLocale()
 
 	-- Reset white space breaking
-	core.display.breakTextAllCharacter(true)
+	core.display.breakTextAllCharacter(false)
 
 	-- Turn based by default
 	core.game.setRealtime(0)
@@ -940,6 +940,7 @@ function _M:instanciate(mod, name, new_game, no_reboot, extra_module_info)
 	-- Load localizations
 	if mod.i18n_support and config.settings.locale then
 		I18N:loadLocale("/data/locales/"..config.settings.locale..".lua")
+		I18N:resetBreakTextAllCharacter()
 	end
 
 	-- Load font packages

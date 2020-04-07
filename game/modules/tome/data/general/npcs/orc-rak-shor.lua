@@ -62,7 +62,7 @@ newEntity{ base = "BASE_NPC_ORC_RAK_SHOR",
 	combat_armor = 0, combat_def = 5,
 
 	soul = resolvers.rngavg(5, 10),
-
+--[[DGDGDGDG
 	resolvers.talents{
 		[Talents.T_NECROTIC_AURA] = 1,
 		[Talents.T_AURA_MASTERY] = 5,
@@ -79,6 +79,7 @@ newEntity{ base = "BASE_NPC_ORC_RAK_SHOR",
 		[Talents.T_FORGERY_OF_HAZE]={base=3, every=5, max=7},
 		[Talents.T_FROSTDUSK]={base=3, every=5, max=7},
 	},
+]]
 	resolvers.sustains_at_birth(),
 }
 

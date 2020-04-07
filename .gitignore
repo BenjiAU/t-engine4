@@ -11,6 +11,10 @@ out*.avi
 out*.ogv
 *recompile.sh
 *.so
+/lib64
+/t-engine64
+/tmp
+/diff.diff
 te4_log_web.txt
 t-engine
 tengine_doc
@@ -32,6 +36,8 @@ profiling-recompile.sh
 recompile.sh
 *.exe
 *.dll
+/*.so
 te4_log.txt
 debug.log
 /.idea/
+/*.log

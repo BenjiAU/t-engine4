@@ -17,6 +17,9 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
+-- DGDGDGDG
+do return end
+
 local Talents = require("engine.interface.ActorTalents")
 
 newEntity{

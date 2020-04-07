@@ -1341,6 +1341,19 @@ function _M:processEffects(update_shape_only)
 	end
 end
 
+function _M:removeEffect(e)
+	if e.particles then
+		for j, ps in ipairs(e.particles) do self:removeParticleEmitter(ps) end
+	end
+	if e.overlay then
+		self.z_effects[e.overlay.zdepth][e] = nil
+	end
+	for i, ee in ipairs(self.effects) do if ee == e then
+		table.remove(self.effects, i)
+		break
+	end end
+end
+
 --- Returns the first effect matching the given damage type, if any
 function _M:hasEffectType(x, y, type)
 	for i, e in ipairs(self.effects) do

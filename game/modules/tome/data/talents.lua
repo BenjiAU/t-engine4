@@ -71,6 +71,11 @@ Talents.newTalent = function(self, t)
 		t.name = ("#SANDY_BROWN# (Race Evolution)"):tformat(_t(t.name))
 	end
 
+	-- Generate easier, reverse parameters, calls for methods
+	for k, e in pairsclone(t) do if type(e) == "function" and type(k) == "string" then
+		t["_"..k] = function(t, self, ...) return e(self, t, ...) end
+	end end
+
 	return oldNewTalent(self, t)
 end
 
@@ -93,8 +98,27 @@ damDesc = function(self, type, dam)
 
 	-- Increases damage
 	if self.inc_damage then
-		local inc = self:combatGetDamageIncrease(type)
-		dam = dam + (dam * inc / 100)
+		if _G.type(type) == "string" then
+			local dt = DamageType:get(type)
+			if dt.damdesc_split then
+				if _G.type(dt.damdesc_split) == "function" then
+					type = dt.damdesc_split(self, type, dam)
+				else
+					type = dt.damdesc_split
+				end
+			end
+		end
+
+		if _G.type(type) == "table" then
+			local basedam = dam
+			for _, ds in ipairs(type) do
+				local inc = self:combatGetDamageIncrease(ds[1])
+				dam = dam + (basedam * inc / 100) * ds[2]
+			end
+		else
+			local inc = self:combatGetDamageIncrease(type)
+			dam = dam + (dam * inc / 100)
+		end
 	end
 	return dam
 end

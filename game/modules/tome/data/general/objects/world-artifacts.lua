@@ -4508,7 +4508,8 @@ newEntity{ base = "BASE_LITE", --Thanks Grayswandir!
 		resists_pen = {[DamageType.COLD]=10},
 
 		talent_cd_reduction = {
-			[Talents.T_CHILL_OF_THE_TOMB] = 2,
+			-- DGDGDGDG !!!!
+			-- [Talents.T_CHILL_OF_THE_TOMB] = 2,
 		},
 	},
 	max_power = 20, power_regen = 1,

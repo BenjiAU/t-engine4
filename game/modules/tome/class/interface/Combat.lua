@@ -1697,9 +1697,8 @@ function _M:combatDamagePower(weapon_combat, add)
 	return (math.sqrt(power / 10) - 1) * 0.5 + 1
 end
 
-function _M:combatPhysicalpower(mod, weapon, add)
+function _M:combatPhysicalpowerRaw(weapon, add)
 	if self.combat_precomputed_physpower then return self.combat_precomputed_physpower end
-	mod = mod or 1
 	add = add or 0
 
 	if self.combat_generic_power then
@@ -1737,6 +1736,13 @@ function _M:combatPhysicalpower(mod, weapon, add)
 
 	if self:attr("hit_penalty_2h") then d = d * (1 - math.max(0, 20 - (self.size_category - 4) * 5) / 100) end
 
+	return d
+end
+
+function _M:combatPhysicalpower(mod, weapon, add)
+	mod = mod or 1
+	local d = self:combatPhysicalpowerRaw(weapon, add)
+
 	if self:knowTalent(self.T_ARCANE_MIGHT) then
 		return self:combatSpellpower(mod, d) -- will do the rescaling and multiplying for us
 	else
@@ -1752,10 +1758,9 @@ function _M:combatTalentPhysicalDamage(t, base, max)
 	return self:rescaleDamage((base + (self:combatPhysicalpower())) * ((math.sqrt(self:getTalentLevel(t)) - 1) * 0.8 + 1) * mod)
 end
 
---- Gets spellpower
-function _M:combatSpellpower(mod, add)
+--- Gets spellpower raw
+function _M:combatSpellpowerRaw(add)
 	if self.combat_precomputed_spellpower then return self.combat_precomputed_spellpower end
-	mod = mod or 1
 	add = add or 0
 
 	if self.combat_generic_power then
@@ -1783,6 +1788,13 @@ function _M:combatSpellpower(mod, add)
 
 	if self:attr("hit_penalty_2h") then d = d * (1 - math.max(0, 20 - (self.size_category - 4) * 5) / 100) end
 
+	return d, am
+end
+
+--- Gets spellpower
+function _M:combatSpellpower(mod, add)
+	mod = mod or 1
+	local d, am = self:combatSpellpowerRaw(add)
 	return self:rescaleCombatStats(d) * mod * am
 end
 
@@ -2069,10 +2081,9 @@ function _M:spellFriendlyFire()
 end
 
 --- Gets mindpower
-function _M:combatMindpower(mod, add)
+function _M:combatMindpowerRaw(add)
 	if self.combat_precomputed_mindpower then return self.combat_precomputed_mindpower end
 
-	mod = mod or 1
 	add = add or 0
 
 	if self.combat_generic_power then
@@ -2104,6 +2115,13 @@ function _M:combatMindpower(mod, add)
 
 	if self:attr("hit_penalty_2h") then d = d * (1 - math.max(0, 20 - (self.size_category - 4) * 5) / 100) end
 
+	return d
+end
+
+--- Gets mindpower
+function _M:combatMindpower(mod, add)
+	mod = mod or 1
+	local d = self:combatMindpowerRaw(add)
 	return self:rescaleCombatStats(d) * mod
 end
 
@@ -2147,9 +2165,9 @@ function _M:combatStatTalentIntervalDamage(t, stat, min, max, stat_weight)
 	return self:rescaleDamage(min + (max - min)*((stat_weight * self[stat](self)/100) + (1 - stat_weight) * self:getTalentLevel(t)/6.5))
 end
 
---- Computes physical resistance
+--- Computes physical resistance (before scaling)
 --- Fake denotes a check not actually being made, used by character sheets etc.
-function _M:combatPhysicalResist(fake, add)
+function _M:combatPhysicalResistRaw(fake, add)
 	add = add or 0
 	if not fake then
 		add = add + (self:checkOnDefenseCall("physical") or 0)
@@ -2165,8 +2183,13 @@ function _M:combatPhysicalResist(fake, add)
 	local d = self.combat_physresist + (self:getCon() + self:getStr() + (self:getLck() - 50) * 0.5) * 0.35 + add
 	if self:attr("dazed") then d = d / 2 end
 
+	return d
+end
 
-	local total = self:rescaleCombatStats(d)
+--- Computes physical resistance (before scaling)
+--- Fake denotes a check not actually being made, used by character sheets etc.
+function _M:combatPhysicalResist(fake, add)
+	local total = self:rescaleCombatStats(self:combatPhysicalResistRaw(fake, add))
 
 	-- Psionic Balance
 	if self:knowTalent(self.T_BALANCE) then
@@ -2177,9 +2200,9 @@ function _M:combatPhysicalResist(fake, add)
 	return total
 end
 
---- Computes spell resistance
+--- Computes spell resistance raw
 --- Fake denotes a check not actually being made, used by character sheets etc.
-function _M:combatSpellResist(fake, add)
+function _M:combatSpellResistRaw(fake, add)
 	add = add or 0
 	if not fake then
 		add = add + (self:checkOnDefenseCall("spell") or 0)
@@ -2194,7 +2217,14 @@ function _M:combatSpellResist(fake, add)
 	-- To return later
 	local d = self.combat_spellresist + (self:getMag() + self:getWil() + (self:getLck() - 50) * 0.5) * 0.35 + add
 	if self:attr("dazed") then d = d / 2 end
-	local total = self:rescaleCombatStats(d)
+
+	return d
+end
+
+--- Computes spell resistance
+--- Fake denotes a check not actually being made, used by character sheets etc.
+function _M:combatSpellResist(fake, add)
+	local total = self:rescaleCombatStats(self:combatSpellResistRaw(fake, add))
 
 	-- Psionic Balance
 	if self:knowTalent(self.T_BALANCE) then
@@ -2205,9 +2235,9 @@ function _M:combatSpellResist(fake, add)
 	return total
 end
 
---- Computes mental resistance
+--- Computes mental resistance raw
 --- Fake denotes a check not actually being made, used by character sheets etc.
-function _M:combatMentalResist(fake, add)
+function _M:combatMentalResistRaw(fake, add)
 	add = add or 0
 	if not fake then
 		add = add + (self:checkOnDefenseCall("mental") or 0)
@@ -2230,7 +2260,14 @@ function _M:combatMentalResist(fake, add)
 	if nm and rng.percent(20) and not fake then
 		d = d * (1-self.tempeffect_def.EFF_CURSE_OF_NIGHTMARES.getVisionsReduction(nm, nm.level)/100)
 	end
-	return self:rescaleCombatStats(d)
+
+	return d
+end
+
+--- Computes mental resistance
+--- Fake denotes a check not actually being made, used by character sheets etc.
+function _M:combatMentalResist(fake, add)
+	return self:rescaleCombatStats(self:combatMentalResistRaw(fake, add))
 end
 
 -- Called when a Save or Defense is checked
@@ -2301,7 +2338,7 @@ end
 --- Returns the damage increase
 function _M:combatGetDamageIncrease(type, straight)
 	local a = self.inc_damage.all or 0
-	local b = self.inc_damage[type] or 0
+	local b = type ~= "all" and self.inc_damage[type] or 0
 	local inc = a + b
 	if straight then return inc end
 

@@ -3750,3 +3750,32 @@ newTalent{
 		tformat(radius, 1 + (damage / 4), (damDesc (self, DamageType.LIGHT, damage)), (damDesc (self, DamageType.FIRE, damage)), duration)
 	end,
 }
+
+newTalent{
+	name = "Blur Sight",
+	type = {"spell/other", 1},
+	mode = "sustained",
+	points = 5,
+	sustain_mana = 30,
+	cooldown = 10,
+	tactical = { BUFF = 2 },
+	getDefense = function(self, t) return self:combatScale(self:getTalentLevel(t)*self:combatSpellpower(), 0, 0, 28.6, 267, 0.75) end,
+	activate = function(self, t)
+		game:playSoundNear(self, "talents/heal")
+		return {
+			particle = self:addParticles(Particles.new("phantasm_shield", 1)),
+			def = self:addTemporaryValue("combat_def", t.getDefense(self, t)),
+		}
+	end,
+	deactivate = function(self, t, p)
+		self:removeParticles(p.particle)
+		self:removeTemporaryValue("combat_def", p.def)
+		return true
+	end,
+	info = function(self, t)
+		local defence = t.getDefense(self, t)
+		return ([[The caster's image blurs, granting a %d bonus to Defense.
+		The bonus will increase with your Spellpower.]]):
+		format(defence)
+	end,
+}

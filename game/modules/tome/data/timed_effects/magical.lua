@@ -254,6 +254,36 @@ newEffect{
 }
 
 newEffect{
+	name = "GREATER_INVISIBILITY", image = "effects/invisibility.png",
+	desc = "Invisibility",
+	long_desc = function(self, eff) return ("Improves/gives invisibility (power %d), and increases damage dealt to blind or dazzled creatures by %d%%."):format(eff.power, eff.dam) end,
+	type = "magical",
+	subtype = { phantasm=true, invisibility=true },
+	status = "beneficial",
+	parameters = { power=10, dam=10 },
+	on_gain = function(self, err) return "#Target# vanishes from sight.", "+Invis" end,
+	on_lose = function(self, err) return "#Target# is no longer invisible.", "-Invis" end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "invisible", eff.power)
+		self:effectTemporaryValue(eff, "blind_inc_damage", eff.dam)
+		if not self.shader then
+			eff.set_shader = true
+			self.shader = "invis_edge"
+			self:removeAllMOs()
+			game.level.map:updateMap(self.x, self.y)
+		end
+	end,
+	deactivate = function(self, eff)
+		if eff.set_shader then
+			self.shader = nil
+			self:removeAllMOs()
+			game.level.map:updateMap(self.x, self.y)
+		end
+		self:resetCanSeeCacheOf()
+	end,
+}
+
+newEffect{
 	name = "INVISIBILITY", image = "effects/invisibility.png",
 	desc = _t"Invisibility",
 	long_desc = function(self, eff) return ("Improves/gives invisibility (power %d), reducing damage dealt by %d%%%s."):tformat(eff.power, eff.penalty*100, eff.regen and _t" and preventing healing and life regeneration" or "") end,
@@ -4546,5 +4576,248 @@ newEffect{
 	on_lose = function(self, err) return nil, true end,
 	activate = function(self, eff)
 		self:effectTemporaryValue(eff, "inc_damage", {[DamageType.PHYSICAL] = eff.power})
+	end,
+}
+
+newEffect{
+	name = "DAZZLED",
+	desc = _t"Dazzled",
+	long_desc = function(self, eff) return ("All damage decreased by %d%%."):format(eff.power) end,
+	type = "magical",
+	subtype = { stun=true,},
+	status = "detrimental",
+	parameters = {power=10},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "generic_damage_penalty", eff.power)
+	end,
+}
+
+newEffect{
+	name = "LICH_RESISTED", image = "talents/lichform.png",
+	desc = _t"Immune to Frightening Presence",
+	long_desc = function(self, eff) return _t"You resisted a Lich and are immune to its frightening presence." end,
+	type = "magical",
+	subtype = { lich=true, fear=true},
+	status = "beneficial",
+	parameters = {},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		game:onTickEnd(function() self:removeEffect(self.EFF_LICH_FEAR) end)
+	end,
+}
+
+newEffect{
+	name = "ELEMENTAL_MIRAGE1", image = "talents/blur_sight.png",
+	desc = _t"Elemental Mirage (First Element)",
+	long_desc = function(self, eff) return ("%s damage increased by %d%% and resistance penetration by %d%%."):tformat(DamageType:get(eff.dt).name, eff.power, eff.pen or 0) end,
+	type = "magical",
+	subtype = { phantasm=true,},
+	status = "beneficial",
+	parameters = {dt=DamageType.ARCANE, power=10},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "inc_damage", {[eff.dt] = eff.power})
+		if eff.pen then self:effectTemporaryValue(eff, "resists_pen", {[eff.dt] = eff.pen}) end
+	end,
+}
+
+newEffect{
+	name = "LICH_FEAR", image = "talents/lichform.png",
+	desc = _t"Frightening Presence",
+	long_desc = function(self, eff) return ("The mere sight of a Lich sent you into a frightened state, reducing all saves by %d, all damage by %d%% and movement speed by %d%%."):tformat(eff.saves, eff.dam, eff.speed) end,
+	type = "magical",
+	subtype = { lich=true, fear=true},
+	status = "detrimental",
+	parameters = {},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "inc_damage", {all = -eff.dam})
+		self:effectTemporaryValue(eff, "combat_mentalresist", -eff.saves)
+		self:effectTemporaryValue(eff, "combat_physresist", -eff.saves)
+		self:effectTemporaryValue(eff, "combat_spellresist", -eff.saves)
+		self:effectTemporaryValue(eff, "movement_speed", -eff.speed / 100)
+	end,
+}
+
+newEffect{
+	name = "ELEMENTAL_MIRAGE2", image = "talents/alter_mirage.png",
+	desc = _t"Elemental Mirage (Second Element)",
+	long_desc = function(self, eff) return ("%s damage increased by %d%% and resistance penetration by %d%%."):tformat(DamageType:get(eff.dt).name, eff.power, eff.pen or 0) end,
+	type = "magical",
+	subtype = { phantasm=true,},
+	status = "beneficial",
+	parameters = {dt=DamageType.FIRE, power=10},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "inc_damage", {[eff.dt] = eff.power})
+		if eff.pen then self:effectTemporaryValue(eff, "resists_pen", {[eff.dt] = eff.pen}) end
+	end,
+}
+
+newEffect{
+	name = "COMMANDER_OF_THE_DEAD", image = "talents/commander_of_the_dead.png",
+	desc = _t"Commander of the Dead",
+	long_desc = function(self, eff) return ("Physical power, spellpower and all saves increased by %d."):tformat(eff.power) end,
+	type = "magical",
+	subtype = { lich=true, power=true },
+	status = "beneficial",
+	parameters = {},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "combat_mentalresist", eff.power)
+		self:effectTemporaryValue(eff, "combat_physresist", eff.power)
+		self:effectTemporaryValue(eff, "combat_spellresist", eff.power)
+		self:effectTemporaryValue(eff, "combat_generic_power", eff.power)
+	end,
+}
+
+newEffect{
+	name = "CONSUME_SOUL", image = "talents/consume_soul.png",
+	desc = _t"Consume Soul",
+	long_desc = function(self, eff) return ("Spellpower increased by %d."):tformat(eff.power) end,
+	type = "magical",
+	subtype = { necrotic=true },
+	status = "beneficial",
+	parameters = {power=10},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "combat_spellpower", eff.power)
+	end,
+}
+
+newEffect{
+	name = "NECROTIC_AURA", image = "talents/necrotic_aura.png",
+	desc = _t"Necrotic Aura",
+	long_desc = function(self, eff) return ("All resistances increased by %d."):tformat(eff.power) end,
+	type = "magical",
+	subtype = { necrotic=true },
+	status = "beneficial",
+	parameters = {power=10},
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "resists", {all=eff.power})
+	end,
+}
+
+newEffect{
+	name = "LORD_OF_SKULLS", image = "talents/lord_of_skulls.png",
+	desc = _t"Lord of Skulls",
+	long_desc = function(self, eff) return ("Maximum life increased by %d."):tformat(eff.life) end,
+	type = "magical",
+	subtype = { necrotic=true, ["lord of skulls"]=true },
+	status = "beneficial", decrease = 0,
+	parameters = {power=10},
+	on_gain = function(self, err) return _t"#Target# becomes the Lord of Skulls!", true end,
+	on_lose = function(self, err) return _t"#Target# is no more the Lord of Skulls.", true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "max_life", eff.life)
+		self:heal(self.max_life, self)
+
+		self.lord_of_skulls = true
+		self.old_los_name = self.name
+		if self.skeleton_minion == "warrior" then self.name = _t"Lord of Skulls (warrior)"
+		elseif self.skeleton_minion == "archer" then self.name = _t"Lord of Skulls (archer)"
+		elseif self.skeleton_minion == "mage" then self.name = _t"Lord of Skulls (mage)"
+		end
+
+		if eff.talents then
+			if self.skeleton_minion == "warrior" then self:learnTalent(self.T_GIANT_LEAP, true)
+			elseif self.skeleton_minion == "archer" then self:learnTalent(self.T_VITAL_SHOT, true)
+			elseif self.skeleton_minion == "mage" then self:learnTalent(self.T_METEORIC_CRASH, true)
+			end
+		end
+	end,
+	deactivate = function(self, eff)
+		self.lord_of_skulls = false
+		if eff.talents then
+			if self.skeleton_minion == "warrior" then self:unlearnTalent(self.T_GIANT_LEAP, 1)
+			elseif self.skeleton_minion == "archer" then self:unlearnTalent(self.T_VITAL_SHOT, 1)
+			elseif self.skeleton_minion == "mage" then self:unlearnTalent(self.T_METEORIC_CRASH, 1)
+			end
+		end
+		self.name = self.old_los_name
+	end,
+}
+
+newEffect{
+	name = "SPIKE_OF_DECREPITUDE", image = "talents/spikes_of_decrepitude.png",
+	desc = _t"Spike of Decrepitude",
+	long_desc = function(self, eff) return ("Damage reduced by %d%%."):tformat(eff.power) end,
+	type = "magical",
+	subtype = { necrotic=true,},
+	status = "detrimental",
+	parameters = {power=10},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "inc_damage", {all = -eff.power})
+	end,
+}
+
+newEffect{
+	name = "SOUL_LEECH", image = "talents/soul_leech.png",
+	desc = _t"Soul Leech",
+	long_desc = function(self, eff) return _t"Soul absorbed upon death." end,
+	type = "magical",
+	subtype = { necrotic=true,},
+	status = "detrimental",
+	parameters = {},
+	callbackOnDeath = function(self, eff)
+		if eff.src then eff.src:resolveSource():incSoul(1) end
+	end,
+	deactivate = function(self, eff)
+		if eff.src and eff.powerful then eff.src:resolveSource():incSoul(1) end
+	end,
+}
+
+newEffect{
+	name = "CORPSE_EXPLOSION", image = "talents/corpse_explosion.png",
+	desc = _t"Corpse Explosion",
+	long_desc = function(self, eff) return ("When a ghoul is hit or dies, it explodes, doing %0.2f frostdusk damage."):tformat(eff.damage) end,
+	type = "magical",
+	subtype = { necrotic=true, ghoul=true },
+	status = "beneficial",
+	parameters = {damage=10, disease=5, radius=1},
+	callbackPriorities={callbackOnSummonDeath = 100, callbackOnSummonHit = 100}, -- trigger after most others
+	callbackOnSummonDeath = function(self, eff, minion, killer, death_note)
+		local ed = self:getEffectFromId(self.EFF_CORPSE_EXPLOSION)
+		ed.registerHit(self, eff, minion)
+	end,
+	callbackOnSummonHit = function(self, eff, cb, minion, src, death_note)
+		if cb.value <= 0 then return end
+		local ed = self:getEffectFromId(self.EFF_CORPSE_EXPLOSION)
+		ed.registerHit(self, eff, minion)
+	end,
+	callbackOnActBase = function(self, eff)
+		if #eff.turn_list == 0 then return end
+		table.sort(eff.turn_list, function(a, b) return a.creation_turn < b.creation_turn end)
+		local m = eff.turn_list[1]
+		if m.x then
+			if not m.dead then m:die(self) end
+			game.logSeen(m, "#GREY#%s explodes in a blast of gore!", m:getName():capitalize())
+			game.level.map:particleEmitter(m.x, m.y, eff.radius, "pustulent_fulmination", {radius=eff.radius})
+			game:playSoundNear(m, "talents/slime")
+			m:project({type="ball", radius=eff.radius, friendlyfire=false}, m.x, m.y, DamageType.FROSTDUSK, self:spellCrit(eff.damage))
+			local diseases = {{self.EFF_WEAKNESS_DISEASE, "str"}, {self.EFF_ROTTING_DISEASE, "con"}, {self.EFF_DECREPITUDE_DISEASE, "dex"}}
+			m:projectApply({type="ball", radius=eff.radius, friendlyfire=false}, m.x, m.y, Map.ACTOR, function(target)
+				local disease = rng.table(diseases)
+				game.log("============== %s", disease[1])
+				target:setEffect(disease[1], 6, {src=self, dam=eff.damage / 6, [disease[2]]=eff.disease, apply_power=self:combatSpellpower()})
+			end)
+		end
+		eff.turn_list = {}
+	end,
+	registerHit = function(self, eff, minion)
+		eff.turn_list[#eff.turn_list+1] = minion
+	end,
+	activate = function(self, eff)
+		eff.turn_list = {}
 	end,
 }

@@ -115,6 +115,12 @@ function _M:loadLocale(file)
 	print("[I18N] Loaded locale file:", file)
 end
 
+function _M:resetBreakTextAllCharacter()
+	if _getFlagI18N("break_text_all_character") then
+		core.display.breakTextAllCharacter(true)
+	end
+end
+
 function _M:setLocale(lc)
 	cur_locale_name = lc
 	if not locales[lc] then locales[lc] = {} end

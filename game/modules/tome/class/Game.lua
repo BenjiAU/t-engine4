@@ -228,6 +228,7 @@ function _M:newGame()
 			self.zone.object_list[#self.zone.object_list+1] = o
 		end
 
+		self.player.innate_player = true
 		if config.settings.cheat then self.player.__cheated = true end
 
 		if game.__mod_info then
@@ -2013,14 +2014,14 @@ function _M:setupCommands()
 			print("===============")
 		end end,
 		[{"_g","ctrl"}] = function() if config.settings.cheat then
+			game.player:takeHit(100, game.player)
+do return end
 			self:changeLevel(game.level.level + 1)
 do return end
 			local f, err = loadfile("/data/general/events/weird-pedestals.lua")
 			print(f, err)
 			setfenv(f, setmetatable({level=self.level, zone=self.zone}, {__index=_G}))
 			print(pcall(f))
-do return end
-			game.player:takeHit(100, game.player)
 do return end
 			package.loaded["mod.dialogs.shimmer.ShimmerDemo"] = nil
 			self:registerDialog(require("mod.dialogs.shimmer.ShimmerDemo").new(game.player, "iron throne couture: "))
@@ -2466,8 +2467,39 @@ do return end
 		self.player:activateHotkey(i)
 	end, function() return self.player.allow_talents_worldmap end))
 
+	self:setupWASD()
 	self.key:setCurrent()
 	self.gamepad:setCurrent()
+end
+
+function _M:setupWASD()
+	self.wasd_state = {}
+	local function handle_wasd()
+		local ws = self.wasd_state
+		if     ws.left  and ws.up   then self.key:triggerVirtual("MOVE_LEFT_UP")
+		elseif ws.right and ws.up   then self.key:triggerVirtual("MOVE_RIGHT_UP")
+		elseif ws.left  and ws.down then self.key:triggerVirtual("MOVE_LEFT_DOWN")
+		elseif ws.right and ws.down then self.key:triggerVirtual("MOVE_RIGHT_DOWN")
+		elseif ws.right             then self.key:triggerVirtual("MOVE_RIGHT")
+		elseif ws.left              then self.key:triggerVirtual("MOVE_LEFT")
+		elseif ws.up                then self.key:triggerVirtual("MOVE_UP")
+		elseif ws.down              then self.key:triggerVirtual("MOVE_DOWN")
+		end
+	end
+
+	if config.settings.tome.use_wasd then
+		self.key:addBinds{
+			MOVE_WASD_UP    = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.up = not isup and true or false end,
+			MOVE_WASD_DOWN  = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.down = not isup and true or false end,
+			MOVE_WASD_LEFT  = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.left = not isup and true or false end,
+			MOVE_WASD_RIGHT = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.right = not isup and true or false end,
+		}
+	else
+		self.key:removeBind("MOVE_WASD_UP")
+		self.key:removeBind("MOVE_WASD_DOWN")
+		self.key:removeBind("MOVE_WASD_LEFT")
+		self.key:removeBind("MOVE_WASD_RIGHT")
+	end
 end
 
 function _M:setupWASD()

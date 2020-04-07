@@ -236,18 +236,6 @@ function _M:use(item)
 		self.actor:check("on_resurrect", "blood_life")
 		self.actor:triggerHook{"Actor:resurrect", reason="blood_life"}
 		game:saveGame()
-	elseif act == "lichform" then
-		local t = self.actor:getTalentFromId(self.actor.T_LICHFORM)
-
-		self:cleanActor(self.actor)
-		self:resurrectBasic(self.actor)
-		self:restoreResources(self.actor)
-		world:gainAchievement("LICHFORM", actor)
-		t.becomeLich(self.actor, t)
-		self.actor:updateModdableTile()
-		self.actor:check("on_resurrect", "lichform")
-		self.actor:triggerHook{"Actor:resurrect", reason="lichform"}
-		game:saveGame()
 	elseif act == "threads" then
 		game:chronoRestore("see_threads_base", true)
 		game:onTickEnd(function()
@@ -308,11 +296,9 @@ function _M:generateList()
 			self.dont_show =true
 			return
 		end
-		if self.actor:isTalentActive(self.actor.T_LICHFORM) then
-			self:use{action="lichform"}
-			self.dont_show = true
-			return
-		end
+		
+		if self.actor:fireTalentCheck("callbackOnDeathbox", self, list) then return end
+
 		if self.actor:attr("easy_mode_lifes") or self.actor:attr("infinite_lifes") then
 			self:use{action="easy_mode"}
 			self.dont_show = true
@@ -329,8 +315,6 @@ function _M:generateList()
 				self.possible_items.consume = true
 			end
 		end)
-
-		self.actor:fireTalentCheck("callbackOnDeathbox", self, list)
 	end
 
 	list[#list+1] = {name=(not profile.auth and _t"Message Log" or _t"Message/Chat log (allows to talk)"), action="log"}
