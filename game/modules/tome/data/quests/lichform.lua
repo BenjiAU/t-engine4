@@ -18,14 +18,13 @@
 -- darkgod@te4.org
 
 name = _t"From Death, Life"
-stables = 0
 desc = function(self, who)
 	local desc = {}
 	desc[#desc+1] = _t"The affairs of this mortal world are trifling compared to your true goal: To conquer death."
 	desc[#desc+1] = _t"Your studies have uncovered much surrounding this subject, but now you must prepare for your glorious rebirth."
 	desc[#desc+1] = _t"You will need:"
 
-	if who.level >= 20 then desc[#desc+1] = _t"#LIGHT_GREEN#* You are experienced enough.#WHITE#"
+	if who.level >= 25 then desc[#desc+1] = _t"#LIGHT_GREEN#* You are experienced enough.#WHITE#"
 	else desc[#desc+1] = _t"#SLATE#* The ceremony will require that you are worthy, experienced, and possessed of a certain amount of power#WHITE#" end
 
 	if self:isCompleted("heart") then desc[#desc+1] = _t"#LIGHT_GREEN#* You have 'extracted' the heart of one of your fellow necromancers.#WHITE#"
@@ -57,7 +56,7 @@ end
 
 check_lichform = function(self, who)
 	if self:isStatus(self.DONE) then return end
-	if who.level < 20 then return end
+	if who.level < 25 then return end
 	if not self:isCompleted("heart") then return end
 	local q = who:hasQuest("shertul-fortress")
 	if not q then return end

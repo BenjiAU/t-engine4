@@ -17,9 +17,6 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
--- DGDGDGDG
-do return end
-
 local Talents = require("engine.interface.ActorTalents")
 
 newEntity{
@@ -49,7 +46,8 @@ newEntity{
 
 	resolvers.talents{
 		[Talents.T_BLURRED_MORTALITY]={base=1, every=7, max=6},
-		[Talents.T_VAMPIRIC_GIFT]={base=1, every=7, max=6},
+		[Talents.T_ETERNAL_NIGHT]={base=1, every=7, max=6},
+		[Talents.T_SOUL_LEECH]={base=1, every=7, max=6},
 	},
 
 	resists = { [DamageType.COLD] = 80, [DamageType.NATURE] = 80, [DamageType.LIGHT] = -50,  },
@@ -106,7 +104,7 @@ newEntity{ base = "BASE_NPC_VAMPIRE",
 		[Talents.T_BLUR_SIGHT]={base=2, every=7, max=5},
 		[Talents.T_PHANTASMAL_SHIELD]={base=1, every=7, max=5},
 		[Talents.T_ROTTING_DISEASE]={base=2, every=7, max=5},
-		[Talents.T_COLD_FLAMES]={base=1, every=7, max=6},
+		[Talents.T_CHILL_OF_THE_TOMB]={base=1, every=7, max=6},
 	},
 }
 
@@ -128,7 +126,7 @@ It can summon the very shades of its victims from beyond the grave to come ensla
 		[Talents.T_BLUR_SIGHT]={base=3, every=7, max=7},
 		[Talents.T_PHANTASMAL_SHIELD]={base=2, every=7, max=6},
 		[Talents.T_ROTTING_DISEASE]={base=3, every=7, max=7},
-		[Talents.T_FORGERY_OF_HAZE]={base=2, every=7, max=5},
+		[Talents.T_DIRE_PLAGUE]={base=2, every=7, max=5},
 	},
 	ingredient_on_death = "ELDER_VAMPIRE_BLOOD",
 }
@@ -145,13 +143,14 @@ newEntity{ base = "BASE_NPC_VAMPIRE",
 	resolvers.inscriptions(1, "rune"),
 	summon = {{type="undead", number=1, hasxp=false}, },
 	resolvers.talents{
-		[Talents.T_FORGERY_OF_HAZE]={base=2, every=7, max=6},
+		[Talents.T_DIRE_PLAGUE]={base=2, every=7, max=6},
 		[Talents.T_IMPENDING_DOOM]={base=2, every=7, max=6},
 		[Talents.T_STUN]={base=4, every=7, max=8},
 		[Talents.T_SUMMON]=1,
 		[Talents.T_BLUR_SIGHT]={base=4, every=7, max=8},
 		[Talents.T_PHANTASMAL_SHIELD]={base=5, every=7, max=8},
 		[Talents.T_ROTTING_DISEASE]={base=5, every=7, max=8},
+		[Talents.T_HIEMAL_SHIELD]={base=5, every=7, max=8},
 	},
 	make_escort = {
 		{type="undead", number=resolvers.mbonus(2, 2)},

@@ -512,7 +512,9 @@ newEffect{
 	on_gain = function(self, err) return _t"#Target# loses sight!", _t"+Blind" end,
 	on_lose = function(self, err) return _t"#Target# recovers sight.", _t"-Blind" end,
 	on_timeout = function(self, eff)
+		self.turn_procs.doing_bane_damage = true
 		DamageType:get(DamageType.DARKNESS).projector(eff.src, self.x, self.y, DamageType.DARKNESS, eff.dam)
+		self.turn_procs.doing_bane_damage = false
 	end,
 	activate = function(self, eff)
 		eff.tmpid = self:addTemporaryValue("blind", 1)
@@ -542,7 +544,9 @@ newEffect{
 	on_gain = function(self, err) return _t"#Target# wanders around!.", _t"+Confused" end,
 	on_lose = function(self, err) return _t"#Target# seems more focused.", _t"-Confused" end,
 	on_timeout = function(self, eff)
+		self.turn_procs.doing_bane_damage = true
 		DamageType:get(DamageType.DARKNESS).projector(eff.src, self.x, self.y, DamageType.DARKNESS, eff.dam)
+		self.turn_procs.doing_bane_damage = false
 	end,
 	activate = function(self, eff)
 		eff.power = math.floor(util.bound(eff.power, 0, 50))
@@ -726,8 +730,8 @@ newEffect{
 		end
 	end,
 	activate = function(self, eff)
-		if self:attr("shield_factor") then eff.power = eff.power * (100 + self:attr("shield_factor")) / 100 end
-		if self:attr("shield_dur") then eff.dur = eff.dur + self:attr("shield_dur") end
+		eff.power = self:getShieldAmount(eff.power)
+		eff.dur = self:getShieldDuration(eff.dur)
 		self.displacement_shield = eff.power
 		self.displacement_shield_max = eff.power
 		self.displacement_shield_chance = eff.chance
@@ -767,16 +771,8 @@ newEffect{
 	on_lose = function(self, err) return _t"The shield around #target# crumbles.", _t"-Shield" end,
 	on_merge = function(self, old_eff, new_eff)
 		local new_eff_adj = {} -- Adjust for shield modifiers
-		if self:attr("shield_factor") then
-			new_eff_adj.power = new_eff.power * (100 + self:attr("shield_factor")) / 100
-		else
-			new_eff_adj.power = new_eff.power
-		end
-		if self:attr("shield_dur") then
-			new_eff_adj.dur = new_eff.dur + self:attr("shield_dur")
-		else
-			new_eff_adj.dur = new_eff.dur
-		end
+		new_eff_adj.power = self:getShieldAmount(new_eff.power)
+		new_eff_adj.dur = self:getShieldDuration(new_eff.dur)
 		-- If the new shield would be stronger than the existing one, just replace it
 		if old_eff.dur > new_eff_adj.dur then return old_eff end
 		if math.max(self.damage_shield_absorb, self.damage_shield_absorb_max) <= new_eff_adj.power then
@@ -832,8 +828,8 @@ newEffect{
 	end,
 	activate = function(self, eff)
 		self:removeEffect(self.EFF_PSI_DAMAGE_SHIELD)
-		if self:attr("shield_factor") then eff.power = eff.power * (100 + self:attr("shield_factor")) / 100 end
-		if self:attr("shield_dur") then eff.dur = eff.dur + self:attr("shield_dur") end
+		eff.power = self:getShieldAmount(eff.power)
+		eff.dur = self:getShieldDuration(eff.dur)
 		eff.tmpid = self:addTemporaryValue("damage_shield", eff.power)
 		if eff.reflect then eff.refid = self:addTemporaryValue("damage_shield_reflect", eff.reflect) end
 		--- Warning there can be only one time shield active at once for an actor
@@ -2001,7 +1997,7 @@ newEffect{
 newEffect{
 	name = "IMPENDING_DOOM", image = "talents/impending_doom.png",
 	desc = _t"Impending Doom",
-	long_desc = function(self, eff) return ("The target's final doom is drawing near, reducing healing factor by 80%% and dealing %0.2f arcane damage per turn. The effect will stop if the caster dies."):tformat(eff.dam) end,
+	long_desc = function(self, eff) return ("The target's final doom is drawing near, reducing healing factor by 80%% and dealing %0.2f frostdusk damage per turn. The effect will stop if the caster dies."):tformat(eff.dam) end,
 	type = "magical",
 	subtype = { arcane=true },
 	status = "detrimental",
@@ -2010,10 +2006,16 @@ newEffect{
 	on_lose = function(self, err) return _t"#Target# is freed from the impending doom.", _t"-Doomed" end,
 	activate = function(self, eff)
 		eff.healid = self:addTemporaryValue("healing_factor", -0.8)
+		eff.soul_turn = false
 	end,
 	on_timeout = function(self, eff)
 		if eff.src.dead or not game.level:hasEntity(eff.src) then return true end
-		DamageType:get(DamageType.ARCANE).projector(eff.src, self.x, self.y, DamageType.ARCANE, eff.dam)
+		DamageType:get(DamageType.FROSTDUSK).projector(eff.src, self.x, self.y, DamageType.FROSTDUSK, eff.dam)
+		eff.soul_turn = not eff.soul_turn
+		if eff.soul_turn then
+			eff.src:incSoul(1)
+			game.logSeen(self, "#CRIMSON#A piece of the soul of %s is torn apart by Impending Doom!", self:getName())
+		end
 	end,
 	deactivate = function(self, eff)
 		self:removeTemporaryValue("healing_factor", eff.healid)
@@ -2023,18 +2025,30 @@ newEffect{
 newEffect{
 	name = "RIGOR_MORTIS", image = "talents/rigor_mortis.png",
 	desc = _t"Rigor Mortis",
-	long_desc = function(self, eff) return ("The target takes %d%% more damage from necrotic minions."):tformat(eff.power) end,
+	long_desc = function(self, eff) return ("The target is slowed by %d%%."):tformat(eff.power*100) end,
 	type = "magical",
-	subtype = { arcane=true },
+	subtype = { necrotic=true },
 	status = "detrimental",
-	parameters = {power=20},
+	parameters = {power=0.25},
 	on_gain = function(self, err) return _t"#Target# feels death coming!", _t"+Rigor Mortis" end,
 	on_lose = function(self, err) return _t"#Target# is freed from the rigor mortis.", _t"-Rigor Mortis" end,
 	activate = function(self, eff)
-		eff.tmpid = self:addTemporaryValue("inc_necrotic_minions", eff.power)
+		self:effectTemporaryValue(eff, "global_speed_add", -eff.power)
 	end,
-	deactivate = function(self, eff)
-		self:removeTemporaryValue("inc_necrotic_minions", eff.tmpid)
+}
+
+newEffect{
+	name = "DEATH_RUSH", image = "talents/utterly_destroyed.png",
+	desc = _t"Death Rush",
+	long_desc = function(self, eff) return ("Movement speed increased by %d%%."):tformat(eff.power*100) end,
+	type = "magical",
+	subtype = { necrotic=true },
+	status = "beneficial",
+	parameters = {power=0.5},
+	on_gain = function(self, err) return _t"#Target# is invogorated by death!", true end,
+	on_lose = function(self, err) return _t"#Target# is less fast.", true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "movement_speed", eff.power)
 	end,
 }
 
@@ -4236,8 +4250,8 @@ newEffect{
 		end
 	end,
 	activate = function(self, eff)
-		if self:attr("shield_factor") then eff.power = eff.power * (100 + self:attr("shield_factor")) / 100 end
-		if self:attr("shield_dur") then eff.dur = eff.dur + self:attr("shield_dur") end
+		eff.power = self:getShieldAmount(eff.power)
+		eff.dur = self:getShieldDuration(eff.dur)
 		eff.max = eff.power
 		if core.shader.active(4) then
 			eff.particle = self:addParticles(Particles.new("shader_shield", 1, {size_factor=1.3, img="runicshield_stonewarden"}, {type="runicshield", shieldIntensity=0.2, oscillationSpeed=4, ellipsoidalFactor=1.3, time_factor=9000, auraColor={0x61/255, 0xff/255, 0x6a/255, 0}}))
@@ -4733,6 +4747,18 @@ newEffect{
 			elseif self.skeleton_minion == "mage" then self:learnTalent(self.T_METEORIC_CRASH, true)
 			end
 		end
+
+		local image
+		if self.skeleton_minion == "warrior" then image = "npc/lord_of_skulls_warrior.png"
+		elseif self.skeleton_minion == "archer" then image = "npc/lord_of_skulls_archer.png"
+		elseif self.skeleton_minion == "mage" then image = "npc/lord_of_skulls_magus.png"
+		end
+
+		self.replace_display = mod.class.Actor.new{
+			image = image, display_y = -1, display_h = 2
+		}
+		self:removeAllMOs()
+		game.level.map:updateMap(self.x, self.y)
 	end,
 	deactivate = function(self, eff)
 		self.lord_of_skulls = false
@@ -4743,6 +4769,9 @@ newEffect{
 			end
 		end
 		self.name = self.old_los_name
+		self.replace_display = nil
+		self:removeAllMOs()
+		game.level.map:updateMap(self.x, self.y)
 	end,
 }
 
@@ -4770,10 +4799,14 @@ newEffect{
 	status = "detrimental",
 	parameters = {},
 	callbackOnDeath = function(self, eff)
-		if eff.src then eff.src:resolveSource():incSoul(1) end
+		if self.turn_procs.soul_leeched then return end
+		self.turn_procs.soul_leeched = true
+		if eff.src then eff.src:resolveSource():callTalent(eff.src:resolveSource().T_SOUL_LEECH, "gainSoul", self, "death") end
 	end,
 	deactivate = function(self, eff)
-		if eff.src and eff.powerful then eff.src:resolveSource():incSoul(1) end
+		if self.turn_procs.soul_leeched then return end
+		self.turn_procs.soul_leeched = true
+		if eff.src and eff.powerful then eff.src:resolveSource():callTalent(eff.src:resolveSource().T_SOUL_LEECH, "gainSoul", self, "periodic") end
 	end,
 }
 
@@ -4797,18 +4830,17 @@ newEffect{
 	end,
 	callbackOnActBase = function(self, eff)
 		if #eff.turn_list == 0 then return end
-		table.sort(eff.turn_list, function(a, b) return a.creation_turn < b.creation_turn end)
+		table.sort(eff.turn_list, function(a, b) return (a.creation_turn or 0) < (b.creation_turn or 0) end)
 		local m = eff.turn_list[1]
 		if m.x then
 			if not m.dead then m:die(self) end
 			game.logSeen(m, "#GREY#%s explodes in a blast of gore!", m:getName():capitalize())
-			game.level.map:particleEmitter(m.x, m.y, eff.radius, "pustulent_fulmination", {radius=eff.radius})
+			game.level.map:particleEmitter(m.x, m.y, eff.radius, "corpse_explosion", {radius=eff.radius})
 			game:playSoundNear(m, "talents/slime")
 			m:project({type="ball", radius=eff.radius, friendlyfire=false}, m.x, m.y, DamageType.FROSTDUSK, self:spellCrit(eff.damage))
 			local diseases = {{self.EFF_WEAKNESS_DISEASE, "str"}, {self.EFF_ROTTING_DISEASE, "con"}, {self.EFF_DECREPITUDE_DISEASE, "dex"}}
 			m:projectApply({type="ball", radius=eff.radius, friendlyfire=false}, m.x, m.y, Map.ACTOR, function(target)
 				local disease = rng.table(diseases)
-				game.log("============== %s", disease[1])
 				target:setEffect(disease[1], 6, {src=self, dam=eff.damage / 6, [disease[2]]=eff.disease, apply_power=self:combatSpellpower()})
 			end)
 		end
@@ -4819,5 +4851,361 @@ newEffect{
 	end,
 	activate = function(self, eff)
 		eff.turn_list = {}
+	end,
+}
+
+newEffect{
+	name = "BRITTLE_BONES", image = "talents/boneyard.png",
+	desc = _t"Brittle Bones",
+	long_desc = function(self, eff) return ("Physical resistance reduced by %d%% and talents cooldowns increased by %d%%."):tformat(eff.resist, eff.cooldown) end,
+	type = "magical",
+	subtype = { necrotic=true, resistance=true, cooldown=true },
+	status = "detrimental",
+	parameters = {resist=10, cooldown=20},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "resists", {[DamageType.PHYSICAL] = -eff.resist})
+		self:effectTemporaryValue(eff, "talent_cd_reduction", {allpct = -eff.cooldown/100})
+	end,
+}
+
+newEffect{
+	name = "BONEYARD", image = "talents/boneyard.png",
+	desc = _t"Boneyard",
+	long_desc = function(self, eff) return ("Spellpower and physical power increased by %d."):tformat(eff.power) end,
+	type = "magical",
+	subtype = { necrotic=true, power=true },
+	status = "beneficial",
+	parameters = {power=10},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "combat_spellpower", eff.power)
+		self:effectTemporaryValue(eff, "combat_dam", eff.power)
+	end,
+}
+
+newEffect{
+	name = "NEVERENDING_PERIL", image = "talents/neverending_peril.png",
+	desc = _t"Neverending Peril",
+	long_desc = function(self, eff) return _t"Invulnerable." end,
+	type = "magical",
+	subtype = { necrotic=true, invulnerable=true },
+	status = "beneficial",
+	parameters = {},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "invulnerable", 1)
+	end,
+}
+
+newEffect{
+	name = "GOLDEN_AGE_OF_NECROMANCY", image = "talents/golden_age_of_necromancy.png",
+	desc = _t"Golden Age of Necromancy",
+	long_desc = function(self, eff) return _t"Invulnerable." end,
+	type = "magical",
+	subtype = { necrotic=true, invulnerable=true },
+	status = "beneficial",
+	parameters = {},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "invulnerable", 1)
+	end,
+}
+
+newEffect{
+	name = "CHILL_OF_THE_TOMB", image = "talents/chill_of_the_tomb.png",
+	desc = _t"Chill of the Tomb",
+	long_desc = function(self, eff) return ("Reduces all damage by %d."):tformat(eff.power) end,
+	type = "magical",
+	subtype = { necrotic=true, flat=true },
+	status = "beneficial",
+	parameters = {},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "flat_damage_armor", {all=eff.power})
+	end,
+}
+
+newEffect{
+	name = "BLACK_ICE", image = "talents/black_ice.png",
+	desc = _t"Black Ice",
+	long_desc = function(self, eff) return ("Damage from necrotic minions increased by %d%%."):tformat(eff.power) end,
+	type = "magical",
+	subtype = { necrotic=true, },
+	status = "detrimental",
+	parameters = {},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "inc_necrotic_minions", eff.power)
+	end,
+}
+
+newEffect{
+	name = "CORPSELIGHT", image = "talents/corpselight.png",
+	desc = _t"Corpselight",
+	long_desc = function(self, eff) return ("Sustains a corpselight of radius %d that deals %0.2f cold damage per turn."):tformat(eff.effective_radius, eff.effective_dam) end,
+	type = "magical",
+	subtype = { necrotic=true, cold=true },
+	status = "beneficial",
+	charges = function(self, eff) return math.floor(eff.stacks) end,
+	parameters = {stacks=0, max_stacks=3, dam=20, radius=3},
+	on_gain = function(self, err) return "#Target# summons a corpselight!", true end,
+	on_lose = function(self, err) return nil, true end,
+	callbackOnChangeLevel = function(self, eff, what)
+		if what ~= "leave" then return end
+		self:removeEffect(self.EFF_CORPSELIGHT, true, true)
+	end,
+	explode = function(self, eff)
+		if not self:knowTalent(self.T_GRAVE_MISTAKE) then return end
+		if eff.exploded then return end
+		eff.exploded = true
+		self:callTalent(self.T_GRAVE_MISTAKE, "explode", eff.x, eff.y, eff.effective_radius, eff.stacks)
+	end,
+	callbackOnTalentPost = function(self, eff, ab)
+		if not ab.is_spell or ab.id == self.T_CORPSELIGHT then return end
+		if eff.stacks >= eff.max_stacks then return end
+		local oldradius = math.min(eff.radius + eff.stacks, 10)
+		eff.stacks = eff.stacks + 1
+
+		eff.effective_dam = eff.dam * (1 + eff.stacks * 0.1)
+		eff.effective_radius = math.min(eff.radius + eff.stacks, 10)
+		if eff.effective_radius == oldradius then return end
+
+		game.level.map:removeParticleEmitter(eff.p_wave)
+		eff.p_wave = game.level.map:particleEmitter(eff.x, eff.y, eff.effective_radius, "corpselight_wave", {radius=eff.effective_radius})
+	end,
+	activate = function(self, eff)
+		eff.effective_dam = eff.dam
+		eff.effective_radius = math.min(eff.radius, 10)
+
+		eff.p_static = game.level.map:particleEmitter(eff.x, eff.y, 1, "corpselight", {})
+		eff.p_wave = game.level.map:particleEmitter(eff.x, eff.y, eff.radius, "corpselight_wave", {radius=eff.radius})
+	end,
+	deactivate = function(self, eff, ed)
+		game.level.map:removeParticleEmitter(eff.p_static)
+		game.level.map:removeParticleEmitter(eff.p_wave)
+		ed.explode(self, eff)
+	end,
+	on_timeout = function(self, eff)
+		self:project({type="ball", friendlyfire=false, radius=eff.effective_radius, x=eff.x, y=eff.y}, eff.x, eff.y, DamageType.COLD, eff.effective_dam)
+	end,
+}
+
+newEffect{
+	name = "CREPUSCULE", image = "talents/crepuscule.png",
+	desc = _t"Crepuscule",
+	long_desc = function(self, eff) return _t"Bring the night!" end,
+	type = "magical",
+	subtype = { necrotic=true, darkness=true, blind=true },
+	status = "beneficial",
+	parameters = {},
+	on_gain = function(self, err) return _t"#Target# calls the night!", true end,
+	on_lose = function(self, err) return _t"The eerie night around #target# fades away.", true end,
+	on_timeout = function(self, eff)
+		self:callTalent(self.T_CREPUSCULE, "trigger")
+	end,
+}
+
+newEffect{
+	name = "DIRE_PLAGUE", image = "talents/dire_plague.png",
+	desc = _t"Dire Plague",
+	long_desc = function(self, eff) return ("The target is infected by a plague, doing %0.2f darkness damage per turn with a %d%% chance to rip apart the soul."):tformat(eff.dam, eff.chance) end,
+	type = "magical",
+	subtype = {disease=true, darkness=true},
+	status = "detrimental",
+	parameters = {dam=10, chance=2},
+	on_gain = function(self, err) return _t"#Target# is afflicted by a dire plague!" end,
+	on_lose = function(self, err) return _t"#Target# is free from the dire plague." end,
+	on_timeout = function(self, eff)
+		if self:attr("purify_disease") then self:heal(eff.dam, eff.src)
+		else if eff.dam > 0 then
+			local dam = eff.dam
+			if rng.percent(eff.chance) then
+				eff.src:incSoul(1)
+				game.logSeen(self, "Dire Plague rips out a piece of %s soul!", self:getName())
+
+				if eff.src:knowTalent(eff.src.T_THE_END_OF_ALL_HOPE) then
+					local t_eah = eff.src:getTalentFromId(eff.src.T_THE_END_OF_ALL_HOPE)
+					-- Force a crit
+					dam = eff.src:spellCrit(dam, 100)
+
+					-- Increase durations
+					if not eff.src.turn_procs.end_of_all_hope_trigger then
+						eff.src.turn_procs.end_of_all_hope_trigger = true
+						self:projectApply({type="ball", radius=eff.src:getTalentRadius(t_eah)}, self.x, self.y, Map.ACTOR, function(target)
+							local tareff = target:hasEffect(target.EFF_DIRE_PLAGUE)
+							if tareff then tareff.dur = tareff.dur + t_eah:_getDur(eff.src) end
+						end)
+					end
+
+					-- Trigger a crepuscule beam
+					if eff.src:hasEffect(eff.src.EFF_CREPUSCULE) then eff.src:callTalent(eff.src.T_CREPUSCULE, "trigger", self) end
+				end
+			end
+			DamageType:get(DamageType.DARKNESS).projector(eff.src, self.x, self.y, DamageType.DARKNESS, dam, {from_disease=true})
+		end end
+	end,
+}
+
+newEffect{
+	name = "FROST_CUT", image = "effects/crumbling_earth.png",
+	desc = _t"Frost Cut",
+	long_desc = function(self, eff) return ("Magically frozen wound that deals %0.2f cold damage per turn and movement speed reduced by %d%%."):tformat(eff.power, eff.speed) end,
+	charges = function(self, eff) return (math.floor(eff.power)) end,
+	type = "magical",
+	subtype = { wound=true, cut=true, bleed=true, cold=true },
+	status = "detrimental",
+	parameters = { power=1, speed=10 },
+	on_gain = function(self, err) return _t"#Target# starts to bleed ice.", _t"+Frost Cut" end,
+	on_lose = function(self, err) return _t"#Target# stops bleeding ice.", _t"-Frost Cut" end,
+	on_merge = function(self, old_eff, new_eff)
+		-- Merge the flames!
+		local olddam = old_eff.power * old_eff.dur
+		local newdam = new_eff.power * new_eff.dur
+		local dur = math.ceil((old_eff.dur + new_eff.dur) / 2)
+		old_eff.dur = dur
+		old_eff.power = (olddam + newdam) / dur
+		return old_eff
+	end,
+	activate = function(self, eff)
+		if eff.src and eff.src:knowTalent(self.T_BLOODY_BUTCHER) then
+			local t = eff.src:getTalentFromId(eff.src.T_BLOODY_BUTCHER)
+			local resist = math.min(t.getResist(eff.src, t), math.max(0, self:combatGetResist(DamageType.PHYSICAL)))
+			self:effectTemporaryValue(eff, "resists", {[DamageType.PHYSICAL] = -resist})
+		end
+		self:effectTemporaryValue(eff, "movement_speed", -eff.speed/100)
+	end,
+	on_timeout = function(self, eff)
+		DamageType:get(DamageType.COLD).projector(eff.src or self, self.x, self.y, DamageType.COLD, eff.power)
+	end,
+}
+
+local rime_wraith_def = {
+	type = "magical",
+	subtype = { necrotic=true, cold=true, parasitic=true },
+	status = "neutral",
+	parameters = {},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	callbackOnChangeLevel = function(self, eff, what)
+		if what ~= "leave" then return end
+		self:removeEffect(eff.effect_id, true, true)
+	end,
+	activate = function(self, eff)
+		if core.shader.active() then
+			self:effectParticles(eff, {type="shader_shield", args={toback=false,  size_factor=1.5, img="rime_wraith_tentacle_shader_wings"}, shader={type="tentacles", appearTime=0.6, time_factor=1000, noup=0.0}})
+		end
+	end,
+	on_timeout = function(self, eff)
+		if self:reactionToward(eff.src) > 0 then
+			if not self:hasEffect(self.EFF_HOARFROST_GOOD) then
+				self:setEffect(self.EFF_HOARFROST_GOOD, 3, {dam=eff.dam, resists=eff.resists*2, permafrost=eff.permafrost, permafrost_huge=eff.permafrost_huge})
+			end
+		else
+			if not self:hasEffect(self.EFF_HOARFROST_BAD) then
+				self:setEffect(self.EFF_HOARFROST_BAD, 3, {apply_power=eff.src:combatSpellpower(), slow=eff.slow, resists=eff.resists, permafrost=eff.permafrost, permafrost_huge=eff.permafrost_huge})
+			end
+		end
+		
+		-- JUMP!
+		local list = table.values(self:projectCollect({type="ball", radius=10, selffire=false}, self.x, self.y, Map.ACTOR))
+		if #list == 0 then return end
+		local has = function(t) return t.target:hasEffect(t.target.EFF_HOARFROST_GOOD) or t.target:hasEffect(t.target.EFF_HOARFROST_BAD) end
+		local has_wraith = function(t) return t:hasEffect(t.EFF_RIME_WRAITH) or t:hasEffect(t.EFF_RIME_WRAITH_GELID_HOST) end
+		local list_has, list_not = {}, {}
+		for _, t in ipairs(list) do if has(t) then list_has[#list_has+1] = t else list_not[#list_not+1] = t end end
+		local use_list = #list_not > 0 and list_not or list_has
+
+		local target
+		if eff.src:knowTalent(eff.src.T_FRIGID_PLUNGE) then
+			table.sort(use_list, "dist")
+			while #use_list > 0 do
+				target = table.remove(use_list).target
+				if not (has_wraith(target) and #use_list > 0) then break end
+			end
+		else
+			while #use_list > 0 do
+				target = rng.table(use_list).target
+				if not (has_wraith(target) and #use_list > 0) then break end
+			end
+		end
+		self:removeEffect(eff.effect_id)
+		target:setEffect(eff.effect_id, eff.dur, eff)
+		game.level.map:particleEmitter(self.x, self.y, 1, "rime_wraith_move", {tx=target.x-self.x, ty=target.y-self.y})
+
+		if eff.src:knowTalent(eff.src.T_FRIGID_PLUNGE) then
+			local heal = eff.src:callTalent(eff.src.T_FRIGID_PLUNGE, "getHeal")
+			local dam = eff.src:callTalent(eff.src.T_FRIGID_PLUNGE, "getDamage")
+			eff.src:projectApply({type="beam", range=10, x=self.x, y=self.y}, target.x, target.y, Map.ACTOR, function(m)
+				if eff.src:reactionToward(m) < 0 then
+					DamageType:get(DamageType.COLD).projector(eff.src, m.x, m.y, DamageType.COLD, dam)
+				else
+					m:heal(heal, eff.src)
+				end
+			end)
+		end
+	end,
+}
+newEffect(table.merge(table.clone(rime_wraith_def), {
+	name = "RIME_WRAITH", image = "talents/rime_wraith.png",
+	desc = _t"Rime Wraith",
+	long_desc = function(self, eff) return _t"Host of a Rime Wraith!" end,
+}))
+newEffect(table.merge(table.clone(rime_wraith_def), {
+	name = "RIME_WRAITH_GELID_HOST", image = "talents/rime_wraith.png",
+	desc = _t"Rime Wraith (Gelid Host)",
+	long_desc = function(self, eff) return _t"Host of a Rime Wraith (Gelid Host)!" end,
+}))
+
+newEffect{
+	name = "HOARFROST_GOOD", image = "talents/permafrost.png",
+	desc = _t"Hoarfrost",
+	long_desc = function(self, eff) return ("All damage converted to cold, cold damage increased by %d%%, cold resistance increased by %d%%."):tformat(eff.dam, eff.resists) end,
+	type = "magical",
+	subtype = { necrotic=true, cold=true },
+	status = "beneficial",
+	parameters = {},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "resists", {[DamageType.COLD]=eff.resists})
+		self:effectTemporaryValue(eff, "inc_damage", {[DamageType.COLD]=eff.dam})
+		self:effectTemporaryValue(eff, "all_damage_convert", DamageType.COLD)
+		self:effectTemporaryValue(eff, "all_damage_convert_percent", 100)
+		if eff.permafrost then
+			self:effectTemporaryValue(eff, "combat_spellresist", eff.permafrost)
+			self:effectTemporaryValue(eff, "combat_physresist", eff.permafrost)
+			if eff.permafrost_huge then
+				self:effectTemporaryValue(eff, "healing_factor", 0.15)
+			end
+		end
+	end,
+}
+newEffect{
+	name = "HOARFROST_BAD", image = "talents/permafrost.png",
+	desc = _t"Hoarfrost",
+	long_desc = function(self, eff) return ("Cold resistance reduced by %d%%, movement speed reduced by %d%%."):tformat(eff.resists, eff.slow) end,
+	type = "magical",
+	subtype = { necrotic=true, cold=true },
+	status = "detrimental",
+	parameters = {},
+	on_gain = function(self, err) return nil, true end,
+	on_lose = function(self, err) return nil, true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "resists", {[DamageType.COLD]=-eff.resists})
+		self:effectTemporaryValue(eff, "movement_speed", -eff.slow/100)
+		if eff.permafrost then
+			self:effectTemporaryValue(eff, "combat_spellresist", -eff.permafrost)
+			self:effectTemporaryValue(eff, "combat_physresist", -eff.permafrost)
+			if eff.permafrost_huge then
+				self:effectTemporaryValue(eff, "talent_cd_reduction", {allpct = -0.15})
+			end
+		end
 	end,
 }

@@ -2655,8 +2655,9 @@ newEntity{ base = "BASE_STAFF", define_as = "SET_SCEPTRE_LICH",
 		},
 		talents_types_mastery = {
 			["celestial/star-fury"] = 0.2,
-			["spell/necrotic-minions"] = 0.2,
-			["spell/advanced-necrotic-minions"] = 0.2,
+			["spell/master-of-bones"] = 0.2,
+			["spell/master-of-flesh"] = 0.2,
+			["spell/master-necromancer"] = 0.2,
 		}
 	},
 	on_wear = function(self, who)
@@ -5301,7 +5302,7 @@ newEntity{ base = "BASE_LIGHT_ARMOR", --Thanks SageAcrin!
  		},
  		talents_types_mastery = {
  			["spell/phantasm"] = 0.1,
- 			["spell/shades"] = 0.1,
+ 			["spell/dreadmaster"] = 0.1,
 			["cunning/stealth"] = 0.1,
  		},
 	},

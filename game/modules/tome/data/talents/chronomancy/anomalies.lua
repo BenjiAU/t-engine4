@@ -315,7 +315,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[50%% chance that damage the caster takes will be warped to a set target.
-		Once the maximum damage (%d) is absorbed, the time runs out, or the target dies, the shield will crumble.]]):tformat(getAnomalyDamage(self, t)*2)
+		Once the maximum damage (%d) is absorbed, the time runs out, or the target dies, the shield will crumble.]]):tformat(self:getShieldAmount(getAnomalyDamage(self, t)*2))
 	end,
 }
 

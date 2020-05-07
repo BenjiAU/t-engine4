@@ -206,6 +206,7 @@ function _M:useObject(who, ...)
 	if not game:hasEntity(self) then game:addEntity(self) end
 
 	local reduce = 100 - util.bound(who:attr("use_object_cooldown_reduce") or 0, 0, 100)
+	if self:attr("unaffected_device_mastery") then reduce = 100 end
 	local usepower = function(power) return math.ceil(power * reduce / 100) end
 
 	if self.use_power then
@@ -2053,6 +2054,18 @@ function _M:getTextualDesc(compare_with, use_actor)
 			end
 		end
 		use_actor.__inscription_data_fake = nil
+	end
+
+	if self.wielder and self.wielder.talents_add_levels then
+		for tid, lvl in pairs(self.wielder.talents_add_levels) do
+			local t = use_actor:getTalentFromId(tid)
+			desc:add(lvl < 0 and {"color","FIREBRICK"} or {"color","OLIVE_DRAB"}, ("Talent level: %+d %s."):tformat(lvl, t and t.name or "???"), {"color","LAST"}, true)
+		end
+	end
+	if self.talents_add_levels_filters then
+		for _, data in ipairs(self.talents_add_levels_filters) do
+			desc:add(data.detrimental and {"color","FIREBRICK"} or {"color","OLIVE_DRAB"}, ("Talent level: %s."):tformat(data.desc), {"color","LAST"}, true)
+		end
 	end
 
 	local talents = {}

@@ -145,7 +145,7 @@ newTalent{
 	no_energy = true,
 	tactical = { MANA = 3, DEFEND = 2, },
 	radius = 5,
-	getMaxAbsorb = function(self, t) return self:combatTalentSpellDamage(t, 50, 450) * (100 + (self:attr("shield_factor") or 0)) / 100 end,
+	getMaxAbsorb = function(self, t) return self:getShieldAmount(self:combatTalentSpellDamage(t, 50, 450)) end,
 	getManaRatio = function(self, t) return self:combatTalentLimit(t, 0.2, 1.1, 0.4) end,
 	-- Note: effects handled in mod.class.Actor:onTakeHit function
 	getMaxDamageLimit = function(self, t) return self:combatTalentLimit(t, 1200, 400, 1000) end,

@@ -204,16 +204,6 @@ newEntity{ base = "BASE_NPC_XORN", define_as = "FULL_HARKOR_ZUN",
 	resolvers.sustains_at_birth(),
 
 	on_die = function(self)
-		if profile.mod.allow_build.mage then
-			game:setAllowedBuild("mage_geomancer", true)
-			world:gainAchievement("GEOMANCER", game.player)
-			local p = game.party:findMember{main=true}
-			if p.descriptor.subclass == "Archmage" or p.descriptor.subclass == "Arcane Blade" then
-				if p:knowTalentType("spell/stone") == nil then
-					p:learnTalentType("spell/stone", false)
-					p:setTalentTypeMastery("spell/stone", p.descriptor.subclass == "Archmage" and 1.3 or 1.1)
-				end
-			end
-		end
+		world:gainAchievement("GEOMANCER", game.player)
 	end,
 }

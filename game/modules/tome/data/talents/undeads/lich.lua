@@ -158,7 +158,7 @@ local function createLichShadow(self, level, tCallShadows, tShadowWarriors, tSha
 	local npc = require("mod.class.NPC").new{
 		type = "undead", subtype = "lich shadow",
 		name = "shadow",
-		desc = [[]], image = "npc/undead_shadow_shadow.png",
+		desc = [[]], image = "npc/lich_s_shadow.png",
 		display = 'b', color=colors.BLACK,
 
 		never_anger = true,

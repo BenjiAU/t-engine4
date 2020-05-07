@@ -181,7 +181,7 @@ newTalent{
 		return math.max(1, math.floor(self:combatTalentScale(t, 1, 2, "log")))
 	end,
 	getMax = function(self, t, ignore)
-		local max = math.max(1, math.floor(self:combatTalentScale(t, 1, 7)))
+		local max = math.max(1, math.floor(self:combatTalentScale(t, 1, 4.5)))
 		if ignore then return max end
 		return math.max(0, max - necroArmyStats(self).nb_skeleton)
 	end,
@@ -224,7 +224,7 @@ newTalent{
 		end
 
 		if use_ressource then self:incMana(-util.getval(t.mana, self, t) * (100 + 2 * self:combatFatigue()) / 100) end
-		game:playSoundNear(self, "talents/spell_generic2")
+		game:playSoundNear(self, "talents/skeleton")
 		return true
 	end,
 	info = function(self, t)
@@ -338,6 +338,7 @@ newTalent{
 		--	game.nicer_tiles:updateAround(game.level, px, py)
 		--	game.level.map:updateMap(px, py)
 		end)
+		game:playSoundNear(self, "talents/skeleton")
 		return true
 	end,
 	info = function(self, t)
@@ -500,7 +501,7 @@ newTalent{
 
 		necroSetupSummon(self, def, pos.x, pos.y, lev, nil, true)
 
-		game:playSoundNear(self, "talents/spell_generic2")
+		game:playSoundNear(self, "talents/skeleton")
 		return true
 	end,
 	info = function(self, t)

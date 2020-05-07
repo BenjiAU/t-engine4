@@ -55,6 +55,7 @@ end
 function _M:init(actor, on_finish, on_birth)
 	self.on_birth = on_birth
 	actor.is_dialog_talent_leveling = true
+	actor.disable_talents_add_levels = true
 	actor.no_last_learnt_talents_cap = true
 	self.actor = actor
 	self.unused_stats = self.actor.unused_stats
@@ -154,6 +155,7 @@ end
 function _M:unload()
 	self.actor.is_dialog_talent_leveling = nil
 	self.actor.no_last_learnt_talents_cap = nil
+	self.actor.disable_talents_add_levels = nil
 	self.actor:capLastLearntTalents("class")
 	self.actor:capLastLearntTalents("generic")
 end

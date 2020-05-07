@@ -345,11 +345,11 @@ newInscription{
 	end,
 	info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[Activate the rune to create a protective shield absorbing at most %d damage for %d turns.]]):tformat((data.power + data.inc_stat) * (100 + (self:attr("shield_factor") or 0)) / 100, data.dur)
+		return ([[Activate the rune to create a protective shield absorbing at most %d damage for %d turns.]]):tformat(self:getShieldAmount(data.power + data.inc_stat), self:getShieldDuration(data.dur))
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[absorb %d; dur %d; cd %d]]):tformat((data.power + data.inc_stat) * (100 + (self:attr("shield_factor") or 0)) / 100, data.dur, data.cooldown)
+		return ([[absorb %d; dur %d; cd %d]]):tformat(self:getShieldAmount(data.power + data.inc_stat), self:getShieldDuration(data.dur), data.cooldown)
 	end,
 }
 
@@ -361,27 +361,37 @@ newInscription{
 	allow_autocast = true,
 	no_energy = true,
 	tactical = { DEFEND = 2 },
+	getPower = function(self, t)
+		local data = self:getInscriptionData(t.short_name)
+		if data.power and data.inc_stat then 
+			return data.power + data.inc_stat
+		else
+			return 100+5*self:getMag()
+		end
+	end,
+	getDuration = function(self, t)
+		local data = self:getInscriptionData(t.short_name)
+		return data.dur or 5
+	end,
 	on_pre_use = function(self, t)
 		return not self:hasEffect(self.EFF_DAMAGE_SHIELD)
 	end,
 	action = function(self, t)
-		local data = self:getInscriptionData(t.short_name)
-		local power = 100+5*self:getMag()
-		if data.power and data.inc_stat then power = data.power + data.inc_stat end
-		self:setEffect(self.EFF_DAMAGE_SHIELD, data.dur or 5, {power=power, reflect=100})
+		local power = t.getPower(self, t)
+		local dur = t.getDuration(self, t)
+		self:setEffect(self.EFF_DAMAGE_SHIELD, dur, {power=power, reflect=100})
 		return true
 	end,
 	info = function(self, t)
-		local data = self:getInscriptionData(t.short_name)
-		local power = 100+5*self:getMag()
-		if data.power and data.inc_stat then power = data.power + data.inc_stat end
-		return ([[Activate the rune to create a protective shield absorbing and reflecting at most %d damage for %d turns.]]):tformat(power, data.dur or 5)
+		local power = t.getPower(self, t)
+		local dur = t.getDuration(self, t)
+		return ([[Activate the rune to create a protective shield absorbing and reflecting at most %d damage for %d turns.]]):tformat(self:getShieldAmount(power), self:getShieldDuration(dur))
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		local power = 100+5*self:getMag()
-		if data.power and data.inc_stat then power = data.power + data.inc_stat end
-		return ([[absorb and reflect %d; dur %d; cd %d]]):tformat(power, data.dur or 5, data.cd)
+		local power = t.getPower(self, t)
+		local dur = t.getDuration(self, t)
+		return ([[absorb and reflect %d; dur %d; cd %d]]):tformat(self:getShieldAmount(power), self:getShieldDuration(dur), data.cd)
 	end,
 }
 
@@ -927,6 +937,9 @@ newInscription{
 		local data = self:getInscriptionData(t.short_name)
 		return data.shield + data.inc_stat
 	end,
+	getDuration = function(self, t)
+		return 3
+	end,
 	on_pre_use = function(self, t)
 		if next(self:effectsFilter({type="physical", status="detrimental"}, 1)) then return true end
 		if next(self:effectsFilter({type="magical", status="detrimental"}, 1)) then return true end
@@ -946,7 +959,7 @@ newInscription{
 		if crosstiers == 0 and cleansed == 0 then return nil end
 
 		if cleansed > 0 then
-			self:setEffect(self.EFF_DAMAGE_SHIELD, 3, {power=(data.shield + data.inc_stat) * cleansed})
+			self:setEffect(self.EFF_DAMAGE_SHIELD, t.getDuration(self, t), {power=(data.shield + data.inc_stat) * cleansed})
 		else
 			game:onTickEnd(function() self:alterTalentCoolingdown(t.id, -math.floor((self.talents_cd[t.id] or 0) * 0.75)) end)
 		end
@@ -955,13 +968,13 @@ newInscription{
 	end,
 	info = function(self, t)
 		return ([[Activate the rune to instantly dissipate the energy of your ailments, cleansing all cross tier effects and 1 physical, mental, and magical effect.
-		You use the dissipated energy to create a shield lasting 3 turns and blocking %d damage per debuff cleansed (not counting cross-tier ones).
+		You use the dissipated energy to create a shield lasting %d turns and blocking %d damage per debuff cleansed (not counting cross-tier ones).
 		If there were only cross-tier effects to cleanse, no shield is created and the rune goes on a 75%% reduced cooldown.]])
-		:tformat(t.getShield(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100)
+		:tformat(self:getShieldAmount(t.getShield(self, t)), self:getShieldDuration(t.getDuration(self, t)))
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
-		return ([[absorb %d; cd %d]]):tformat(t.getShield(self, t) * (100 + (self:attr("shield_factor") or 0)) / 100, data.cooldown)
+		return ([[absorb %d; cd %d]]):tformat(self:getShieldAmount(t.getShield(self, t)), data.cooldown)
 	end,
 }
 

@@ -188,5 +188,5 @@ function _M:tooltip(x, y, seen_by)
 end
 
 function _M:die(src)
-	engine.interface.ActorLife.die(self, src)
+	return engine.interface.ActorLife.die(self, src)
 end

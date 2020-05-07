@@ -3144,6 +3144,7 @@ function _M:die(src, death_note)
 	if self.sound_die and (self.unique or rng.chance(5)) then game:playSoundNear(self, self.sound_die) end
 
 	if src and src.fireTalentCheck then src:fireTalentCheck("callbackOnKill", self, death_note) end
+	if src and src.summoner and src.summoner.fireTalentCheck then src.summoner:fireTalentCheck("callbackOnSummonKill", src, self, death_note) end
 
 	return true
 end
@@ -4263,6 +4264,15 @@ function _M:onWear(o, inven_id, bypass_set, silent)
 		-- o.wielder.wielded = true
 	end
 
+	if o.talents_add_levels_filters then
+		self.talents_add_levels_custom = self.talents_add_levels_custom or {}
+		for i = 1, #o.talents_add_levels_filters do
+			local id = util.uuid()
+			self.talents_add_levels_custom[id] = o.talents_add_levels_filters[i].filter
+			o.talents_add_levels_filters[i]._id = id
+		end
+	end
+
 	if o.talent_on_spell then
 		self.talent_on_spell = self.talent_on_spell or {}
 		for i = 1, #o.talent_on_spell do
@@ -4334,6 +4344,14 @@ end
 --- Call when an object is taken off
 function _M:onTakeoff(o, inven_id, bypass_set, silent)
 	engine.interface.ActorInventory.onTakeoff(self, o, inven_id)
+
+	if o.talents_add_levels_filters then
+		self.talents_add_levels_custom = self.talents_add_levels_custom or {}
+		for i = 1, #o.talents_add_levels_filters do
+			local id = o.talents_add_levels_filters[i]._id
+			self.talents_add_levels_custom[id] = nil
+		end
+	end
 
 	if o.talent_on_spell then
 		self.talent_on_spell = self.talent_on_spell or {}
@@ -5113,6 +5131,16 @@ function _M:incMana(mana)
 	return previous_incMana(self, mana)
 end
 
+-- Overwrite incMana for grim shadow
+local previous_incSoul = _M.incSoul
+function _M:incSoul(soul)
+	if soul > 0 and self:isTalentActive(self.T_GRIM_SHADOW) then
+		self:callTalent(self.T_GRIM_SHADOW, "onSoulGain", soul)
+	end
+
+	return previous_incSoul(self, soul)
+end
+
 -- Overwrite incParadox to set up threshold log messages
 local previous_incParadox = _M.incParadox
 
@@ -5639,8 +5667,9 @@ local sustainCallbackCheck = {
 	callbackOnSummonDeath = "talents_on_summon_death",
 	callbackOnDie = "talents_on_die",
 	callbackOnKill = "talents_on_kill",
+	callbackOnSummonKill = "talents_on_summon_kill",
 	callbackOnCombatAttack = "talents_on_combat_attack",
-	callbackOMeleeAttackBonuses = "talents_on_melee_attack_bonus",
+	callbackOnMeleeAttackBonuses = "talents_on_melee_attack_bonus",
 	callbackOnMeleeAttack = "talents_on_melee_attack",
 	callbackOnMeleeHit = "talents_on_melee_hit",
 	callbackOnMeleeMiss = "talents_on_melee_miss",
@@ -6480,6 +6509,21 @@ function _M:startTalentCooldown(t, v)
 	if self.talents_cd[t.id] <= 0 then self.talents_cd[t.id] = nil end
 	self.changed = true
 	if t.cooldownStart then t.cooldownStart(self, t) end
+end
+
+--- Called if a talent level is > 0
+function _M:alterTalentLevelRaw(t, lvl)
+	if t.no_unlearn_last then return lvl end -- Those are dangerous, do not change them
+	if self.talents_add_levels and self.talents_add_levels[t.id] then lvl = lvl + self.talents_add_levels[t.id] end
+	if self:attr("spells_bonus_level") and t.is_spell then lvl = lvl + self:attr("spells_bonus_level") end
+	if self.talents_add_levels_custom and next(self.talents_add_levels_custom) then
+		for id, filter in pairs(self.talents_add_levels_custom) do if type(filter) == "function" then
+			lvl = filter(self, t, lvl) or lvl
+		end end
+	end
+	-- if self:attr("mind_bonus_level") and t.is_mind then lvl = lvl + self:attr("mind_bonus_level") end
+	-- if self:attr("nature_bonus_level") and t.is_nature then lvl = lvl + self:attr("nature_bonus_level") end
+	return lvl
 end
 
 --- Alter the remanining cooldown of a talent
@@ -7791,4 +7835,12 @@ function _M:checkSustainDeactivate(check)
 			if ok then self:forceUseTalent(tid, {ignore_energy=true, ignore_cd=true}) end
 		end
 	end
+end
+
+function _M:getShieldAmount(amount)
+	return amount * (100 + (self:attr("shield_factor") or 0)) / 100
+end
+
+function _M:getShieldDuration(duration)
+	return duration + (self:attr("shield_dur") or 0)
 end

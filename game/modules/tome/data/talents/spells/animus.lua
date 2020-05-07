@@ -38,12 +38,20 @@ newTalent{
 	end,
 	callbackOnDealDamage = function(self, t, val, target, dead, death_note)
 		if dead then
-			self:resolveSource():incSoul(1)
+			t:_gainSoul(self, target, "death")
 		else
 			if target:hasEffect(target.EFF_SOUL_LEECH) then return end -- Dont reset, we want it to exprei to leech
 			local turns, powerful = t.getTurnsByRank(self, t, target)
 			target:setEffect(target.EFF_SOUL_LEECH, turns, {src=self, powerful=powerful})
 		end
+	end,
+	gainSoul = function(self, t, src, mode)
+		if mode == "death" then
+			if src.turn_procs.soul_leeched_death then return end
+			src.turn_procs.soul_leeched_death = true
+		end
+		self:incSoul(1)
+		self:triggerHook{"Necromancer:SoulLeech:GainSoul", src=src}
 	end,
 	info = function(self, t)
 		local npc = mod.class.NPC.new{rank=3.2}
@@ -113,13 +121,14 @@ newTalent{
 			if DamageType:get(DamageType.FROSTDUSK).projector(self, target.x, target.y, DamageType.FROSTDUSK, dam) > 0 then
 				nb = nb + 1
 			end
+			game.level.map:particleEmitter(target.x, target.y, 1, "circle", {oversize=1.7, a=170, base_rot=0, limit_life=12, shader=true, appear=12, speed=0, img="torture_souls_aura", radius=0})
 		end, "hostile")
 		self:incSoul(math.min(nb, t.getNb(self, t)))
 		return true
 	end,
 	info = function(self, t)
 		return ([[Unleash dark forces to all foes in sight that are afflicted by Soul Leech, dealing %0.2f frostdusk damage to them and tearing apart their souls.
-		This returns up to %d souls toyou (based on number of foes hit).
+		This returns up to %d souls to you (based on number of foes hit).
 		The damage increases with your Spellpower.]]):
 		tformat(damDesc(self, DamageType.FROSTDUSK, t.getDamage(self, t)), t.getNb(self, t))
 	end,
@@ -151,8 +160,15 @@ newTalent{
 		self:talentTemporaryValue(p, "max_soul", t.getNb(self, t))
 	end,
 	activate = function(self, t)
+		local ret = {}
 		game:onTickEnd(function() self:updateTalentPassives(t) end)
-		return {}
+
+		if core.shader.active(4) then
+			self:talentParticles(ret, {type="shader_shield", args={toback=true,  size_factor=1.2, img="reaping_shieldwall"}, shader={type="rotatingshield", noup=2.0, time_factor=500, appearTime=0.8}})
+			self:talentParticles(ret, {type="shader_shield", args={toback=false, size_factor=1.2, img="reaping_shieldwall"}, shader={type="rotatingshield", noup=1.0, time_factor=500, appearTime=0.8}})
+		end
+
+		return ret
 	end,
 	deactivate = function(self, t)
 		return true

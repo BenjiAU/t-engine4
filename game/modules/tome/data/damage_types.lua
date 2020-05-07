@@ -4300,11 +4300,73 @@ newDamageType{
 }
 
 newDamageType{
+	name = _t"chill of the tomb", type = "CHILL_OF_THE_TOMB", text_color = "#DARK_BLUE#",
+	projector = function(src, x, y, type, dam, state)
+		state = initState(state)
+		useImplicitCrit(src, state)
+		local target = game.level.map(x, y, Map.ACTOR)
+		if not target then return end
+		local realdam = 0
+		if src:reactionToward(target) < 0 then
+			realdam = DamageType:get(DamageType.COLD).projector(src, x, y, DamageType.COLD, dam.dam, state)
+		elseif target.summoner == src and target.necrotic_minion then
+			target:setEffect(target.EFF_CHILL_OF_THE_TOMB, 4, {power=dam.resist})
+		end
+		return realdam
+	end,
+}
+
+newDamageType{
 	name = _t"putrescent liquefaction", type = "PUTRESCENT_LIQUEFACTION", text_color = "#OLIVE_DRAB#",
 	projector = function(src, x, y, type, dam, state)
 		state = initState(state)
 		useImplicitCrit(src, state)
 		local realdam = DamageType:get(DamageType.FROSTDUSK).projector(src, x, y, DamageType.FROSTDUSK, dam, state)
 		return realdam or 0
+	end,
+}
+
+newDamageType{
+	name = _t"boneyard", type = "BONEYARD", text_color = "#GREY#",
+	projector = function(src, x, y, type, dam, state)
+		state = initState(state)
+		useImplicitCrit(src, state)
+		local target = game.level.map(x, y, Map.ACTOR)
+		if not target then return end
+
+		if src:reactionToward(target) < 0 then
+			target:setEffect(target.EFF_BRITTLE_BONES, 1, {apply_power=src:combatSpellpower(), resist=dam.resist, cooldown=dam.cooldown})
+		elseif target.summoner == src and target.necrotic_minion then
+			target:setEffect(target.EFF_BONEYARD, 1, {power=dam.power})
+		end
+	end,
+}
+
+newDamageType{
+	name = _t"desolate waste", type = "DESOLATE_WASTE", text_color = "#BLUE#",
+	projector = function(src, x, y, type, dam, state)
+		state = initState(state)
+		useImplicitCrit(src, state)
+		local target = game.level.map(x, y, Map.ACTOR)
+		if target and (target.old_x ~= x or target.old_y ~= y) and src:knowTalent(src.T_CRUMBLING_EARTH) and src:reactionToward(target) < 0 then
+			src:callTalent(src.T_CRUMBLING_EARTH, "trigger", target)
+		end
+		return DamageType:get(DamageType.COLD).projector(src, x, y, DamageType.COLD, dam, state)
+	end,
+}
+
+newDamageType{
+	name = _t"desolate waste", type = "HIEMAL_SHIELD", text_color = "#BLUE#",
+	projector = function(src, x, y, type, dam, state)
+		state = initState(state)
+		useImplicitCrit(src, state)
+		local target = game.level.map(x, y, Map.ACTOR)
+		local dam = DamageType:get(DamageType.COLD).projector(src, x, y, DamageType.COLD, dam, state)
+		if dam > 0 and target then
+			local waste = game.level.map:hasEffectType(x, y, DamageType.DESOLATE_WASTE)
+			if waste then
+				src:callTalent(src.T_DESOLATE_WASTE, "trigger")
+			end			
+		end
 	end,
 }

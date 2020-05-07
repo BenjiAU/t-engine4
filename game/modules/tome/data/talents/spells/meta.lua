@@ -196,7 +196,12 @@ newTalent{
 		return count ^.5
 	end },
 	getTalentCount = function(self, t) return math.floor(self:combatTalentScale(t, 2, 7, "log")) end,
-	getMaxLevel = function(self, t) return self:getTalentLevel(t) end,
+	getMaxLevel = function(self, t) return util.bound(math.floor(self:getTalentLevel(t)), 1, 4) end,
+	passives = function(self, t, p)
+		if self:getTalentLevel(t) >= 6 then
+			self:talentTemporaryValue(p, "spells_bonus_level", 1)
+		end
+	end,
 	action = function(self, t)
 		local tids = {}
 		for tid, _ in pairs(self.talents_cd) do
@@ -219,7 +224,9 @@ newTalent{
 	info = function(self, t)
 		local talentcount = t.getTalentCount(self, t)
 		local maxlevel = t.getMaxLevel(self, t)
-		return ([[Your mastery of arcane flows allow you to reset the cooldown of up to %d of your spells (that don't have a fixed cooldown) of tier %d or less.]]):
+		return ([[Your mastery of arcane flows allow you to reset the cooldown of up to %d of your spells (that don't have a fixed cooldown) of tier %d or less.
+		Passive effect:
+		At talent level 6 all known spells are considered one talent level higher when casting them.]]):
 		tformat(talentcount, maxlevel)
 	end,
 }

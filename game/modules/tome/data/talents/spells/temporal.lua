@@ -73,8 +73,8 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		local maxabsorb = t.getMaxAbsorb(self, t)
-		local duration = t.getDuration(self, t)
+		local maxabsorb = self:getShieldAmount(t.getMaxAbsorb(self, t))
+		local duration = self:getShieldDuration(t.getDuration(self, t))
 		local time_reduc = t.getTimeReduction(self,t)
 		return ([[This intricate spell instantly erects a time shield around the caster, preventing any incoming damage and sending it forward in time.
 		Once either the maximum damage (%d) is absorbed, or the time runs out (%d turns), the stored damage will return as a temporal restoration field over time (5 turns).

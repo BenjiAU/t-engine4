@@ -26,6 +26,10 @@ module(..., package.seeall, class.make)
 function _M:onPartyDeath(src, death_note)
 	if self.dead then if game.level:hasEntity(self) then game.level:removeEntity(self, true) end return true end
 
+	-- Die
+	death_note = death_note or {}
+	if not mod.class.Actor.die(self, src, death_note) then return end
+
 	-- Remove from the party if needed
 	if self.remove_from_party_on_death then
 		game.party:removeMember(self, true)
@@ -34,12 +38,8 @@ function _M:onPartyDeath(src, death_note)
 		game.party:setDeathTurn(self, game.turn)
 	end
 
-	-- Die
-	death_note = death_note or {}
-	mod.class.Actor.die(self, src, death_note)
-
 	-- Was not the current player, just die
-	if game.player ~= self then return end
+	if game.player ~= self then return true end
 
 	-- Check for any survivor that can be controlled
 	local game_ender = not game.party:findSuitablePlayer()
@@ -138,4 +138,5 @@ function _M:onPartyDeath(src, death_note)
 			profile.chat.uc_ext:sendKillerLink(msg, short_msg, src)
 		end
 	end
+	return true
 end

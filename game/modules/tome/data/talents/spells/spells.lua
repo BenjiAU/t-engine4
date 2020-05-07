@@ -130,6 +130,7 @@ function necroArmyStats(self)
 			if act.ghoul_minion then stats.nb_ghoul = stats.nb_ghoul + 1 end
 			if act.lord_of_skulls then stats.lord_of_skulls = act end
 			if act.is_bone_giant then stats.bone_giant = act end
+			if act.dread_minion then stats.dread = act end
 			stats.list[#stats.list+1] = act
 		end end
 	else
@@ -139,6 +140,7 @@ function necroArmyStats(self)
 			if act.ghoul_minion then stats.nb_ghoul = stats.nb_ghoul + 1 end
 			if act.lord_of_skulls then stats.lord_of_skulls = act end
 			if act.is_bone_giant then stats.bone_giant = act end
+			if act.dread_minion then stats.dread = act end
 			stats.list[#stats.list+1] = act
 		end end
 	end
@@ -146,13 +148,21 @@ function necroArmyStats(self)
 end
 
 function necroSetupSummon(self, def, x, y, level, turns, no_control)
+	local hookdata = {"Necromancer:NecroSetupSummon", def=def, x=y, y=y, level=level, turns=turns, no_control=no_control}
+	if self:triggerHook(hookdata) and hookdata.new_def then
+		def = hookdata.new_def
+	end
+
 	local m = require("mod.class.NPC").new(def)
 	m.necrotic_minion = true
 	m.creation_turn = game.turn
 	m.faction = self.faction
 	m.summoner = self
 	m.summoner_gain_exp = true
-	if turns then m.summon_time = turns end
+	if turns then
+		m.summon_time_max = turns
+		m.summon_time = turns
+	end
 	m.exp_worth = 0
 	m.life_regen = 0
 	m.unused_stats = 0
@@ -250,6 +260,7 @@ function necroSetupSummon(self, def, x, y, level, turns, no_control)
 				if e.src == src and e.damtype == engine.DamageType.PUTRESCENT_LIQUEFACTION and e.grids[self.x] and e.grids[self.x][self.y] and src:isTalentActive(src.T_PUTRESCENT_LIQUEFACTION) then
 					local p = src:isTalentActive(src.T_PUTRESCENT_LIQUEFACTION)
 					p.dur = p.dur + src:callTalent(src.T_PUTRESCENT_LIQUEFACTION, "getIncrease")
+					game.level.map:particleEmitter(self.x, self.y, 1, "pustulent_fulmination", {radius=1})
 					game.logSeen(self, "#GREY#%s dissolves into the cloud of gore.", self:getName():capitalize())
 				end
 			end
@@ -259,9 +270,10 @@ function necroSetupSummon(self, def, x, y, level, turns, no_control)
 	-- Summons never flee
 	m.ai_tactic = m.ai_tactic or {}
 	m.ai_tactic.escape = 0
+	return m
 end
 
-function checkLifeThreshold(val, fct)
+function checkLifeThreshold(val, fct, basefct)
 	return function(self, t)
 		local checkid = "__check_threshold_"..t.id
 		if not self[checkid] then self[checkid] = self.life end
@@ -269,6 +281,7 @@ function checkLifeThreshold(val, fct)
 			fct(self, t)
 		end
 		self[checkid] = self.life
+		if basefct then basefct(self, t) end
 	end
 end
 -------------------------------------------
@@ -306,7 +319,15 @@ load("/data/talents/spells/golem.lua")
 load("/data/talents/spells/master-of-bones.lua")
 load("/data/talents/spells/master-of-flesh.lua")
 load("/data/talents/spells/master-necromancer.lua")
+load("/data/talents/spells/nightfall.lua")
+load("/data/talents/spells/dreadmaster.lua")
+load("/data/talents/spells/age-of-dusk.lua")
+load("/data/talents/spells/grave.lua")
+load("/data/talents/spells/glacial-waste.lua")
+load("/data/talents/spells/rime-wraith.lua")
 load("/data/talents/spells/animus.lua")
+load("/data/talents/spells/death.lua")
+load("/data/talents/spells/eradication.lua")
 load("/data/talents/spells/necrosis.lua")
 load("/data/talents/spells/spectre.lua")
 
