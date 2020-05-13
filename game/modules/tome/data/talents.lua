@@ -68,7 +68,7 @@ Talents.newTalent = function(self, t)
 	end
 	if t.is_race_evolution then
 		t.short_name = (t.short_name or t.name):upper():gsub("[ ']", "_")
-		t.name = ("#SANDY_BROWN# (Race Evolution)"):tformat(_t(t.name))
+		t.name = ("#SANDY_BROWN#%s (Race Evolution)"):tformat(_t(t.name))
 	end
 
 	-- Generate easier, reverse parameters, calls for methods
