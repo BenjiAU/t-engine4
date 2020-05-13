@@ -116,7 +116,7 @@ function _M:update(player)
 	if not p then return end
 
 	if self.text_dur and p.dur ~= self.old_dur then
-		self.text_dur:text(p.dur + 1)
+		self.text_dur:text(p.dur + 1, true)
 		if not self.no_center then self.text_dur:center() end
 		self.old_dur = p.dur
 	end
@@ -125,7 +125,7 @@ function _M:update(player)
 		local e = player:getEffectFromId(self.eff_id)
 		local charges = e.charges(player, p) or 0
 		if charges ~= self.old_charges then
-			self.text_charges:text(charges)
+			self.text_charges:text(charges, true)
 			if not self.no_center then self.text_charges:center() end
 			self.old_charges = charges
 		end

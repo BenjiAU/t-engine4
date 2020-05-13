@@ -193,7 +193,7 @@ public:
 
 	void resetMoveAnim();
 	void setMoveAnim(int32_t startx, int32_t starty, float max, float blur, uint8_t twitch_dir, float twitch);
-	bool computeMoveAnim(float nb_keyframes);
+	bool computeMoveAnim(float nb_keyframes, bool force = false);
 	vec2 getWorldPos();
 
 	void addMOR(MapObjectRenderer *mor);
@@ -335,7 +335,7 @@ public:
 
 	/* Compute visuals */
 	void computeGrid(MapObject *m, int32_t dz, int32_t i, int32_t j);
-	bool computeScrollAnim(float nb_keyframes);
+	bool computeScrollAnim(float nb_keyframes, bool force = false);
 
 	/* Vision handling */
 	void setVisionShader(shader_type *s, int ref);

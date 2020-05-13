@@ -355,7 +355,7 @@ void RendererGL::update() {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_elements);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * vbo_elements_nb * 6, NULL, GL_STATIC_DRAW); // Static because this wont change often
 			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLuint) * vbo_elements_nb * 6, vbo_elements_data);
-			printf("Upping vbo_elements to %d in renderer %s\n", nb_quads, getRendererName());
+			// printf("Upping vbo_elements to %d in renderer %s\n", nb_quads, getRendererName());
 		}
 	}
 }

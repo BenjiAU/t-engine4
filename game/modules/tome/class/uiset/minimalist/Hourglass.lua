@@ -79,7 +79,7 @@ function _M:update(nb_keyframes)
 			local p = c / m
 			self.sand:cutoff(0, self.sand_h * (1-p), self.sand_w, self.sand_h * p)
 
-			self.text:text(("%d"):format(game.level.turn_counter / 10)):center()
+			self.text:text(("%d"):format(game.level.turn_counter / 10), true):center()
 
 			self.old_turn = game.level.turn_counter
 			self.old_turn_max = game.level.max_turn_counter

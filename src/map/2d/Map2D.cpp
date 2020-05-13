@@ -202,6 +202,7 @@ void MapObject::setMoveAnim(int32_t startx, int32_t starty, float max, float blu
 	move_blur = blur; // defaults to 0
 	move_twitch_dir = twitch_dir; // defaults to 0 (which is equivalent to up or 8)
 	move_twitch = twitch; // defaults to 0
+	computeMoveAnim(0, true);
 }
 
 vec2 MapObject::getWorldPos() {
@@ -209,8 +210,8 @@ vec2 MapObject::getWorldPos() {
 	return p;
 }
 
-inline bool MapObject::computeMoveAnim(float nb_keyframes) {
-	if (!nb_keyframes) return move_max > 0;
+inline bool MapObject::computeMoveAnim(float nb_keyframes, bool force) {
+	if (!nb_keyframes && !force) return move_max > 0;
 
 	move_step += nb_keyframes;
 	if (move_step >= move_max) {
@@ -635,10 +636,12 @@ void Map2D::scroll(int32_t x, int32_t y, float smooth) {
 	scroll_anim_dy = 0;
 	mx = x;
 	my = y;	
+
+	computeScrollAnim(0, true);
 }
 
-inline bool Map2D::computeScrollAnim(float nb_keyframes) {
-	if (!nb_keyframes) return scroll_anim_max > 0;
+inline bool Map2D::computeScrollAnim(float nb_keyframes, bool force) {
+	if (!nb_keyframes && !force) return scroll_anim_max > 0;
 
 	scroll_anim_step += nb_keyframes;
 	if (scroll_anim_step >= scroll_anim_max) {

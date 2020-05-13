@@ -97,7 +97,7 @@ end
 function _M:update(nb_keyframes)
 	if not game.level or not game.level.map then return end
 	if self.old_name ~= game.zone_name then
-		self.text_name:text(game.zone_name or ""):center()
+		self.text_name:text(game.zone_name or "", true):center()
 		local w = self.text_name:getStats()
 		-- Ensure the zone name is always at most 200 pixels
 		if w > 200 then self.text_name:scale(200 / w, 200 / w, 1)

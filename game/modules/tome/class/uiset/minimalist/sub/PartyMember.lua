@@ -93,7 +93,7 @@ function _M:update(player)
 	local a = self.a
 	if self.text_overlay then
 		if a.summon_time ~= self.old_time then			
-			self.text_overlay:text(a.summon_time):center()
+			self.text_overlay:text(a.summon_time, true):center()
 			self.old_time = a.summon_time
 		end
 	end

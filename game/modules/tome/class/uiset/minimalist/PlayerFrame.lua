@@ -142,15 +142,15 @@ function _M:update(nb_keyframes)
 	if self.old_exp ~= player.exp then
 		local cur_exp, max_exp = player.exp, player:getExpChart(player.level+1)
 		local v = math.min(1, math.max(0, cur_exp / max_exp))
-		self.text_exp:text(("%d%%"):format(v * 100))
+		self.text_exp:text(("%d%%"):format(v * 100), true)
 		self.text_exp:center()
 		self.pf_exp:scale(v, 1, 1)
 		self.pf_exp_levelup:scale(v, 1, 1)
 		self.old_exp = player.exp
 	end
-	if self.old_money ~= player.money then self.text_money:text(("%d"):format(player.money)) self.text_money:center() self.old_money = player.money end
-	if self.old_level ~= player.level then self.text_level:text("Lvl "..player.level) self.old_level = player.level end
-	if self.old_name ~= player.name then self.text_name:text(player.name) self.old_name = player.name end
+	if self.old_money ~= player.money then self.text_money:text(("%d"):format(player.money), true) self.text_money:center() self.old_money = player.money end
+	if self.old_level ~= player.level then self.text_level:text("Lvl "..player.level, true) self.old_level = player.level end
+	if self.old_name ~= player.name then self.text_name:text(player.name, true) self.old_name = player.name end
 
 	local v = (not config.settings.tome.actor_based_movement_mode and self or player).bump_attack_disabled and true or false
 	if self.old_attack == nil or self.old_attack ~= v then

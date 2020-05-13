@@ -20,7 +20,7 @@
 newKind{
 	kind = "talent",
 	setup = function(self, actor, page, bi, i, x, y)
-		self.last_pre_use_check = 10
+		self.last_pre_use_check = 10000
 		self.checkPreUseTalent = function(self, actor, t, nb_keyframes)
 			self.last_pre_use_check = self.last_pre_use_check + nb_keyframes
 			if self.last_pre_use_check >= 10 then

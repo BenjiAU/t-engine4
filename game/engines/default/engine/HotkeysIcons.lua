@@ -148,7 +148,7 @@ function _M:update(hks, actor, nb_keyframes)
 	end
 
 	if txt ~= self.oldtxt then
-		if txt then self.txt:text(txt) else self.txt:text("") end
+		if txt then self.txt:text(txt, true) else self.txt:text("", true) end
 		local tw, th = self.txt:getStats()
 		self.txt:translate(self.x + (hks.icon_w - tw) / 2, self.y + (hks.icon_h - th) / 2, 0)
 		self.oldtxt = txt
@@ -158,7 +158,7 @@ end
 function _M:updateKeybind(hks, actor)
 	local ks = game.key:formatKeyString(game.key:findBoundKeys(self.keybound))
 	if ks ~= self.oldks then
-		self.txtkey:text(ks)
+		self.txtkey:text(ks, true)
 		local tw, th = self.txtkey:getStats()
 		self.txtkey:translate(self.x + hks.icon_w - tw/2, self.y + hks.icon_h - th/2, 10) -- /2 because we scale by 0.5
 		self.oldks = ks
@@ -216,7 +216,7 @@ end
 function Empty:updateKeybind(hks, actor)
 	local ks = game.key:formatKeyString(game.key:findBoundKeys(self.keybound))
 	if ks ~= self.oldks then
-		self.txtkey:text(ks)
+		self.txtkey:text(ks, true)
 		local tw, th = self.txtkey:getStats()
 		self.txtkey:translate(self.x + hks.icon_w - tw/2, self.y + hks.icon_h - th/2, 10) -- /2 because we scale by 0.5
 		self.oldks = ks

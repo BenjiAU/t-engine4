@@ -88,7 +88,7 @@ function _M:update(player)
 		local t = player:getTalentFromId(self.tid)
 		local o, fnt = t.iconOverlay(player, t, p)
 		if o ~= self.old_overlay then			
-			self.text_overlay:text(o):center()
+			self.text_overlay:text(o, true):center()
 			if fnt == "buff_font_small" then self.text_overlay:scale(0.8, 0.8, 1)
 			elseif fnt == "buff_font_smaller" then self.text_overlay:scale(0.65, 0.65, 1)
 			end
