@@ -210,7 +210,7 @@ static int noise_texture2d(lua_State *L)
 
 	t->w = w; t->h = h; t->no_free = FALSE;
 	glGenTextures(1, &t->tex);
-	glBindTexture(GL_TEXTURE_2D, t->tex);
+	tfglBindTexture(GL_TEXTURE_2D, t->tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -285,7 +285,7 @@ static int noise_texture3d(lua_State *L)
 
 	t->w = w; t->h = h; t->no_free = FALSE;
 	glGenTextures(1, &t->texture_id);
-	tglBindTexture(GL_TEXTURE_3D, t->texture_id);
+	tfglBindTexture(GL_TEXTURE_3D, t->texture_id);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
@@ -322,7 +322,7 @@ static int noise_texture2d(lua_State *L)
 
 	t->w = w; t->h = h; t->no_free = FALSE;
 	glGenTextures(1, &t->texture_id);
-	tglBindTexture(GL_TEXTURE_3D, t->texture_id);
+	tfglBindTexture(GL_TEXTURE_3D, t->texture_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -365,7 +365,7 @@ static int noise_texture2dstack(lua_State *L)
 
 		t->w = w; t->h = h; t->no_free = FALSE;
 		glGenTextures(1, &t->texture_id);
-		tglBindTexture(GL_TEXTURE_2D, t->texture_id);
+		tfglBindTexture(GL_TEXTURE_2D, t->texture_id);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

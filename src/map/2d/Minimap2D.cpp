@@ -38,7 +38,7 @@ extern "C" {
 
 Minimap2D::Minimap2D() {
 	glGenTextures(1, &tex[0].texture_id);
-	tglBindTexture(GL_TEXTURE_2D, tex[0].texture_id);
+	tfglBindTexture(GL_TEXTURE_2D, tex[0].texture_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

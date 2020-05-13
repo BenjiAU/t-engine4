@@ -474,7 +474,7 @@ Map2D::Map2D(int32_t z, int32_t w, int32_t h, int32_t tile_w, int32_t tile_h, in
 	// Init vision data
 	seens_texture_size = powerOfTwoSize(viewport_dimension.x, viewport_dimension.y);
 	glGenTextures(1, &seens_texture);
-	tglBindTexture(GL_TEXTURE_2D, seens_texture);
+	tfglBindTexture(GL_TEXTURE_2D, seens_texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
