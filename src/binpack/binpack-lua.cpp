@@ -72,6 +72,8 @@ static void blit_surface(SDL_Surface *from, glm::ivec4 from_coords, SDL_Surface 
 	dstrect.w = to_coords.z;
 	dstrect.h = to_coords.w;
 
+	SDL_SetSurfaceBlendMode(from, SDL_BLENDMODE_NONE);
+	SDL_SetSurfaceBlendMode(to, SDL_BLENDMODE_NONE);
 	if (from_coords.x == -1) {
 		SDL_BlitSurface(from, NULL, to, &dstrect);
 	} else {
@@ -290,6 +292,7 @@ static int generate_spritesheet(lua_State *L) {
 
 		PHYSFS_file *file = PHYSFS_openRead(filename);
 		SDL_Surface *s = IMG_Load_RW(PHYSFSRWOPS_makeRWops(file), TRUE);
+		SDL_SetSurfaceBlendMode(s, SDL_BLENDMODE_NONE);
 		sprites.emplace_back(new sprite_holder(filename, s, do_trim));
 
 		lua_pop(L, 1);
@@ -323,6 +326,7 @@ static int generate_spritesheet(lua_State *L) {
 		if (verbose) printf("************* IN SHEET %d [%dx%d]\n", sheet.id, sheet.w, sheet.h);
 
 		SDL_Surface *sheet_s = SDL_CreateRGBSurface(0, sheet.w, sheet.h, 32, rmask, gmask, bmask, amask);
+		SDL_SetSurfaceBlendMode(sheet_s, SDL_BLENDMODE_NONE);
 
 		for (auto sprite : sheet.sprites) {
 			// if (verbose) printf(" - %s : %dx%d [%dx%d]\n", sprite.filename.c_str(), sprite.x, sprite.y, sprite.w, sprite.h);
