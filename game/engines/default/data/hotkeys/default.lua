@@ -47,7 +47,7 @@ newKind{
 				pie_color = {1,0,0,0.4}
 			end
 			pie_angle = 360 * (1 - (actor.talents_cd[t.id] / actor:getTalentCooldown(t)))
-			txt = tostring(actor:isTalentCoolingDown(t))
+			txt = tostring(math.ceil(actor:isTalentCoolingDown(t)))
 		elseif actor:isTalentActive(t.id) then
 			pie_color = {1,1,0,0.4}
 			pie_angle = 0
@@ -109,7 +109,7 @@ newKind{
 				pie_color = {1,0,0,0.4}
 				pie_angle = 360 * (1 - (actor.talents_cd[t.id] / actor:getTalentCooldown(t)))
 				frame = "cooldown"
-				txt = tostring(actor:isTalentCoolingDown(t))
+				txt = tostring(math.ceil(actor:isTalentCoolingDown(t)))
 			end
 		elseif o and (o.use_talent or o.use_power) then
 			pie_angle = 360 * ((o.power / o.max_power))
@@ -117,7 +117,7 @@ newKind{
 			local cd = o:getObjectCooldown(actor)
 			if cd and cd > 0 then
 				frame = "cooldown"
-				txt = tostring(cd)
+				txt = tostring(math.ceil(cd))
 			elseif not cd then
 				frame = "disabled"
 			end
