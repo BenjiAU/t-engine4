@@ -7686,7 +7686,7 @@ function _M:doWearTinker(wear_inven, wear_item, wear_o, base_inven, base_item, b
 
 	if not forbid then
 		base_o.tinker = wear_o
-		game.logPlayer(self, "You attach %s to your %s.", wear_o:getName{do_color=true}, base_o:getName{do_color=true})
+		game.logPlayer(self, "You attach %s to your %s.", wear_o:getName{do_color=true}, base_o:getName{do_color=true, no_add_name=true})
 
 		if wear_inven and wear_item then self:removeObject(wear_inven, wear_item) end
 

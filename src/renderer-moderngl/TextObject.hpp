@@ -23,6 +23,7 @@
 
 #include "renderer-moderngl/Renderer.hpp"
 #include <string.h>
+#include <vector>
 #include "font.hpp"
 
 class DORText : public DORVertexes{
@@ -30,6 +31,7 @@ private:
 	static shader_type *default_shader;
 
 	DORContainer entities_container;
+	vector<int> entities_container_refs;
 
 	int font_lua_ref = LUA_NOREF;
 	FontInstance *font = NULL;

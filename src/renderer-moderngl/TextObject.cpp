@@ -173,7 +173,6 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 
 void DORText::parseText() {
 	clear();
-	entities_container.clear();
 	positions.clear();
 	centered = false;
 	setChanged(true);
@@ -309,11 +308,12 @@ void DORText::parseText() {
 
 						DisplayObject *c = userdata_to_DO(L, -1);
 						if (c) {
-							c->setLuaRef(luaL_ref(L, LUA_REGISTRYINDEX));
+							entities_container_refs.push_back(luaL_ref(L, LUA_REGISTRYINDEX));
 							c->translate(bx + size, by + (nb_lines-1) * font_h, -1, false);
 							entities_container.add(c);
+						} else {
+							lua_pop(L, 1);
 						}
-						lua_pop(L, 1);
 						size += font_h;
 					}
 					lua_pop(L, 1);
@@ -463,7 +463,7 @@ void DORText::center() {
 
 vec2 DORText::getLetterPosition(int idx) {
 	idx = idx - 1;
-	if (positions.empty()) return {0, 0};
+	if (positions.empty() || idx < 0) return {0, 0};
 	if (idx > positions.size()) idx = positions.size();
 	return positions[idx];
 }
@@ -471,6 +471,10 @@ vec2 DORText::getLetterPosition(int idx) {
 void DORText::clear() {
 	DORVertexes::clear();
 	entities_container.clear();
+	for (auto ref : entities_container_refs) {
+		refcleaner(&ref);
+	}
+	entities_container_refs.clear();
 }
 
 void DORText::render(RendererGL *container, mat4& cur_model, vec4& cur_color, bool cur_visible) {
@@ -501,4 +505,7 @@ DORText::DORText() {
 DORText::~DORText() {
 	free((void*)text);
 	refcleaner(&font_lua_ref);
+	for (auto ref : entities_container_refs) {
+		refcleaner(&ref);
+	}
 };

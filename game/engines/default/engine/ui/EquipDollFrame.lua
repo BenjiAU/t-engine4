@@ -63,10 +63,10 @@ function _M:generate()
 
 	self.item_container = core.renderer.renderer()
 
-	self.bg = core.renderer.fromTextureTable(self:getAtlasTexture(self.bg))
-	self.bg_sel = core.renderer.fromTextureTable(self:getAtlasTexture(self.bg_sel))
+	self.bg = core.renderer.fromTextureTable(self:getAtlasTexture(self.bg), nil, nil, self.w, self.h)
+	self.bg_sel = core.renderer.fromTextureTable(self:getAtlasTexture(self.bg_sel), nil, nil, self.w, self.h)
 	if self.bg_empty then
-		self.bg_empty = core.renderer.fromTextureTable(self:getAtlasTexture(self.bg_empty))
+		self.bg_empty = core.renderer.fromTextureTable(self:getAtlasTexture(self.bg_empty), nil, nil, self.w, self.h)
 		self.do_container:add(self.bg_empty:color(1, 1, 1, 0))
 	end
 
