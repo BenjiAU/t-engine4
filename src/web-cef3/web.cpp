@@ -238,7 +238,7 @@ public:
 		const char *mime = cstring_to_c(download_item->GetMimeType());
 		const char *url = cstring_to_c(download_item->GetURL());
 		const char *name = cstring_to_c(suggested_name);
-		fprintf(logfile, "[WEBCORE] Download request id %ld [name: %s] [mime: %s] [url: %s]\n", id, name, mime, url);
+		fprintf(logfile, "[WEBCORE] Download request id %d [name: %s] [mime: %s] [url: %s]\n", id, name, mime, url);
 
 		WebEvent *event = new WebEvent();
 		event->kind = TE4_WEB_EVENT_DOWNLOAD_REQUEST;
@@ -256,7 +256,7 @@ public:
 		if (!cd) { return; }
 		cd->cancel_cb = callback;
 
-		fprintf(logfile, "[WEBCORE] Download update id %ld [size: %ld / %ld] [completed: %d, canceled: %d, inprogress: %d, valid: %d]\n",
+		fprintf(logfile, "[WEBCORE] Download update id %d [size: %ld / %ld] [completed: %d, canceled: %d, inprogress: %d, valid: %d]\n",
 				id,
 				download_item->GetReceivedBytes(), download_item->GetTotalBytes(),
 				download_item->IsComplete(), download_item->IsCanceled(),
@@ -807,6 +807,10 @@ void te4_web_do_update(void (*cb)(WebEvent*)) {
 			case TE4_WEB_EVENT_DELETE_TEXTURE:
 				web_del_texture(event->data.texture);
 				break;
+			case TE4_WEB_EVENT_END_BROWSER:
+				break;
+			case TE4_WEB_EVENT_BROWSER_COUNT:
+				break;
 		}
 
 		delete event;
@@ -898,7 +902,7 @@ void te4_web_shutdown() {
 
 	while (!all_browsers.empty()) {
 		CefDoMessageLoopWork();
-		fprintf(logfile, "Waiting browsers to close: %d left\n", all_browsers.size());
+		fprintf(logfile, "Waiting browsers to close: %ld left\n", all_browsers.size());
 	}
 	
 	fprintf(logfile, "[WEBCORE] all browsers dead, shutting down\n");
