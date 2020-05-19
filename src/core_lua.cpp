@@ -259,6 +259,8 @@ GLenum sdl_gl_texture_format(SDL_Surface *s) {
 			texture_format = GL_RGB;
 		else
 			texture_format = GL_BGR;
+	} else if (nOfColors == 1) {
+		texture_format = GL_RED;
 	} else {
 		printf("warning: the image is not truecolor..  this will probably break %d\n", nOfColors);
 		// this error should not go unhandled

@@ -39,8 +39,11 @@ extern "C" {
 #include <queue>
 #include <string>
 #include <array>
+#include <vector>
+#include "glm/glm.hpp"
 
 using namespace std;
+using namespace glm;
 static int loader_running = 0;
 
 /**************************************************************************
@@ -62,6 +65,63 @@ public:
 		SDL_mutexP(loader_mutex);
 		loader_queue_done.push(this);
 		SDL_mutexV(loader_mutex);
+	}
+};
+
+/************************************************************************************
+ ** Palette to texture
+ ************************************************************************************/
+struct palette_color{GLubyte red; GLubyte green; GLubyte blue; GLubyte alpha;};
+class LoaderPalette : public Loader {
+private:
+	string filename;
+	GLuint tex;
+	vector<palette_color> colors;
+	PHYSFS_file *file;
+
+	palette_color readNextLine() {
+		char buf[102400];
+		char *ptr = buf;
+		int bufsize = 102400;
+		int total = 0;
+
+		if (PHYSFS_eof(file)) return palette_color{0, 0, 0, 0};
+
+		bufsize--;  /* allow for null terminating char */
+		while ((total < bufsize) && (PHYSFS_read(file, ptr, 1, 1) == 1))
+		{
+			if (*ptr == '\n')
+			{
+				if ((total > 0) && (*(ptr-1) == '\r')) *(ptr-1) = '\0';
+				break;
+			}
+			ptr++;
+			total++;
+		}
+		*ptr = '\0';  // null terminate it.
+
+		int len = strlen(buf);
+		if (buf[0] != '#' || len != 7) return palette_color{0, 0, 0, 0};
+		float blue = stoi(&buf[5], 0, 16); buf[5] = '\0';
+		float green = stoi(&buf[3], 0, 16); buf[3] = '\0';
+		float red = stoi(&buf[1], 0, 16);
+		return palette_color{red, green, blue, 255};
+	}
+public:
+	LoaderPalette(const char *filename, GLuint tex) : tex(tex), filename(filename), colors(256) {};
+	virtual ~LoaderPalette() { };
+	virtual bool load() {
+		file = PHYSFS_openRead(filename.c_str());
+		for (int i = 0; i < 256; i++) {
+			colors[i] = readNextLine();
+		}
+		PHYSFS_close(file);
+		done();
+	}
+	virtual bool finish() {
+		printf("[LOADER] done loading palette %s in texture %d!\n", filename.c_str(), tex);
+		tfglBindTexture(GL_TEXTURE_2D, tex);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, colors.data());
 	}
 };
 
@@ -89,7 +149,7 @@ public:
 			tfglBindTexture(GL_TEXTURE_2D, tex);
 			GLenum texture_format = sdl_gl_texture_format(s);
 			GLint nOfColors = s->format->BytesPerPixel;
-			glTexImage2D(GL_TEXTURE_2D, 0, nOfColors == 4 ? GL_RGBA : GL_RGB, s->w, s->h, 0, texture_format, GL_UNSIGNED_BYTE, s->pixels);
+			glTexImage2D(GL_TEXTURE_2D, 0, nOfColors == 4 ? GL_RGBA : (nOfColors == 3 ? GL_RGB : GL_RED), s->w, s->h, 0, texture_format, GL_UNSIGNED_BYTE, s->pixels);
 			SDL_FreeSurface(s);
 		}
 	}
@@ -300,6 +360,44 @@ static void create_loader_thread() {
 /**************************************************************************
  ** Lua code
  **************************************************************************/
+
+static int lua_loader_palette(lua_State *L) {
+	const char *filename = luaL_checkstring(L, 1);
+	if (!PHYSFS_exists(filename)) return 0;
+
+	// This is a bit fugly, we go and peek inside the fiel to know the size of the png
+	int sw = 256;
+	int sh = 1;
+
+	texture_lua *t = new(L) texture_lua();
+	glGenTextures(1, &t->texture_id);
+	tfglBindTexture(GL_TEXTURE_2D, t->texture_id);
+	t->w = sw;
+	t->h = sh;
+	t->no_free = false;
+
+	// Paramétrage de la texture.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	SDL_mutexP(loader_mutex);
+	loader_queue.push(new LoaderPalette(filename, t->texture_id));
+	loader_running++;
+	SDL_mutexV(loader_mutex);
+	SDL_SemPost(loader_sem);
+
+	// if this is chagned remember to change the caching superload in utils.lua
+	lua_pushnumber(L, sw);
+	lua_pushnumber(L, sh);
+	lua_pushnumber(L, 1);
+	lua_pushnumber(L, 1);
+	lua_pushnumber(L, sw);
+	lua_pushnumber(L, sh);
+
+	return 7;
+}
 
 #define MAKE_BYTE(b) ((b) & 0xFF)
 #define MAKE_DWORD(a,b,c,d) ((MAKE_BYTE(a) << 24) | (MAKE_BYTE(b) << 16) | (MAKE_BYTE(c) << 8) | MAKE_BYTE(d))
@@ -520,6 +618,7 @@ static int lua_loader_wait(lua_State *L) {
 }
 
 static const struct luaL_Reg loaderlib[] = {
+	{"palette", lua_loader_palette},
 	{"png", lua_loader_png},
 	{"pngCubemap", lua_loader_cubemap_png},
 	{"waitAll", lua_loader_wait},
