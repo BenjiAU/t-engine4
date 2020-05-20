@@ -29,6 +29,7 @@ function _M:restInit(turns, what, past, on_end, on_very_end)
 	what = what or _t"resting"
 	past = past or _t"rested"
 	self.resting = {
+		rest_time_start = core.game.getTime(),
 		rest_turns = turns,
 		past = past,
 		on_end = on_end,
@@ -103,6 +104,7 @@ function _M:restStop(msg)
 	else
 		game.log("%s for %d turns.", self.resting.past:capitalize(), self.resting.cnt)
 	end
+	print("Rested", self.resting.cnt.." turns in", (core.game.getTime()-self.resting.rest_time_start).."ms")
 
 	local finish = self.resting.cnt and self.resting.rest_turns and self.resting.cnt > self.resting.rest_turns
 	local on_very_end = self.resting.on_very_end

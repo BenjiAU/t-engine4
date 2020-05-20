@@ -20,6 +20,9 @@
 -- Configure Map
 --dofile("/mod/map_config.lua")
 
+-- Switch to realtime mode, to get more accurate FPS
+core.game.setRealtime(1)
+
 -- Entities that are ASCII are outline
 local Entity = require "engine.Entity"
 Entity.ascii_outline = {x=2, y=2, r=0, g=0, b=0, a=0.8}

@@ -73,6 +73,8 @@ function _M:runInit(dir)
 	self.running.dialog.__showup = nil
 	self.running.dialog.__hidden = true
 
+	self:onRunStart()
+
 	self:runStep()
 end
 
@@ -102,6 +104,8 @@ function _M:runFollow(path)
 	}
 	self.running.dialog.__showup = nil
 	self.running.dialog.__hidden = true
+
+	self:onRunStart()
 
 	self:runStep()
 end
@@ -364,6 +368,16 @@ function _M:runCheck()
 	return true
 end
 
+--- We started running
+-- Rewrite this method to do whatever you need
+function _M:onRunStart()
+end
+
+--- We stopped running
+-- Rewrite this method to do whatever you need
+function _M:onRunStop()
+end
+
 --- Stops running
 function _M:runStop(msg)
 	if not self.running then return false end
@@ -376,6 +390,8 @@ function _M:runStop(msg)
 	if msg then
 		game.log("Ran for %d turns (stop reason: %s).", self.running.cnt, msg)
 	end
+
+	self:onRunStop()
 
 	self:runStopped(self.running.cnt, msg)
 	self.running = nil
