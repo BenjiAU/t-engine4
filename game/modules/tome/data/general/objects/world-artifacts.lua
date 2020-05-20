@@ -358,7 +358,7 @@ newEntity{ base = "BASE_AMULET", define_as = "SET_GARKUL_TEETH",
 	end,
 }
 
-newEntity{ base = "BASE_LITE",
+newEntity{ base = "BASE_LITE", define_as = "SUMMERTIDE_PHIAL",
 	power_source = {nature=true},
 	unique = true,
 	name = "Summertide Phial", image="object/artifact/summertide_phial.png",
@@ -497,7 +497,9 @@ newEntity{
 
 	use_simple = { name = _t"quaff the Blood of Life to grant an extra life", use = function(self, who)
 		game.logSeen(who, "%s quaffs the %s!", who:getName():capitalize(), self:getName({no_add_name = true, do_color = true}))
-		if not who:attr("undead") then
+		if self:triggerHook{"Artifact:BloodOfLife:used", who=who} then
+			-- let addons do stuff
+		elseif not who:attr("undead") then
 			who.blood_life = true
 			game.logPlayer(who, "#LIGHT_RED#You feel the Blood of Life rushing through your veins.")
 		else

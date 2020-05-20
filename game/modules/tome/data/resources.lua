@@ -71,17 +71,20 @@ ActorResource:defineResource(_t"Stamina", "stamina", ActorTalents.T_STAMINA_POOL
 	color = "#ffcc80#",
 	cost_factor = function(self, t, check) return (check and self:hasEffect(self.EFF_ADRENALINE_SURGE)) and 0 or (100 + self:combatFatigue()) / 100 end,
 	wait_on_rest = true,
+	restore_factor = 1,
 	randomboss_enhanced = true,
 })
 ActorResource:defineResource(_t"Mana", "mana", ActorTalents.T_MANA_POOL, "mana_regen", _t"Mana represents your reserve of magical energies. Most spells cast consume mana and each sustained spell reduces your maximum mana.", nil, nil, {
 	color = "#7fffd4#",
 	cost_factor = function(self, t) return (100 + 2 * self:combatFatigue()) / 100 end,
 	wait_on_rest = true,
+	restore_factor = 1,
 	randomboss_enhanced = true,
 })
 ActorResource:defineResource(_t"Equilibrium", "equilibrium", ActorTalents.T_EQUILIBRIUM_POOL, "equilibrium_regen", _t"Equilibrium represents your standing in the grand balance of nature. The closer it is to 0 the more balanced you are. Being out of equilibrium will adversely affect your ability to use Wild Gifts.", 0, false, {
 	color = "#00ff74#", invert_values = true,
 	wait_on_rest = true,
+	restore_factor = -0.5,
 	randomboss_enhanced = true,
 	display = {
 		status_text = function(act)
@@ -143,11 +146,13 @@ ActorResource:defineResource(_t"Vim", "vim", ActorTalents.T_VIM_POOL, "vim_regen
 	color = "#904010#",
 	wait_on_rest = true,
 	randomboss_enhanced = true,
-	-- Minimalist = {shader_params = {color = {0x90/255, 0x40/255, 0x10/255}}} --parameters for the Minimalist uiset
+	restore_factor = 0.8,
+	Minimalist = {shader_params = {color = {0x90/255, 0x40/255, 0x10/255}}} --parameters for the Minimalist uiset
 })
 ActorResource:defineResource(_t"Positive energy", "positive", ActorTalents.T_POSITIVE_POOL, "positive_regen", _t"Positive energy represents your reserve of positive power. It slowly increases.", nil, nil, {
 	color = "#ffd700#",
 	wait_on_rest = true,
+	restore_factor = 0.4,
 	randomboss_enhanced = true,
 	cost_factor = function(self, t, check, value) if value < 0 then return 1 else return (100 + self:combatFatigue()) / 100 end end,
 	Minimalist = {highlight = function(player, vc, vn, vm, vr) return vc >=0.7*vm end},
@@ -155,12 +160,14 @@ ActorResource:defineResource(_t"Positive energy", "positive", ActorTalents.T_POS
 ActorResource:defineResource(_t"Negative energy", "negative", ActorTalents.T_NEGATIVE_POOL, "negative_regen", _t"Negative energy represents your reserve of negative power. It slowly increases.", nil, nil, {
 	color = "#7f7f7f#",
 	randomboss_enhanced = true,
+	restore_factor = 0.4,
 	wait_on_rest = true,
 	cost_factor = function(self, t, check, value) if value < 0 then return 1 else return (100 + self:combatFatigue()) / 100 end end,
 	Minimalist = {highlight = function(player, vc, vn, vm, vr) return vc >=0.7*vm end},
 })
 ActorResource:defineResource(_t"Hate", "hate", ActorTalents.T_HATE_POOL, "hate_regen", _t"Hate represents your soul's primal antipathy towards others.  It generally decreases whenever you have no outlet for your rage, and increases when you are damaged or destroy others.", nil, nil, {
 	color = "#ffa0ff#",
+	restore_factor = 0.4,
 	cost_factor = function(self, t) return (100 + self:combatFatigue()) / 100 end,
 	Minimalist = {highlight = function(player, vc, vn, vm, vr) return vc >=100 end},
 })
@@ -224,6 +231,7 @@ ActorResource:defineResource(_t"Psi", "psi", ActorTalents.T_PSI_POOL, "psi_regen
 	color = "#4080ff#",
 	wait_on_rest = true,
 	randomboss_enhanced = true,
+	restore_factor = 0.5,
 	cost_factor = function(self, t) return (100 + 2 * self:combatFatigue()) / 100 end,
 	ai = { -- special ai functions and data
 		tactical = { -- tactical AI

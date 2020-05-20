@@ -272,6 +272,7 @@ uberTalent{
 	cooldown = 30,
 	no_energy = true,
 	is_spell = true,
+	cant_steal = true,
 	no_npc_use = true,
 	require = { special={desc=_t"Have time-travelled at least once", fct=function(self) return game.state.birth.ignore_prodigies_special_reqs or (self:attr("time_travel_times") and self:attr("time_travel_times") >= 1) end} },
 	action = function(self, t)

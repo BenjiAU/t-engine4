@@ -1956,7 +1956,7 @@ end
 -- accounts for healing_factor and Solipsism life/psi healing split, which includes psi_regen
 function _M:regenLife(fake)
 	if self.life_regen and not self:attr("no_life_regen") then
-		local regen, psi_increase = self.life_regen * util.bound((self.healing_factor or 1), 0, 2.5)
+		local regen, psi_increase = self.life_regen * util.bound((self.healing_factor or 1), 0, self.healing_factor_max or 2.5)
 
 		-- Solipsism: regeneration split between life and psi
 		if self:knowTalent(self.T_SOLIPSISM) then
@@ -4253,6 +4253,7 @@ function _M:onWear(o, inven_id, bypass_set, silent)
 	self:checkMindstar(o)
 
 	o:check("on_wear", self, inven_id)
+	self:triggerHook{"Actor:onWear", o=o, inven_id=inven_id}
 
 	if o.wielder then
 		for k, e in pairs(o.wielder) do
