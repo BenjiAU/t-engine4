@@ -71,11 +71,13 @@ function _M:generate()
 	local frame = self:makeFrameDO("ui/emote/", nil, nil, w, h)
 	self.w, self.h = frame.w, frame.h
 
-	self.renderer:add(frame.container:color(1, 1, 1, 0.7))
-	self.renderer:add(text:translate(self.w / 2, self.h / 2))
+	self.renderer:add(frame.container:color(1, 1, 1, 0.7):translate(0, -self.h))
+	self.renderer:add(text:translate(self.w / 2, self.h / 2 - self.h))
 
-	self.renderer:tween(self.dur, "wait", function(r)
-		r:tween(10, "a", nil, 0, "inQuad"):tween(10, "scale_x", nil, 0, "inQuad", function() self.dead = true end)
+	self.renderer:translate(0, self.h):tween(self.dur, "wait", function(r)
+		r:tween(10, "a", nil, 0, "inQuad")
+		 :tween(10, "scale_y", nil, 0, "inQuad")
+		 :tween(10, "scale_x", nil, 0, "inQuad", function() self.dead = true end)
 	end)
 
 	self.dead = false
