@@ -1259,6 +1259,7 @@ function _M:loadList(file, no_default, res, mod, loaded)
 		entity_mod = mod,
 		loading_list = res,
 		ignoreLoaded = function(v) res.ignore_loaded = v end,
+		applyAll = function(...) local args = {...} return function(e) for _, f in ipairs(args) do f(e) end end end,
 		rarity = function(add, mult) add = add or 0; mult = mult or 1; return function(e) if e.rarity then e.rarity = math.ceil(e.rarity * mult + add) end end end,
 		switchRarity = function(name) return function(e) if e.rarity then e[name], e.rarity = e.rarity, nil end end end,
 		mapShaderKind = function(k) 

@@ -1297,8 +1297,9 @@ end
 -- @param y the coord of the teleportation
 -- @param dist the radius of the random effect, if set to 0 it is a precise teleport
 -- @param min_dist the minimum radius of of the effect, will never teleport closer. Defaults to 0 if not set
+-- @param force_move_anim does a "quick movement" animation
 -- @return true if the teleport worked
-function _M:teleportRandom(x, y, dist, min_dist)
+function _M:teleportRandom(x, y, dist, min_dist, force_move_anim)
 	-- can we teleport?
 	if self:attr("encased_in_ice") then return end
 	if self:attr("cant_teleport") then return end
@@ -1349,7 +1350,11 @@ function _M:teleportRandom(x, y, dist, min_dist)
 
 		-- Teleport
 		local pos = poss[rng.range(1, #poss)]
-		self:move(pos[1], pos[2], true)
+		if force_move_anim then
+			self:forceMoveAnim(pos[1], pos[2])
+		else
+			self:move(pos[1], pos[2], true)
+		end
 		teleported = true
 
 		if self.runStop then self:runStop(_t"teleported") end

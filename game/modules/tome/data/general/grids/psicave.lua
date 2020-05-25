@@ -18,6 +18,7 @@
 -- darkgod@te4.org
 
 local psitech_wall_editer = { method="sandWalls_def", def="psitechwall"}
+local psitech_floor_editer = { method="borders_def", def="psitechfloor"}
 
 newEntity{
 	define_as = "PSYCAVEFLOOR",
@@ -26,6 +27,7 @@ newEntity{
 	display = '.', color=colors.SANDY_BROWN, back_color=colors.DARK_UMBER,
 	grow = "PSYCAVEWALL",
 	nice_tiler = { method="replace", base={"PSYCAVEFLOOR", 100, 1, 5}},
+	nice_editer = psitech_floor_editer,
 }
 for i = 1, 5 do newEntity{ base = "PSYCAVEFLOOR", define_as = "PSYCAVEFLOOR"..i, image = "terrain/psicave/psitech_floor_"..i.."_01.png"} end
 
@@ -41,6 +43,7 @@ newEntity{
 	air_level = -10,
 	dig = "PSYCAVEFLOOR",
 	nice_editer = psitech_wall_editer,
+	nice_editer2 = psitech_floor_editer,
 	nice_tiler = { method="replace", base={"PSYCAVEWALL", 100, 1, 9}},
 }
 for i = 1, 9 do newEntity{ base = "PSYCAVEWALL", define_as = "PSYCAVEWALL"..i, image = "terrain/psicave/psitechwall_5_"..i..".png"} end
@@ -61,6 +64,7 @@ newEntity{
 	is_door = true,
 	door_opened = "PSYCAVE_DOOR_OPEN",
 	dig = "FLOOR",
+	nice_editer = psitech_floor_editer,
 }
 newEntity{
 	define_as = "PSYCAVE_DOOR_OPEN",
@@ -70,6 +74,7 @@ newEntity{
 	always_remember = true,
 	is_door = true,
 	door_closed = "PSYCAVE_DOOR",
+	nice_editer = psitech_floor_editer,
 }
 newEntity{ base = "PSYCAVE_DOOR", define_as = "PSYCAVE_DOOR_HORIZ", z=3, image = "terrain/psicave/psitech_door1.png", add_displays = {class.new{image="terrain/psicave/psitechwall_8_1.png", z=18, display_y=-1}}, door_opened = "PSYCAVE_DOOR_HORIZ_OPEN"}
 newEntity{ base = "PSYCAVE_DOOR_OPEN", define_as = "PSYCAVE_DOOR_HORIZ_OPEN", image = "terrain/psicave/psitech_floor_1_01.png", add_mos={{image="terrain/psicave/psitech_door1_open_backg.png"}}, add_displays = {class.new{image="terrain/psicave/psitech_door1_open.png", z=17}, class.new{image="terrain/psicave/psitechwall_8_1.png", z=18, display_y=-1}}, door_closed = "PSYCAVE_DOOR_HORIZ"}
@@ -88,6 +93,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	change_level = 1,
+	nice_editer = psitech_floor_editer,
 }
 newEntity{
 	define_as = "PSYCAVE_LADDER_UP",
@@ -97,6 +103,7 @@ newEntity{
 	notice = true,
 	always_remember = true,
 	change_level = -1,
+	nice_editer = psitech_floor_editer,
 }
 newEntity{
 	define_as = "PSYCAVE_LADDER_UP_WILDERNESS",
@@ -106,4 +113,5 @@ newEntity{
 	notice = true,
 	change_level = 1,
 	change_zone = "wilderness",
+	nice_editer = psitech_floor_editer,
 }

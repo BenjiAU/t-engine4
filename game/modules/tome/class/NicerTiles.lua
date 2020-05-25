@@ -1261,6 +1261,22 @@ psitechwall = { method="walls", type="psitechwall", forbid={}, use_type=true, ex
 	default4={add_displays={{image="terrain/psicave/psitech_ver_edge_left_01.png", display_x=-1}}, min=1, max=1},
 	default6={add_displays={{image="terrain/psicave/psitech_ver_edge_right_01.png", display_x=1}}, min=1, max=1},
 },
+psitechfloor = { method="borders", type="psitech", forbid={lava=true, rock=true},
+	default8={add_mos={{image="terrain/psicave/psitech_floor_trans3_2_%02d.png", display_y=-1}}, min=1, max=1},
+	default2={add_mos={{image="terrain/psicave/psitech_floor_trans3_8_%02d.png", display_y=1}}, min=1, max=1},
+	default4={add_mos={{image="terrain/psicave/psitech_floor_trans3_6_%02d.png", display_x=-1}}, min=1, max=1},
+	default6={add_mos={{image="terrain/psicave/psitech_floor_trans3_4_%02d.png", display_x=1}}, min=1, max=1},
+
+	default1={z=3,add_mos={{image="terrain/psicave/psitech_floor_trans3_9_%02d.png", display_x=-1, display_y=1}}, min=1, max=1},
+	default3={z=3,add_mos={{image="terrain/psicave/psitech_floor_trans3_7_%02d.png", display_x=1, display_y=1}}, min=1, max=1},
+	default7={z=3,add_mos={{image="terrain/psicave/psitech_floor_trans3_3_%02d.png", display_x=-1, display_y=-1}}, min=1, max=1},
+	default9={z=3,add_mos={{image="terrain/psicave/psitech_floor_trans3_1_%02d.png", display_x=1, display_y=-1}}, min=1, max=1},
+
+	default1i={add_mos={{image="terrain/psicave/psitech_floor_trans3_inner_1_%02d.png", display_x=-1, display_y=1}}, min=1, max=1},
+	default3i={add_mos={{image="terrain/psicave/psitech_floor_trans3_inner_3_%02d.png", display_x=1, display_y=1}}, min=1, max=1},
+	default7i={add_mos={{image="terrain/psicave/psitech_floor_trans3_inner_7_%02d.png", display_x=-1, display_y=-1}}, min=1, max=1},
+	default9i={add_mos={{image="terrain/psicave/psitech_floor_trans3_inner_9_%02d.png", display_x=1, display_y=-1}}, min=1, max=1},
+},
 }
 _M.generic_borders_defs = defs
 
