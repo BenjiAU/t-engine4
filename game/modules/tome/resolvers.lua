@@ -1392,3 +1392,11 @@ function resolvers.calc.robe_stats(t, e)
 	e.wielder.resists = e.wielder.resists or {}
 	e.wielder.resists.all = (e.wielder.resists.all or 0) + 5 + ((e.material_level or 1) * 2)
 end
+
+--- Make robes great again
+function resolvers.for_campaign(id, fct)
+	return {__resolver="for_campaign", __resolve_last=true, id, fct}
+end
+function resolvers.calc.for_campaign(t, e)
+	if game:isCampaign(t[1]) then t[2](e) end
+end

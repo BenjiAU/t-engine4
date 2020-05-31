@@ -495,7 +495,7 @@ newEffect{
 	subtype = { miscellaneous=true },
 	status = "detrimental",
 	parameters = { },
-	on_gain = function(self, err) return _t"#LIGHT_RED##Target# is out of sight of its master; direct control will break!.", _t"+Out of sight" end,
+	on_gain = function(self, err) return _t"#LIGHT_RED##Target# is out of sight of its master; direct control will break!", _t"+Out of sight" end,
 	activate = function(self, eff)
 	end,
 	deactivate = function(self, eff)
@@ -522,7 +522,7 @@ newEffect{
 	subtype = { miscellaneous=true },
 	status = "detrimental",
 	parameters = { },
-	on_gain = function(self, err) return _t"#LIGHT_RED##Target# is out of sight of its master; direct control will break!.", _t"+Out of sight" end,
+	on_gain = function(self, err) return _t"#LIGHT_RED##Target# is out of sight of its master; direct control will break!", _t"+Out of sight" end,
 	activate = function(self, eff)
 	end,
 	deactivate = function(self, eff)
@@ -549,7 +549,7 @@ newEffect{
 	subtype = { miscellaneous=true },
 	status = "detrimental",
 	parameters = { },
-	on_gain = function(self, err) return _t"#LIGHT_RED##Target# is out of sight of its master; direct control will break!.", _t"+Out of sight" end,
+	on_gain = function(self, err) return _t"#LIGHT_RED##Target# is out of sight of its master; direct control will break!", _t"+Out of sight" end,
 	activate = function(self, eff)
 	end,
 	deactivate = function(self, eff)
@@ -3980,8 +3980,8 @@ newEffect{
 
 newEffect{
 	name = "LICH_HUNGER", image = "talents/lichform.png",
-	desc = "Lich Hunger",
-	long_desc = function(self, eff) return "To complete your resurrection you must kill a unique/boss/elite boss rank creature before the duration expires." end,
+	desc = _t"Lich Hunger",
+	long_desc = function(self, eff) return _t"To complete your resurrection you must kill a unique/boss/elite boss rank creature before the duration expires." end,
 	type = "other",
 	subtype = { lich = true },
 	status = "neutral",

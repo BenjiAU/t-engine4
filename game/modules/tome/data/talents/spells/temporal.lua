@@ -122,11 +122,11 @@ newTalent{
 	require = spells_req4,
 	points = 5,
 	mode = "sustained",
-	sustain_mana = 180,
+	sustain_mana = 120,
 	cooldown = 20,
 	use_only_arcane = 4,
 	tactical = { BUFF = 2 },
-	getHaste = function(self, t) return self:combatTalentLimit(t, 0.35, 0.05, 0.25) end,
+	getHaste = function(self, t) return self:combatTalentScale(t, 0.075, 0.26, 1/3) end, -- +10~30% for players, cube root scaling to prevent excessive strength on NPCs
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/spell_generic")
 		local power = t.getHaste(self, t)

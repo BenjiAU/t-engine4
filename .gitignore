@@ -41,4 +41,5 @@ te4_log.txt
 debug.log
 /.idea/
 /*.log
+.vscode
 __autosave__.pc

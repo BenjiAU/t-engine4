@@ -663,7 +663,7 @@ newInscription{
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x then return end
-		if not self:hasLOS(x, y) then return end
+		if not self:hasLOS(x, y) or game.level.map:checkEntity(x, y, Map.TERRAIN, "block_move") then return end
 
 		local _ _, x, y = self:canProject(tg, x, y)
 		local rad = 0
@@ -683,7 +683,7 @@ newInscription{
 		local data = self:getInscriptionData(t.short_name)
 		local power = data.power + data.inc_stat * 3
 		return ([[Activate the rune to teleport up to %d spaces within line of sight.  Afterwards you stay out of phase for %d turns. In this state all new negative status effects duration is reduced by %d%%, your defense is increased by %d and all your resistances by %d%%.]]):
-			tformat(data.range + data.inc_stat, t.getDur(self, t), power, power, power)
+			tformat(t.range(self, t), t.getDur(self, t), power, power, power)
 	end,
 	short_info = function(self, t)
 		local data = self:getInscriptionData(t.short_name)

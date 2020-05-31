@@ -36,12 +36,16 @@ newTalent{
 	requires_target = true,
 	getIncrease = function(self, t) return math.floor(self:combatTalentLimit(t, 4, 1, 3.5)) end,
 	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 0.8, 1.6) end,
+	on_pre_use = function(self, t, silent)
+		if not self:hasDualWeapon() then
+			if not silent then game.logPlayer(self, "You cannot use Virulent Strike without two weapons!") end
+			return false
+		end
+		return true
+	end,
 	action = function(self, t)
 		local weapon, offweapon = self:hasDualWeapon()
-		if not weapon then
-			game.logPlayer(self, "You cannot use Virulent Strike without two weapons!")
-			return nil
-		end
+		if not weapon then return nil end
 
 		local tg = self:getTalentTarget(t)
 		local x, y, target = self:getTarget(tg)
@@ -132,12 +136,16 @@ newTalent{
 	end,
 	getSplash = function(self, t) return self:combatTalentSpellDamage(t, 10, 200) end,
 	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 0.8, 1.6) end,
+	on_pre_use = function(self, t, silent)
+		if not self:hasDualWeapon() then
+			if not silent then game.logPlayer(self, "You cannot use Acid Strike without two weapons!") end
+			return false
+		end
+		return true
+	end,
 	action = function(self, t)
 		local weapon, offweapon = self:hasDualWeapon()
-		if not weapon then
-			game.logPlayer(self, "You cannot use Acid Strike without two weapons!")
-			return nil
-		end
+		if not weapon then return nil end
 
 		local tg = {type="hit", range=self:getTalentRange(t)}
 		local x, y, target = self:getTarget(tg)
@@ -182,12 +190,16 @@ newTalent{
 	tactical = { ATTACK = {BLIGHT = 1},},
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
 	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 1, 2) end,
+	on_pre_use = function(self, t, silent)
+		if not self:hasDualWeapon() then
+			if not silent then game.logPlayer(self, "You cannot use Corrupting Strike without two weapons!") end
+			return false
+		end
+		return true
+	end,
 	action = function(self, t)
 		local weapon, offweapon = self:hasDualWeapon()
-		if not weapon then
-			game.logPlayer(self, "You cannot use Corrupting Strike without two weapons!")
-			return nil
-		end
+		if not weapon then return nil end
 
 		local tg = self:getTalentTarget(t)
 		local x, y, target = self:getTarget(tg)

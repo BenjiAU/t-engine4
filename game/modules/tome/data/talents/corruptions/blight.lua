@@ -56,6 +56,7 @@ newTalent{
 	vim = 30,
 	range = 10,
 	radius = 3,
+	random_boss_rarity = 50, -- prevent sustain removal from being too common on NPCs
 	tactical = { ATTACKAREA = {BLIGHT = 1}, DISABLE = 2 },
 	requires_target = true,
 	target = function(self, t)

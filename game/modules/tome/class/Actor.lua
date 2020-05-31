@@ -5596,6 +5596,8 @@ function _M:preUseTalent(ab, silent, fake)
 
 		if self:hasEffect(self.EFF_SENTINEL) and (ab.mode ~= "sustained" or not self:isTalentActive(ab.id)) and util.getval(ab.no_energy, self, ab) ~= true and not fake and not self:attr("force_talent_ignore_ressources") then
 			if not silent then game.logSeen(self, "%s's %s is interrupted by the shot!", self:getName():capitalize(), ab.name) end
+			local cdr = self:getTalentCooldown(ab)
+			self.talents_cd[ab.id] = cdr
 			self.tempeffect_def[self.EFF_SENTINEL].do_proc(self, self:hasEffect(self.EFF_SENTINEL))
 			self:useEnergy()
 			self:fireTalentCheck("callbackOnTalentDisturbed", t)
@@ -7551,7 +7553,8 @@ function _M:transmoInven(inven, idx, o, transmo_source)
 	if price ~= price or not tostring(price):find("^[0-9]") then price = 1 end -- NaN is the only value that does not equals itself, this is the way to check it since we do not have a math.isnan method
 	if inven and idx then self:removeObject(inven, idx, true) end
 
-	if self.hasQuest and self:hasQuest("shertul-fortress") and self:isQuestStatus("shertul-fortress", engine.Quest.COMPLETED, "transmo-chest-extract-gems") and self:knowTalent(self.T_EXTRACT_GEMS) and self:callTalent(self.T_EXTRACT_GEMS, "filterGem", o) then
+	local gem_extracted = false
+	if game.state.transmo_chest_extract_gems and self:knowTalent(self.T_EXTRACT_GEMS) and self:callTalent(self.T_EXTRACT_GEMS, "filterGem", o) then
 		local gem = self:callTalent(self.T_EXTRACT_GEMS, "getGem", o)
 
 		if gem then
@@ -7564,12 +7567,15 @@ function _M:transmoInven(inven, idx, o, transmo_source)
 				game.logPlayer(self, "You extract %s from %s", gem:getName{do_color=true, do_count=true}, o:getName{do_color=true, do_count=true})
 				o = gem
 			end
+			gem_extracted = gem
 		end
 	end
 
 	self:sortInven()
 	self:incMoney(price)
-	if self.hasQuest and self:hasQuest("shertul-fortress") and self:isQuestStatus("shertul-fortress", engine.Quest.COMPLETED, "transmo-chest") then self:hasQuest("shertul-fortress"):gain_energy(price/10) end
+	if not self:triggerHook{"TransmogrificationChest:gainedMoney", transmo_source=transmo_source, from=o, price=price, gem_extracted=gem_extracted} then
+		if self.hasQuest and self:hasQuest("shertul-fortress") and self:isQuestStatus("shertul-fortress", engine.Quest.COMPLETED, "transmo-chest") then self:hasQuest("shertul-fortress"):gain_energy(price/10) end
+	end
 	game.log("You gain %0.2f gold from the transmogrification of %s.", price, o:getName{do_count=true, do_color=true})
 end
 

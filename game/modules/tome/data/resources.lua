@@ -182,7 +182,7 @@ ActorResource:defineResource(_t"Paradox", "paradox", ActorTalents.T_PARADOX_POOL
 	ai = { -- special ai functions and data
 		tactical = { default_pool_size = 100, -- assumed pool size to account for gains/losses/regeneration
 			want_level = function(act, aitarget)
-				local value = util.bound(5*(act:getParadox()-act.preferred_paradox)*act.global_speed/300, -10, 5) -- excess paradox
+				local value = util.bound(5*(act:getParadox()-(act.preferred_paradox or 300))*act.global_speed/300, -10, 5) -- excess paradox
 				value = value + math.min(value, 5*(act:paradoxFailChance()/100)^.5) -- preferred paradox overrides failure chance
 				return value
 			end

@@ -1489,27 +1489,22 @@ end
 -- x = a numeric value
 -- limit = value approached as x increases
 -- y_high = value to match at when x = x_high
--- y_low (optional) = value to match when x = x_low
---	returns (limit - add)*x/(x + halfpoint) + add (= add when x = 0 and limit when x = infinity)
--- halfpoint and add are internally computed to match the desired high/low values
--- note that the progression low->high->limit must be monotone, consistently increasing or decreasing
+-- y_low = value to match when x = x_low
+-- returns limit * (1-{a*(x)^0.75+b})
+-- 		(1-(e)^(-x)) ranges from 0 to 1 and can effectively be thought of as giving a percent of limit based on talent level (note that a*(x)^0.75+b will be < 0 for all x)
+-- 		note that the progression low->high->limit must be monotone, consistently increasing or decreasing
 function _M:combatLimit(x, limit, y_low, x_low, y_high, x_high)
---	local x_low, x_high = 1,5 -- Implied talent levels for low and high values respectively
---	local tl = type(t) == "table" and (raw and self:getTalentLevelRaw(t) or self:getTalentLevel(t)) or t
-	if y_low and x_low then
-		local p = limit*(x_high-x_low)
-		local m = x_high*y_high - x_low*y_low
---		local halfpoint = (p-m)/(y_high - y_low)
---		local add = (limit*(x_high*y_low-x_low*y_high) + y_high*y_low*(x_low-x_high))/(p-m)
---		return (limit-add)*x/(x + halfpoint) + add
-		local ah = (limit*(x_high*y_low-x_low*y_high)+ y_high*y_low*(x_low-x_high))/(y_high - y_low) -- add*halfpoint product calculated at once to avoid possible divide by zero
-		return (limit*x + ah)/(x + (p-m)/(y_high - y_low)) --factored version of above formula
---		return (limit-add)*x/(x + halfpoint) + add, halfpoint, add
-	else
-		local add = 0
-		local halfpoint = limit*x_high/(y_high-add)-x_high
-		return (limit-add)*x/(x + halfpoint) + add
---		return (limit-add)*x/(x + halfpoint) + add, halfpoint, add
+	x_low = x_low^0.75
+	x_high = x_high^0.75
+	if y_high >= y_low then -- find a and b such that (1-exp{a*sqrt(x)+b}) * limit returns y_low at x_low and y_high at x_high
+		-- gaze in horror at how we find our constants 
+		local a = math.log( (y_high-limit)/(y_low-limit) )/(x_high - x_low)
+		local b = -( (x_high - x_low) * math.log(1 - y_high/limit) - x_high * math.log( (y_high-limit)/(y_low-limit) ) )/(x_low - x_high)
+		return limit * (1 - math.exp( ((x)^.75*a+b)) )
+	elseif y_low > y_high then -- find a and b such that y_low - (y_low-limit)*(1-exp{a*(x)^0.75+b}) returns y_low at x_low and y_high at x_high
+		local a = math.log( (y_high-limit)/(y_low-limit) ) / (x_high - x_low)
+		local b = -( (x_high - x_low)*math.log(1-(y_low-y_high)/(y_low-limit)) - x_high * math.log( (y_high-limit)/(y_low-limit) ) )/(x_low - x_high)
+		return y_low - (y_low-limit) * (1 - math.exp( ((x)^.75*a+b) ))
 	end
 end
 
@@ -1573,57 +1568,54 @@ function _M:combatStatScale(stat, low, high, power, add, shift)
 	end
 end
 
--- Compute a diminishing returns value based on talent level that cannot go beyond a limit
+-- Compute a diminishing returns value based on talent level using exponentials that cannot go beyond a limit
 -- t = talent def table or a numeric value
 -- limit = value approached as talent levels increase
--- high = value at talent level 5
--- low = value at talent level 1 (optional)
+-- high = value at talent level 5 multiplied by mastery (default 6.5)
+-- low = value at talent level 1 multiplied by mastery (default 1.3)
 -- raw if true specifies use of raw talent level
---	returns (limit - add)*TL/(TL + halfpoint) + add == add when TL = 0 and limit when TL = infinity
--- TL = talent level, halfpoint and add are internally computed to match the desired high/low values
--- note that the progression low->high->limit must be monotone, consistently increasing or decreasing
-function _M:combatTalentLimit(t, limit, low, high, raw)
-	local x_low, x_high = 1,5 -- Implied talent levels for low and high values respectively
+-- mastery = value used for determining high and low
+-- returns limit * (1-exp{a*sqrt(tl)+b})
+-- 		(1-(e)^(-x)) ranges from 0 to 1 and can effectively be thought of as giving a percent of limit based on talent level (note that a*sqrt(tl)+b will be < 0 for all tl)
+-- 		note that the progression low->high->limit must be monotone, consistently increasing or decreasing
+function _M:combatTalentLimit(t, limit, low, high, raw, mastery)
+	local x_low = mastery and math.sqrt(mastery) or math.sqrt(1.3)
+	local x_high = mastery and math.sqrt(mastery*5) or math.sqrt(6.5)	
 	local tl = type(t) == "table" and (raw and self:getTalentLevelRaw(t) or self:getTalentLevel(t)) or t
-	if tl <= 0 then tl = 0.1 end
-	if low then
-		local p = limit*(x_high-x_low)
-		local m = x_high*high - x_low*low
---		local halfpoint = (p-m)/(high - low) -- point at which half progress towards the limit is reached
---		local add = (limit*(x_high*low-x_low*high) + high*low*(x_low-x_high))/(p-m)
-		local ah = (limit*(x_high*low-x_low*high)+ high*low*(x_low-x_high))/(high - low) -- add*halfpoint product calculated at once to avoid possible divide by zero
-		return (limit*tl + ah)/(tl + (p-m)/(high - low)) --factored version of above formula
---		return (limit-add)*tl/(tl + halfpoint) + add, halfpoint, add
-	else -- assume low and x_low are both 0
-		local halfpoint = limit*x_high/high-x_high
-		return limit*tl/(tl + halfpoint)
---		return (limit-add)*tl/(tl + halfpoint) + add, halfpoint, add
+	if tl <= 0 then tl = 0.5 end
+	if high >= low then -- find a and b such that (1-exp{a*sqrt(tl)+b}) * limit returns low at x_low and high at x_high
+		-- gaze in horror at how we find our constants 
+		local a = math.log( (high-limit)/(low-limit) )/(x_high - x_low)
+		local b = -( (x_high - x_low) * math.log(1 - high/limit) - x_high * math.log( (high-limit)/(low-limit) ) )/(x_low - x_high)
+		return limit * (1 - math.exp( (math.sqrt(tl)*a+b)) )
+	elseif low > high then -- find a and b such that low - (low-limit)*(1-exp{a*sqrt(tl)+b}) returns low at x_low and high at x_high
+		local a = math.log( (high-limit)/(low-limit) ) / (x_high - x_low)
+		local b = -( (x_high - x_low)*math.log(1-(low-high)/(low-limit)) - x_high * math.log( (high-limit)/(low-limit) ) )/(x_low - x_high)
+		return low - (low-limit) * (1 - math.exp( (math.sqrt(tl)*a+b) ))
 	end
 end
 
--- Compute a diminishing returns value based on a stat value that cannot go beyond a limit
+-- Compute a diminishing returns value based on a stat value using exponentials that cannot go beyond a limit
 -- stat == "str", "con",.... or a numeric value
--- limit = value approached as talent levels increase
+-- limit = value approached as stats increase
 -- high = value to match when stat = 100
--- low = value to match when stat = 10 (optional)
---	returns (limit - add)*stat/(stat + halfpoint) + add == add when STAT = 0 and limit when stat = infinity
--- halfpoint and add are internally computed to match the desired high/low values
--- note that the progression low->high->limit must be monotone, consistently increasing or decreasing
+-- low = value to match when stat = 10
+-- returns limit * (1-exp{a*(stat)^0.75+b})
+-- 		(1-(e)^(-x)) ranges from 0 to 1 and can effectively be thought of as giving a percent of limit based on talent level (note that a*(stat)^0.75+b will be < 0 for all tl)
+-- 		note that the progression low->high->limit must be monotone, consistently increasing or decreasing
 function _M:combatStatLimit(stat, limit, low, high)
-	local x_low, x_high = 10,100 -- Implied stat levels for low and high values respectively
+	local x_low = 5.6234 -- 10^0.75
+	local x_high = 31.623 --100^0.75
 	stat = type(stat) == "string" and self:getStat(stat,nil,true) or stat
-	if low then
-		local p = limit*(x_high-x_low)
-		local m = x_high*high - x_low*low
---		local halfpoint = (p-m)/(high - low) -- point at which half progress towards the limit is reached
---		local add = (limit*(x_high*low-x_low*high) + high*low*(x_low-x_high))/(p-m)
-		local ah = (limit*(x_high*low-x_low*high)+ high*low*(x_low-x_high))/(high - low) -- add*halfpoint product calculated at once to avoid possible divide by zero
-		return (limit*stat + ah)/(stat + (p-m)/(high - low)) --factored version of above formula
---		return (limit-add)*stat/(stat + halfpoint) + add, halfpoint, add
-	else -- assume low and x_low are both 0
-		local halfpoint = limit*x_high/high-x_high
-		return limit*stat/(stat + halfpoint)
---		return (limit-add)*stat/(stat + halfpoint) + add, halfpoint, add
+	if high >= low then -- find a and b such that (1-exp{a*(stat)^0.75+b}) * limit returns low at 10 stat and high at 100
+		-- gaze in horror at how we find our constants 
+		local a = math.log( (high-limit)/(low-limit) )/(x_high - x_low)
+		local b = -( (x_high - x_low) * math.log(1 - high/limit) - x_high * math.log( (high-limit)/(low-limit) ) )/(x_low - x_high)
+		return limit * (1 - math.exp( ((stat)^.75*a+b)) )
+	elseif low > high then -- find a and b such that low - (low-limit)*(1-exp{a*(stat)^0.75+b}) returns low at 10 stat and high at 100
+		local a = math.log( (high-limit)/(low-limit) ) / (x_high - x_low)
+		local b = -( (x_high - x_low)*math.log(1-(low-high)/(low-limit)) - x_high * math.log( (high-limit)/(low-limit) ) )/(x_low - x_high)
+		return low - (low-limit) * (1 - math.exp( ((stat)^.75*a+b) ))
 	end
 end
 
@@ -2782,6 +2774,13 @@ function _M:startGrapple(target)
 		grappleParam["drain"] = t.getDrain(self, t) -- stamina/turn set by Clinch
 		grappleParam["sharePct"] = t.getSharePct(self, t) -- damage shared with grappled set by Clinch
 
+	end
+
+	if grappledParam.silence == 1 and not target:canBe("silence") then
+		grappledParam.silence = 0
+	end
+	if grappledParam.slow == 1 and not target:canBe("slow") then
+		grappledParam.slow = 0
 	end
 	-- oh for the love of god why didn't I rewrite this entire structure
 	grappledParam["src"] = self

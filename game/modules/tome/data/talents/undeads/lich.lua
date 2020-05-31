@@ -46,7 +46,7 @@ newTalent{
 			game:saveGame()
 			return true
 		elseif not self:hasEffect(self.EFF_LICH_HUNGER) and not self.lich_no_more_regen then
-			list[#list+1] = {name=("Lich Regeneration (%d turns)"):format(t.getTurns(self, t)), action=function()
+			list[#list+1] = {name=("Lich Regeneration (%d turns)"):tformat(t.getTurns(self, t)), action=function()
 				dialog:cleanActor(self)
 				dialog:resurrectBasic(self)
 				dialog:restoreResources(self)
@@ -66,7 +66,7 @@ newTalent{
 		Any further death will still regenerate you but you will need to consume the essence of a creature of unique/boss/elite boss or more rank within %d turns to sustain yourself.
 		If you have not killed one when the duration expires or if you are killed again in this duration, you die permanently.
 		If this happens this power can never re-activate, even if you managed to resurrect by other means.]]):
-		format(t.getDieAt(self, t), t.getTurns(self, t))
+		tformat(t.getDieAt(self, t), t.getTurns(self, t))
 	end,
 }
 
@@ -95,7 +95,7 @@ newTalent{
 		return ([[Your mere presence is terrying to any foes that dare stand against you.
 		Every turn all foes in radius %d must make a metal save against your spellpower/physical power (whichever is highest) or become frightened (bypassing fear immunity), reducing all their saves by %d, all damage by %d%% and movement speed by %d%%.
 		If they successfully resist, they are immune for %d turns.]]):
-		format(self:getTalentRadius(t), t.getSaves(self, t), t.getDam(self, t), t.getSpeed(self, t), t.getImmune(self, t))
+		tformat(self:getTalentRadius(t), t.getSaves(self, t), t.getDam(self, t), t.getSpeed(self, t), t.getImmune(self, t))
 	end,
 }
 
@@ -123,7 +123,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Bathes the target in flames doing %0.2f damage
 		The damage will increase with the Magic stat]]):
-		format(damDesc(self, DamageType.DARKNESS, damage))
+		tformat(damDesc(self, DamageType.DARKNESS, damage))
 	end,
 }
 newTalent{
@@ -150,7 +150,7 @@ newTalent{
 		local damage = t.getDamage(self, t)
 		return ([[Bathes the target in flames doing %0.2f damage
 		The damage will increase with the Magic stat]]):
-		format(damDesc(self, DamageType.DARKNESS, damage))
+		tformat(damDesc(self, DamageType.DARKNESS, damage))
 	end,
 }
 
@@ -484,7 +484,7 @@ newTalent{
 		local blindsideLevel = t.getBlindsideLevel(self, t)
 		local avoid_master_damage = t.getAvoidMasterDamage(self, t)
 		return ([[While this ability is active, you will continually call up to %d level %d shadows to aid you in battle. Shadows are weak combatants that can: Use Arcane Reconstruction to heal themselves (level %d), Blindside their opponents (level %d), and Phase Door from place to place.
-		Shadows ignore %d%% of the damage dealt to them by their master.]]):format(maxShadows, level, healLevel, blindsideLevel, avoid_master_damage)
+		Shadows ignore %d%% of the damage dealt to them by their master.]]):tformat(maxShadows, level, healLevel, blindsideLevel, avoid_master_damage)
 	end,
 }
 
@@ -509,6 +509,6 @@ newTalent{
 	info = function(self, t)
 		return ([[You are so full with power that it overflows out of you whenever you cast a spell.
 		Upon spell cast you have %d%% chances to boost the physical power, spellpower, mindpower and all saves of all friendly undeads in sight (including yourself) by %d for 4 turns.]]):
-		format(t.getChance(self, t), t.getPower(self, t))
+		tformat(t.getChance(self, t), t.getPower(self, t))
 	end,
 }

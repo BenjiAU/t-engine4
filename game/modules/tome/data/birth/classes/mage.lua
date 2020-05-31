@@ -299,6 +299,10 @@ newBirthDescriptor{
 			{type="weapon", subtype="staff", name="elm staff", autoreq=true, ego_chance=-1000},
 			{type="armor", subtype="cloth", name="linen robe", autoreq=true, ego_chance=-1000},
 		},
+		resolvers.for_campaign("Maj'Eyal", function()
+			local p = game:getPlayer(true)
+			if p:callTalent(p.T_LICH, "canGrantQuest") then p:grantQuest("lichform") end
+		end)
 	},
 	copy_add = {
 		life_rating = -3,

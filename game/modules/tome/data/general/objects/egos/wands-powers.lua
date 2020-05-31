@@ -161,7 +161,7 @@ newEntity{
 	{
 	radius = function(self, who) return 10 end,
 	shield = function(self, who) return self:getCharmPower(who) end,
-	target = function(self, who) return {type="ball", nowarning=true, radius=self.use_power.radius(self, who)} end,
+	target = function(self, who) return {type="ball", nowarning=true, radius=self.use_power.radius(self, who), ignore_nullify_all_friendlyfire=true} end,
 	tactical = {HEAL = 1},
 	})
 }

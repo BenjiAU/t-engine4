@@ -321,7 +321,19 @@ local function dofolder(dir)
 		print(colors("%{bright}-------------------------------------"))
 		print(colors("%{bright}-- "..file))
 		print(colors("%{bright}-------------------------------------"))
-		explore(file:gsub("%.%./", ""), p:parse{file})
+		local function err(x)
+			io.stderr:write("In file ".. file .. ":\n")
+			io.stderr:write(x .. "\n")
+		end
+		local function parsefunc()
+			return p:parse{file}
+		end
+		local ok, parsed = xpcall(parsefunc, err)
+		if ok then
+			explore(file:gsub("%.%./", ""), parsed)
+		else
+			print()
+		end
 	end
 
 	if lfs.attributes(dir, "mode") == "file" then

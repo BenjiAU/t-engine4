@@ -25,6 +25,7 @@ newTalent{
 	random_ego = "utility",
 	mana = 40,
 	cooldown = 25,
+	random_boss_rarity = 50,
 	-- no_energy = function(self, t) return self:getTalentLevel(t) >= 7 and true or false end,
 	tactical = { CURE = function(self, t, aitarget)
 			local nb = 0

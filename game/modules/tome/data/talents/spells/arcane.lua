@@ -216,16 +216,18 @@ newTalent{
 		-- if self:reactionToward(src) > 0 then return end
 		self.disruption_shield_power = self.disruption_shield_power or 0
 		self.disruption_shield_storage = self.disruption_shield_storage or 0
+		local absorbed = 0
 
 		if cb.value <= self.disruption_shield_power then
-			game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):tformat(cb.value), false)
 			self.disruption_shield_power = self.disruption_shield_power - cb.value
+			absorbed = cb.value
 			cb.value = 0
+			game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):tformat(absorbed), false)
 			return true
 		else
-			game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):tformat(cb.value), false)
-			self.disruption_shield_power = 0
 			cb.value = cb.value - self.disruption_shield_power
+			absorbed = self.disruption_shield_power
+			self.disruption_shield_power = 0
 		end
 
 		local do_explode = false
@@ -233,18 +235,23 @@ newTalent{
 		local mana_usage = cb.value * ratio
 		local store = cb.value
 
+		if self.disruption_shield_storage + store >= t.getMaxDamage(self, t) then
+			do_explode = true
+			store = t.getMaxDamage(self, t) - self.disruption_shield_storage
+			mana_usage = store * ratio
+		end
 		if (self:getMana() - mana_usage) / self:getMaxMana() < 0.5 then
 			do_explode = true
 			local mana_limit = self:getMaxMana() * 0.3
 			mana_usage = self:getMana() - mana_limit
-			cb.value = cb.value - mana_usage / ratio
 			store = mana_usage / ratio
-		else
-			cb.value = 0
 		end
+		cb.value = cb.value - store
+		absorbed = absorbed + store
 		self:incMana(-mana_usage)
 		self.disruption_shield_storage = math.min(self.disruption_shield_storage + store, t.getMaxDamage(self, t))
 
+		game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):tformat(absorbed), false)
 		game:delayedLogDamage(src, self, 0, ("#PURPLE#(%d mana)#LAST#"):tformat(store), false)
 
 		if do_explode then	

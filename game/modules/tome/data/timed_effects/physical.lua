@@ -673,28 +673,6 @@ newEffect{
 }
 
 newEffect{
-	name = "DWARVEN_RESILIENCE", image = "talents/dwarf_resilience.png",
-	desc = _t"Dwarven Resilience",
-	long_desc = function(self, eff) return ("The target's skin turns to stone, granting %d armour, %d physical save and %d spell save."):tformat(eff.armor, eff.physical, eff.spell) end,
-	type = "physical",
-	subtype = { earth=true },
-	status = "beneficial",
-	parameters = { armor=10, spell=10, physical=10 },
-	on_gain = function(self, err) return _t"#Target#'s skin turns to stone." end,
-	on_lose = function(self, err) return _t"#Target#'s skin returns to normal." end,
-	activate = function(self, eff)
-		eff.aid = self:addTemporaryValue("combat_armor", eff.armor)
-		eff.pid = self:addTemporaryValue("combat_physresist", eff.physical)
-		eff.sid = self:addTemporaryValue("combat_spellresist", eff.spell)
-	end,
-	deactivate = function(self, eff)
-		self:removeTemporaryValue("combat_armor", eff.aid)
-		self:removeTemporaryValue("combat_physresist", eff.pid)
-		self:removeTemporaryValue("combat_spellresist", eff.sid)
-	end,
-}
-
-newEffect{
 	name = "STONE_SKIN", image = "talents/stoneskin.png",
 	desc = _t"Stoneskin",
 	long_desc = function(self, eff) return ("The target's skin reacts to damage, granting %d armour."):tformat(eff.power) end,
@@ -1287,7 +1265,7 @@ newEffect{
 	subtype = { speed=true, tactic=true },
 	status = "beneficial",
 	parameters = {power=1000},
-	on_gain = function(self, err) return _t"#Target# prepares for the next kill!.", _t"+Step Up" end,
+	on_gain = function(self, err) return _t"#Target# prepares for the next kill!", _t"+Step Up" end,
 	on_lose = function(self, err) return _t"#Target# slows down.", _t"-Step Up" end,
 	get_fractional_percent = function(self, eff)
 		local d = game.turn - eff.start_turn
@@ -1317,7 +1295,7 @@ newEffect{
 	subtype = { lightning=true, speed=true },
 	status = "beneficial",
 	parameters = {},
-	on_gain = function(self, err) return _t"#Target# turns into pure lightning!.", _t"+Lightning Speed" end,
+	on_gain = function(self, err) return _t"#Target# turns into pure lightning!", _t"+Lightning Speed" end,
 	on_lose = function(self, err) return _t"#Target# is back to normal.", _t"-Lightning Speed" end,
 	get_fractional_percent = function(self, eff)
 		local d = game.turn - eff.start_turn
@@ -3635,15 +3613,15 @@ newEffect{
 	desc = _t"Dwarven Resilience",
 	long_desc = function(self, eff)
 		if eff.mid_ac then
-			return ("The target's skin turns to stone, granting %d armour, %d physical save and %d spell save. Also applies %d armour to all non-physical damage."):tformat(eff.armor, eff.physical, eff.spell, eff.mid_ac)
+			return ("The target's skin turns to stone, granting %d armour, %d%% armour hardiness, %d physical save and %d spell save. Also applies %d armour to all non-physical damage."):tformat(eff.armor, eff.armor_hardiness, eff.physical, eff.spell, eff.mid_ac)
 		else
-			return ("The target's skin turns to stone, granting %d armour, %d physical save and %d spell save."):tformat(eff.armor, eff.physical, eff.spell)
+			return ("The target's skin turns to stone, granting %d armour, %d%% armour hardiness, %d physical save and %d spell save."):tformat(eff.armor, eff.armor_hardiness, eff.physical, eff.spell)
 		end
 	end,
 	type = "physical",
 	subtype = { earth=true },
 	status = "beneficial",
-	parameters = { armor=10, spell=10, physical=10 },
+	parameters = { armor=10, armor_hardiness=20, spell=10, physical=10 },
 	on_gain = function(self, err) return _t"#Target#'s skin turns to stone." end,
 	on_lose = function(self, err) return _t"#Target#'s skin returns to normal." end,
 	activate = function(self, eff)
@@ -3841,7 +3819,7 @@ newEffect{
 	subtype = { tactic=true, speed=true },
 	status = "beneficial",
 	parameters = {power=1000},
-	on_gain = function(self, err) return _t"#Target# enters an evasive stance!.", _t"+Escape!" end,
+	on_gain = function(self, err) return _t"#Target# enters an evasive stance!", _t"+Escape!" end,
 	on_lose = function(self, err) return _t"#Target# slows down.", _t"-Escape" end,
 	get_fractional_percent = function(self, eff)
 		local d = game.turn - eff.start_turn

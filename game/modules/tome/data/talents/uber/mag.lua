@@ -343,22 +343,28 @@ uberTalent{
 uberTalent{
 	name = "Lich",
 	require = {
-		special={desc="Is a living creature that knows necromancy", fct=function(self)
+		special={desc=_t"Is a living creature that knows necromancy", fct=function(self)
 			local nb = 0
 			for tid, lvl in pairs(self.talents) do local t = self:getTalentFromId(tid) if t.is_necromancy then nb = nb + lvl end end
 			return not self:attr("true_undead") and nb > 0
 		end},
-		special2={desc="Have completed the ritual", fct=function(self)
+		special2={desc=_t"Have completed the ritual", fct=function(self)
+			if self.lichform_quest_checker then return true end
 			if not game.state.birth.supports_lich_transform then return true else return self:isQuestStatus(game.state.birth.supports_lich_transform, engine.Quest.DONE) end
 		end},
 		stat = {wil=25},
 	},
 	is_race_evolution = function(self, t)
-		if self:attr("necromancy_immune") then return false end
-		if self:attr("greater_undead") then return false end
+		if not t:_canGrantQuest(self) then return false end
 		local nb = 0
 		for tid, lvl in pairs(self.talents) do local t = self:getTalentFromId(tid) if t.is_necromancy then nb = nb + lvl end end
-		return not self:attr("true_undead") and nb > 0
+		return nb > 0
+	end,
+	canGrantQuest = function(self, t)
+		if self:attr("necromancy_immune") then return false end
+		if self:attr("greater_undead") then return false end
+		if self:attr("true_undead") then return false end
+		return true
 	end,
 	cant_steal = true,
 	is_spell = true,
@@ -399,7 +405,6 @@ uberTalent{
 
 		self:attr("undead", 1)
 		self:attr("true_undead", 1)
-		self:attr("greater_undead", 1)
 
 		self:learnTalentType("undead/lich", true)
 
@@ -411,16 +416,17 @@ uberTalent{
 		if not self.has_custom_tile then
 			self:removeAllMOs()
 			self:updateModdableTile()
-			Dialog:yesnoLongPopup("Lichform", "#GREY#You feel your life slip away, only to be replaced by pure arcane forces! Your flesh starts to rot on your bones, and your eyes fall apart as you are reborn into a Lich!\n\n#{italic}#You may now choose to customize the appearance of your Lich, this can not be changed afterwards.", 600, function(ret) if ret then
-				require("mod.dialogs.Birther"):showCosmeticCustomizer(self, "Lich Cosmetic Options")
-			end end, "Customize Appearance", "Use Default", true)
+			Dialog:yesnoLongPopup(_t"Lichform", _t"#GREY#You feel your life slip away, only to be replaced by pure arcane forces! Your flesh starts to rot on your bones, and your eyes fall apart as you are reborn into a Lich!\n\n#{italic}#You may now choose to customize the appearance of your Lich, this can not be changed afterwards.", 600, function(ret) if ret then
+				require("mod.dialogs.Birther"):showCosmeticCustomizer(self, _t"Lich Cosmetic Options")
+			end end, _t"Customize Appearance", _t"Use Default", true)
 		else
-			Dialog:simplePopup("Lichform", "#GREY#You feel your life slip away, only to be replaced by pure arcane forces! Your flesh starts to rot on your bones, and your eyes fall apart as you are reborn into a Lich!")
+			Dialog:simplePopup(_t"Lichform", _t"#GREY#You feel your life slip away, only to be replaced by pure arcane forces! Your flesh starts to rot on your bones, and your eyes fall apart as you are reborn into a Lich!")
 		end
 
 		game.level.map:particleEmitter(self.x, self.y, 1, "demon_teleport")
 	end,
 	on_learn = function(self, t)
+		self:attr("greater_undead", 1) -- Set that here so that the player cant become an Exarch while waiting for their death to become a Lich
 		self:learnTalent(self.T_NEVERENDING_UNLIFE, true, 1)
 		game.bignews:say(120, "#DARK_ORCHID#You are on your way to Lichdom. #{bold}#Your next death will finish the ritual.#{normal}#")
 	end,
@@ -437,6 +443,6 @@ uberTalent{
 		- Frightening Presence: Your mere presence is enough to shatter the resolve of most, reducing their saves, damage and movement speed.
 		- Doomed for Eternity: As a creature of doom and despair you now constantly spawn undead shadows around you.
 		- Commander of the Dead: You are able to infuse all undead party members (including yourself) with un-natural power, increasing your physical and spellpower.
-		]]):format()
+		]]):tformat()
 	end,
 }

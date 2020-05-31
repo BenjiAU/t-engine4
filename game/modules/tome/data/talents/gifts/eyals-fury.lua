@@ -195,7 +195,7 @@ newTalent{
 	action = function(self, t)
 		-- Add a lasting map effect
 		local eff = game.level.map:addEffect(self,
-			self.x, self.y, 7,
+			self.x, self.y, t.getDuration(self, t),
 			DamageType.NATURE, self:mindCrit(t.getDamage(self, t)),
 			t.radius(self, t),
 			5, nil,
