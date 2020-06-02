@@ -815,7 +815,7 @@ function _M:parametrizedBox(t)
 		else box.title_do:color(1, 1, 1, 1)
 		end
 	end
-	t.chars = t.chars or 12
+	t.chars = 18
 	if not tonumber(t.number) then
 		t.is_parametrized = true
 	end
