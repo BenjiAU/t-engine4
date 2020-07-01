@@ -43,6 +43,7 @@ newEntity{
 	resolvers.inscriptions(1, "rune"),
 
 	resolvers.sustains_at_birth(),
+	resolvers.racial(), -- Unused for basegame
 
 	resolvers.talents{
 		[Talents.T_BLURRED_MORTALITY]={base=1, every=7, max=6},

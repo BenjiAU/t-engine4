@@ -102,7 +102,7 @@ function melindaCompanion(self, who, c, sc)
 	birth:setDescriptor("class", c)
 	birth:setDescriptor("subclass", sc)
 	birth.actor = melinda
-	birth:apply()
+	birth:apply(true)
 	melinda.image = "player/cornac_female_redhair.png"
 	melinda.moddable_tile_base = "base_redhead_01.png"
 	melinda.moddable_tile_ornament = {female="braid_redhead_01"}

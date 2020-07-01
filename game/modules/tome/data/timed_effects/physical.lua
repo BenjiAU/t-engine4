@@ -2295,6 +2295,7 @@ newEffect{
 	on_gain = function(self, eff) return nil, nil end,
 	on_lose = function(self, eff) return nil, nil end,
 	do_block = function(type, dam, eff, self, src)
+		if self == src then return dam end
 		local dur_inc = 0
 		local crit_inc = 0
 		local nb = 1

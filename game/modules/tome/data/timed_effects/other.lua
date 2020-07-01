@@ -4021,7 +4021,7 @@ newEffect{
 	name = "DOZING", image = "talents/sleep.png",
 	desc = _t"Dozing",
 	long_desc = function(self, eff) return _t"The target is completely asleep, unable to act." end,
-	type = "other",
+	type = "otber",
 	subtype = { sleep=true },
 	status = "detrimental",
 	parameters = { },
@@ -4029,5 +4029,49 @@ newEffect{
 		self:effectTemporaryValue(eff, "dont_act", 1)
 	end,
 	deactivate = function(self, eff)
+	end,
+}
+
+newEffect{
+	name = "MIRROR_IMAGE_REAL", image = "talents/mirror_images.png",
+	desc = _t"Protected by a Mirror Image",
+	long_desc = function(self, eff) return ("Target is protected by a mirror image. Increases damage dealt to blind or dazzled creatures by %d%%"):tformat(eff.dam) end,
+	type = "other",
+	subtype = { phantasm=true },
+	status = "beneficial", decrease = 0,
+	cancel_on_level_change = true,
+	parameters = { dam=10 },
+	callbackOnTalentPost = function(self, eff, ab, ret, silent)
+		if ab.id == self.T_MIRROR_IMAGES then return end
+		if not ab.is_spell or ab.is_inscription then return end
+		if ab.mode ~= "activated" then return end
+		if not ret then return end
+		local x, y, tgt = self:getTarget()
+		if not tgt or not ab.requires_target then return end
+		if eff.image:attr("dead") or not game.level:hasEntity(eff.image) then return end
+
+		pcall(function() -- Just in case
+			eff.image:forceUseTalent(ab.id, {force_level=self:getTalentLevelRaw(ab.id), ignore_cd=true, no_talent_fail=true, ignore_energy=true, force_talent_ignore_ressources=true, force_target=tgt})
+			eff.image:takeHit(1, eff.image)
+		end)
+
+		eff.last_talent = true
+	end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "blind_inc_damage", eff.dam)	
+	end,
+}
+
+newEffect{
+	name = "MIRROR_IMAGE_FAKE", image = "talents/mirror_images.png",
+	desc = _t"Protected by a Mirror Image",
+	long_desc = function(self, eff) return ("Target is protected by a mirror image. Increases damage dealt to blind or dazzled creatures by %d%%"):tformat(eff.dam) end,
+	type = "other",
+	subtype = { phantasm=true },
+	status = "beneficial", decrease = 0,
+	cancel_on_level_change = true,
+	parameters = { dam=10 },
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "blind_inc_damage", eff.dam)	
 	end,
 }

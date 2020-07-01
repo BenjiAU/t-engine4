@@ -233,6 +233,7 @@ newTalent{
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/thunderstorm")
 		game.logSeen(self, "#0080FF#A furious lightning storm forms around %s!", self:getName())
+		self:callTalent(self.T_ENERGY_ALTERATION, "forceActivate", DamageType.LIGHTNING)
 		return {
 		}
 	end,

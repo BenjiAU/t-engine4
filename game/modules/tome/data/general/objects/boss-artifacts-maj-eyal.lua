@@ -1767,8 +1767,8 @@ newEntity{ base = "BASE_GAUNTLETS", define_as = "STORM_BRINGER_GAUNTLETS",
 	talents_add_levels_filters = {
 		{desc=_t"+1 to all lightning damage spells", filter=function(who, t, lvl)
 			if t.is_spell and t.tactical and (
-				table.get(t.tactical, "attack", "LIGHTNING") or
-				table.get(t.tactical, "attackarea", "LIGHTNING")
+				table.has(t.tactical, "attack", "LIGHTNING") or
+				table.has(t.tactical, "attackarea", "LIGHTNING")
 			) then
 				return lvl + 1
 			end

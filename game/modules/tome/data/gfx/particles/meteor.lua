@@ -1,5 +1,5 @@
 -- ToME - Tales of Maj'Eyal
--- Copyright (C) 2009 - 2019 Nicolas Casalini
+-- Copyright (C) 2009 - 2017 Nicolas Casalini
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 -- Nicolas Casalini "DarkGod"
 -- darkgod@te4.org
 
+-- Changed to be very fast, with a longer tail to compensate.
+
 local nb = 1
 
 return { generator = function()
@@ -26,7 +28,7 @@ return { generator = function()
 	local x = sradius * math.cos(a)
 	local y = sradius * math.sin(a)
 	a = math.rad(ad + 180)
-	local life = 10
+	local life = 5
 
 	return {
 		trail = 1,

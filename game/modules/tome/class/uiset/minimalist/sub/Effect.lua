@@ -48,7 +48,7 @@ function _M:init(effects, eff_id)
 		self.texts:add(self.text_dur)
 	end
 	if e.charges then
-		local font = e.decrease > 0 and effects.buff_font_small or effects.buff_font
+		local font = (e.decrease > 0 or e.charges_smallfont) and effects.buff_font_small or effects.buff_font
 		self.text_charges = core.renderer.text(font):outline(1, 0, 0, 0, 1)
 		if e.decrease == 0 then self.text_charges:translate(20, 20, 10) else self.text_charges:translate(2, 38 - font:height(), 10) self.no_center = true end
 		self.texts:add(self.text_charges)

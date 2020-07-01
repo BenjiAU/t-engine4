@@ -54,11 +54,10 @@ newTalent{
 		self:triggerHook{"Necromancer:SoulLeech:GainSoul", src=src}
 	end,
 	info = function(self, t)
-		local npc = mod.class.NPC.new{rank=3.2}
-		local _, c_rare = npc:TextRank()
-		npc.rank = 3.5 local _, c_unique = npc:TextRank()
-		npc.rank = 4 local _, c_boss = npc:TextRank()
-		npc.rank = 5 local _, c_eboss = npc:TextRank()
+		local _, c_rare = self:textRank(3.2)
+		local _, c_unique = self:textRank(3.5)
+		local _, c_boss = self:textRank(4)
+		local _, c_eboss = self:textRank(5)
 
 		return ([[Each time you or your undead minions deal damage to a creature you apply Soul Leech to them.
 		If a creature dies with this effect active, you steal its soul.

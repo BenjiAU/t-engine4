@@ -74,7 +74,7 @@ newTalent{
 			soul = self:alterTalentCost(t, "soul", soul)
 
 			if self:getSoul() < soul or self:getMana() < mana then
-				game.logPlayer(self, "#GREY#Your hiemal shield does not have enough ressources!")
+				game.logPlayer(self, "#GREY#Your hiemal shield does not have enough resources!")
 				self:forceUseTalent(t.id, {ignore_energy=true})
 			else
 				game.logPlayer(self, "#GREY#Your hiemal shield regenerates to full!")

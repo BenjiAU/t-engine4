@@ -4623,21 +4623,39 @@ newEffect{
 	end,
 }
 
-newEffect{
-	name = "ELEMENTAL_MIRAGE1", image = "talents/blur_sight.png",
-	desc = _t"Elemental Mirage (First Element)",
-	long_desc = function(self, eff) return ("%s damage increased by %d%% and resistance penetration by %d%%."):tformat(DamageType:get(eff.dt).name, eff.power, eff.pen or 0) end,
+local base_energy_alteration = {
 	type = "magical",
-	subtype = { phantasm=true,},
+	subtype = { meta=true, },
 	status = "beneficial",
-	parameters = {dt=DamageType.ARCANE, power=10},
+	parameters = {power=20},
 	on_gain = function(self, err) return nil, true end,
 	on_lose = function(self, err) return nil, true end,
-	activate = function(self, eff)
-		self:effectTemporaryValue(eff, "inc_damage", {[eff.dt] = eff.power})
-		if eff.pen then self:effectTemporaryValue(eff, "resists_pen", {[eff.dt] = eff.pen}) end
+	decrease = 0,
+	charges_smallfont = true,
+	charges = function(self, eff)
+		return math.floor(eff.dur + 1)
+	end,
+	activate = function(self, eff, ed)
+		self:effectTemporaryValue(eff, "all_damage_convert", ed.dt)
+		self:effectTemporaryValue(eff, "all_damage_convert_percent", eff.power)
+	end,
+	on_timeout = function(self, eff)
+		eff.dur = eff.dur - 1
 	end,
 }
+for _, dt in ipairs{
+	DamageType.FIRE, DamageType.COLD, DamageType.ARCANE, DamageType.TEMPORAL,
+	DamageType.PHYSICAL, DamageType.MIND, DamageType.BLIGHT, DamageType.NATURE,
+	DamageType.LIGHT, DamageType.DARKNESS, DamageType.LIGHTNING, DamageType.ACID,
+} do
+	local name = DamageType:get(dt).name
+	local e = table.clone(base_energy_alteration, true)
+	e.name = "ENERGY_ALTERATION_"..dt
+	e.desc = ("Energy Alteration (%s)"):tformat(name)
+	e.long_desc = function(self, eff) return ("%d%% of all damage converted to %s."):tformat(eff.power, name) end
+	e.dt = dt
+	newEffect(e)
+end
 
 newEffect{
 	name = "LICH_FEAR", image = "talents/lichform.png",
@@ -4655,22 +4673,6 @@ newEffect{
 		self:effectTemporaryValue(eff, "combat_physresist", -eff.saves)
 		self:effectTemporaryValue(eff, "combat_spellresist", -eff.saves)
 		self:effectTemporaryValue(eff, "movement_speed", -eff.speed / 100)
-	end,
-}
-
-newEffect{
-	name = "ELEMENTAL_MIRAGE2", image = "talents/alter_mirage.png",
-	desc = _t"Elemental Mirage (Second Element)",
-	long_desc = function(self, eff) return ("%s damage increased by %d%% and resistance penetration by %d%%."):tformat(DamageType:get(eff.dt).name, eff.power, eff.pen or 0) end,
-	type = "magical",
-	subtype = { phantasm=true,},
-	status = "beneficial",
-	parameters = {dt=DamageType.FIRE, power=10},
-	on_gain = function(self, err) return nil, true end,
-	on_lose = function(self, err) return nil, true end,
-	activate = function(self, eff)
-		self:effectTemporaryValue(eff, "inc_damage", {[eff.dt] = eff.power})
-		if eff.pen then self:effectTemporaryValue(eff, "resists_pen", {[eff.dt] = eff.pen}) end
 	end,
 }
 
@@ -5207,5 +5209,24 @@ newEffect{
 				self:effectTemporaryValue(eff, "talent_cd_reduction", {allpct = -0.15})
 			end
 		end
+	end,
+}
+
+newEffect{
+	name = "CLEANSING_FLAMES", image = "talents/cleansing_flames.png",
+	desc = _t"Cleansing Flames",
+	long_desc = function(self, eff) return ("The target is on fire, taking %0.2f fire damage per turn and %d%% chance per turn of removing a physical or magical effect from all targets affected by Inferno, Burning Wake or Cleansing Flames."):tformat(eff.power, eff.chance) end,
+	charges = function(self, eff) return (math.floor(eff.power)) end,
+	type = "magical",
+	subtype = { fire=true, cleanse=true },
+	status = "beneficial",
+	parameters = { power=10 },
+	on_gain = function(self, err) return _t"#Target# bathes in cleansing flames!", true end,
+	on_lose = function(self, err) return _t"#Target# stops burning.", true end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "cleansing_flames", eff.chance)
+	end,
+	on_timeout = function(self, eff)
+		DamageType:get(DamageType.FIRE).projector(self, self.x, self.y, DamageType.FIRE, eff.power)
 	end,
 }

@@ -3969,3 +3969,29 @@ newTalent{
 		Damage improves with your Spellpower.]]):tformat(darkCount, radius, damDesc(self, DamageType.COLD, damage))
 	end,
 }
+
+newTalent{
+	name = "Quicken Spells",
+	type = {"spell/other",1},
+	points = 5,
+	mode = "sustained",
+	sustain_mana = 80,
+	cooldown = 30,
+	tactical = { BUFF = 2 },
+	getCooldownReduction = function(self, t) return util.bound(self:getTalentLevelRaw(t) / 15, 0.05, 0.3) end,
+	activate = function(self, t)
+		game:playSoundNear(self, "talents/spell_generic")
+		return {
+			cd = self:addTemporaryValue("spell_cooldown_reduction", t.getCooldownReduction(self, t)),
+		}
+	end,
+	deactivate = function(self, t, p)
+		self:removeTemporaryValue("spell_cooldown_reduction", p.cd)
+		return true
+	end,
+	info = function(self, t)
+		local cooldownred = t.getCooldownReduction(self, t)
+		return ([[Reduces the cooldown of all spells by %d%%.]]):
+		tformat(cooldownred * 100)
+	end,
+}

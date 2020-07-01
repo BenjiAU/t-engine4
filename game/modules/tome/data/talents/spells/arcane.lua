@@ -118,6 +118,7 @@ newTalent{
 		target = game.level.map(tx, ty, Map.ACTOR)
 		if not target then return nil end
 
+		self:callTalent(self.T_ENERGY_ALTERATION, "forceActivate", DamageType.ARCANE)
 		target:setEffect(target.EFF_ARCANE_VORTEX, 6, {src=self, dam=self:spellCrit(t.getDamage(self, t))})
 		game:playSoundNear(self, "talents/arcane")
 		return true

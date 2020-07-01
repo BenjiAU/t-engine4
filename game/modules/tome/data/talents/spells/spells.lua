@@ -178,7 +178,7 @@ function necroSetupSummon(self, def, x, y, level, turns, no_control)
 	m.inc_damage = table.clone(self.inc_damage, true)
 	m.no_breath = 1
 	m.no_drops = true
-	m.necrotic_minion_be_nice = 1
+	m.minion_be_nice = 1
 
 	if self:isTalentActive(self.T_NECROTIC_AURA) then
 		local t = self:getTalentFromId(self.T_NECROTIC_AURA)

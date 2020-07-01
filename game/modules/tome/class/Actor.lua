@@ -139,6 +139,9 @@ _M.temporary_values_conf.projectile_evasion_spread = "highest"
 
 _M.temporary_values_conf.life_leech_chance = "highest"
 
+-- For archmages
+_M.temporary_values_conf.blind_inc_damage = "highest"
+
 -- Damage redirection takes last
 _M.temporary_values_conf.force_use_resist = "last"
 _M.temporary_values_conf.force_use_resist_percent = "last"
@@ -1563,21 +1566,23 @@ function _M:allowedRanks()
 	return { 1, 2, 3, 3.2, 3.5, 4, 5, 10 }
 end
 
-function _M:TextRank()
+function _M:textRank(use_rank)
+	use_rank = use_rank or self.rank
 	local rank, color = _t"normal", "#ANTIQUE_WHITE#"
-	if self.rank == 1 then rank, color = _t"critter", "#C0C0C0#"
-	elseif self.rank == 2 then rank, color = _t"normal", "#ANTIQUE_WHITE#"
-	elseif self.rank == 3 then rank, color = _t"elite", "#YELLOW#"
-	elseif self.rank == 3.2 then rank, color = _t"rare", "#SALMON#"
-	elseif self.rank == 3.5 then rank, color = _t"unique", "#SANDY_BROWN#"
-	elseif self.rank == 4 then rank, color = _t"boss", "#ORANGE#"
-	elseif self.rank == 5 then rank, color = _t"elite boss", "#GOLD#"
-	elseif self.rank >= 10 then rank, color = _t"god", "#FF4000#"
+	if use_rank == 1 then rank, color = _t"critter", "#C0C0C0#"
+	elseif use_rank == 2 then rank, color = _t"normal", "#ANTIQUE_WHITE#"
+	elseif use_rank == 3 then rank, color = _t"elite", "#YELLOW#"
+	elseif use_rank == 3.2 then rank, color = _t"rare", "#SALMON#"
+	elseif use_rank == 3.5 then rank, color = _t"unique", "#SANDY_BROWN#"
+	elseif use_rank == 4 then rank, color = _t"boss", "#ORANGE#"
+	elseif use_rank == 5 then rank, color = _t"elite boss", "#GOLD#"
+	elseif use_rank >= 10 then rank, color = _t"god", "#FF4000#"
 	end
 	return rank, color
 end
+_M.TextRank = _M.textRank -- This drove me crazy to have them with the bad camelCase
 
-function _M:TextSizeCategory()
+function _M:textSizeCategory()
 	local sizecat = _t"medium"
 	if self.size_category <= 1 then sizecat = _t"tiny"
 	elseif self.size_category == 2 then sizecat = _t"small"
@@ -1588,6 +1593,7 @@ function _M:TextSizeCategory()
 	end
 	return sizecat
 end
+_M.TextSizeCategory = _M.textSizeCategory -- This drove me crazy to have them with the bad camelCase
 
 function _M:colorStats(stat)
 	local score = 0
@@ -5539,6 +5545,21 @@ function _M:preUseTalent(ab, silent, fake)
 			end
 		end
 
+		-- Psionic can fail
+		if (ab.is_mind and not self:isTalentActive(ab.id)) and not fake and self:attr("mind_failure") then
+			if rng.percent(self:attr("mind_failure")) then
+				if not silent then game.logSeen(self, "%s's %s has been disrupted by #ORCHID#anti-psionic forces#LAST#!", self:getName():capitalize(), ab.name) end
+				if not util.getval(ab.no_energy, self, ab) then
+					self:useEnergy()
+				else
+					self.turn_procs.forbid_instant_talents = self.turn_procs.forbid_instant_talents or {}
+					self.turn_procs.forbid_instant_talents[ab.id] = true
+				end
+				self:fireTalentCheck("callbackOnTalentDisturbed", ab)
+				return false
+			end
+		end
+
 		-- Chronomancy can fail, causing an anomaly but returning Paradox
 		if (ab.paradox or (ab.sustain_paradox and not self:isTalentActive(ab.id))) and not fake and not self:attr("force_talent_ignore_ressources") then
 			-- Random anomalies reduce paradox by twice the talent's paradox cost
@@ -5866,7 +5887,9 @@ function _M:iterCallbacks(event)
 				return function(...)
 					local old_ps = self.__project_source
 					self.__project_source = self.sustain_talents[tid]
+					self:setCurrentTalentMode("callback")
 					local ret = self:callTalent(tid, event, ...)
+					self:setCurrentTalentMode(nil)
 					self.__project_source = old_ps
 					return ret
 				end, priority, kind
@@ -7214,6 +7237,8 @@ end
 
 --- Called when we are initiating a projection
 function _M:on_project_init(t, x, y, damtype, dam, particles)
+	t.talent_mode = self:getCurrentTalentMode()
+
 	if self:attr("nullify_all_friendlyfire") and not t.ignore_nullify_all_friendlyfire then
 		local dt = DamageType:exists(damtype)
 		if not dt or not dt.ignore_nullify_all_friendlyfire then
@@ -7703,8 +7728,10 @@ function _M:doWearTinker(wear_inven, wear_item, wear_o, base_inven, base_item, b
 		if wear_inven and wear_item then self:removeObject(wear_inven, wear_item) end
 
 		self:fireTalentCheck("callbackOnWearTinker", wear_o, base_o)
-		if not self:attr("quick_wear_takeoff") or self:attr("quick_wear_takeoff_disable") then self:useEnergy() end
-		if self:attr("quick_wear_takeoff") then self:setEffect(self.EFF_SWIFT_HANDS_CD, 1, {}) self.tmp[self.EFF_SWIFT_HANDS_CD].dur = 0 end
+		if not self:attr("free_tinker_attach") then
+			if not self:attr("quick_wear_takeoff") or self:attr("quick_wear_takeoff_disable") then self:useEnergy() end
+			if self:attr("quick_wear_takeoff") then self:setEffect(self.EFF_SWIFT_HANDS_CD, 1, {}) self.tmp[self.EFF_SWIFT_HANDS_CD].dur = 0 end
+		end
 		return true, base_o
 	else
 		game.logPlayer(self, "You fail to attach %s to %s.", wear_o:getName{do_color=true}, base_o:getName{do_color=true})

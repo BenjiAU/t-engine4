@@ -28,7 +28,7 @@ newTalent{
 	tactical = { ATTACK = {DARKNESS=1}, DISABLE = 5 },
 	requires_target = true,
 	autolearn_talent = "T_SOUL_POOL",
-	range = 0,
+	range = 10,
 	minions_list = {
 		dread = {
 			type = "undead", subtype = "ghost",

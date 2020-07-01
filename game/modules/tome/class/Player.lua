@@ -126,7 +126,7 @@ function _M:onBirth(birther)
 		local zones = {}
 		for i, zd in ipairs(def) do for j = zd[2], zd[3] do zones[#zones+1] = {zd[1], j} end end
 		self.random_escort_levels = {}
-		for i = 1, 9 do
+		for i = 1, world.random_escort_possibilities_max or 9 do
 			local z = rng.tableRemove(zones)
 			print("Random escort on", z[1], z[2])
 			self.random_escort_levels[z[1]] = self.random_escort_levels[z[1]] or {}
@@ -168,7 +168,11 @@ function _M:onEnterLevel(zone, level)
 
 	-- Fire random escort quest
 	if self.random_escort_levels and self.random_escort_levels[escort_zone_name] and self.random_escort_levels[escort_zone_name][level.level - escort_zone_offset] then
-		self:grantQuest("escort-duty")
+		if self:triggerHook{"Player:onEnterLevel:generateEscort", zone=zone, level=level} then
+			-- nothing
+		elseif game:isCampaign("Maj'Eyal") then
+			self:grantQuest("escort-duty")
+		end
 	end
 
 	-- Cancel effects

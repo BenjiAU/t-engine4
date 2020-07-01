@@ -33,7 +33,7 @@ local entities_load_functions = {}
 
 _M.__mo_final_repo = {}
 --- Fields we shouldn't save
-_M._no_save_fields = { _shader = true, __z_layers = true, _do_cache = true }
+_M._no_save_fields = { _shader = true, __z_layers = true, _do_cache = true, _temp_data = true }
  --- Subclasses can change it to know where they are on the map
 _M.__position_aware = false
 

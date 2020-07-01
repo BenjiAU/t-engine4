@@ -834,61 +834,62 @@ newInscription{
 		return res
 	end,
 	action = function(self, t)
-			if not self:canBe("summon") then game.logPlayer(self, "You cannot summon; you are suppressed!") return end
+		if not self:canBe("summon") then game.logPlayer(self, "You cannot summon; you are suppressed!") return end
 
-			-- Find all actors in radius 10 and add them to a table
-			local tg = {type="ball", radius=self.sight}
-			local grids = self:project(tg, self.x, self.y, function() end)
-			local tgts = {}
-			for x, ys in pairs(grids) do for y, _ in pairs(ys) do
-				local target = game.level.map(x, y, Map.ACTOR)
-				if target and self:reactionToward(target) < 0 then tgts[#tgts+1] = target end
-			end end
+		-- Find all actors in radius 10 and add them to a table
+		local tg = {type="ball", radius=self.sight}
+		local grids = self:project(tg, self.x, self.y, function() end)
+		local tgts = {}
+		for x, ys in pairs(grids) do for y, _ in pairs(ys) do
+			local target = game.level.map(x, y, Map.ACTOR)
+			if target and self:reactionToward(target) < 0 then tgts[#tgts+1] = target end
+		end end
 
-			for _ = 1,3 do
-				local target = rng.tableRemove(tgts)
-				if target then
-					local tx, ty = util.findFreeGrid(target.x, target.y, 10, true, {[Map.ACTOR]=true})
-					if tx then
-						local Talents = require "engine.interface.ActorTalents"
-						local NPC = require "mod.class.NPC"
-						local caster = self
-						local image = NPC.new{
-							name = _t"Mirror Image",
-							type = "image", subtype = "image",
-							ai = "summoned", ai_real = nil, ai_state = { talent_in=1, }, ai_target = {actor=nil},
-							desc = _t"A blurred image.",
-							image = caster.image,
-							add_mos = caster.add_mos, -- this is horribly wrong isn't it?  seems to work though
-							shader = "shadow_simulacrum", shader_args = { color = {0.0, 0.4, 0.8}, base = 0.6, time_factor = 1500 },
-							exp_worth=0,
-							max_life = caster.max_life,
-							life = caster.max_life, -- We don't want to make this only useful before you take damage
-							combat_armor_hardiness = caster:combatArmorHardiness(),
-							combat_def = caster:combatDefense(),
-							combat_armor = caster:combatArmor(),
-							size_category = caster.size_category,
-							resists = t.getInheritedResist(self, t),
-							rank = 1,
-							life_rating = 0,
-							cant_be_moved = 1,
-							never_move = 1,
-							never_anger = true,
-							resolvers.talents{
-								[Talents.T_TAUNT]=1, -- Add the talent so the player can see it even though we cast it manually
-							},
-							on_act = function(self) -- avoid any interaction with .. uh, anything
-								self:forceUseTalent(self.T_TAUNT, {ignore_cd=true, no_talent_fail = true})
-							end,
-							faction = caster.faction,
-							summoner = caster,
-							summon_time=t.getDur(self, t),
-							no_breath = 1,
-							remove_from_party_on_death = true,
-						}
+		for _ = 1,3 do
+			local target = rng.tableRemove(tgts)
+			if target then
+				local tx, ty = util.findFreeGrid(target.x, target.y, 10, true, {[Map.ACTOR]=true})
+				if tx then
+					local Talents = require "engine.interface.ActorTalents"
+					local NPC = require "mod.class.NPC"
+					local caster = self
+					local image = NPC.new{
+						name = _t"Mirror Image",
+						type = "image", subtype = "image",
+						ai = "summoned", ai_real = nil, ai_state = { talent_in=1, }, ai_target = {actor=nil},
+						desc = _t"A blurred image.",
+						image = caster.image,
+						add_mos = table.clone(caster.add_mos, true),
+						shader = "shadow_simulacrum", shader_args = { color = {0.0, 0.4, 0.8}, base = 0.6, time_factor = 1500 },
+						exp_worth=0,
+						max_life = caster.max_life,
+						life = caster.max_life, -- We don't want to make this only useful before you take damage
+						combat_armor_hardiness = caster:combatArmorHardiness(),
+						combat_def = caster:combatDefense(),
+						combat_armor = caster:combatArmor(),
+						size_category = caster.size_category,
+						resists = t.getInheritedResist(self, t),
+						rank = 1,
+						life_rating = 0,
+						cant_be_moved = 1,
+						never_move = 1,
+						never_anger = true,
+						resolvers.talents{
+							[Talents.T_TAUNT]=1, -- Add the talent so the player can see it even though we cast it manually
+						},
+						on_act = function(self) -- avoid any interaction with .. uh, anything
+							self:forceUseTalent(self.T_TAUNT, {ignore_cd=true, no_talent_fail = true})
+						end,
+						faction = caster.faction,
+						summoner = caster,
+						summon_time=t.getDur(self, t),
+						no_breath = 1,
+						remove_from_party_on_death = true,
+					}
 
-						image:resolve()
-						game.zone:addEntity(game.level, image, "actor", tx, ty)
+					image:resolve()
+					game.zone:addEntity(game.level, image, "actor", tx, ty)
+					if game.party:hasMember(self) then
 						game.party:addMember(image, {
 							control=false,
 							type="summon",
@@ -896,11 +897,12 @@ newInscription{
 							temporary_level = true,
 							orders = {},
 						})
-
-						image:forceUseTalent(image.T_TAUNT, {ignore_cd=true, no_talent_fail = true})
 					end
+
+					image:forceUseTalent(image.T_TAUNT, {ignore_cd=true, no_talent_fail = true})
 				end
 			end
+		end
 
 		return true
 	end,

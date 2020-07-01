@@ -112,6 +112,8 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 	end
 
 	local source_talent = src.__projecting_for and src.__projecting_for.project_type and (src.__projecting_for.project_type.talent_id or src.__projecting_for.project_type.talent) and src.getTalentFromId and src:getTalentFromId(src.__projecting_for.project_type.talent or src.__projecting_for.project_type.talent_id)
+	local source_talent_mode = src.__projecting_for and src.__projecting_for.project_type and src.__projecting_for.project_type.talent_mode
+	if not source_talent_mode and src.getCurrentTalentMode then source_talent_mode = src:getCurrentTalentMode() end
 
 	local terrain = game.level.map(x, y, Map.TERRAIN)
 	if terrain then terrain:check("damage_project", src, x, y, type, dam, source_talent) end
@@ -481,13 +483,13 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 		end
 
 		--Dark Empathy (Reduce damage against summoner)
-		if src.necrotic_minion_be_nice and src.summoner == target then
-			dam = dam * (1 - src.necrotic_minion_be_nice)
+		if src.minion_be_nice and src.summoner == target then
+			dam = dam * (1 - src.minion_be_nice)
 		end
 
 		--Dark Empathy (Reduce damage against other minions)
-		if src.necrotic_minion_be_nice and target.summoner and src.summoner == target.summoner then
-			dam = dam * (1 - src.necrotic_minion_be_nice)
+		if src.minion_be_nice and target.summoner and src.summoner == target.summoner then
+			dam = dam * (1 - src.minion_be_nice)
 		end
 
 		-- Curse of Misfortune: Unfortunate End (chance to increase damage enough to kill)
@@ -517,7 +519,7 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 
 		print("[PROJECTOR] final dam after static checks", dam)
 
-		local hd = {"DamageProjector:final", src=src, target=target, x=x, y=y, type=type, dam=dam, state=state, source_talent=source_talent}
+		local hd = {"DamageProjector:final", src=src, target=target, x=x, y=y, type=type, dam=dam, state=state, source_talent=source_talent, source_talent_mode=source_talent_mode}
 		if src:triggerHook(hd) then dam = hd.dam if hd.stopped then return hd.stopped end end
 		if target.iterCallbacks then
 			for cb in target:iterCallbacks("callbackOnTakeDamage") do
@@ -537,7 +539,7 @@ setDefaultProjector(function(src, x, y, type, dam, state)
 		print("[PROJECTOR] final dam after hooks and callbacks", dam)
 
 		local dead
-		dead, dam = target:takeHit(dam, src, {damtype=type, damstate=state, source_talent=source_talent, initial_dam=initial_dam})
+		dead, dam = target:takeHit(dam, src, {damtype=type, damstate=state, source_talent=source_talent, source_talent_mode=source_talent_mode, initial_dam=initial_dam})
 
 		-- Log damage for later
 		if not DamageType:get(type).hideMessage then
@@ -4282,6 +4284,18 @@ newDamageType{
 		state.is_meteor = true
 		local realdam1 = DamageType:get(DamageType.PHYSICAL).projector(src, x, y, DamageType.PHYSICAL, dam / 2, state)
 		local realdam2 = DamageType:get(DamageType.FIRE).projector(src, x, y, DamageType.FIRE, dam / 2, state)
+		return (realdam1 or 0) + (realdam2 or 0)
+	end,
+}
+
+newDamageType{
+	name = _t"fetid", type = "FETID", text_color = "#DARK_GREEN#",
+	damdesc_split = { {DamageType.BLIGHT, 0.5}, {DamageType.DARKNESS, 0.5} },
+	projector = function(src, x, y, type, dam, state)
+		state = initState(state)
+		useImplicitCrit(src, state)
+		local realdam1 = DamageType:get(DamageType.BLIGHT).projector(src, x, y, DamageType.BLIGHT, dam / 2, state)
+		local realdam2 = DamageType:get(DamageType.DARKNESS).projector(src, x, y, DamageType.DARKNESS, dam / 2, state)
 		return (realdam1 or 0) + (realdam2 or 0)
 	end,
 }

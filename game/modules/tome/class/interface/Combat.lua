@@ -492,6 +492,8 @@ function _M:attackTargetWith(target, weapon, damtype, mult, force_dam)
 		repelled = true
 	end
 
+	local no_procs = false
+
 	if repelled then
 		self:logCombat(target, "#Target# repels an attack from #Source#.")
 	elseif self:checkEvasion(target) then
@@ -545,6 +547,16 @@ function _M:attackTargetWith(target, weapon, damtype, mult, force_dam)
 			local bonus = 1 + self:getAccuracyEffect(weapon, atk, def, 0.005, 0.5)  -- +50% APR bonus at 100 accuracy
 			apr = apr * bonus
 			print("[ATTACK] dagger accuracy bonus", atk, def, "=", bonus, "apr ==>", apr)
+		end
+
+		local hd = {"Combat:attackTargetWith:beforeArmor", target=target, weapon=weapon, damtype=damtype, mult=mult, dam=dam, apr=apr, atk=atk, def=def, armor=armor}
+		if self:triggerHook(hd) then
+			dam = hd.dam
+			damtype = hd.damtype
+			apr = hd.apr
+			armor = hd.armor
+			mult = hd.mult
+			no_procs = hd.no_procs
 		end
 
 		armor = math.max(0, armor - apr)
@@ -646,7 +658,9 @@ function _M:attackTargetWith(target, weapon, damtype, mult, force_dam)
 	end
 ]]
 
-	hitted = self:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult, atk, def, hitted, crit, evaded, repelled, old_target_life)
+	if not no_procs then
+		hitted = self:attackTargetHitProcs(target, weapon, dam, apr, armor, damtype, mult, atk, def, hitted, crit, evaded, repelled, old_target_life)
+	end
 
 	-- Visual feedback
 	if hitted then game.level.map:particleEmitter(target.x, target.y, 1, "melee_attack", {color=target.blood_color}) end
@@ -1752,7 +1766,7 @@ end
 
 --- Gets spellpower raw
 function _M:combatSpellpowerRaw(add)
-	if self.combat_precomputed_spellpower then return self.combat_precomputed_spellpower end
+	if self.combat_precomputed_spellpower then return self.combat_precomputed_spellpower, 1 end
 	add = add or 0
 
 	if self.combat_generic_power then

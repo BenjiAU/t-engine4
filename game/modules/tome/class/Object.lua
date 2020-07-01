@@ -240,7 +240,17 @@ function _M:useObject(who, ...)
 			local id = self.use_talent.id
 			local ab = self:getTalentFromId(id)
 			local old_level = who.talents[id]; who.talents[id] = self.use_talent.level
-			local ret = ab.action(who, ab)
+
+			who:attr("force_talent_ignore_ressources", 1)
+			local ret = false
+			if not who:preUseTalent(ab) then 
+				ret = false
+			else
+				local ok, special
+				ok, ret, special = xpcall(function() return ab.action(who, ab) end, debug.traceback)
+				if not ok then who:onTalentLuaError(ab, ret) error(ret) end
+			end
+			who:attr("force_talent_ignore_ressources", -1)
 			who.talents[id] = old_level
 
 			if ret then

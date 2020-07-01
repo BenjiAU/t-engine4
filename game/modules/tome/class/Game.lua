@@ -1367,6 +1367,8 @@ function _M:changeLevelReal(lev, zone, params)
 	self.change_level_party_back = nil
 
 	self:dieClonesDie()
+
+	self:triggerHook{"Game:changeLevel"}
 end
 
 function _M:dieClonesDie()
@@ -2014,6 +2016,8 @@ function _M:setupCommands()
 			print("===============")
 		end end,
 		[{"_g","ctrl"}] = function() if config.settings.cheat then
+			game.player:setEffect("EFF_STUNNED", 1, {apply_power=200})
+do return end
 			local f, err = loadfile("/data/general/events/rat-lich.lua")
 			print(f, err)
 			setfenv(f, setmetatable({level=self.level, zone=self.zone}, {__index=_G}))
@@ -2291,7 +2295,9 @@ do return end
 			local mx, my = self.mouse.last_pos.x, self.mouse.last_pos.y
 			local tmx, tmy = self.level.map:getMouseTile(mx, my)
 			local a = self.level.map(tmx, tmy, Map.ACTOR)
-			self:registerDialog(require("mod.dialogs.CharacterSheet").new((config.settings.cheat or self.player:canSee(a)) and a or self.player))
+			a = (config.settings.cheat or self.player:canSee(a)) and a or self.player
+			if a.showCharacterSheet then a = a:showCharacterSheet() end
+			self:registerDialog(require("mod.dialogs.CharacterSheet").new(a))
 		end,
 
 		CENTER_ON_PLAYER = function()

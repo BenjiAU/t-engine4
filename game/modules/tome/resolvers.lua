@@ -1175,7 +1175,7 @@ function resolvers.racial(race)
 	return {__resolver="racial", race}
 end
 function resolvers.calc.racial(t, e)
-	if e.type ~= "humanoid" and e.type ~= "giant" and e.type ~= "undead" then return end
+	if e.type ~= "humanoid" and e.type ~= "giant" and e.type ~= "undead" and e.type ~= "construct" then return end
 	local race = t[1] or e.subtype
 	if not racials[race] then return end
 
@@ -1196,6 +1196,14 @@ local racials_visuals = {
 		Cornac = {
 			{kind="skin", filter={"oneof", {"Skin Color 1", "Skin Color 2", "Skin Color 3", "Skin Color 4", "Skin Color 5"}}},
 			{kind="skin", percent=5, filter={"oneof", {"Skin Color 6", "Skin Color 7", "Skin Color 8"}}},
+			{kind="hairs", filter={"findname", "Dark Hair"}},
+			{kind="hairs", percent=10, filter={"findname", "Redhead "}},
+			{kind="facial_features", percent=20, filter={"findname", "Dark Beard "}},
+			{kind="facial_features", percent=20, filter={"findname", "Dark Mustache "}},
+		},
+		Sholtar = {
+			{kind="skin", filter={"oneof", {"Skin Color 6", "Skin Color 7", "Skin Color 8"}}},
+			{kind="skin", percent=5, filter={"oneof", {"Skin Color 1", "Skin Color 2", "Skin Color 3", "Skin Color 4", "Skin Color 5"}}},
 			{kind="hairs", filter={"findname", "Dark Hair"}},
 			{kind="hairs", percent=10, filter={"findname", "Redhead "}},
 			{kind="facial_features", percent=20, filter={"findname", "Dark Beard "}},
@@ -1227,6 +1235,11 @@ local racials_visuals = {
 		Halfling = {
 			{kind="skin", filter={"oneof", {"Skin Color 1", "Skin Color 2", "Skin Color 3", "Skin Color 4"}}},
 			{kind="skin", percent=5, filter={"oneof", {"Skin Color 5", "Skin Color 6"}}},
+			{kind="hairs", filter={"all"}},
+		},
+		DarkSkinHalfling = {
+			{kind="skin", filter={"oneof", {"Skin Color 5", "Skin Color 6"}}},
+			{kind="skin", percent=5, filter={"oneof", {"Skin Color 1", "Skin Color 2", "Skin Color 3", "Skin Color 4"}}},
 			{kind="hairs", filter={"all"}},
 		},
 	},

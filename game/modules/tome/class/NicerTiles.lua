@@ -114,7 +114,7 @@ function _M:replaceAll(level)
 		local r = self.repl[i]
 		-- Safety check
 		local og = level.map(r[1], r[2], Map.TERRAIN)
-		if og and (og.change_zone or og.change_level) then
+		if og and (og.change_zone or og.change_level) and not og.change_level_allow_nice_tile then
 			print("[NICE TILER] *warning* refusing to remove zone/level changer at ", r[1], r[2], og.change_zone, og.change_level)
 		else
 			local no = overlay(self, level, "replace", r[1], r[2], r[3])

@@ -629,6 +629,18 @@ function table.compareKeys(left, right)
 	return result
 end
 
+--- Checks if a (sub)subentry of a table exists
+function table.has(t, ...)
+	if type(t) ~= 'table' then return false end
+	local args = {...}
+	local last = table.remove(args)
+	for _, key in ipairs(args) do
+		t = t[key]
+		if type(t) ~= 'table' then return false end
+	end
+	return t[last]
+end
+
 --[=[
   Decends recursively through a table by the given list of keys.
 

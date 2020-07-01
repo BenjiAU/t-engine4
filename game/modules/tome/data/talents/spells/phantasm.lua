@@ -144,124 +144,129 @@ newTalent{
 }
 
 newTalent{
-	name = "Elemental Mirage", image = "talents/blur_sight.png",
+	name = "Mirror Image", short_name = "MIRROR_IMAGES",
 	type = {"spell/phantasm", 4},
-	mode = "sustained",
 	require = spells_req4,
 	points = 5,
-	sustain_mana = 30,
+	mana = 30,
 	cooldown = 20,
-	tactical = { BUFF = 2 },
-	no_npc_use = true,
-	autolearn_talent = "T_ALTER_MIRAGE",
-	getBonus = function(self, t) return self:combatTalentScale(t, 10, 30) end,
-	chooseElements = function(self, t)
-		local DT = DamageType
-		local elements = {}
-		for _, dtid in ipairs{DT.ARCANE, DT.FIRE, DT.LIGHTNING, DT.COLD, DT.PHYSICAL, DT.LIGHT, DT.TEMPORAL, DT.ACID, DT.NATURE, DT.BLIGHT, DT.DARKNESS} do
-			local dt = DT:get(dtid)
-			elements[#elements+1] = {name = dt.text_color..dt.name, id=dtid}
-		end
-
-		local e1, e2 = nil, nil
-
-		local res = self:talentDialog(Dialog:listPopup("Elemental Mirage", "Choose the first element:", elements, 400, 300, function(item) self:talentDialogReturn(item) end))
-		if not res then return nil end
-		e1 = res.id
-		table.removeFromList(elements, res)
-
-		local res = self:talentDialog(Dialog:listPopup("Elemental Mirage", "Choose the second element:", elements, 400, 300, function(item) self:talentDialogReturn(item) end))
-		if not res then return nil end
-		e2 = res.id
-
-		return e1, e2
-	end,
-	callbackOnDealDamage = function(self, t, val, target, dead, death_note)
-		self.elemental_mirage_elements = self.elemental_mirage_elements or {}
-		if not self.elemental_mirage_elements.e1 then return end
-		if not death_note or not death_note.damtype then return end
-
-		if death_note.damtype == self.elemental_mirage_elements.e1 then
-			if self.turn_procs.elemental_mirage1 then return end
-			self.turn_procs.elemental_mirage1 = true
-
-			local pen = nil
-			if self:getTalentLevel(t) >= 5 then
-				local ep1 = self:combatGetResistPen(self.elemental_mirage_elements.e1, true)
-				local ep2 = self:combatGetResistPen(self.elemental_mirage_elements.e2, true)
-				if ep2 < ep1 then pen = ep1 - ep2 end
-			end
-
-			self:setEffect(self.EFF_ELEMENTAL_MIRAGE2, 3, {dt=self.elemental_mirage_elements.e2, power=t.getBonus(self, t), pen=pen})
-		elseif death_note.damtype == self.elemental_mirage_elements.e2 then
-			if self.turn_procs.elemental_mirage2 then return end
-			self.turn_procs.elemental_mirage2 = true
-
-			local pen = nil
-			if self:getTalentLevel(t) >= 5 then
-				local ep1 = self:combatGetResistPen(self.elemental_mirage_elements.e1, true)
-				local ep2 = self:combatGetResistPen(self.elemental_mirage_elements.e2, true)
-				if ep1 < ep2 then pen = ep2 - ep1 end
-			end
-
-			self:setEffect(self.EFF_ELEMENTAL_MIRAGE1, 3, {dt=self.elemental_mirage_elements.e1, power=t.getBonus(self, t), pen=pen})
-		end
-	end,
-	activate = function(self, t)
-		self.elemental_mirage_elements = self.elemental_mirage_elements or {}
-		local e1, e2
-		if self.elemental_mirage_elements.e1 then e1, e2 = self.elemental_mirage_elements.e1, self.elemental_mirage_elements.e2
-		else e1, e2 = t.chooseElements(self, t) end
-
-		game:playSoundNear(self, "talents/heal")
-		local ret = {}
-		self.elemental_mirage_elements = {e1=e1, e2=e2}
-
-		self:addShaderAura("elemental_mirage", "crystalineaura", {time_factor=500, spikeOffset=0.123123, spikeLength=1.1, spikeWidth=3, growthSpeed=5, color={255/255, 215/255, 0/255}}, "particles_images/smoothspikes.png")
-
-		return ret
-	end,
-	deactivate = function(self, t, p)
-		self:removeShaderAura("elemental_mirage")
-		return true
-	end,
-	info = function(self, t)
-		self.elemental_mirage_elements = self.elemental_mirage_elements or {}
-		local DT = DamageType
-		local e1, e2
-		if self.elemental_mirage_elements.e1 then
-			local dt1 = DT:get(self.elemental_mirage_elements.e1)
-			local dt2 = DT:get(self.elemental_mirage_elements.e2)
-			e1, e2 = dt1.text_color..dt1.name, dt2.text_color..dt2.name
-		else
-			e1, e2 = "not selected", "not selected"
-		end
-
-		return ([[Your mastery of both illusion and elements knows no bound.
-		Upon first sustaining this spell you may select two elements. You may later change them with the Alter Mirage spell, provided automatically upon learning this one.
-
-		Any time you deal damage with one of those elements, the other gets a bonus of %d%% damage for 3 turns.
-		At level 5 if the target element has less resistance penetration, it gets increased to match the one of the source element.
-
-		Current elements selected: %s#LAST# and %s]]):
-		tformat(t.getBonus(self, t), e1, e2)
-	end,
-}
-
-newTalent{
-	name = "Alter Mirage",
-	type = {"spell/other", 1},
-	points = 5,
-	mana = 3,
-	cooldown = 3,
-	no_npc_use = true,
+	tactical = { DEFEND = 3, ATTACK = 2 },
+	getLife = function(self, t) return math.ceil(self:combatTalentScale(t, 5, 12)) end,
+	on_pre_use = function(self, t) return self.in_combat and not self:hasEffect(self.EFF_MIRROR_IMAGE_REAL) end,
 	action = function(self, t)
-		local e1, e2 = self:callTalent(self.T_ELEMENTAL_MIRAGE, "chooseElements")
-		if not e1 then return end
-		self.elemental_mirage_elements = {e1=e1, e2=e2}
+		if not self:canBe("summon") then game.logPlayer(self, "You cannot summon; you are suppressed!") return end
+
+		-- Find all actors in radius 10 and add them to a table
+		local tg = {type="ball", radius=self.sight}
+		local grids = self:project(tg, self.x, self.y, function() end)
+		local tgts = {}
+		for x, ys in pairs(grids) do for y, _ in pairs(ys) do
+			local target = game.level.map(x, y, Map.ACTOR)
+			if target and self:reactionToward(target) < 0 then tgts[#tgts+1] = target end
+		end end
+
+		local target = rng.tableRemove(tgts)
+		if not target then return end
+		local tx, ty = util.findFreeGrid(target.x, target.y, 10, true, {[Map.ACTOR]=true})
+		if not tx then return end
+
+		local Talents = require "engine.interface.ActorTalents"
+		local NPC = require "mod.class.NPC"
+		local image = NPC.new{
+			name = ("Mirror Image (%s)"):tformat(self:getName()),
+			type = "image", subtype = "image",
+			ai = "mirror_image", ai_real = nil, ai_state = { talent_in=1, }, ai_target = {actor=nil},
+			desc = _t"A blurred image.",
+			image = self.image,
+			add_mos = table.clone(self.add_mos, true),
+			exp_worth=0,
+			level_range = {self.level, self.level},
+			level = self.level,
+			size_category = self.size_category,
+			global_speed = self.global_speed,
+			global_speed_add = self.global_speed_add,
+			global_speed_base = self.global_speed_base,
+			combat_spellspeed = self.combat_spellspeed,
+			combat_def = -1000,
+			combat_armor = 0,
+			max_mana = 10000,
+			mana = 10000,
+			rank = self.rank,
+			difficulty_boosted = 1,
+			life_rating = 0,
+			life_regen = 0, no_life_regen = 1,
+			cant_be_moved = 1,
+			never_move = 1,
+			never_anger = true,
+			generic_damage_penalty = 66,
+			inc_damage = table.clone(self.inc_damage or {}, true),
+			resists_pen = table.clone(self.resists_pen or {}, true),
+			combat_precomputed_spellpower = self:combatSpellpowerRaw(),
+			resolvers.talents{
+				[Talents.T_TAUNT]=1, -- Add the talent so the player can see it even though we cast it manually
+			},
+			faction = self.faction,
+			summoner = self,
+			heal = function() return 0 end, -- Cant ever heal
+			takeHit = function(self, value, src, death_note) -- Cant ever take more than one damage per turn per actor
+				if not src then return false, 0 end
+				if src ~= self then
+					if death_note.source_talent_mode ~= "active" then return false, 0 end
+					if self.turn_procs.mirror_image_dmg and self.turn_procs.mirror_image_dmg[src] then return false, 0 end
+					self.turn_procs.mirror_image_dmg = self.turn_procs.mirror_image_dmg or {}
+					self.turn_procs.mirror_image_dmg[src] = true
+				end
+				return mod.class.NPC.takeHit(self, 1, src, death_note)
+			end,
+			on_die = function(self)
+				self.summoner:removeEffect(self.summoner.EFF_MIRROR_IMAGE_REAL, true, true)
+			end,
+			spellFriendlyFire = function() return 100 end,
+			no_breath = 1,
+			remove_from_party_on_death = true,
+		}
+
+		image:resolve()
+		game.zone:addEntity(game.level, image, "actor", tx, ty)
+		image.max_life = t:_getLife(self)
+		image.life = t:_getLife(self)
+
+		-- Clone particles
+		for ps, _ in pairs(self.__particles) do
+			image:addParticles(ps:clone())
+		end
+
+		local dam_bonus = self:callTalent(self.T_INVISIBILITY, "getDamPower")
+		image:setEffect(image.EFF_MIRROR_IMAGE_FAKE, 1, {dam=dam_bonus})
+		self:setEffect(image.EFF_MIRROR_IMAGE_REAL, 1, {image=image, dam=dam_bonus})
+
+		-- Player & NPC don't work the same for this spell
+		if game.party:hasMember(self) then
+			game.party:addMember(image, {
+				control=false,
+				type="summon",
+				title=_t"Summon",
+				temporary_level = true,
+				orders = {},
+			})
+			image:forceUseTalent(image.T_TAUNT, {ignore_cd=true, no_talent_fail = true})
+			image.ai_state.use_taunt = true
+		else
+			-- Dont reveal ourself to player
+			image.tooltip = function(self, x, y, seen_by) return mod.class.NPC.tooltip(self.summoner, x, y, seen_by) end
+			image.showCharacterSheet = function(self) return self.summoner end
+			image.ai_state.use_taunt = false
+		end
+
 		return true
 	end,
 	info = function(self, t)
-		return _t[[Change your choice of elements for Elemental Mirage.]]
+		return ([[Create a perfect lookalike of your own form made out of pure light near a creature or yourself if no creature is present.
+		This image has %d life and can never take more than 1 damage per creature per turn and is immune to any non direct damage (ground effects, damage over time, ...).
+		Whenever you cast a spell your mirror image will try to duplicate it at the same target for 66%% less damage, if possible. If it can it will loose 1 life, if not it will instead taunt a creature to focus its attention on itself.
+		While the image exists you receive the damage bonus from the Invisibility spell as if you were invisible.
+		This spell can not be cast while a Mirror Image already exists and only in combat.
+		]])
+		:tformat(t.getLife(self, t))
 	end,
 }

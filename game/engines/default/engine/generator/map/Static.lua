@@ -262,6 +262,9 @@ function _M:tmxLoad(file)
 	if mapprops.lua then
 		self:loadLuaInEnv(g, nil, "return "..mapprops.lua)
 	end
+	if mapprops.lua_exec then
+		self:loadLuaInEnv(g, nil, mapprops.lua_exec)
+	end
 
 	-- copy certain variables from the map file
 	if mapprops.roomcheck then

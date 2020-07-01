@@ -130,6 +130,7 @@ newTalent{
 		game.level:addEntity(t)
 		game.zone:addEntity(game.level, t, "trap", x, y)
 		game.level.map:particleEmitter(x, y, 1, "summon")
+		self:callTalent(self.T_ENERGY_ALTERATION, "forceActivate", DamageType.ARCANE)
 
 		return true
 	end,
@@ -173,6 +174,7 @@ newTalent{
 		local list = {}
 		self:project(tg, x, y, function(px, py) list[#list+1] = {x=px, y=py} end)
 
+		self:callTalent(self.T_ENERGY_ALTERATION, "forceActivate", DamageType.ARCANE)
 		self:setEffect(self.EFF_AETHER_BREACH, t.getNb(self, t), {src=self, x=x, y=y, radius=tg.radius, list=list, level=game.zone.short_name.."-"..game.level.level, dam=self:spellCrit(t.getDamage(self, t))})
 
 		game:playSoundNear(self, "talents/arcane")

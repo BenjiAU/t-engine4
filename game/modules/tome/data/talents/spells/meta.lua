@@ -125,32 +125,36 @@ newTalent{
 	type = {"spell/meta",2},
 	require = spells_req2,
 	points = 5,
-	sustain_mana = 70,
+	sustain_mana = 80,
 	cooldown = 30,
 	mode = "sustained",
 	tactical = { BUFF = 2 },
 	getChance = function(self, t) return self:getTalentLevelRaw(t) * 20 end,
+	getCooldownReduction = function(self, t) return util.bound(self:getTalentLevelRaw(t) / 15, 0.05, 0.3) end,
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/spell_generic")
 		return {
 			cd = self:addTemporaryValue("spellshock_on_damage", self:combatTalentSpellDamage(t, 10, 320) / 4),
+			shock = self:addTemporaryValue("spell_cooldown_reduction", t.getCooldownReduction(self, t)),
 		}
 	end,
 	deactivate = function(self, t, p)
 		self:removeTemporaryValue("spellshock_on_damage", p.cd)
+		self:removeTemporaryValue("spell_cooldown_reduction", p.shock)
 		return true
 	end,
 	info = function(self, t)
 		local chance = t.getChance(self, t)
-		return ([[You learn to finely craft and tune your offensive spells.
-		You try to carve a hole in spells that affect an area to avoid damaging yourself.  The chance of success is %d%%.
+		local cooldownred = t.getCooldownReduction(self, t)
+		return ([[You learn to finely craft and tune your spells, reducing all their cooldowns by %d%%.
+		In doing so you can also carve a hole in spells that affect an area to avoid damaging yourself.  The chance of success is %d%%.
 		In addition, you hone your damaging spells to spellshock their targets. Whenever you deal damage with a spell you attempt to spellshock them with %d more Spellpower than normal. Spellshocked targets suffer a temporary 20%% penalty to damage resistances.]]):
-		tformat(chance, self:combatTalentSpellDamage(t, 10, 320) / 4)
+		tformat(cooldownred * 100, chance, self:combatTalentSpellDamage(t, 10, 320) / 4)
 	end,
 }
 
 newTalent{
-	name = "Quicken Spells",
+	name = "Energy Alteration", image = "talents/quicken_spells.png",
 	type = {"spell/meta",3},
 	require = spells_req3,
 	points = 5,
@@ -158,21 +162,34 @@ newTalent{
 	sustain_mana = 80,
 	cooldown = 30,
 	tactical = { BUFF = 2 },
-	getCooldownReduction = function(self, t) return util.bound(self:getTalentLevelRaw(t) / 15, 0.05, 0.3) end,
+	getPct = function(self, t) return math.min(100, math.ceil(self:combatTalentScale(t, 30, 90))) end,
+	forceActivate = function(self, t, damtype)
+		if not self:isTalentActive(t.id) then return end
+		if self:hasEffect(self.EFF_ENERGY_ALTERATION_FIRE) or self:hasEffect(self.EFF_ENERGY_ALTERATION_COLD) or self:hasEffect(self.EFF_ENERGY_ALTERATION_ARCANE) or self:hasEffect(self.EFF_ENERGY_ALTERATION_TEMPORAL) or
+			self:hasEffect(self.EFF_ENERGY_ALTERATION_PHYSICAL) or self:hasEffect(self.EFF_ENERGY_ALTERATION_MIND) or self:hasEffect(self.EFF_ENERGY_ALTERATION_BLIGHT) or self:hasEffect(self.EFF_ENERGY_ALTERATION_NATURE) or
+			self:hasEffect(self.EFF_ENERGY_ALTERATION_LIGHT) or self:hasEffect(self.EFF_ENERGY_ALTERATION_DARKNESS) or self:hasEffect(self.EFF_ENERGY_ALTERATION_LIGHTNING) or self:hasEffect(self.EFF_ENERGY_ALTERATION_ACID)
+		then return end
+		if not self['EFF_ENERGY_ALTERATION_'..damtype] then return end
+		self:setEffect(self['EFF_ENERGY_ALTERATION_'..damtype], 6, {power=t:_getPct(self)})
+	end,
+	callbackOnDealDamage = function(self, t, val, target, dead, death_note)
+		if not death_note then return end
+		if death_note.source_talent_mode ~= "active" then return end
+		if not death_note.source_talent or not death_note.source_talent.is_spell then return end
+		t.forceActivate(self, t, death_note.damtype)
+	end,	
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/spell_generic")
-		return {
-			cd = self:addTemporaryValue("spell_cooldown_reduction", t.getCooldownReduction(self, t)),
-		}
+		return {}
 	end,
 	deactivate = function(self, t, p)
-		self:removeTemporaryValue("spell_cooldown_reduction", p.cd)
 		return true
 	end,
 	info = function(self, t)
-		local cooldownred = t.getCooldownReduction(self, t)
-		return ([[Reduces the cooldown of all spells by %d%%.]]):
-		tformat(cooldownred * 100)
+		return ([[Your mastery over magic is so great that you can alter the energy of all damaging spells to suit your needs.
+		Whenever you deal damage with a spell you attune to the element of that spell for 6 turns, converting %d%% of any damage you deal into that element.
+		This effect will not override itself and will only trigger from spells directly cast by you, not from damage over time or ground damage effects.]]):
+		tformat(t:_getPct(self))
 	end,
 }
 
