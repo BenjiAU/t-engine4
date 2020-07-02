@@ -2010,50 +2010,48 @@ newTalent{
 		t.terrains = terrains -- cache
 
 		local meteor = function(src, x, y, dam)
-			game.level.map:particleEmitter(x, y, 10, "meteor", {x=x, y=y}).on_remove = function(self)
-				local x, y = self.args.x, self.args.y
-				game.level.map:particleEmitter(x, y, 10, "fireflash", {radius=2})
-				game:playSoundNear(game.player, "talents/fireflash")
+			game.level.map:particleEmitter(x, y, 10, "meteor", {x=x, y=y})
+			game.level.map:particleEmitter(x, y, 10, "fireflash", {radius=2})
+			game:playSoundNear(game.player, "talents/fireflash")
 
-				local grids = {}
-				for i = x-1, x+1 do for j = y-1, y+1 do
-					local oe = game.level.map(i, j, Map.TERRAIN)
-					if oe and not oe:attr("temporary") and
-					(core.fov.distance(x, y, i, j) < 1 or rng.percent(40)) and (game.level.map:checkEntity(i, j, engine.Map.TERRAIN, "dig") or game.level.map:checkEntity(i, j, engine.Map.TERRAIN, "grow")) then
-						local g = terrains.LAVA_FLOOR:clone()
-						g:resolve() g:resolve(nil, true)
-						game.zone:addEntity(game.level, g, "terrain", i, j)
-						grids[#grids+1] = {x=i,y=j,oe=oe}
-					end
-				end end
-				for i = x-1, x+1 do for j = y-1, y+1 do
-					game.nicer_tiles:updateAround(game.level, i, j)
-				end end
-				for _, spot in ipairs(grids) do
-					local i, j = spot.x, spot.y
-					local g = game.level.map(i, j, Map.TERRAIN)
-					g.temporary = 8
-					g.x = i g.y = j
-					g.canAct = false
-					g.energy = { value = 0, mod = 1 }
-					g.old_feat = spot.oe
-					g.useEnergy = mod.class.Trap.useEnergy
-					g.act = function(self)
-						self:useEnergy()
-						self.temporary = self.temporary - 1
-						if self.temporary <= 0 then
-							game.level.map(self.x, self.y, engine.Map.TERRAIN, self.old_feat)
-							game.level:removeEntity(self)
-							game.nicer_tiles:updateAround(game.level, self.x, self.y)
-						end
-					end
-					game.level:addEntity(g)
+			local grids = {}
+			for i = x-1, x+1 do for j = y-1, y+1 do
+				local oe = game.level.map(i, j, Map.TERRAIN)
+				if oe and not oe:attr("temporary") and
+				(core.fov.distance(x, y, i, j) < 1 or rng.percent(40)) and (game.level.map:checkEntity(i, j, engine.Map.TERRAIN, "dig") or game.level.map:checkEntity(i, j, engine.Map.TERRAIN, "grow")) then
+					local g = terrains.LAVA_FLOOR:clone()
+					g:resolve() g:resolve(nil, true)
+					game.zone:addEntity(game.level, g, "terrain", i, j)
+					grids[#grids+1] = {x=i,y=j,oe=oe}
 				end
-
-				src:project({type="ball", radius=2, selffire=false}, x, y, engine.DamageType.METEOR, dam)
-				if core.shader.allow("distort") then game.level.map:particleEmitter(x, y, 2, "shockwave", {radius=2}) end
-				game:getPlayer(true):attr("meteoric_crash", 1)
+			end end
+			for i = x-1, x+1 do for j = y-1, y+1 do
+				game.nicer_tiles:updateAround(game.level, i, j)
+			end end
+			for _, spot in ipairs(grids) do
+				local i, j = spot.x, spot.y
+				local g = game.level.map(i, j, Map.TERRAIN)
+				g.temporary = 8
+				g.x = i g.y = j
+				g.canAct = false
+				g.energy = { value = 0, mod = 1 }
+				g.old_feat = spot.oe
+				g.useEnergy = mod.class.Trap.useEnergy
+				g.act = function(self)
+					self:useEnergy()
+					self.temporary = self.temporary - 1
+					if self.temporary <= 0 then
+						game.level.map(self.x, self.y, engine.Map.TERRAIN, self.old_feat)
+						game.level:removeEntity(self)
+						game.nicer_tiles:updateAround(game.level, self.x, self.y)
+					end
+				end
+				game.level:addEntity(g)
 			end
+
+			src:project({type="ball", radius=2, selffire=false}, x, y, engine.DamageType.METEOR, dam)
+			if core.shader.allow("distort") then game.level.map:particleEmitter(x, y, 2, "shockwave", {radius=2}) end
+			game:getPlayer(true):attr("meteoric_crash", 1)
 		end
 
 		local grids = {}
