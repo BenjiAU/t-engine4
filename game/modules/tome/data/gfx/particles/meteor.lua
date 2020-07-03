@@ -21,9 +21,12 @@
 
 local nb = 1
 
+local force_dir = nil
+if tx and ty then force_dir = math.deg(math.atan2(-ty, -tx)) end
+
 return { generator = function()
 	local sradius = 10 * (engine.Map.tile_w + engine.Map.tile_h) / 2
-	local ad = rng.float(0, 360)
+	local ad = force_dir or rng.float(0, 360)
 	local a = math.rad(ad)
 	local x = sradius * math.cos(a)
 	local y = sradius * math.sin(a)
