@@ -4741,35 +4741,38 @@ newEffect{
 		if self.skeleton_minion == "warrior" then self.name = _t"Lord of Skulls (warrior)"
 		elseif self.skeleton_minion == "archer" then self.name = _t"Lord of Skulls (archer)"
 		elseif self.skeleton_minion == "mage" then self.name = _t"Lord of Skulls (mage)"
+		elseif self.is_bone_giant then self.name = _t"Lord of Skulls (bone giant)"
 		end
 
-		if eff.talents then
-			if self.skeleton_minion == "warrior" then self:learnTalent(self.T_GIANT_LEAP, true)
-			elseif self.skeleton_minion == "archer" then self:learnTalent(self.T_VITAL_SHOT, true)
-			elseif self.skeleton_minion == "mage" then self:learnTalent(self.T_METEORIC_CRASH, true)
-			end
+		if eff.talents >= 2 and self.skeleton_minion == "warrior" then self:learnTalent(self.T_GIANT_LEAP, true)
+		elseif eff.talents >= 3 and self.skeleton_minion == "archer" then self:learnTalent(self.T_VITAL_SHOT, true)
+		elseif eff.talents >= 5 and self.skeleton_minion == "mage" then self:learnTalent(self.T_METEORIC_CRASH, true)
+		elseif eff.talents >= 6 and self.is_bone_giant then self:learnTalent(self.T_TITAN_S_SMASH, true)
 		end
 
 		local image
 		if self.skeleton_minion == "warrior" then image = "npc/lord_of_skulls_warrior.png"
 		elseif self.skeleton_minion == "archer" then image = "npc/lord_of_skulls_archer.png"
 		elseif self.skeleton_minion == "mage" then image = "npc/lord_of_skulls_magus.png"
+		elseif self.is_bone_giant then image = "npc/undead_giant_heavy_sentinel.png"
 		end
 
 		self.replace_display = mod.class.Actor.new{
-			image = image, display_y = -1, display_h = 2
+			image = "invis.png",
+			add_mos = {{image = image, display_y = -1, display_h = 2}}
 		}
 		self:removeAllMOs()
 		game.level.map:updateMap(self.x, self.y)
 	end,
 	deactivate = function(self, eff)
 		self.lord_of_skulls = false
-		if eff.talents then
-			if self.skeleton_minion == "warrior" then self:unlearnTalent(self.T_GIANT_LEAP, 1)
-			elseif self.skeleton_minion == "archer" then self:unlearnTalent(self.T_VITAL_SHOT, 1)
-			elseif self.skeleton_minion == "mage" then self:unlearnTalent(self.T_METEORIC_CRASH, 1)
-			end
+
+		if eff.talents >= 2 and self.skeleton_minion == "warrior" then self:unlearnTalent(self.T_GIANT_LEAP, 1)
+		elseif eff.talents >= 3 and self.skeleton_minion == "archer" then self:unlearnTalent(self.T_VITAL_SHOT, 1)
+		elseif eff.talents >= 5 and self.skeleton_minion == "mage" then self:unlearnTalent(self.T_METEORIC_CRASH, 1)
+		elseif eff.talents >= 6 and self.is_bone_giant then self:unlearnTalent(self.T_TITAN_S_SMASH, 1)
 		end
+
 		self.name = self.old_los_name
 		self.replace_display = nil
 		self:removeAllMOs()

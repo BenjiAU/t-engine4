@@ -1927,6 +1927,14 @@ function _M:display(nb_keyframes)
 		self.full_fbo:use(false)
 		self.full_fbo:toScreen(0, 0)
 	end
+
+	if self.wasd_state and self.wasd_state.cnt > 0 then
+		self.wasd_state.cd = self.wasd_state.cd - nb_keyframes
+		if self.wasd_state.cd <= 0 then			
+			self.wasd_state.cd = self.wasd_state.base_cd
+			self:onTickEnd(function() self:executeWASD() end)
+		end
+	end
 end
 
 --- Called when a dialog is registered to appear on screen
@@ -2508,27 +2516,39 @@ function _M:setupWASD()
 	end
 end
 
+function _M:executeWASD()
+	local ws = self.wasd_state
+	if     ws.left  and ws.up   then self.key:triggerVirtual("MOVE_LEFT_UP")
+	elseif ws.right and ws.up   then self.key:triggerVirtual("MOVE_RIGHT_UP")
+	elseif ws.left  and ws.down then self.key:triggerVirtual("MOVE_LEFT_DOWN")
+	elseif ws.right and ws.down then self.key:triggerVirtual("MOVE_RIGHT_DOWN")
+	elseif ws.right             then self.key:triggerVirtual("MOVE_RIGHT")
+	elseif ws.left              then self.key:triggerVirtual("MOVE_LEFT")
+	elseif ws.up                then self.key:triggerVirtual("MOVE_UP")
+	elseif ws.down              then self.key:triggerVirtual("MOVE_DOWN")
+	end
+	ws.has_executed_once = true
+end
+
 function _M:setupWASD()
-	self.wasd_state = {}
-	local function handle_wasd()
+	self.wasd_state = {cnt=0, cd=12, base_cd=3}
+	local function update_wasd()
 		local ws = self.wasd_state
-		if     ws.left  and ws.up   then self.key:triggerVirtual("MOVE_LEFT_UP")
-		elseif ws.right and ws.up   then self.key:triggerVirtual("MOVE_RIGHT_UP")
-		elseif ws.left  and ws.down then self.key:triggerVirtual("MOVE_LEFT_DOWN")
-		elseif ws.right and ws.down then self.key:triggerVirtual("MOVE_RIGHT_DOWN")
-		elseif ws.right             then self.key:triggerVirtual("MOVE_RIGHT")
-		elseif ws.left              then self.key:triggerVirtual("MOVE_LEFT")
-		elseif ws.up                then self.key:triggerVirtual("MOVE_UP")
-		elseif ws.down              then self.key:triggerVirtual("MOVE_DOWN")
-		end
+		local old_cnt = ws.cnt
+		ws.cnt = 0
+		if ws.left then ws.cnt = ws.cnt + 1 end
+		if ws.right then ws.cnt = ws.cnt + 1 end
+		if ws.up then ws.cnt = ws.cnt + 1 end
+		if ws.down then ws.cnt = ws.cnt + 1 end
+		if ws.cnt == 0 then ws.has_executed_once = false ws.cd = ws.cd + 3 * ws.base_cd end
 	end
 
 	if config.settings.tome.use_wasd then
 		self.key:addBinds{
-			MOVE_WASD_UP    = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.up = not isup and true or false end,
-			MOVE_WASD_DOWN  = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.down = not isup and true or false end,
-			MOVE_WASD_LEFT  = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.left = not isup and true or false end,
-			MOVE_WASD_RIGHT = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup then handle_wasd() end self.wasd_state.right = not isup and true or false end,
+			MOVE_WASD_UP    = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup and not self.wasd_state.has_executed_once then self:executeWASD() end self.wasd_state.up = not isup and true or false update_wasd() end,
+			MOVE_WASD_DOWN  = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup and not self.wasd_state.has_executed_once then self:executeWASD() end self.wasd_state.down = not isup and true or false update_wasd() end,
+			MOVE_WASD_LEFT  = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup and not self.wasd_state.has_executed_once then self:executeWASD() end self.wasd_state.left = not isup and true or false update_wasd() end,
+			MOVE_WASD_RIGHT = function(sym, ctrl, shift, alt, meta, unicode, isup, key) if isup and not self.wasd_state.has_executed_once then self:executeWASD() end self.wasd_state.right = not isup and true or false update_wasd() end,
 		}
 	else
 		self.key:removeBind("MOVE_WASD_UP")

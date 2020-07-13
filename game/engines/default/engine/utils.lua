@@ -1733,13 +1733,14 @@ function tstring:splitLines(max_width, font, max_lines)
 end
 
 function tstring:tokenize(tokens)
+	if type(tokens) == "string" then tokens = lpeg.S("\n"..tokens) end
 	local ret = tstring{}
 	local v, tv
 	for i = 1, #self do
 		v = self[i]
 		tv = type(v)
 		if tv == "string" then
-			local ls = v:split(lpeg.S("\n"..tokens), true)
+			local ls = v:split(tokens, true)
 			for i = 1, #ls do
 				local vv = ls[i]
 				if vv == "\n" then
@@ -1908,6 +1909,27 @@ function tstring:diffWith(str2, on_diff)
 			res:add(self[i])
 		end
 		j = j + 1
+	end
+	return res
+end
+
+function tstring:diffMulti(list, on_diff)
+	local res = tstring{}
+	for i = 1, #list[1] do
+		local diffs = {}
+		local has_diffs = false
+		for j = 2, #list do
+			if type(list[1][i]) == "string" and list[1][i] ~= list[j][i] then has_diffs = true break end
+		end
+
+		if not has_diffs then
+			res:add(list[1][i])
+		else
+			for j = 1, #list do
+				diffs[#diffs+1] = {id=j, str=list[j][i]}
+			end
+			on_diff(diffs, res)
+		end
 	end
 	return res
 end

@@ -37,6 +37,7 @@ newTalent{
 		end
 	end,
 	callbackOnDealDamage = function(self, t, val, target, dead, death_note)
+		if target.necrotic_minion then return end
 		if dead then
 			t:_gainSoul(self, target, "death")
 		else

@@ -5887,7 +5887,7 @@ function _M:iterCallbacks(event)
 				return function(...)
 					local old_ps = self.__project_source
 					self.__project_source = self.sustain_talents[tid]
-					self:setCurrentTalentMode("callback")
+					self:setCurrentTalentMode("callback", tid)
 					local ret = self:callTalent(tid, event, ...)
 					self:setCurrentTalentMode(nil)
 					self.__project_source = old_ps

@@ -166,7 +166,7 @@ function _M:useTalent(id, who, force_level, ignore_cd, force_target, silent, no_
 			msg, line = game.logNewest()
 			if not silent then self:logTalentMessage(ab) end
 			
-			self:setCurrentTalentMode("active")
+			self:setCurrentTalentMode("active", ab.id)
 			local ok, ret, special = xpcall(function() return ab.action(who, ab) end, debug.traceback)
 			self:setCurrentTalentMode(nil)
 			self.__talent_running = nil
@@ -202,7 +202,7 @@ function _M:useTalent(id, who, force_level, ignore_cd, force_target, silent, no_
 			local ok, ret, special
 			if not self.sustain_talents[id] then -- activating
 				if self.deactivating_sustain_talent == ab.id then return end
-				self:setCurrentTalentMode("active")
+				self:setCurrentTalentMode("active", ab.id)
 				ok, ret, special = xpcall(function() return ab.activate(who, ab) end, debug.traceback)
 				self:setCurrentTalentMode(nil)
 				if not ok then self:onTalentLuaError(ab, ret) error(ret) end
@@ -247,7 +247,7 @@ function _M:useTalent(id, who, force_level, ignore_cd, force_target, silent, no_
 					end
 				end
 				p.__tmpparticles = nil
-				self:setCurrentTalentMode("active")
+				self:setCurrentTalentMode("active", ab.id)
 				ok, ret, special = xpcall(function() return ab.deactivate(who, ab, p) end, debug.traceback)
 				self:setCurrentTalentMode(nil)
 				if not ok then self:onTalentLuaError(ab, ret) error(ret) end
@@ -428,7 +428,7 @@ function _M:forceUseTalent(t, def)
 	if def.ignore_energy then self.energy.value = 10000 end
 
 	if def.ignore_ressources then self:attr("force_talent_ignore_ressources", 1) end
-	self:setCurrentTalentMode("forced")
+	self:setCurrentTalentMode("forced", t.id)
 	local ret = {self:useTalent(t, def.force_who, def.force_level, def.ignore_cd or def.ignore_cooldown, def.force_target, def.silent, true)}
 	self:setCurrentTalentMode(nil)
 	if def.ignore_ressources then self:attr("force_talent_ignore_ressources", -1) end
@@ -1163,17 +1163,24 @@ function _M:talentParticles(p, ...)
 	return unpack(ret)
 end
 
+function _M:getCurrentTalent()
+	return self._temp_data and self._temp_data.current_talent and self._temp_data.current_talent[1] or nil
+end
+
 function _M:getCurrentTalentMode()
 	return self._temp_data and self._temp_data.current_talent_mode and self._temp_data.current_talent_mode[1] or "none"
 end
 
-function _M:setCurrentTalentMode(mode)
+function _M:setCurrentTalentMode(mode, tid)
 	if not self._temp_data then self._temp_data = {} end
 	if not self._temp_data.current_talent_mode then self._temp_data.current_talent_mode = {} end
+	if not self._temp_data.current_talent then self._temp_data.current_talent = {} end
 	if mode then
 		table.insert(self._temp_data.current_talent_mode, mode)
+		table.insert(self._temp_data.current_talent, tid)
 	else
 		table.remove(self._temp_data.current_talent_mode)
+		table.remove(self._temp_data.current_talent)
 	end
 end
 
@@ -1185,7 +1192,7 @@ function _M:triggerTalent(tid, name, ...)
 	name = name or "trigger"
 	if t[name] then
 		self.__talent_running = t
-		self:setCurrentTalentMode("trigger")
+		self:setCurrentTalentMode("trigger", t.id)
 		local ret = {t[name](self, t, ...)}
 		self:setCurrentTalentMode(nil)
 		self.__talent_running = nil
@@ -1199,7 +1206,7 @@ function _M:callTalent(tid, name, ...)
 	name = name or "trigger"
 	if t[name] then
 		self.__talent_running = t
-		self:setCurrentTalentMode("call")
+		self:setCurrentTalentMode("call", t.id)
 		local ret = {t[name](self, t, ...)}
 		self:setCurrentTalentMode(nil)
 		self.__talent_running = nil

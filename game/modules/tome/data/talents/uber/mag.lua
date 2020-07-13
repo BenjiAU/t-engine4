@@ -355,6 +355,7 @@ uberTalent{
 		stat = {wil=25},
 	},
 	is_race_evolution = function(self, t)
+		if self:knowTalent(t.id) then return true end
 		if not t:_canGrantQuest(self) then return false end
 		local nb = 0
 		for tid, lvl in pairs(self.talents) do local t = self:getTalentFromId(tid) if t.is_necromancy then nb = nb + lvl end end

@@ -88,7 +88,11 @@ function _M:onPartyDeath(src, death_note)
 		if not death_note.special_death_msg then
 			msg = _t"%s the level %d %s %s was %s to death by %s%s%s on level %s of %s."
 			short_msg = _t"%s(%d %s %s) was %s to death by %s%s on %s %s."
-			local srcname = src.unique and src:getName() or src:getName():a_an()
+			local srcname
+			if src.getName and src.unique then srcname = src:getName()
+			elseif src.getName then srcname = src:getName():a_an()
+			else srcname = src.name and tostring(src.name) or "(???)"
+			end
 			local killermsg = (src.killer_message and " "..src.killer_message or ""):gsub("#sex#", game.player.female and _t"her" or _t"him")
 			if src.name == game.player.name then
 				srcname = game.player.female and _t"herself" or _t"himself"

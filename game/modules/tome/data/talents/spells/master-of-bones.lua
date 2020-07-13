@@ -216,8 +216,19 @@ newTalent{
 				if self.__call_crypt_count == 3 then
 					self.__call_crypt_count = 0
 					if self:getTalentLevel(t) >= 5 then
+						local stats = necroArmyStats(self)
 						local pos = rng.tableRemove(possible_spots)
-						if pos then necroSetupSummon(self, rng.percent(50) and t.minions_list.skel_mage or t.minions_list.skel_m_archer, pos.x, pos.y, lev, nil, true) end
+						local kind = nil
+						if not stats.has_skeleton_mage and stats.has_skeleton_archer then
+							kind = t.minions_list.skel_mage
+						elseif stats.has_skeleton_mage and not stats.has_skeleton_archer then
+							kind = t.minions_list.skel_m_archer
+						elseif not stats.has_skeleton_mage and not stats.has_skeleton_archer then
+							kind = rng.percent(50) and t.minions_list.skel_mage or t.minions_list.skel_m_archer
+						else
+							kind = t.minions_list.a_skel_warrior
+						end
+						if pos and kind then necroSetupSummon(self, kind, pos.x, pos.y, lev, nil, true) end
 					end
 				end
 			end
@@ -231,7 +242,7 @@ newTalent{
 		return ([[Call upon the battle fields of old to collect bones and fuse them with souls, combining them to create skeletal minions to do your bidding.
 		Up to %d skeleton warriors of level %d are summoned. Up to %d skeletons can be controlled at once.
 		At level 3 the summons become armoured skeletons warriors.
-		At level 5 every 3 summoned warriors a free skeleton mage or skeleton archer is also created (without costing a soul).
+		At level 5 every 3 summoned warriors a free skeleton mage or skeleton archer is also created (without costing a soul). You can only sustain one mage and one archer at most in your army, in which case the free minion will be an armoured skeleton warrior.
 
 		#GREY##{italic}#Skeleton minions come in fewer numbers than ghoul minions but are generaly more durable.#{normal}#
 		]]):tformat(t:_getNb(self), math.max(1, self.level + t:_getLevel(self)), t:_getMax(self, true))
@@ -465,7 +476,7 @@ newTalent{
 			melee_project = {[DamageType.BLIGHT]=resolvers.mbonus(15, 5)},
 			autolevel = "warriormage",
 			resists = {all = 50},
-			resolvers.talents{ T_BONE_ARMOUR={base=5, every=10, max=7}, T_STUN={base=3, every=10, max=5}, T_SKELETON_REASSEMBLE=5, },
+			resolvers.talents{ T_BONE_ARMOUR={base=5, every=10, max=7}, T_THROW_BONES={base=4, every=10, max=7}, T_STUN={base=3, every=10, max=5}, T_SKELETON_REASSEMBLE=5, },
 		},
 	},
 	tactical = { ATTACK = 2 },
@@ -479,7 +490,7 @@ newTalent{
 		if stats.bone_giant then stats.bone_giant:die(self) end
 
 		local list = {}
-		for _, m in ipairs(stats.list) do if m.skeleton_minion then list[#list+1] = m end end
+		for _, m in ipairs(stats.list) do if m.skeleton_minion and not m.lord_of_skulls then list[#list+1] = m end end
 		table.sort(list, function(a, b)
 			local pa, pb = a.life / a.max_life, b.life / b.max_life
 			if pa == pb then return a.creation_turn < b.creation_turn end
@@ -531,34 +542,35 @@ newTalent{
 	onAIGetTarget = function(self, t)
 		local targets = {}
 		for _, act in pairs(game.level.entities) do
-			if act.summoner == self and act.necrotic_minion and act.skeleton_minion and self:hasLOS(act.x, act.y) and core.fov.distance(self.x, self.y, act.x, act.y) <= self:getTalentRange(t) then
+			if act.summoner == self and act.necrotic_minion and (act.skeleton_minion or act.is_bone_giant) and self:hasLOS(act.x, act.y) and core.fov.distance(self.x, self.y, act.x, act.y) <= self:getTalentRange(t) then
 			targets[#targets+1] = act
 		end end
 		if #targets == 0 then return nil end
 		local tgt = rng.table(targets)
 		return tgt.x, tgt.y, tgt
 	end,
-	on_pre_use = function(self, t) return necroArmyStats(self).nb_skeleton > 0 end,
+	on_pre_use = function(self, t) local stats = necroArmyStats(self) return stats.nb_skeleton > 0 or stats.bone_giant end,
 	action = function(self, t, p)
 		local tg = self:getTalentTarget(t)
 		local x, y, target = self:getTargetLimited(tg)
 		if not x or not y or not target then return nil end
-		if not target.skeleton_minion or target.summoner ~= self then return nil end
+		if (not target.skeleton_minion and not target.is_bone_giant) or target.summoner ~= self then return nil end
 
 		local stats = necroArmyStats(self)
 		if stats.lord_of_skulls then stats.lord_of_skulls:removeEffect(stats.lord_of_skulls.EFF_LORD_OF_SKULLS, false, true) end
 
-		target:setEffect(target.EFF_LORD_OF_SKULLS, 1, {life=t:_getLife(self), talents=self:getTalentLevel(t) >= 6})
+		target:setEffect(target.EFF_LORD_OF_SKULLS, 1, {life=t:_getLife(self), talents=self:getTalentLevel(t)})
 		return true
 	end,	
 	info = function(self, t)
 		return ([[Consume a soul to empower one of your skeleton, making it into a Lord of Skulls.
 		The Lord of Skulls gain %d%% more life, is instantly healed to full.
 		There can be only one active Lord of Skulls, casting this spell on an other skeleton removes the effect from the current one.
-		At level 6 it also gains a new talent:
-		- Warriors learn Giant Leap, a powerful jump attack that deals damage and dazes and impact and frees the skeleton from any stun, daze and pin effects they may have
-		- Archers learn Vital Shot, a devastating attack that can stun and cripple their foes
-		- Mages learn Meteoric Crash, a destructive spell that crushes and burns foes in a big radius for multiple turns
+		It also gains a new talent if high enough:
+		At level 2 Warriors learn Giant Leap, a powerful jump attack that deals damage and dazes and impact and frees the skeleton from any stun, daze and pin effects they may have
+		At level 3 Archers learn Vital Shot, a devastating attack that can stun and cripple their foes
+		At level 5 Mages learn Meteoric Crash, a destructive spell that crushes and burns foes in a big radius for multiple turns
+		At level 6 Bone Giants learn You Shall Be My Weapon!, a massive attack that deals high damage, knockbacks foes and stuns them
 		]]):
 		tformat(t:_getLife(self))
 	end,

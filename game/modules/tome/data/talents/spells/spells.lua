@@ -126,7 +126,11 @@ function necroArmyStats(self)
 	if not game.party or not game.party:hasMember(self) then
 		for _, act in pairs(game.level.entities) do if act.summoner == self and act.necrotic_minion then
 			stats.nb = stats.nb + 1
-			if act.skeleton_minion then stats.nb_skeleton = stats.nb_skeleton + 1 end
+			if act.skeleton_minion then
+				stats.nb_skeleton = stats.nb_skeleton + 1
+				if act.skeleton_minion == "mage" then stats.has_skeleton_mage = true end
+				if act.skeleton_minion == "archer" then stats.has_skeleton_archer = true end
+			end
 			if act.ghoul_minion then stats.nb_ghoul = stats.nb_ghoul + 1 end
 			if act.lord_of_skulls then stats.lord_of_skulls = act end
 			if act.is_bone_giant then stats.bone_giant = act end
@@ -136,7 +140,11 @@ function necroArmyStats(self)
 	else
 		for act, _ in pairs(game.party.members) do if act.summoner == self and act.necrotic_minion then
 			stats.nb = stats.nb + 1
-			if act.skeleton_minion then stats.nb_skeleton = stats.nb_skeleton + 1 end
+			if act.skeleton_minion then
+				stats.nb_skeleton = stats.nb_skeleton + 1
+				if act.skeleton_minion == "mage" then stats.has_skeleton_mage = true end
+				if act.skeleton_minion == "archer" then stats.has_skeleton_archer = true end
+			end
 			if act.ghoul_minion then stats.nb_ghoul = stats.nb_ghoul + 1 end
 			if act.lord_of_skulls then stats.lord_of_skulls = act end
 			if act.is_bone_giant then stats.bone_giant = act end
@@ -176,9 +184,15 @@ function necroSetupSummon(self, def, x, y, level, turns, no_control)
 	-- Try to use stored AI talents to preserve tweaking over multiple summons
 	m.ai_talents = self.stored_ai_talents and self.stored_ai_talents[m.name] or {}
 	m.inc_damage = table.clone(self.inc_damage, true)
+	m.no_inventory_access = 1
 	m.no_breath = 1
 	m.no_drops = true
 	m.minion_be_nice = 1
+	m.heal = function(self, amt, src)
+		if not src or src == self or src.necrotic_minion then return mod.class.NPC.heal(self, amt, src) end
+		if src.getCurrentTalent and src:getCurrentTalent() and src:getTalentFromId(src:getCurrentTalent()) and not src:getTalentFromId(src:getCurrentTalent()).is_nature then return mod.class.NPC.heal(self, amt, src) end
+		game.logSeen(self, "#GREY#%s can not be healed this way!", self:getName():capitalize())
+	end
 
 	if self:isTalentActive(self.T_NECROTIC_AURA) then
 		local t = self:getTalentFromId(self.T_NECROTIC_AURA)
@@ -231,10 +245,10 @@ function necroSetupSummon(self, def, x, y, level, turns, no_control)
 
 		m.remove_from_party_on_death = true
 		game.party:addMember(m, {
-			control=can_control and "full" or "no",
+			control=can_control and "full" or "order",
 			type="minion",
 			title=_t"Necrotic Minion",
-			orders = {target=true},
+			orders = {target=true, dismiss=true},
 		})
 	end
 	m:resolve() m:resolve(nil, true)
@@ -258,10 +272,8 @@ function necroSetupSummon(self, def, x, y, level, turns, no_control)
 			local src = self:resolveSource()
 			for i, e in ipairs(game.level.map.effects) do
 				if e.src == src and e.damtype == engine.DamageType.PUTRESCENT_LIQUEFACTION and e.grids[self.x] and e.grids[self.x][self.y] and src:isTalentActive(src.T_PUTRESCENT_LIQUEFACTION) then
-					local p = src:isTalentActive(src.T_PUTRESCENT_LIQUEFACTION)
-					p.dur = p.dur + src:callTalent(src.T_PUTRESCENT_LIQUEFACTION, "getIncrease")
-					game.level.map:particleEmitter(self.x, self.y, 1, "pustulent_fulmination", {radius=1})
-					game.logSeen(self, "#GREY#%s dissolves into the cloud of gore.", self:getName():capitalize())
+					src:callTalent(src.T_PUTRESCENT_LIQUEFACTION, "absorbGhoul", self)
+					return
 				end
 			end
 		end

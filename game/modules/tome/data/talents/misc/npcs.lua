@@ -3945,11 +3945,6 @@ newTalent{
 		darkCount = math.min(darkCount, #locations)
 		if darkCount == 0 then return false end
 
-		local empower = necroEssenceDead(self)
-		if empower then
-			damage.chance = 100
-			empower()
-		end
 		for i = 1, darkCount do
 			local location, id = rng.table(locations)
 			table.remove(locations, id)
