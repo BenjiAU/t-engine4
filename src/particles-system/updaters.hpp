@@ -18,6 +18,11 @@
 	Nicolas Casalini "DarkGod"
 	darkgod@te4.org
 */
+#include <unordered_map>
+#include <cmath>
+
+#define PI2 6.28318530717958647692
+
 using namespace std;
 using namespace glm;
 
@@ -25,7 +30,7 @@ enum class UpdatersList : uint8_t {
 	LinearColorUpdater, BiLinearColorUpdater, EasingColorUpdater,
 	BasicTimeUpdater,
 	AnimatedTextureUpdater,
-	EulerPosUpdater, EasingPosUpdater, MathPosUpdater, PosUpdater, NoisePosUpdater,
+	EulerPosUpdater, EasingPosUpdater, MathPosUpdater, PosUpdater, NoisePosUpdater, BoidPosUpdater,
 	LinearSizeUpdater, EasingSizeUpdater,
 	LinearRotationUpdater, EasingRotationUpdater,
 };
@@ -141,5 +146,211 @@ private:
 public:
 	NoisePosUpdater(spNoiseHolder noise, vec2 amplitude, float traversal_speed) : noise(noise), amplitude(amplitude), traversal_speed(traversal_speed) {};
 	virtual void useSlots(ParticlesData &p) { p.initSlot4(POS); p.initSlot4(LIFE); p.initSlot2(ORIGIN_POS); };
+	virtual void update(ParticlesData &p, float dt);
+};
+
+/********************************************
+ ** BOIDS!
+ ** Code inspired by https://github.com/Cultrarius/Swarmz/blob/master/swarmz.h
+ ********************************************/
+enum class BoidDistanceType {
+	LINEAR, INVERSE_LINEAR, QUADRATIC, INVERSE_QUADRATIC
+};
+
+typedef uint32_t Boid;
+class BoidPosUpdater : public Updater {
+public:
+	// Parameters
+	float PerceptionRadius = 50;
+
+	float SeparationWeight = 1;
+	BoidDistanceType SeparationType = BoidDistanceType::INVERSE_QUADRATIC;
+
+	float AlignmentWeight = 1;
+	float CohesionWeight = 1;
+
+	float SteeringWeight = 0;
+	vector<vec2> steering_targets = {{0.0f, -0.1f}};
+	BoidDistanceType SteeringTargetType = BoidDistanceType::LINEAR;
+
+	float BlindspotAngleDeg = 20;
+	float MaxAcceleration = 250;
+	float MaxVelocity = 100;
+
+private:
+	struct Vec2Hasher {
+		typedef std::size_t result_type;
+
+		result_type operator()(vec2 const &v) const {
+			result_type const h1(std::hash<float>()(v.x));
+			result_type const h2(std::hash<float>()(v.y));
+			return h1 * 31 + h2;
+		}
+	};
+
+	// Internal stuff
+	vec4* cur_pos = nullptr;
+	vec2* cur_vel = nullptr;
+	vector<vec2> accelerations;
+	std::unordered_map<vec2, std::vector<Boid>, Vec2Hasher> voxelCache;
+	float BlindspotAngleDegCompareValue = 0; // = cos(PI2 * BlindspotAngleDeg / 360)
+
+	struct NearbyBoid {
+		Boid boid;
+		vec2 direction;
+		float distance;
+	};
+
+	vec2 getRandomUniform();
+
+	vec2 clampLength(vec2 v, float length) const {
+		float l = glm::length(v);
+		if (l > length) {
+			vec2 p = glm::normalize(v) * length;
+			return glm::normalize(v) * length;
+		}
+		return v;
+	}
+
+	void updateBoid(Boid b) {
+		vec2 separationSum;
+		vec2 headingSum;
+		vec2 positionSum;
+		vec2 po(cur_pos[b].x, cur_pos[b].y);
+
+		auto nearby = getNearbyBoids(b);
+
+		for (NearbyBoid &closeBoid : nearby) {
+			if (closeBoid.distance == 0) {
+				separationSum += getRandomUniform();
+			}
+			else {
+				float separationFactor = TransformDistance(closeBoid.distance, SeparationType);
+				separationSum += -closeBoid.direction * separationFactor;
+			}
+			headingSum += cur_vel[closeBoid.boid];
+			positionSum += vec2(cur_pos[closeBoid.boid].x, cur_pos[closeBoid.boid].y);
+		}
+
+		vec2 steeringTarget = po;
+		float targetDistance = -1;
+		for (auto &target : steering_targets) {
+			float distance = TransformDistance(glm::distance(po, target), SteeringTargetType);
+			if (targetDistance < 0 || distance < targetDistance) {
+				steeringTarget = target;
+				targetDistance = distance;
+			}
+		}
+
+		// Separation: steer to avoid crowding local flockmates
+		vec2 separation = nearby.size() > 0 ? separationSum / static_cast<float>(nearby.size()) : separationSum;
+
+		// Alignment: steer towards the average heading of local flockmates
+		vec2 alignment = nearby.size() > 0 ? headingSum / static_cast<float>(nearby.size()) : headingSum;
+
+		// Cohesion: steer to move toward the average position of local flockmates
+		vec2 avgPosition = nearby.size() > 0 ? positionSum / static_cast<float>(nearby.size()) : po;
+		vec2 cohesion = avgPosition - po;
+
+		// Steering: steer towards the nearest target location (like a moth to the light)
+		vec2 steering = glm::normalize(steeringTarget - po) * targetDistance;
+		
+		// calculate boid acceleration
+		vec2 acceleration;
+		// printf("updateBoid[b] acc += %fx%f * %f\n", separation.x, separation.y, SeparationWeight);
+		acceleration += separation * SeparationWeight;
+		// printf("updateBoid[b] acc += %fx%f * %f\n", alignment.x, alignment.y, AlignmentWeight);
+		acceleration += alignment * AlignmentWeight;
+		// printf("updateBoid[b] acc += %fx%f * %f\n", cohesion.x, cohesion.y, CohesionWeight);
+		acceleration += cohesion * CohesionWeight;
+		// printf("updateBoid[b] acc += %fx%f * %f\n", steering.x, steering.y, SteeringWeight);
+		acceleration += steering * SteeringWeight;
+		accelerations[b] = clampLength(acceleration, MaxAcceleration);
+	}
+
+	vector<NearbyBoid> getNearbyBoids(Boid b) const {
+		vector<NearbyBoid> result;
+		result.reserve(accelerations.size());
+
+		vec2 voxelPos = getVoxelForBoid(b);
+		voxelPos.x -= 1;
+		voxelPos.y -= 1;
+		for (int x = 0; x < 3; x++) {
+			for (int y = 0; y < 3; y++) {
+				checkVoxelForBoids(b, result, voxelPos);
+				voxelPos.y++;
+			}
+			voxelPos.y -= 3;
+			voxelPos.x++;
+		}
+		return result;
+	}
+
+	void checkVoxelForBoids(Boid b, vector<NearbyBoid> &result, const vec2 &voxelPos) const {
+		auto iter = voxelCache.find(voxelPos);
+		if (iter != voxelCache.end()) {
+			for (Boid test : iter->second) {
+				vec2 p1(cur_pos[b].x, cur_pos[b].y);
+				vec2 p2(cur_pos[test].x, cur_pos[test].y);
+				vec2 vec = p2 - p1;
+				float distance = glm::length(vec);
+
+				float compareValue = 0;
+				float l1 = distance;
+				float l2 = glm::length(cur_vel[b]);
+				if (l1 != 0 && l2 != 0) {
+					compareValue = glm::dot(-cur_vel[b], vec) / (l1 * l2);
+				}
+
+				if (b != test && distance <= PerceptionRadius && (BlindspotAngleDegCompareValue > compareValue || l2 == 0)) {
+					NearbyBoid nb;
+					nb.boid = test;
+					nb.distance = distance;
+					nb.direction = vec;
+					result.push_back(nb);
+				}
+			}
+		}
+	}
+
+	void buildVoxelCache() {
+		voxelCache.clear();
+		voxelCache.reserve(accelerations.size());
+		for (Boid b = 0; b < accelerations.size(); b++) {
+			voxelCache[getVoxelForBoid(b)].push_back(b);
+		}
+	}
+
+	vec2 getVoxelForBoid(Boid b) const {
+		float r = std::abs(PerceptionRadius);
+		vec2 p(cur_pos[b].x, cur_pos[b].y);
+		vec2 voxelPos;
+		voxelPos.x = static_cast<int>(p.x / r);
+		voxelPos.y = static_cast<int>(p.y / r);
+		return voxelPos;
+	}
+
+	float TransformDistance(float distance, BoidDistanceType type) {
+		if (type == BoidDistanceType::LINEAR) {
+			return distance;
+		}
+		else if (type == BoidDistanceType::INVERSE_LINEAR) {
+			return distance == 0 ? 0 : 1 / distance;
+		}
+		else if (type == BoidDistanceType::QUADRATIC) {
+			return std::pow(distance, 2);
+		}
+		else if (type == BoidDistanceType::INVERSE_QUADRATIC) {
+			float quad = std::pow(distance, 2);
+			return quad == 0 ? 0 : 1 / quad;
+		}
+		else {
+			return distance; // throw exception instead?
+		}
+	}
+
+public:
+	BoidPosUpdater() {};
+	virtual void useSlots(ParticlesData &p) { p.initSlot4(POS); p.initSlot2(VEL); };
 	virtual void update(ParticlesData &p, float dt);
 };

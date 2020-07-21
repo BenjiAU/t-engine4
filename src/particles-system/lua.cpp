@@ -630,6 +630,18 @@ static int p_new(lua_State *L) {
 					spNoiseHolder nh = Ensemble::getNoise(noise_str);
 					u = new NoisePosUpdater(nh, lua_vec2(L, -1, "amplitude", vec2(5, 5)), lua_float(L, -1, "traversal_speed", 400));
 					break;}
+				case UpdatersList::BoidPosUpdater: {
+					auto uu = new BoidPosUpdater(); u = uu;
+					lua_vec2(L, uu->steering_targets.data(), -1, "steering_to", vec2(0, 0));
+					lua_float(L, &uu->PerceptionRadius, -1, "perception_radius", 50);
+					lua_float(L, &uu->SeparationWeight, -1, "separation_weight", 1);
+					lua_float(L, &uu->AlignmentWeight, -1, "alignment_weight", 1);
+					lua_float(L, &uu->CohesionWeight, -1, "cohesion_weight", 1);
+					lua_float(L, &uu->SteeringWeight, -1, "steering_weight", 0);
+					lua_float(L, &uu->BlindspotAngleDeg, -1, "blindspot_angle_deg", 20);
+					lua_float(L, &uu->MaxAcceleration, -1, "max_acceleration", 250);
+					lua_float(L, &uu->MaxVelocity, -1, "max_velocity", 100);
+					break;}
 				case UpdatersList::LinearRotationUpdater:
 					u = new LinearRotationUpdater();
 					break;
@@ -757,6 +769,7 @@ extern "C" int luaopen_particles_system(lua_State *L) {
 	lua_pushliteral(L, "MathPosUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::MathPosUpdater)); lua_rawset(L, -3);
 	lua_pushliteral(L, "EasingPosUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::EasingPosUpdater)); lua_rawset(L, -3);
 	lua_pushliteral(L, "NoisePosUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::NoisePosUpdater)); lua_rawset(L, -3);
+	lua_pushliteral(L, "BoidPosUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::BoidPosUpdater)); lua_rawset(L, -3);
 	lua_pushliteral(L, "LinearRotationUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::LinearRotationUpdater)); lua_rawset(L, -3);
 	lua_pushliteral(L, "EasingRotationUpdater"); lua_pushnumber(L, static_cast<uint8_t>(UpdatersList::EasingRotationUpdater)); lua_rawset(L, -3);
 

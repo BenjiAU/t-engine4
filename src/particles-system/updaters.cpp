@@ -181,6 +181,35 @@ void NoisePosUpdater::update(ParticlesData &p, float dt) {
 	}
 }
 
+vec2 BoidPosUpdater::getRandomUniform() {
+	float theta = Ensemble::rng.genrand_real2() * PI2;
+	float r = sqrt(Ensemble::rng.genrand_real2());
+	return vec2(r * cos(theta) * 1000.0, r * sin(theta) * 1000.0);
+}
+void BoidPosUpdater::update(ParticlesData &p, float dt) {
+	accelerations.resize(p.count);
+	cur_pos = p.getSlot4(POS);
+	cur_vel = p.getSlot2(VEL);
+
+	BlindspotAngleDegCompareValue = cosf(PI2 * BlindspotAngleDeg / 360.0f);
+	if (PerceptionRadius == 0) PerceptionRadius = 1;
+	buildVoxelCache();
+	for (uint32_t b = 0; b < p.count; b++) {
+		updateBoid(b);
+		// printf("ub [%d] vel = %f x %f\n", b, cur_vel[b].x, cur_vel[b].y);
+		// printf("ub [%d] acc = %f x %f\n", b, accelerations[b].x, accelerations[b].y);
+	}
+
+	for (uint32_t b = 0; b < p.count; b++) {
+		cur_vel[b] = clampLength(cur_vel[b] + accelerations[b] * dt, MaxVelocity);
+		// printf("2c [%d] vel = %f x %f\n", b, cur_vel[b].x, cur_vel[b].y);
+		cur_pos[b].x += cur_vel[b].x * dt;
+		cur_pos[b].y += cur_vel[b].y * dt;
+	}
+	// exit(0);
+	// printf("STERRING %f x %f\n", steering_targets[0].x, steering_targets[0].y);
+}
+
 void LinearSizeUpdater::update(ParticlesData &p, float dt) {
 	vec4* pos = p.getSlot4(POS);
 	vec2* size = p.getSlot2(SIZE);

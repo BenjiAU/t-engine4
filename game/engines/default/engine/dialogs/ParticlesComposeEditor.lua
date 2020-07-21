@@ -101,6 +101,39 @@ local particle_zoom = 1
 
 local pdef = {
 -- [[
+	parameters = { ty=1.000000, size=100.000000, tx=0.000000 },
+	{
+		max_particles = 5, blend=PC.ShinyBlend, type=PC.RendererPoint, compute_only=false,
+		texture = "/data/gfx/particle.png",
+		shader = "particles/glow",
+		emitters = {
+			{PC.LinearEmitter, {
+				{PC.BasicTextureGenerator},
+				{PC.LifeGenerator, max=10.000000, duration=10.000000, min=10.000000},
+				{PC.CirclePosGenerator, width="size/10", max_angle=6.283185, base_point={0.000000, 0.000000}, radius="size", min_angle=0.000000},
+				{PC.DiskVelGenerator, max_vel=30.000000, min_vel=30.000000},
+				{PC.BasicSizeGenerator, max_size="sqrt(size)", min_size="sqrt(size)/2"},
+				{PC.BasicRotationGenerator, min_rot=0.000000, max_rot=6.283185},
+				{PC.FixedColorGenerator, color_stop={0.000000, 1.000000, 0.000000, 0.000000}, color_start={1.000000, 0.843137, 0.000000, 1.000000}},
+			}, dormant=false, startat=0.000000, events = { stopping = PC.EventSTOP }, rate=0.030000, triggers = { die = PC.TriggerDELETE }, display_name="active", nb=20.000000, duration=-1.000000 },
+			{PC.LinearEmitter, {
+				{PC.BasicTextureGenerator},
+				{PC.LifeGenerator, max=3.000000, duration=10.000000, min=0.300000},
+				{PC.CirclePosGenerator, width=20.000000, max_angle=6.283185, base_point={0.000000, 0.000000}, radius="size+200", min_angle=0.000000},
+				{PC.BasicSizeGenerator, max_size=70.000000, min_size=25.000000},
+				{PC.BasicRotationGenerator, min_rot=0.000000, max_rot=6.283185},
+				{PC.StartStopColorGenerator, min_color_start={0.000000, 0.000000, 0.890196, 1.000000}, max_color_start={0.498039, 1.000000, 0.831373, 1.000000}, max_color_stop={0.000000, 1.000000, 0.000000, 0.000000}, min_color_stop={0.000000, 0.525490, 0.270588, 0.000000}},
+				{PC.OriginPosGenerator},
+				{PC.DirectionVelGenerator, min_vel=-150.000000, max_vel=-300.000000, from={0.000000, 0.000000}, min_rot=0.000000, max_rot=0.000000},
+			}, startat=0.000000, duration=0.000000, rate=0.010000, dormant=true, events = { dying = PC.EventSTART }, triggers = { die = PC.TriggerWAKEUP }, display_name="dying", nb=500.000000, hide=true },
+		},
+		updaters = {
+			{PC.BasicTimeUpdater},
+			{PC.BoidPosUpdater, steering_to={"tx", "ty"}},
+		},
+	},
+--]]
+--[[
 	parameters = { size=300.000000, },
 	{
 		max_particles = 2000, blend=PC.ShinyBlend,
@@ -631,6 +664,17 @@ local specific_uis = {
 		}},
 		[PC.EasingPosUpdater] = {name="EasingPosUpdater", category="position & movement", fields={
 			{type="select", id="easing", text="Easing method: ", list=easings, default="outQuad"},
+		}},
+		[PC.BoidPosUpdater] = {name="BoidPosUpdater", category="position & movement", fields={
+			{type="number", id="perception_radius", text="Perception Radius", min=-10000, max=10000, default=50, line=true},
+			{type="number", id="separation_weight", text="Separation Weight", min=-10000, max=10000, default=1, line=true},
+			{type="number", id="alignment_weight", text="Alignment Weight", min=-10000, max=10000, default=1, line=true},
+			{type="number", id="cohesion_weight", text="Cohesion Weight", min=-10000, max=10000, default=1, line=true},
+			{type="number", id="steering_weight", text="Steering Weight", min=-10000, max=10000, default=0, line=true},
+			{type="point", id="steering_to", text="Steering to: ", min=-10000, max=10000, default={500, 500}, line=true},
+			{type="number", id="max_acceleration", text="Max Acceleration", min=-10000, max=10000, default=250, line=true},
+			{type="number", id="max_velocity", text="Max Velocity", min=-10000, max=10000, default=100, line=true},
+			{type="number", id="blindspot_angle_deg", text="Blindspot Angle(deg)", min=-10000, max=10000, default=20},
 		}},
 		[PC.NoisePosUpdater] = {name="NoisePosUpdater", category="position & movement", fields={
 			{type="file", id="noise", text="Noise: ", dir="/data/gfx/particles_textures/noises/", filter="%.png$", default="/data/gfx/particles_textures/noises/turbulent.png", line=true},
