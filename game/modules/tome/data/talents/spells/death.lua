@@ -26,6 +26,7 @@ newTalent{
 	mana = 10,
 	range = 10,
 	cooldown = 15,
+	requires_target = true,
 	tactical = { ATTACK = { COLD=1, DARK=1 }, DISABLE = 1 },
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 30, 300) end,
 	getMax = function(self, t) return math.floor(self:combatTalentScale(t, 1, 9)) end,

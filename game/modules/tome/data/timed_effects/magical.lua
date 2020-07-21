@@ -5233,3 +5233,53 @@ newEffect{
 		DamageType:get(DamageType.FIRE).projector(self, self.x, self.y, DamageType.FIRE, eff.power)
 	end,
 }
+
+newEffect{
+	name = "GHOST_WALK", image = "talents/ghost_walk.png",
+	desc = _t"Ghost Walk",
+	long_desc = function(self, eff) return ("Taking on a spectral form, allowing teleportation back to their original tile."):tformat() end,
+	type = "magical",
+	subtype = { darkness=true },
+	status = "beneficial",
+	parameters = {},
+	on_gain = function(self, err) return _t"#Target#'s form becomes intangible!", _t"+Ghost Walk" end,
+	on_lose = function(self, err) return _t"#Target# seems more solid.", _t"-Ghost Walk" end,
+	on_timeout = function(self, eff)
+		if self:knowTalent(self.T_SPECTRAL_SIGHT) then
+			self:setEffect(self.EFF_SENSE, self:callTalent(self.T_SPECTRAL_SIGHT, "getDuration"), {
+			range = self:callTalent(self.T_SPECTRAL_SIGHT, "getVision"),
+			actor = 1,
+			})
+		end
+		if self:knowTalent(self.T_INTANGIBILITY) then
+			self:setEffect(self.EFF_INTANGIBILITY, self:callTalent(self.T_INTANGIBILITY, "getDuration"), {
+			src = self,
+			power = self:callTalent(self.T_INTANGIBILITY, "getChance"),
+			})			
+		end
+	end,
+	activate = function(self, eff)
+		if self.hotkey and self.isHotkeyBound then
+			local pos = self:isHotkeyBound("talent", self.T_GHOST_WALK)
+			if pos then
+				self.hotkey[pos] = {"talent", self.T_GHOST_WALK_RETURN}
+			end
+		end
+
+		local ohk = self.hotkey
+		self.hotkey = nil -- Prevent assigning hotkey, we just did
+		self:learnTalent(self.T_GHOST_WALK_RETURN, true, 1, {no_unlearn=true})
+		self.hotkey = ohk
+
+	end,
+	deactivate = function(self, eff)
+		if self.hotkey and self.isHotkeyBound then
+			local pos = self:isHotkeyBound("talent", self.T_GHOST_WALK_RETURN)
+			if pos then
+				self.hotkey[pos] = {"talent", self.T_GHOST_WALK}
+			end
+		end
+
+		self:unlearnTalent(self.T_GHOST_WALK_RETURN, 1, nil, {no_unlearn=true})
+	end,
+}

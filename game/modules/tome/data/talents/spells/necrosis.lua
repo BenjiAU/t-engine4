@@ -131,7 +131,7 @@ newTalent{
 		elseif nb > 0 then bonus = ("%d runes active"):tformat(nb) end
 
 		return ([[As you continue to attune your body to undeath you reject nature as a whole.
-		As long as you have no natural infusion on your skin, each rune on it increases your minimum negative life by -%d and your spells critical chance by %d%%.
+		As long as you have no natural infusion on your skin, each rune on it increases your minimum negative life by -%d and your spells critical chance by %0.1f%%.
 
 		Currently: %s]]):
 		tformat(t.getLifeBonus(self, t), t.getCrit(self, t), bonus)

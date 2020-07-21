@@ -4298,3 +4298,25 @@ newEffect{
 		self:removeTemporaryValue("healing_factor", eff.tmpid)
 	end,
 }
+
+newEffect{
+	name = "INTANGIBILITY", image = "talents/intangibility.png",
+	desc = _t"Intangible",
+	long_desc = function(self, eff) return ("%d%% chance to fully evade any damaging actions or negative effects."):tformat(eff.power) end,
+	type = "physical",
+	subtype = { nature=true },
+	status = "beneficial",
+	parameters = { power=10 },
+	activate = function(self, eff)
+		eff.tmpid = self:addTemporaryValue("cancel_damage_chance", eff.power)
+	end,
+	deactivate = function(self, eff)
+		self:removeTemporaryValue("cancel_damage_chance", eff.tmpid)
+	end,
+	callbackOnTemporaryEffect = function(self, eff, eff_id, e, p)
+		if e.status ~= "detrimental" or e.type == "other" or not rng.percent(eff.power) then return end
+		game.logSeen(self, "#LIGHT_BLUE#%s evades the effect '%s'!", self.name:capitalize(), e.desc)
+		p.dur = 0
+		return true
+	end,
+}

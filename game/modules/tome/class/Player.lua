@@ -386,7 +386,7 @@ function _M:act()
 	self:updateMainShader()
 
 	if config.settings.tome.life_lost_warning and self.shader_old_life then
-		local perc = (self.shader_old_life - self.life) / self.max_life
+		local perc = (self.shader_old_life - self.life) / (self.max_life - self.die_at)
 		if perc > (config.settings.tome.life_lost_warning / 100) then
 			game.bignews:say(100, "#LIGHT_RED#LIFE LOST WARNING!")
 			game.key.disable_until = core.game.getTime() + 2000
