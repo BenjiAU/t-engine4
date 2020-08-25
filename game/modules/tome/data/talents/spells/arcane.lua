@@ -32,8 +32,10 @@ newTalent{
 	proj_speed = 20,
 	direct_hit = function(self, t) if self:getTalentLevel(t) >= 3 then return true else return false end end,
 	reflectable = true,
+	is_beam_spell = true,
 	requires_target = true,
 	target = function(self, t)
+		if thaumaturgyCheck(self) then return {type="widebeam", radius=1, range=self:getTalentRange(t), talent=t, selffire=false, friendlyfire=self:spellFriendlyFire()} end
 		local tg = {type="bolt", range=self:getTalentRange(t), talent=t, display={particle="bolt_arcane", trail="arcanetrail"}}
 		if self:getTalentLevel(t) >= 3 then tg.type = "beam" end
 		return tg
@@ -43,11 +45,18 @@ newTalent{
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
-		if tg.type == "beam" then
-			self:project(tg, x, y, DamageType.ARCANE, self:spellCrit(t.getDamage(self, t)), nil)
-			game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "arcane_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h})
+		local dam = thaumaturgyBeamDamage(self, self:spellCrit(t.getDamage(self, t)))
+		if tg.type == "beam" or tg.type == "widebeam" then
+			self:project(tg, x, y, DamageType.ARCANE, dam, nil)
+			local _ _, x, y = self:canProject(tg, x, y)
+--			game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "arcane_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h})
+			if thaumaturgyCheck(self) then
+				game.level.map:particleEmitter(self.x, self.y, math.max(math.abs(x-self.x), math.abs(y-self.y)), "mana_beam_wide", {tx=x-self.x, ty=y-self.y})
+			else
+				game.level.map:particleEmitter(self.x, self.y, math.max(math.abs(x-self.x), math.abs(y-self.y)), "mana_beam", {tx=x-self.x, ty=y-self.y})
+			end
 		else
-			self:projectile(tg, x, y, DamageType.ARCANE, self:spellCrit(t.getDamage(self, t)), {type="manathrust"})
+			self:projectile(tg, x, y, DamageType.ARCANE, dam, {type="manathrust"})
 		end
 		game:playSoundNear(self, "talents/arcane")
 		return true

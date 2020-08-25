@@ -633,6 +633,8 @@ newEffect{
 	on_lose = function(self, err) return _t"#Target# speeds up.", _t"-Slow" end,
 	on_merge = function(self, old_eff, new_eff)
 		if new_eff.power > old_eff.power then
+			self:removeTemporaryValue("global_speed_add", old_eff.tmpid)
+			old_eff.tmpid = self:addTemporaryValue("global_speed_add", -new_eff.power)
 			old_eff.power = new_eff.power
 			old_eff.dur = new_eff.dur
 		end 
@@ -2542,11 +2544,7 @@ newEffect{
 
 			if #effs > 0 then
 				local eff = rng.tableRemove(effs)
-				if eff[1] == "effect" then
-					self:removeEffect(eff[2])
-				else
-					self:forceUseTalent(eff[2], {ignore_energy=true})
-				end
+				self:dispel(eff[2], eff.src)
 			end
 		end
 		self:setEffect(self.EFF_DISTORTION, 2, {power=eff.distort})

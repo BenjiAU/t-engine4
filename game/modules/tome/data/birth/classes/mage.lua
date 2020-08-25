@@ -221,6 +221,9 @@ newBirthDescriptor{
 				self.faction = "angolwen"
 				self:learnTalent(self.T_TELEPORT_ANGOLWEN, true, nil, {no_unlearn=true})
 			end
+			if not profile.mod.allow_build.mage_thaumaturgist then
+				self:learnTalent(self.T_THAUMATURGIST_UNLOCK_CHECKER, true)
+			end
 			self:triggerHook{"BirthStartZone:archmage"}
 		end,
 

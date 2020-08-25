@@ -133,7 +133,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Tigthen the ethereal leash to some of your minions currently within your aura of undeath, pulling them to you and swapping place with any eventual foes in the way.
+		return ([[Tighten the ethereal leash to some of your minions currently within your aura of undeath, pulling them to you and swapping place with any eventual foes in the way.
 		Up to %d minions are affected.
 		When recalling a minion the spell tries to prioritize a spot where there is already a foe, to push it away.]]):
 		tformat(t:_getNb(self, t))
@@ -175,7 +175,7 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[By creating an arcane link with your minions army you are able to redirect parts of any damage affecting you to them.
+		return ([[By creating an arcane link with your minion army you are able to redirect parts of any damage affecting you to them.
 		Anytime you take damage %d%% of it is instead redirected to a random minion without your aura of undeath.
 		The minion takes 300%% damage from that effect.
 		The damage redirected percent depends on your Spellpower.]]):

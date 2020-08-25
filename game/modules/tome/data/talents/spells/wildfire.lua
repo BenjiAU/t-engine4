@@ -130,6 +130,7 @@ newTalent{
 	on_pre_use = function(self, t) return game.level and self.x and game.level.map:hasEffectType(self.x, self.y, DamageType.INFERNO) end,
 	action = function(self, t)
 		self:setEffect(self.EFF_CLEANSING_FLAMES, t:_getDur(self), {chance=t:_getChance(self)})
+		return true
 	end,
 	info = function(self, t)
 		local damage = t.getDamage(self, t)

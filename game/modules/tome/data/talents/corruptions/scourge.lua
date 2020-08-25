@@ -206,7 +206,7 @@ newTalent{
 		if not target or not self:canProject(tg, x, y) then return nil end
 
 		-- Awkward to have this happen first, but part of the point of the talent is to help guarantee any misc disease on hit effects can't be immuned
-		target:removeSustainsFilter(function(e) return e.is_nature end, 2)
+		target:removeSustainsFilter(self, function(e) return e.is_nature end, 2)
 		target:setEffect(target.EFF_CORRUPTING_STRIKE, 2, {})
 
 		DamageType:projectingFor(self, {project_type={talent=t}})

@@ -211,12 +211,12 @@ newTalent{
 	info = function(self, t)
 		return ([[You control dead matter around you, lyring in the ground, decaying.
 		When you enter combat and every %d turns thereafter a ghoul of level %d automatically raises to fight for you.
-		At level 3 you can forcefully activate this spell to summon up to %d ghasts, as close as possible to your foes in range %d.
+		At level 3 you can forcefully activate this spell to summon up to %d ghasts around you.
 		At level 5 every 4 summoned ghouls or ghasts a ghoulking is summoned for free.
 		Ghouls, ghasts and ghoulkings last for %d turns.
 
-		#GREY##{italic}#Ghoul minions come in larger numbers than skeleton minions but are generaly more frail and disposable.#{normal}#
-		]]):tformat(t:_getEvery(self), math.max(1, self.level + t:_getLevel(self)), t:_getNb(self), self:getTalentRadius(self, t), t:_getTurns(self))
+		#GREY##{italic}#Ghoul minions come in larger numbers than skeleton minions but are generally more frail and disposable.#{normal}#
+		]]):tformat(t:_getEvery(self), math.max(1, self.level + t:_getLevel(self)), t:_getNb(self), t:_getTurns(self))
 	end,
 }
 
@@ -316,7 +316,7 @@ newTalent{
 				e.duration = 10 -- Duration is fake, its handled by the sustain
 				return true
 			end,
-			false
+			false, false
 		)
 
 		return ret
@@ -329,7 +329,7 @@ newTalent{
 		return ([[Shattering up to %d ghouls or ghasts you create a putrescent swirling cloud of radius %d that follows you around for 3 turns per dead ghoul. Oldest ghouls are prioritized for destruction.
 		Any ghoul or ghast dying or expiring within this cloud increases its duration by %d turn and every two aborbed ghoul/ghast your gain back one soul.
 		The cloud deals %0.2f frostdusk damage to any foes caught inside.
-		The damage is increased by your Spellpower.
+		The damage will increase with your Spellpower.
 		]]):tformat(t:_getNb(self), self:getTalentRadius(t), t:_getIncrease(self), damDesc(self, DamageType.FROSTDUSK, t:_getDamage(self)))
 	end,
 }
@@ -356,7 +356,7 @@ newTalent{
 	info = function(self, t)
 		return ([[Ghouls are nothing but mere tools to you, for %d turns you render them bloated with dark forces.
 		Anytime a ghoul or ghast is hit it will explode in a messy splash of gore, dealing %0.2f frostdusk damage to all foes in radius %d of it.
-		Any creature caught in the blast also receives a random disease that deals %0.2f blight damage over 6 turns and reduces on attribute by %d.
+		Any creature caught in the blast also receives a random disease that deals %0.2f blight damage over 6 turns and reduces one attribute by %d.
 		Only one ghoul may explode per turn. The one with the least time left to live is always the first to do so.
 		The damage and disease power is increased by your Spellpower.
 		]]):
@@ -370,17 +370,21 @@ newTalent{
 	require = spells_req4,
 	points = 5,
 	mode = "sustained",
-	sustain_mana = 40,
+	mana = 40,
 	soul = 1,
-	cooldown = function(self, t) return math.ceil(self:combatTalentLimit(t, 15, 40, 20)) end,
+	cooldown = function(self, t) return math.ceil(self:combatTalentLimit(t, 15, 35, 15)) end,
 	tactical = { CURE = 1 },
 	range = 10,
+	no_energy = true,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
-	on_pre_use = function(self, t) return necroArmyStats(self).nb_ghoul > 0 end,
+	on_pre_use = function(self, t) return necroArmyStats(self).nb_ghoul > 0 and self.in_combat end,
 	callbackOnActBase = function(self, t)
 		if necroArmyStats(self).nb_ghoul == 0 then
 			self:forceUseTalent(t.id, {ignore_energy=true})
 		end
+	end,
+	callbackOnCombat = function(self, t, state)
+		if state == false then self:forceUseTalent(t.id, {ignore_energy=true}) end
 	end,
 	callbackOnTemporaryEffect = function(self, t, eff_id, e, p)
 		if e.status ~= "detrimental" then return end
@@ -409,11 +413,11 @@ newTalent{
 		return true
 	end,	
 	info = function(self, t)
-		return ([[Whenever you would be affected by a detrimental physical effect you instead transfer it instantly to one of your ghoul.
+		return ([[Whenever you would be affected by a detrimental physical effect you instead transfer it instantly to one of your ghouls.
 		The ghoul dies from the process.
 		While under 1 life it also affects magical and mental effects.
 		Cross-tier effects are never affected.
-		This spell will automatically unsustain if you have no more ghouls.
+		This spell can only be used in comabt and will automatically unsustain if you have no more ghouls or if you leave combat.
 		]]):
 		tformat()
 	end,

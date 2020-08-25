@@ -1293,7 +1293,7 @@ function _M:changeLevelReal(lev, zone, params)
 	self.zone_name = nil
 
 	-- Special stuff
-	for uid, act in pairs(self.level.entities) do if act.removeEffectsFilter then act:removeEffectsFilter(function(e) return e.zone_wide_effect end, nil, nil, true) end end
+	for uid, act in pairs(self.level.entities) do if act.removeEffectsFilter then act:removeEffectsFilter(act, function(e) return e.zone_wide_effect end, nil, nil, true) end end
 	for uid, act in pairs(self.level.entities) do
 		if act.setEffect then
 			if self.level.data.zero_gravity then act:setEffect(act.EFF_ZERO_GRAVITY, 1, {})
@@ -1458,8 +1458,12 @@ end
 
 function _M:getZoneName()
 	local name
-	if self.zone.display_name then
+	if not self.zone then
+		name = _t"the great unknown"
+	elseif self.zone.display_name then
 		name = self.zone.display_name()
+	elseif not self.level then
+		name = self.zone.name
 	else
 		local lev = self.level.level
 		if self.level.data.reverse_level_display then lev = 1 + self.level.data.max_level - lev end
@@ -2025,6 +2029,8 @@ function _M:setupCommands()
 		end end,
 		[{"_g","ctrl"}] = function() if config.settings.cheat then
 			game.player:takeHit(100, game.player)
+			game.player:useEnergy()
+			-- DamageType:get(DamageType.ACID).projector(game.player, game.player.x, game.player.y, DamageType.ACID, 100)
 do return end
 			game.player:setEffect("EFF_STUNNED", 1, {apply_power=200})
 do return end
@@ -2304,7 +2310,6 @@ do return end
 			local tmx, tmy = self.level.map:getMouseTile(mx, my)
 			local a = self.level.map(tmx, tmy, Map.ACTOR)
 			a = (config.settings.cheat or self.player:canSee(a)) and a or self.player
-			if a.showCharacterSheet then a = a:showCharacterSheet() end
 			self:registerDialog(require("mod.dialogs.CharacterSheet").new(a))
 		end,
 

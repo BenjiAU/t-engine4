@@ -49,7 +49,7 @@ newTalent{
 			ret.waste_counter = 0
 		end
 	end,
-	callbackOnActBase = checkLifeThreshold(1, function(self, t)
+	callbackOnAct = checkLifeThreshold(1, function(self, t)
 		local p = self:isTalentActive(t.id)
 		if not p then return end
 
@@ -63,7 +63,8 @@ newTalent{
 				p.crit_id = nil
 			end
 		end
-	end, function(self, t)
+	end),
+	callbackOnActBase = function(self, t)
 		local p = self:isTalentActive(t.id)
 		if not p then return end
 
@@ -83,7 +84,7 @@ newTalent{
 				self:incSoul(-soul)
 			end
 		end
-	end),
+	end,
 	callbackOnCombat = function(self, t, state)
 		local p = self:isTalentActive(t.id)
 		if not p then return end
@@ -97,18 +98,20 @@ newTalent{
 		local p = self:isTalentActive(t.id)
 		if not p then return end
 		if cb.value <= 0 then return end
+		local cbvalue = cb.value
+		if self.life >= 1 then cbvalue = cb.value * 0.666 end
 
 		local reduce = 0
 		if self:knowTalent(self.T_BLEAK_GUARD) then
 			reduce = self:callTalent(self.T_BLEAK_GUARD, "getReduce")
 		end
 		reduce = (100 - reduce) / 100
-		local rvalue = cb.value * reduce
+		local rvalue = cbvalue * reduce
 
 		if rvalue <= p.shield then
-			game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):tformat(cb.value), false)
+			game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):tformat(cbvalue), false)
 			p.shield = p.shield - rvalue
-			cb.value = 0
+			cbvalue = 0
 
 			if p.waste_counter then
 				p.waste_counter = p.waste_counter + rvalue / p.original_shield
@@ -120,7 +123,7 @@ newTalent{
 			end
 		else
 			game:delayedLogDamage(src, self, 0, ("#SLATE#(%d absorbed)#LAST#"):tformat(p.shield), false)
-			cb.value = (rvalue - p.shield) / reduce
+			cbvalue = (rvalue - p.shield) / reduce
 			p.shield = 0
 		end
 		p.been_used = true
@@ -135,6 +138,9 @@ newTalent{
 			-- Deactivate without losing energy
 			self:forceUseTalent(t.id, {ignore_energy=true})
 		end
+
+		if self.life >= 1 then cb.value = cb.value * (1-0.666) + cbvalue
+		else cb.value = cbvalue end
 		return true
 	end,
 	activate = function(self, t)
@@ -156,9 +162,10 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Conjure a shield of ice around you that can absorbs a total of %d damage.
+		return ([[Conjure a shield of ice around you that can absorb a total of %d damage.
 		Anytime it does it retaliates by sending a bolt of ice at the attacker, dealing %0.2f cold damage (this can only happen once per turn per creature).
-		When you are under 1 life it also reduces the damage of critical hits by %d%%.
+		When you are above 1 life it only affects 66.6%% of the damage, letting through the rest.
+		When you are under 1 life it affects 100%% of the damage and also reduces the damage of critical hits by %d%%.
 		10 turns after leaving combat the shield will consume its mana and soul cost again to fully regenerate if needed. if that cost can not be matched, it unsustains.
 		The shield strength will increase with your Spellpower.]]):
 		tformat(t:_getMaxAbsorb(self), damDesc(self, DamageType.COLD, t:_getDamage(self)), t:_getCritResist(self))
@@ -194,11 +201,11 @@ newTalent{
 		p.shield = p.shield + math.ceil(p.original_shield * t:_getRegen(self) / 100)
 	end,
 	info = function(self, t)
-		return ([[Everytime your shield looses %d%% of its original value an radius %d circle of desolate waste spawns under you that deals %0.2f cold damage per turn to all foes for 6 turns.
+		return ([[Every time your shield loses %d%% of its original value a circle of desolate waste will spawn under you, lasting 6 turns, and dealing %0.2f cold damage per turn to foes within radius %d.
 		If a creature is hit by your hiemal shield's retribution bolt while on the waste, the shield feeds of the wasteland to regenerate %0.1f%% of its original value.
 		No more than %d desolate wastes can trigger per shield activation.
 		The damage will increase with your Spellpower.]]):
-		tformat(t:_getThreshold(self), self:getTalentRadius(t), damDesc(self, DamageType.COLD, t:_getDamage(self)), t:_getRegen(self), 100 / t:_getThreshold(self))
+		tformat(t:_getThreshold(self), damDesc(self, DamageType.COLD, t:_getDamage(self)), self:getTalentRadius(t), t:_getRegen(self), 100 / t:_getThreshold(self))
 	end,
 }
 
@@ -216,7 +223,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Your desolate wastes are now rapidly crumbling.
-		Any foe moving through them is likely to get cut, bleeding ice that deals %0.2f cold damage over 4 turns (stacking) and reducing its movement speed by %d%%.
+		Any foe moving through them is likely to get cut, taking %0.2f cold damage and bleeding over 4 turns (stacking) while reducing its movement speed by 15%%.
 		The damage will increase with your Spellpower.]]):
 		tformat(t:_getDamage(self), t:_getSpeed(self))
 	end,

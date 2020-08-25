@@ -90,8 +90,8 @@ newEntity{ base = "BASE_NPC_DEMON",
 
 newEntity{ base = "BASE_NPC_DEMON",
 	name = "onilug", color=colors.GREY,
-	desc = _t[[A gaunt vaguely humanoid shape featuring unadorned grey leathery skin. Its arms and legs seem somehow too long and it stands toll, projecting an ominous shadow even in darkness.
-Its glowing red eyes shiny with both cruelty and a deep frightening intellect.]],
+	desc = _t[[A gaunt vaguely humanoid shape featuring unadorned grey leathery skin. Its arms and legs seem somehow too long and it stands tall, projecting an ominous shadow even in darkness.
+Its glowing red eyes shine with both cruelty and a deep frightening intellect.]],
 	resolvers.nice_tile{tall=1},
 	level_range = {10, nil}, exp_worth = 1,
 	rarity = 1,

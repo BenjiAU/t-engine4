@@ -123,6 +123,7 @@ newTalent{
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t), talent=t} end,
 	getDuration = function(self, t) return math.min(5, 2 + math.ceil(self:getTalentLevel(t) / 2)) end,
 	getDamage = function(self, t) return self:combatTalentWeaponDamage(t, 0.8, 2) end,
+	on_pre_use = function(self, t, silent) if self:attr("never_move") then if not silent then game.logPlayer(self, "You require to be able to move to use this talent.") end return false end return true end,
 	action = function(self, t)
 		if self:attr("never_move") then game.logPlayer(self, "You cannot do that currently.") return end
 		

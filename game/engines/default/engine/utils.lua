@@ -267,8 +267,9 @@ end
 -- @param tbl The original table to be cloned
 -- @param deep Boolean allow recursive cloning (unless .__ATOMIC or .__CLASSNAME is defined)
 -- @param k_skip A table containing key values set to true if you want to skip them.
+-- @param clone_meta If true table and subtables that have a metatable will have it assigned to the clone too
 -- @return The cloned table.
-function table.clone(tbl, deep, k_skip)
+function table.clone(tbl, deep, k_skip, clone_meta)
 	if not tbl then return nil end
 	local n = {}
 	k_skip = k_skip or {}
@@ -276,11 +277,14 @@ function table.clone(tbl, deep, k_skip)
 		if not k_skip[k] then
 			-- Deep copy subtables, but not objects!
 			if deep and type(e) == "table" and not e.__ATOMIC and not e.__CLASSNAME then
-				n[k] = table.clone(e, true, k_skip)
+				n[k] = table.clone(e, true, k_skip, clone_meta)
 			else
 				n[k] = e
 			end
 		end
+	end
+	if clone_meta then
+		setmetatable(n, getmetatable(tbl))
 	end
 	return n
 end
@@ -727,7 +731,7 @@ function table.orderedPairs(t)
 	return function ()
 		if i < n then
 			i = i + 1
-			return sorted_keys[i], t[sorted_keys[i]]
+			return sorted_keys[i], t[sorted_keys[i]], i == n
 		end
 	end
 end
@@ -743,7 +747,7 @@ function table.orderedPairs2(t, ordering)
 		if index <= #t then
 			value = t[index]
 			index = index + 1
-			return value[1], value[2]
+			return value[1], value[2], index == #t + 1
 		end
 	end
 end

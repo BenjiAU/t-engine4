@@ -28,9 +28,11 @@ newTalent{
 	tactical = { ATTACK = { FIRE = 2 } },
 	range = 10,
 	reflectable = true,
+	is_beam_spell = true,
 	proj_speed = 20,
 	requires_target = true,
 	target = function(self, t)
+		if thaumaturgyCheck(self) then return {type="widebeam", radius=1, range=self:getTalentRange(t), talent=t, selffire=false, friendlyfire=self:spellFriendlyFire()} end
 		local tg = {type="bolt", range=self:getTalentRange(t), talent=t, display={particle="bolt_fire", trail="firetrail"}}
 		if self:getTalentLevel(t) >= 5 then tg.type = "beam" end
 		return tg
@@ -39,20 +41,30 @@ newTalent{
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 25, 290) end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
+		table.print(tg)
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
 		local grids = nil
-		if self:getTalentLevel(t) < 5 then
-			self:projectile(tg, x, y, DamageType.FIREBURN, self:spellCrit(t.getDamage(self, t)), function(self, tg, x, y, grids)
-				game.level.map:particleEmitter(x, y, 1, "flame")
-				if self:attr("burning_wake") then
-					game.level.map:addEffect(self, x, y, 4, engine.DamageType.INFERNO, self:attr("burning_wake"), 0, 5, nil, {type="inferno"}, nil, self:spellFriendlyFire())
-				end
-			end)
-		else
-			grids = self:project(tg, x, y, DamageType.FIREBURN, self:spellCrit(t.getDamage(self, t)))
+
+		local dam = thaumaturgyBeamDamage(self, self:spellCrit(t.getDamage(self, t)))
+		if thaumaturgyCheck(self) then
+			grids = self:project(tg, x, y, DamageType.FIREBURN, dam)
 			local _ _, x, y = self:canProject(tg, x, y)
-			game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "flame_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h})
+			-- game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "flame_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h})
+			game.level.map:particleEmitter(self.x, self.y, tg.radius, "flamebeam_wide", {tx=x-self.x, ty=y-self.y})
+		else
+			if self:getTalentLevel(t) < 5 then
+				self:projectile(tg, x, y, DamageType.FIREBURN, dam, function(self, tg, x, y, grids)
+					game.level.map:particleEmitter(x, y, 1, "flame")
+					if self:attr("burning_wake") then
+						game.level.map:addEffect(self, x, y, 4, engine.DamageType.INFERNO, self:attr("burning_wake"), 0, 5, nil, {type="inferno"}, nil, self:spellFriendlyFire())
+					end
+				end)
+			else
+				grids = self:project(tg, x, y, DamageType.FIREBURN, dam)
+				local _ _, x, y = self:canProject(tg, x, y)
+				game.level.map:particleEmitter(self.x, self.y, tg.radius, "flamebeam", {tx=x-self.x, ty=y-self.y})
+			end
 		end
 
 		if self:attr("burning_wake") and grids then

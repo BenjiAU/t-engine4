@@ -103,7 +103,7 @@ newInscription{
 			return cut + poison + disease
 		end
 	},
-	is_heal = true,
+	is_heal = true, ignore_is_heal_test = true,
 	no_energy = true,
 	action = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
@@ -113,9 +113,9 @@ newInscription{
 		self:attr("disable_ancestral_life", -1)
 		self:attr("allow_on_heal", -1)
 
-		self:removeEffectsFilter(function(e) return e.subtype.wound end, 1)
-		self:removeEffectsFilter(function(e) return e.subtype.poison end, 1)
-		self:removeEffectsFilter(function(e) return e.subtype.disease end, 1)
+		self:removeEffectsFilter(self, function(e) return e.subtype.wound end, 1)
+		self:removeEffectsFilter(self, function(e) return e.subtype.poison end, 1)
+		self:removeEffectsFilter(self, function(e) return e.subtype.disease end, 1)
 
 		if core.shader.active(4) then
 			self:addParticles(Particles.new("shader_shield_temp", 1, {toback=true , size_factor=1.5, y=-0.3, img="healgreen", life=25}, {type="healing", time_factor=2000, beamsCount=20, noup=2.0}))
@@ -153,9 +153,9 @@ newInscription{
 		local force = {}
 		local removed = 0
 
-		removed = target:removeEffectsFilter({types=data.what, subtype={["cross tier"] = true}, status="detrimental"})
+		removed = target:removeEffectsFilter(self, {types=data.what, subtype={["cross tier"] = true}, status="detrimental"})
 		for k,v in pairs(data.what) do
-			removed = removed + target:removeEffectsFilter({type=k, status="detrimental"}, 1)
+			removed = removed + target:removeEffectsFilter(self, {type=k, status="detrimental"}, 1)
 		end
 
 		if removed > 0 then
@@ -952,11 +952,11 @@ newInscription{
 	action = function(self, t)
 		local data = self:getInscriptionData(t.short_name)
 		
-		local crosstiers = self:removeEffectsFilter({subtype={["cross tier"] = true}, status="detrimental"}, 3)
+		local crosstiers = self:removeEffectsFilter(self, {subtype={["cross tier"] = true}, status="detrimental"}, 3)
 		local cleansed = 0
-		cleansed = cleansed + self:removeEffectsFilter({type="physical", status="detrimental"}, 1)
-		cleansed = cleansed + self:removeEffectsFilter({type="magical", status="detrimental"}, 1)
-		cleansed = cleansed + self:removeEffectsFilter({type="mental", status="detrimental"}, 1)
+		cleansed = cleansed + self:removeEffectsFilter(self, {type="physical", status="detrimental"}, 1)
+		cleansed = cleansed + self:removeEffectsFilter(self, {type="magical", status="detrimental"}, 1)
+		cleansed = cleansed + self:removeEffectsFilter(self, {type="mental", status="detrimental"}, 1)
 
 		if crosstiers == 0 and cleansed == 0 then return nil end
 
@@ -1006,7 +1006,7 @@ newInscription{
 		if not (x and y) or not target or not self:canProject(tg, x, y) then return nil end
 
 		if self:reactionToward(target) < 0 then
-			target:removeSustainsFilter(function(o)
+			target:removeSustainsFilter(self, function(o)
 				if o.type == "magical" or o.is_spell then
 					if o.status and o.status == "detrimental" then return false end
 					return true
@@ -1015,7 +1015,7 @@ newInscription{
 			end,
 			8)
 		else
-			target:removeEffectsFilter({type="magical", status="detrimental"}, 999)
+			target:removeEffectsFilter(self, {type="magical", status="detrimental"}, 999)
 		end
 
 		game:playSoundNear(self, "talents/spell_generic")
@@ -1252,7 +1252,7 @@ newInscription{
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
 		self:project(tg, x, y, DamageType.ICE, data.power + data.inc_stat, {type="freeze"})
-		self:removeEffectsFilter({status="detrimental", type="mental", ignore_crosstier=true}, 1)
+		self:removeEffectsFilter(self, {status="detrimental", type="mental", ignore_crosstier=true}, 1)
 		game:playSoundNear(self, "talents/ice")
 		attack_rune(self, t.id)
 		return true
@@ -1301,7 +1301,7 @@ newInscription{
 		self:project(tg, x, y, DamageType.FIREBURN, {dur=5, initial=0, dam=data.power + data.inc_stat})
 		local _ _, x, y = self:canProject(tg, x, y)
 		game.level.map:particleEmitter(self.x, self.y, tg.radius, "flamebeam", {tx=x-self.x, ty=y-self.y})
-		self:removeEffectsFilter({status="detrimental", type="physical", ignore_crosstier=true}, 1)
+		self:removeEffectsFilter(self, {status="detrimental", type="physical", ignore_crosstier=true}, 1)
 		game:playSoundNear(self, "talents/fire")
 		attack_rune(self, t.id)
 		return true
@@ -1517,7 +1517,7 @@ newInscription{
 		local x, y = self:getTarget(tg)
 		if not x or not y then return nil end
 		self:projectile(tg, x, y, DamageType.INSIDIOUS_POISON, {dam=data.power + data.inc_stat, dur=7, heal_factor=data.heal_factor}, {type="slime"})
-		self:removeEffectsFilter({status="detrimental", type="magical", ignore_crosstier=true}, 1)
+		self:removeEffectsFilter(self, {status="detrimental", type="magical", ignore_crosstier=true}, 1)
 		game:playSoundNear(self, "talents/slime")
 		return true
 	end,

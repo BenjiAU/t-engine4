@@ -1553,11 +1553,11 @@ newEffect{
 		(function()
 			local def, level, bonusLevel = self.tempeffect_def[self.EFF_CURSE_OF_NIGHTMARES], eff.level, math.min(eff.unlockLevel, eff.level)
 			if math.min(eff.unlockLevel, eff.level) >= 3 then
-				--if e.status == "detrimental" and not e.subtype["cross tier"] and p.src and p.src._is_actor and not p.src.dead then
+				--if e.status == "detrimental" and not e.subtype["cross tier"] and p.src and p.src.__is_actor and not p.src.dead then
 					--local e = self.tempeffect_def[eff_id]
 				if e.status ~= "detrimental" or e.type == "other" or e.subtype["cross tier"] then return end
 				local harrowDam = def.getHarrowDam(self, level)
-				if p.src and p.src._is_actor then
+				if p.src and p.src.__is_actor then
 					DamageType:get(DamageType.MIND).projector(self, p.src.x, p.src.y, DamageType.MIND, harrowDam)
 					DamageType:get(DamageType.MIND).projector(self, p.src.x, p.src.y, DamageType.DARKNESS, harrowDam)
 					--game.logSeen(self, "#F53CBE#%s harrows '%s'!", self:getName():capitalize(), p.src.name)
@@ -3986,12 +3986,22 @@ newEffect{
 	subtype = { lich = true },
 	status = "neutral",
 	parameters = { },
-	callbackOnKill = function(self, eff, who, death_note)
-		if who.rank >= 3.2 then
+	callbackOnSummonKill = function(self, eff, minion, who, death_note)
+		if who.rank >= 3.5 then
 			eff.success = true
 			self:removeEffect(self.EFF_LICH_HUNGER)
 			game.bignews:say(120, "#DARK_ORCHID#Lichform regeneration is complete!#{normal}#")
 		end
+	end,
+	callbackOnKill = function(self, eff, who, death_note)
+		if who.rank >= 3.5 then
+			eff.success = true
+			self:removeEffect(self.EFF_LICH_HUNGER)
+			game.bignews:say(120, "#DARK_ORCHID#Lichform regeneration is complete!#{normal}#")
+		end
+	end,
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "lich_hunger", 1)
 	end,
 	deactivate = function(self, eff)
 		if eff.success then return end
@@ -4052,13 +4062,14 @@ newEffect{
 
 		pcall(function() -- Just in case
 			eff.image:forceUseTalent(ab.id, {force_level=self:getTalentLevelRaw(ab.id), ignore_cd=true, no_talent_fail=true, ignore_energy=true, force_talent_ignore_ressources=true, force_target=tgt})
-			eff.image:takeHit(1, eff.image)
+			-- eff.image:takeHit(1, eff.image)
+			eff.image:useCharge()
 		end)
 
 		eff.last_talent = true
 	end,
 	activate = function(self, eff)
-		self:effectTemporaryValue(eff, "blind_inc_damage", eff.dam)	
+		self:effectTemporaryValue(eff, "blind_inc_damage", eff.dam)
 	end,
 }
 
@@ -4073,5 +4084,30 @@ newEffect{
 	parameters = { dam=10 },
 	activate = function(self, eff)
 		self:effectTemporaryValue(eff, "blind_inc_damage", eff.dam)	
+		eff.out_of_combat = 5
+	end,
+	on_timeout = function(self, eff)
+		if not self.in_combat then
+			eff.out_of_combat = eff.out_of_combat - 1
+			if eff.out_of_combat <= 0 then
+				self:die(self)
+			end
+		end
+	end,
+}
+
+newEffect{
+	name = "AETHER_PERMEATION", image = "talents/aether_permeation.png",
+	desc = _t"Aether Permeation",
+	long_desc = function(self, eff) return ("Target is protected from dispels"):tformat() end,
+	type = "other",
+	subtype = { prodigy=true, arcane=true },
+	status = "beneficial",
+	parameters = { },
+	callbackPriorities={callbackOnDispel = -9999999}, -- Never set anything lower heh, it should trigger before anything else
+	callbackOnDispel = function(self, t, type, effid_or_tid, src, allow_immunity, name)
+		if not allow_immunity then return false end
+		game.logSeen(self, "#ORCHID#Aether Permeation protects %s from a dispel!", name)
+		return true
 	end,
 }

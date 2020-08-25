@@ -39,6 +39,8 @@ cs_player_dup = nil
 local tabs_list = {general=true, attack=true, defense=true, talents=true, equipment=true}
 
 function _M:init(actor, start_tab)
+	if actor.showCharacterSheet then actor = actor:showCharacterSheet() end
+
 	if _M.cs_player_dup and _M.cs_player_dup.name ~= actor.name then _M.cs_player_dup = nil end
 
 	self.actor = actor

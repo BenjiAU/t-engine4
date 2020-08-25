@@ -423,12 +423,13 @@ end
 -- "def" can have a field "ignore_energy" to not consume energy; other parameters can be passed and handled by an overload of this method.  
 -- Object activation interface calls this method with an "ignore_ressources" parameter
 function _M:forceUseTalent(t, def)
+	if type(t) == "table" then t = t.id end -- Ugh
 	local oldpause = game.paused
 	local oldenergy = self.energy.value
 	if def.ignore_energy then self.energy.value = 10000 end
 
 	if def.ignore_ressources then self:attr("force_talent_ignore_ressources", 1) end
-	self:setCurrentTalentMode("forced", t.id)
+	self:setCurrentTalentMode("forced", t)
 	local ret = {self:useTalent(t, def.force_who, def.force_level, def.ignore_cd or def.ignore_cooldown, def.force_target, def.silent, true)}
 	self:setCurrentTalentMode(nil)
 	if def.ignore_ressources then self:attr("force_talent_ignore_ressources", -1) end
@@ -895,22 +896,20 @@ end
 --- Talent level, 0 if not known
 function _M:getTalentLevelRaw(id)
 	if type(id) == "table" then id = id.id end
-	local lvl = self.talents[id] or 0
-	if lvl > 0 and not self.disable_talents_add_levels then lvl = self:alterTalentLevelRaw(_M.talents_def[id], lvl) end
-	return lvl
+	return self.talents[id] or 0
 end
 
 --- Talent level, 0 if not known
 -- Includes mastery (defaults to 1)
 function _M:getTalentLevel(id)
 	local t
+	if type(id) == "table" then t, id = id, id.id
+	else t = _M.talents_def[id] end
+	if not t then return 0 end
 
-	if type(id) == "table" then
-		t, id = id, id.id
-	else
-		t = _M.talents_def[id]
-	end
-	return t and (self:getTalentLevelRaw(id)) * (self:getTalentMastery(t) or 0) or 0
+	local lvl = self:getTalentLevelRaw(id)
+	if lvl > 0 then lvl = self:alterTalentLevelRaw(t, lvl) end
+	return lvl * (self:getTalentMastery(t) or 0)
 
 end
 

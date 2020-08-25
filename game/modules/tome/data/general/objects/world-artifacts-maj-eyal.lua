@@ -247,7 +247,7 @@ newEntity{ base = "BASE_LONGBOW",
 	material_level = 5,
 	combat = {
 		range = 10,
-		physspeed = 0.7,
+		physspeed = 0.85,
 		apr = 12,
 	},
 	wielder = {
@@ -459,7 +459,7 @@ newEntity{ base = "BASE_SLING",
 	material_level = 3,
 	combat = {
 		range = 10,
-		physspeed = 0.7,
+		physspeed = 0.85,
 	},
 	wielder = {
 		inc_stats = { [Stats.STAT_DEX] = 4, [Stats.STAT_CUN] = 3,  },

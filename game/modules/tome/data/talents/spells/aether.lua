@@ -247,7 +247,7 @@ newTalent{
 		local aegis
 		self:setEffect(self.EFF_AETHER_AVATAR, t.getNb(self, t), {})
 		if self:isTalentActive(self.T_PURE_AETHER) and self:getTalentLevel(self.T_PURE_AETHER) >= 5 then
-			self:removeEffectsFilter({type="physical", status="detrimental"}, self:callTalent(self.T_PURE_AETHER, "getNbRemove"))
+			self:removeEffectsFilter(self, {type="physical", status="detrimental"}, self:callTalent(self.T_PURE_AETHER, "getNbRemove"))
 		end
 		game:playSoundNear(self, "talents/arcane")
 		return true

@@ -40,7 +40,7 @@ newTalent{
 			sound_random = {"creatures/ghost/random%d", 1, 1},
 			level_range = {1, nil}, exp_worth = 0,
 			body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1, QUIVER=1 },
-			autolevel = "warriormage",
+			autolevel = "wisecaster",
 			ai = "dumb_talented_simple", ai_state = { ai_target="target_closest", ai_move="move_complex", talent_in=2, },
 			dont_pass_target = true,
 			stats = { str=14, dex=18, mag=20, con=12 },
@@ -90,7 +90,7 @@ newTalent{
 			sound_random = {"creatures/ghost/random%d", 1, 1},
 			level_range = {1, nil}, exp_worth = 0,
 			body = { INVEN = 10, MAINHAND=1, OFFHAND=1, BODY=1, QUIVER=1 },
-			autolevel = "warriormage",
+			autolevel = "wisecaster",
 			ai = "dumb_talented_simple", ai_state = { ai_target="target_closest", ai_move="move_complex", talent_in=2, },
 			dont_pass_target = true,
 			stats = { str=14, dex=18, mag=20, con=12 },
@@ -198,7 +198,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Any time one of your minions dies or expires, and even if it is resurrected by a boneyard, the dread feeds on it.
-		Each time it feeds it gets healed by %d and reduces remaining cooldown of its spells by %d.
+		Each time it feeds it gets healed for %d and reduces remaining cooldown of its spells by %d.
 		Every 10 minion deaths it casts a random hex on up to %d foes at once, instantly and without triggering a cooldown.]]):
 		tformat(t:_getHeal(self), t:_getCD(self), t:_getFoes(self))
 	end,

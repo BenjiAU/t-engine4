@@ -447,7 +447,7 @@ newEffect{
 	deactivate = function(self, eff)
 	end,
 	on_timeout = function(self, eff)
-		local cleanse = self:removeEffectsFilter({type="physical", status="detrimental"}, 1)
+		local cleanse = self:removeEffectsFilter(self, {type="physical", status="detrimental"}, 1)
 		if cleanse > 0 then eff.dur = eff.dur + 1 end
 	end,
 }
@@ -2242,9 +2242,9 @@ newEffect{
 	end,
 	activate = function(self, eff)
 		self:effectTemporaryValue(eff, "inc_stats", {
-			[Stats.STAT_STR] = math.floor(eff.str),
-			[Stats.STAT_CON] = math.floor(eff.con),
-			[Stats.STAT_DEX] = math.floor(eff.dex),
+			[Stats.STAT_STR] = -math.floor(eff.str),
+			[Stats.STAT_CON] = -math.floor(eff.con),
+			[Stats.STAT_DEX] = -math.floor(eff.dex),
 		})
 	end,
 	deactivate = function(self, eff)
@@ -2344,55 +2344,43 @@ newEffect{
 	type = "magical",
 	subtype = {disease=true, blight=true, acid=true},
 	status = "detrimental",
-	parameters = {},
+	parameters = {chance=20, dam=10, burst=20},
 	on_gain = function(self, err) return _t"#Target# is afflicted by a terrible worm rot!" end,
 	on_lose = function(self, err) return _t"#Target# is free from the worm rot." end,
+	callbackOnDispelled = function(self, eff, type, effid_or_tid, src, allow_immunity)
+		if effid_or_tid ~= self.EFF_WORM_ROT then return end
+		if rng.percent(eff.chance) then
+			local ed = self:getEffectFromId(eff.effect_id)
+			ed.spawn_worm(self, eff)
+		else
+			-- Fake it, we missed out chance!
+			eff.spawned = true
+		end
+	end,
+	spawn_worm = function(self, eff)
+		if eff.spawned then return end
+		DamageType:get(DamageType.BLIGHT).projector(eff.src, self.x, self.y, DamageType.BLIGHT, eff.burst, {from_disease=true})
+		eff.src:callTalent(eff.src.T_WORM_ROT, "spawn_carrion_worm", self)
+		game.logSeen(self, "#LIGHT_RED#A carrion worm mass bursts out of %s!", self:getName():capitalize())
+		eff.spawned = true
+		self:removeEffect(self.EFF_WORM_ROT)
+	end,
 	-- Damage each turn
 	on_timeout = function(self, eff)
-		eff.rot_timer = eff.rot_timer - 1
-
 		-- disease damage
-		if self:attr("purify_disease") then
-			self:heal(eff.dam, eff.src)
-		else
-			DamageType:get(DamageType.BLIGHT).projector(eff.src, self.x, self.y, DamageType.BLIGHT, eff.dam, {from_disease=true})
+		if self:attr("purify_disease") then self:heal(eff.dam, eff.src)
+		else DamageType:get(DamageType.BLIGHT).projector(eff.src, self.x, self.y, DamageType.BLIGHT, eff.dam, {from_disease=true})
 		end
+
 		-- acid damage from the larvae
 		DamageType:get(DamageType.ACID).projector(eff.src, self.x, self.y, DamageType.ACID, eff.dam)
 
-		local effs = {}
-		-- Go through all physical effects
-		for eff_id, p in pairs(self.tmp) do
-			local e = self.tempeffect_def[eff_id]
-			if e.status == "beneficial" and e.type == "physical" then
-				effs[#effs+1] = {"effect", eff_id}
-			end
-		end
-		-- remove a random physical effect
-		if #effs > 0 then
-			local eff = rng.tableRemove(effs)
-			if eff[1] == "effect" then
-				self:removeEffect(eff[2])
-			end
-		end
-
-		-- burst and spawn a worm mass
-		local t = eff.src:getTalentFromId(eff.src.T_WORM_ROT)
-		if eff.rot_timer == 0 then
-			DamageType:get(DamageType.BLIGHT).projector(eff.src, self.x, self.y, DamageType.BLIGHT, eff.burst, {from_disease=true})
-			t.spawn_carrion_worm(eff.src, self, t)
-			game.logSeen(self, "#LIGHT_RED#A carrion worm mass bursts out of %s!", self:getName():capitalize())
-			self:removeEffect(self.EFF_WORM_ROT)
-		end
+		-- Remove one effect
+		self:removeEffectsFilter(eff.src, {type="physical", status="beneficial"}, 1)
 	end,
 	deactivate = function(self, eff)
-		local t = eff.src:getTalentFromId(eff.src.T_WORM_ROT)
-		if rng.percent(t.getChance(eff.src,t)) then
-			DamageType:get(DamageType.BLIGHT).projector(eff.src, self.x, self.y, DamageType.BLIGHT, eff.burst, {from_disease=true})
-			t.spawn_carrion_worm(eff.src, self, t)
-			game.logSeen(self, "#LIGHT_RED#A carrion worm mass bursts out of %s!", self:getName():capitalize())
-			self:removeEffect(self.EFF_WORM_ROT)
-		end
+		local ed = self:getEffectFromId(eff.effect_id)
+		ed.spawn_worm(self, eff)
 	end,
 }
 
@@ -3706,7 +3694,7 @@ newEffect{
 	status = "detrimental",
 	parameters = {},
 	on_timeout = function(self, eff)
-		self:removeSustainsFilter(nil, 1)
+		self:removeSustainsFilter(eff.src, nil, 1)
 	end,
 	activate = function(self, eff)
 		if core.shader.allow("adv") then
@@ -4754,7 +4742,11 @@ newEffect{
 		if self.skeleton_minion == "warrior" then image = "npc/lord_of_skulls_warrior.png"
 		elseif self.skeleton_minion == "archer" then image = "npc/lord_of_skulls_archer.png"
 		elseif self.skeleton_minion == "mage" then image = "npc/lord_of_skulls_magus.png"
-		elseif self.is_bone_giant then image = "npc/undead_giant_heavy_sentinel.png"
+		elseif self.is_bone_giant then
+			if self.is_bone_giant == "e_bone_giant" then image = "npc/lord_of_skulls_eternal_bone_giant.png"
+			elseif self.is_bone_giant == "h_bone_giant" then image = "npc/lord_of_skulls_heavy_bone_giant.png"
+			elseif self.is_bone_giant == "bone_giant" then image = "npc/lord_of_skulls_bone_giant.png"
+			end
 		end
 
 		self.replace_display = mod.class.Actor.new{
@@ -4852,6 +4844,7 @@ newEffect{
 		eff.turn_list = {}
 	end,
 	registerHit = function(self, eff, minion)
+		if not minion.ghoul_minion then return end
 		eff.turn_list[#eff.turn_list+1] = minion
 	end,
 	activate = function(self, eff)
@@ -4918,6 +4911,7 @@ newEffect{
 	on_lose = function(self, err) return nil, true end,
 	activate = function(self, eff)
 		self:effectTemporaryValue(eff, "invulnerable", 1)
+		eff.dur = 0 -- Force one turn
 	end,
 }
 
@@ -4966,6 +4960,9 @@ newEffect{
 		if what ~= "leave" then return end
 		self:removeEffect(self.EFF_CORPSELIGHT, true, true)
 	end,
+	callbackOnDeath = function(self, eff)
+		self:removeEffect(self.EFF_CORPSELIGHT, true, true)
+	end,
 	explode = function(self, eff)
 		if not self:knowTalent(self.T_GRAVE_MISTAKE) then return end
 		if eff.exploded then return end
@@ -4975,6 +4972,9 @@ newEffect{
 	callbackOnTalentPost = function(self, eff, ab)
 		if not ab.is_spell or ab.id == self.T_CORPSELIGHT then return end
 		if eff.stacks >= eff.max_stacks then return end
+		local found_self = false
+		self:projectApply({type="ball", radius=eff.effective_radius, x=eff.x, y=eff.y}, eff.x, eff.y, Map.ACTOR, function(tgt) if tgt == self then found_self = true end end)
+		if not found_self then return end
 		local oldradius = math.min(eff.radius + eff.stacks, 10)
 		eff.stacks = eff.stacks + 1
 
@@ -5027,6 +5027,10 @@ newEffect{
 	parameters = {dam=10, chance=2},
 	on_gain = function(self, err) return _t"#Target# is afflicted by a dire plague!" end,
 	on_lose = function(self, err) return _t"#Target# is free from the dire plague." end,
+	on_merge = function(self, old_eff, new_eff)
+		new_eff.dur = math.max(old_eff.dur, new_eff.dur)
+		return new_eff
+	end,
 	on_timeout = function(self, eff)
 		if self:attr("purify_disease") then self:heal(eff.dam, eff.src)
 		else if eff.dam > 0 then
@@ -5088,6 +5092,39 @@ newEffect{
 	end,
 	on_timeout = function(self, eff)
 		DamageType:get(DamageType.COLD).projector(eff.src or self, self.x, self.y, DamageType.COLD, eff.power)
+	end,
+}
+
+newEffect{
+	name = "SHATTERED_REMAINS", image = "talents/bone_wall.png",
+	desc = _t"Shattered Remains",
+	long_desc = function(self, eff) return ("health increased by %d, armour by %d and melee retaliation by %d."):tformat(eff.health, eff.armor, eff.retaliation) end,
+	type = "magical",
+	subtype = { skeleton=true, bone=true },
+	status = "beneficial",
+	parameters = { health=10, armor=10, retaliation=10 },
+	on_gain = function(self, err) return _t"#Target# picks up the remains of its fallen comrade.", true end,
+	on_lose = function(self, err) return _t"#Target# drops its additional bones.", true end,
+	updateBonus = function(self, eff)
+		if eff.tmpids then self:tableTemporaryValuesRemove(eff.tmpids) end
+		eff.tmpids = {}
+		self:tableTemporaryValue(eff.tmpids, "max_life", eff.health)
+		self:tableTemporaryValue(eff.tmpids, "life", eff.health)
+		self:tableTemporaryValue(eff.tmpids, "combat_armor", eff.armor)
+		self:tableTemporaryValue(eff.tmpids, "on_melee_hit", {[DamageType.PHYSICAL]=eff.retaliation})
+	end,
+	on_merge = function(self, old_eff, new_eff, ed)
+		old_eff.health = old_eff.health + new_eff.health
+		old_eff.armor = old_eff.armor + new_eff.armor
+		old_eff.retaliation = old_eff.retaliation + new_eff.retaliation
+		ed.updateBonus(self, old_eff)
+		return old_eff
+	end,
+	activate = function(self, eff, ed)
+		ed.updateBonus(self, eff)
+	end,
+	deactivate = function(self, eff)
+		self:tableTemporaryValuesRemove(eff.tmpids)
 	end,
 }
 
@@ -5281,5 +5318,88 @@ newEffect{
 		end
 
 		self:unlearnTalent(self.T_GHOST_WALK_RETURN, 1, nil, {no_unlearn=true})
+	end,
+}
+
+newEffect{
+	name = "SLIPSTREAM", image = "talents/slipstream.png",
+	desc = _t"Slipstream Free Movement",
+	long_desc = function(self, eff) return _t"Can move once for free, this turn only." end,
+	type = "magical",
+	subtype = { thaumaturgy=true, movement=true },
+	status = "beneficial", decrease = 0,
+	parameters = {},
+	activate = function(self, eff)
+		self:effectTemporaryValue(eff, "free_movement", 1)
+		eff.setup = true
+	end,
+	callbackOnMove = function(self, eff, moved, force, ox, oy)
+		if not moved or force then return end
+		self:removeEffect(self.EFF_SLIPSTREAM, true, true)
+		self:callTalent(self.T_SLIPSTREAM, "useStream")
+	end,
+	callbackOnAct = function(self, eff)
+		if eff.setup then eff.setup = nil return end
+		self:removeEffect(self.EFF_SLIPSTREAM, true, true)
+	end,
+}
+
+newEffect{
+	name = "ORB_OF_THAUMATURGY", image = "talents/orb_of_thaumaturgy.png",
+	desc = _t"Orb Of Thaumaturgy",
+	long_desc = function(self, eff) return _t"All beam spells are duplicated to the orb." end,
+	type = "magical",
+	subtype = { thaumaturgy=true, meta=true },
+	status = "beneficial",
+	parameters = {},
+	callbackOnChangeLevel = function(self, eff, what)
+		if what ~= "leave" then return end
+		self:removeEffect(self.EFF_ORB_OF_THAUMATURGY, true, true)
+	end,
+	callbackOnTalentPost = function(self, eff, t)
+		if self._orb_of_thaumaturgy_recurs then return end
+		if not t.is_beam_spell then return end
+		game:onTickEnd(function()
+			local target = {x=eff.x, y=eff.y, __no_self=true}
+			self._orb_of_thaumaturgy_recurs = target
+			self:attr("archmage_beam_dam_mult", -eff.dam_pct)
+			self:forceUseTalent(t.id, {ignore_cooldown=true, ignore_ressources=true, ignore_energy=true, force_target=target})
+			self:attr("archmage_beam_dam_mult", eff.dam_pct)
+			self._orb_of_thaumaturgy_recurs = nil
+		end)
+	end,
+	activate = function(self, eff)
+		eff.particle = game.level.map:particleEmitter(eff.x, eff.y, 1, "thaumaturgy_orb", {})
+	end,
+	deactivate = function(self, eff, ed)
+		game.level.map:removeParticleEmitter(eff.particle)
+	end,
+}
+
+newEffect{
+	name = "METAFLOW", image = "talents/metaflow.png",
+	desc = _t"Metaflow",
+	long_desc = function(self, eff) return ("Overflowing with energy, increasing all spells talent level by %d."):tformat(eff.power) end,
+	type = "magical",
+	subtype = { meta=true },
+	status = "beneficial",
+	parameters = {power=1},
+	on_gain = function(self, err) return _t"#Target# is overflowing with energy!", true end,
+	on_lose = function(self, err) return _t"#Target# is no more overflowing with energy.", true end,
+	activate = function(self, eff, ed)
+		eff.tmpid = self:addTemporaryValue("spells_bonus_level", eff.power)
+		self:udpateSustains()
+
+		if core.shader.allow("adv") then
+			eff.particle1, eff.particle2 = self:addParticles3D("volumetric", {kind="fast_sphere", appear=10, radius=1.2, twist=50, density=15, growSpeed=0.002, scrollingSpeed=0.008, img="continuum_01"})
+		else
+			eff.particle1 = self:addParticles(Particles.new("generic_shield", 1, {r=1, g=0, b=0, a=0.5}))
+		end
+	end,
+	deactivate = function(self, eff, ed)
+		self:removeTemporaryValue("spells_bonus_level", eff.tmpid)
+		self:udpateSustains()
+		if eff.particle1 then self:removeParticles(eff.particle1) end
+		if eff.particle2 then self:removeParticles(eff.particle2) end
 	end,
 }

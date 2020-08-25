@@ -74,7 +74,7 @@ newTalent{
 	action = function(self, t)
 		local tg = {type="bolt", range=self:getTalentRange(t), friendlyblock=false, talent=t}
 		local x, y, target = self:getTargetLimited(tg)
-		if not target then return nil end
+		if not target or target == self then return nil end
 		
 		local dam = self:spellCrit(t.getDamage(self, t))
 		if core.fov.distance(self.x, self.y, target.x, target.y) > 1 then

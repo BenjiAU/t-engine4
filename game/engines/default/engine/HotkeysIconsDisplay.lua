@@ -123,7 +123,7 @@ function _M:resize(x, y, w, h, iw, ih)
 	self.hk_cache = {}
 end
 
-_M.page_to_hotkey = {"", "SECOND_", "THIRD_", "FOURTH_", "FIFTH_"}
+_M.page_to_hotkey = {"", "SECOND_", "THIRD_", "FOURTH_", "FIFTH_", "SIX_", "SEVEN_"}
 
 function _M:onKeyBindAltered()
 	for _, hk in pairs(self.hk_cache) do hk:updateKeybind(self, self.actor) end

@@ -61,6 +61,9 @@ function _M:bumpInto(target, x, y)
 			if target.describeFloor then target:describeFloor(target.x, target.y, true) end
 			if self.describeFloor then self:describeFloor(self.x, self.y, true) end
 
+			local eff = self:hasEffect(self.EFF_CURSE_OF_SHROUDS) if eff then eff.moved = true end
+			eff = target:hasEffect(target.EFF_CURSE_OF_SHROUDS) if eff then eff.moved = true end
+
 			local energy = game.energy_to_act * self:combatMovementSpeed(x, y)
 			if self:attr("bump_swap_speed_divide") then
 				energy = energy / self:attr("bump_swap_speed_divide")
@@ -1896,7 +1899,7 @@ end
 
 --- Gets summon speed
 function _M:combatSummonSpeed()
-	return math.max(1 - ((self:attr("fast_summons") or 0) / 100), 0.4)
+	return math.max(1 - ((self:attr("fast_summons") or 0) / 100), 0.15)
 end
 
 --- Computes physical crit chance reduction
@@ -2476,7 +2479,7 @@ function _M:hasOffWeaponType(type)
 	if not self:getInven("OFFHAND") then return end
 	local weapon = self:getInven("OFFHAND")[1]
 	if not weapon then return nil end
-	if type and weapon.combat.talented ~= type then return nil end
+	if type and (weapon.special_combat or weapon.combat).talented ~= type then return nil end
 	return weapon
 end
 

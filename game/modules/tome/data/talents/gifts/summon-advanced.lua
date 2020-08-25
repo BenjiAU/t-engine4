@@ -114,7 +114,7 @@ newTalent{
 	on_pre_use = function(self, t, silent)
 		return self:isTalentActive(self.T_MASTER_SUMMONER)
 	end,
-	duration = function(self, t) return  math.floor(self:combatTalentLimit(t, 15, 1, 5)) end, -- Limit <25
+	duration = function(self, t) return math.floor(self:combatTalentLimit(t, 15, 1, 6)) end, -- Limit <25
 	action = function(self, t)
 		self:setEffect(self.EFF_WILD_SUMMON, t.duration(self,t), {chance=100})
 		game:playSoundNear(self, "talents/teleport")

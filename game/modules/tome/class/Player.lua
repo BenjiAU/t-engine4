@@ -183,7 +183,7 @@ function _M:onEnterLevel(zone, level)
 			if type(self.tempeffect_def[eff_id].cancel_on_level_change) == "function" then self.tempeffect_def[eff_id].cancel_on_level_change(self, p) end
 		end
 	end
-	for i, eff_id in ipairs(effs) do self:removeEffect(eff_id) end
+	for i, eff_id in ipairs(effs) do self:removeEffect(eff_id, nil, true) end
 
 	-- Clear existing player created effects on the map
 	for i, eff in ipairs(level.map.effects) do
@@ -459,7 +459,7 @@ function _M:updateMainShader()
 
 	-- Set shader HP warning
 	if self.life ~= self.shader_old_life then
-		if self.life < self.max_life / 2 then game.fbo_shader:setUniform("hp_warning", 1 - (self.life / self.max_life))
+		if (self.life - self.die_at) < (self.max_life - self.die_at) / 2 then game.fbo_shader:setUniform("hp_warning", 1 - (self.life / (self.max_life - self.die_at)))
 		else game.fbo_shader:setUniform("hp_warning", 0) end
 	end
 	-- Set shader air warning
@@ -681,6 +681,26 @@ function _M:playerFOV()
 		end end
 	end
 
+	if self:knowTalent(self.T_SPECTRAL_SIGHT) then
+		local t = self:getTalentFromId(self.T_SPECTRAL_SIGHT)
+		local range = self:getTalentRange(t)
+		local sqsense = range * range
+
+		for minion, _ in pairs(game.party.members) do if minion.necrotic_minion and not minion.dead and minion.x then
+			local arr = minion.fov.actors_dist
+			local tbl = minion.fov.actors
+			local act
+			game.level.map:apply(minion.x, minion.y, 0.6)
+			game.level.map:applyExtraLite(minion.x, minion.y)
+			for i = 1, #arr do
+				act = arr[i]
+				if act and not act.dead and act.x and tbl[act] and minion:canSee(act) and tbl[act].sqdist <= sqsense then
+					game.level.map.seens(act.x, act.y, 0.6)
+				end
+			end
+		end end
+	end
+
 	if not self:attr("blind") then
 		-- Handle infravision/heightened_senses which allow to see outside of lite radius but with LOS
 		-- Note: Overseer of Nations bonus already factored into attributes
@@ -841,6 +861,10 @@ end
 function _M:setName(name)
 	self.name = name
 	game.save_name = name
+end
+
+function _M:playerControlled()
+	return self.player and true or false
 end
 
 --- Notify the player of available cooldowns

@@ -18,9 +18,56 @@
 -- darkgod@te4.org
 
 newTalent{
-	name = "Chill of the Tomb",
+	name = "Black Ice",
 	type = {"spell/grave",1},
 	require = spells_req1,
+	points = 5,
+	mana = 7,
+	cooldown = 4,
+	tactical = { ATTACK= { COLD = 2 }, DISABLE = 2 },
+	range = 10,
+	direct_hit = true,
+	requires_target = true,
+	target = function(self, t)
+		if self:getTalentLevel(t) < 5 then
+			return {type="hit", range=self:getTalentRange(t), friendlyfire=false}
+		else
+			return {type="ball", radius=1, range=self:getTalentRange(t), friendlyfire=false}
+		end
+	end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 250) end,
+	getMinionsInc = function(self,t) return math.floor(self:combatTalentScale(t, 10, 30)) end,
+	action = function(self, t)
+		local tg = self:getTalentTarget(t)
+		local x, y = self:getTarget(tg)
+		local _ _, _, _, x, y = self:canProject(tg, x, y)
+		if not x or not y then return nil end
+
+		local dam = self:spellCrit(t:_getDamage(self))
+		self:projectApply(tg, x, y, Map.ACTOR, function(target, x, y)
+			if DamageType:get(DamageType.COLD).projector(self, x, y, DamageType.COLD, dam) > 0 then
+				target:setEffect(target.EFF_BLACK_ICE, 3, {apply_power=self:combatSpellpower(), power=t:_getMinionsInc(self)})
+			end
+			game.level.map:particleEmitter(x, y, 1, "black_ice", {})
+		end)
+
+		game:playSoundNear(self, "talents/ice")
+		return true
+	end,
+	info = function(self, t)
+		local damage = t.getDamage(self, t)
+		return ([[Summon an icy spike directly on a foe, impaling it for %0.2f cold damage.
+		At level 5 it hits all foes in range 1 around the target.
+		Any creature hit will take %d%% more damage from your necrotic minions for 3 turns.
+		The damage will increase with your Spellpower.]]):
+		tformat(damDesc(self, DamageType.COLD, damage), t:_getMinionsInc(self))
+	end,
+}
+
+newTalent{
+	name = "Chill of the Tomb",
+	type = {"spell/grave",2},
+	require = spells_req2,
 	points = 5,
 	mana = 30,
 	cooldown = 8,
@@ -58,53 +105,6 @@ newTalent{
 }
 
 newTalent{
-	name = "Black Ice",
-	type = {"spell/grave",2},
-	require = spells_req2,
-	points = 5,
-	mana = 7,
-	cooldown = 4,
-	tactical = { ATTACK= { COLD = 2 }, DISABLE = 2 },
-	range = 10,
-	direct_hit = true,
-	requires_target = true,
-	target = function(self, t)
-		if self:getTalentLevel(t) < 5 then
-			return {type="hit", range=self:getTalentRange(t), friendlyfire=false}
-		else
-			return {type="ball", radius=1, range=self:getTalentRange(t), friendlyfire=false}
-		end
-	end,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 250) end,
-	getMinionsInc = function(self,t) return math.floor(self:combatTalentScale(t, 10, 30)) end,
-	action = function(self, t)
-		local tg = self:getTalentTarget(t)
-		local x, y = self:getTarget(tg)
-		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		if not x or not y then return nil end
-
-		local dam = self:spellCrit(t:_getDamage(self))
-		self:projectApply(tg, x, y, Map.ACTOR, function(target, x, y)
-			if DamageType:get(DamageType.COLD).projector(self, x, y, DamageType.COLD, dam) > 0 then
-				target:setEffect(target.EFF_BLACK_ICE, 3, {apply_power=self:combatSpellpower(), power=t:_getMinionsInc(self)})
-			end
-			game.level.map:particleEmitter(x, y, 1, "black_ice", {})
-		end)
-
-		game:playSoundNear(self, "talents/ice")
-		return true
-	end,
-	info = function(self, t)
-		local damage = t.getDamage(self, t)
-		return ([[Summon a icy spike directly on a foe, impaling it for %0.2f cold damage.
-		At level 5 it hits all foes in range 1 around the target.
-		Any creature hit will take %d%% more damage from your necrotic minions for 3 turns.
-		The damage will increase with your Spellpower.]]):
-		tformat(damDesc(self, DamageType.COLD, damage), t:_getMinionsInc(self))
-	end,
-}
-
-newTalent{
 	name = "Corpselight",
 	type = {"spell/grave",3},
 	require = spells_req3,
@@ -120,7 +120,7 @@ newTalent{
 	target = function(self, t) return {type="ball", radius=self:getTalentRadius(t), range=self:getTalentRange(t), nolock=true, nowarning=true} end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
-		local x, y = self:getTargetLimited(tg)
+		local x, y = self:getTargetLimitedWallStop(tg)
 		if not x then return end
 		self:setEffect(self.EFF_CORPSELIGHT, 7, {x=x, y=y, radius=self:getTalentRadius(t), dam=t:_getDamage(self), stacks=self.life < 1 and 3 or 0, max_stacks=t:_getMaxStacks(self)})
 		return true
@@ -159,7 +159,7 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		return ([[Upon expiring the corpselight implodes, pulling in all foes towards its center and dealing %0.2f cold damage.
-		The damage is increased by +10%% per stacks.
+		The damage is increased by +10%% per stack.
 		The damage will increase with your Spellpower.
 
 		#PURPLE#Learning this spell will make Corpselight cost two souls to use instead of one.]]):

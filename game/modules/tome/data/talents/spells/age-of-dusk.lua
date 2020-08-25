@@ -47,7 +47,7 @@ newTalent{
 	info = function(self, t)
 		return ([[You unleash the glorious vision of the past when the continent was filled with death and plagues.
 		All foes in range %d catch a dire plague for 5 turns, dealing %0.2f darkness damage each turn.
-		The Dire Plague is considered a disease but is not prevented by diseases immunity.
+		The Dire Plague is considered a disease but is not prevented by disease immunity.
 		Every turn there is a %d%% chance of a piece of the soul to be ripped away, increasing your souls by 1.
 		]]):tformat(self:getTalentRadius(t), damDesc(self, DamageType.DARKNESS, t:_getDamage(self)), t:_getChance(self))
 	end,
@@ -93,7 +93,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[You call upon an eerie night to aid you for %d turns.
-		Each turn you automatically fire a beam of darkness towards a random foe (prioritizing the ones further away) that deals %0.2f darkness damage and has 25%% chances to blind any foes caught inside for 4 turns.
+		Each turn you automatically fire a beam of darkness towards a random foe (prioritizing the ones further away) that deals %0.2f darkness damage and has 25%% chance to blind any foes caught inside for 4 turns.
 		The damage will increase with your Spellpower.]]):
 		tformat(t:_getDur(self), damDesc(self, DamageType.DARKNESS, t:_getDamage(self)))
 	end,
@@ -130,7 +130,7 @@ newTalent{
 	tactical = { BUFF = 2 },
 	getImmune = function(self, t) return math.floor(self:combatTalentLimit(t, 100, 20, 50)) end,
 	getSaves = function(self, t) return math.floor(self:combatTalentScale(t, 10, 55)) end,
-	callbackOnActBase = checkLifeThreshold(1, function(self, t)
+	callbackOnAct = checkLifeThreshold(1, function(self, t)
 		if self:getTalentLevel(t) < 5 then return end
 		self:setEffect(self.EFF_GOLDEN_AGE_OF_NECROMANCY, 1, {})
 		return true
@@ -155,7 +155,7 @@ newTalent{
 	info = function(self, t)
 		return ([[You recall the age long gone where necromancers had free reign over the world.
 		Increases all saves by %d, confusion and teleport resistances by %d%%.
-		At level 5 any time you cross the 1 life thresshold you become invulnerable for 2 turns.]])
+		At level 5 any time you cross the 1 life threshold you become invulnerable for 1 turns.]])
 		:tformat(t:_getSaves(self), t:_getImmune(self))
 	end,
 }

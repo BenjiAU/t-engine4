@@ -72,7 +72,7 @@ end
 -- @param[type=table] t
 -- @param[type=table] base
 local function importBase(t, base)
-	local temp = table.clone(base, true, {uid=true, define_as = true})
+	local temp = table.clone(base, true, {uid=true, define_as = true}, true)
 	if base.onEntityMerge then base:onEntityMerge(temp) end
 	table.mergeAppendArray(temp, t, true)
 	t = temp
@@ -107,7 +107,7 @@ function _M:init(t, no_default)
 	for k, e in pairs(t) do
 		if k ~= "__CLASSNAME" and k ~= "uid" then
 			local ee = e
-			if type(e) == "table" and not e.__ATOMIC and not e.__CLASSNAME then ee = table.clone(e, true) end
+			if type(e) == "table" and not e.__ATOMIC and not e.__CLASSNAME then ee = table.clone(e, true, nil, true) end
 			self[k] = ee
 		end
 	end

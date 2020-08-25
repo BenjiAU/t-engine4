@@ -32,6 +32,7 @@ newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=tru
 newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=true, type="spell/temporal", name = _t"temporal", description = _t"The school of time manipulation." }
 newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=true, type="spell/phantasm", name = _t"phantasm", description = _t"Control the power of tricks and illusions." }
 newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=true, type="spell/enhancement", name = _t"enhancement", description = _t"Magical enhancement of your body." }
+newTalentType{ allow_random=true, no_silence=true, is_spell=true, mana_regen=true, type="spell/thaumaturgy", name = _t"thaumaturgy", description = _t"The pinacle of spellcasting." }
 newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="spell/conveyance", name = _t"conveyance", generic = true, description = _t"Conveyance is the school of travel. It allows you to travel faster and to track others." }
 newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="spell/divination", name = _t"divination", generic = true, description = _t"Divination allows the caster to sense its surroundings, and find hidden things." }
 newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="spell/aegis", name = _t"aegis", generic = true, description = _t"Command the arcane forces into healing and protection." }
@@ -118,6 +119,20 @@ spells_req_high5 = {
 	level = function(level) return 26 + (level-1)  end,
 }
 
+function thaumaturgyCheck(self)
+	if not self:attr("archmage_widebeam") then return false end
+	local inven = self:getInven("BODY")
+	if not inven then return true end
+	if not inven[1] then return true end
+	if inven[1].type ~= "armor" or inven[1].subtype ~= "cloth" then return false end
+	return true
+end
+function thaumaturgyBeamDamage(self, dam)
+	local v = self:attr("archmage_beam_dam_mult")
+	if not v then return dam end
+	return dam * (1 + v / 100)
+end
+
 -------------------------------------------
 -- Necromancer minions
 function necroArmyStats(self)
@@ -178,7 +193,7 @@ function necroSetupSummon(self, def, x, y, level, turns, no_control)
 	m.unused_generics = 0
 	m.unused_talents_types = 0
 	m.silent_levelup = true
-	m.no_points_on_levelup = true
+	-- m.no_points_on_levelup = true
 	m.ai_state = m.ai_state or {}
 	m.ai_state.tactic_leash = 100
 	-- Try to use stored AI talents to preserve tweaking over multiple summons
@@ -314,6 +329,7 @@ load("/data/talents/spells/meta.lua")
 load("/data/talents/spells/divination.lua")
 load("/data/talents/spells/temporal.lua")
 load("/data/talents/spells/phantasm.lua")
+load("/data/talents/spells/thaumaturgy.lua")
 load("/data/talents/spells/enhancement.lua")
 
 load("/data/talents/spells/explosives.lua")

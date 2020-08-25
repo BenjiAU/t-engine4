@@ -53,7 +53,7 @@ newTalent{
 		if not x then print("Multiply: no free space") return nil end
 
 		self.can_multiply = self.can_multiply - 1
-		local a = self:cloneActor({can_multiply=self.can_multiply-1, exp_worth=0.1})
+		local a = (self.clone_base or self):cloneActor({can_multiply=self.can_multiply-1, exp_worth=0.1})
 		mod.class.NPC.castAs(a)
 
 		a:removeTimedEffectsOnClone()

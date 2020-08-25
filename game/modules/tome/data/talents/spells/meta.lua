@@ -101,11 +101,7 @@ newTalent{
 			if #effs == 0 then break end
 			local eff = rng.tableRemove(effs)
 
-			if eff[1] == "effect" then
-				target:removeEffect(eff[2])
-			else
-				target:forceUseTalent(eff[2], {ignore_energy=true})
-			end
+			target:dispel(eff[2], self)
 		end
 		game:playSoundNear(self, "talents/spell_generic")
 		return true
@@ -215,11 +211,7 @@ newTalent{
 	end },
 	getTalentCount = function(self, t) return math.floor(self:combatTalentScale(t, 2, 7, "log")) end,
 	getMaxLevel = function(self, t) return util.bound(math.floor(self:getTalentLevel(t)), 1, 4) end,
-	passives = function(self, t, p)
-		if self:getTalentLevel(t) >= 6 then
-			self:talentTemporaryValue(p, "spells_bonus_level", 1)
-		end
-	end,
+	getDur = function(self, t) return math.floor(self:combatTalentScale(t, 2, 12)) end,
 	action = function(self, t)
 		local tids = {}
 		for tid, _ in pairs(self.talents_cd) do
@@ -235,6 +227,7 @@ newTalent{
 			local tid = rng.tableRemove(tids)
 			self.talents_cd[tid] = nil
 		end
+		self:setEffect(self.EFF_METAFLOW, t:_getDur(self), {power=1})
 		self.changed = true
 		game:playSoundNear(self, "talents/spell_generic")
 		return true
@@ -243,8 +236,7 @@ newTalent{
 		local talentcount = t.getTalentCount(self, t)
 		local maxlevel = t.getMaxLevel(self, t)
 		return ([[Your mastery of arcane flows allow you to reset the cooldown of up to %d of your spells (that don't have a fixed cooldown) of tier %d or less.
-		Passive effect:
-		At talent level 6 all known spells are considered one talent level higher when casting them.]]):
-		tformat(talentcount, maxlevel)
+		In addition for %d turns you are overflowing with energy; all known spells are considered one talent level higher when casting them.]]):
+		tformat(talentcount, maxlevel, t:_getDur(self))
 	end,
 }

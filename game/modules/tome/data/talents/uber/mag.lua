@@ -70,24 +70,32 @@ uberTalent{
 
 uberTalent{
 	name = "Aether Permeation",
-	mode = "passive",
-	require = { special={desc=_t"Have at least 25% arcane damage reduction and have been exposed to the void of space", fct=function(self)
-		return (game.state.birth.ignore_prodigies_special_reqs or self:attr("planetary_orbit")) and self:combatGetResist(DamageType.ARCANE) >= 25
+	mode = "sustained",
+	require = { special={desc=_t"Have been exposed to the void of space", fct=function(self)
+		return (game.state.birth.ignore_prodigies_special_reqs or self:attr("planetary_orbit"))
 	end} },
-	cant_steal = true,
-	on_learn = function(self, t)
+	cooldown = 20,
+	callbackPriorities={callbackOnDispel = -9999}, -- Never set anything lower heh, it should trigger before anything else
+	callbackOnDispel = function(self, t, type, effid_or_tid, src, allow_immunity, name)
+		if not allow_immunity then return false end
+		if self:hasEffect(self.EFF_AETHER_PERMEATION) then return end
+		self:setEffect(self.EFF_AETHER_PERMEATION, 6, {})
+		game:onTickEnd(function() self:forceUseTalent(t.id, {ignore_energy=true}) end)
+		game.logSeen(self, "#ORCHID#Aether Permeation protects %s from a dispel!", name)
+		return true
+	end,
+	activate = function(self, t)
 		local ret = {}
-		self:talentTemporaryValue(ret, "force_use_resist", DamageType.ARCANE)
-		self:talentTemporaryValue(ret, "force_use_resist_percent", 66)
-		self:talentTemporaryValue(ret, "resists", {[DamageType.ARCANE] = 20})
-		self:talentTemporaryValue(ret, "resists_cap", {[DamageType.ARCANE] = 10})
+		self:talentTemporaryValue(ret, "combat_spellpower", 40)
 		return ret
 	end,
-	on_unlearn = function(self, t)
+	deactivate = function(self, t, p)
+		return true
 	end,
 	info = function(self, t)
-		return ([[You manifest a thin layer of aether all around you. Any attack passing through it will check arcane resistance instead of the incoming damage resistance.
-		In effect, all of your resistances are equal to 66%% of your arcane resistance, which is increased by 20%% (and cap increased by 10%%).]])
+		return ([[You manifest a thin layer of aether all around you. 
+		Any time you are the target of a dispel effect the aether strengthens around you, protecting you from the dispel and any further ones for 6 turns and unsustaining this spell.
+		While undisturbed the layer of aether provides you with 40 raw spellpower.]])
 		:tformat()
 	end,
 }
@@ -184,7 +192,9 @@ uberTalent{
 		who:learnTalent(who.T_BONE_SHIELD, true, 3, {no_unlearn=true})
 		who:forceUseTalent(who.T_BONE_SHIELD, {ignore_energy=true})
 		if who.necrotic_minion then
-			if who.subtype == "giant" then
+			if who.name == "dread" or who.name == "dreadmaster" then
+				who:learnTalent(who.T_SLUMBER, true, 3, {no_unlearn=true})				
+			elseif who.subtype == "giant" then
 				who:learnTalent(who.T_BONE_SPIKE, true, 3, {no_unlearn=true})
 				who:learnTalent(who.T_RUIN, true, 3, {no_unlearn=true}) who:forceUseTalent(who.T_RUIN, {ignore_energy=true})
 			elseif who.subtype == "vampire" or who.subtype == "lich" then
@@ -261,8 +271,7 @@ uberTalent{
 		- Skeleton Warriors: Ruin
 		- Bone Giants: Bone Spike and Ruin
 		- Ghouls: Virulent Disease
-		- Vampires / Liches: Blood Grasp and Blood Boil
-		- Ghosts / Wights: Blood Fury and Curse of Death
+		- Dread: Slumber
 		]]):tformat()
 	end,
 }
@@ -349,6 +358,7 @@ uberTalent{
 			return not self:attr("true_undead") and nb > 0
 		end},
 		special2={desc=_t"Have completed the ritual", fct=function(self)
+			if config.settings.cheat then return true end
 			if self.lichform_quest_checker then return true end
 			if not game.state.birth.supports_lich_transform then return true else return self:isQuestStatus(game.state.birth.supports_lich_transform, engine.Quest.DONE) end
 		end},
@@ -429,7 +439,16 @@ uberTalent{
 	on_learn = function(self, t)
 		self:attr("greater_undead", 1) -- Set that here so that the player cant become an Exarch while waiting for their death to become a Lich
 		self:learnTalent(self.T_NEVERENDING_UNLIFE, true, 1)
-		game.bignews:say(120, "#DARK_ORCHID#You are on your way to Lichdom. #{bold}#Your next death will finish the ritual.#{normal}#")
+
+		-- Wait for death
+		if not self.no_resurrect then
+			game.bignews:say(120, "#DARK_ORCHID#You are on your way to Lichdom. #{bold}#Your next death will finish the ritual.#{normal}#")
+		-- We cant wait for death! do it now!
+		else
+			local dialog = require("mod.dialogs.DeathDialog").new(self)
+			t:_becomeLich(self)
+			game.level.map:particleEmitter(self.x, self.y, 1, "demon_teleport")
+		end
 	end,
 	on_unlearn = function(self, t)
 	end,
@@ -445,5 +464,39 @@ uberTalent{
 		- Doomed for Eternity: As a creature of doom and despair you now constantly spawn undead shadows around you.
 		- Commander of the Dead: You are able to infuse all undead party members (including yourself) with un-natural power, increasing your physical and spellpower.
 		]]):tformat()
+	end,
+}
+
+uberTalent{
+	name = "High Thaumaturgist",
+	require = {
+		birth_descriptors={{"subclass", "Archmage"}},
+		special={desc=_t"Unlocked the High Thaumaturgist evolution", fct=function(self) return profile.mod.allow_build.mage_thaumaturgist end},
+		stat = {wil=25},
+	},
+	is_class_evolution = "Archmage", requires_unlock = "mage_thaumaturgist",
+	cant_steal = true,
+	is_spell = true,
+	mode = "passive",
+	on_learn = function(self, t)
+		self:learnTalentType("spell/thaumaturgy", true)
+		self:setTalentTypeMastery("spell/thaumaturgy", 1.3)
+		self:attr("archmage_widebeam", 1)
+
+		if not game.party:hasMember(self) then return end
+		self.descriptor.class_evolution = _t"High Thaumaturgist"
+	end,
+	on_unlearn = function(self, t)
+	end,
+	info = function(self, t)
+		return ([[Thaumaturgists have unlocked a deeper understanding of their spells, allowing them to combine the elements into new ways and to empower them.
+		The spells Flame, Manathrust, Lightning, Pulverizing Auger and Ice Shards are permanently turned into 3-wide beams spells.
+		In addition they have access to the unique Thaumaturgy class tree:
+		- Orb of Thaumaturgy: a temporary orb that duplicates any beam spells that you cast
+		- Multicaster: When casting a beam spell adds a chance to also cast an other archmage spell
+		- Slipstream: Allows movement when casting beams
+		- Elemental Array Burst: a powerful, multi-elemental beam spell that can inflict all elemental ailments and can not be resisted
+		#CRIMSON#The fine spellcasting required for wide beams and all thaumaturgy spells can only happen while wearing cloth. Anything heavier will hinder the casting too much.]])
+		:tformat()
 	end,
 }

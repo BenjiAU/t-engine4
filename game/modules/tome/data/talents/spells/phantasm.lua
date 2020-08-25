@@ -86,7 +86,7 @@ newTalent{
 	callbackOnHit = function(self, t, cb, src, dt)
 		local p = self:isTalentActive(t.id)
 		if not p then return end
-		if cb.value <= 0 then return end
+		if cb.value <= 0 or src == self then return end
 		if rng.percent(t.getEvade(self, t)) then
 			game:delayedLogDamage(src, self, 0, ("#YELLOW#(%d ignored)#LAST#"):format(cb.value), false)
 			cb.value = 0
@@ -208,20 +208,38 @@ newTalent{
 			faction = self.faction,
 			summoner = self,
 			heal = function() return 0 end, -- Cant ever heal
+			useCharge = function(self)
+				self.charges = self.charges - 1
+				self.max_life = self.max_charges
+				self.life = self.charges
+				if self.charges < 0 then self:die(self) end
+			end,
+			callbackOnAct = function(self)
+				self.max_life = self.max_charges
+				self.life = self.charges
+			end,
+			onTemporaryValueChange = function(self, ...)
+				self:callbackOnAct()
+				return mod.class.NPC.onTemporaryValueChange(self, ...)
+			end,
 			takeHit = function(self, value, src, death_note) -- Cant ever take more than one damage per turn per actor
 				if not src then return false, 0 end
 				if src ~= self then
-					if death_note.source_talent_mode ~= "active" then return false, 0 end
+					if not death_note or death_note.source_talent_mode ~= "active" then return false, 0 end
 					if self.turn_procs.mirror_image_dmg and self.turn_procs.mirror_image_dmg[src] then return false, 0 end
 					self.turn_procs.mirror_image_dmg = self.turn_procs.mirror_image_dmg or {}
 					self.turn_procs.mirror_image_dmg[src] = true
 				end
-				return mod.class.NPC.takeHit(self, 1, src, death_note)
+				self:useCharge()
+				return false, 1
+				-- return mod.class.NPC.takeHit(self, 1, src, death_note)
 			end,
 			on_die = function(self)
 				self.summoner:removeEffect(self.summoner.EFF_MIRROR_IMAGE_REAL, true, true)
 			end,
-			spellFriendlyFire = function() return 100 end,
+			spellFriendlyFire = function(self) return self.summoner:spellFriendlyFire() end,
+			archmage_widebeam = self.archmage_widebeam,
+			iceblock_pierce = self.iceblock_pierce,
 			no_breath = 1,
 			remove_from_party_on_death = true,
 		}
@@ -230,11 +248,16 @@ newTalent{
 		game.zone:addEntity(game.level, image, "actor", tx, ty)
 		image.max_life = t:_getLife(self)
 		image.life = t:_getLife(self)
+		image.max_charges = t:_getLife(self)
+		image.charges = t:_getLife(self)
 
 		-- Clone particles
 		for ps, _ in pairs(self.__particles) do
 			image:addParticles(ps:clone())
 		end
+
+		-- Let addons/dlcs that need to alter the image
+		self:triggerHook{"Spell:Phantasm:MirrorImage", image=image}
 
 		local dam_bonus = self:callTalent(self.T_INVISIBILITY, "getDamPower")
 		image:setEffect(image.EFF_MIRROR_IMAGE_FAKE, 1, {dam=dam_bonus})
@@ -261,11 +284,11 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
-		return ([[Create a perfect lookalike of your own form made out of pure light near a creature or yourself if no creature is present.
+		return ([[Create a perfect lookalike of your own form made out of pure light near a creature.
 		This image has %d life and can never take more than 1 damage per creature per turn and is immune to any non direct damage (ground effects, damage over time, ...).
 		Whenever you cast a spell your mirror image will try to duplicate it at the same target for 66%% less damage, if possible. If it can it will loose 1 life, if not it will instead taunt a creature to focus its attention on itself.
 		While the image exists you receive the damage bonus from the Invisibility spell as if you were invisible.
-		This spell can not be cast while a Mirror Image already exists and only in combat.
+		This spell can not be cast while a Mirror Image already exists and only in combat. It will disappear after a few turn when outside of combat.
 		]])
 		:tformat(t.getLife(self, t))
 	end,

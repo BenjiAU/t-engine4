@@ -51,7 +51,7 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		return ([[Conjures up a beam of darkness, doing %0.2f darkness damage.
-		At level 5, the beam widens to hit foes on each sides.
+		At level 5, the beam widens to hit foes on each side.
 		The damage will increase with your Spellpower.]]):
 		tformat(damDesc(self, DamageType.DARKNESS, damage))
 	end,
@@ -72,7 +72,7 @@ newTalent{
 	target = function(self, t)
 		return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t)}
 	end,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 15, 40) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 15, 60) end,
 	getDuration = function(self, t) return 5 end,
 	getBaneDur = function(self,t) return math.floor(self:combatTalentScale(t, 4.5, 6.5)) end,
 	action = function(self, t)
@@ -113,7 +113,7 @@ newTalent{
 	sutain_mana = 20,
 	cooldown = 10,
 	tactical = { BUFF=1 },
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 30, 330) / 5 end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 30, 250) / 5 end,
 	callbackOnDealDamage = function(self, t, val, target, dead, death_note)
 		if dead or not death_note or not death_note.damtype or target == self then return end
 		if death_note.damtype ~= DamageType.DARKNESS then return end
@@ -142,8 +142,8 @@ newTalent{
 	info = function(self, t)
 		local damage = t.getDamage(self, t)
 		local radius = self:getTalentRadius(t)
-		return ([[Shadows engulf your foes, anytime you deal darkness damage to a creature affected by a bane, the bane's duration is increased by 1 turn and the shadows erupt, dealing an additional %0.2f damage.
-		The damage the can only happen once per turn per creature, the turn increase however always happens.
+		return ([[Shadows engulf your foes, anytime you deal darkness damage to a creature affected by a bane, the bane's duration is increased by 1 turn and the shadows erupt, dealing an additional %0.2f darkness damage.
+		The damage can only happen once per turn per creature, the turn increase however always happens.
 		The damage will increase with your Spellpower.]]):
 		tformat(damDesc(self, DamageType.DARKNESS, damage))
 	end,
@@ -163,7 +163,7 @@ newTalent{
 	requires_target = true,
 	radius = function(self, t) return math.floor(self:combatTalentScale(t, 3, 4)) end,
 	target = function(self, t) return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), friendlyfire=false, talent=t, display={particle="bolt_dark", trail="darktrail"}} end,
-	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 280) end,
+	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 20, 220) end,
 	iconOverlay = function(self, t, p)
 		local val = p.dur
 		if val <= 0 then return "" end

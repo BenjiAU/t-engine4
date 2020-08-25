@@ -73,7 +73,7 @@ newTalent{
 	info = function(self, t)
 		local range = self:getTalentRange(t)
 		return ([[Taking on a spectral form, you teleport to the target tile within range %d. 
-		For 3 turns after using this spell, you gain the ability to teleport back to your original tile as long as you are within range of it.]]):tformat(range)
+		For 3 turns after using this spell, you gain the ability to instantly teleport back to your original tile as long as you are within range of it.]]):tformat(range)
 	end,
 }
 

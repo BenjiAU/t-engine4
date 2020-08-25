@@ -63,8 +63,8 @@ newTalent{
 	info = function(self, t)
 		return ([[Spawn a boneyard of radius %d around you that lasts for 8 turns.
 		Any foes inside gain the brittle bones effect, reducing their physical resistance by %d%% and making all cooldowns %d%% longer.
-		When one of your minion stands in the boneyard they gain %d more physical and spell power.
-		At level 5 when a minion dies inside the boneyard it has %d%% chances to resurrect instantly. This effect may only happen once per minion.
+		When one of your minions stands in the boneyard they gain %d more physical and spell power.
+		At level 5 when a minion dies inside the boneyard it has a %d%% chance to resurrect instantly. This effect may only happen once per minion.
 		]]):tformat(self:getTalentRadius(t), t:_getResist(self), t:_getCooldown(self), t:_getPower(self), t:_getResurrect(self))
 	end,
 }
@@ -110,10 +110,10 @@ newTalent{
 		while #gs > 0 and #list > 0 do
 			local foe = table.remove(list, 1).target
 			local spot = table.remove(gs, 1)
-			if foe:canBe("teleport") and target:checkHit(self:combatSpellpower(), target:combatSpellResist(), 0, 95, 15) then
+			if foe:canBe("teleport") and foe:checkHit(self:combatSpellpower(), foe:combatSpellResist(), 0, 95, 15) then
 				foe:forceMoveAnim(spot[1], spot[2])
 			else
-				game.logSeen(foe, "%s resists the call of the boneyard!")
+				game.logSeen(foe, "%s resists the call of the boneyard!", foe:getName():capitalize())
 			end
 		end
 
@@ -187,6 +187,7 @@ newTalent{
 	getDamageIncrease = function(self, t) return self:combatTalentScale(t, 2.5, 10) end,
 	getResistPenalty = function(self, t) return self:combatTalentLimit(t, 100, 17, 50, true) end,
 	getVampiric = function(self, t) return math.floor(self:combatTalentLimit(t, 60, 3, 8)) end,
+	callbackPriorities={callbackOnActBase = 100}, -- trigger after most others
 	callbackOnActBase = function(self, t)
 		local p = self:isTalentActive(t.id) if not p then return end
 		if p.cur_value > 0 then self:heal(p.cur_value, self) end

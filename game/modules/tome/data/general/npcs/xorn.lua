@@ -164,6 +164,7 @@ newEntity{ base = "BASE_NPC_XORN",
 
 -- Does not appear randomly, it is summoned by killing the fragments
 newEntity{ base = "BASE_NPC_XORN", define_as = "FULL_HARKOR_ZUN",
+	type = "demon", subtype = "major",
 	name = "Harkor'Zun", color=colors.VIOLET, unique=true,
 	resolvers.nice_tile{image="invis.png", add_mos = {{image="npc/elemental_xorn_harkor_zun.png", display_h=2, display_y=-1}}},
 	desc = _t[[A gigantic demon composed of elemental Earth, resembling a twisted Xaren but much, much larger.  It doesn't seem pleased with your presence.]],

@@ -136,8 +136,8 @@ function _M:generateList()
 					w = h * r
 					save.screenshot_do = core.renderer.texture(save.screenshot, 0, 0, w, h)
 				end
-				table.sort(nodes, function(a, b) return (a.timestamp or 0) > (b.timestamp or 0) end)
 				table.insert(nodes, save)
+				table.sort(nodes, function(a, b) return (a.timestamp or 0) > (b.timestamp or 0) end)
 				found = true
 			end
 		end

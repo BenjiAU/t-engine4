@@ -2172,14 +2172,14 @@ function _M:applyRandomClass(b, data, instant)
 		local nb_focus, nb_shallow = 0, 0
 		local rank = b.rank
 		if rank <= 3.2 then 	--rare
-			nb_focus = math.floor(0.2 + rng.float(0.25, 0.35)*(math.max(0,data.level))^0.55) -- first around 8-10, second around 25-35, third around 50-70
-			nb_shallow = 2 + math.floor(0.25 + rng.float(0.1, 0.2)*(math.max(0,data.level))^0.6) -- third around 12-30, fourth 40-80
+			nb_focus = math.floor(0.2 + rng.float(0.22, 0.35)*(math.max(0,data.level-3))^0.5)
+			nb_shallow = 2 + math.floor(0.25 + rng.float(0.08, 0.2)*(math.max(0,data.level-6))^0.5)
 		elseif rank >= 4 then 	--boss/elite boss 
-			nb_focus = 1 + math.floor(0.25 + rng.float(0.18, 0.33)*(math.max(0,data.level-4))^0.5) -- second around 11-23, third around 35-75, fourth around 80-90 rarely
-			nb_shallow = 1 + math.floor(0.33 + rng.float(0.125, 0.2)*(math.max(0,data.level-3))^0.6) -- second around 12-20, third 40-80
+			nb_focus = 1 + math.floor(0.25 + rng.float(0.15, 0.35)*(math.max(0,data.level-6))^0.5)
+			nb_shallow = 1 + math.floor(0.3 + rng.float(0.1, 0.2)*(math.max(0,data.level-4))^0.5)
 		else 					--unique
-			nb_focus = 1 + math.floor(0.2 + rng.float(0.15, 0.3)*(math.max(0,data.level-10))^0.5) -- second around 20-40, third around 50-90 
-			nb_shallow = 1 + math.floor(0.7 + rng.float(0.125, 0.2)*(math.max(0,data.level-8))^0.6) -- second around 11-14, third around 30-60, fourth around 70-90 rarely
+			nb_focus = 1 + math.floor(0.2 + rng.float(0.15, 0.3)*(math.max(0,data.level-10))^0.5)
+			nb_shallow = 1 + math.floor(0.55 + rng.float(0.1, 0.2)*(math.max(0,data.level-8))^0.5)
 		end
 		print("Adding "..nb_focus.." primary trees to boss")
 		print("Adding "..nb_shallow.." secondary trees to boss")

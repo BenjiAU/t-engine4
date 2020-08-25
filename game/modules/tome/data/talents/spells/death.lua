@@ -37,6 +37,9 @@ newTalent{
 
 		return true
 	end,
+	incFormula = function(nb)
+		return 1 + math.log10(nb) * 1.5
+	end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTarget(tg)
@@ -45,7 +48,7 @@ newTalent{
 		self:projectApply(tg, x, y, Map.ACTOR, function(target)
 			local nb = #target:effectsFilter({status="detrimental", ignore_crosstier=true}, 999)
 			if nb == 0 then return end
-			local mult = 1 + math.log10(nb) * 1.5
+			local mult = t.incFormula(nb)
 			local dam = self:spellCrit(mult * t:_getDamage(self))
 			if DamageType:get(DamageType.FROSTDUSK).projector(self, target.x, target.y, DamageType.FROSTDUSK, dam) > 0 then
 				if target:canBe("slow") then
@@ -59,9 +62,17 @@ newTalent{
 		return true
 	end,
 	info = function(self, t)
+		local dam = damDesc(self, DamageType.FROSTDUSK, t:_getDamage(self))
 		return ([[Press your advantage when your foes are starting to crumble.
-		For every detrimental effect on the target you deals %0.2f frostdusk damage per effect (with disminishing returns) and reduce its global speed by 25%% for one turn per effect (up to a maximum of %d).
-		]]):tformat(damDesc(self, DamageType.FROSTDUSK, t:_getDamage(self)), t:_getMax(self))
+		For every detrimental effect on the target you deals %0.2f frostdusk damage (with diminishing returns) and reduce its global speed by 25%% for one turn per effect (up to a maximum of %d).
+		The diminishing returns on damage bonus works this way:
+		- 2 effects: %0.2f
+		- 5 effects: %0.2f
+		- 10 effects: %0.2f
+		- 15 effects: %0.2f
+		And so on...
+		Damage increases with your Spellpower.
+		]]):tformat(dam, t:_getMax(self), dam*t.incFormula(2), dam*t.incFormula(5), dam*t.incFormula(10), dam*t.incFormula(15))
 	end,
 }
 
@@ -141,7 +152,7 @@ newTalent{
 		return nil
 	end,	
 	info = function(self, t)
-		return ([[Everytime you or one of your minions kills a creature you create a temporary link to the place of death.
+		return ([[Every time you or one of your minions kill a creature you create a temporary link to the place of death.
 		For %d turns afterwards you can instantly and accurately teleport to it (if it is in sight).
 		]]):tformat(t:_getTurns(self))
 	end,
@@ -191,7 +202,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Your body starts to radiate shadows, increasing your darkness resistance by %d%%, armour by %d and defence by %d.
-		Any time you absorb a soul the shadows pulse outward, dealing %0.2f frostdusk damage to all foes in range %d and knocking them back 3 tiles away.
+		Any time you absorb a soul the shadows pulse outward, dealing %0.2f frostdusk damage to all foes in range %d and knocking them back 3 tiles.
 		This can only happen once per turn.
 		The damage increases with your Spellpower.]]):
 		tformat(t:_getResist(self), t:_getArmor(self), t:_getDef(self), damDesc(self, DamageType.FROSTDUSK, t.getDamage(self, t)), self:getTalentRadius(t))
@@ -228,7 +239,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[Whenever a creature is killed by yourself or a minion you feast on its essence, gaining %0.1f mana.
-		At level 3 the thrill of the death invigorates you, granting a movement sped bonus of 50%% for %d turns.]]):
+		At level 3 the thrill of the death invigorates you, granting a movement speed bonus of 50%% for %d turns.]]):
 		tformat(t.getMana(self, t), t.getDur(self, t))
 	end,
 }

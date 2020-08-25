@@ -26,6 +26,7 @@ newTalent{
 	mana = 15,
 	range = 10,
 	cooldown = 30,
+	fixed_cooldown = true,
 	tactical = { BUFF = 2 },
 	requires_target = true,
 	target = function(self, t) return {type="ball", range=self:getTalentRange(t), radius=self:getTalentRadius(t), talent=t} end,
@@ -68,7 +69,7 @@ newTalent{
 	info = function(self, t)
 		return ([[When switching targets your rime wraith now always prefers the one farther away if possible.
 		Any creatures on the path of the wraith while it travels are affected:
-		- if friendly: they are healed by %d
+		- if friendly: they are healed for %d
 		- if hostile: they take %0.2f cold damage
 		The damage and healing will increase with your Spellpower.]]):
 		tformat(t:_getHeal(self), damDesc(self, DamageType.COLD, t:_getDamage(self)))
@@ -96,14 +97,14 @@ newTalent{
 		self:callTalent(self.T_RIME_WRAITH, "createWraith", target, "EFF_RIME_WRAITH_GELID_HOST", t:_getDur(self))
 
 		local radius = self:getTalentRadius(t)
-		self:project({type="ball", radius=radius, x=target.x, y=target.y}, target.x, target.y, DamageType.COLD, t:_getDamage(self))
+		self:project({type="ball", radius=radius, x=target.x, y=target.y, friendlyfire=false}, target.x, target.y, DamageType.COLD, t:_getDamage(self))
 		game.level.map:particleEmitter(target.x, target.y, radius, "iceflash", {radius=radius})
 
 		return true
 	end,
 	info = function(self, t)
 		return ([[By crushing one more soul you reinforce your existing rime wraith, duplicating it out of its current host.
-		The new wraith will exist for %d turns and cannot be used for an other cast of Gelid Host.
+		The new wraith will exist for %d turns and cannot be used for another cast of Gelid Host.
 		When it is created the current host and all foes in radius %d are blasted for %0.2f cold damage.
 		The damage will increase with your Spellpower.]]):
 		tformat(t:_getDur(self), self:getTalentRadius(t), damDesc(self, DamageType.COLD, t:_getDamage(self)))

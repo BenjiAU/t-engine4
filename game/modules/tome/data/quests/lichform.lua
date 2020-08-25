@@ -48,6 +48,9 @@ end
 
 on_status_change = function(self, who, status, sub)
 	if self:isCompleted() then
+		local q = who:hasQuest("shertul-fortress")
+		if q then q.shertul_energy = q.shertul_energy - 40 end
+
 		who:setQuestStatus(self.id, engine.Quest.DONE)
 		who.unused_prodigies = who.unused_prodigies - 1
 		who:learnTalent(who.T_LICH, true, 1, {no_unlearn=true})

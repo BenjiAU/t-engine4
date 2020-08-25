@@ -412,7 +412,7 @@ end
 function _M:descAttribute(attr)
 	local power = function(c)
 		if config.settings.tome.advanced_weapon_stats then
-			return ("%d%% power"):tformat(math.floor(game.player:combatDamagePower(self.combat)*100))
+			return ("%d%% power"):tformat(math.floor(game.player:combatDamagePower(self.special_combat or self.combat)*100))
 		else
 			return ("%d-%d power"):tformat(c.dam, (c.dam*(c.damrange or 1.1)))
 		end
@@ -2231,8 +2231,6 @@ function _M:getDesc(name_param, compare_with, never_compare, use_actor)
 		desc:merge(reqs)
 	end
 
-	print("[DEBUG XXX power source]")
-	table.print(desc)
 	if self.power_source then
 		if self.power_source.arcane then desc:merge((_t"Powered by #VIOLET#arcane forces#LAST#\n"):toTString()) end
 		if self.power_source.nature then desc:merge((_t"Infused by #OLIVE_DRAB#nature#LAST#\n"):toTString()) end
@@ -2242,7 +2240,6 @@ function _M:getDesc(name_param, compare_with, never_compare, use_actor)
 		if self.power_source.unknown then desc:merge((_t"Powered by #CRIMSON#unknown forces#LAST#\n"):toTString()) end
 		self:triggerHook{"Object:descPowerSource", desc=desc, object=self}
 	end
-	table.print(desc)
 
 	if self.encumber then
 		desc:add({"color",0x67,0xAD,0x00}, ("%0.2f Encumbrance."):tformat(self.encumber), {"color", "LAST"})
@@ -2286,6 +2283,7 @@ local type_sort = {
 	weapon = 100,
 	armor = 101,
 }
+_M.type_sort = type_sort
 
 --- Sorting by type function
 -- By default, sort by type name

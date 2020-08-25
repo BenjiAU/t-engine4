@@ -217,7 +217,7 @@ It is said the Conclave created this weapon for their warmaster during the dark 
 		tactical = function(self, who, aitarget)
 			if not (self.winterStorm and aitarget) then return end
 			local tx, ty
-			if who.aiSeeTargetPos then tx, ty = who:aiSeeTargetPos(aitarget)
+			if not who:playerControlled() then then tx, ty = who:aiSeeTargetPos(aitarget)
 			else tx, ty = aitarget.x, aitarget.y end
 			local TDist, TEnv, SEnv=
 				core.fov.distance(who.x, who.y, tx, ty), -- dist to target
@@ -1646,7 +1646,7 @@ It has been kept somewhat intact with layers of salt and clay, but in spite of t
 			-- Go through all spell effects
 			for eff_id, p in pairs(target.tmp) do
 				local e = target.tempeffect_def[eff_id]
-				if e.subtype.pin or e.subtype.stun then
+				if e and (e.subtype.pin or e.subtype.stun) then
 					effs[#effs+1] = {"effect", eff_id}
 					num = 1
 				end
