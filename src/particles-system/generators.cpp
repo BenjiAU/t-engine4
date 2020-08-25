@@ -108,18 +108,28 @@ void TrianglePosGenerator::generate(ParticlesData &p, uint32_t start, uint32_t e
 
 void LinePosGenerator::generate(ParticlesData &p, uint32_t start, uint32_t end) {
 	vec4* pos = p.getSlot4(POS);
+	float spread_angle = 0;
+	if (spread) spread_angle = atan2f(p2.y - p1.y, p2.x - p1.x) - M_PI / 2.0;
 	for (uint32_t i = start; i < end; i++) {
 		pos[i].x = (p2.x - p1.x) * Ensemble::rng.genrand_real(0, 1) + p1.x;
 		pos[i].y = (p1.y - p2.y) / (p1.x - p2.x) * (pos[i].x - p1.x) + p1.y;
+		if (spread) {
+			float s = Ensemble::rng.genrand_real(-spread, spread);
+			pos[i].x += s * cos(spread_angle);
+			pos[i].y += s * sin(spread_angle);
+		}
 		pos[i].x += final_pos.x;
 		pos[i].y += final_pos.y;
 	}
 }
 
-void JaggedLineGeneratorBase::generateStrands(ParticlesData &p, uint32_t &start, uint32_t &end, vec2 p1, vec2 p2, vec4 &c1, vec4 &c2) {
+void JaggedLineGeneratorBase::generateStrands(ParticlesData &p, uint32_t &start, uint32_t &end, vec2 p1, vec2 p2, float spread, vec4 &c1, vec4 &c2) {
 	// printf("--generating at %d to %d\n", start, end);
 	if (end - start < 2 || !strands) { end = start; return; }
 	uint32_t nb_gen = end - start;
+
+	float spread_angle = 0;
+	if (spread) spread_angle = atan2f(p2.y - p1.y, p2.x - p1.x) - M_PI / 2.0;
 
 	vec4* pos = p.getSlot4(POS);
 	vec4* color = p.getSlot4(COLOR);
@@ -127,13 +137,22 @@ void JaggedLineGeneratorBase::generateStrands(ParticlesData &p, uint32_t &start,
 	vec4* cstop = p.getSlot4(COLOR_STOP);
 	vec2* links = p.getSlot2(LINKS);
 
-	vec2 tangent = p2 - p1;
-	vec2 normal = glm::normalize(vec2(tangent.y, -tangent.x));
-	float length = glm::length(tangent);
- 
- 	// printf("@stranding start %d\n", (int)strands);
+	// printf("@stranding start %d\n", (int)strands);
  	if (strands < 1) strands = 1;
  	for (uint32_t strand = 0; strand < strands; strand++) {
+ 		vec2 cp1 = p1;
+ 		vec2 cp2 = p2;
+		if (spread) {
+			float s = Ensemble::rng.genrand_real(-spread, spread);
+			vec2 sp(s * cos(spread_angle), s * sin(spread_angle));
+			cp1 += sp;
+			cp2 += sp;
+		}
+
+		vec2 tangent = cp2 - cp1;
+		vec2 normal = glm::normalize(vec2(tangent.y, -tangent.x));
+		float length = glm::length(tangent);
+
 	 	// printf("@stranding exec %d / %d\n", strand, (int)strands);
 		vector<float> positions;
 		positions.push_back((float)0);
@@ -144,8 +163,8 @@ void JaggedLineGeneratorBase::generateStrands(ParticlesData &p, uint32_t &start,
 		}
 	 
 	 
-		pos[start].x = p1.x;
-		pos[start].y = p1.y;
+		pos[start].x = cp1.x;
+		pos[start].y = cp1.y;
 		color[start] = cstart[start] = cstop[start] = c1;
 		links[start].x = -1; links[start].y = start + 1;
 
@@ -166,7 +185,7 @@ void JaggedLineGeneratorBase::generateStrands(ParticlesData &p, uint32_t &start,
 			displacement -= (displacement - prevDisplacement) * (1 - scale);
 			displacement *= envelope;
 	 
-			vec2 point = p1 + curpos * tangent + displacement * normal;
+			vec2 point = cp1 + curpos * tangent + displacement * normal;
 
 			pos[start + i].x = point.x;
 			pos[start + i].y = point.y;
@@ -180,8 +199,8 @@ void JaggedLineGeneratorBase::generateStrands(ParticlesData &p, uint32_t &start,
 			prevDisplacement = displacement;
 		} 
 
-		pos[end-1].x = p2.x;
-		pos[end-1].y = p2.y;
+		pos[end-1].x = cp2.x;
+		pos[end-1].y = cp2.y;
 		color[end-1] = cstart[end-1] = cstop[end-1] = c2;
 		links[end-1].x = end - 2; links[end-1].y = -1;
 
@@ -198,7 +217,7 @@ void JaggedLineGeneratorBase::generateStrands(ParticlesData &p, uint32_t &start,
 
 uint32_t JaggedLinePosGenerator::generateLimit(ParticlesData &p, uint32_t start, uint32_t end) {
 	vec4 c;
-	generateStrands(p, start, end, p1 + final_pos, p2 + final_pos, c, c);
+	generateStrands(p, start, end, p1 + final_pos, p2 + final_pos, spread, c, c);
 	return end;
 }
 
@@ -404,7 +423,7 @@ uint32_t JaggedLineBetweenGenerator::generateLimit(ParticlesData &p, uint32_t st
 			}
 		}
 		c1.a = c2.a = 1;
-		generateStrands(p, start, end, p1, p2, c1, c2);
+		generateStrands(p, start, end, p1, p2, 0, c1, c2);
 		if (r < repeat_times - 1 && end + nb_gen < p.max) {
 			start += nb_gen;
 			end += nb_gen;

@@ -58,7 +58,7 @@ class JaggedLineGeneratorBase : public Generator {
 public:
 	float strands;
 	float sway;
-	virtual void generateStrands(ParticlesData &p, uint32_t &start, uint32_t &end, vec2 p1, vec2 p2, vec4 &c1, vec4 &c2);
+	virtual void generateStrands(ParticlesData &p, uint32_t &start, uint32_t &end, vec2 p1, vec2 p2, float spread, vec4 &c1, vec4 &c2);
 };
 
 /********************************************************************
@@ -133,6 +133,7 @@ public:
 class LinePosGenerator : public Generator {
 public:
 	vec2 p1, p2;
+	float spread;
 	virtual void useSlots(ParticlesData &p) { p.initSlot4(POS); };
 	virtual void generate(ParticlesData &p, uint32_t start, uint32_t end);
 	virtual GeneratorsList getID() { return GeneratorsList::LinePosGenerator; }
@@ -141,6 +142,7 @@ public:
 class JaggedLinePosGenerator : public JaggedLineGeneratorBase {
 public:
 	vec2 p1, p2;
+	float spread;
 	JaggedLinePosGenerator() { use_limiter = true; };
 	virtual uint32_t weight() const { return 10; };
 	virtual void useSlots(ParticlesData &p) { p.initSlot4(POS); p.initSlot2(LINKS); };

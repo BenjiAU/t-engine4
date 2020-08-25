@@ -50,8 +50,7 @@ newTalent{
 		if thaumaturgyCheck(self) then
 			grids = self:project(tg, x, y, DamageType.FIREBURN, dam)
 			local _ _, x, y = self:canProject(tg, x, y)
-			-- game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "flame_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h})
-			game.level.map:particleEmitter(self.x, self.y, tg.radius, "flamebeam_wide", {tx=x-self.x, ty=y-self.y})
+			game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "flame_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h, width=2})
 		else
 			if self:getTalentLevel(t) < 5 then
 				self:projectile(tg, x, y, DamageType.FIREBURN, dam, function(self, tg, x, y, grids)
@@ -63,7 +62,7 @@ newTalent{
 			else
 				grids = self:project(tg, x, y, DamageType.FIREBURN, dam)
 				local _ _, x, y = self:canProject(tg, x, y)
-				game.level.map:particleEmitter(self.x, self.y, tg.radius, "flamebeam", {tx=x-self.x, ty=y-self.y})
+				game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "flame_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h, width=1})
 			end
 		end
 

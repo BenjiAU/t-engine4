@@ -468,10 +468,12 @@ static int p_new(lua_State *L) {
 						auto g = new LinePosGenerator(); gg = g;
 						lua_vec2(L, &g->p1, -1, "p1", vec2(0, 0)); lua_vec2(L, &g->p2, -1, "p2", vec2(0, 0));
 						lua_vec2(L, &g->base_pos, -1, "base_point", {0, 0});
+						lua_float(L, &g->spread, -1, "spread", 0);
 						break;}
 					case GeneratorsList::JaggedLinePosGenerator: {
 						auto g = new JaggedLinePosGenerator(); gg = g;
 						lua_vec2(L, &g->p1, -1, "p1", vec2(0, 0)); lua_vec2(L, &g->p2, -1, "p2", vec2(0, 0));
+						lua_float(L, &g->spread, -1, "spread", 0);
 						lua_vec2(L, &g->base_pos, -1, "base_point", {0, 0});
 						lua_float(L, &g->strands, -1, "strands", 1);
 						lua_float(L, &g->sway, -1, "sway", 80);

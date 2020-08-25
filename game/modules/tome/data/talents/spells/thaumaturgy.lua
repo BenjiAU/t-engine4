@@ -243,11 +243,14 @@ newTalent{
 		end
 
 		local _ _, x, y = self:canProject(tg, x, y)
-		game.level.map:particleEmitter(self.x, self.y, tg.radius, "flamebeam_wide", {tx=x-self.x, ty=y-self.y})
-		game.level.map:particleEmitter(self.x, self.y, tg.radius, "mana_beam_wide", {tx=x-self.x, ty=y-self.y})
+		game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "flame_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h, width=2})
+		-- game.level.map:particleEmitter(self.x, self.y, tg.radius, "flamebeam_wide", {tx=x-self.x, ty=y-self.y})
+		game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "arcane_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h, width=2})
+		-- game.level.map:particleEmitter(self.x, self.y, tg.radius, "mana_beam_wide", {tx=x-self.x, ty=y-self.y})
 		game.level.map:particleEmitter(self.x, self.y, tg.radius, "ice_beam_wide", {tx=x-self.x, ty=y-self.y})
 		game.level.map:particleEmitter(self.x, self.y, tg.radius, "earth_beam_wide", {tx=x-self.x, ty=y-self.y})
-		game.level.map:particleEmitter(self.x, self.y, tg.radius, "lightning_beam_wide", {tx=x-self.x, ty=y-self.y})
+		game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "lightning_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h, width=2})
+		-- game.level.map:particleEmitter(self.x, self.y, tg.radius, "lightning_beam_wide", {tx=x-self.x, ty=y-self.y})
 		game:shakeScreen(10, 3)
 		game:playSoundNear(self, "talents/reality_breach")
 		return true

@@ -49,12 +49,7 @@ newTalent{
 		if tg.type == "beam" or tg.type == "widebeam" then
 			self:project(tg, x, y, DamageType.ARCANE, dam, nil)
 			local _ _, x, y = self:canProject(tg, x, y)
---			game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "arcane_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h})
-			if thaumaturgyCheck(self) then
-				game.level.map:particleEmitter(self.x, self.y, math.max(math.abs(x-self.x), math.abs(y-self.y)), "mana_beam_wide", {tx=x-self.x, ty=y-self.y})
-			else
-				game.level.map:particleEmitter(self.x, self.y, math.max(math.abs(x-self.x), math.abs(y-self.y)), "mana_beam", {tx=x-self.x, ty=y-self.y})
-			end
+			game.level.map:particleComposeEmitter(self.x, self.y, tg.radius, "arcane_beam", {tx=(x-self.x)*Map.tile_w, ty=(y-self.y)*Map.tile_h, width=thaumaturgyCheck(self) and 2 or 1})
 		else
 			self:projectile(tg, x, y, DamageType.ARCANE, dam, {type="manathrust"})
 		end

@@ -566,13 +566,15 @@ local specific_uis = {
 		}},
 		[PC.LinePosGenerator] = {name="LinePosGenerator", category="position", fields={
 			{type="point", id="base_point", text="Origin: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="point", id="p1", text="P1: ", min=-10000, max=10000, default={0, 0}},
-			{type="point", id="p2", text="P2: ", min=-10000, max=10000, default={100, 100}},
+			{type="point", id="p1", text="P1: ", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="point", id="p2", text="P2: ", min=-10000, max=10000, default={100, 100}, line=true},
+			{type="number", id="spread", text="Spread: ", min=0, max=10000, default=0},
 		}},
 		[PC.JaggedLinePosGenerator] = {name="JaggedLinePosGenerator", category="position", fields={
 			{type="point", id="base_point", text="Origin: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="point", id="p1", text="P1: ", min=-10000, max=10000, default={0, 0}},
+			{type="point", id="p1", text="P1: ", min=-10000, max=10000, default={0, 0}, line=true},
 			{type="point", id="p2", text="P2: ", min=-10000, max=10000, default={100, 100}, line=true},
+			{type="number", id="spread", text="Spread: ", min=0, max=10000, default=0, line=true},
 			{type="number", id="sway", text="Sway: ", min=0, max=10000, default=80},
 			{type="number", id="strands", text="strands: ", min=1, max=10000, default=1},
 		}},
