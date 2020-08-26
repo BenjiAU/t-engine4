@@ -372,20 +372,12 @@ newTalent{
 	mode = "sustained",
 	mana = 40,
 	soul = 1,
-	cooldown = function(self, t) return math.ceil(self:combatTalentLimit(t, 15, 35, 15)) end,
+	cooldown = 30,
 	tactical = { CURE = 1 },
 	range = 10,
 	no_energy = true,
+	getNb = function(self, t) return math.floor(self:combatTalentScale(t, 1, 6)) end,
 	target = function(self, t) return {type="hit", range=self:getTalentRange(t)} end,
-	on_pre_use = function(self, t) return necroArmyStats(self).nb_ghoul > 0 and self.in_combat end,
-	callbackOnActBase = function(self, t)
-		if necroArmyStats(self).nb_ghoul == 0 then
-			self:forceUseTalent(t.id, {ignore_energy=true})
-		end
-	end,
-	callbackOnCombat = function(self, t, state)
-		if state == false then self:forceUseTalent(t.id, {ignore_energy=true}) end
-	end,
 	callbackOnTemporaryEffect = function(self, t, eff_id, e, p)
 		if e.status ~= "detrimental" then return end
 		if self.life < 1 then
@@ -396,13 +388,15 @@ newTalent{
 		local stats = necroArmyStats(self)
 		if stats.nb_ghoul == 0 then return end
 
+		local nb = self.turn_procs.discarded_refuse or 0
+		if nb > t:_getNb(self) then return end
+		self.turn_procs.discarded_refuse = nb + 1
+
 		local list = {}
 		for _, m in ipairs(stats.list) do if m.ghoul_minion then list[#list+1] = m end end
 		local m = rng.table(list)
-		game.logSeen(self, "%s sacrifice a ghoul to avoid being affected by %s!", self:getName():capitalize(), self:getEffectFromId(eff_id).desc)
+		game.logSeen(self, "%s sacrifices a ghoul to avoid being affected by %s!", self:getName():capitalize(), self:getEffectFromId(eff_id).desc)
 		m:die(self)		
-
-		if stats.nb_ghoul == 1 then self:forceUseTalent(t.id, {ignore_energy=true}) end
 		return true
 	end,
 	activate = function(self, t)
@@ -416,9 +410,8 @@ newTalent{
 		return ([[Whenever you would be affected by a detrimental physical effect you instead transfer it instantly to one of your ghouls.
 		The ghoul dies from the process.
 		While under 1 life it also affects magical and mental effects.
-		Cross-tier effects are never affected.
-		This spell can only be used in comabt and will automatically unsustain if you have no more ghouls or if you leave combat.
-		]]):
-		tformat()
+		At most %d effects can be affected by turn.
+		Cross-tier effects are never affected.]]):
+		tformat(t:_getNb(self))
 	end,
 }

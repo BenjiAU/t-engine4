@@ -958,7 +958,6 @@ newEffect{
 	no_stop_enter_worlmap = true,
 	decrease = 0,
 	no_remove = true,
-	cancel_on_level_change = true,
 	parameters = {Penalty = 1},
 	getResistsUndead = function(eff, level) return -2 * level * (eff.Penalty or 1) end,
 	getIncDamageUndead = function(level) return 2 + level * 2 end,
@@ -1122,7 +1121,6 @@ newEffect{
 	no_stop_enter_worlmap = true,
 	decrease = 0,
 	no_remove = true,
-	cancel_on_level_change = true,
 	parameters = {Penalty = 1},
 	getMindResistChange = function(eff, level) return -level * 3 * (eff.Penalty or 1) end,
 	getConfusionImmuneChange = function(eff, level) return -level * 0.04 * (eff.Penalty or 1) end,
@@ -1332,7 +1330,6 @@ newEffect{
 	no_stop_enter_worlmap = true,
 	decrease = 0,
 	no_remove = true,
-	cancel_on_level_change = true,
 	parameters = {Penalty = 1},
 	getShroudIncDamageChange = function(eff, level) return -(4 + level * 2) * (eff.Penalty or 1) end,
 	getResistsDarknessChange = function(level) return level * 4 end,
@@ -1478,7 +1475,6 @@ newEffect{
 	no_stop_enter_worlmap = true,
 	decrease = 0,
 	no_remove = true,
-	cancel_on_level_change = true,
 	parameters = {Penalty = 1},
 	-- called by _M:combatMentalResist in mod.class.interface.Combat.lua
 	getVisionsReduction = function(eff, level)
@@ -1561,7 +1557,7 @@ newEffect{
 					DamageType:get(DamageType.MIND).projector(self, p.src.x, p.src.y, DamageType.MIND, harrowDam)
 					DamageType:get(DamageType.MIND).projector(self, p.src.x, p.src.y, DamageType.DARKNESS, harrowDam)
 					--game.logSeen(self, "#F53CBE#%s harrows '%s'!", self:getName():capitalize(), p.src.name)
-					game.logSeen(self, "#F53CBE#%s harrows %s!", self:getName():capitalize(), target:getName())
+					game.logSeen(self, "#F53CBE#%s harrows %s!", self:getName():capitalize(), p.src:getName())
 					self.turn_procs.curse_of_nightmare_3 = true
 				else
 					local tgts = {}
@@ -1714,7 +1710,6 @@ newEffect{
 	no_stop_enter_worlmap = true,
 	decrease = 0,
 	no_remove = true,
-	cancel_on_level_change = true,
 	parameters = {Penalty = 1},
 	getMoneyMult = function(eff, level) return Combat:combatTalentLimit(level, 1, 0.15, 0.35) * (eff.Penalty or 1)end, -- Limit < 1 bug fix
 	getMissplacedEndeavours = function(level) return Combat:combatTalentLimit(level, 100, 25, 45) end, -- Limit < 100%
