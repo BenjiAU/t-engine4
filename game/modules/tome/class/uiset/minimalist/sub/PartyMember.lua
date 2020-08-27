@@ -106,7 +106,7 @@ function _M:update(player)
 
 
 	local p = (game.player == a) and "base_portrait" or "base_portrait_unsel"
-	if a.unused_stats > 0 or a.unused_talents > 0 or a.unused_generics > 0 or a.unused_talents_types > 0 and def.control == "full" then
+	if (a.unused_stats > 0 or a.unused_talents > 0 or a.unused_generics > 0 or a.unused_talents_types > 0) and def.control == "full" then
 		p = (game.player == a) and "base_portrait_lev" or "base_portrait_unsel_lev"
 	end
 	if p ~= self.old_frame then
