@@ -4153,6 +4153,7 @@ newEffect{
 	name = "CRIPPLING_BLIGHT", image = "talents/crippling_poison.png",
 	desc = _t"Crippling Blight",
 	long_desc = function(self, eff) return ("The target is poisoned and sick, doing %0.2f blight damage per turn. Each time it tries to use a talent there is %d%% chance of failure."):tformat(eff.power, eff.fail) end,
+	charges = function(self, eff) return (math.floor(eff.fail).."%") end,
 	type = "magical",
 	subtype = { poison=true, blight=true }, no_ct_effect = true,
 	status = "detrimental",
@@ -5186,7 +5187,9 @@ local rime_wraith_def = {
 			local dam = eff.src:callTalent(eff.src.T_FRIGID_PLUNGE, "getDamage")
 			eff.src:projectApply({type="beam", range=10, x=self.x, y=self.y}, target.x, target.y, Map.ACTOR, function(m)
 				if eff.src:reactionToward(m) < 0 then
-					DamageType:get(DamageType.COLD).projector(eff.src, m.x, m.y, DamageType.COLD, dam)
+					eff.src:attr("damage_shield_penetrate", 100)
+					pcall(function() DamageType:get(DamageType.COLD).projector(eff.src, m.x, m.y, DamageType.COLD, dam) end)
+					eff.src:attr("damage_shield_penetrate", -100)
 				else
 					m:heal(heal, eff.src)
 				end

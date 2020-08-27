@@ -1087,7 +1087,7 @@ newEffect{
 	type = "mental",
 	subtype = { fear=true },
 	status = "detrimental",
-	parameters = {},
+	parameters = {tyrantDur=5, tyrantPower=2},
 	on_gain = function(self, err) return _t"#F53CBE##Target# is in despair!", _t"+Despair" end,
 	on_lose = function(self, err) return _t"#Target# is no longer in despair", _t"-Despair" end,
 	activate = function(self, eff)
@@ -1117,7 +1117,7 @@ newEffect{
 	type = "mental",
 	subtype = { fear=true },
 	status = "detrimental",
-	parameters = {},
+	parameters = {tyrantDur=5, tyrantPower=2},
 	charges = function(self, eff) return (tostring(math.floor(eff.cooldownPower * 100)).."%") end,
 	on_gain = function(self, err) return _t"#F53CBE##Target# becomes terrified!", _t"+Terrified" end,
 	on_lose = function(self, err) return _t"#Target# is no longer terrified", _t"-Terrified" end,
@@ -1175,7 +1175,7 @@ newEffect{
 	type = "mental",
 	subtype = { fear=true },
 	status = "detrimental",
-	parameters = {damage=10},
+	parameters = {damage=10, tyrantDur=5, tyrantPower=2},
 	on_gain = function(self, err) return _t"#F53CBE##Target# becomes haunted!", _t"+Haunted" end,
 	on_lose = function(self, err) return _t"#Target# is no longer haunted", _t"-Haunted" end,
 	activate = function(self, eff)

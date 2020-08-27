@@ -7011,8 +7011,8 @@ end
 
 --- Suffocate a bit, lose air
 function _M:suffocate(value, src, death_message)
-	if self:attr("no_breath") then return false, false end
-	if self:attr("invulnerable") then return false, false end
+	if self:attr("no_breath") then self:removeEffect(self.EFF_SUFFOCATING) return false, false end
+	if self:attr("invulnerable") then self:removeEffect(self.EFF_SUFFOCATING) return false, false end
 	self.air = self.air - value
 	local ae = game.level.map(self.x, self.y, Map.ACTOR)
 	self.force_suffocate = true

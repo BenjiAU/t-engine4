@@ -2672,6 +2672,15 @@ newEffect{
 			self:removeEffect(self.EFF_SUFFOCATING, false, true)
 			return
 		end
+		-- We can breathe now! What a relief!
+		local air_level, air_condition = game.level.map:checkEntity(self.x, self.y, Map.TERRAIN, "air_level"), game.level.map:checkEntity(self.x, self.y, Map.TERRAIN, "air_condition")
+		if air_level then
+			if not (not air_condition or not self.can_breath[air_condition] or self.can_breath[air_condition] <= 0) or self:attr("no_breath") or self:attr("invulnerable") then
+				self.is_suffocating = nil
+				self:removeEffect(self.EFF_SUFFOCATING, false, true)
+				return
+			end
+		end
 
 		-- Bypass all shields & such
 		local old = self.onTakeHit
