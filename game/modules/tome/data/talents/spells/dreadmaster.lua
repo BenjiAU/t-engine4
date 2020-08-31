@@ -121,6 +121,15 @@ newTalent{
 	},
 	getLevel = function(self, t) return math.floor(self:combatScale(self:getTalentLevel(t), -6, 0.9, 2, 5)) end, -- -6 @ 1, +2 @ 5, +5 @ 8
 	on_pre_use = function(self, t) return not necroArmyStats(self).dread end,
+	-- Fucking respec.
+	on_levelup_changed = function(self, t, lvl, old_lvl, lvl_raw, old_lvl_raw)
+		if lvl >= old_lvl then return end
+		local stats = necroArmyStats(self)
+		if stats.dread then
+			game.party:removeMember(stats.dread, true)
+			stats.dread:disappear(self)
+		end
+	end,
 	action = function(self, t)
 		local lev = t.getLevel(self, t)
 
@@ -235,6 +244,15 @@ newTalent{
 	require = spells_req4,
 	points = 5,
 	mode = "passive",
+	-- Fucking respec.
+	on_levelup_changed = function(self, t, lvl, old_lvl, lvl_raw, old_lvl_raw)
+		if lvl >= old_lvl then return end
+		local stats = necroArmyStats(self)
+		if stats.dread then
+			game.party:removeMember(stats.dread, true)
+			stats.dread:disappear(self)
+		end
+	end,
 	info = function(self, t)
 		return ([[You now summon a Dreadmaster instead of a Dread.
 		Dreadmasters learn to cast silence, disperse magic and mind disruption, making them the ultimate annoyance tool.

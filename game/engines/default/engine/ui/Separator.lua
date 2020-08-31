@@ -27,6 +27,8 @@ module(..., package.seeall, class.inherit(Base))
 function _M:init(t)
 	self.dir = assert(t.dir, "no separator dir")
 	self.size = assert(t.size, "no separator size")
+	self.text = t.text
+	self.text_shadow = t.text_shadow or self.text_shadow
 
 	self.dest_area = {w = 1, h = 1}
 	Base.init(self, t)

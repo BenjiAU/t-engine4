@@ -1160,6 +1160,7 @@ function _M:tableTemporaryValuesRemove(t)
 	for i = 1, #t do
 		self:removeTemporaryValue(t[i][1], t[i][2])
 	end
+	table.empty(t)
 end
 
 --- Called when a temporary value changes (added or deleted)

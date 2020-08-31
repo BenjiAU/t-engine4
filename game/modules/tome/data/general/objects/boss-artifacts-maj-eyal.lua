@@ -1052,6 +1052,7 @@ newEntity{ base = "BASE_SHIELD",
 		life_regen = 5,
 		on_melee_hit = {[DamageType. DRAINLIFE] = 15},
 		learn_talent = { [Talents.T_BLOCK] = 1, },
+		talents_types_mastery = { ["cursed/bloodstained"] = 0.3, },
 	},
 }
 
