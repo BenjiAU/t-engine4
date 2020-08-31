@@ -35,9 +35,8 @@ extern "C" {
 
 using namespace std;
 
-#define DEFAULT_ATLAS_W	1024
-#define DEFAULT_ATLAS_H	1024
-#define MAX_ATLAS_DATA	256*256
+#define DEFAULT_ATLAS_W	2048
+#define DEFAULT_ATLAS_H	2048
 
 typedef enum {
 	FONT_STYLE_NORMAL,
