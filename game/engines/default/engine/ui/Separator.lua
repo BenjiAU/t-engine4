@@ -28,7 +28,6 @@ function _M:init(t)
 	self.dir = assert(t.dir, "no separator dir")
 	self.size = assert(t.size, "no separator size")
 	self.text = t.text
-	self.text_shadow = t.text_shadow or self.text_shadow
 
 	self.dest_area = {w = 1, h = 1}
 	Base.init(self, t)
@@ -57,6 +56,10 @@ function _M:generate()
 		self.do_container:add(core.renderer.fromTextureTable(right, self.size - right.w, 0))
 
 		self.w, self.h = self.size, middle.h
+
+		if self.text then
+			self.do_container:add(self:applyShadowOutline(core.renderer.text(self.font):text(self.text):center():translate(self.w / 2, self.h / 2)))
+		end
 	end
 	self.dest_area.w = self.w
 	self.dest_area.h = self.h

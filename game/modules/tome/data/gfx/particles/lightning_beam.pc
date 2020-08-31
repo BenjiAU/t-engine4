@@ -1,5 +1,5 @@
 return {
-	parameters = { width=2.000000, ty=0.000000, tx=500.000000 },
+	parameters = { width=1.000000, ty=0.000000, tx=500.000000 },
 	{
 		display_name = "main beam",
 		max_particles = 2000, blend=PC.AdditiveBlend, type=PC.RendererLine, compute_only=false,

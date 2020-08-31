@@ -32,6 +32,7 @@ function _M:init(t)
 	self.grid = t.grid or {}
 	self.w = assert(t.width, "no width")
 	self.h = assert(t.height, "no height")
+	self.auto_shrink = t.auto_shrink
 	self.tooltip = assert(t.tooltip, "no tooltip")
 	self.no_tooltip = t.no_tooltip
 	self.on_use = assert(t.on_use, "no on_use")
@@ -55,6 +56,13 @@ function _M:generate()
 	self.list_mouse = Mouse.new()
 	self.mouse:reset()
 	self.key:reset()
+
+	self.sel_i = 1
+	self.sel_j = 1
+	self.max_h = self.grid.max * (self.frame_size + self.frame_offset)
+	if self.h == "auto" then self.h = self.max_h end
+	if self.auto_shrink and self.h > self.max_h then self.h = self.max_h end
+
 	self.do_container:clear():zSort(true):cutoff(0, 0, self.w, self.h):setRendererName("TalentGrid")
 	self.grid_container:clear():translate(0, 0)
 	self.do_container:add(self.grid_container)
@@ -72,10 +80,6 @@ function _M:generate()
 		self.use_w = self.w
 	end
 	
-	self.sel_i = 1
-	self.sel_j = 1
-	self.max_h = self.grid.max * (self.frame_size + self.frame_offset)
-
 	self:generateAllItems()
 	
 	-- Add UI controls
