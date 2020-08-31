@@ -1503,13 +1503,6 @@ void event_loop_realtime() {
 	on_redraw();
 	// printf("===!! %f\n", (float)(SDL_GetPerformanceCounter()-ticks) /max_ticks);
 
-#ifdef SELFEXE_WINDOWS
-	if (os_autoflush) _commit(_fileno(stdout));
-#endif
-#ifdef SELFEXE_MACOSX
-	if (os_autoflush) fflush(stdout);
-#endif
-
 	while (true) {
 		on_tick();
 
@@ -1548,13 +1541,6 @@ void event_loop_tickbased() {
 			SDL_mutexP(renderingLock);
 			redraw_pending = 0;
 			SDL_mutexV(renderingLock);
-
-			#ifdef SELFEXE_WINDOWS
-				if (os_autoflush) _commit(_fileno(stdout));
-			#endif
-			#ifdef SELFEXE_MACOSX
-				if (os_autoflush) fflush(stdout);
-			#endif
 			break;
 		} else {
 			if (on_event(&event)) {
@@ -1649,7 +1635,7 @@ int main(int argc, char *argv[])
 		if (!strncmp(arg, "-n", 2)) core_def->reboot_new = 1;
 		if (!strncmp(arg, "--flush-stdout", 14))
 		{
-			setvbuf(stdout, (char *) NULL, _IOLBF, 0);
+			setbuf(stdout, nullptr);
 #ifdef SELFEXE_WINDOWS
 			os_autoflush = true;
 #endif
