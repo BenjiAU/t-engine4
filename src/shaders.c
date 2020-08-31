@@ -326,7 +326,7 @@ static int program_set_uniform_number(lua_State *L)
 		int i;
 		GLfloat is[nb];
 		for (i = 0; i < nb; i++) {
-			lua_rawgeti(L, 3, i + 1); is[i*4+0] = lua_tonumber(L, -1); lua_pop(L, 1);
+			lua_rawgeti(L, 3, i + 1); is[i] = lua_tonumber(L, -1); lua_pop(L, 1);
 		}
 		glUniform1fv(glGetUniformLocation(p->shader, var), nb, is);
 	} else {
