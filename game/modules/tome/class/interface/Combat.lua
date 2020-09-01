@@ -319,6 +319,7 @@ function _M:crossTierEffect(eff_id, apply_power, apply_save, use_given_e)
 	end
 	local dur = self:getTierDiff(apply_power, save)
 	self:setEffect(ct_effect, dur, {})
+	return ct_effect
 end
 
 function _M:getTierDiff(atk, def)

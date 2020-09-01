@@ -2085,7 +2085,7 @@ function _M:onTakeHit(value, src, death_note)
 	end
 
 	-- Un-daze
-	if self:hasEffect(self.EFF_DAZED) and not self:attr("damage_dont_undaze") then
+	if self:hasEffect(self.EFF_DAZED) and not self:attr("damage_dont_undaze") and (not src or not src.turn_procs or not src.turn_procs.dealing_damage_dont_undaze) then
 		self:removeEffect(self.EFF_DAZED)
 	end
 
@@ -5866,6 +5866,8 @@ function _M:fireTalentCheck(event, ...)
 				self.__object_use_running = tid
 				ret = tid:check(event, self, ...) or ret
 				self.__object_use_running = nil
+			elseif kind == "self" then
+				ret = tid.__self_callbacks[event](self, ...) or ret
 			else
 				self.__project_source = self.sustain_talents[tid]
 				ret = self:callTalent(tid, event, ...) or ret
@@ -5910,6 +5912,11 @@ function _M:iterCallbacks(event)
 					self.__project_source = tid
 					local ret = tid:check(event, self, ...)
 					self.__project_source = old_ps
+					return ret
+				end, priority, kind
+			elseif kind == "self" then
+				return function(...)
+					local ret = tid.__self_callbacks[event](self, ...)
 					return ret
 				end, priority, kind
 			else

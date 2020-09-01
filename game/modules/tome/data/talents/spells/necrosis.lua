@@ -107,7 +107,7 @@ newTalent{
 		local nb = 0
 		for tid, lvl in pairs(self.talents) do
 			local tt = self:getTalentFromId(tid)
-			if tt.is_inscription then
+			if tt and tt.is_inscription then
 				if tt.is_nature then nb = -1 break end -- FILTHY NATURE USER! WE ARE DONE WITH YOU!
 				if tt.is_spell then nb = nb + 1 end
 			end
