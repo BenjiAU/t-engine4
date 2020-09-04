@@ -87,6 +87,28 @@ divi_req_high5 = {
 	level = function(level) return 26 + (level-1)  end,
 }
 
+-- Used by Fallen Black Sun tree
+divi_str_req_high1 = {
+	stat = { str=function(level) return 22 + (level-1) * 2 end },
+	level = function(level) return 10 + (level-1)  end,
+}
+divi_str_req_high2 = {
+	stat = { str=function(level) return 30 + (level-1) * 2 end },
+	level = function(level) return 14 + (level-1)  end,
+}
+divi_str_req_high3 = {
+	stat = { str=function(level) return 38 + (level-1) * 2 end },
+	level = function(level) return 18 + (level-1)  end,
+}
+divi_str_req_high4 = {
+	stat = { str=function(level) return 46 + (level-1) * 2 end },
+	level = function(level) return 22 + (level-1)  end,
+}
+divi_str_req_high5 = {
+	stat = { str=function(level) return 54 + (level-1) * 2 end },
+	level = function(level) return 26 + (level-1)  end,
+}
+
 load("/data/talents/celestial/chants.lua")
 load("/data/talents/celestial/sunlight.lua")
 load("/data/talents/celestial/sun.lua")
