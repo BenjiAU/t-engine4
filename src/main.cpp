@@ -1495,33 +1495,44 @@ void handleIdleTransition(int goIdle)
 void event_loop_realtime() {
 	SDL_Event event;
 
-	int ticks = SDL_GetTicks();
-	uint64 max_time = SDL_GetPerformanceFrequency() / requested_fps;
-	uint64 ms1 = SDL_GetPerformanceFrequency() / 1000;
-	uint64 max_time1  = ms1 * (1000 / requested_fps - 1); // Sinde SDL_Delay resolution is far from perfect, we require one less millisecond for it, and we'll busy-wait the last ms ourselves
-	uint64 time = SDL_GetPerformanceCounter();
-	on_redraw();
-	// printf("===!! %f\n", (float)(SDL_GetPerformanceCounter()-ticks) /max_ticks);
+	// This is liekly super wrong, but we dont care much about unbound mode anyway
+	if (!requested_fps) {
+		on_redraw();
+		// printf("===!! %f\n", (float)(SDL_GetPerformanceCounter()-ticks) /max_ticks);
 
-	while (true) {
 		on_tick();
 
 		/* handle the events in the queue */
-		while (SDL_PollEvent(&event))
-		{
-			if (on_event(&event)) {
-				tickPaused = false;
+		if (SDL_PollEvent(&event)) on_event(&event);
+	} else {
+		int ticks = SDL_GetTicks();
+		uint64 max_time = SDL_GetPerformanceFrequency() / requested_fps;
+		uint64 ms1 = SDL_GetPerformanceFrequency() / 1000;
+		uint64 max_time1  = ms1 * (1000 / requested_fps - 1); // Sinde SDL_Delay resolution is far from perfect, we require one less millisecond for it, and we'll busy-wait the last ms ourselves
+		uint64 time = SDL_GetPerformanceCounter();
+		on_redraw();
+		// printf("===!! %f\n", (float)(SDL_GetPerformanceCounter()-ticks) /max_ticks);
+
+		while (true) {
+			on_tick();
+
+			/* handle the events in the queue */
+			while (SDL_PollEvent(&event))
+			{
+				if (on_event(&event)) {
+					tickPaused = false;
+				}
+				if (SDL_GetPerformanceCounter()-time >= max_time1) break;
 			}
+			if (tickPaused) break; // No more ticks to process
 			if (SDL_GetPerformanceCounter()-time >= max_time1) break;
 		}
-		if (tickPaused) break; // No more ticks to process
-		if (SDL_GetPerformanceCounter()-time >= max_time1) break;
-	}
-	// printf("== %ld :: %ld\n", max_ticks1, max_ticks);
-	while (SDL_GetPerformanceCounter()-time < max_time1) SDL_Delay(1);
-	while (SDL_GetPerformanceCounter()-time < max_time); // Now, we busywait the remaining ms or so
+		// printf("== %ld :: %ld\n", max_ticks1, max_ticks);
+		while (SDL_GetPerformanceCounter()-time < max_time1) SDL_Delay(1);
+		while (SDL_GetPerformanceCounter()-time < max_time); // Now, we busywait the remaining ms or so
 
-	ticks_per_frame = SDL_GetTicks() - ticks;
+		ticks_per_frame = SDL_GetTicks() - ticks;
+	}
 }
 
 void event_loop_tickbased() {

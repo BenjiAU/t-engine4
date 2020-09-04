@@ -499,8 +499,10 @@ static int lua_loader_cubemap_png(lua_State *L) {
 
 
 	array<string, 6> adds;
-	if (scheme == 0) adds = {"right", "left", "up", "down", "back", "front"};
-	else if (scheme == 1) adds = {"px", "nx", "py", "ny", "pz", "nz"};;
+	if (scheme == 0) adds = {"right", "left", "top", "bottom", "front", "back"};
+	else if (scheme == 1) adds = {"right", "left", "up", "down", "front", "back"};
+	else if (scheme == 2) adds = {"px", "nx", "py", "ny", "pz", "nz"};
+	else if (scheme == 3) adds = {"PositiveX", "NegativeX", "PositiveY", "NegativeY", "PositiveZ", "NegativeZ"};
 	array<string, 6> filenames;
 
 	for (int i = 0; i < 6; i++) {
