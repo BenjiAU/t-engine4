@@ -76,6 +76,7 @@ void releaseDisplayList(DisplayList *dl) {
 		dl->list_map_info.clear();
 		dl->list_model_info.clear();
 		dl->list_picking_info.clear();
+		dl->list_normal_info.clear();
 		dl->tex = 0;
 		dl->shader = NULL;
 		dl->sub = NULL;

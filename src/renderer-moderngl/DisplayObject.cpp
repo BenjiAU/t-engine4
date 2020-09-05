@@ -1094,7 +1094,6 @@ void DORVertexes::render(RendererGL *container, mat4& cur_model, vec4& cur_color
 	int nb = vertices.size();
 	int startat = dl->list.size();
 	dl->list.reserve(startat + nb);
-
 	// Copy & apply the model matrix
 	// DGDGDGDG: is it better to first copy it all and then alter it ? most likely not, change me
 	dl->list.insert(std::end(dl->list), std::begin(this->vertices), std::end(this->vertices));
@@ -1150,6 +1149,16 @@ void DORVertexes::render(RendererGL *container, mat4& cur_model, vec4& cur_color
 		int startat = dl->list_normal_info.size();
 		dl->list_normal_info.reserve(startat + nb);
 		dl->list_normal_info.insert(std::end(dl->list_normal_info), std::begin(this->vertices_normal_info), std::end(this->vertices_normal_info));
+
+		// Apply rotations
+		if (!(data_kind & VERTEX_MODEL_INFO)) {
+			vertex_normal_info *dest = dl->list_normal_info.data();
+			mat3 rotmat(vmodel);
+			rotmat = glm::transpose(glm::inverse(rotmat));
+			for (int di = startat; di < startat + nb; di++) {
+				dest[di].normal = glm::normalize(rotmat * dest[di].normal);
+			}		
+		}
 	}
 
 	resetChanged();
