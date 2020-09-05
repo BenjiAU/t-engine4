@@ -277,6 +277,18 @@ void DORTarget::tick() {
 	use(true);
 	subrender->toScreenSimple();
 	use(false);
+
+	if (copy_depth) {
+		GLuint cur_fbo = 0;
+		if (!fbo_stack.empty()) cur_fbo = fbo_stack.top();
+
+		// We do not use "use()" because we only need binding, we do NOT want to clear&reset it
+		tglBindFramebuffer(GL_READ_FRAMEBUFFER, fbo.fbo);
+		tglBindFramebuffer(GL_DRAW_FRAMEBUFFER, cur_fbo);
+		glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		tglBindFramebuffer(GL_FRAMEBUFFER, cur_fbo);
+		// printf("copying %d to %d\n", fbo.fbo, cur_fbo);
+	}
 }
 
 void DORTarget::onScreenResize(int w, int h) {

@@ -729,6 +729,14 @@ static int gl_target_enable_picking(lua_State *L)
 	return 1;
 }
 
+static int gl_target_copy_depth(lua_State *L)
+{
+	DORTarget *c = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
+	c->copyDepth(lua_toboolean(L, 2));
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
 static int gl_target_picking(lua_State *L)
 {
 	DORTarget *c = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
@@ -2114,6 +2122,7 @@ static const struct luaL_Reg gl_target_reg[] =
 	{"compute", gl_target_compute},
 	{"use", gl_target_use},
 	{"enablePicking", gl_target_enable_picking},
+	{"copyDepth", gl_target_copy_depth},
 	{"picking", gl_target_picking},
 	{"displaySize", gl_target_displaysize},
 	{"clearColor", gl_target_clearcolor},

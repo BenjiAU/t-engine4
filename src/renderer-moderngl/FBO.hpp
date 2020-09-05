@@ -146,6 +146,8 @@ protected:
 	GLuint picking_pbo[2] = {0, 0};
 	int picking_pbo_idx = 0;
 
+	bool copy_depth = false;
+
 	VBO *toscreen_vbo = NULL;
 
 	virtual void cloneInto(DisplayObject *into);
@@ -184,6 +186,7 @@ public:
 	void deleteFramebuffer(Fbo *fbo);
 	void useFramebuffer(Fbo *fbo);
 
+	void copyDepth(bool v) { copy_depth = v; }
 	void enablePicking(int tex_id);
 	uint32_t picking(int x, int y);
 };

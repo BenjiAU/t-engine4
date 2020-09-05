@@ -91,6 +91,8 @@ end
 
 function _M:update(player)
 	local a = self.a
+	local def = game.party.members[a] or {}
+
 	if self.text_overlay then
 		if a.summon_time ~= self.old_time then			
 			self.text_overlay:text(a.summon_time, true):center()
