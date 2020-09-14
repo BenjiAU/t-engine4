@@ -399,7 +399,9 @@ public:
 		radius2 = radius * radius;
 		subhits.clear();
 		b2Body *cur_body = fixture->GetBody();
-		PhysicSimulator::current->world.RayCast(this, src, cur_body->GetPosition());
+		b2Vec2 bpos = cur_body->GetPosition();
+		if (bpos == src) return true;
+		PhysicSimulator::current->world.RayCast(this, src, bpos);
 		sort(subhits.begin(), subhits.end(), sort_subhits);
 
 		for (auto &it : subhits) {
@@ -550,7 +552,7 @@ public:
 					d,
 					it.point,
 					it.normal,
-					sqrt(it.dist)
+					sqrt(pow(it.point.x - point1.x, 2) + pow(it.point.y - point1.y, 2))
 				});
 				break;
 			}
@@ -586,6 +588,7 @@ void PhysicSimulator::fatRayCast(float x1, float y1, float x2, float y2, float r
 		aabb.upperBound = b2Vec2(fmax(point1.x, point2.x) + raysize / unit_scale, fmax(point1.y, point2.y) + raysize / unit_scale);
 		world.QueryAABB(&callback, aabb);
 	}
+	sort(callback.hits.begin(), callback.hits.end(), sort_hits);
 	
 	int i = 1;
 	lua_rawgeti(L, LUA_REGISTRYINDEX, DisplayObject::weak_registry_ref);
