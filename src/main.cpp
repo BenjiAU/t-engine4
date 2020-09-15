@@ -56,6 +56,9 @@ extern "C" {
 #include "profile.hpp"
 #include "renderer-moderngl/Interfaces.hpp"
 #include "utilities.hpp"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_opengl3.h"
+#include "imgui/imgui_impl_sdl.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -118,6 +121,8 @@ GLint max_texture_size = 1024;
 extern bool shaders_active;
 bool fbo_active;
 bool multitexture_active;
+
+ImGuiIO *imgui_io = nullptr;
 
 /*
  * Locks for thread safety with respect to the rendering.
@@ -341,6 +346,8 @@ void on_music_stop()
 
 bool on_event(SDL_Event *event)
 {
+	ImGui_ImplSDL2_ProcessEvent(event);
+
 	switch (event->type) {
 	case SDL_WINDOWEVENT: {
 		switch (event->window.event) {
@@ -423,6 +430,7 @@ bool on_event(SDL_Event *event)
 		}
 		break;
 	case SDL_TEXTINPUT:
+		if (imgui_io->WantTextInput) break;
 		if (current_keyhandler != LUA_NOREF)
 		{
 			static Uint32 lastts = 0;
@@ -458,6 +466,7 @@ bool on_event(SDL_Event *event)
 		return true;
 	case SDL_KEYDOWN:
 	case SDL_KEYUP:
+		if (imgui_io->WantCaptureKeyboard) break;
 		if (current_keyhandler != LUA_NOREF)
 		{
 			lua_rawgeti(L, LUA_REGISTRYINDEX, current_keyhandler);
@@ -511,6 +520,7 @@ bool on_event(SDL_Event *event)
 		return true;
 	case SDL_MOUSEBUTTONDOWN:
 	case SDL_MOUSEBUTTONUP:
+		if (imgui_io->WantCaptureMouse) break;
 		if (event->type == SDL_MOUSEBUTTONDOWN) SDL_SetCursor(mouse_cursor_down);
 		else SDL_SetCursor(mouse_cursor);
 
@@ -553,6 +563,7 @@ bool on_event(SDL_Event *event)
 		}
 		return true;
 	case SDL_MOUSEWHEEL:
+		if (imgui_io->WantCaptureMouse) break;
 		if (current_mousehandler != LUA_NOREF)
 		{
 			int x = 0, y = 0;
@@ -579,6 +590,7 @@ bool on_event(SDL_Event *event)
 		}
 		return true;
 	case SDL_MOUSEMOTION:
+		if (imgui_io->WantCaptureMouse) break;
 		mousex = event->motion.x / screen_zoom;
 		mousey = event->motion.y / screen_zoom;
 
@@ -791,6 +803,11 @@ void on_redraw()
 
 	if (!anims_paused) cur_frame_tick = ticks - frame_tick_paused_time;
 
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(window);
+        ImGui::NewFrame();
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	frames_count = ((float)ticks - last_ticks) / ((float)1000.0 / (float)NORMALIZED_FPS);
@@ -799,6 +816,9 @@ void on_redraw()
 	call_draw(nb_keyframes);
 	keyframes_done += nb_keyframes;
 	frames_done++;
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	switch (current_redraw_type)
 	{
@@ -1144,6 +1164,15 @@ void do_resize(int w, int h, bool fullscreen, bool borderless, float zoom)
 		SDL_GL_MakeCurrent(window, maincontext);
 		glewInit();
 		printf ("OpenGL version: %s\n", glGetString(GL_VERSION));
+
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		imgui_io = &io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;     // Enable Keyboard Controls
+		ImGui::StyleColorsDark();
+		ImGui_ImplSDL2_InitForOpenGL(window, maincontext);
+		ImGui_ImplOpenGL3_Init("#version 130");
 
 		/* Set the window icon. */
 		windowIconSurface = IMG_Load_RW(PHYSFSRWOPS_openRead(WINDOW_ICON_PATH)
@@ -1610,11 +1639,17 @@ void setupDisplayTimer(int fps)
 	SDL_mutexV(renderingLock);
 }
 
+extern "C" void cimgui_forcelink();
+extern "C" void cimplot_forcelink();
+
 /**
  * Core entry point.
  */
 int main(int argc, char *argv[])
 {
+	cimgui_forcelink();
+	cimplot_forcelink();
+
 	core_def = (core_boot_type*)calloc(1, sizeof(core_boot_type));
 	core_def->define = &define_core;
 	core_def->define(core_def, "te4core", -1, NULL, NULL, NULL, NULL, 0, NULL);
