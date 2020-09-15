@@ -504,28 +504,28 @@ local easings = {
 local specific_uis = {
 	emitters = {
 		[PC.LinearEmitter] = {name="LinearEmitter", category="emitter", addnew=new_default_linear_emitter, fields={
-			{type="number", id="rate", text="Triggers every seconds: ", min=0, max=600, default=0.033},
+			{type="number", id="rate", text="Triggers every seconds: ", min=0, max=600, default=0.033, line=true},
 			{type="number", id="nb", text="Particles per trigger: ", min=0, max=100000, default=30, line=true},
-			{type="number", id="startat", text="Start at second: ", min=0, max=600, default=0},
+			{type="number", id="startat", text="Start at second: ", min=0, max=600, default=0, line=true},
 			{type="number", id="duration", text="Work for seconds (-1 for infinite): ", min=-1, max=600, default=-1, line=true},
 			{type="bool", id="dormant", text="Dormant (needs trigger to wakeup)", default=false},
 			{type="invisible", id=2, default={}},
 		}},
 		[PC.BurstEmitter] = {name="BurstEmitter", category="emitter", addnew=new_default_burst_emitter, fields={
-			{type="number", id="rate", text="Burst every seconds: ", min=0, max=600, default=0.5},
+			{type="number", id="rate", text="Burst every seconds: ", min=0, max=600, default=0.5, line=true},
 			{type="number", id="burst", text="Burst for seconds: ", min=0, max=600, default=0.15, line=true},
 			{type="number", id="nb", text="Particles per burst: ", min=0, max=100000, default=10, line=true},
-			{type="number", id="startat", text="Start at second: ", min=0, max=600, default=0},
+			{type="number", id="startat", text="Start at second: ", min=0, max=600, default=0, line=true},
 			{type="number", id="duration", text="Work for seconds (-1 for infinite): ", min=-1, max=600, default=-1, line=true},
 			{type="bool", id="dormant", text="Dormant (needs trigger to wakeup)", default=false},
 			{type="invisible", id=2, default={}},
 		}},
 		[PC.BuildupEmitter] = {name="BuildupEmitter", category="emitter", addnew=new_default_buildup_emitter, fields={
-			{type="number", id="rate", text="Triggers every seconds: ", min=0, max=600, default=0.5},
+			{type="number", id="rate", text="Triggers every seconds: ", min=0, max=600, default=0.5, line=true},
 			{type="number", id="rate_sec", text="Triggers/sec increase/sec: ", min=-600, max=600, default=0.15, line=true},
-			{type="number", id="nb", text="Particles per trigger: ", min=0, max=100000, default=10},
+			{type="number", id="nb", text="Particles per trigger: ", min=0, max=100000, default=10, line=true},
 			{type="number", id="nb_sec", text="Particles/trig increase/sec: ", min=-100000, max=100000, default=5, line=true},
-			{type="number", id="startat", text="Start at second: ", min=0, max=600, default=0},
+			{type="number", id="startat", text="Start at second: ", min=0, max=600, default=0, line=true},
 			{type="number", id="duration", text="Work for seconds (-1 for infinite): ", min=-1, max=600, default=-1, line=true},
 			{type="bool", id="dormant", text="Dormant (needs trigger to wakeup)", default=false},
 			{type="invisible", id=2, default={}},
@@ -1410,7 +1410,7 @@ function UIDialog:init(master)
 	self.__showup = false
 	self.absolute = true
 
-	local cp =ColorPicker.new{font=self.dfont, color={0, 0, 0, 1}, width=20, height=20, fct=function(p) master:setBG(p) end}
+	local cp =ColorPicker.new{font=master.dfont, color={0, 0, 0, 1}, width=20, height=20, fct=function(p) master:setBG(p) end}
 
 	local new = Button.new{font=master.dfont, text="New", fct=function() self:reset() end}
 	local load = Button.new{font=master.dfont, text="Load", fct=function() self:load(master) end}
