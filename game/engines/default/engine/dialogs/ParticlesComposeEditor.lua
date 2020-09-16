@@ -1286,7 +1286,9 @@ function _M:makeUI()
 	ig.End()
 
 	self.next_field_id = 1
-	ig.Begin("Particles Editor", nil, ig.lib.ImGuiWindowFlags_MenuBar)
+	local open = ffi.new("bool[1]", true)
+	ig.Begin("Particles Editor", open, ig.lib.ImGuiWindowFlags_MenuBar)
+	if not open[0] then self:exitEditor() end
 	self.is_ui_focus = ig.IsWindowHovered()
 	-- ig.PushStyleVarFloat(ig.lib.ImGuiStyleVar_IndentSpacing, 50)
 	local def = pdef
@@ -1779,4 +1781,9 @@ function _M:saveAs(txt, silent)
 	else
 		print("AUTOSAVE", txt)
 	end
+end
+
+function _M:exitEditor()
+	game:unregisterDialog(self)
+	if game.__mod_info.short_name == "particles_editor" then os.exit() end
 end
