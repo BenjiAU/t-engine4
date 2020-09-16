@@ -36,7 +36,7 @@ local List = require "engine.ui.List"
 local Button = require "engine.ui.Button"
 local Shader = require "engine.Shader"
 local PC = core.particlescompose
-local ig = require "imgui.sdl"
+local ig = require "engine.imgui"
 local ffi = require "ffi"
 
 --- Particles editor
@@ -246,6 +246,64 @@ local pdef = {
 	},
 --]]
 -- [[
+	parameters = { tx=600, ty=0, angle=0, size=600 },
+	{
+		display_name = "buildup",
+		max_particles = 100, blend=PC.AdditiveBlend,
+		texture = "/data/gfx/particles_textures/directional_particle.png",
+		shader = "particles/glow",
+		emitters = {
+			{PC.LinearEmitter, {
+				{PC.BasicTextureGenerator},
+				{PC.FixedColorGenerator, color_stop={0.968750, 0.927885, 0.041418, 0.000000}, color_start={0.914062, 0.307196, 0.053362, 1.000000}},
+				{PC.BasicSizeGenerator, max_size=8.000000, min_size=4.000000},
+				{PC.LifeGenerator, min=0.200000, max=0.600000},
+				{PC.RotationByVelGenerator, min_rot=0.000000, max_rot=0.000000},
+				{PC.CirclePosGenerator, width=20.000000, max_angle="angle+pi*0.7", base_point={0.000000, 0.000000}, radius=150.000000, min_angle="angle-pi*0.7"},
+				{PC.DirectionVelGenerator, max_vel=-190.000000, from={0.000000, 0.000000}, min_vel=-160.000000},
+				{PC.OriginPosGenerator},
+			}, startat=0.000000, duration=-1.000000, rate=0.030000, triggers = { die = PC.TriggerDELETE }, nb=10.000000, dormant=false },
+		},
+		updaters = {
+			{PC.BasicTimeUpdater},
+			{PC.LinearColorUpdater, bilinear=true},
+			{PC.EulerPosUpdater, global_acc={0.000000, 0.000000}, global_vel={0.000000, 0.000000}},
+			{PC.NoisePosUpdater, amplitude={200.000000, 200.000000}, noise="/data/gfx/particles_textures/noises/turbulent.png", traversal_speed=1.000000},
+		},
+	},
+	{
+		display_name = "beam",
+		max_particles = 250, blend=PC.AdditiveBlend,
+		texture = "/data/gfx/particles_textures/particle_boom_anim.png",
+		shader = "particles/glow",
+		emitters = {
+			{PC.LinearEmitter, {
+				{PC.BasicTextureGenerator},
+				{PC.FixedColorGenerator, color_stop={0.953125, 0.510159, 0.051919, 0.000000}, color_start={0.933594, 0.735687, 0.473890, 1.000000}},
+				{PC.LifeGenerator, min=0.400000, max=0.800000},
+				{PC.LinePosGenerator, p2={"tx", "ty"}, p1={"ty/sqrt(tx*tx+ty*ty)*15", "-tx/sqrt(tx*tx+ty*ty)*15"}, base_point={0, 0}},
+				{PC.DirectionVelGenerator, max_vel=150.000000, from={20.000000, 0.000000}, min_vel=50.000000},
+				{PC.StartStopSizeGenerator, min_start_size=20.000000, min_stop_size=1.000000, max_stop_size=3.000000, max_start_size=30.000000},
+			}, startat=0.000000, duration=-1.000000, rate=0.030000, triggers = { die = PC.TriggerDELETE }, display_name="top arm", nb=7.000000, dormant=false },
+			{PC.LinearEmitter, {
+				{PC.BasicTextureGenerator},
+				{PC.FixedColorGenerator, color_stop={0.953125, 0.510159, 0.051919, 0.000000}, color_start={0.933594, 0.735687, 0.473890, 1.000000}},
+				{PC.LifeGenerator, min=0.400000, max=0.800000},
+				{PC.LinePosGenerator, p2={"tx", "ty"}, p1={"-ty/sqrt(tx*tx+ty*ty)*15", "tx/sqrt(tx*tx+ty*ty)*15"}, base_point={0, 0}},
+				{PC.DirectionVelGenerator, max_vel=150.000000, from={20.000000, 0.000000}, min_vel=50.000000},
+				{PC.StartStopSizeGenerator, min_start_size=20.000000, min_stop_size=1.000000, max_stop_size=3.000000, max_start_size=30.000000},
+			}, dormant=false, duration=-1.000000, rate=0.030000, startat=0.000000, display_name="bottom arm", nb=7.000000, triggers = { die = PC.TriggerDELETE } },
+		},
+		updaters = {
+			{PC.BasicTimeUpdater},
+			{PC.LinearColorUpdater, bilinear=false},
+			{PC.EulerPosUpdater, global_acc={0.000000, 0.000000}, global_vel={0.000000, 0.000000}},
+			{PC.AnimatedTextureUpdater, splity=5.000000, repeat_over_life=1.000000, splitx=5.000000, firstframe=0.000000, lastframe=22.000000},
+			{PC.EasingSizeUpdater, easing="inCubic"},
+		},
+	},
+--]]
+--[[
 	parameters = { ty=0.000000, size=300.000000, tx=500.000000 },
 	{
 		max_particles = 2000, blend=PC.DefaultBlend, type=PC.RendererPoint,
@@ -1095,6 +1153,7 @@ function _M:displaySystem(id_system, system)
 	if ig.TreeNodeEx("----==== Emitters ====----", ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
 		for id_emitter, emitter in ipairs(system.emitters) do
 			ig.Separator()
+			self:processSpecificUI("emitters", emitter, function() table.remove(system.emitters, id) self:makeUI() self:regenParticle() end)
 			if ig.TreeNodeEx("---=== Generators ===---"..self:getFieldId(), ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
 				for id_generator, generator in ipairs(emitter[2]) do
 					local id = id_generator
@@ -1143,15 +1202,18 @@ function _M:doLoadTemp(path)
 	self:regenParticle(true)
 end
 
-function _M:loadParticle()
-	ig.SetNextWindowSizeConstraints(ig.ImVec2(600, 600), ig.ImVec2(-1, -1))
-	if ig.BeginPopup("Load Particles System") then
+function _M:defineMenuPopups()
+	ig.SetNextWindowSizeConstraints(ig.ImVec2(600, 600), ig.ImVec2(600, 600))
+	self.loading_dialog_shown = false
+	if ig.BeginPopupModal("Load Particles System") then
+		self.loading_dialog_shown = true
 		local list = {}
 		local max_size = 1
 		for i, file in ipairs(fs.list(filesprefix.."/data/gfx/particles/")) do if file:find("%.pc$") then
 			list[#list+1] = {name=file, path=filesprefix.."/data/gfx/particles/"..file}
 			max_size = math.max(max_size, ig.CalcTextSize(file, nil,false, -1.0).x)
 		end end 
+		table.sort(list, "name")
 
 		ig.Text("Select file to load:")
 		ig.Separator()
@@ -1160,12 +1222,12 @@ function _M:loadParticle()
 		local desiredY = math.max(regionsize.y - ig.GetFrameHeightWithSpacing()*3,200)
 		ig.BeginChild("files", ig.ImVec2(0,desiredY), true, 0)
 
-		print(max_size)
 		ig.Columns(3)
 		ig.PushItemWidth(max_size + ig.GetStyle().ItemInnerSpacing.x * 2)
 		for i, file in ipairs(list) do
 			if ig.Selectable(file.name) then
 				self:doLoad(file.name, file.path)
+				ig.CloseCurrentPopup()
 			end
 			if ig.IsItemHovered() then
 				self:doLoadTemp(file.path)
@@ -1178,8 +1240,41 @@ function _M:loadParticle()
 		ig.EndChild()
 
 		ig.Separator()
-		ig.Button("Load")
-		ig.Button("Cancel")
+		if ig.Button("Cancel") then ig.CloseCurrentPopup() end
+		ig.EndPopup()
+	end
+
+	if ig.BeginPopupModal("Clear particles?", nil, ig.lib.ImGuiWindowFlags_NoResize + ig.lib.ImGuiWindowFlags_AlwaysAutoResize) then
+		ig.Text("All data will be lost.")
+		if ig.Button("Delete all") or ig.HotkeyEntered(0, engine.Key._RETURN) then self:reset() ig.CloseCurrentPopup() end
+		ig.SameLine()
+		if ig.Button("Cancel") or ig.HotkeyEntered(0, engine.Key._ESCAPE) then ig.CloseCurrentPopup() end
+		ig.EndPopup()
+	end
+
+	if ig.BeginPopupModal("Save Particles System", nil, ig.lib.ImGuiWindowFlags_NoResize + ig.lib.ImGuiWindowFlags_AlwaysAutoResize) then
+		ig.Text("All data will be lost.")
+
+		if self.current_filename_tmp then
+			ig.Text("Confirm to overwrite existing file: "..self.current_filename_tmp)
+			if ig.Button("Save & Overwrite") or ig.HotkeyEntered(0, engine.Key._RETURN) then self:saveAs(self.current_filename_tmp, false) self.current_filename_tmp = nil ig.CloseCurrentPopup() end
+			ig.SameLine()
+			if ig.Button("Cancel") or ig.HotkeyEntered(0, engine.Key._ESCAPE) then self.current_filename_tmp = nil ig.CloseCurrentPopup() end
+		else
+			local buffer = ffi.new("char[500]", self.current_filename_tmp or self.current_filename or "")
+			if ig.InputText("Filename (without .pc)", buffer, ffi.sizeof(buffer), ig.lib.ImGuiInputTextFlags_EnterReturnsTrue) then
+				local fname = ffi.string(buffer)
+				if fs.exists("/data/gfx/particles/"..fname..".pc") then
+					self.current_filename_tmp = fname
+				else
+					self:saveAs(fname, false)
+					ig.CloseCurrentPopup()
+				end
+			end
+			ig.SetKeyboardFocusHere()
+			ig.Separator()
+			if ig.Button("Cancel") or ig.HotkeyEntered(0, engine.Key._ESCAPE) then ig.CloseCurrentPopup() end
+		end
 		ig.EndPopup()
 	end
 end
@@ -1196,23 +1291,28 @@ function _M:makeUI()
 	-- ig.PushStyleVarFloat(ig.lib.ImGuiStyleVar_IndentSpacing, 50)
 	local def = pdef
 
-	local do_load = false
+	local do_load, do_new, do_save = false, false, false
 	if ig.BeginMenuBar() then
 		if ig.BeginMenu("File") then
-			ig.MenuItem("New", "CTRL+N")
+			if ig.MenuItem("New", "CTRL+N") then do_new = true end
 			if ig.MenuItem("Load", "CTRL+L") then do_load = true end
-			ig.MenuItem("Save", "CTRL+S")
+			if ig.MenuItem("Save", "CTRL+S") then do_save = true end
 			ig.EndMenu()
 		end
 		ig.EndMenuBar()
 	end
-	if ig.Button("Load") or do_load then
-		ig.OpenPopup("Load Particles System")
-	elseif self.cur_temp or self.temp_pdo then
+	self:defineMenuPopups()
+	
+	-- Hotkeys
+	if ig.HotkeyEntered(ig.lib.KeyModCtrl, engine.Key._n) or do_new then ig.OpenPopup("Clear particles?") end
+	if ig.HotkeyEntered(ig.lib.KeyModCtrl, engine.Key._l) or do_load then ig.OpenPopup("Load Particles System") end
+	if ig.HotkeyEntered(ig.lib.KeyModCtrl, engine.Key._s) or do_save then ig.OpenPopup("Save Particles System") end
+
+	-- Cleanup
+	if not self.loading_dialog_shown and (self.cur_temp or self.temp_pdo) then
 		self.cur_temp, self.temp_pdo = nil, nil
 		self:regenParticle()
 	end
-	self:loadParticle()
 
 	if def.parameters and ig.TreeNodeEx("Parameters", ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
 		for name, value in pairs(def.parameters) do
@@ -1423,9 +1523,6 @@ function _M:init(no_bloom)
 	end
 
 	self:regenParticle()
-
-	-- local function autosave() self.renderer:tween(30, "wait", function() game:onTickEnd(function() self.uidialog:saveAs("__autosave__", true) autosave() end) end) end
-	-- autosave()
 end
 
 function _M:toggleBloom()
@@ -1468,6 +1565,7 @@ function _M:regenParticle(nosave)
 
 	self.particle_renderer:clear():add(self.bg):add(self.pdo)
 
+	self.particle_renderer:tween(30 * 5, "wait", function() self:saveAs("__autosave__", true) end)
 	collectgarbage("collect")
 end
 
@@ -1494,9 +1592,7 @@ function _M:toScreen(x, y, nb_keyframes)
 	-- self.p:toScreen(0, 0, nb_keyframes)
 
 	if not self.hide_ui then
-		-- Dialog.toScreen(self, x, y, nb_keyframes)
 		self:makeUI()
-
 		self.bignews:display(nb_keyframes)
 	end
 end
@@ -1507,4 +1603,180 @@ function _M:undo()
 	pdef_history_pos = pdef_history_pos - 1
 	self:makeUI()
 	self:regenParticle(true)
+end
+
+function _M:reset()
+	pdef={}
+	pdef_history_pos = 0
+	pdef_history = {}
+	-- PC.gcTextures()
+	self.current_filename = ""
+	self:regenParticle(true)
+end
+
+function _M:load(master)
+	local d = Dialog.new("Load particle effects from /data/gfx/particles/", game.w * 0.6, game.h * 0.6)
+
+	local list = {}
+	for i, file in ipairs(fs.list(filesprefix.."/data/gfx/particles/")) do if file:find("%.pc$") then
+		list[#list+1] = {name=file, path=filesprefix.."/data/gfx/particles/"..file}
+	end end 
+
+	local clist = List.new{font=self.dfont, scrollbar=true, width=d.iw, height=d.ih, list=list, fct=function(item)
+		game:unregisterDialog(d)
+		-- PC.gcTextures()
+		pdef_history={} pdef_history_pos=0
+		local ok, f = pcall(loadfile, item.path)
+		if not ok then Dialog:simplePopup("Error loading particle file", f) return end
+		setfenv(f, {math=math, colors_alphaf=colors_alphaf, PC=PC})
+		local ok, data = pcall(f)
+		if not ok then Dialog:simplePopup("Error loading particle file", data) return end
+		pdef = data
+		master:makeUI()
+		master:regenParticle()
+		core.display.setWindowTitle("Particles Editor: "..item.name)
+		master.current_filename = item.name:gsub("%.pc$", "")
+	end}
+
+	d:loadUI{
+		{left=0, top=0, ui=clist}
+	}
+	d:setupUI(false, false)
+	d.key:addBinds{EXIT = function() game:unregisterDialog(d) end}
+	game:registerDialog(d)
+end
+
+function _M:merge(master)
+	-- ig.("Load particle effects from /data/gfx/particles/", game.w * 0.6, game.h * 0.6)
+
+	local list = {}
+	for i, file in ipairs(fs.list(filesprefix.."/data/gfx/particles/")) do if file:find("%.pc$") then
+		list[#list+1] = {name=file, path=filesprefix.."/data/gfx/particles/"..file}
+	end end 
+
+	local clist = List.new{font=self.dfont, scrollbar=true, width=d.iw, height=d.ih, list=list, fct=function(item)
+		game:unregisterDialog(d)
+		local ok, f = pcall(loadfile, item.path)
+		if not ok then Dialog:simplePopup("Error loading particle file", f) return end
+		setfenv(f, {math=math, colors_alphaf=colors_alphaf, PC=PC})
+		local ok, data = pcall(f)
+		if not ok then Dialog:simplePopup("Error loading particle file", data) return end
+		table.append(pdef, data)
+		master:makeUI()
+		master:regenParticle()
+	end}
+
+	d:loadUI{
+		{left=0, top=0, ui=clist}
+	}
+	d:setupUI(false, false)
+	d.key:addBinds{EXIT = function() game:unregisterDialog(d) end}
+	game:registerDialog(d)
+end
+
+function _M:saveDef(w)
+	local function getFormat(v)
+		if type(v) == "number" then return "%f"
+		elseif type(v) == "string" then return "%q"
+		else error("Unsupported format: "..tostring(v))
+		end
+	end
+	local function getData(up, simple)
+		local data = {}
+		for k, v in pairs(up) do
+			if type(k) == "string" and k ~= "triggers" and k ~= "events" then
+				if type(v) == "number" then
+					data[#data+1] = ("%s=%f"):format(k, v)
+				elseif type(v) == "boolean" then
+					data[#data+1] = ("%s=%s"):format(k, v and "true" or "false")
+				elseif type(v) == "string" then
+					data[#data+1] = ("%s=%q"):format(k, v)
+				elseif type(v) == "table" and #v == 2 then
+					data[#data+1] = (("%%s={%s, %s}"):format(getFormat(v[1]), getFormat(v[2]))):format(k, v[1], v[2])
+				elseif type(v) == "table" and #v == 3 then
+					data[#data+1] = (("%%s={%s, %s, %s}"):format(getFormat(v[1]), getFormat(v[2]), getFormat(v[3]))):format(k, v[1], v[2], v[3])
+				elseif type(v) == "table" and #v == 4 then
+					data[#data+1] = (("%%s={%s, %s, %s, %s}"):format(getFormat(v[1]), getFormat(v[2]), getFormat(v[3]), getFormat(v[4]))):format(k, v[1], v[2], v[3], v[4])
+				elseif type(v) == "table" and #v == 0 and next(v) then
+					data[#data+1] = ("%s={%s}"):format(k, getData(v, true))
+				else
+					error("Unsupported save parameter: "..tostring(v).." for key "..k)
+				end
+			elseif k == "triggers" and next(v) then
+				local tgs = {}
+				for name, id in pairs(v) do
+					tgs[#tgs+1] = ("%s = PC.%s"):format(name, triggerkind_by_id[id])
+				end
+				data[#data+1] = "triggers = { "..table.concat(tgs, ", ").." }"
+			elseif k == "events" and next(v) then
+				local tgs = {}
+				for name, id in pairs(v) do
+					tgs[#tgs+1] = ("%s = PC.%s"):format(name, eventkind_by_id[id])
+				end
+				data[#data+1] = "events = { "..table.concat(tgs, ", ").." }"
+			end
+		end
+		if #data > 0 then data = (not simple and ", " or "")..table.concat(data, ", ") else data = "" end
+		return data
+	end
+
+	w(0, "return {\n")
+	if pdef.parameters then
+		w(1, ("parameters = { %s },\n"):format(getData(pdef.parameters, true)))
+	end
+	for _, system in ipairs(pdef) do
+		w(1, "{\n")
+		if system.display_name then w(2, ("display_name = %q,\n"):format(system.display_name)) end
+		w(2, ("max_particles = %d, blend=PC.%s, type=PC.%s, compute_only=%s,\n"):format(system.max_particles, blend_by_id[system.blend], system.type and type_by_id[system.type] or "RendererPoint", system.compute_only and "true" or "false"))
+		w(2, ("texture = %q,\n"):format(system.texture))
+		if system.shader then w(2, ("shader = %q,\n"):format(system.shader)) end
+		w(2, "emitters = {\n")
+		for _, em in ipairs(system.emitters) do
+			local data = getData(em)
+			w(3, ("{PC.%s, {\n"):format(emitters_by_id[em[1]]))
+			for _, g in ipairs(em[2]) do
+				local data = getData(g)
+				w(4, ("{PC.%s%s},\n"):format(generators_by_id[g[1]], data))
+			end
+			w(3, ("}%s },\n"):format(data))
+		end
+		w(2, "},\n")
+		w(2, "updaters = {\n")
+		for _, up in ipairs(system.updaters) do
+			local data = getData(up)
+			w(3, ("{PC.%s%s},\n"):format(updaters_by_id[up[1]], data))
+		end
+		w(2, "},\n")
+		w(1, "},\n")
+	end
+	w(0, "}\n")
+end
+
+function _M:saveAs(txt, silent)
+	local mod = game.__mod_info
+
+	local basedir = "/data/gfx/particles/"
+	local path
+	if fileswritepath then
+		path = fileswritepath..basedir
+	elseif mod.team then
+		basedir = "/save/"
+		path = fs.getRealPath(basedir)
+	else
+		path = mod.real_path..basedir
+	end
+	if not path then return end
+	local restore = fs.getWritePath()
+	fs.setWritePath(path)
+	local f = fs.open("/"..txt..".pc", "w")
+	self:saveDef(function(indent, str) f:write(string.rep("\t", indent)..str) end)
+	f:close()
+	fs.setWritePath(restore)
+	if not silent then
+		self.bignews:saySimple(60, "#GOLD#Saved to "..tostring(fs.getRealPath(basedir..txt..".pc")))
+		core.display.setWindowTitle("Particles Editor: "..txt)
+		self.current_filename = txt
+	else
+		print("AUTOSAVE", txt)
+	end
 end

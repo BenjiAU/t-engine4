@@ -56,9 +56,7 @@ extern "C" {
 #include "profile.hpp"
 #include "renderer-moderngl/Interfaces.hpp"
 #include "utilities.hpp"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_opengl3.h"
-#include "imgui/imgui_impl_sdl.h"
+#include "imgui/te4_imgui.hpp"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -1698,12 +1696,14 @@ void setupDisplayTimer(int fps)
 
 extern "C" void cimgui_forcelink();
 extern "C" void cimplot_forcelink();
+extern "C" void te4_imgui_forcelink();
 
 /**
  * Core entry point.
  */
 int main(int argc, char *argv[])
 {
+	te4_imgui_forcelink();
 	cimgui_forcelink();
 	cimplot_forcelink();
 
