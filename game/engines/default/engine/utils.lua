@@ -92,6 +92,12 @@ function table.concatNice(t, sep, endsep)
 	return table.concat(t, sep, 1, #t - 1)..endsep..t[#t]
 end
 
+function table.concatsub(t, sep, k)
+	local v = {}
+	for i, e in ipairs(t) do v[#v+1] = e[k] end
+	return table.concat(v, sep)
+end
+
 ---Convert a table (non-recursively) to a table of strings for each key/value pair
 -- @param src <table> = source table
 -- @param fmt <string, optional, default "[%s]=%s"> = format to use for each key-value pair
@@ -193,6 +199,12 @@ end
 function table.findValue(t, fv)
 	for k, v in pairs(t) do
 		if v == fv then return k end
+	end
+end
+
+function table.findValueSub(t, fv, s)
+	for k, v in pairs(t) do
+		if v[s] == fv then return k end
 	end
 end
 

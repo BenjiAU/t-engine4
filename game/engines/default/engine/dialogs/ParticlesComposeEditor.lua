@@ -36,6 +36,8 @@ local List = require "engine.ui.List"
 local Button = require "engine.ui.Button"
 local Shader = require "engine.Shader"
 local PC = core.particlescompose
+local ig = require "imgui.sdl"
+local ffi = require "ffi"
 
 --- Particles editor
 -- @classmod engine.dialogs.ParticlesComposeEditor
@@ -52,9 +54,6 @@ if __module_extra_info.editmodule then
 		fileswritepath = mrpath
 	end
 end
-
-
-local UIDialog
 
 local new_default_linear_emitter = {PC.LinearEmitter, {
 	{PC.BasicTextureGenerator},
@@ -100,7 +99,7 @@ local particle_speed = 1
 local particle_zoom = 1
 
 local pdef = {
--- [[
+--[[
 	parameters = { ty=1.000000, size=100.000000, tx=0.000000 },
 	{
 		max_particles = 5, blend=PC.ShinyBlend, type=PC.RendererPoint, compute_only=false,
@@ -134,7 +133,7 @@ local pdef = {
 	},
 --]]
 --[[
-	parameters = { size=300.000000, },
+	parameters = { size=300.000000 },
 	{
 		max_particles = 2000, blend=PC.ShinyBlend,
 		texture = "/data/gfx/particle.png",
@@ -246,7 +245,7 @@ local pdef = {
 		},
 	},
 --]]
---[[
+-- [[
 	parameters = { ty=0.000000, size=300.000000, tx=500.000000 },
 	{
 		max_particles = 2000, blend=PC.DefaultBlend, type=PC.RendererPoint,
@@ -504,168 +503,168 @@ local easings = {
 local specific_uis = {
 	emitters = {
 		[PC.LinearEmitter] = {name="LinearEmitter", category="emitter", addnew=new_default_linear_emitter, fields={
-			{type="number", id="rate", text="Triggers every seconds: ", min=0, max=600, default=0.033, line=true},
-			{type="number", id="nb", text="Particles per trigger: ", min=0, max=100000, default=30, line=true},
-			{type="number", id="startat", text="Start at second: ", min=0, max=600, default=0, line=true},
-			{type="number", id="duration", text="Work for seconds (-1 for infinite): ", min=-1, max=600, default=-1, line=true},
+			{type="number", id="rate", text="Triggers every seconds", min=0, max=600, default=0.033, line=true},
+			{type="number", id="nb", text="Particles per trigger", min=0, max=100000, default=30, line=true},
+			{type="number", id="startat", text="Start at second", min=0, max=600, default=0, line=true},
+			{type="number", id="duration", text="Work for seconds (-1 for infinite)", min=-1, max=600, default=-1, line=true},
 			{type="bool", id="dormant", text="Dormant (needs trigger to wakeup)", default=false},
 			{type="invisible", id=2, default={}},
 		}},
 		[PC.BurstEmitter] = {name="BurstEmitter", category="emitter", addnew=new_default_burst_emitter, fields={
-			{type="number", id="rate", text="Burst every seconds: ", min=0, max=600, default=0.5, line=true},
-			{type="number", id="burst", text="Burst for seconds: ", min=0, max=600, default=0.15, line=true},
-			{type="number", id="nb", text="Particles per burst: ", min=0, max=100000, default=10, line=true},
-			{type="number", id="startat", text="Start at second: ", min=0, max=600, default=0, line=true},
-			{type="number", id="duration", text="Work for seconds (-1 for infinite): ", min=-1, max=600, default=-1, line=true},
+			{type="number", id="rate", text="Burst every seconds", min=0, max=600, default=0.5, line=true},
+			{type="number", id="burst", text="Burst for seconds", min=0, max=600, default=0.15, line=true},
+			{type="number", id="nb", text="Particles per burst", min=0, max=100000, default=10, line=true},
+			{type="number", id="startat", text="Start at second", min=0, max=600, default=0, line=true},
+			{type="number", id="duration", text="Work for seconds (-1 for infinite)", min=-1, max=600, default=-1, line=true},
 			{type="bool", id="dormant", text="Dormant (needs trigger to wakeup)", default=false},
 			{type="invisible", id=2, default={}},
 		}},
 		[PC.BuildupEmitter] = {name="BuildupEmitter", category="emitter", addnew=new_default_buildup_emitter, fields={
-			{type="number", id="rate", text="Triggers every seconds: ", min=0, max=600, default=0.5, line=true},
-			{type="number", id="rate_sec", text="Triggers/sec increase/sec: ", min=-600, max=600, default=0.15, line=true},
-			{type="number", id="nb", text="Particles per trigger: ", min=0, max=100000, default=10, line=true},
-			{type="number", id="nb_sec", text="Particles/trig increase/sec: ", min=-100000, max=100000, default=5, line=true},
-			{type="number", id="startat", text="Start at second: ", min=0, max=600, default=0, line=true},
-			{type="number", id="duration", text="Work for seconds (-1 for infinite): ", min=-1, max=600, default=-1, line=true},
+			{type="number", id="rate", text="Triggers every seconds", min=0, max=600, default=0.5, line=true},
+			{type="number", id="rate_sec", text="Triggers/sec increase/sec", min=-600, max=600, default=0.15, line=true},
+			{type="number", id="nb", text="Particles per trigger", min=0, max=100000, default=10, line=true},
+			{type="number", id="nb_sec", text="Particles/trig increase/sec", min=-100000, max=100000, default=5, line=true},
+			{type="number", id="startat", text="Start at second", min=0, max=600, default=0, line=true},
+			{type="number", id="duration", text="Work for seconds (-1 for infinite)", min=-1, max=600, default=-1, line=true},
 			{type="bool", id="dormant", text="Dormant (needs trigger to wakeup)", default=false},
 			{type="invisible", id=2, default={}},
 		}},
 	},
 	generators = {
 		[PC.LifeGenerator] = {name="LifeGenerator", category="life", fields={
-			{type="number", id="min", text="Min seconds: ", min=0.00001, max=600, default=1},
-			{type="number", id="max", text="Max seconds: ", min=0.00001, max=600, default=3},
+			{type="number", id="min", text="Min seconds", min=0.00001, max=600, default=1},
+			{type="number", id="max", text="Max seconds", min=0.00001, max=600, default=3},
 		}},
 		[PC.BasicTextureGenerator] = {name="BasicTextureGenerator", category="texture", fields={}},
 		[PC.OriginPosGenerator] = {name="OriginPosGenerator", category="position", fields={}},
 		[PC.SquarePosGenerator] = {name="SquarePosGenerator", category="position", fields={
-			{type="point", id="base_point", text="Origin: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="number", id="min_x", text="MinX: ", min=-10000, max=10000, default=-100},
-			{type="number", id="max_x", text="MaxX: ", min=-10000, max=10000, default=-100, line=true},
-			{type="number", id="min_y", text="MinY: ", min=-10000, max=10000, default=-100},
-			{type="number", id="max_y", text="MaxY: ", min=-10000, max=10000, default=-100, line=true},
+			{type="point", id="base_point", text="Origin", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="number", id="min_x", text="MinX", min=-10000, max=10000, default=-100},
+			{type="number", id="max_x", text="MaxX", min=-10000, max=10000, default=-100, line=true},
+			{type="number", id="min_y", text="MinY", min=-10000, max=10000, default=-100},
+			{type="number", id="max_y", text="MaxY", min=-10000, max=10000, default=-100, line=true},
 		}},
 		[PC.DiskPosGenerator] = {name="DiskPosGenerator", category="position", fields={
-			{type="point", id="base_point", text="Origin: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="number", id="radius", text="Radius: ", min=0, max=10000, default=150, line=true},
-			{type="number", id="min_angle", text="Min angle: ", min=-math.pi*2, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
-			{type="number", id="max_angle", text="Max angle: ", min=-math.pi*2, max=math.pi*2, default=math.pi*2, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
+			{type="point", id="base_point", text="Origin", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="number", id="radius", text="Radius", min=0, max=10000, default=150, line=true},
+			{type="number", id="min_angle", text="Min angle", min=-math.pi*2, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
+			{type="number", id="max_angle", text="Max angle", min=-math.pi*2, max=math.pi*2, default=math.pi*2, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
 		}},
 		[PC.CirclePosGenerator] = {name="CirclePosGenerator", category="position", fields={
-			{type="point", id="base_point", text="Origin: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="number", id="radius", text="Radius: ", min=0, max=10000, default=150},
-			{type="number", id="width", text="Width: ", min=0, max=10000, default=20, line=true},
-			{type="number", id="min_angle", text="Min angle: ", min=-math.pi*2, max=math.pi*2, default=0, from=function(v) print("!!!!", type(v) == "number", tonumber(v), v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
-			{type="number", id="max_angle", text="Max angle: ", min=-math.pi*2, max=math.pi*2, default=math.pi*2, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
+			{type="point", id="base_point", text="Origin", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="number", id="radius", text="Radius", min=0, max=10000, default=150},
+			{type="number", id="width", text="Width", min=0, max=10000, default=20, line=true},
+			{type="number", id="min_angle", text="Min angle", min=-math.pi*2, max=math.pi*2, default=0, from=function(v) print("!!!!", type(v) == "number", tonumber(v), v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
+			{type="number", id="max_angle", text="Max angle", min=-math.pi*2, max=math.pi*2, default=math.pi*2, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
 		}},
 		[PC.TrianglePosGenerator] = {name="TrianglePosGenerator", category="position", fields={
-			{type="point", id="base_point", text="Origin: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="point", id="p1", text="P1: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="point", id="p2", text="P2: ", min=-10000, max=10000, default={100, 100}, line=true},
-			{type="point", id="p3", text="P3: ", min=-10000, max=10000, default={-100, 100}},
+			{type="point", id="base_point", text="Origin", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="point", id="p1", text="P1", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="point", id="p2", text="P2", min=-10000, max=10000, default={100, 100}, line=true},
+			{type="point", id="p3", text="P3", min=-10000, max=10000, default={-100, 100}},
 		}},
 		[PC.LinePosGenerator] = {name="LinePosGenerator", category="position", fields={
-			{type="point", id="base_point", text="Origin: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="point", id="p1", text="P1: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="point", id="p2", text="P2: ", min=-10000, max=10000, default={100, 100}, line=true},
-			{type="number", id="spread", text="Spread: ", min=0, max=10000, default=0},
+			{type="point", id="base_point", text="Origin", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="point", id="p1", text="P1", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="point", id="p2", text="P2", min=-10000, max=10000, default={100, 100}, line=true},
+			{type="number", id="spread", text="Spread", min=0, max=10000, default=0},
 		}},
 		[PC.JaggedLinePosGenerator] = {name="JaggedLinePosGenerator", category="position", fields={
-			{type="point", id="base_point", text="Origin: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="point", id="p1", text="P1: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="point", id="p2", text="P2: ", min=-10000, max=10000, default={100, 100}, line=true},
-			{type="number", id="spread", text="Spread: ", min=0, max=10000, default=0, line=true},
-			{type="number", id="sway", text="Sway: ", min=0, max=10000, default=80},
-			{type="number", id="strands", text="strands: ", min=1, max=10000, default=1},
+			{type="point", id="base_point", text="Origin", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="point", id="p1", text="P1", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="point", id="p2", text="P2", min=-10000, max=10000, default={100, 100}, line=true},
+			{type="number", id="spread", text="Spread", min=0, max=10000, default=0, line=true},
+			{type="number", id="sway", text="Sway", min=0, max=10000, default=80},
+			{type="number", id="strands", text="strands", min=1, max=10000, default=1},
 		}},
 		[PC.ImagePosGenerator] = {name="ImagePosGenerator", category="position", fields={
-			{type="file", id="image", text="Image: ", dir="/data/gfx/particles_masks/", filter="%.png$", default="/data/gfx/particles_masks/tome.png", line=true},
-			{type="point", id="base_point", text="Origin: ", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="file", id="image", text="Image", dir="/data/gfx/particles_masks/", filter="%.png$", default="/data/gfx/particles_masks/tome.png", line=true},
+			{type="point", id="base_point", text="Origin", min=-10000, max=10000, default={0, 0}, line=true},
 		}},
 		[PC.DiskVelGenerator] = {name="DiskVelGenerator", category="movement", fields={
-			{type="number", id="min_vel", text="Min velocity: ", min=0, max=1000, default=50},
-			{type="number", id="max_vel", text="Max velocity: ", min=0, max=1000, default=150},
+			{type="number", id="min_vel", text="Min velocity", min=0, max=1000, default=50},
+			{type="number", id="max_vel", text="Max velocity", min=0, max=1000, default=150},
 		}},
 		[PC.DirectionVelGenerator] = {name="DirectionVelGenerator", category="movement", fields={
-			{type="point", id="from", text="From: ", min=-10000, max=10000, default={0, 0}, line=true},
-			{type="number", id="min_vel", text="Min velocity: ", min=-1000, max=1000, default=50},
-			{type="number", id="max_vel", text="Max velocity: ", min=-1000, max=1000, default=150, line=true},
-			{type="number", id="min_rot", text="Min rotation: ", min=-math.pi*2, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
-			{type="number", id="max_rot", text="Max rotation: ", min=-math.pi*2, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
+			{type="point", id="from", text="From", min=-10000, max=10000, default={0, 0}, line=true},
+			{type="number", id="min_vel", text="Min velocity", min=-1000, max=1000, default=50},
+			{type="number", id="max_vel", text="Max velocity", min=-1000, max=1000, default=150, line=true},
+			{type="number", id="min_rot", text="Min rotation", min=-math.pi*2, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
+			{type="number", id="max_rot", text="Max rotation", min=-math.pi*2, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
 		}},
 		[PC.SwapPosByVelGenerator] = {name="SwapPosByVelGenerator", category="movement", fields={
 		}},
 		[PC.BasicSizeGenerator] = {name="BasicSizeGenerator", category="size", fields={
-			{type="number", id="min_size", text="Min size: ", min=0.00001, max=1000, default=10},
-			{type="number", id="max_size", text="Max size: ", min=0.00001, max=1000, default=30},
+			{type="number", id="min_size", text="Min size", min=0.00001, max=1000, default=10},
+			{type="number", id="max_size", text="Max size", min=0.00001, max=1000, default=30},
 		}},
 		[PC.StartStopSizeGenerator] = {name="StartStopSizeGenerator", category="size", fields={
-			{type="number", id="min_start_size", text="Min start: ", min=0.00001, max=1000, default=10},
-			{type="number", id="max_start_size", text="Max start: ", min=0.00001, max=1000, default=30, line=true},
-			{type="number", id="min_stop_size", text="Min stop: ", min=0.00001, max=1000, default=1},
-			{type="number", id="max_stop_size", text="Max stop: ", min=0.00001, max=1000, default=3},
+			{type="number", id="min_start_size", text="Min start", min=0.00001, max=1000, default=10},
+			{type="number", id="max_start_size", text="Max start", min=0.00001, max=1000, default=30, line=true},
+			{type="number", id="min_stop_size", text="Min stop", min=0.00001, max=1000, default=1},
+			{type="number", id="max_stop_size", text="Max stop", min=0.00001, max=1000, default=3},
 		}},
 		[PC.BasicRotationGenerator] = {name="BasicRotationGenerator", category="rotation", fields={
-			{type="number", id="min_rot", text="Min rotation: ", min=0, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
-			{type="number", id="max_rot", text="Max rotation: ", min=0, max=math.pi*2, default=math.pi*2, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
+			{type="number", id="min_rot", text="Min rotation", min=0, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
+			{type="number", id="max_rot", text="Max rotation", min=0, max=math.pi*2, default=math.pi*2, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
 		}},
 		[PC.RotationByVelGenerator] = {name="RotationByVelGenerator", category="rotation", fields={
-			{type="number", id="min_rot", text="Min rotation: ", min=0, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return math.deg(v) end},
-			{type="number", id="max_rot", text="Max rotation: ", min=0, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return math.deg(v) end},
+			{type="number", id="min_rot", text="Min rotation", min=0, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return math.deg(v) end},
+			{type="number", id="max_rot", text="Max rotation", min=0, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return math.deg(v) end},
 		}},
 		[PC.BasicRotationVelGenerator] = {name="BasicRotationVelGenerator", category="rotation", fields={
-			{type="number", id="min_rot", text="Min rotation velocity: ", min=0, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
-			{type="number", id="max_rot", text="Max rotation velocity: ", min=0, max=math.pi*2, default=math.pi*2, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
+			{type="number", id="min_rot", text="Min rotation velocity", min=0, max=math.pi*2, default=0, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
+			{type="number", id="max_rot", text="Max rotation velocity", min=0, max=math.pi*2, default=math.pi*2, from=function(v) return (type(v) == "number" or tonumber(v)) and math.rad(v) or v end, to=function(v) return (type(v) == "number" or tonumber(v)) and math.deg(v) or v end},
 		}},
 		[PC.StartStopColorGenerator] = {name="StartStopColorGenerator", category="color", fields={
-			{type="color", id="min_color_start", text="Min start color: ", default=colors_alphaf.GOLD(1)},
-			{type="color", id="max_color_start", text="Max start color: ", default=colors_alphaf.ORANGE(1), line=true},
-			{type="color", id="min_color_stop", text="Min stop color: ", default=colors_alphaf.GREEN(0)},
-			{type="color", id="max_color_stop", text="Max stop color: ", default=colors_alphaf.LIGHT_GREEN(0)},
+			{type="color", id="min_color_start", text="Min start color", default=colors_alphaf.GOLD(1)},
+			{type="color", id="max_color_start", text="Max start color", default=colors_alphaf.ORANGE(1), line=true},
+			{type="color", id="min_color_stop", text="Min stop color", default=colors_alphaf.GREEN(0)},
+			{type="color", id="max_color_stop", text="Max stop color", default=colors_alphaf.LIGHT_GREEN(0)},
 		}},
 		[PC.FixedColorGenerator	] = {name="FixedColorGenerator", category="color", fields={
-			{type="color", id="color_start", text="Start color: ", default=colors_alphaf.GOLD(1)},
-			{type="color", id="color_stop", text="Stop color: ", default=colors_alphaf.LIGHT_GREEN(0)},
+			{type="color", id="color_start", text="Start color", default=colors_alphaf.GOLD(1)},
+			{type="color", id="color_stop", text="Stop color", default=colors_alphaf.LIGHT_GREEN(0)},
 		}},
 		[PC.CopyGenerator] = {name="CopyGenerator", category="special", fields={
-			{type="number", id="source_system", text="Source system ID: ", min=1, max=100, default=1},
-			{type="bool", id="copy_pos", text="Copy position: ", default=true},
-			{type="bool", id="copy_color", text="Copy color: ", default=true},
+			{type="number", id="source_system", text="Source system ID", min=1, max=100, default=1},
+			{type="bool", id="copy_pos", text="Copy position", default=true},
+			{type="bool", id="copy_color", text="Copy color", default=true},
 		}},
 		[PC.JaggedLineBetweenGenerator] = {name="JaggedLineBetweenGenerator", category="special", fields={
-			{type="number", id="source_system1", text="Source system1 ID: ", min=1, max=100, default=1},
-			{type="number", id="source_system2", text="Source system2 ID: ", min=1, max=100, default=1, line=true},
-			{type="bool", id="copy_pos", text="Copy position: ", default=true},
-			{type="bool", id="copy_color", text="Copy color: ", default=true, line=true},
-			{type="number", id="sway", text="Sway: ", min=0, max=10000, default=80},
-			{type="number", id="strands", text="Strands: ", min=1, max=10000, default=1, line=true},
-			{type="number", id="close_tries", text="Pick closer tries: ", min=0, max=200, default=0},
-			{type="number", id="repeat_times", text="Repeat: ", min=1, max=1000, default=1},
+			{type="number", id="source_system1", text="Source system1 ID", min=1, max=100, default=1},
+			{type="number", id="source_system2", text="Source system2 ID", min=1, max=100, default=1, line=true},
+			{type="bool", id="copy_pos", text="Copy position", default=true},
+			{type="bool", id="copy_color", text="Copy color", default=true, line=true},
+			{type="number", id="sway", text="Sway", min=0, max=10000, default=80},
+			{type="number", id="strands", text="Strands", min=1, max=10000, default=1, line=true},
+			{type="number", id="close_tries", text="Pick closer tries", min=0, max=200, default=0},
+			{type="number", id="repeat_times", text="Repeat", min=1, max=1000, default=1},
 		}},
 		[PC.ParametrizerGenerator] = {name="ParametrizerGenerator", category="special", fields={
-			{type="string", id="name", text="Parameter name: ", default="p1", line=true},
-			{type="string", id="expr", chars=40, text="Expr: ", default="rng(1, 10)"},
+			{type="string", id="name", text="Parameter name", default="p1", line=true},
+			{type="string", id="expr", chars=40, text="Expr", default="rng(1, 10)"},
 		}},
 	},
 	updaters = {
 		[PC.BasicTimeUpdater] = {name="BasicTimeUpdater", category="life", fields={}},
 		[PC.AnimatedTextureUpdater] = {name="AnimatedTextureUpdater", category="texture", fields={
-			{type="number", id="splitx", text="Texture Columns: ", min=1, max=100, default=1},
-			{type="number", id="splity", text="Texture Lines: ", min=1, max=100, default=1, line=true},
-			{type="number", id="firstframe", text="First frame: ", min=0, max=10000, default=0},
-			{type="number", id="lastframe", text="Last frame: ", min=0, max=10000, default=0, line=true},
-			{type="number", id="repeat_over_life", text="Repeat over lifetime: ", min=0, max=10000, default=1},
+			{type="number", id="splitx", text="Texture Columns", min=1, max=100, default=1},
+			{type="number", id="splity", text="Texture Lines", min=1, max=100, default=1, line=true},
+			{type="number", id="firstframe", text="First frame", min=0, max=10000, default=0},
+			{type="number", id="lastframe", text="Last frame", min=0, max=10000, default=0, line=true},
+			{type="number", id="repeat_over_life", text="Repeat over lifetime", min=0, max=10000, default=1},
 		}},
 		[PC.MathPosUpdater] = {name="MathPosUpdater", category="position & movement", fields={
-			{type="string", chars=40, id="expr_x", text="Expr X: ", default="t*dx", line=true},
-			{type="string", chars=40, id="expr_y", text="Expr Y: ", default="t*dy"},
+			{type="string", chars=40, id="expr_x", text="Expr X", default="t*dx", line=true},
+			{type="string", chars=40, id="expr_y", text="Expr Y", default="t*dy"},
 		}},
 		[PC.EulerPosUpdater] = {name="EulerPosUpdater", category="position & movement", fields={
-			{type="point", id="global_vel", text="X Expr: ", min=-10000, max=10000, default={0, 0}},
-			{type="point", id="global_acc", text="Y Expr: ", min=-10000, max=10000, default={0, 0}},
+			{type="point", id="global_vel", text="Velocity", min=-10000, max=10000, default={0, 0}},
+			{type="point", id="global_acc", text="Acceleration", min=-10000, max=10000, default={0, 0}},
 		}},
 		[PC.EasingPosUpdater] = {name="EasingPosUpdater", category="position & movement", fields={
-			{type="select", id="easing", text="Easing method: ", list=easings, default="outQuad"},
+			{type="select", id="easing", text="Easing method", list=easings, default="outQuad"},
 		}},
 		[PC.BoidPosUpdater] = {name="BoidPosUpdater", category="position & movement", fields={
 			{type="number", id="perception_radius", text="Perception Radius", min=-10000, max=10000, default=50, line=true},
@@ -673,30 +672,30 @@ local specific_uis = {
 			{type="number", id="alignment_weight", text="Alignment Weight", min=-10000, max=10000, default=1, line=true},
 			{type="number", id="cohesion_weight", text="Cohesion Weight", min=-10000, max=10000, default=1, line=true},
 			{type="number", id="steering_weight", text="Steering Weight", min=-10000, max=10000, default=0, line=true},
-			{type="point", id="steering_to", text="Steering to: ", min=-10000, max=10000, default={500, 500}, line=true},
+			{type="point", id="steering_to", text="Steering to", min=-10000, max=10000, default={500, 500}, line=true},
 			{type="number", id="max_acceleration", text="Max Acceleration", min=-10000, max=10000, default=250, line=true},
 			{type="number", id="max_velocity", text="Max Velocity", min=-10000, max=10000, default=100, line=true},
 			{type="number", id="blindspot_angle_deg", text="Blindspot Angle(deg)", min=-10000, max=10000, default=20},
 		}},
 		[PC.NoisePosUpdater] = {name="NoisePosUpdater", category="position & movement", fields={
-			{type="file", id="noise", text="Noise: ", dir="/data/gfx/particles_textures/noises/", filter="%.png$", default="/data/gfx/particles_textures/noises/turbulent.png", line=true},
-			{type="point", id="amplitude", text="Movement amplitude: ", min=-10000, max=10000, default={500, 500}},
-			{type="number", id="traversal_speed", text="Noise traversal speed: ", min=0, max=10000, default=1},
+			{type="file", id="noise", text="Noise", dir="/data/gfx/particles_textures/noises/", filter="%.png$", default="/data/gfx/particles_textures/noises/turbulent.png", line=true},
+			{type="point", id="amplitude", text="Movement amplitude", min=-10000, max=10000, default={500, 500}},
+			{type="number", id="traversal_speed", text="Noise traversal speed", min=0, max=10000, default=1},
 		}},
 		[PC.LinearColorUpdater] = {name="LinearColorUpdater", category="color", fields={
-			{type="bool", id="bilinear", text="Bilinear (from start to stop to start): ", default=false},
+			{type="bool", id="bilinear", text="Bilinear (from start to stop to start)", default=false},
 		}},
 		[PC.EasingColorUpdater] = {name="EasingColorUpdater", category="color", fields={
-			{type="bool", id="bilinear", text="Bilinear (from start to stop to start): ", default=false, line=true},
-			{type="select", id="easing", text="Easing method: ", list=easings, default="outQuad"},
+			{type="bool", id="bilinear", text="Bilinear (from start to stop to start)", default=false, line=true},
+			{type="select", id="easing", text="Easing method", list=easings, default="outQuad"},
 		}},
 		[PC.LinearSizeUpdater] = {name="LinearSizeUpdater", category="size", fields={}},
 		[PC.EasingSizeUpdater] = {name="EasingSizeUpdater", category="size", fields={
-			{type="select", id="easing", text="Easing method: ", list=easings, default="outQuad"},
+			{type="select", id="easing", text="Easing method", list=easings, default="outQuad"},
 		}},
 		[PC.LinearRotationUpdater] = {name="LinearRotationUpdater", category="rotation", fields={}},
 		[PC.EasingRotationUpdater] = {name="EasingRotationUpdater", category="rotation", fields={
-			{type="select", id="easing", text="Easing method: ", list=easings, default="outQuad"},
+			{type="select", id="easing", text="Easing method", list=easings, default="outQuad"},
 		}},
 	},
 	systems = {
@@ -827,314 +826,419 @@ function _M:addNew(kind, into)
 	end
 end
 
+function _M:displayParameter(name, value)
+	if type(value) == "number" then
+		local v = ffi.new("float[1]", value)
+		if ig.InputFloat(name, v, -100000, 100000, "%.3f") then pdef.parameters[name] = v[0] self:regenParticle() end
+	elseif type(value) == "table" and #value == 2 then
+		local v = ffi.new("float[2]", value[1], value[2])
+		if ig.InputFloat2(name, v, "%.3f") then pdef.parameters[name] = {v[0], v[1]} self:regenParticle() end
+	end
+end
+
+function _M:makeStandardContextMenu(spe, parent)
+	local finish = false
+	if ig.BeginPopupContextItem("System Menu") then
+		if ig.Selectable("Rename") then
+			Dialog:textboxPopup("Name for this addon's release", "Name", 1, 50, function(name) if name then
+				spe.display_name = name finish = true
+			end end)
+		end
+		if ig.Selectable("Duplicate") then
+			for i, s in ipairs(parent) do if s == spe then
+				local c = table.clone(s, true)
+				c.display_name = (c.display_name or "unnamed").." (duplicated)"
+				table.insert(parent, i + 1, c)
+				finish = true
+				break
+			end end
+		end
+		if ig.Selectable("Move Up") then
+			for i, s in ipairs(parent) do if s == spe and i > 1 then
+				table.remove(parent, i)
+				table.insert(parent, i - 1, s)
+				finish = true
+				break
+			end end
+		end
+		if ig.Selectable("Move Down") then
+			for i, s in ipairs(parent) do if s == spe and i < #parent then
+				table.remove(parent, i)
+				table.insert(parent, i + 1, s)
+				finish = true
+				break
+			end end
+		end
+		ig.Text("")
+		if ig.Selectable("Delete") then
+			ig.OpenPopup("Delete?")
+			if ig.BeginPopupModal("Delete?", nil, ig.lib.ImGuiWindowFlags_AlwaysAutoResize) then
+				ig.Text("Are you sure?")
+				if ig.Button("Delete") then table.remove(pdef, id_system) finish = true ig.CloseCurrentPopup() end
+				if ig.Button("Cancel") then ig.CloseCurrentPopup() end
+				ig.EndPopup()
+			end
+		end
+		ig.EndPopup()
+	end
+	return finish
+end
+
+local function imcolor(c, a)
+	a = a or 1
+	local r, g, b = colors.unpack1(colors[c])
+	return ig.ImVec4(r, g, b, a)
+end
+local imcolor_white = imcolor"WHITE"
+
 local function getParametrizedColor(p)
-	if not p then return "CRIMSON" end
+	if not p then return imcolor"CRIMSON" end
 	local f, err = loadstring("return "..p)
-	if not f then print("Param error", err) return "LIGHT_RED" end
+	if not f then print("Param error", err) return imcolor"LIGHT_RED" end
 	local env = table.clone(pdef.parameters or {}, true)
 	setmetatable(env, {__index=math})
 	setfenv(f, env)
 	local ok, err = pcall(f)
-	if not ok then print("Param error", err) return "LIGHT_RED" end
-	if type(err) ~= "number" then print("Param return error: not a number") return "YELLOW" end
-	return "SALMON"
+	if not ok then print("Param error", err) return imcolor"LIGHT_RED" end
+	if type(err) ~= "number" then print("Param return error: not a number") return imcolor"YELLOW" end
+	return imcolor"SALMON"
 end
 
-function _M:parametrizedBox(t)
-	local on_change = t.on_change
-	t.font = self.dfont
-	t.orig_title = t.title
-	t.text = tostring(t.string or t.number)
-	t.on_change = function(v, box)
-		-- Number, bound it
-		if tonumber(v) and not t.string then
-			v = util.bound(tonumber(v), t.min, t.max)
-			t.is_parametrized = false
-		-- String parameter
-		else
-			t.is_parametrized = true
-		end
-		on_change(v)
+local default_converted = {from=function(v) return v end, to=function(v) return v end}
 
-		if t.string then box.title_do:color(colors_alphafs.GOLD)
-		elseif t.is_parametrized then box.title_do:color(colors_alphafs[getParametrizedColor(v)](1))
-		else box.title_do:color(1, 1, 1, 1)
-		end
-	end
-	t.chars = 18
-	if not tonumber(t.number) then
-		t.is_parametrized = true
-	end
-	local b = Textbox.new(t)
-	if t.is_parametrized then b.title_do:color(colors_alphafs[getParametrizedColor(t.number)](1)) end
-	return b
+function _M:getFieldId()
+	self.next_field_id = self.next_field_id + 1
+	return "###ufi"..self.next_field_id
 end
 
-function _M:processSpecificUI(ui, add, kind, spe, delete)
+function _M:input_checkbox(name, base, k)
+	local v = ffi.new("bool[1]", base[k] and true or false)
+	if ig.Checkbox(name, v) then base[k] = v[0] self:regenParticle() end
+	if ig.IsItemHovered() then ig.SetTooltip(name) end
+end
+
+function _M:input_int(name, base, k, min, max, converter)
+	converter = converter or default_converted
+	local v = ffi.new("int[1]", converter.to(base[k]))
+	if ig.DragInt(name, v, 1, converter.to(min), converter.to(max), "%d", ig.lib.ImGuiSliderFlags_ClampOnInput) then base[k] = converter.from(v[0]) self:regenParticle() end
+	if ig.IsItemHovered() then ig.SetTooltip(name) end
+end
+
+function _M:input_float(name, base, k, min, max, converter)
+	converter = converter or default_converted
+	local color = imcolor_white
+	if not tonumber(base[k]) then color = getParametrizedColor(base[k]) end
+	ig.lib.igPushItemWidth(120)
+	local buffer = ffi.new("char[500]", tostring(converter.to(base[k])))
+	ig.PushStyleColor(ig.lib.ImGuiCol_Text, color) 
+	if ig.InputText(name, buffer, ffi.sizeof(buffer)) then
+		local v = ffi.string(buffer)
+		if tonumber(v) then v = tonumber(v) end
+		base[k] = converter.from(v)
+		self:regenParticle()
+	end
+	if ig.IsItemHovered() then ig.SetTooltip(name) end
+	ig.PopStyleColor()
+	ig.PopItemWidth()
+end
+
+function _M:input_vec2(name, base, k, min, max, converter)
+	converter = converter or default_converted
+	ig.lib.igPushItemWidth(51)
+	local color = imcolor_white
+	if not tonumber(base[k][1]) then color = getParametrizedColor(base[k][1]) end
+	ig.PushStyleColor(ig.lib.ImGuiCol_Text, color) 
+	local buffer = ffi.new("char[500]", tostring(converter.to(base[k][1])))
+	if ig.InputText("x"..self:getFieldId(), buffer, ffi.sizeof(buffer)) then
+		local v = ffi.string(buffer)
+		if tonumber(v) then v = tonumber(v) end
+		base[k][1] = converter.from(v)
+		self:regenParticle()
+	end
+	if ig.IsItemHovered() then ig.SetTooltip(name) end
+	ig.PopStyleColor()
+
+	ig.SameLine()
+	local color = imcolor_white
+	if not tonumber(base[k][2]) then color = getParametrizedColor(base[k][2]) end
+	ig.PushStyleColor(ig.lib.ImGuiCol_Text, color) 
+	local buffer = ffi.new("char[500]", tostring(converter.to(base[k][2])))
+	if ig.InputText(name, buffer, ffi.sizeof(buffer)) then
+		local v = ffi.string(buffer)
+		if tonumber(v) then v = tonumber(v) end
+		base[k][2] = converter.from(v)
+		self:regenParticle()
+	end
+	if ig.IsItemHovered() then ig.SetTooltip(name) end
+	ig.PopItemWidth()
+	ig.PopStyleColor()
+end
+
+function _M:input_combo(name, base, k, list, d_prop, v_prop)
+	local v = ffi.new("int[1]", (table.findValueSub(list, base[k], v_prop) or 1) - 1)
+	if ig.ComboStr(name, v, table.concatsub(list, "\0", d_prop), #list) then
+		base[k] = list[v[0]+1][v_prop]
+		self:regenParticle()
+	end
+	if ig.IsItemHovered() then ig.SetTooltip(name) end
+end
+
+function _M:input_color(name, base, k)
+	local pickerid = self:getFieldId()
+	local colori = ig.ImVec4(unpack(base[k]))
+	if ig.ColorButton(name, colori, ig.lib.ImGuiColorEditFlags_AlphaPreviewHalf) then
+		ig.OpenPopup(pickerid)
+	end
+
+	if ig.BeginPopup(pickerid) then
+		local color = ffi.new("float[4]", unpack(base[k]))
+		ig.Text(name)
+		ig.Separator()
+		if ig.ColorPicker4("##picker", color, ig.lib.ImGuiColorEditFlags_NoSidePreview + ig.lib.ImGuiColorEditFlags_NoSmallPreview) then
+			base[k] = {color[0], color[1], color[2], color[3]}
+			self:regenParticle()
+		end
+		ig.SameLine()
+
+		ig.BeginGroup() -- Lock X position
+		ig.Text("Current")
+		ig.ColorButton("##current", colori, ig.lib.ImGuiColorEditFlags_NoPicker + ig.lib.ImGuiColorEditFlags_AlphaPreviewHalf, ig.ImVec2(60, 40))
+		ig.Separator()
+		ig.Text("Palette")
+
+		local colors = table.values(colors_simple1)
+		table.sort(colors, function (a, b) if a[1] == b[1] then
+			if a[2] == b[2] then return a[3] < b[3]
+			else return a[2] < b[2] end
+		else return a[1] < b[1] end end)
+		for n, c in ipairs(colors) do
+			local c = c
+			ig.PushID(n)
+			if (n-1) % 8 ~= 0 then ig.SameLine(0, 4) end
+
+			if ig.ColorButton("##palette", ig.ImVec4(unpack(c)), ig.lib.ImGuiColorEditFlags_NoAlpha + ig.lib.ImGuiColorEditFlags_NoPicker + ig.lib.ImGuiColorEditFlags_NoTooltip, ig.ImVec2(20, 20)) then
+				base[k] = {c[1], c[2], c[3], base[k][4]}
+				self:regenParticle()
+			end
+			ig.PopID()
+		end
+		ig.EndGroup()
+		ig.EndPopup()
+	end	
+
+	ig.SameLine()
+	ig.Text(name)
+	if ig.IsItemHovered() then ig.SetTooltip(name) end
+end
+
+function _M:processSpecificUI(kind, spe, delete)
 	local spe_def = specific_uis[kind][spe[1]]
 	if not spe_def then error("unknown def for: "..tostring(spe[1])) end
-	add(Checkbox.new{font=self.dfont, title="#{bold}##GOLD#"..spe_def.name, default=true, fct=function()end, on_change=function(v) if not v then delete() end end})
-	local adds = {}
-	for i, field in ipairs(spe_def.fields) do
-		field.from = field.from or function(v) return v end
-		field.to = field.to or function(v) return v end
-		if field.type == "number" then
-			if not spe[field.id] then spe[field.id] = field.default end
-			adds[#adds+1] = self:parametrizedBox{title=field.text, number=field.to(spe[field.id]), min=field.to(field.min), max=field.to(field.max), chars=6, on_change=function(p) spe[field.id] = field.from(p) self:regenParticle() end, fct=function()end}
-		elseif field.type == "string" then
-			if not spe[field.id] then spe[field.id] = field.default end
-			adds[#adds+1] = self:parametrizedBox{title=field.text, string=spe[field.id], chars=field.chars, on_change=function(p) spe[field.id] = p self:regenParticle() end, fct=function()end}
-		elseif field.type == "bool" then
-			if not spe[field.id] then spe[field.id] = field.default end
-			adds[#adds+1] = Checkbox.new{font=self.dfont, title=field.text, default=field.to(spe[field.id]), on_change=function(p) spe[field.id] = field.from(p) self:regenParticle() end, fct=function()end}
-		elseif field.type == "point" then
-			if not spe[field.id] then spe[field.id] = table.clone(field.default, true) end
-			adds[#adds+1] = self:parametrizedBox{title=field.text, number=field.to(spe[field.id][1]), min=field.to(field.min), max=field.to(field.max), chars=6, on_change=function(p) spe[field.id][1] = field.from(p) self:regenParticle() end, fct=function()end}
-			adds[#adds+1] = self:parametrizedBox{title="x", number=field.to(spe[field.id][2]), min=field.to(field.min), max=field.to(field.max), chars=6, on_change=function(p) spe[field.id][2] = field.from(p) self:regenParticle() end, fct=function()end}
-		elseif field.type == "color" then
-			if not spe[field.id] then spe[field.id] = table.clone(field.default, true) end
-			adds[#adds+1] = Textzone.new{font=self.dfont, text=(i==1 and "    " or "")..field.text, auto_width=1, auto_height=1}
-			adds[#adds+1] = ColorPicker.new{font=self.dfont, color=spe[field.id], width=20, height=20, fct=function(p) spe[field.id] = p self:regenParticle() end}
-		elseif field.type == "select" then
-			if not spe[field.id] then spe[field.id] = field.default end
-			adds[#adds+1] = Textzone.new{font=self.dfont, text=(i==1 and "    " or "")..field.text, auto_width=1, auto_height=1}
-			adds[#adds+1] = Dropdown.new{font=self.dfont, width=200, default={"name", spe[field.id]}, fct=function(item) spe[field.id] = item.name self:regenParticle() self:makeUI() end, on_select=function(item)end, list=easings, nb_items=math.min(#easings, 30)}
-		elseif field.type == "file" then
-			if not spe[field.id] then spe[field.id] = field.default end
-			adds[#adds+1] = Textzone.new{font=self.dfont, text=(i==1 and "    " or "")..field.text..tostring(spe[field.id]), auto_width=1, auto_height=1, fct=function() self:selectFile(spe, field) end}
+
+	ig.PushStyleColor(ig.lib.ImGuiCol_Header, imcolor("STEEL_BLUE", 0.5))
+	if ig.CollapsingHeader(spe_def.name, ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+		ig.PushStyleVar(ig.lib.ImGuiStyleVar_FrameRounding, 12)
+		ig.PushStyleVar(ig.lib.ImGuiStyleVar_ItemSpacing, ig.ImVec2(4, 1))
+		ig.Indent(20)
+		if #spe_def.fields > 1 then ig.Columns(2) end
+		for i, field in ipairs(spe_def.fields) do
+			field.from = field.from or function(v) return v end
+			field.to = field.to or function(v) return v end
+			if field.type == "number" then
+				if not spe[field.id] then spe[field.id] = field.default end
+				self:input_float(field.text, spe, field.id, field.min, field.max, field)
+			elseif field.type == "string" then
+				if not spe[field.id] then spe[field.id] = field.default end
+				-- adds[#adds+1] = self:parametrizedBox{title=field.text, string=spe[field.id], chars=field.chars, on_change=function(p) spe[field.id] = p self:regenParticle() end, fct=function()end}
+			elseif field.type == "bool" then
+				if not spe[field.id] then spe[field.id] = field.default end
+				self:input_checkbox(field.text, spe, field.id)
+			elseif field.type == "point" then
+				if not spe[field.id] then spe[field.id] = table.clone(field.default, true) end
+				self:input_vec2(field.text, spe, field.id, field.min, field.max, field)
+			elseif field.type == "color" then
+				if not spe[field.id] then spe[field.id] = table.clone(field.default, true) end
+				self:input_color(field.text, spe, field.id)
+			elseif field.type == "select" then
+				if not spe[field.id] then spe[field.id] = field.default end
+				-- adds[#adds+1] = Textzone.new{font=self.dfont, text=(i==1 and "    " or "")..field.text, auto_width=1, auto_height=1}
+				-- adds[#adds+1] = Dropdown.new{font=self.dfont, width=200, default={"name", spe[field.id]}, fct=function(item) spe[field.id] = item.name self:regenParticle() self:makeUI() end, on_select=function(item)end, list=easings, nb_items=math.min(#easings, 30)}
+			elseif field.type == "file" then
+				if not spe[field.id] then spe[field.id] = field.default end
+				-- adds[#adds+1] = Textzone.new{font=self.dfont, text=(i==1 and "    " or "")..field.text..tostring(spe[field.id]), auto_width=1, auto_height=1, fct=function() self:selectFile(spe, field) end}
+			end
+			-- if not field.line and i < #spe_def.fields then ig.SameLine() end
+			if i == #spe_def.fields - 1 then ig.PopStyleVar() end
+			ig.NextColumn()
 		end
-		if field.line then add(unpack(adds)) adds={} end
+		if #spe_def.fields < 2 then ig.PopStyleVar() end
+		if #spe_def.fields > 1 then ig.Columns(1) end
+		ig.Unindent(20)
+		ig.PopStyleVar()
 	end
-	add(unpack(adds))
-	add(8)
+	ig.PopStyleColor()
 end
 
-function _M:displayParameter(add, name, value)
-	local adds = {Checkbox.new{font=self.dfont, title="", default=true, fct=function()end, on_change=function(v) if not v then pdef.parameters[name] = nil if not next(pdef.parameters) then pdef.parameters = nil end self:regenParticle() self:makeUI() end end}}
-	if type(value) == "number" then
-		adds[#adds+1] = Numberbox.new{font=self.dfont, title="#{bold}##SALMON#"..name..": ", number=value, min=-100000, max=100000, chars=6, on_change=function(p) pdef.parameters[name] = p self.pdo:params(pdef.parameters) end, fct=function()end}
-	elseif type(value) == "table" and #value == 2 then
-		adds[#adds+1] = Numberbox.new{font=self.dfont, title="#{bold}##SALMON#"..name..": ", number=value[1], min=-100000, max=100000, chars=6, on_change=function(p) pdef.parameters[name][1] = p self.pdo:params(pdef.parameters) end, fct=function()end}
-		adds[#adds+1] = Numberbox.new{font=self.dfont, title="x", number=value[2], min=-100000, max=100000, chars=6, on_change=function(p) pdef.parameters[name][2] = p self:regenParticle() end, fct=function()end}
-	end
-	add(unpack(adds))
-	add(8)
-end
+function _M:displaySystem(id_system, system)
+	if self:makeStandardContextMenu("System Menu", system, pdef) then self:regenParticle() end
 
-function _M:makeTitle(add, tab, text, important, on_click)
-	local b = Button.new{font=self.dfont, text=text, all_buttons_fct=true, fct=function(button) if on_click then on_click(button) end end, width=self.iw - tab - 10, use_frame=important and "ui/heading" or "ui/selector"}
+	ig.PushStyleVar(ig.lib.ImGuiStyleVar_FrameRounding, 4)
 
-	if important then
-		add(Checkbox.new{font=self.dfont, title="", default=true, fct=function()end, on_change=function(v) if not v then important() end end}, b)
-	else
-		add(b)
-	end
-end
+	self:input_int("Max particles", system, "max_particles", 1, 100000)
+	self:input_combo("Blend mode", system, "blend", blendmodes, "name", "blend")
+	self:input_combo("Type", system, "type", typemodes, "name", "type")
+	self:input_checkbox("Compute only (hidden)", system, "compute_only")
+	if ig.Button(system.texture or "--") then self:selectTexture(system) end ig.SameLine() ig.Text("Texture")
+	if ig.Button(system.shader or "--") then self:selectShader(system) end ig.SameLine() ig.Text("Shader")
 
-function _M:titleMenu(spe, parent)
-	return function(button)
-		if button == "left" then
-			spe.hide = not spe.hide self:makeUI()
-		elseif button == "right" then
-			Dialog:listPopup("Options", "", {
-				{name="Rename", id="rename"},
-				{name="Duplicate", id="clone"},
-				{name="Move up", id="up"},
-				{name="Move down", id="down"},
-			}, 100, 200, function(item) if item then
-				if item.id == "rename" then
-					Dialog:textboxPopup("Name for this addon's release", "Name", 1, 50, function(name) if name then
-						spe.display_name = name self:makeUI()
-					end end)
-				elseif item.id == "clone" then
-					for i, s in ipairs(parent) do if s == spe then
-						local c = table.clone(s, true)
-						c.display_name = (c.display_name or "unnamed").." (duplicated)"
-						table.insert(parent, i + 1, c)
-						self:makeUI()
-						break
-					end end
-				elseif item.id == "up" then
-					for i, s in ipairs(parent) do if s == spe and i > 1 then
-						table.remove(parent, i)
-						table.insert(parent, i - 1, s)
-						self:makeUI()
-						break
-					end end
-				elseif item.id == "down" then
-					for i, s in ipairs(parent) do if s == spe and i < #parent then
-						table.remove(parent, i)
-						table.insert(parent, i + 1, s)
-						self:makeUI()
-						break
-					end end
+	ig.Separator()
+	if ig.TreeNodeEx("----==== Emitters ====----", ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+		for id_emitter, emitter in ipairs(system.emitters) do
+			ig.Separator()
+			if ig.TreeNodeEx("---=== Generators ===---"..self:getFieldId(), ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+				for id_generator, generator in ipairs(emitter[2]) do
+					local id = id_generator
+					self:processSpecificUI("generators", generator, function() table.remove(emitter[2], id) self:regenParticle() end)
 				end
-			end end)
+				ig.TreePop()
+			end
 		end
+		ig.TreePop()
+	end
+
+	ig.Separator()
+	if ig.TreeNodeEx("----==== Updaters ====----", ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+		for id_updater, updater in ipairs(system.updaters) do
+			local id = id_updater
+			self:processSpecificUI("updaters", updater, function() table.remove(system.updaters, id_updater) self:regenParticle() end)
+		end
+		ig.TreePop()
+	end
+
+	ig.PopStyleVar()
+end
+
+function _M:doLoad(name, path)
+	pdef_history={} pdef_history_pos=0
+	local ok, f = pcall(loadfile, path)
+	if not ok then print("Error loading particle file", f) return end
+	setfenv(f, {math=math, colors_alphaf=colors_alphaf, PC=PC})
+	local ok, data = pcall(f)
+	if not ok then print("Error loading particle file", data) return end
+	pdef = data
+	self:regenParticle()
+	core.display.setWindowTitle("Particles Editor: "..name)
+	self.current_filename = name:gsub("%.pc$", "")
+end
+
+function _M:doLoadTemp(path)
+	if self.cur_temp == path then return end
+	self.cur_temp = path
+	local ok, f = pcall(loadfile, path)
+	if not ok then print("Error loading particle file", f) return end
+	setfenv(f, {math=math, colors_alphaf=colors_alphaf, PC=PC})
+	local ok, data = pcall(f)
+	if not ok then print("Error loading particle file", data) return end
+	self.temp_pdo = PC.new(data, nil, 1, 1, true)
+	self:regenParticle(true)
+end
+
+function _M:loadParticle()
+	ig.SetNextWindowSizeConstraints(ig.ImVec2(600, 600), ig.ImVec2(-1, -1))
+	if ig.BeginPopup("Load Particles System") then
+		local list = {}
+		local max_size = 1
+		for i, file in ipairs(fs.list(filesprefix.."/data/gfx/particles/")) do if file:find("%.pc$") then
+			list[#list+1] = {name=file, path=filesprefix.."/data/gfx/particles/"..file}
+			max_size = math.max(max_size, ig.CalcTextSize(file, nil,false, -1.0).x)
+		end end 
+
+		ig.Text("Select file to load:")
+		ig.Separator()
+
+		local regionsize = ig.GetContentRegionAvail()
+		local desiredY = math.max(regionsize.y - ig.GetFrameHeightWithSpacing()*3,200)
+		ig.BeginChild("files", ig.ImVec2(0,desiredY), true, 0)
+
+		print(max_size)
+		ig.Columns(3)
+		ig.PushItemWidth(max_size + ig.GetStyle().ItemInnerSpacing.x * 2)
+		for i, file in ipairs(list) do
+			if ig.Selectable(file.name) then
+				self:doLoad(file.name, file.path)
+			end
+			if ig.IsItemHovered() then
+				self:doLoadTemp(file.path)
+			end
+			ig.NextColumn()
+		end
+		ig.PopItemWidth()
+		ig.Columns(1)
+
+		ig.EndChild()
+
+		ig.Separator()
+		ig.Button("Load")
+		ig.Button("Cancel")
+		ig.EndPopup()
 	end
 end
 
 function _M:makeUI()
-	local old_scroll = self.scrollbar and self.scrollbar.pos or 0
+	local fps, msframe = core.display.getFPS()
+	ig.Begin("Stats", nil, ig.lib.ImGuiWindowFlags_NoTitleBar + ig.lib.ImGuiWindowFlags_NoResize + ig.lib.ImGuiWindowFlags_AlwaysAutoResize)
+	ig.Text(("Elapsed Time %0.2fs / FPS: %0.1f / %d ms/frame / Active particles: %d / Zoom: %d%% / Speed: %d%%"):format((core.game.getTime() - self.p_date) / 1000, fps, msframe, self.pdo:countAlive(), particle_zoom * 100, particle_speed * 100))
+	ig.End()
+
+	self.next_field_id = 1
+	ig.Begin("Particles Editor", nil, ig.lib.ImGuiWindowFlags_MenuBar)
+	self.is_ui_focus = ig.IsWindowHovered()
+	-- ig.PushStyleVarFloat(ig.lib.ImGuiStyleVar_IndentSpacing, 50)
 	local def = pdef
-	local ui = {}
-	local y = 0
-	local tab = 0
-	local lastc = nil
-	local function add(...)
-		local args = {...}
-		if type(args[1]) == "number" then y = y + args[1] return args[1] end
-		local max_h = 0
-		for i, c in ipairs(args) do if c.h > max_h then max_h = c.h end end
-		local x = tab
-		for i, c in ipairs(args) do
-			ui[#ui+1] = {left=x, top=y + (max_h - c.h) / 2, ui=c}
-			x = x + c.w
+
+	local do_load = false
+	if ig.BeginMenuBar() then
+		if ig.BeginMenu("File") then
+			ig.MenuItem("New", "CTRL+N")
+			if ig.MenuItem("Load", "CTRL+L") then do_load = true end
+			ig.MenuItem("Save", "CTRL+S")
+			ig.EndMenu()
 		end
-		y = y + max_h
-		return max_h
+		ig.EndMenuBar()
+	end
+	if ig.Button("Load") or do_load then
+		ig.OpenPopup("Load Particles System")
+	elseif self.cur_temp or self.temp_pdo then
+		self.cur_temp, self.temp_pdo = nil, nil
+		self:regenParticle()
+	end
+	self:loadParticle()
+
+	if def.parameters and ig.TreeNodeEx("Parameters", ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+		for name, value in pairs(def.parameters) do
+			self:displayParameter(name, value)
+		end
+		ig.TreePop()
 	end
 
-	if def.parameters then
-		tab = 0
-		self:makeTitle(add, tab, "#{bold}##SALMON#----== Parameters ==----", false)
-		for name, value in pairs(def.parameters) do
-			self:displayParameter(add, name, value)
-		end
-	end					
-	add(DisplayObject.new{font=self.dfont, DO=core.renderer.fromTextureTable(self.plus_t), width=16, height=16, fct=function() self:addParameter() end}, Textzone.new{font=self.dfont, text="add parameter", auto_width=1, auto_height=1, fct=function() self:addParameter() end})
-	add(Separator.new{font=self.dfont, dir="vertical", size=self.iw})
-	add(10)
-
+	ig.Separator()
+	ig.BeginTabBar("Systems")
 	for id_system, system in ipairs(def) do
 		local id = id_system
-		tab = 0
-		self:makeTitle(add, tab, "#{bold}##OLIVE_DRAB#----------====== System "..id_system..": #ANTIQUE_WHITE#"..(system.display_name or "unnamed").."#LAST# ======----------", 	function() table.remove(def, id) self:makeUI() self:regenParticle() end, self:titleMenu(system, def))
-		if not system.hide then
-			tab = 20
-			add(
-				Textzone.new{font=self.dfont, text="Max: ", auto_width=1, auto_height=1}, Numberbox.new{font=self.dfont, number=system.max_particles, min=1, max=100000, chars=6, on_change=function(p) system.max_particles = p self:regenParticle() end, fct=function()end},
-				Textzone.new{font=self.dfont, text="Blend: ", auto_width=1, auto_height=1}, Dropdown.new{font=self.dfont, width=200, default={"blend", system.blend}, fct=function(item) system.blend = item.blend self:regenParticle() self:makeUI() end, on_select=function(item)end, list=blendmodes, nb_items=#blendmodes}
-			)
-			add(Textzone.new{font=self.dfont, text="Type: ", auto_width=1, auto_height=1}, Dropdown.new{font=self.dfont, width=200, default={"type", system.type}, fct=function(item) system.type = item.type self:regenParticle() self:makeUI() end, on_select=function(item)end, list=typemodes, nb_items=#typemodes})
-			add(0)
-			add(Checkbox.new{font=self.dfont, title="Compute Only (Hidden)", default=system.compute_only, on_change=function(p) system.compute_only = p self:regenParticle() end, fct=function()end})
-			add(0)
-			add(Textzone.new{font=self.dfont, text="Texture: "..system.texture, auto_width=1, auto_height=1, fct=function() self:selectTexture(system) end})
-			add(Textzone.new{font=self.dfont, text="Shader: "..(system.shader or "--"), auto_width=1, auto_height=1, fct=function() self:selectShader(system) end})
-			add(8)
-			
-			for id_emitter, emitter in ipairs(system.emitters) do
-				local id = id_emitter
-				tab = 20
-				self:makeTitle(add, tab, "#{bold}##CRIMSON#----== Emitter "..id..": #ANTIQUE_WHITE#"..(emitter.display_name or "unnamed").."#LAST# ==----", false, self:titleMenu(emitter, system.emitters))
-				if not emitter.hide then
-					tab = 40
-					self:processSpecificUI(ui, add, "emitters", emitter, function() table.remove(system.emitters, id) self:makeUI() self:regenParticle() end)
-					add(Separator.new{font=self.dfont, dir="vertical", size=self.iw * 0.5})
-
-					for id_generator, generator in ipairs(emitter[2]) do
-						local id = id_generator
-						self:processSpecificUI(ui, add, "generators", generator, function() table.remove(emitter[2], id) self:makeUI() self:regenParticle() end)
-					end
-					add(DisplayObject.new{font=self.dfont, DO=core.renderer.fromTextureTable(self.plus_t), width=16, height=16, fct=function() self:addNew("generators", emitter[2]) end}, Textzone.new{font=self.dfont, text="add generator", auto_width=1, auto_height=1, fct=function() self:addNew("generators", emitter[2]) end})
-
-					if emitter.triggers then
-						tab = 60
-						self:makeTitle(add, tab, "#{bold}##OLIVE_DRAB#----== Triggers ==----", false)
-						for name, kind in pairs(emitter.triggers) do
-							add(Checkbox.new{font=self.dfont, title="#OLIVE_DRAB#"..name.."#LAST# => #{italic}#"..trigger_by_id[kind], default=true, on_change=function(p) emitter.triggers[name] = nil if not next(emitter.triggers) then emitter.triggers = nil end self:makeUI() self:regenParticle() end, fct=function()end})
-						end
-					end					
-					add(DisplayObject.new{font=self.dfont, DO=core.renderer.fromTextureTable(self.plus_t), width=16, height=16, fct=function() self:addNew("generators", emitter[2]) end}, Textzone.new{font=self.dfont, text="add trigger", auto_width=1, auto_height=1, fct=function() self:addTrigger(emitter) end})
-
-					if emitter.events then
-						tab = 60
-						self:makeTitle(add, tab, "#{bold}##DARK_ORCHID#----== Events ==----", false)
-						for name, kind in pairs(emitter.events) do
-							add(Checkbox.new{font=self.dfont, title="#DARK_ORCHID#"..name.."#LAST# => #{italic}#"..event_by_id[kind], default=true, on_change=function(p) emitter.events[name] = nil if not next(emitter.events) then emitter.events = nil end self:makeUI() self:regenParticle() end, fct=function()end})
-						end
-					end					
-					add(DisplayObject.new{font=self.dfont, DO=core.renderer.fromTextureTable(self.plus_t), width=16, height=16, fct=function() self:addNew("generators", emitter[2]) end}, Textzone.new{font=self.dfont, text="add event", auto_width=1, auto_height=1, fct=function() self:addEvent(emitter) end})
-				end
-			end
-			tab = 20
-			add(5)
-			add(DisplayObject.new{font=self.dfont, DO=core.renderer.fromTextureTable(self.plus_t), width=16, height=16, fct=function() self:addNew("emitters", system.emitters) end}, Textzone.new{font=self.dfont, text="add emitter", auto_width=1, auto_height=1, fct=function() self:addNew("emitters", system.emitters) end})
-			add(5)
-			
-			self:makeTitle(add, tab, "#{bold}##AQUAMARINE#----== Updaters ==----", false)
-			tab = 40
-			for id_updater, updater in ipairs(system.updaters) do
-				local id = id_updater
-				self:processSpecificUI(ui, add, "updaters", updater, function() table.remove(system.updaters, id) self:makeUI() self:regenParticle() end)
-			end
-			add(DisplayObject.new{font=self.dfont, DO=core.renderer.fromTextureTable(self.plus_t), width=16, height=16, fct=function() self:addNew("updaters", system.updaters) end}, Textzone.new{font=self.dfont, text="add updater", auto_width=1, auto_height=1, fct=function() self:addNew("updaters", system.updaters) end})
+		if ig.BeginTabItem((system.display_name or "unnamed").."("..id_system..")") then
+			self:displaySystem(id_system, system)
+			ig.EndTabItem()
+		else
+			if self:makeStandardContextMenu("System Menu", system, pdef) then self:regenParticle() end
 		end
-		add(8)
 	end
-	tab = 0
-	add(8)
-	add(DisplayObject.new{font=self.dfont, DO=core.renderer.fromTextureTable(self.plus_t), width=16, height=16, fct=function() self:addNew("systems", def) end}, Textzone.new{font=self.dfont, text="add system", auto_width=1, auto_height=1, fct=function() self:addNew("systems", def) end})
+	ig.EndTabBar()
 	
-	self:loadUI(ui)
-	self:setupUI(false, false)
-	self:setScroll(old_scroll)
+	-- ig.PopStyleVar(1)
+	ig.End()
 
-	self.mouse:registerZone(0, 0, game.w, game.h, function(button, mx, my, xrel, yrel, bx, by, event)
-		if mx < game.w - 550 and my >= self.uidialog.margin_top and my <= game.h - self.uidialog.margin_bottom then
-			if core.key.modState("ctrl") then
-				if event == "button" and (button == "wheelup" or button == "button4") then
-					particle_speed = util.bound(particle_speed + 0.05, 0.1, 10)
-					self.pdo:speed(particle_speed)
-					return true
-				elseif event == "button" and (button == "wheeldown" or button == "button5") then
-					particle_speed = util.bound(particle_speed - 0.05, 0.1, 10)
-					self.pdo:speed(particle_speed)
-					return true
-				elseif event == "button" and button == "middle" then
-					particle_speed = 1
-					self.pdo:speed(particle_speed)
-					return true
-				end
-			else
-				if event == "button" and (button == "wheelup" or button == "button4") then
-					particle_zoom = util.bound(particle_zoom + 0.05, 0.1, 10)
-					self.pdo:zoom(particle_zoom)
-					self:shift(mx, my)
-					return true
-				elseif event == "button" and (button == "wheeldown" or button == "button5") then
-					particle_zoom = util.bound(particle_zoom - 0.05, 0.1, 10)
-					self.pdo:zoom(particle_zoom)
-					self:shift(mx, my)
-					return true
-				elseif event == "button" and button == "middle" then
-					particle_zoom = 1
-					self.pdo:zoom(particle_zoom)
-					self:shift(mx, my)
-					return true
-				elseif event == "button" and button == "right" and self.last_trigger then
-					self.pdo:trigger(self.last_trigger)
-				elseif event == "button" and (button == "left" or button == "right") then
-					self:showTriggers()
-				end
-			end
-		end
-
-		if mx < game.w - 550 then 
-			if core.key.modState("alt") then 
-				local a = math.atan2(my - self.old_shift_y, mx - self.old_shift_x)
-				local r = math.sqrt((my - self.old_shift_y)^2 + (mx - self.old_shift_x)^2)
-				self.pdo:params{size=r, range=r, angle=a, angled=math.deg(a), tx=mx - self.old_shift_x, ty=my - self.old_shift_y}
-			else
-				self:shift(mx, my)
-			end
-		else self:shift((game.w - (self.hide_ui and 0 or 550)) / 2, game.h / 2) end
-
-		if mx < game.w - 550 then if self.uidialog:mouseEvent(button, mx, my, xrel, yrel, bx, by, event) then return true end end
-
-		return false
-	end)
+	local b = ffi.new("bool[1]", 1)
+	ig.ShowDemoWindow(b)
 end
 
 function _M:selectTexture(system)
@@ -1226,58 +1330,68 @@ function _M:setBG(kind)
 end
 
 function _M:init(no_bloom)
-	local id, size = FontPackage:getDefault()
-	FontPackage:setDefaultId("default") FontPackage:setDefaultSize("normal")
-	self.dfont = FontPackage:get("default")
-	FontPackage:setDefaultId(id) FontPackage:setDefaultSize(size)
+	self.bignews = BigNews.new(FontPackage:getFont("bignews"))
+	self.bignews:setTextOutline(0.7)
 
-	self.allow_scroll = true
 	Dialog.init(self, _t"Particles Editor", 500, game.h * 0.9, game.w - 550)
 	self.__showup = false
 	self.absolute = true
 	self.old_shift_x, self.old_shift_y = (game.w - 550) / 2, game.h / 2
-
-	self.bignews = BigNews.new(FontPackage:getFont("bignews"))
-	self.bignews:setTextOutline(0.7)
-
-	self.uidialog = UIDialog.new(self)
-
-	-- fs.setWritePath("/home/cvs/t-engine4/game/modules/demo/data/gfx/particles/")
-	-- local f = fs.open("/test.pc", "w")
-	-- self.uidialog:saveDef(function(indent, str) f:write(string.rep("\t", indent)..str) end)
-	-- f:close()
-	-- os.crash()
-
-	self.plus_t = self:getAtlasTexture("ui/plus.png")
 
 	self.bg_shader = Shader.new("particles/normal", nil, true, "gl2")
 
 	PC.defaultShader("particles/normal")
 	self.bg = core.renderer.renderer()
 
-	self:makeUI(pdef)
+	self.mouse:registerZone(0, 0, game.w, game.h, function(button, mx, my, xrel, yrel, bx, by, event)
+		if core.key.modState("ctrl") then
+			if event == "button" and (button == "wheelup" or button == "button4") then
+				particle_speed = util.bound(particle_speed + 0.05, 0.1, 10)
+				self.pdo:speed(particle_speed)
+				return true
+			elseif event == "button" and (button == "wheeldown" or button == "button5") then
+				particle_speed = util.bound(particle_speed - 0.05, 0.1, 10)
+				self.pdo:speed(particle_speed)
+				return true
+			elseif event == "button" and button == "middle" then
+				particle_speed = 1
+				self.pdo:speed(particle_speed)
+				return true
+			end
+		else
+			if event == "button" and (button == "wheelup" or button == "button4") then
+				particle_zoom = util.bound(particle_zoom + 0.05, 0.1, 10)
+				self.pdo:zoom(particle_zoom)
+				self:shift(mx, my)
+				return true
+			elseif event == "button" and (button == "wheeldown" or button == "button5") then
+				particle_zoom = util.bound(particle_zoom - 0.05, 0.1, 10)
+				self.pdo:zoom(particle_zoom)
+				self:shift(mx, my)
+				return true
+			elseif event == "button" and button == "middle" then
+				particle_zoom = 1
+				self.pdo:zoom(particle_zoom)
+				self:shift(mx, my)
+				return true
+			elseif event == "button" and button == "right" and self.last_trigger then
+				self.pdo:trigger(self.last_trigger)
+			elseif event == "button" and (button == "left" or button == "right") then
+				self:showTriggers()
+			end
+		end
+
+		if core.key.modState("alt") then 
+			local a = math.atan2(my - self.old_shift_y, mx - self.old_shift_x)
+			local r = math.sqrt((my - self.old_shift_y)^2 + (mx - self.old_shift_x)^2)
+			self.pdo:params{size=r, range=r, angle=a, angled=math.deg(a), tx=mx - self.old_shift_x, ty=my - self.old_shift_y}
+		else
+			self:shift(mx, my)
+		end
+		return false
+	end)
 
 	self.key:setupRebootKeys()
-	self.key:addBinds{
-		EXIT = function()
-			local list = {
-				"resume",
-				"keybinds_all",
-				"video",
-				"sound",
-				{"Exit", function() if game.__mod_info.short_name=="particles_editor" then os.exit() else game:unregisterDialog(self) end end},
-			}
-			local menu = require("engine.dialogs.GameMenu").new(list)
-			game:registerDialog(menu)
-		end,
-		LUA_CONSOLE = function() game:registerDialog(require("engine.DebugConsole").new()) end,
-		FILE_NEW = function() print("FILE_NEW") self.uidialog:reset() end,
-		FILE_LOAD = function() print("FILE_LOAD") self.uidialog:load(self) end,
-		FILE_MERGE = function() print("FILE_MERGE") self.uidialog:merge(self) end,
-		FILE_SAVE = function() print("FILE_SAVE") self.uidialog:save() end,		
-		EDITOR_UNDO = function() print("EDITOR_UNDO") self:undo() end,
-		EDITOR_REDO = function() print("EDITOR_REDO") self:redo() end,
-	}
 	self.key:addCommands{
 		_b = function() self:toggleBloom() end,
 		_u = function() self:toggleUI() end,
@@ -1310,8 +1424,8 @@ function _M:init(no_bloom)
 
 	self:regenParticle()
 
-	local function autosave() self.renderer:tween(30, "wait", function() game:onTickEnd(function() self.uidialog:saveAs("__autosave__", true) autosave() end) end) end
-	autosave()
+	-- local function autosave() self.renderer:tween(30, "wait", function() game:onTickEnd(function() self.uidialog:saveAs("__autosave__", true) autosave() end) end) end
+	-- autosave()
 end
 
 function _M:toggleBloom()
@@ -1339,9 +1453,11 @@ function _M:regenParticle(nosave)
 		pdef_history_pos = #pdef_history
 	end
 
-	-- table.print(pdef)
-	-- self.pdo = PC.new("/data/gfx/particles/fireflash.pc", {}, particle_speed, particle_zoom, true)
-	self.pdo = PC.new(pdef, nil, particle_speed, particle_zoom, true)
+	if self.temp_pdo then
+		self.pdo = self.temp_pdo
+	else
+		self.pdo = PC.new(pdef, nil, particle_speed, particle_zoom, true)
+	end
 	self:shift(self.old_shift_x, self.old_shift_y)
 	self.p_date = core.game.getTime()
 
@@ -1366,6 +1482,8 @@ function _M:toScreen(x, y, nb_keyframes)
 		self:regenParticle(true)
 	end
 
+	if self.is_ui_focus then self:shift((game.w - 550) / 2, game.h / 2) end
+
 	if self.blooming then
 		self.fbomain:compute()
 		self.fbobloom:compute()
@@ -1376,17 +1494,11 @@ function _M:toScreen(x, y, nb_keyframes)
 	-- self.p:toScreen(0, 0, nb_keyframes)
 
 	if not self.hide_ui then
-		self.uidialog:toScreen(0, 0, nb_keyframes)
-
-		Dialog.toScreen(self, x, y, nb_keyframes)
+		-- Dialog.toScreen(self, x, y, nb_keyframes)
+		self:makeUI()
 
 		self.bignews:display(nb_keyframes)
 	end
-end
-
-function _M:keyEvent(...)
-	-- self.uidialog:keyEvent(...)
-	Dialog.keyEvent(self, ...)
 end
 
 function _M:undo()
@@ -1395,258 +1507,4 @@ function _M:undo()
 	pdef_history_pos = pdef_history_pos - 1
 	self:makeUI()
 	self:regenParticle(true)
-end
-
-
-
-----------------------------------------------------------------------
--- UIDialog, absolute positions
-----------------------------------------------------------------------
-UIDialog = class.inherit(Dialog){}
-
-function UIDialog:init(master)
-	self.ui = "invisible"
-	Dialog.init(self, "", game.w, game.h)
-	self.__showup = false
-	self.absolute = true
-
-	local cp =ColorPicker.new{font=master.dfont, color={0, 0, 0, 1}, width=20, height=20, fct=function(p) master:setBG(p) end}
-
-	local new = Button.new{font=master.dfont, text="New", fct=function() self:reset() end}
-	local load = Button.new{font=master.dfont, text="Load", fct=function() self:load(master) end}
-	local merge = Button.new{font=master.dfont, text="Merge", fct=function() self:merge(master) end}
-	local save = Button.new{font=master.dfont, text="Save", fct=function() self:save() end}
-
-	local bgt = Button.new{font=master.dfont, text="Transparent background", fct=function() master:setBG("transparent") end}
-	local bgb = Button.new{font=master.dfont, text="Color background", fct=function() cp:popup() end}
-	local bg1 = Button.new{font=master.dfont, text="Background1", fct=function() master:setBG("tome1") end}
-	local bg2 = Button.new{font=master.dfont, text="Background2", fct=function() master:setBG("tome2") end}
-	local bg3 = Button.new{font=master.dfont, text="Background3", fct=function() master:setBG("tome3") end}
-
-	self.margin_top = new.h + 5
-	self.margin_bottom = bgt.h + 5
-
-	self.master = master
-	self.particles_count = core.renderer.text(self.font_mono):translate(600, 0):outline(1)
-	self.particles_count_renderer = core.renderer.renderer():add(self.particles_count)
-
-	self:loadUI{
-		{absolute=true, left=0, top=0, ui=new},
-		{absolute=true, left=new.w, top=0, ui=load},
-		{absolute=true, left=new.w+load.w, top=0, ui=merge},
-		{absolute=true, left=new.w+load.w+merge.w, top=0, ui=save},
-
-		{absolute=true, left=0, bottom=0, ui=bgt},
-		{absolute=true, left=bgt.w, bottom=0, ui=bgb},
-		{absolute=true, left=bgt.w+bgb.w, bottom=0, ui=bg1},
-		{absolute=true, left=bgt.w+bgb.w+bg1.w, bottom=0, ui=bg2},
-		{absolute=true, left=bgt.w+bgb.w+bg1.w+bg2.w, bottom=0, ui=bg3},
-	}
-	self:setupUI(false, false)
-end
-
-function UIDialog:reset()
-	Dialog:yesnoPopup("Clear particles?", "All data will be lost.", function(ret) if ret then
-		pdef={}
-		pdef_history_pos = 0
-		pdef_history = {}
-		-- PC.gcTextures()
-		self.master.current_filename = ""
-		self.master:makeUI()
-		self.master:regenParticle(true)
-	end end)
-end
-
-function UIDialog:load(master)
-	local d = Dialog.new("Load particle effects from /data/gfx/particles/", game.w * 0.6, game.h * 0.6)
-
-	local list = {}
-	for i, file in ipairs(fs.list(filesprefix.."/data/gfx/particles/")) do if file:find("%.pc$") then
-		list[#list+1] = {name=file, path=filesprefix.."/data/gfx/particles/"..file}
-	end end 
-
-	local clist = List.new{font=self.dfont, scrollbar=true, width=d.iw, height=d.ih, list=list, fct=function(item)
-		game:unregisterDialog(d)
-		-- PC.gcTextures()
-		pdef_history={} pdef_history_pos=0
-		local ok, f = pcall(loadfile, item.path)
-		if not ok then Dialog:simplePopup("Error loading particle file", f) return end
-		setfenv(f, {math=math, colors_alphaf=colors_alphaf, PC=PC})
-		local ok, data = pcall(f)
-		if not ok then Dialog:simplePopup("Error loading particle file", data) return end
-		pdef = data
-		master:makeUI()
-		master:regenParticle()
-		core.display.setWindowTitle("Particles Editor: "..item.name)
-		master.current_filename = item.name:gsub("%.pc$", "")
-	end}
-
-	d:loadUI{
-		{left=0, top=0, ui=clist}
-	}
-	d:setupUI(false, false)
-	d.key:addBinds{EXIT = function() game:unregisterDialog(d) end}
-	game:registerDialog(d)
-end
-
-function UIDialog:merge(master)
-	local d = Dialog.new("Load particle effects from /data/gfx/particles/", game.w * 0.6, game.h * 0.6)
-
-	local list = {}
-	for i, file in ipairs(fs.list(filesprefix.."/data/gfx/particles/")) do if file:find("%.pc$") then
-		list[#list+1] = {name=file, path=filesprefix.."/data/gfx/particles/"..file}
-	end end 
-
-	local clist = List.new{font=self.dfont, scrollbar=true, width=d.iw, height=d.ih, list=list, fct=function(item)
-		game:unregisterDialog(d)
-		local ok, f = pcall(loadfile, item.path)
-		if not ok then Dialog:simplePopup("Error loading particle file", f) return end
-		setfenv(f, {math=math, colors_alphaf=colors_alphaf, PC=PC})
-		local ok, data = pcall(f)
-		if not ok then Dialog:simplePopup("Error loading particle file", data) return end
-		table.append(pdef, data)
-		master:makeUI()
-		master:regenParticle()
-	end}
-
-	d:loadUI{
-		{left=0, top=0, ui=clist}
-	}
-	d:setupUI(false, false)
-	d.key:addBinds{EXIT = function() game:unregisterDialog(d) end}
-	game:registerDialog(d)
-end
-
-function UIDialog:saveDef(w)
-	local function getFormat(v)
-		if type(v) == "number" then return "%f"
-		elseif type(v) == "string" then return "%q"
-		else error("Unsupported format: "..tostring(v))
-		end
-	end
-	local function getData(up, simple)
-		local data = {}
-		for k, v in pairs(up) do
-			if type(k) == "string" and k ~= "triggers" and k ~= "events" then
-				if type(v) == "number" then
-					data[#data+1] = ("%s=%f"):format(k, v)
-				elseif type(v) == "boolean" then
-					data[#data+1] = ("%s=%s"):format(k, v and "true" or "false")
-				elseif type(v) == "string" then
-					data[#data+1] = ("%s=%q"):format(k, v)
-				elseif type(v) == "table" and #v == 2 then
-					data[#data+1] = (("%%s={%s, %s}"):format(getFormat(v[1]), getFormat(v[2]))):format(k, v[1], v[2])
-				elseif type(v) == "table" and #v == 3 then
-					data[#data+1] = (("%%s={%s, %s, %s}"):format(getFormat(v[1]), getFormat(v[2]), getFormat(v[3]))):format(k, v[1], v[2], v[3])
-				elseif type(v) == "table" and #v == 4 then
-					data[#data+1] = (("%%s={%s, %s, %s, %s}"):format(getFormat(v[1]), getFormat(v[2]), getFormat(v[3]), getFormat(v[4]))):format(k, v[1], v[2], v[3], v[4])
-				elseif type(v) == "table" and #v == 0 and next(v) then
-					data[#data+1] = ("%s={%s}"):format(k, getData(v, true))
-				else
-					error("Unsupported save parameter: "..tostring(v).." for key "..k)
-				end
-			elseif k == "triggers" and next(v) then
-				local tgs = {}
-				for name, id in pairs(v) do
-					tgs[#tgs+1] = ("%s = PC.%s"):format(name, triggerkind_by_id[id])
-				end
-				data[#data+1] = "triggers = { "..table.concat(tgs, ", ").." }"
-			elseif k == "events" and next(v) then
-				local tgs = {}
-				for name, id in pairs(v) do
-					tgs[#tgs+1] = ("%s = PC.%s"):format(name, eventkind_by_id[id])
-				end
-				data[#data+1] = "events = { "..table.concat(tgs, ", ").." }"
-			end
-		end
-		if #data > 0 then data = (not simple and ", " or "")..table.concat(data, ", ") else data = "" end
-		return data
-	end
-
-	w(0, "return {\n")
-	if pdef.parameters then
-		w(1, ("parameters = { %s },\n"):format(getData(pdef.parameters, true)))
-	end
-	for _, system in ipairs(pdef) do
-		w(1, "{\n")
-		if system.display_name then w(2, ("display_name = %q,\n"):format(system.display_name)) end
-		w(2, ("max_particles = %d, blend=PC.%s, type=PC.%s, compute_only=%s,\n"):format(system.max_particles, blend_by_id[system.blend], system.type and type_by_id[system.type] or "RendererPoint", system.compute_only and "true" or "false"))
-		w(2, ("texture = %q,\n"):format(system.texture))
-		if system.shader then w(2, ("shader = %q,\n"):format(system.shader)) end
-		w(2, "emitters = {\n")
-		for _, em in ipairs(system.emitters) do
-			local data = getData(em)
-			w(3, ("{PC.%s, {\n"):format(emitters_by_id[em[1]]))
-			for _, g in ipairs(em[2]) do
-				local data = getData(g)
-				w(4, ("{PC.%s%s},\n"):format(generators_by_id[g[1]], data))
-			end
-			w(3, ("}%s },\n"):format(data))
-		end
-		w(2, "},\n")
-		w(2, "updaters = {\n")
-		for _, up in ipairs(system.updaters) do
-			local data = getData(up)
-			w(3, ("{PC.%s%s},\n"):format(updaters_by_id[up[1]], data))
-		end
-		w(2, "},\n")
-		w(1, "},\n")
-	end
-	w(0, "}\n")
-end
-
-function UIDialog:saveAs(txt, silent)
-	local mod = game.__mod_info
-
-	local basedir = "/data/gfx/particles/"
-	local path
-	if fileswritepath then
-		path = fileswritepath..basedir
-	elseif mod.team then
-		basedir = "/save/"
-		path = fs.getRealPath(basedir)
-	else
-		path = mod.real_path..basedir
-	end
-	if not path then return end
-	local restore = fs.getWritePath()
-	fs.setWritePath(path)
-	local f = fs.open("/"..txt..".pc", "w")
-	self:saveDef(function(indent, str) f:write(string.rep("\t", indent)..str) end)
-	f:close()
-	fs.setWritePath(restore)
-	if not silent then
-		self.master.bignews:saySimple(60, "#GOLD#Saved to "..tostring(fs.getRealPath(basedir..txt..".pc")))
-		core.display.setWindowTitle("Particles Editor: "..txt)
-		self.master.current_filename = txt
-	end
-end
-
-function UIDialog:save()
-	local d = Dialog.new("Save particle effects to /data/gfx/particles/", 1, 1)
-
-	local function exec(txt)
-		game:unregisterDialog(d)
-		self:saveAs(txt, false)
-	end
-
-	local box = Textbox.new{font=self.dfont, title="Filename (without .pc extension): ", chars=80, text=self.master.current_filename or "", fct=function(txt) if #txt > 0 then
-		if fs.exists("/data/gfx/particles/"..txt..".pc") then
-			Dialog:yesnoPopup("Override", "File already exists, override it?", function(ret) if ret then exec(txt) end end)
-		else exec(txt) end
-	end end}
-
-	d:loadUI{
-		{left=0, top=0, ui=box}
-	}
-	d:setupUI(true, true)
-	d.key:addBinds{EXIT = function() game:unregisterDialog(d) end}
-	game:registerDialog(d)
-end
-
-function UIDialog:toScreen(x, y, nb_keyframes)
-	local fps, msframe = core.display.getFPS()
-	self.particles_count:text(("Elapsed Time %0.2fs / FPS: %0.1f / %d ms/frame / Active particles: %d / Zoom: %d%% / Speed: %d%%"):format((core.game.getTime() - self.master.p_date) / 1000, fps, msframe, self.master.pdo:countAlive(), particle_zoom * 100, particle_speed * 100), true)
-	self.particles_count_renderer:toScreen()
-	Dialog.toScreen(self, x, y, nb_keyframes)
 end

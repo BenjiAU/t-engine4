@@ -787,6 +787,7 @@ static void call_draw(float nb_keyframes)
 	interface_realtime(nb_keyframes);
 }
 
+static bool imgui_loaded = false;
 redraw_type_t current_redraw_type = redraw_type_normal;
 void on_redraw()
 {
@@ -803,10 +804,12 @@ void on_redraw()
 
 	if (!anims_paused) cur_frame_tick = ticks - frame_tick_paused_time;
 
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame(window);
-        ImGui::NewFrame();
+	if (imgui_loaded) {
+		// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame(window);
+		ImGui::NewFrame();
+	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -817,8 +820,10 @@ void on_redraw()
 	keyframes_done += nb_keyframes;
 	frames_done++;
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	if (imgui_loaded) {
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
 
 	switch (current_redraw_type)
 	{
@@ -1102,6 +1107,57 @@ void GLAPIENTRY openglDebugCallbackFunction(GLenum source, GLenum type, GLuint i
 	printf("\n---------------------opengl-callback-end--------------\x1b[0m\n");
 }
 
+static void imgui_save_settings() {
+	imgui_io->WantSaveIniSettings = false;
+	size_t len;
+	const char* ini = ImGui::SaveIniSettingsToMemory(&len);
+
+	string oldwrite(PHYSFS_getWriteDir());
+	
+	lua_getglobal(L, "engine");
+	lua_pushliteral(L, "homepath");
+	lua_gettable(L, -2);
+	const char* homepath = lua_tostring(L, -1); lua_pop(L, 1);
+	PHYSFS_setWriteDir(homepath);
+
+	auto f = PHYSFS_openWrite("/imgui_settings.ini");
+	PHYSFS_write(f, ini, sizeof(char), len);
+	PHYSFS_close(f);
+
+	PHYSFS_setWriteDir(oldwrite.c_str());
+}
+
+static void imgui_load_settings() {
+	imgui_loaded = true;
+
+	auto f = PHYSFS_openRead("/imgui_settings.ini");
+	if (!f) return;
+
+	long n = ~((size_t)0);
+	size_t rlen;  /* how much to read */
+	size_t nr;  /* number of chars actually read */
+	luaL_Buffer b;
+	luaL_buffinit(L, &b);
+	rlen = LUAL_BUFFERSIZE;  /* try to read that much each time */
+	do {
+		char *p = luaL_prepbuffer(&b);
+		if (rlen > n) rlen = n;  /* cannot read more than asked */
+		nr = PHYSFS_read(f, p, sizeof(char), rlen);
+		luaL_addsize(&b, nr);
+		n -= nr;  /* still have to read `n' chars */
+	} while (n > 0 && nr == rlen);  /* until end of count or eof */
+	luaL_pushresult(&b);  /* close buffer */
+	
+	if (n == 0 || lua_objlen(L, -1) > 0) {
+		size_t len;
+		const char* ini = lua_tolstring(L, -1, &len);
+		ImGui::LoadIniSettingsFromMemory(ini, len);
+	}
+	lua_pop(L, 1);
+
+	PHYSFS_close(f);
+}
+
 extern void interface_resize(int w, int h); // From Interface.cpp
 
 /* @see main.h#do_resize */
@@ -1168,6 +1224,7 @@ void do_resize(int w, int h, bool fullscreen, bool borderless, float zoom)
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
 		imgui_io = &io;
+		io.IniFilename = nullptr;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;     // Enable Keyboard Controls
 		ImGui::StyleColorsDark();
@@ -1806,9 +1863,12 @@ int main(int argc, char *argv[])
 
 	threaded_runner_start();
 
+	imgui_load_settings();
+
 	while (!exit_engine)
 	{
 		event_loop();
+		if (imgui_io->WantSaveIniSettings) imgui_save_settings();
 
 		/* Reboot the lua engine */
 		if (core_def->corenum)

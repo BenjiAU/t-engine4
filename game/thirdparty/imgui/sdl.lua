@@ -3741,6 +3741,7 @@ end
 function M.SliderInt(label,v,v_min,v_max,format,flags)
     flags = flags or 0
     format = format or "%d"
+    print("!!!", flags)
     return lib.igSliderInt(label,v,v_min,v_max,format,flags)
 end
 function M.SliderInt2(label,v,v_min,v_max,format,flags)
