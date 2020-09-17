@@ -728,6 +728,13 @@ static int sdl_new_surface(lua_State *L)
 	return 1;
 }
 
+static int gl_texture_id(lua_State *L)
+{
+	texture_lua *t = texture_lua::from_state(L, 1);
+	lua_pushnumber(L, t->texture_id);
+	return 1;
+}
+
 static int gl_texture_to_sdl(lua_State *L)
 {
 	texture_lua *t = texture_lua::from_state(L, 1);
@@ -1515,6 +1522,7 @@ static const struct luaL_Reg sdl_texture_reg[] =
 {
 	{"__gc", sdl_free_texture},
 	{"close", sdl_free_texture},
+	{"toID", gl_texture_id},
 	{"toSurface", gl_texture_to_sdl},
 	{"generateSDM", gl_texture_alter_sdm},
 	{"bind", sdl_texture_bind},

@@ -793,56 +793,97 @@ function _M:showTriggers()
 	end end)
 end
 
+local add_parameter_sel = ffi.new("int[1]", 1)
+local add_parameter_buffer = ffi.new("char[500]", "")
+function _M:addParameter(spe, none)
+	if none then
+		if ig.Button("New Parameter") then ig.OpenPopup("Add Parameter") end
+	else
+		ig.SameLine(ig.GetWindowWidth() - 36)
+		if ig.Button("+") then ig.OpenPopup("Add Parameter") end
+	end
+
+	if ig.BeginPopupModal("Add Parameter", nil, ig.lib.ImGuiWindowFlags_AlwaysAutoResize) then
+		ig.InputText("Name", add_parameter_buffer, ffi.sizeof(add_parameter_buffer))
+		ig.SetKeyboardFocusHere()
+		ig.RadioButtonIntPtr("Number", add_parameter_sel, 1) ig.SameLine() ig.RadioButtonIntPtr("Point", add_parameter_sel, 2)
+		ig.Separator()
+		if ig.Button("Add") or ig.HotkeyEntered(0, engine.Key._RETURN) then
+			local name = ffi.string(add_parameter_buffer)
+			if #name > 0 then
+				spe.parameters = spe.parameters or {}
+				spe.parameters[name] = add_parameter_sel[0] == 1 and 0 or {0, 0}
+				self:regenParticle()
+				ig.CloseCurrentPopup()
+			end
+		end
+		ig.SameLine()
+		if ig.Button("Cancel"..self:getFieldId()) or ig.HotkeyEntered(0, engine.Key._ESCAPE) then ig.CloseCurrentPopup() end
+		ig.EndPopup()
+	end
+end
+
+local add_trigger_sel = 1
+local add_trigger_buffer = ffi.new("char[500]", "")
 function _M:addTrigger(spe)
-	Dialog:textboxPopup("Trigger", "Name:", 1, 50, function(name) if name then
-		Dialog:listPopup("Trigger", "Effect:", table.clone(triggermodes, true), 150, 250, function(item) if item then
-			spe.triggers = spe.triggers or {}
-			spe.triggers[name] = item.trigger
-			self:makeUI()
-			self:regenParticle()
-		end end)
-	end end)
+	ig.SameLine(ig.GetWindowWidth() - 36)
+	if ig.Button("+") then ig.OpenPopup("Add Trigger") end
+
+	if ig.BeginPopupModal("Add Trigger", nil, ig.lib.ImGuiWindowFlags_AlwaysAutoResize) then
+		ig.InputText("Name", add_trigger_buffer, ffi.sizeof(add_trigger_buffer))
+		ig.SetKeyboardFocusHere()
+		for i, t in ipairs(triggermodes) do
+			if ig.Selectable(t.name, add_trigger_sel == i, ig.lib.ImGuiSelectableFlags_DontClosePopups) then
+				add_trigger_sel = i
+			end
+		end
+		ig.Separator()
+		if ig.Button("Add") or ig.HotkeyEntered(0, engine.Key._RETURN) then
+			local name = ffi.string(add_trigger_buffer)
+			if #name > 0 then
+				spe.triggers = spe.triggers or {}
+				spe.triggers[name] = triggermodes[add_trigger_sel].trigger
+				self:regenParticle()
+				ig.CloseCurrentPopup()
+			end
+		end
+		ig.SameLine()
+		if ig.Button("Cancel"..self:getFieldId()) or ig.HotkeyEntered(0, engine.Key._ESCAPE) then ig.CloseCurrentPopup() end
+		ig.EndPopup()
+	end
 end
 
+local add_event_sel = 1
+local add_event_buffer = ffi.new("char[500]", "")
 function _M:addEvent(spe)
-	Dialog:textboxPopup("Event", "Name:", 1, 50, function(name) if name then
-		Dialog:listPopup("Event", "When:", table.clone(eventmodes, true), 150, 250, function(item) if item then
-			spe.events = spe.events or {}
-			spe.events[name] = item.event
-			self:makeUI()
-			self:regenParticle()
-		end end)
-	end end)
+	ig.SameLine(ig.GetWindowWidth() - 36)
+	if ig.Button("+") then ig.OpenPopup("Add Event") end
+
+	if ig.BeginPopupModal("Add Event", nil, ig.lib.ImGuiWindowFlags_AlwaysAutoResize) then
+		ig.InputText("Name", add_event_buffer, ffi.sizeof(add_event_buffer))
+		ig.SetKeyboardFocusHere()
+		for i, t in ipairs(eventmodes) do
+			if ig.Selectable(t.name, add_event_sel == i, ig.lib.ImGuiSelectableFlags_DontClosePopups) then
+				add_event_sel = i
+			end
+		end
+		ig.Separator()
+		if ig.Button("Add") or ig.HotkeyEntered(0, engine.Key._RETURN) then
+			local name = ffi.string(add_event_buffer)
+			if #name > 0 then
+				spe.events = spe.events or {}
+				spe.events[name] = eventmodes[add_event_sel].event
+				self:regenParticle()
+				ig.CloseCurrentPopup()
+			end
+		end
+		ig.SameLine()
+		if ig.Button("Cancel"..self:getFieldId()) or ig.HotkeyEntered(0, engine.Key._ESCAPE) then ig.CloseCurrentPopup() end
+		ig.EndPopup()
+	end
 end
 
-function _M:addParameter()
-	local item = {name="Number"}
-	-- Dialog:listPopup("Parameter", "Type:", {{name="Number"}, {name="Point"}}, 150, 250, function(item) if item then
-		Dialog:textboxPopup("Parameter", "Name:", 1, 50, function(name) if name then
-			name = name:gsub("[A-Z]", function(c) return c:lower() end)
-			if not name:find("^[a-z][a-z_0-9]*$") then Dialog:simplePopup("Parameter Error", "Name invalid, only letters, numbers and _ allowed and can not being with number.") return end
-			Dialog:textboxPopup("Parameter", item.name=="Number" and "Default Value:" or "Default Value (format as '<number>x<number>'): ", 1, 50, function(value) if value then
-				if item.name == "Number" then
-					value = tonumber(value)
-				elseif item.name == "Point" then
-					local s = value
-					value = nil
-					local _, _, x, y = s:find("^([0-9.]+)x([0-9.]+)$")
-					if tonumber(x) and tonumber(y) then value = {tonumber(x), tonumber(y)} end
-				end
-				if value then
-					pdef.parameters = pdef.parameters or {}
-					pdef.parameters[name] = value
-					self:makeUI()
-					self:regenParticle()
-				end
-			end end)
-		end end)
-	-- end end)
-end
-
-function _M:addNew(kind, into)
-	-- PC.gcTextures()
+function _M:addNew(kind, into, force_exec)
 	local list = {}
 	for id, t in pairs(specific_uis[kind]) do
 		local t = table.clone(t, true)
@@ -862,40 +903,66 @@ function _M:addNew(kind, into)
 			f = table.clone(item.addnew, true)
 		end
 		table.insert(into, f)
-		self:makeUI()
 		self:regenParticle()
 	end end
 
-	if #list == 1 then
-		exec(list[1])
-	else
-		local last_cat = nil
-		local i = 1
-		while i < #list do
-			local t = list[i]
-			if t.category ~= last_cat and not t.fake then
-				table.insert(list, i, {name="#LIGHT_BLUE#-------- "..t.category, fake=true})
-			end
-			i = i + 1
-			last_cat = t.category
-		end
+	if force_exec then return exec(list[1]) end
 
-		self:listPopup("New "..kind, "Select:", list, 400, 500, exec)
+	ig.SameLine(ig.GetWindowWidth() - 36)
+	if #list == 1 then
+		if ig.Button("+") then exec(list[1]) end
+		return
+	end
+
+	-- Update list with splitters
+	local last_cat = nil
+	local i = 1
+	while i < #list do
+		local t = list[i]
+		if t.category ~= last_cat and not t.fake then
+			table.insert(list, i, {name=t.category, fake=true})
+		end
+		i = i + 1
+		last_cat = t.category
+	end
+
+	if ig.Button("+") then ig.OpenPopup("Add "..kind:capitalize()) end
+	if ig.BeginPopupModal("Add "..kind:capitalize()) then
+		ig.BeginChild(self:getFieldId())
+		for i, t in ipairs(list) do
+			if t.fake then
+				ig.CollapsingHeader(t.name)
+			elseif ig.Selectable(t.name) then
+				exec(t)
+				ig.CloseCurrentPopup()
+			end
+		end
+		ig.EndChild()
+
+		ig.Separator()
+		if ig.Button("Cancel"..self:getFieldId()) then ig.CloseCurrentPopup() end
+		ig.EndPopup()
 	end
 end
 
 function _M:displayParameter(name, value)
 	if type(value) == "number" then
 		local v = ffi.new("float[1]", value)
-		if ig.InputFloat(name, v, -100000, 100000, "%.3f") then pdef.parameters[name] = v[0] self:regenParticle() end
+		if ig.InputFloat(name..self:getFieldId(), v, -100000, 100000, "%.3f") then pdef.parameters[name] = v[0] self:regenParticle() end
 	elseif type(value) == "table" and #value == 2 then
 		local v = ffi.new("float[2]", value[1], value[2])
-		if ig.InputFloat2(name, v, "%.3f") then pdef.parameters[name] = {v[0], v[1]} self:regenParticle() end
+		if ig.InputFloat2(name..self:getFieldId(), v, "%.3f") then pdef.parameters[name] = {v[0], v[1]} self:regenParticle() end
+	end
+	ig.SameLine(ig.GetWindowWidth() - 36)
+	if ig.Button("X"..self:getFieldId()) then
+		pdef.parameters[name] = nil
+		self:regenParticle()
 	end
 end
 
 function _M:makeStandardContextMenu(spe, parent)
 	local finish = false
+	local do_delete = false
 	if ig.BeginPopupContextItem("System Menu") then
 		if ig.Selectable("Rename") then
 			Dialog:textboxPopup("Name for this addon's release", "Name", 1, 50, function(name) if name then
@@ -927,18 +994,26 @@ function _M:makeStandardContextMenu(spe, parent)
 				break
 			end end
 		end
-		ig.Text("")
+		ig.Separator()
+		if ig.Selectable("New") then
+			self:addNew("systems", pdef, true)
+		end
+		ig.Separator()
 		if ig.Selectable("Delete") then
-			ig.OpenPopup("Delete?")
-			if ig.BeginPopupModal("Delete?", nil, ig.lib.ImGuiWindowFlags_AlwaysAutoResize) then
-				ig.Text("Are you sure?")
-				if ig.Button("Delete") then table.remove(pdef, id_system) finish = true ig.CloseCurrentPopup() end
-				if ig.Button("Cancel") then ig.CloseCurrentPopup() end
-				ig.EndPopup()
-			end
+			do_delete = true
 		end
 		ig.EndPopup()
 	end
+
+	if ig.BeginPopupModal("Delete?", nil, ig.lib.ImGuiWindowFlags_AlwaysAutoResize) then
+		ig.Text("Are you sure?")
+		if ig.Button("Delete System") or ig.HotkeyEntered(0, engine.Key._RETURN) then table.remove(pdef, id_system) finish = true ig.CloseCurrentPopup() end
+		ig.SameLine()
+		if ig.Button("Cancel"..self:getFieldId()) or ig.HotkeyEntered(0, engine.Key._ESCAPE) then ig.CloseCurrentPopup() end
+		ig.EndPopup()
+	end
+	if do_delete then ig.OpenPopup("Delete?") end
+
 	return finish
 end
 
@@ -982,6 +1057,22 @@ function _M:input_int(name, base, k, min, max, converter)
 	if ig.IsItemHovered() then ig.SetTooltip(name) end
 end
 
+function _M:input_string(name, base, k)
+	converter = converter or default_converted
+	local color = getParametrizedColor(base[k])
+	ig.lib.igPushItemWidth(120)
+	local buffer = ffi.new("char[500]", tostring(converter.to(base[k])))
+	ig.PushStyleColor(ig.lib.ImGuiCol_Text, color) 
+	if ig.InputText(name..self:getFieldId(), buffer, ffi.sizeof(buffer)) then
+		local v = ffi.string(buffer)
+		base[k] = converter.from(v)
+		self:regenParticle()
+	end
+	if ig.IsItemHovered() then ig.SetTooltip(name) end
+	ig.PopStyleColor()
+	ig.PopItemWidth()
+end
+
 function _M:input_float(name, base, k, min, max, converter)
 	converter = converter or default_converted
 	local color = imcolor_white
@@ -989,7 +1080,7 @@ function _M:input_float(name, base, k, min, max, converter)
 	ig.lib.igPushItemWidth(120)
 	local buffer = ffi.new("char[500]", tostring(converter.to(base[k])))
 	ig.PushStyleColor(ig.lib.ImGuiCol_Text, color) 
-	if ig.InputText(name, buffer, ffi.sizeof(buffer)) then
+	if ig.InputText(name..self:getFieldId(), buffer, ffi.sizeof(buffer)) then
 		local v = ffi.string(buffer)
 		if tonumber(v) then v = tonumber(v) end
 		base[k] = converter.from(v)
@@ -1021,7 +1112,7 @@ function _M:input_vec2(name, base, k, min, max, converter)
 	if not tonumber(base[k][2]) then color = getParametrizedColor(base[k][2]) end
 	ig.PushStyleColor(ig.lib.ImGuiCol_Text, color) 
 	local buffer = ffi.new("char[500]", tostring(converter.to(base[k][2])))
-	if ig.InputText(name, buffer, ffi.sizeof(buffer)) then
+	if ig.InputText(name..self:getFieldId(), buffer, ffi.sizeof(buffer)) then
 		local v = ffi.string(buffer)
 		if tonumber(v) then v = tonumber(v) end
 		base[k][2] = converter.from(v)
@@ -1034,11 +1125,31 @@ end
 
 function _M:input_combo(name, base, k, list, d_prop, v_prop)
 	local v = ffi.new("int[1]", (table.findValueSub(list, base[k], v_prop) or 1) - 1)
-	if ig.ComboStr(name, v, table.concatsub(list, "\0", d_prop), #list) then
+	if ig.ComboStr(name..self:getFieldId(), v, table.concatsub(list, "\0", d_prop), #list) then
 		base[k] = list[v[0]+1][v_prop]
 		self:regenParticle()
 	end
 	if ig.IsItemHovered() then ig.SetTooltip(name) end
+end
+
+function _M:input_shader(name, base, k)
+	local list = {{name = "--", path=nil}}
+	for i, file in ipairs(fs.list(filesprefix.."/data/gfx/shaders/particles/")) do if file:find("%.lua$") then
+		list[#list+1] = {name=file, path="particles/"..file:gsub("%.lua$", "")}
+	end end 
+	return self:input_combo(name..self:getFieldId(), base, k, list, "name", "path")
+end
+
+function _M:input_file(name, base, k, field)
+	local list = {{name = "--", path=nil}}
+	for i, file in ipairs(fs.list(filesprefix..field.dir)) do if file:find(field.filter) then
+		list[#list+1] = {name=file, path=field.dir..file}
+	end end
+	return self:input_combo(name..self:getFieldId(), base, k, list, "name", "path")
+end
+
+function _M:input_select(name, base, k, field)
+	return self:input_combo(name..self:getFieldId(), base, k, field.list, "name", "name")
 end
 
 function _M:input_color(name, base, k)
@@ -1089,12 +1200,29 @@ function _M:input_color(name, base, k)
 	if ig.IsItemHovered() then ig.SetTooltip(name) end
 end
 
-function _M:processSpecificUI(kind, spe, delete)
+function _M:input_texture(name, base, k)
+	if ig.BeginCombo(self:getFieldId(), base[k]) then
+		ig.Columns(math.floor((ig.GetWindowWidth() - 8) / 64), nil, false)
+		for i, t in ipairs(self.available_textures) do
+			if ig.ImageButton(t.id, ig.ImVec2(64, 64), nil, nil, 0) then
+				base[k] = t.path
+				self:regenParticle()
+				ig.CloseCurrentPopup()
+			end
+			ig.NextColumn()
+		end
+		ig.Columns(1)
+		ig.EndCombo()
+	end
+end
+
+function _M:processSpecificUI(kind, spe, color, delete)
 	local spe_def = specific_uis[kind][spe[1]]
 	if not spe_def then error("unknown def for: "..tostring(spe[1])) end
 
-	ig.PushStyleColor(ig.lib.ImGuiCol_Header, imcolor("STEEL_BLUE", 0.5))
-	if ig.CollapsingHeader(spe_def.name, ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+	ig.PushStyleColor(ig.lib.ImGuiCol_Header, imcolor(color or "STEEL_BLUE", 0.5))
+	local open = ffi.new("bool[1]", true)
+	if ig.CollapsingHeaderBoolPtr(spe_def.name, open, ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
 		ig.PushStyleVar(ig.lib.ImGuiStyleVar_FrameRounding, 12)
 		ig.PushStyleVar(ig.lib.ImGuiStyleVar_ItemSpacing, ig.ImVec2(4, 1))
 		ig.Indent(20)
@@ -1107,7 +1235,7 @@ function _M:processSpecificUI(kind, spe, delete)
 				self:input_float(field.text, spe, field.id, field.min, field.max, field)
 			elseif field.type == "string" then
 				if not spe[field.id] then spe[field.id] = field.default end
-				-- adds[#adds+1] = self:parametrizedBox{title=field.text, string=spe[field.id], chars=field.chars, on_change=function(p) spe[field.id] = p self:regenParticle() end, fct=function()end}
+				self:input_string(field.text, spe, field.id)
 			elseif field.type == "bool" then
 				if not spe[field.id] then spe[field.id] = field.default end
 				self:input_checkbox(field.text, spe, field.id)
@@ -1119,11 +1247,10 @@ function _M:processSpecificUI(kind, spe, delete)
 				self:input_color(field.text, spe, field.id)
 			elseif field.type == "select" then
 				if not spe[field.id] then spe[field.id] = field.default end
-				-- adds[#adds+1] = Textzone.new{font=self.dfont, text=(i==1 and "    " or "")..field.text, auto_width=1, auto_height=1}
-				-- adds[#adds+1] = Dropdown.new{font=self.dfont, width=200, default={"name", spe[field.id]}, fct=function(item) spe[field.id] = item.name self:regenParticle() self:makeUI() end, on_select=function(item)end, list=easings, nb_items=math.min(#easings, 30)}
+				self:input_select(field.text, spe, field.id, field)
 			elseif field.type == "file" then
 				if not spe[field.id] then spe[field.id] = field.default end
-				-- adds[#adds+1] = Textzone.new{font=self.dfont, text=(i==1 and "    " or "")..field.text..tostring(spe[field.id]), auto_width=1, auto_height=1, fct=function() self:selectFile(spe, field) end}
+				self:input_file(field.text, spe, field.id, field)
 			end
 			-- if not field.line and i < #spe_def.fields then ig.SameLine() end
 			if i == #spe_def.fields - 1 then ig.PopStyleVar() end
@@ -1134,11 +1261,38 @@ function _M:processSpecificUI(kind, spe, delete)
 		ig.Unindent(20)
 		ig.PopStyleVar()
 	end
+	if not open[0] then game:onTickEnd(delete) end
+	ig.PopStyleColor()
+end
+
+function _M:processTriggerEventUI(base, type, name, kind, color)
+	local modes = type == "trigger" and triggermodes or eventmodes
+	local by_id = type == "trigger" and trigger_by_id or event_by_id
+	ig.PushStyleColor(ig.lib.ImGuiCol_Header, imcolor(color or "STEEL_BLUE", 0.5))
+	local open = ffi.new("bool[1]", true)
+	if ig.CollapsingHeaderBoolPtr(name..self:getFieldId(), open, ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+		ig.PushStyleVar(ig.lib.ImGuiStyleVar_FrameRounding, 12)
+		ig.PushStyleVar(ig.lib.ImGuiStyleVar_ItemSpacing, ig.ImVec2(4, 1))
+		ig.Indent(20)
+		if ig.BeginCombo(self:getFieldId(), by_id[kind]) then
+			for _, m in ipairs(modes) do
+				if ig.Selectable(m.name) then
+					base[name] = m[type]
+					self:regenParticle()
+				end
+			end
+			ig.EndCombo()
+		end
+		ig.Unindent(20)
+		ig.PopStyleVar()
+		ig.PopStyleVar()
+	end
+	if not open[0] then base[name] = nil self:regenParticle() end
 	ig.PopStyleColor()
 end
 
 function _M:displaySystem(id_system, system)
-	if self:makeStandardContextMenu("System Menu", system, pdef) then self:regenParticle() end
+	if self:makeStandardContextMenu(system, pdef) then self:regenParticle() end
 
 	ig.PushStyleVar(ig.lib.ImGuiStyleVar_FrameRounding, 4)
 
@@ -1146,30 +1300,65 @@ function _M:displaySystem(id_system, system)
 	self:input_combo("Blend mode", system, "blend", blendmodes, "name", "blend")
 	self:input_combo("Type", system, "type", typemodes, "name", "type")
 	self:input_checkbox("Compute only (hidden)", system, "compute_only")
-	if ig.Button(system.texture or "--") then self:selectTexture(system) end ig.SameLine() ig.Text("Texture")
-	if ig.Button(system.shader or "--") then self:selectShader(system) end ig.SameLine() ig.Text("Shader")
-
-	ig.Separator()
-	if ig.TreeNodeEx("----==== Emitters ====----", ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
-		for id_emitter, emitter in ipairs(system.emitters) do
-			ig.Separator()
-			self:processSpecificUI("emitters", emitter, function() table.remove(system.emitters, id) self:makeUI() self:regenParticle() end)
-			if ig.TreeNodeEx("---=== Generators ===---"..self:getFieldId(), ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
-				for id_generator, generator in ipairs(emitter[2]) do
-					local id = id_generator
-					self:processSpecificUI("generators", generator, function() table.remove(emitter[2], id) self:regenParticle() end)
-				end
-				ig.TreePop()
-			end
-		end
-		ig.TreePop()
+	if not system.compute_only then
+		self:input_texture("Texture", system, "texture")
+		self:input_shader("Shader", system, "shader")
 	end
 
 	ig.Separator()
+	if ig.TreeNodeEx("----==== Emitters ====----", ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+		self:addNew("emitters", system.emitters)
+		for id_emitter, emitter in ipairs(system.emitters) do
+			local id = id_emitter
+			ig.Separator()
+			self:processSpecificUI("emitters", emitter, nil, function() table.remove(system.emitters, id) self:regenParticle() end)
+			ig.PushStyleColor(ig.lib.ImGuiCol_Text, imcolor"ROYAL_BLUE")
+			if ig.TreeNodeEx("---=== Generators ===---"..self:getFieldId(), ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+				ig.PopStyleColor()
+				self:addNew("generators", emitter[2])
+				for id_generator, generator in ipairs(emitter[2]) do
+					local id = id_generator
+					self:processSpecificUI("generators", generator, "ROYAL_BLUE", function() table.remove(emitter[2], id) self:regenParticle() end)
+				end
+				ig.TreePop()
+			else ig.PopStyleColor()
+			end
+
+			ig.PushStyleColor(ig.lib.ImGuiCol_Text, imcolor"OLIVE_DRAB")
+			if ig.TreeNodeEx("---=== Triggers ===---"..self:getFieldId(), ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+				ig.PopStyleColor()
+				self:addTrigger(emitter)
+				if emitter.triggers then
+					for name, kind in pairs(emitter.triggers) do
+						self:processTriggerEventUI(emitter.triggers, "trigger", name, kind, "OLIVE_DRAB")
+					end
+				end
+				ig.TreePop()
+			else ig.PopStyleColor()
+			end
+
+			ig.PushStyleColor(ig.lib.ImGuiCol_Text, imcolor"DARK_ORCHID")
+			if ig.TreeNodeEx("---=== Events ===---"..self:getFieldId(), ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+				ig.PopStyleColor()
+				self:addEvent(emitter)
+				if emitter.events then
+					for name, kind in pairs(emitter.events) do
+						self:processTriggerEventUI(emitter.events, "event", name, kind, "DARK_ORCHID")
+					end
+				end
+				ig.TreePop()
+			else ig.PopStyleColor()
+			end
+		end
+		ig.TreePop()
+	end	
+
+	ig.Separator()
 	if ig.TreeNodeEx("----==== Updaters ====----", ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+		self:addNew("updaters", system.updaters)
 		for id_updater, updater in ipairs(system.updaters) do
 			local id = id_updater
-			self:processSpecificUI("updaters", updater, function() table.remove(system.updaters, id_updater) self:regenParticle() end)
+			self:processSpecificUI("updaters", updater, nil, function() table.remove(system.updaters, id_updater) self:regenParticle() end)
 		end
 		ig.TreePop()
 	end
@@ -1240,7 +1429,7 @@ function _M:defineMenuPopups()
 		ig.EndChild()
 
 		ig.Separator()
-		if ig.Button("Cancel") then ig.CloseCurrentPopup() end
+		if ig.Button("Cancel"..self:getFieldId()) then ig.CloseCurrentPopup() end
 		ig.EndPopup()
 	end
 
@@ -1248,7 +1437,7 @@ function _M:defineMenuPopups()
 		ig.Text("All data will be lost.")
 		if ig.Button("Delete all") or ig.HotkeyEntered(0, engine.Key._RETURN) then self:reset() ig.CloseCurrentPopup() end
 		ig.SameLine()
-		if ig.Button("Cancel") or ig.HotkeyEntered(0, engine.Key._ESCAPE) then ig.CloseCurrentPopup() end
+		if ig.Button("Cancel"..self:getFieldId()) or ig.HotkeyEntered(0, engine.Key._ESCAPE) then ig.CloseCurrentPopup() end
 		ig.EndPopup()
 	end
 
@@ -1259,7 +1448,7 @@ function _M:defineMenuPopups()
 			ig.Text("Confirm to overwrite existing file: "..self.current_filename_tmp)
 			if ig.Button("Save & Overwrite") or ig.HotkeyEntered(0, engine.Key._RETURN) then self:saveAs(self.current_filename_tmp, false) self.current_filename_tmp = nil ig.CloseCurrentPopup() end
 			ig.SameLine()
-			if ig.Button("Cancel") or ig.HotkeyEntered(0, engine.Key._ESCAPE) then self.current_filename_tmp = nil ig.CloseCurrentPopup() end
+			if ig.Button("Cancel"..self:getFieldId()) or ig.HotkeyEntered(0, engine.Key._ESCAPE) then self.current_filename_tmp = nil ig.CloseCurrentPopup() end
 		else
 			local buffer = ffi.new("char[500]", self.current_filename_tmp or self.current_filename or "")
 			if ig.InputText("Filename (without .pc)", buffer, ffi.sizeof(buffer), ig.lib.ImGuiInputTextFlags_EnterReturnsTrue) then
@@ -1273,7 +1462,7 @@ function _M:defineMenuPopups()
 			end
 			ig.SetKeyboardFocusHere()
 			ig.Separator()
-			if ig.Button("Cancel") or ig.HotkeyEntered(0, engine.Key._ESCAPE) then ig.CloseCurrentPopup() end
+			if ig.Button("Cancel"..self:getFieldId()) or ig.HotkeyEntered(0, engine.Key._ESCAPE) then ig.CloseCurrentPopup() end
 		end
 		ig.EndPopup()
 	end
@@ -1317,102 +1506,36 @@ function _M:makeUI()
 	end
 
 	if def.parameters and ig.TreeNodeEx("Parameters", ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+		self:addParameter(def)
 		for name, value in pairs(def.parameters) do
 			self:displayParameter(name, value)
 		end
 		ig.TreePop()
+	else
+		self:addParameter(def, true)
 	end
 
 	ig.Separator()
-	ig.BeginTabBar("Systems")
-	for id_system, system in ipairs(def) do
-		local id = id_system
-		if ig.BeginTabItem((system.display_name or "unnamed").."("..id_system..")") then
-			self:displaySystem(id_system, system)
-			ig.EndTabItem()
-		else
-			if self:makeStandardContextMenu("System Menu", system, pdef) then self:regenParticle() end
+	if #def == 0 then
+		if ig.Button("Add System") then self:addNew("systems", pdef, true) end
+	else
+		ig.BeginTabBar("Systems", ig.lib.ImGuiTabBarFlags_TabListPopupButton)
+		for id_system, system in ipairs(def) do
+			local id = id_system
+			if ig.BeginTabItem((system.display_name or "unnamed").."("..id_system..")") then
+				self:displaySystem(id_system, system)
+				ig.EndTabItem()
+			else
+				if self:makeStandardContextMenu(system, pdef) then self:regenParticle() end
+			end
 		end
+		ig.EndTabBar()
 	end
-	ig.EndTabBar()
 	
-	-- ig.PopStyleVar(1)
 	ig.End()
 
 	local b = ffi.new("bool[1]", 1)
 	ig.ShowDemoWindow(b)
-end
-
-function _M:selectTexture(system)
-	local d = Dialog.new("Select Texture", game.w * 0.6, game.h * 0.6)
-
-	local list = {}
-
-	for i, file in ipairs(fs.list(filesprefix.."/data/gfx/particles_textures/")) do if file:find("%.png$") then
-		list[#list+1] = filesprefix.."/data/gfx/particles_textures/"..file
-	end end 
-
-	local clist = ImageList.new{font=self.dfont, width=self.iw, height=self.ih, tile_w=128, tile_h=128, force_size=true, padding=10, scrollbar=true, root_loader=true, list=list, fct=function(item)
-		game:unregisterDialog(d)
-		system.texture = item.data:gsub('^'..filesprefix, '')
-		self:makeUI()
-		self:regenParticle()
-	end}
-
-	d:loadUI{
-		{left=0, top=0, ui=clist}
-	}
-	d:setupUI(false, false)
-	d.key:addBinds{EXIT = function() game:unregisterDialog(d) end}
-	game:registerDialog(d)
-end
-
-function _M:selectShader(system)
-	local d = Dialog.new("Select Shader", game.w * 0.6, game.h * 0.6)
-
-	local list = {{name = "--", path=nil}}
-
-	for i, file in ipairs(fs.list(filesprefix.."/data/gfx/shaders/particles/")) do if file:find("%.lua$") then
-		list[#list+1] = {name=file, path="particles/"..file:gsub("%.lua$", "")}
-	end end 
-
-	local clist = List.new{font=self.dfont, width=self.iw, height=self.ih, scrollbar=true, list=list, fct=function(item)
-		game:unregisterDialog(d)
-		system.shader = item.path
-		self:makeUI()
-		self:regenParticle()
-	end}
-
-	d:loadUI{
-		{left=0, top=0, ui=clist}
-	}
-	d:setupUI(false, false)
-	d.key:addBinds{EXIT = function() game:unregisterDialog(d) end}
-	game:registerDialog(d)
-end
-
-function _M:selectFile(spe, field)
-	local d = Dialog.new("Select "..field.id, game.w * 0.6, game.h * 0.6)
-
-	local list = {{name = "--", path=nil}}
-
-	for i, file in ipairs(fs.list(filesprefix..field.dir)) do if file:find(field.filter) then
-		list[#list+1] = {name=file, path=field.dir..file}
-	end end 
-
-	local clist = List.new{font=self.dfont, width=self.iw, height=self.ih, scrollbar=true, list=list, fct=function(item)
-		game:unregisterDialog(d)
-		spe[field.id] = item.path
-		self:makeUI()
-		self:regenParticle()
-	end}
-
-	d:loadUI{
-		{left=0, top=0, ui=clist}
-	}
-	d:setupUI(false, false)
-	d.key:addBinds{EXIT = function() game:unregisterDialog(d) end}
-	game:registerDialog(d)
 end
 
 function _M:setBG(kind)
@@ -1525,6 +1648,15 @@ function _M:init(no_bloom)
 	end
 
 	self:regenParticle()
+
+	local list = {}
+	for i, file in ipairs(fs.list("/data/gfx/particles_textures/")) do if file:find("%.png$") then
+		local path = "/data/gfx/particles_textures/"..file
+		local t = core.loader.png(path)
+		-- Directly storing texture actual GLuint id .. this is very very wrong :<
+		list[#list+1] = {name=file, path=path, texture=t, id=ffi.cast("void*", ffi.new("unsigned int", t:toID()))}
+	end end
+	self.available_textures = list
 end
 
 function _M:toggleBloom()
@@ -1603,7 +1735,6 @@ function _M:undo()
 	if pdef_history_pos == 0 then return end
 	pdef = table.clone(pdef_history[pdef_history_pos], true)
 	pdef_history_pos = pdef_history_pos - 1
-	self:makeUI()
 	self:regenParticle(true)
 end
 
@@ -1614,38 +1745,6 @@ function _M:reset()
 	-- PC.gcTextures()
 	self.current_filename = ""
 	self:regenParticle(true)
-end
-
-function _M:load(master)
-	local d = Dialog.new("Load particle effects from /data/gfx/particles/", game.w * 0.6, game.h * 0.6)
-
-	local list = {}
-	for i, file in ipairs(fs.list(filesprefix.."/data/gfx/particles/")) do if file:find("%.pc$") then
-		list[#list+1] = {name=file, path=filesprefix.."/data/gfx/particles/"..file}
-	end end 
-
-	local clist = List.new{font=self.dfont, scrollbar=true, width=d.iw, height=d.ih, list=list, fct=function(item)
-		game:unregisterDialog(d)
-		-- PC.gcTextures()
-		pdef_history={} pdef_history_pos=0
-		local ok, f = pcall(loadfile, item.path)
-		if not ok then Dialog:simplePopup("Error loading particle file", f) return end
-		setfenv(f, {math=math, colors_alphaf=colors_alphaf, PC=PC})
-		local ok, data = pcall(f)
-		if not ok then Dialog:simplePopup("Error loading particle file", data) return end
-		pdef = data
-		master:makeUI()
-		master:regenParticle()
-		core.display.setWindowTitle("Particles Editor: "..item.name)
-		master.current_filename = item.name:gsub("%.pc$", "")
-	end}
-
-	d:loadUI{
-		{left=0, top=0, ui=clist}
-	}
-	d:setupUI(false, false)
-	d.key:addBinds{EXIT = function() game:unregisterDialog(d) end}
-	game:registerDialog(d)
 end
 
 function _M:merge(master)
@@ -1664,7 +1763,6 @@ function _M:merge(master)
 		local ok, data = pcall(f)
 		if not ok then Dialog:simplePopup("Error loading particle file", data) return end
 		table.append(pdef, data)
-		master:makeUI()
 		master:regenParticle()
 	end}
 

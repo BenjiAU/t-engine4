@@ -22,6 +22,8 @@ game/modules/pits/
 game/modules/uaws/
 game/modules/bare_minimum/
 game/modules/bone/
+game/modules/void/
+game/modules/frall/
 game/modules/demo/
 game/modules/unused/
 game/modules/particles_editor/
