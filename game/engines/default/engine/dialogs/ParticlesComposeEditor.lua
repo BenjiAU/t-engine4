@@ -1222,7 +1222,7 @@ function _M:processSpecificUI(kind, spe, color, delete)
 
 	ig.PushStyleColor(ig.lib.ImGuiCol_Header, imcolor(color or "STEEL_BLUE", 0.5))
 	local open = ffi.new("bool[1]", true)
-	if ig.CollapsingHeaderBoolPtr(spe_def.name, open, ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
+	if ig.CollapsingHeaderBoolPtr(spe_def.name..self:getFieldId(), open, ig.lib.ImGuiTreeNodeFlags_DefaultOpen) then
 		ig.PushStyleVar(ig.lib.ImGuiStyleVar_FrameRounding, 12)
 		ig.PushStyleVar(ig.lib.ImGuiStyleVar_ItemSpacing, ig.ImVec2(4, 1))
 		ig.Indent(20)
