@@ -55,7 +55,7 @@ function _M:init(name, args, unique, gl_specific)
 	self.args = args or {}
 	self.gl_specific = gl_specific
 	if type(name) == "table" then
-		self.name = name[1]
+		self.name = util.uuid()
 		if type(name[2]) == "table" then
 			-- Dynamic shader conf
 			self.shader_def = name[2]
