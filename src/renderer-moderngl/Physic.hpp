@@ -63,6 +63,8 @@ public:
 	void applyAngularImpulse(float t);
 	void sleep(bool v);
 	vec2 getLinearVelocity();
+	
+	void createJoint(DORPhysic *b2);
 
 	virtual void onKeyframe(float nb_keyframes);
 };

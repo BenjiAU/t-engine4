@@ -1995,6 +1995,13 @@ static int body_sleep(lua_State *L)
 	if (p) p->sleep(lua_toboolean(L, 2));
 	return 0;
 }
+static int body_create_joint(lua_State *L)
+{
+	DORPhysic *p = *(DORPhysic**)auxiliar_checkclass(L, "physic{body}", 1);
+	DORPhysic *p2 = *(DORPhysic**)auxiliar_checkclass(L, "physic{body}", 2);
+	p->createJoint(p2);
+	return 0;
+}
 
 /******************************************************************
  ** Generic non object functions
@@ -2272,6 +2279,7 @@ static const struct luaL_Reg physic_body_reg[] =
 	{"applyTorque", body_apply_torque},
 	{"applyAngularImpulse", body_apply_angular_impulse},
 	{"getLinearVelocity", body_get_linear_velocity},
+	{"createJoint", body_create_joint},
 	{"sleep", body_sleep},
 	{NULL, NULL},
 };
