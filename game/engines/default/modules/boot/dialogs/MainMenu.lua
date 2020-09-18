@@ -269,7 +269,8 @@ function _M:updateUI()
 	-- self:setupUI(false, true)
 	self.key:addBind("LUA_CONSOLE", function()
 		if config.settings.cheat then
-			game:registerDialog(require("engine.DebugConsole").new())
+			game:showDebugConsole()
+			-- game:registerDialog(require("engine.DebugConsole").new())
 		end
 	end)
 	self.key:addBind("SCREENSHOT", function() game:saveScreenshot() end)

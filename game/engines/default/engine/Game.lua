@@ -19,7 +19,7 @@
 
 require "engine.class"
 require "engine.Mouse"
-require "engine.DebugConsole"
+local DebugConsole2 = require "engine.DebugConsole2"
 local tween = require "tween"
 local Shader = require "engine.Shader"
 
@@ -232,6 +232,10 @@ function _M:display(nb_keyframes)
 			core.display.countDraws()
 		end
 		fps_counter_renderer:toScreen()
+	end
+
+	if self._display_console then
+		self._debug_console:display()
 	end
 end
 
@@ -891,4 +895,11 @@ function _M:isAddonActive(name)
 	if not self.__mod_info then return end
 	if not self.__mod_info.addons then return end
 	return game.__mod_info.addons[name]
+end
+
+--- Show a debug console
+function _M:showDebugConsole(v)
+	if v == nil then v = not self._display_console end
+	self._debug_console = DebugConsole2.new()
+	self._display_console = v
 end
