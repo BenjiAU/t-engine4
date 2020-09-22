@@ -100,6 +100,47 @@ local particle_zoom = 1
 
 local pdef = {
 --[[
+	{
+		max_particles = 100, blend=PC.DefaultBlend, type=PC.RendererPoint, compute_only=true,
+		texture = "/data/gfx/particle.png",
+		emitters = {
+			{PC.LinearEmitter, {
+				{PC.BasicTextureGenerator},
+				{PC.FixedColorGenerator, color_stop={1.000000, 1.000000, 1.000000, 0.000000}, color_start={1.000000, 1.000000, 1.000000, 1.000000}},
+				{PC.DiskPosGenerator, base_point={0.000000, 0.000000}, max_angle=6.283185, radius=50.000000, min_angle=0.000000},
+				{PC.BasicSizeGenerator, max_size=30.000000, min_size=10.000000},
+				{PC.DiskVelGenerator, max_vel=150.000000, min_vel=50.000000},
+				{PC.LifeGenerator, min=1.000000, max=3.000000},
+			}, startat=0.000000, duration=-1.000000, rate=0.030000, nb=10.000000, dormant=false },
+		},
+		updaters = {
+			{PC.BasicTimeUpdater},
+			{PC.LinearColorUpdater, bilinear=false},
+			{PC.EulerPosUpdater, global_vel={0.000000, 0.000000}, global_acc={0.000000, 0.000000}},
+		},
+	},
+	{
+		display_name = "unnamed (duplicated)",
+		max_particles = 850, blend=PC.SubstractBlend, type=PC.RendererPoint, compute_only=false,
+		texture = "/data/gfx/particle.png",
+		emitters = {
+			{PC.LinearEmitter, {
+				{PC.BasicTextureGenerator},
+				{PC.FixedColorGenerator, color_stop={1.000000, 1.000000, 1.000000, 0.000000}, color_start={0.000000, 1.000000, 0.000000, 0.313726}},
+				{PC.DiskPosGenerator, base_point={0.000000, 0.000000}, min_angle=0.000000, radius=50.000000, max_angle=6.283185},
+				{PC.BasicSizeGenerator, max_size=30.000000, min_size=10.000000},
+				{PC.DiskVelGenerator, max_vel=150.000000, min_vel=50.000000},
+				{PC.LifeGenerator, min=1.000000, max=3.000000},
+			}, startat=0.000000, duration=-1.000000, rate=0.030000, nb=10.000000, dormant=false },
+		},
+		updaters = {
+			{PC.BasicTimeUpdater},
+			{PC.LinearColorUpdater, bilinear=false},
+			{PC.EulerPosUpdater, global_acc={0.000000, 0.000000}, global_vel={0.000000, 0.000000}},
+		},
+	},
+--]]
+--[[
 	parameters = { ty=1.000000, size=100.000000, tx=0.000000 },
 	{
 		max_particles = 5, blend=PC.ShinyBlend, type=PC.RendererPoint, compute_only=false,
@@ -132,7 +173,7 @@ local pdef = {
 		},
 	},
 --]]
---[[
+-- [[
 	parameters = { size=300.000000 },
 	{
 		max_particles = 2000, blend=PC.ShinyBlend,
@@ -245,7 +286,7 @@ local pdef = {
 		},
 	},
 --]]
--- [[
+--[[
 	parameters = { tx=600, ty=0, angle=0, size=600 },
 	{
 		display_name = "buildup",
@@ -504,6 +545,9 @@ local blendmodes = {
 	{name="AdditiveBlend", blend=PC.AdditiveBlend},
 	{name="MixedBlend", blend=PC.MixedBlend},
 	{name="ShinyBlend", blend=PC.ShinyBlend},
+	{name="SubstractBlend", blend=PC.SubstractBlend},
+	{name="SubstractMixedBlend", blend=PC.SubstractMixedBlend},
+	{name="SubstractShinyBlend", blend=PC.SubstractShinyBlend},
 }
 local blend_by_id = table.map(function(k, v) return v.blend, v.name end, blendmodes)
 
@@ -1163,7 +1207,7 @@ function _M:input_color(name, base, k)
 		local color = ffi.new("float[4]", unpack(base[k]))
 		ig.Text(name)
 		ig.Separator()
-		if ig.ColorPicker4("##picker", color, ig.lib.ImGuiColorEditFlags_NoSidePreview + ig.lib.ImGuiColorEditFlags_NoSmallPreview) then
+		if ig.ColorPicker4("##picker", color, ig.lib.ImGuiColorEditFlags_NoSidePreview + ig.lib.ImGuiColorEditFlags_NoSmallPreview + ig.lib.ImGuiColorEditFlags_AlphaBar) then
 			base[k] = {color[0], color[1], color[2], color[3]}
 			self:regenParticle()
 		end
@@ -1468,10 +1512,50 @@ function _M:defineMenuPopups()
 	end
 end
 
+local bg_color_sel = ffi.new("float[4]", 0, 0, 0, 1)
 function _M:makeUI()
 	local fps, msframe = core.display.getFPS()
 	ig.Begin("Stats", nil, ig.lib.ImGuiWindowFlags_NoTitleBar + ig.lib.ImGuiWindowFlags_NoResize + ig.lib.ImGuiWindowFlags_AlwaysAutoResize)
 	ig.Text(("Elapsed Time %0.2fs / FPS: %0.1f / %d ms/frame / Active particles: %d / Zoom: %d%% / Speed: %d%%"):format((core.game.getTime() - self.p_date) / 1000, fps, msframe, self.pdo:countAlive(), particle_zoom * 100, particle_speed * 100))
+	ig.End()
+
+	if ig.Begin("Background") then
+		if ig.ColorPicker4("##picker", bg_color_sel, ig.lib.ImGuiColorEditFlags_NoSidePreview + ig.lib.ImGuiColorEditFlags_NoSmallPreview) then
+			self:setBG("color", {bg_color_sel[0], bg_color_sel[1], bg_color_sel[2], 1})
+		end
+		ig.SameLine()
+
+		ig.BeginGroup() -- Lock X position
+		ig.Text("Palette")
+
+		local colors = table.values(colors_simple1)
+		table.sort(colors, function (a, b) if a[1] == b[1] then
+			if a[2] == b[2] then return a[3] < b[3]
+			else return a[2] < b[2] end
+		else return a[1] < b[1] end end)
+		for n, c in ipairs(colors) do
+			local c = c
+			ig.PushID(n)
+			if (n-1) % 8 ~= 0 then ig.SameLine(0, 4) end
+
+			if ig.ColorButton("##palette", ig.ImVec4(unpack(c)), ig.lib.ImGuiColorEditFlags_NoAlpha + ig.lib.ImGuiColorEditFlags_NoPicker + ig.lib.ImGuiColorEditFlags_NoTooltip, ig.ImVec2(20, 20)) then
+				-- base[k] = {c[1], c[2], c[3], base[k][4]}
+				self:setBG("color", {c[1], c[2], c[3], 1})
+			end
+			ig.PopID()
+		end
+		ig.EndGroup()
+		ig.Separator()
+
+		ig.Columns(math.floor((ig.GetWindowWidth() - 8) / 96), nil, false)
+		for i, t in ipairs(self.available_bgs) do
+			if ig.ImageButton(t.id, ig.ImVec2(96, 96), nil, nil, 0) then
+				self:setBG("texture", t)
+			end
+			ig.NextColumn()
+		end
+		ig.Columns(1)
+	end
 	ig.End()
 
 	self.next_field_id = 1
@@ -1535,22 +1619,18 @@ function _M:makeUI()
 	ig.End()
 
 	local b = ffi.new("bool[1]", 1)
-	ig.ShowDemoWindow(b)
+	-- ig.ShowDemoWindow(b)
 end
 
-function _M:setBG(kind)
+function _M:setBG(kind, data)
 	local w, h = game.w, game.h
 	self.bg:clear()
 	if kind == "transparent" then
 		-- nothing
-	elseif kind == "tome1" then
-		self.bg:add(core.renderer.image("/data/gfx/background/tome.png"):shader(self.bg_shader))
-	elseif kind == "tome2" then
-		self.bg:add(core.renderer.image("/data/gfx/background/tome2.png"):shader(self.bg_shader))
-	elseif kind == "tome3" then
-		self.bg:add(core.renderer.image("/data/gfx/background/tome3.png"):shader(self.bg_shader))
-	elseif type(kind) == "table" then
-		self.bg:add(core.renderer.colorQuad(0, 0, w, h, unpack(kind)):shader(self.normal_shader))
+	elseif kind == "texture" then
+		self.bg:add(core.renderer.texture(data.texture):shader(self.bg_shader))
+	elseif kind == "color" then
+		self.bg:add(core.renderer.colorQuad(0, 0, w, h, unpack(data)):shader(self.normal_shader))
 	end
 end
 
@@ -1657,6 +1737,15 @@ function _M:init(no_bloom)
 		list[#list+1] = {name=file, path=path, texture=t, id=ffi.cast("void*", ffi.new("unsigned int", t:toID()))}
 	end end
 	self.available_textures = list
+
+	local list = {}
+	for i, file in ipairs{"tome.png", "tome2.png", "tome3.png"} do if file:find("%.png$") then
+		local path = "/data/gfx/background/"..file
+		local t = core.loader.png(path)
+		-- Directly storing texture actual GLuint id .. this is very very wrong :<
+		list[#list+1] = {name=file, path=path, texture=t, id=ffi.cast("void*", ffi.new("unsigned int", t:toID()))}
+	end end
+	self.available_bgs = list
 end
 
 function _M:toggleBloom()

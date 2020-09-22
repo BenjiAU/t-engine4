@@ -756,6 +756,9 @@ extern "C" int luaopen_particles_system(lua_State *L) {
 	lua_pushliteral(L, "AdditiveBlend"); lua_pushnumber(L, static_cast<uint8_t>(RendererBlend::AdditiveBlend)); lua_rawset(L, -3);
 	lua_pushliteral(L, "MixedBlend"); lua_pushnumber(L, static_cast<uint8_t>(RendererBlend::MixedBlend)); lua_rawset(L, -3);
 	lua_pushliteral(L, "ShinyBlend"); lua_pushnumber(L, static_cast<uint8_t>(RendererBlend::ShinyBlend)); lua_rawset(L, -3);
+	lua_pushliteral(L, "SubstractBlend"); lua_pushnumber(L, static_cast<uint8_t>(RendererBlend::SubstractBlend)); lua_rawset(L, -3);
+	lua_pushliteral(L, "SubstractMixedBlend"); lua_pushnumber(L, static_cast<uint8_t>(RendererBlend::SubstractMixedBlend)); lua_rawset(L, -3);
+	lua_pushliteral(L, "SubstractShinyBlend"); lua_pushnumber(L, static_cast<uint8_t>(RendererBlend::SubstractShinyBlend)); lua_rawset(L, -3);
 
 	lua_pushliteral(L, "LinearEmitter"); lua_pushnumber(L, static_cast<uint8_t>(EmittersList::LinearEmitter)); lua_rawset(L, -3);
 	lua_pushliteral(L, "BurstEmitter"); lua_pushnumber(L, static_cast<uint8_t>(EmittersList::BurstEmitter)); lua_rawset(L, -3);

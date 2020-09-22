@@ -96,12 +96,7 @@ void RendererGL2::draw(ParticlesData &p, mat4 &model) {
 	mat4 mvp = View::getCurrent()->get() * model;
 	vec4 color(1, 1, 1, 1);
 
-	switch (blend) {
-		case RendererBlend::DefaultBlend: break;
-		case RendererBlend::AdditiveBlend: glBlendFunc(GL_ONE, GL_ONE); break;
-		case RendererBlend::MixedBlend: glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); break;
-		case RendererBlend::ShinyBlend: glBlendFunc(GL_SRC_ALPHA,GL_ONE); break;
-	}
+	enableBlending(blend);
 
 	if (tex.get()) {
 		tglActiveTexture(GL_TEXTURE0);
@@ -135,10 +130,7 @@ void RendererGL2::draw(ParticlesData &p, mat4 &model) {
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	switch (blend) {
-		case RendererBlend::DefaultBlend: break;
-		default: glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); break;
-	}
+	disableBlending(blend);
 }
 
 }

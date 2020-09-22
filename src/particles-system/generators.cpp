@@ -21,6 +21,7 @@
 extern "C" {
 #include "SFMT.h"
 }
+#include "renderer-moderngl/Renderer.hpp"
 #include "particles-system/system.hpp"
 #include <math.h>
 

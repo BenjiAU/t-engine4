@@ -27,7 +27,30 @@ struct renderer_vertex {
 	vec4 color;
 };
 
-enum class RendererBlend : uint8_t { DefaultBlend, AdditiveBlend, MixedBlend, ShinyBlend };
+enum class RendererBlend : uint8_t {
+	DefaultBlend, AdditiveBlend, MixedBlend, ShinyBlend, SubstractBlend, SubstractMixedBlend, SubstractShinyBlend
+};
+inline void enableBlending(RendererBlend blend) {
+	switch (blend) {
+		case RendererBlend::DefaultBlend: break;
+		case RendererBlend::AdditiveBlend: glBlendFunc(GL_ONE, GL_ONE); break;
+		case RendererBlend::MixedBlend: glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); break;
+		case RendererBlend::ShinyBlend: glBlendFunc(GL_SRC_ALPHA,GL_ONE); break;
+		case RendererBlend::SubstractBlend: glBlendFunc(GL_ONE, GL_ONE); glBlendEquation(GL_FUNC_REVERSE_SUBTRACT); break;
+		case RendererBlend::SubstractMixedBlend: glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO); glBlendEquation(GL_FUNC_REVERSE_SUBTRACT); break;
+		case RendererBlend::SubstractShinyBlend: glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE, GL_ONE, GL_ZERO); glBlendEquation(GL_FUNC_REVERSE_SUBTRACT); break;
+	}
+}
+inline void disableBlending(RendererBlend blend) {
+	switch (blend) {
+		case RendererBlend::DefaultBlend: break;
+		case RendererBlend::SubstractBlend:
+		case RendererBlend::SubstractMixedBlend:
+		case RendererBlend::SubstractShinyBlend:
+			glBlendEquation(GL_FUNC_ADD); glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); break;
+		default: glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); break;
+	}
+}
 
 class Renderer {
 protected:
