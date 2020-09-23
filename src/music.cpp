@@ -77,16 +77,17 @@ namespace SoLoud {
 
 static SoLoud::Soloud soloud;
 Wav tmp;
-PhysfsFile *wav_file;;
+PhysfsFile *wav_file;
 
 void init_sounds() {
 	soloud.init();
-	wav_file = new PhysfsFile("game/modules/tome/data/sound/talents/fireflash.ogg");
-	tmp.loadFile(wav_file); // Load a wave
-	soloud.play(tmp);
+	// wav_file = new PhysfsFile("/data/sound/talents/fireflash.ogg");
+	// tmp.loadFile(wav_file); // Load a wave
+	// soloud.play(tmp);
 }
 
 void deinit_sounds() {
+	soloud.deinit();
 }
 
 static int loadsoundLua(lua_State *L) {
