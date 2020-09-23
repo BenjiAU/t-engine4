@@ -38,7 +38,6 @@ extern "C" {
 #include "physfsrwops.h"
 #include "wfc/lua_wfc_external.h"
 #include "getself.h"
-#include "music.h"
 #include "serial.h"
 #include "main.h"
 #include "te4web.h"
@@ -52,6 +51,7 @@ extern "C" {
 #endif
 }
 
+#include "music.hpp"
 #include "core_lua.hpp"
 #include "profile.hpp"
 #include "renderer-moderngl/Interfaces.hpp"
@@ -1790,8 +1790,6 @@ int main(int argc, char *argv[])
 	if (!no_steam) te4_steam_init();
 #endif
 
-	init_openal();
-
 	// RNG init
 	init_gen_rand(time(NULL));
 
@@ -1822,6 +1820,8 @@ int main(int argc, char *argv[])
 			printf("Found gamepad, enabling support: %s\n", SDL_GameControllerMapping(gamepad));
 		}
 	}
+
+	init_sounds();
 
 	// Filter events, to catch the quit event
 	SDL_SetEventFilter(event_filter, NULL);
@@ -1904,8 +1904,8 @@ int main(int argc, char *argv[])
 	if (desktop_gamma_set) SDL_SetWindowBrightness(window, desktop_gamma);
 //	SDL_Quit();
 	printf("SDL shutdown complete\n");
-//	deinit_openal();
-	printf("OpenAL shutdown complete\n");
+	deinit_sounds();
+	printf("SoLoud shutdown complete\n");
 	printf("Thanks for having fun!\n");
 
 #ifdef SELFEXE_WINDOWS

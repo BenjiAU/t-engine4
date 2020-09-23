@@ -47,7 +47,7 @@ project "TEngine"
 	if _OPTIONS.steam then
 		files { "../steamworks/luasteam.c", }
 	end
-	links { "physfs", "lua".._OPTIONS.lua, "fov", "luasocket", "luaprofiler", "lpeg", "tcodimport", "lxp", "expatstatic", "luamd5", "luazlib", "luabitop", "te4-bzip", "te4-wfc", "utf8proc", "te4-renderer", "te4-map2d", "te4-particles-system", "te4-navmesh", "te4-spriter", "tinyxml2", "te4-freetype-gl", "te4-tinyobjloader", "te4-box2d-".._OPTIONS.box2d:lower(), "te4-poly2tri", "te4-clipper", "te4-muparser", "te4-binpack", "te4-imgui" }
+	links { "physfs", "lua".._OPTIONS.lua, "fov", "luasocket", "luaprofiler", "lpeg", "tcodimport", "lxp", "expatstatic", "luamd5", "luazlib", "luabitop", "te4-bzip", "te4-wfc", "utf8proc", "te4-renderer", "te4-map2d", "te4-particles-system", "te4-navmesh", "te4-spriter", "tinyxml2", "te4-freetype-gl", "te4-tinyobjloader", "te4-box2d-".._OPTIONS.box2d:lower(), "te4-poly2tri", "te4-clipper", "te4-muparser", "te4-binpack", "te4-imgui", "te4-soloud" }
 	if _OPTIONS.discord then defines { "DISCORD_TE4" } end
 	defines { "_DEFAULT_VIDEOMODE_FLAGS_='SDL_HWSURFACE|SDL_DOUBLEBUF'" }
 	defines { [[TENGINE_HOME_PATH='".t-engine"']], "TE4CORE_VERSION="..TE4CORE_VERSION }
@@ -878,3 +878,23 @@ project "te4-discord"
 		kind "SharedLib"
 		-- Empty
 end
+
+project "te4-soloud"
+	kind "StaticLib"
+	language "C++"
+	targetname "te4-soloud"
+	if _OPTIONS.profiling then buildoptions { "-fno-omit-frame-pointer" } linkoptions{ "-fno-omit-frame-pointer" } end
+	enableSanitizer()
+
+	files{
+		"../src/soloud/src/audiosource/**.c*",
+		"../src/soloud/src/filter/**.c*",
+		"../src/soloud/src/core/**.c*",
+		"../src/soloud/src/backend/sdl2_static/**.c*",
+	}
+
+	includedirs{
+		"../src/soloud/src/**",
+		"../src/soloud/include"
+	}
+	defines { "WITH_SDL2_STATIC" }
