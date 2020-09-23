@@ -855,6 +855,8 @@ void on_redraw()
 #endif
 	if (te4_web_update) te4_web_update(L);
 
+	update_audio(nb_keyframes);
+
 	// Run GC every second, this is the only place the GC should be called
 	// This is also a way to ensure the GC wont try to delete things while in callbacks from the display code and such which is annoying
 	if (ticks_count_gc >= 100) {
@@ -1315,6 +1317,7 @@ void do_resize(int w, int h, bool fullscreen, bool borderless, float zoom)
 }
 
 static void close_state() {
+	kill_audio();
 	core_mouse_close();
 	refcleaner_clean(L);
 	core_loader_waitall();
