@@ -64,9 +64,11 @@ extern "C" {
 #define WINDOW_ICON_PATH ("/engines/default/data/gfx/te4-icon.png")
 
 #ifdef SELFEXE_WINDOWS
+extern "C" {
 // Force nvidia optimus and amd equivalent to use the real GPU instead of the intel crappy one
 __declspec( dllexport ) DWORD NvOptimusEnablement                = 0x00000001;
 __declspec( dllexport ) int AmdPowerXpressRequestHighPerformance = 1;
+}
 #endif
 
 int start_xpos = -1, start_ypos = -1;
