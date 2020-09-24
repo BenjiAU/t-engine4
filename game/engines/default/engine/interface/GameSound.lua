@@ -23,72 +23,28 @@ require "engine.class"
 -- @classmod engine.generator.interface.GameSound
 module(..., package.seeall, class.make)
 
+_M.max_simultanous_sounds = 50
+
 --- Initializes
 function _M:init()
-	self.playing_sounds = {}
-	self.loaded_sounds = {}
---	setmetatable(self.loaded_sounds, {__mode="v"})
+	self:loaded()
 end
 
 function _M:loaded()
-	self.loaded_sounds = self.loaded_sounds or {}
-	self.playing_sounds = {}
---	setmetatable(self.loaded_sounds, {__mode="v"})
+	core.sound.maxSounds(self.max_simultanous_sounds)
 end
 
-function _M:playSound(name, position)
-	local pitch, vol = nil, 1
+function _M:playSound(name, pos)
+	local set_vol = nil
 	if type(name) == "table" then
 		if name[2] and name[3] then name[1] = name[1]:format(rng.range(name[2], name[3])) end
-		if name.pitch then pitch = name.pitch end
-		if name.vol then vol = name.vol end
+		-- if name.pitch then pitch = name.pitch end
+		if name.vol then set_vol = name.vol end
 		name = name[1]
 	end
-
-	local s = self.loaded_sounds[name]
-	if not s then
-		local def, ok
-		if fs.exists("/data/sound/"..name..".lua") then
-			local f = loadfile("/data/sound/"..name..".lua")
-			setfenv(f, setmetatable({}, {__index=_G}))
-			def = f()
-			if not def.file then def.file = name..".ogg" end
-			print("[SOUND] loading from", "/data/sound/"..name..".lua", ":=:", "/data/sound/"..def.file, ":>")
-			ok, def.sample = pcall(core.sound.load, "/data/sound/"..def.file, false)
-			if not ok then print("Failed loading sound", def.file, def.sample) return end
-			print("[SOUND] :=>", def.sample)
-		elseif fs.exists("/data/sound/"..name..".ogg") then
-			def = {}
-			ok, def.sample = pcall(core.sound.load, "/data/sound/"..name..".ogg", false)
-			if not ok then print("Failed loading sound", name, def.sample) return end
-			print("[SOUND] loading from", "/data/sound/"..name..".ogg", ":=:", def.sample)
-		else
-			def = {}
-			print("[SOUND] loading from", "/data/sound/"..name..".ogg", ":=: unknown file")
-		end
-
-		self.loaded_sounds[name] = def
-		s = self.loaded_sounds[name]
-	end
-	if not s or not s.sample then return end
-	local source = s.sample:use()
-	if s.volume then source:volume(vol * (s.volume / 100) * (config.settings.audio.effects_volume / 100))
-	else source:volume(vol * config.settings.audio.effects_volume / 100) end
-	if position then source:location(position.x, position.y, position.z) end
-	if pitch then source:pitch(pitch) end
-	source:play()
-	self.playing_sounds[source] = true
-	return source
-end
-
---- Called on ticks to free up non playing sources
-function _M:cleanSounds()
-	if not self.playing_sounds then return end
-	local todel = {}
-	for s, _ in pairs(self.playing_sounds) do
-		if not s:playing() then todel[#todel+1] = s end
-	end
-	for i = 1, #todel do self.playing_sounds[todel[i]] = nil end
+	local h = core.sound.play(name, pos)
+	if set_vol then h:volume(set_vol) end
+	return h
 end
 
 function _M:volumeSoundEffects(vol)
@@ -98,7 +54,5 @@ function _M:volumeSoundEffects(vol)
 		config.settings.audio.effects_volume = vol
 		game:audioSaveSettings()
 	end
-	for source, _ in pairs(self.playing_sounds) do
-		source:volume(vol / 100)
-	end
+	core.sound.globalVolume(vol / 100)
 end

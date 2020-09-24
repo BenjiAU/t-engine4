@@ -317,7 +317,7 @@ namespace SoLoud
 		mChannels = 1;
 
 		mHardwareChannels = 1;
-		mWaveform = Soloud::WAVE_SQUARE;
+		mWaveform = SoLoud::Misc::WAVE_SQUARE;
 	}
 
 	void Monotone::clear()

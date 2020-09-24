@@ -23,7 +23,7 @@ require "engine.class"
 -- @classmod engine.generator.interface.GameMusic
 module(..., package.seeall, class.make)
 
-_M.music_fade_time = 1
+_M.music_fade_time = 1.2
 
 --- Initializes musics
 function _M:init()
@@ -42,8 +42,6 @@ function _M:playMusic(name)
 	if not name:find("^/") then name = "/data/music/"..name end
 	local m = core.music.play(name, self.music_fade_time)
 	if not m then return end
-
-	core.music.volume(config.settings.audio.music_volume / 100)
 	self.playing_musics = core.music.list()
 end
 

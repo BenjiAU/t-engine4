@@ -121,10 +121,13 @@ static bool string_get_lua_table(lua_State *L, int table_idx, const char *field,
 	return ret;
 }
 
+static float global_volume = 1;
+
 struct LoadedSound {
 	float ttl = 60;
 	float die_in = 60;
 	float speed = 1;
+	float volume = 1;
 	AudioSource *data = nullptr;
 	string name;
 	LoadedSound() : ttl(default_ttl), die_in(default_ttl) {}
@@ -138,8 +141,7 @@ struct LoadedSound {
 		name = file;
 		file = base_folder + file;
 		bool rewrote_file = false;
-		float volume = 1;
-
+		
 		if (L) {
 			bool clean_stack = false;
 			int stack = 0;
@@ -172,8 +174,9 @@ struct LoadedSound {
 		if (!rewrote_file) file = file + ".ogg";
 		PhysfsFile f(file.c_str());
 		auto w = new Wav();
+		w->setInaudibleBehavior(false, true);
 		if (f.exists()) w->loadFile(&f);
-		w->setVolume(volume);
+		w->setVolume(volume * global_volume);
 		data = w;
 	}
 };
@@ -183,12 +186,25 @@ static unordered_map<string, unique_ptr<LoadedSound>> loaded_sounds;
 static int sound_base_folder(lua_State *L) {
 	auto file = string(lua_tostring(L, 1));
 	base_folder = file;
-	return 1;
+	return 0;
 }
 
 static int sound_default_ttl(lua_State *L) {
 	default_ttl = lua_tonumber(L, 1);
-	return 1;
+	return 0;
+}
+
+static int sound_max_sounds(lua_State *L) {
+	soloud.setMaxActiveVoiceCount(lua_tonumber(L, 1));
+	return 0;
+}
+
+static int audio_global_volume(lua_State *L) {
+	global_volume = lua_tonumber(L, 1);
+	for (auto& s : loaded_sounds) {
+		s.second->data->setVolume(s.second->volume * global_volume);
+	}
+	return 0;
 }
 
 static LoadedSound* do_load(string &name, lua_State *L = nullptr, int lua_def_stack = 0) {
@@ -215,43 +231,74 @@ static int audio_enable(lua_State *L) {
 	soloud.fadeGlobalVolume(v and 1 or 0, 0.3);
 	return 0;
 }
-
-static int sound_free(lua_State *L) {
-	return 0;
-}
-
 static int sound_play(lua_State *L) {
+	if (soloud.getActiveVoiceCount() >= soloud.getMaxActiveVoiceCount()) {
+		lua_pushnumber(L, 0);
+		return 1;
+	}
+
 	auto name = string(lua_tostring(L, 1));
-	auto s = do_load(name, L, 2);
+	auto s = do_load(name, L, 3);
 	if (!s->data) return 0;
 	s->die_in = s->ttl;
-	auto h = soloud.play(*s->data);
+	handle h;
+	if (lua_istable(L, 2)) {
+		float x = 0, y = 0, z = 0;
+		float_get_lua_table(L, 2, "x", x);
+		float_get_lua_table(L, 2, "y", y);
+		float_get_lua_table(L, 2, "z", z);
+		h = soloud.play3d(*s->data, x, y, z);
+	} else {
+		h = soloud.play(*s->data);
+	}
 	if (s->speed != 1) soloud.setRelativePlaySpeed(h, s->speed);
-	lua_pushnumber(L, h);
+	int *lh = (int*)lua_newuserdata(L, sizeof(int));
+	auxiliar_setclass(L, "sound{handle}", -1);
+	*lh = h;
 	return 1;
 }
 
 static int sound_pause(lua_State *L) {
+	int h = *(int*)auxiliar_checkclass(L, "sound{handle}", 1);
+	soloud.setPause(h, lua_toboolean(L, 2));
 	return 0;
 }
 
 static int sound_stop(lua_State *L) {
+	int h = *(int*)auxiliar_checkclass(L, "sound{handle}", 1);
+	soloud.stop(h);
 	return 0;
 }
 
 static int sound_loop(lua_State *L) {
-	return 1;
+	int h = *(int*)auxiliar_checkclass(L, "sound{handle}", 1);
+	soloud.setLooping(h, lua_toboolean(L, 2));
+	return 0;
 }
 
 static int sound_volume(lua_State *L) {
-	return 1;
+	int h = *(int*)auxiliar_checkclass(L, "sound{handle}", 1);
+	float v = lua_tonumber(L, 2) * global_volume;
+	float fade = lua_tonumber(L, 3);
+	if (fade) {
+		if (lua_toboolean(L, 4)) soloud.fadeVolume(h, soloud.getVolume(h) * v, fade);
+		else soloud.fadeVolume(h, v, fade);
+	} else {
+		if (lua_toboolean(L, 4)) soloud.setVolume(h, soloud.getVolume(h) * v);		
+		else soloud.setVolume(h, v);
+	}
+	return 0;
 }
 
 static int sound_speed(lua_State *L) {
-	return 1;
+	int h = *(int*)auxiliar_checkclass(L, "sound{handle}", 1);
+	soloud.setRelativePlaySpeed(h, lua_tonumber(L, 2));
+	return 0;
 }
 
 static int sound_is_playing(lua_State *L) {
+	int h = *(int*)auxiliar_checkclass(L, "sound{handle}", 1);
+	lua_pushboolean(L, soloud.isValidVoiceHandle(h));
 	return 1;
 }
 
@@ -277,6 +324,7 @@ struct PlayingMusic {
 };
 
 static vector<unique_ptr<PlayingMusic>> current_musics;
+static float music_volume = 1;
 
 static int play_music(lua_State *L) {
 	const char* file = lua_tostring(L, 1);
@@ -289,13 +337,15 @@ static int play_music(lua_State *L) {
 	
 	m->load(cfile);
 	m->h = soloud.playBackground(m->stream);
-	lua_pushnumber(L, m->h);
+	soloud.setProtectVoice(m->h, true);
+	soloud.setInaudibleBehavior(m->h, true, false);
 	if (fade == 0) {
-		soloud.setVolume(m->h, 1);
+		soloud.setVolume(m->h, music_volume);
 	} else {
 		soloud.setVolume(m->h, 0);
-		soloud.fadeVolume(m->h, 1, fade);
+		soloud.fadeVolume(m->h, music_volume, fade);
 	}
+	lua_pushnumber(L, m->h);
 	return 1;
 }
 
@@ -304,6 +354,7 @@ static int volume_music(lua_State *L) {
 	float fade = 1;
 	if (lua_isnumber(L, 2)) fade = lua_tonumber(L, 2);
 
+	music_volume = volume;
 	for (auto& m : current_musics) {
 		if (m->die_in) continue;
 		if (fade == 0) {
@@ -359,15 +410,12 @@ static int stop_musics(lua_State *L) {
 	return 0;
 }
 
-static float time_counter = 0;
 void update_audio(float nb_keyframes) {
-	time_counter += nb_keyframes / 30.0;
-	if (time_counter < 1) return;
-	time_counter--;
+	// printf("%d / %d sounds\n", soloud.getActiveVoiceCount(), soloud.getVoiceCount());
 
 	for (auto m = current_musics.begin(); m != current_musics.end();) {
 		if ((*m)->die_in) {
-			(*m)->die_in--;
+			(*m)->die_in -= nb_keyframes / 30.0;
 			if ((*m)->die_in <= 0) {
 				m = current_musics.erase(m);
 				continue;
@@ -378,14 +426,14 @@ void update_audio(float nb_keyframes) {
 
 	for (auto s = loaded_sounds.begin(); s != loaded_sounds.end();) {
 		if (s->second->die_in) {
-			s->second->die_in--;
+			s->second->die_in -= nb_keyframes / 30.0;
 			if (s->second->die_in <= 0) {
 				s = loaded_sounds.erase(s);
 				continue;
 			}
 		}
 		s++;
-	}	
+	}
 }
 
 void kill_audio() {
@@ -393,8 +441,7 @@ void kill_audio() {
 	loaded_sounds.clear();
 }
 
-const luaL_Reg sourceFuncs[] = {
-	{"__gc", sound_free},
+const luaL_Reg handle_fcts[] = {
 	{"play", sound_play},
 	{"pause", sound_pause},
 	{"stop", sound_stop},
@@ -408,6 +455,8 @@ const luaL_Reg sourceFuncs[] = {
 const luaL_Reg soundlib[] = {
 	{"baseFolder", sound_base_folder},
 	{"cacheTime", sound_default_ttl},
+	{"maxSounds", sound_max_sounds},
+	{"globalVolume", audio_global_volume},
 	{"load", sound_load},
 	{"play", sound_play},
 	{"enable", audio_enable},
@@ -424,7 +473,7 @@ const luaL_Reg musiclib[] = {
 
 int luaopen_sound(lua_State *L)
 {
-	auxiliar_newclass(L, "sound{source}", sourceFuncs);
+	auxiliar_newclass(L, "sound{handle}", handle_fcts);
 	luaL_openlib(L, "core.sound", soundlib, 0);
 	luaL_openlib(L, "core.music", musiclib, 0);
 	lua_pop(L, 1);
