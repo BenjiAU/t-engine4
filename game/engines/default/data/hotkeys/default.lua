@@ -125,6 +125,14 @@ newKind{
 		if o and o.wielded then
 			frame = "sustain"
 		end
+		if o and o.wielded and o.use_talent and o.use_talent.id then
+			local t = a:getTalentFromId(o.use_talent.id)
+			if not a:preUseTalent(t, true, true, true) then
+				pie_angle = 0
+				pie_color = {0.74,0.74,0.74,0.4}
+				frame = "disabled"
+			end
+		end
 		return display_entity, pie_color, pie_angle, frame, txt
 	end,
 	drag_display_object = function(self, actor)

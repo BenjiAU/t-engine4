@@ -101,7 +101,8 @@ newTalent{
 		All non-ghoul minions are healed by %d%%.
 		If you know Call of the Mausoleum, the time remaining to the next free ghoul is reduced by %d.
 		if you know Corpse Explosion or Putrescent Liquefaction the duration of those effects are increased by %d.
-		All non-undead foes caught inside are dazed for %d turns.]]):
+		All non-undead foes caught inside are dazed for %d turns.
+		In addition all your minions (created after you learn this spell) have a passive health regeneration.]]):
 		tformat(t:_getSpeed(self), t:_getHeal(self), t:_getGhoulDur(self), t:_getGhoulDur(self), t:_getDaze(self))
 	end,
 }
@@ -191,7 +192,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		return ([[By creating an arcane link with your minion army you are able to redirect parts of any damage affecting you to them.
-		Anytime you take damage %d%% of it is instead redirected to a random minion without your aura of undeath.
+		Anytime you take damage %d%% of it is instead redirected to a random minion within your aura of undeath.
 		The minion takes 300%% damage from that effect.
 		The damage redirected percent depends on your Spellpower.]]):
 		tformat(t:_getPower(self))

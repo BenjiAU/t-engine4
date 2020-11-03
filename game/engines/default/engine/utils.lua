@@ -1548,6 +1548,7 @@ end
 
 local oldfsgetrealpath = fs.getRealPath
 function fs.getRealPath(path)
+	-- print("- ", path, "=>", p, "::", sep)
 	local p = oldfsgetrealpath(path)
 	if not p then return p end
 	local sep = fs.getPathSeparator()

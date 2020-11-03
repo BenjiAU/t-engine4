@@ -1873,6 +1873,9 @@ int main(int argc, char *argv[])
 
 	imgui_load_settings();
 
+	// yes its duplicated I know
+	init_blank_surface();
+
 	while (!exit_engine)
 	{
 		event_loop();

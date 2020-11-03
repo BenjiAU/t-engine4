@@ -4834,6 +4834,7 @@ end
 -- Make sure such talents are always flagged as unlearnable (see Command Staff for an example)
 function _M:learnItemTalent(o, tid, level)
 	local t = self:getTalentFromId(tid)
+	if not t then return end
 	local max = t.hard_cap or (t.points and t.points + 2) or 5
 	if not self.item_talent_surplus_levels then self.item_talent_surplus_levels = {} end
 	if not self.item_talent_surplus_levels[tid] then self.item_talent_surplus_levels[tid] = 0 end
@@ -4856,6 +4857,7 @@ end
 
 function _M:unlearnItemTalent(o, tid, level)
 	local t = self:getTalentFromId(tid)
+	if not t then return end
 	local max = (t.points and t.points + 2) or 5
 	if not self.item_talent_surplus_levels then self.item_talent_surplus_levels = {} end
 	if not self.item_talent_surplus_levels[tid] then self.item_talent_surplus_levels[tid] = 0 end
@@ -5393,12 +5395,11 @@ end
 -- Check the actor can cast it
 -- @param ab the talent (not the id, the table)
 -- @return true to continue, false to stop
-function _M:preUseTalent(ab, silent, fake)
+function _M:preUseTalent(ab, silent, fake, ignore_ressources)
 	if ab._ai_parsed == nil then -- add some AI info to the talent if needed
 		print("[Actor:preUseTalent] PARSING TALENT for AI info", ab.id, self.name)
 		mod.class.interface.ActorAI.aiParseTalent(ab, self)
 	end
-
 	if self.forbid_talents and self.forbid_talents[ab.id] then
 		if not silent then game.logSeen(self, self.forbid_talents[ab.id] or "%s can not use %s.", self:getName():capitalize(), ab.name) end
 		return false
@@ -5488,7 +5489,7 @@ function _M:preUseTalent(ab, silent, fake)
 	end
 
 	-- check resource costs (sustains can always be deactivated at no cost)
-	if not self:attr("force_talent_ignore_ressources") and not self:isTalentActive(ab.id) and (not self.talent_no_resources or not self.talent_no_resources[ab.id]) then
+	if not ignore_ressources and not self:attr("force_talent_ignore_ressources") and not self:isTalentActive(ab.id) and (not self.talent_no_resources or not self.talent_no_resources[ab.id]) then
 		local rname, cost, rmin, rmax
 		-- check for sustained resources
 		self.on_preuse_checking_resources = true
@@ -6923,8 +6924,6 @@ end
 -- @param src who is doing the dispelling
 -- @param allow_immunity If true will check for canBe("dispel_XXX"), defaults to true
 function _M:dispel(effid_or_tid, src, allow_immunity, params)
-	if allow_immunity and self:attr("invulnerable") then return end
-
 	if not params then params = {} end
 	if params.silent == nil then params.silent = false end
 	if params.force == nil then params.force = false end
@@ -6934,6 +6933,8 @@ function _M:dispel(effid_or_tid, src, allow_immunity, params)
 
 	-- Dont resist yourself!
 	if src == self then allow_immunity = false end
+
+	if allow_immunity and self:attr("invulnerable") then return end
 
 	-- Effect
 	if effid_or_tid:find("^EFF_") then
