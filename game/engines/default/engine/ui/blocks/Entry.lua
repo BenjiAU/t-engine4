@@ -24,7 +24,7 @@ local Block = require "engine.ui.blocks.Block"
 -- @classmod engine.ui.blocks.block
 module(..., package.seeall, class.inherit(Block))
 
-function _M:init(t, text, color, w, h, offset, max_lines, default_unseen)
+function _M:init(t, text, color, w, h, offset, max_lines, default_unseen, smallcaps)
 	color = color or {255,255,255}
 	self.color = color
 	self.offset = offset
@@ -33,6 +33,7 @@ function _M:init(t, text, color, w, h, offset, max_lines, default_unseen)
 
 	self.selected = false
 	self.default_unseen = true
+	self.smallcaps = smallcaps
 
 	t = t or {}
 	self.t = t
@@ -64,6 +65,7 @@ function _M:generateContainer()
 	self.max_text_w = w - self.frame.b4.w - self.frame.b6.w
 	self.up_text_h = (h - self.font_h * self.max_lines) / 2
 	self.text = core.renderer.text(self.parent.font):translate(0, 0, 10)
+	if self.smallcaps then self.text:smallCaps(true):textStyle("bold") end
 	self.text:maxLines(self.max_lines)
 	if self.max_lines > 1 then self.text:maxWidth(self.max_text_w) end
 	self.text:textColor(self.color[1] / 255, self.color[2] / 255, self.color[3] / 255, 1)

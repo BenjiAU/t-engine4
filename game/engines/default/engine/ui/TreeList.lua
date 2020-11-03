@@ -273,7 +273,7 @@ function _M:setList(tree) -- the name is a bit misleading but legacy
 	self:setTree(tree)
 end
 
-function _M:drawItem(item)
+function _M:drawItem(item, smallcaps)
 	local is_header = item._is_header
 	if not item._container then
 		item.cols = {}
@@ -315,7 +315,7 @@ function _M:drawItem(item)
 				if is_header then
 					opts = {frame="ui/heading-sel", frame_sel="ui/heading"}
 				end
-				item.cols[i]._entry = Entry.new(opts, text, color, col.width - offset, self.fh, offset, 1, not is_header)
+				item.cols[i]._entry = Entry.new(opts, text, color, col.width - offset, self.fh, offset, 1, not is_header, is_header)
 				item.cols[i]._entry:translate(x + offset, 0, 0)
 				item.cols[i]._entry:select(is_header)
 				local ec = item.cols[i]._entry:get()

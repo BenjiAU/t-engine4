@@ -92,7 +92,7 @@ function _M:init(title, equip_actor, filter, action, on_select, inven_actor, for
 	self.c_inven = Inventory.new{actor=inven_actor, inven=inven_actor:getInven("INVEN") or {}, width=self.iw - vsep.w - self.c_doll.w, height=self.ih - 10, filter=filter,
 		default_last_tabs = "all",
 		fct=function(item, sel, button, event) self:use(item, button, event) end,
-		select=function(item, sel) if self.c_inven and item._pos_y then
+		select=function(item, sel) if self.c_inven and item and item._pos_y then
 			item.last_display_x = self.c_inven.c_inven.last_display_x + self.c_inven.w
 			item.last_display_y = self.c_inven.c_inven.last_display_y + item._pos_y
 			self:select(item)
