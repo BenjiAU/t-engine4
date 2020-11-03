@@ -272,6 +272,16 @@ function _M:setVisionShader(shader)
 	self._map:setVisionShader(shader.shad)
 end
 
+function _M:setGridLinesShader(shader)
+	if not shader then
+		if not _M.default_gridlines_shader then
+			_M.default_gridlines_shader = Shader.new("default/map_gridlines")
+		end
+		shader = _M.default_gridlines_shader
+	end
+	self._map:setGridLinesShader(shader.shad)
+end
+
 function _M:getMapDO()
 	-- Map C object is already a DO, woot
 	return self._map
@@ -297,6 +307,7 @@ function _M:makeCMap()
 
 	self:updateDefaultShader()
 	self:setVisionShader()
+	self:setGridLinesShader()
 
 	self._fovcache =
 	{

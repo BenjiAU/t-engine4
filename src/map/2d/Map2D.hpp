@@ -268,6 +268,7 @@ private:
 	// Grid lines
 	VBO grid_lines_vbo;
 	int grid_lines_shader_ref = LUA_NOREF;
+	shader_type *grid_lines_shader = nullptr;
 	float show_grid_lines = 2;
 
 	// Renderer

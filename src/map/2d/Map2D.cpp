@@ -591,7 +591,10 @@ void Map2D::setVisionShader(shader_type *s, int ref) {
 void Map2D::setGridLinesShader(shader_type *s, int ref) {
 	refcleaner(&grid_lines_shader_ref);
 	grid_lines_shader_ref = ref;
+	grid_lines_shader = s;
 	grid_lines_vbo.setShader(s);
+	useShaderSimple(s);
+	glUniform2f(s->p_texsize, screen->w / screen_zoom, screen->h / screen_zoom);
 }
 
 void Map2D::setZCallback(int32_t z, int ref) {
@@ -826,7 +829,15 @@ void Map2D::toScreen(mat4 cur_model, vec4 color) {
 	}
 
 	// Render grid lines
-	if (show_grid_lines) grid_lines_vbo.toScreen(scur_model);
+	if (show_grid_lines) {
+		if (grid_lines_shader) {
+			int x = 0, y = 0;
+			int buttons = SDL_GetMouseState(&x, &y);
+			useShaderSimple(grid_lines_shader);
+			glUniform2f(grid_lines_shader->p_mapcoord, x / screen_zoom, (screen->h - y) / screen_zoom);
+		}
+		grid_lines_vbo.toScreen(scur_model);
+	}
 
 	// Update minimaps
 	if (minimap_changed) {

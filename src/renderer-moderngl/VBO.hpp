@@ -52,7 +52,6 @@ class VBO {
 
 	GLuint vbo = 0, vbo_elements = 0;
 	vector<GLuint> textures;
-	shader_type *shader = NULL;
 
 	vector<vbo_vertex> vertices;
 	vector<GLuint> elements;
@@ -62,6 +61,7 @@ class VBO {
 	void update();
 
 public:
+	shader_type *shader = NULL;
 	VBO();
 	VBO(VBOMode mode);
 	virtual ~VBO();
