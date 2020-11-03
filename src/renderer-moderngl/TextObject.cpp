@@ -471,6 +471,7 @@ void DORText::center() {
 		it->pos.x -= hw;
 		it->pos.y -= hh;
 	}
+	entities_container.translate(-hw, -hh, (float)0, false);
 	setChanged();
 }
 

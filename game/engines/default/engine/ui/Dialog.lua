@@ -548,6 +548,7 @@ function _M:generate()
 		self.frame_container:add(fromTextureTable(b8, cx + b7.w, cy + 0, w - b7.w - b9.w, nil, true, r, g, b, a))
 		self.frame_container:add(fromTextureTable(b2, cx + b1.w, cy + h - b2.h, w - b1.w - b3.w, nil, true, r, g, b, a))
 	end
+	self.frame.b8_h = b8.h
 
 	-- Overlays
 	self.overs = {}
@@ -604,6 +605,8 @@ function _M:generate()
 		Base:changeDefault(self._lastui)
 		self._lastui = nil
 	end
+
+	if self.postGenerate then self:postGenerate() end
 end
 
 function _M:updateTitle(title)

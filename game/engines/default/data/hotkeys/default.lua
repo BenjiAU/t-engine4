@@ -126,8 +126,8 @@ newKind{
 			frame = "sustain"
 		end
 		if o and o.wielded and o.use_talent and o.use_talent.id then
-			local t = a:getTalentFromId(o.use_talent.id)
-			if not a:preUseTalent(t, true, true, true) then
+			local t = actor:getTalentFromId(o.use_talent.id)
+			if not actor:preUseTalent(t, true, true, true) then
 				pie_angle = 0
 				pie_color = {0.74,0.74,0.74,0.4}
 				frame = "disabled"

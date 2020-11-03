@@ -56,8 +56,6 @@ function _M:init(quest, status)
 	local add = ''
 	if quest.popup_text and quest.popup_text[status] then add = quest.popup_text[status].."\n" end
 
-	self.blight = self:getUITexture("ui/dialogframe_backglow.png")
-
 	local f, fs = FontPackage:getFont("bold")
 	local quest = Textzone.new{auto_width=true, auto_height=true, text=("#ANTIQUE_WHITE#Quest: #AQUAMARINE#%s"):tformat(self.quest.name), font={f, math.ceil(fs * 2)}}
 	quest:setTextShadow(3)
@@ -79,6 +77,16 @@ function _M:init(quest, status)
 		EXIT = function() game:unregisterDialog(self) end,
 		ACCEPT = function() game:unregisterDialog(self) end,
 	}
+end
+
+function _M:postGenerate()
+	local cx, cy = self.frame.ox1, self.frame.oy1
+	local blight_t = self:getUITexture("ui/dialogframe_backglow.png")
+	local blight = core.renderer.fromTextureTable(blight_t)
+	self.frame_container:add(blight:translate(cx, cy - blight_t.h / 2 + self.frame.b8_h / 2, -10))
+	local swap = false
+	local function glow(blight) swap = not swap blight:tween(40, "a", nil, swap and 0.5 or 1, nil, glow) end
+	glow(blight)
 end
 
 -- Any clicks inside will open the journal
