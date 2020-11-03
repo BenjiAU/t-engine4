@@ -2170,6 +2170,7 @@ do return end
 						self.log("There is nowhere left to explore.")
 						self:triggerHook{"Player:autoExplore:nowhere"}
 					else
+						self.player:onRunStart()
 						while self.player:enoughEnergy() and self.player:runStep() do end
 					end
 				end

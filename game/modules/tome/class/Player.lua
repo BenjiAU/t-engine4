@@ -1019,6 +1019,7 @@ end
 --- We started resting
 function _M:onRestStart()
 	core.game.setRealtime(0) -- Swap to tick mode to improve speed
+	core.game.setFPS(config.settings.display_fps / 3)
 	if self.resting and self:attr("equilibrium_regen_on_rest") and not self.resting.equilibrium_regen then
 		self:attr("equilibrium_regen", self:attr("equilibrium_regen_on_rest"))
 		self.resting.equilibrium_regen = self:attr("equilibrium_regen_on_rest")
@@ -1033,6 +1034,7 @@ end
 --- We stopped resting
 function _M:onRestStop()
 	core.game.setRealtime(1) -- Swap back to realtime mode
+	core.game.setFPS(config.settings.display_fps)
 	if self.resting and self.resting.equilibrium_regen then
 		self:attr("equilibrium_regen", -self.resting.equilibrium_regen)
 		self.resting.equilibrium_regen = nil
@@ -1047,11 +1049,13 @@ end
 --- We started running
 function _M:onRunStart()
 	core.game.setRealtime(0) -- Swap to tick mode to improve speed
+	core.game.setFPS(config.settings.display_fps / 3)
 end
 
 --- We stopped running
 function _M:onRunStop()
 	core.game.setRealtime(1) -- Swap back to realtime mode
+	core.game.setFPS(config.settings.display_fps)
 end
 
 --- Can we continue resting ?
