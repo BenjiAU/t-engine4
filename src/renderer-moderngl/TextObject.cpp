@@ -29,6 +29,7 @@ extern "C" {
 #include "main.h"
 #include "utf8proc/utf8proc.h"
 }
+#include <cctype>
 
 #include "renderer-moderngl/Renderer.hpp"
 #include "renderer-moderngl/TextObject.hpp"
@@ -63,6 +64,7 @@ void DORText::setFrom(DORText *prev) {
 void DORText::setTextStyle(font_style style) {
 	default_style = style;
 	used_font_style = style;
+	parseText();
 }
 void DORText::setTextColor(float r, float g, float b, float a) {
 	font_color.r = r; font_color.g = g; font_color.b = b; font_color.a = a;
@@ -71,18 +73,29 @@ void DORText::setTextColor(float r, float g, float b, float a) {
 	used_last_color = font_last_color;
 	parseText();
 }
+void DORText::setTextSmallCaps(bool v) {
+	small_caps = v;
+	parseText();
+}
 
 int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, int by, float r, float g, float b, float a) {
 	int x = 0, y = by;
 	ssize_t off = 1;
 	int32_t c;
-	float scale = font->scale;
 	float italic = 0;
+	float base_scale = font->scale;
 	if (style == FONT_STYLE_ITALIC) { style = FONT_STYLE_NORMAL; italic = 0.3; }
 	while (off > 0) {
 		off = utf8proc_iterate((const uint8_t*)str, len, &c);
 		str += off;
 		len -= off;
+		float scale = base_scale;
+		if (small_caps) {
+			if (!isupper(c)) {
+				scale *= 0.75;
+				c = toupper(c);
+			}
+		}
 
 		font->kind->font->outline_thickness = 0;
 		font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
@@ -100,7 +113,7 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 			float x0  = bx + x + d->offset_x * scale;
 			float x1  = x0 + d->width * scale;
 			float italicx = - d->offset_x * scale * italic;
-			float y0 = by + (font->kind->font->ascender - d->offset_y) * scale;
+			float y0 = by + (font->kind->font->ascender - d->offset_y) * scale + d->height * (base_scale - scale);
 			float y1 = y0 + (d->height) * scale;
 			positions.push_back({x0, y});
 
@@ -123,7 +136,7 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 					float x0  = bx + x + doutline->offset_x * scale;
 					float x1  = x0 + doutline->width * scale;
 					float italicx = - doutline->offset_x * scale * italic;
-					float y0 = by + (font->kind->font->ascender - doutline->offset_y) * scale;
+					float y0 = by + (font->kind->font->ascender - doutline->offset_y) * scale + d->height * (base_scale - scale);
 					float y1 = y0 + (doutline->height) * scale;
 
 					vertices.push_back({{1+x0+italicx, 1+y0, 0, 1},	{doutline->s0, doutline->t0}, outline_color});

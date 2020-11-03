@@ -35,6 +35,7 @@ dark = {
 	frame_oy1 = -42,
 	frame_oy2 =  42,
 	title_bar = {x=0, y=-18, w=4, h=25},
+	header_compress = 10,
 }
 
 stone = {

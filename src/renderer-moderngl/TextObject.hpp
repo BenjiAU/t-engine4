@@ -55,6 +55,8 @@ private:
 	float outline = 0;
 	vec4 outline_color;
 
+	bool small_caps = false;
+
 	virtual void cloneInto(DisplayObject *into);
 
 public:
@@ -80,6 +82,7 @@ public:
 	void setMaxLines(int max) { this->max_lines = max; parseText(); };
 	void setTextStyle(font_style style);
 	void setTextColor(float r, float g, float b, float a);
+	void setTextSmallCaps(bool v);
 	void setFrom(DORText *prev);
 
 	vec2 getLetterPosition(int idx);

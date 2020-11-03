@@ -611,7 +611,7 @@ function _M:updateTitle(title)
 	if type(title)=="function" then title = title() end
 
 	if not self.title_do then
-		self.title_do = core.renderer.text(self.font_bold):scale(1.15, 1.15, 1)
+		self.title_do = core.renderer.text(self.font_bold):smallCaps(true):scale(1.15, 1.15, 1)
 		self.do_container:add(self.title_do)
 	else
 		self.title_do:removeFromParent()

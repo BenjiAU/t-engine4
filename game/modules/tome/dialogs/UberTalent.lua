@@ -26,6 +26,7 @@ local Textzone = require "engine.ui.Textzone"
 local TextzoneList = require "engine.ui.TextzoneList"
 local TalentGrid = require "mod.dialogs.elements.TalentGrid"
 local Separator = require "engine.ui.Separator"
+local Header = require "engine.ui.Header"
 local DamageType = require "engine.DamageType"
 local FontPackage = require "engine.FontPackage"
 
@@ -195,15 +196,16 @@ function _M:createDisplay()
 	self.c_tut = Textzone.new{ width=self.iw, auto_height = true, text=self.regentuttext()}
 	
 	local vsep = Separator.new{dir="horizontal", size=self.ih - 20 - self.c_tut.h}
-	local listsep = Separator.new{dir="vertical", size=370, text=_t"#{bold}##GOLD#Prodigies#{normal}#"}
-	listsep:setTextShadow(true)
+	-- local listsep = Separator.new{dir="vertical", size=370, text=_t"#{bold}##GOLD#Prodigies#{normal}#"}
+	-- listsep:setTextShadow(true)
+	local listsep = Header.new{width=370, text=_t"Prodigies", color=colors.simple1(colors.GOLD)}
 	local evosep
 
-	self.c_desc = TextzoneList.new{ focus_check = true, scrollbar = true, pingpong = 20, width=self.iw - 370 - vsep.w - 20, height = self.ih - self.c_tut.h, dest_area = { h = self.ih - self.c_tut.h } }
+	self.c_tal_name = Header.new{width=370, color=colors.simple1(colors.GOLD)}
+	self.c_desc = TextzoneList.new{ focus_check = true, scrollbar = true, pingpong = 20, width=self.iw - 370 - vsep.w - 20, height = self.ih - self.c_tut.h - self.c_tal_name.h, dest_area = { h = self.ih - self.c_tut.h } }
 
 	if self.has_evos then
-		evosep = Separator.new{dir="vertical", size=370, text=_t"#{bold}##LIGHT_STEEL_BLUE#Evolutions#{normal}#", text_shadow=1}
-		evosep:setTextShadow(true)
+		evosep = Header.new{width=370, text=_t"Evolutions", color=colors.simple1(colors.LIGHT_STEEL_BLUE)}
 		self.c_evo = TalentGrid.new{
 			font = core.display.newFont("/data/font/DroidSans.ttf", 14),
 			tiles=game.uiset.hotkeys_display_icons,
@@ -215,6 +217,7 @@ function _M:createDisplay()
 				local ret = self:getTalentDesc(item), x, nil
 				self.c_desc:erase()
 				self.c_desc:switchItem(ret, ret)
+				self.c_tal_name:set(item.rawname)
 				return ret
 			end,
 			on_use = function(item, inc) self:use(item) end,
@@ -234,6 +237,7 @@ function _M:createDisplay()
 			local ret = self:getTalentDesc(item), x, nil
 			self.c_desc:erase()
 			self.c_desc:switchItem(ret, ret)
+			self.c_tal_name:set(item.rawname)
 			return ret
 		end,
 		on_use = function(item, inc) self:use(item) end,
@@ -245,7 +249,8 @@ function _M:createDisplay()
 		{left=0, top=self.c_tut.h, ui=listsep},
 		{left=0, top=self.c_tut.h+listsep.h, ui=self.c_list},
 		{left=self.c_list, top=self.c_tut.h, ui=vsep},
-		{right=0, top=self.c_tut.h, ui=self.c_desc},
+		{right=0, top=self.c_tut.h, ui=self.c_tal_name},
+		{right=0, top=self.c_tut.h+self.c_tal_name.h, ui=self.c_desc},
 	}
 	if self.has_evos then
 		table.insert(ret, 3, {left=0, top=self.c_tut.h+listsep.h+self.c_list.h, ui=evosep})
@@ -285,9 +290,6 @@ end
 function _M:getTalentDesc(item)
 	if not item.talent then return end
 	local text = tstring{}
-
- 	text:add({"color", "GOLD"}, {"font", "bold"}, util.getval(item.rawname, item), {"color", "LAST"}, {"font", "normal"})
-	text:add(true, true)
 
 	if item.talent then
 		local t = self.actor:getTalentFromId(item.talent)

@@ -28,6 +28,7 @@ local UIContainer = require "engine.ui.UIContainer"
 local TalentTrees = require "mod.dialogs.elements.TalentTrees"
 local StatusBox = require "mod.dialogs.elements.StatusBox"
 local Separator = require "engine.ui.Separator"
+local Header = require "engine.ui.Header"
 local Checkbox = require "engine.ui.Checkbox"
 local Empty = require "engine.ui.Empty"
 local DamageType = require "engine.DamageType"
@@ -723,6 +724,8 @@ function _M:createDisplay()
 				if self.no_tooltip then
 					self.c_desc:erase()
 					self.c_desc:switchItem(ret, ret)
+					if config.settings.cheat and item.talent then self.c_tal_name:set(util.getval(item.rawname, item).." ("..self.actor:getTalentFromId(item.talent).id..")")
+					else self.c_tal_name:set(util.getval(item.rawname, item)) end
 				end
 				return ret
 			end,
@@ -745,6 +748,8 @@ function _M:createDisplay()
 				if self.no_tooltip then
 					self.c_desc:erase()
 					self.c_desc:switchItem(ret, ret)
+					if config.settings.cheat and item.talent then self.c_tal_name:set(util.getval(item.rawname, item).." ("..self.actor:getTalentFromId(item.talent).id..")")
+					else self.c_tal_name:set(util.getval(item.rawname, item)) end
 				end
 				return ret
 			end,
@@ -769,6 +774,7 @@ function _M:createDisplay()
 			if self.no_tooltip then
 				self.c_desc:erase()
 				self.c_desc:switchItem(ret, ret)
+				self.c_tal_name:set(item.rawname)
 			end
 			return ret
 		end,
@@ -861,9 +867,11 @@ function _M:createDisplay()
 	if self.no_tooltip then
 		local vsep3 = Separator.new{dir="horizontal", size=self.ih - self.b_stat.h - 10}
 		-- will be recalculated
-		self.c_desc = TextzoneList.new{ focus_check = true, scrollbar = true, pingpong=20, width=200, height = self.ih - (self.b_prodigies and self.b_prodigies.h + 5 or 0), dest_area = { h = self.ih - (self.b_prodigies and self.b_prodigies.h + 5 or 0) } }
+		self.c_tal_name = Header.new{width=200, color=colors.simple1(colors.GOLD)}
+		self.c_desc = TextzoneList.new{ focus_check = true, scrollbar = true, pingpong=20, width=200, height = self.ih - self.c_tal_name.h - (self.b_prodigies and self.b_prodigies.h + 5 or 0), dest_area = { h = self.ih - (self.b_prodigies and self.b_prodigies.h + 5 or 0) } }
 		ret[#ret+1] = {left=self.c_gtree, top=align_empty1, ui=vsep3}
-		ret[#ret+1] = {left=vsep3, right=0, top=0, ui=self.c_desc, calc_width=3}
+		ret[#ret+1] = {left=vsep3, right=0, top=0, ui=self.c_tal_name, calc_width=3}
+		ret[#ret+1] = {left=vsep3, right=0, top=self.c_tal_name, ui=self.c_desc, calc_width=3}
 	end
 
 	return ret
@@ -957,13 +965,6 @@ tokenize_number.decimal =
 function _M:getTalentDesc(item)
 	self.last_drawn_talent = item.talent
 	local text = tstring{}
-
-	if config.settings.cheat and item.talent then
- 		text:add({"color", "GOLD"}, {"font", "bold"}, util.getval(item.rawname, item), " (", self.actor:getTalentFromId(item.talent).id,")", {"color", "LAST"}, {"font", "normal"})
-	else
- 		text:add({"color", "GOLD"}, {"font", "bold"}, util.getval(item.rawname, item), {"color", "LAST"}, {"font", "normal"})
- 	end
-	text:add(true, true)
 
 	if item.type then
 		text:add({"color",0x00,0xFF,0xFF}, _t"Talent Category", true)

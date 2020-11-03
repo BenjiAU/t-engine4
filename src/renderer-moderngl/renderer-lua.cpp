@@ -1363,7 +1363,16 @@ static int gl_text_style(lua_State *L)
 		lua_pushstring(L, "text:style called without normal/bold/italic/underline");
 		lua_error(L);
 	}
-	return 0;
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
+static int gl_text_smallcaps(lua_State *L)
+{
+	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
+	v->setTextSmallCaps(lua_toboolean(L, 2));
+	lua_pushvalue(L, 1);
+	return 1;
 }
 
 static int gl_text_from(lua_State *L)
@@ -2186,6 +2195,8 @@ static const struct luaL_Reg gl_text_reg[] =
 	{"outline", gl_text_outline},
 	{"setFrom", gl_text_from},
 	{"textColor", gl_text_text_color},
+	{"textStyle", gl_text_style},
+	{"smallCaps", gl_text_smallcaps},
 	{"getStats", gl_text_stats},
 	{"maxWidth", gl_text_max_width},
 	{"maxLines", gl_text_max_lines},
