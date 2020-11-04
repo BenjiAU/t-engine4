@@ -1065,7 +1065,7 @@ function _M:toScreen(x, y, nb_keyframes)
 					pos.x = self.w + pdef.position.ox + self.b3.w
 					pos.y = self.h + pdef.position.oy + self.b3.h
 				end
-				self.frame_container:add(p:getDO():translate(pos.x, pos.y, 100))
+				self.frame_container:add(p:getDO():translate(self.frame.ox1 + pos.x, self.frame.oy1 + pos.y, 100))
 			end
 		end
 	end

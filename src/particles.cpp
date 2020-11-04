@@ -210,13 +210,13 @@ static int particles_new(lua_State *L)
 	ps->args = strdup(args);
 	ps->shift_x = ps->shift_y = 0;
 	ps->density = density;
-	ps->alive = TRUE;
-	ps->i_want_to_die = FALSE;
+	ps->alive = true;
+	ps->i_want_to_die = false;
 	ps->l = NULL;
 	ps->can_shift = can_shift;
 	ps->vertices = NULL;
 	ps->particles = NULL;
-	ps->init = FALSE;
+	ps->init = false;
 	ps->send_value = 0;
 	ps->send_value_pt = 0;
 	ps->trigger_old = 0;
@@ -228,7 +228,7 @@ static int particles_new(lua_State *L)
 	ps->fboalter = fboalter;
 	ps->allow_bloom = allow_bloom;
 	ps->sub = NULL;
-	ps->recompile = FALSE;
+	ps->recompile = false;
 	glGenBuffers(1, &ps->vbo);
 	ps->vbo_elements = 0;
 
@@ -291,7 +291,7 @@ void particles_shift(particles_type *ps, float sx, float sy, bool set) {
 				}
 			}
 
-			ps->recompile = TRUE;
+			ps->recompile = true;
 		}
 	}
 
@@ -327,7 +327,7 @@ static int particles_free(lua_State *L)
 
 	if (l && l->pt) SDL_mutexP(l->pt->lock);
 
-	ps->alive = FALSE;
+	ps->alive = false;
 	if (l) l->ps = NULL;
 	ps->l = NULL;
 	SDL_DestroyMutex(ps->lock);
@@ -360,7 +360,7 @@ static int particles_die(lua_State *L)
 {
 	particles_type *ps = (particles_type*)auxiliar_checkclass(L, "core{particles}", 1);
 
-	ps->i_want_to_die = TRUE;
+	ps->i_want_to_die = true;
 	return 1;
 }
 
@@ -368,7 +368,7 @@ static int particles_die(lua_State *L)
 static void particles_update(particles_type *ps, bool last, bool no_update)
 {
 	int w = 0;
-	bool alive = FALSE;
+	bool alive = false;
 	float zoom = 1;
 	float i, j;
 	float a;
@@ -378,7 +378,7 @@ static void particles_update(particles_type *ps, bool last, bool no_update)
 
 	if (last) SDL_mutexP(ps->lock);
 
-	ps->recompile = FALSE;
+	ps->recompile = false;
 
 	particles_vertex *vertices = ps->vertices;
 
@@ -388,11 +388,10 @@ static void particles_update(particles_type *ps, bool last, bool no_update)
 	for (w = 0; w < ps->nb; w++)
 	{
 		particle_type *p = &ps->particles[w];
-
 		if (p->life > 0)
 		{
 			if (!no_update) {
-				alive = TRUE;
+				alive = true;
 
 				if (p->life != PARTICLE_ETERNAL) p->life--;
 
@@ -611,7 +610,7 @@ void particles_to_screen(particles_type *ps, mat4 model)
 	if (!ps->init) return;
 	if (!ps->texture) return;
 
-	if (ps->recompile) particles_update(ps, TRUE, TRUE);
+	if (ps->recompile) particles_update(ps, true, true);
 
 	if (ps->allow_bloom && bloom_fbo) {
 		particle_draw_last *pdl = (particle_draw_last*)malloc(sizeof(particle_draw_last));
@@ -823,7 +822,7 @@ static int particles_emit(lua_State *L)
 				p->ga = rng(ps->ga_min, ps->ga_max) / ps->base;
 				p->ba = rng(ps->ba_min, ps->ba_max) / ps->base;
 				p->aa = rng(ps->aa_min, ps->aa_max) / ps->base;
-				p->trail = FALSE;
+				p->trail = false;
 			}
 			else
 			{
@@ -1003,10 +1002,10 @@ void thread_particle_run(particle_thread *pt, plist *l)
 			lua_pop(L, 2);
 		}
 		else {
-			bool run = FALSE;
+			bool run = false;
 			lua_pushliteral(L, "ps");
 			lua_rawget(L, -2);
-			if (!lua_isnil(L, -1)) run = TRUE;
+			if (!lua_isnil(L, -1)) run = true;
 			lua_pop(L, 1);
 
 			if (run) {
@@ -1014,7 +1013,7 @@ void thread_particle_run(particle_thread *pt, plist *l)
 				if (lua_pcall(L, 2, 1, 0))
 				{
 	//				printf("L(%x) Particle updater error %x (%d, %d): %s\n", (int)L, (int)l, l->updator_ref, l->emit_ref, lua_tostring(L, -1));
-	//				ps->i_want_to_die = TRUE;
+	//				ps->i_want_to_die = true;
 					lua_pop(L, 1);
 				}
 				ps->trigger_pass = lua_tonumber(L, -1);
@@ -1023,10 +1022,10 @@ void thread_particle_run(particle_thread *pt, plist *l)
 		}
 		lua_pop(L, 1); // global table
 
-		particles_update(ps, TRUE, FALSE);
+		particles_update(ps, true, false);
 	} else {
 		// We panic'ed! This particule is borked and needs to die
-		ps->i_want_to_die = TRUE;
+		ps->i_want_to_die = true;
 	}
 }
 
@@ -1239,7 +1238,7 @@ void thread_particle_init(particle_thread *pt, plist *l)
 	free((char*)ps->name_def);
 	free((char*)ps->args);
 	ps->name_def = ps->args = NULL;
-	ps->init = TRUE;
+	ps->init = true;
 }
 
 plist * thread_particle_die(particle_thread *pt, plist *l)
@@ -1279,8 +1278,8 @@ plist * thread_particle_die(particle_thread *pt, plist *l)
 		if (ps->particles) { free(ps->particles); ps->particles = NULL; }
 		if (ps->args) { free((void*)ps->args); ps->args = NULL; }
 		if (ps->name_def) { free((void*)ps->name_def); ps->name_def = NULL; }
-		ps->init = FALSE;
-		ps->alive = FALSE;
+		ps->init = false;
+		ps->alive = false;
 		ps->l = NULL;
 	}
 
@@ -1429,7 +1428,7 @@ void free_particles_thread()
 
 		printf("Destroying particle thread %d (waiting for mutex)\n", i);
 		SDL_mutexP(pt->lock);
-		pt->running = FALSE;
+		pt->running = false;
 		SDL_mutexV(pt->lock);
 
 		printf("Destroying particle thread %d\n", i);
@@ -1470,7 +1469,7 @@ void create_particles_thread()
 		pt->list = NULL;
 		pt->lock = SDL_CreateMutex();
 		pt->keyframes = SDL_CreateSemaphore(0);
-		pt->running = TRUE;
+		pt->running = true;
 
 		thread = SDL_CreateThread(thread_particles, "particles", pt);
 		if (thread == NULL) {
