@@ -3602,7 +3602,7 @@ function _M:resolveLevelTalents()
 		for tid, info in pairs(self._levelup_talents) do
 			if not info.max or (self.talents[tid] or 0) < math.floor(info.max*maxfact) then
 				local last = info.last or self.start_level
-				if self.level - last >= info.every then
+				if self.level - last >= (info.every or 5) then
 					self:learnTalent(tid, true)
 					info.last = self.level
 				end
