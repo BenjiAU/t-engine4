@@ -39,6 +39,7 @@ void DORParticles::toScreen(mat4 cur_model, vec4 color) {
 	if (ps) {
 		// If we are dead, our parent has no more uses for us
 		if (!ps->alive) {
+REMEMBER THERE IS A BUG WHERE THE STEAM UI PARTICLES DONT FREE
 			removeFromParent();
 			return;
 		}

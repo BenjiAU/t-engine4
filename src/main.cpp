@@ -848,7 +848,7 @@ void on_redraw()
 
 	if (ticks_count >= 500) {
 		current_fps = (float)frames_done * 1000.0 / (float)ticks_count;
-		// printf("%d frames in %d ms = %0.2f FPS (%f keyframes)\n", frames_done, ticks_count, current_fps, keyframes_done);
+		printf("%d frames in %d ms = %0.2f FPS (%f keyframes)\n", frames_done, ticks_count, current_fps, keyframes_done);
 		ticks_count = 0;
 		frames_done = 0;
 		keyframes_done = 0;
@@ -865,9 +865,10 @@ void on_redraw()
 
 	// Run GC every second, this is the only place the GC should be called
 	// This is also a way to ensure the GC wont try to delete things while in callbacks from the display code and such which is annoying
-	if (ticks_count_gc >= 100) {
+	if (ticks_count_gc >= 5000) {
 		refcleaner_clean(L);
 		// lua_gc(L, LUA_GCSTEP, 5);
+		lua_gc(L, LUA_GCCOLLECT, 0);
 		ticks_count_gc = 0;
 	}
 }

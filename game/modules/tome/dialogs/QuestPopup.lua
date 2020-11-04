@@ -83,7 +83,7 @@ function _M:postGenerate()
 	local cx, cy = self.frame.ox1, self.frame.oy1
 	local blight_t = self:getUITexture("ui/dialogframe_backglow.png")
 	local blight = core.renderer.fromTextureTable(blight_t)
-	self.frame_container:add(blight:translate(cx, cy - blight_t.h / 2 + self.frame.b8_h / 2, -10))
+	self.frame_container:add(blight:translate(cx, cy - blight_t.h / 2 + self.b8.h / 2, -10))
 	local swap = false
 	local function glow(blight) swap = not swap blight:tween(40, "a", nil, swap and 0.5 or 1, nil, glow) end
 	glow(blight)
@@ -95,20 +95,3 @@ function _M:mouseEvent(button, x, y, xrel, yrel, bx, by, event)
 	game:unregisterDialog(self)
 	game:registerDialog(require("engine.dialogs.ShowQuests").new(game.party:findMember{main=true}, self.quest.id))
 end
-
--- DGDGDGDG replace
--- function _M:drawFrame(x, y, r, g, b, a)
--- 	-- Draw the glow
--- 	if a >= 1 then
--- 		local a = (1 + math.sin(core.game.getTime() / 500)) / 2
--- 		local x = x + self.frame.ox1
--- 		local y = y + self.frame.oy1
--- 		local mw = math.floor(self.frame.w / 2)
--- 		local blhw = math.floor(self.blight.w / 2)
--- 		local blhh = math.floor(self.blight.h / 2)
--- 		local b8hh = math.floor(self.b8.h / 2)
--- 		self.blight.t:toScreenFull(x + mw - blhw, y - blhh + b8hh, self.blight.w, self.blight.h, self.blight.tw, self.blight.th, r, g, b, 0.5 + 0.5 * a)
--- 	end
-	
--- 	Dialog.drawFrame(self, x, y, r, g, b, a)
--- end

@@ -498,7 +498,8 @@ static void particles_update(particles_type *ps, bool last, bool no_update)
 		ps->send_value_pt = ps->send_value;
 		ps->send_value = 0;
 
-		if (!no_update) ps->alive = alive || ps->no_stop;
+		ps->alive = alive || ps->no_stop;
+		// if (!no_update) ps->alive = alive || ps->no_stop;
 
 		SDL_mutexV(ps->lock);
 	}

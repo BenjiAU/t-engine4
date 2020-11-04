@@ -206,11 +206,6 @@ function _M:switchSets(which)
 	self.c_off_set.selected = self.equip_actor.off_weapon_slots
 end
 
-function _M:firstDisplay()
-	self.cur_item = nil
-	self.c_inven.c_inven:onSelect(true)
-end
-
 function _M:on_register()
 	if not self.inven_actor:getInven("INVEN") then
 		Dialog:simplePopup(_t"No Inventory", ("%s Has no defined main inventory"):tformat(self.inven_actor:getName():capitalize()))
