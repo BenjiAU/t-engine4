@@ -33,7 +33,7 @@ function _M:init(t)
 	self.w = assert(t.width, "no dropdown width")
 	self.fct = assert(t.fct, "no dropdown fct")
 	self.list = assert(t.list, "no dropdown list")
-	self.nb_items = assert(t.nb_items, "no dropdown nb_items")
+	self.nb_items = t.nb_items or #t.list
 	self.on_select = t.on_select
 	self.display_prop = t.display_prop or "name"
 	self.scrollbar = t.scrollbar
