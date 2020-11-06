@@ -22,10 +22,11 @@ local KeyBind = require "engine.KeyBind"
 local Base = require "engine.ui.Base"
 local Particles = require "engine.Particles"
 local Scrollbar = require "engine.ui.blocks.Scrollbar"
+local LayoutEngine = require "engine.ui.LayoutEngine"
 
 --- A generic UI Dialog
 -- @classmod engine.ui.Dialog
-module(..., package.seeall, class.inherit(Base))
+module(..., package.seeall, class.inherit(Base, LayoutEngine))
 
 --- Requests a simple waiter dialog
 function _M:simpleWaiter(title, text, width, count, max)

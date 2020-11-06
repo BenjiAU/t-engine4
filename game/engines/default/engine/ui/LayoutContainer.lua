@@ -20,11 +20,12 @@
 require "engine.class"
 local Base = require "engine.ui.Base"
 local Focusable = require "engine.ui.Focusable"
+local LayoutEngine = require "engine.ui.LayoutEngine"
 local KeyBind = require "engine.KeyBind"
 
 --- A UI container that can host other UI elements and lay them out same as Dialog can
 -- @classmod engine.ui.LayoutContainer
-module(..., package.seeall, class.inherit(Base, Focusable))
+module(..., package.seeall, class.inherit(Base, Focusable, LayoutEngine))
 
 function _M:init(t)
 	if not t.uis then error("LayoutContainer needs uis") end
@@ -284,51 +285,5 @@ function _M:on_focus_change(status)
 	else
 		self.focus_ui_id = 0 -- Hack
 		self:moveSubFocus(1)
-	end
-end
-
-function _M:getNUI(name)
-	return self.nuis and self.nuis[name]
-end
-
-function _M:makeByLines(lines)
-	local uis = self.uis
-	local linew = self.iw
-	local y = 0
-	self.nuis = {}
-	for i, line in ipairs(lines) do
-		local x = 0
-		local max_h = 0
-		line.padding = line.padding or 10
-		for j, ui in ipairs(line) do
-			local forcew = nil
-			local args = table.clone(ui[2], true)
-			local use_w = 0
-			if ui.w then
-				local p1 = ((j > 1) and line[j-1].pos.ui.w or 0) + line.padding
-				local p2 = ((j > 2) and line[j-2].pos.ui.w or 0) + line.padding
-				local p3 = ((j > 3) and line[j-3].pos.ui.w or 0) + line.padding
-				local p4 = ((j > 4) and line[j-4].pos.ui.w or 0) + line.padding
-				local p5 = ((j > 5) and line[j-5].pos.ui.w or 0) + line.padding
-				local s = "return function(p1,p2,p3,p4,p5) return "..ui.w:gsub('%%', '*'..self.iw.."/100").." end"
-				s = loadstring(s)()
-				args.width = s(p1,p2,p3,p4,p5)
-				use_w = args.width
-			end
-			local class = ui[1]
-			if not class:find("%.") then class = "engine.ui."..class end
-			local c = require(class).new(args)
-			ui.pos = {left = x, top = y, ui=c}
-			uis[#uis+1] = ui.pos
-			x = x + math.max(c.w, use_w) + line.padding
-			max_h = math.max(max_h, c.h)
-			if ui[3] then self.nuis[ui[3]] = c end
-		end
-		if line.vcenter then
-			for j, ui in ipairs(line) do
-				ui.pos.top = y + math.floor((max_h - ui.pos.ui.h) / 2)
-			end
-		end
-		y = y + max_h + (line.vpadding or 3)
 	end
 end
