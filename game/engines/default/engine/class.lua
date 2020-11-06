@@ -218,7 +218,7 @@ end
 
 local weak_metat = {
 	__mode = "v",
-	__index = function(t, k) util.show_backtrace() return rawget(t, "__getstrong")[k] end,
+	__index = function(t, k) return rawget(t, "__getstrong")[k] end,
 	__call = function(t) return rawget(t, "__getstrong") end,
 }
 

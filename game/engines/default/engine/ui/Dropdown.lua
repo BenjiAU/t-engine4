@@ -81,7 +81,7 @@ function _M:positioned(x, y, sx, sy, dialog)
 end
 
 function _M:showSelect()
-	local sx, sy = self.base_x, self.base_y + self.h
+	local sx, sy = self.base_x + self.dialog.display_x, self.base_y + self.h + self.dialog.display_y
 	if self.dialog() and self.dialog().scrollbar then sy = sy - self.dialog().scrollbar.pos  end
 
 	if sy + self.h + self.c_list.h > game.h then sy = game.h - self.c_list.h - self.h end
@@ -105,12 +105,14 @@ end
 
 function _M:selectEntry(i)
 	self.c_list.sel = i
+	self.value = self.c_list.list[self.c_list.sel]
 	self.textinput:setText(self.c_list:getCurrentText())
 end
 
 function _M:selectEntryBy(k, v)
 	for i, t in ipairs(self.list) do if t[k] == v then
 		self.c_list.sel = i
+		self.value = self.c_list.list[self.c_list.sel]
 		self.textinput:setText(self.c_list:getCurrentText())
 	end end
 end

@@ -238,6 +238,7 @@ function _M:updateUI()
 ----------------------------
 --[[
 	local LayoutContainer = require "engine.ui.LayoutContainer"
+	local Dropdown = require "engine.ui.Dropdown"
 
 	local tree = {}
 	for i = 1, 100 do tree[#tree+1] = {name='this is azlkdj a long text '..i, plop="kjhekjghekg", plop3="kjhekjghekg"} end
@@ -258,6 +259,7 @@ function _M:updateUI()
 	local test5 = Textzone.new{width=200, auto_height=true, text=table.concat(txttest,"\n")}
 	local test3 = Button.new{text="Login", width=100, fct=function() print("PLOP") end}
 	local test4 = Textbox.new{title="Search: ", text="", chars=30, max_len=60, fct=function() end, on_change=function(text)end}
+	local droptest = Dropdown.new{width=150, fct=function(item)  end, on_select=function(item) end, list={{name="pop"}, {name="pop1"}, {name="pop2"}, {name="pop3"}, }}
 	
 	local lay = LayoutContainer.new{width=600, height=600, uis={
 		{left=0, top=0, ui=test},
@@ -265,9 +267,11 @@ function _M:updateUI()
 		{left=0, top=test, ui=test5},
 	}}
 	local lay2 = LayoutContainer.new{width=600, height=600, uis={
-		{left=0, top=0, ui=test3},
-		{right=0, top=0, ui=test4},
+		{left=0, top=0, ui=droptest},
+		{left=0, top=60, ui=test3},
+		{right=0, top=200, ui=test4},
 	}}
+
 
 	uis = {
 		{left=0, top=0, ui=lay},
