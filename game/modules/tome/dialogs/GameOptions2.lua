@@ -86,6 +86,113 @@ function _M:isTome()
 	return game.__mod_info.short_name == "tome"
 end
 
+function _M:saveNumberValue(name, fct)
+	return function(v)
+		game:saveSettings(name, ("%s = %d\n"):format(name, v))
+		config.settings[name] = v
+		if fct then fct(v) end
+	end
+end
+
+function _M:saveBoolValue(name, fct)
+	return function(v)
+		game:saveSettings(name, ("%s = %s\n"):format(name, v and "true" or "false"))
+		config.settings[name] = v
+		if fct then fct(v) end
+	end
+end
+
+function _M:switchTo(kind)
+	self['generateList'..kind:capitalize()](self)
+	self:triggerHook{"GameOptions2:generateList", list=self.list, kind=kind}
+
+	local uis = {}
+	self.c_layout.uis = uis
+
+	local modes = {
+		{name=_t"Fullscreen", mode=" Fullscreen"},
+		{name=_t"Borderless", mode=" Borderless"},
+		{name=_t"Windowed", mode=" Windowed"},
+	}
+	local w, h, fullscreen, borderless = core.display.size()
+	local default_mode = 3
+	if borderless then default_mode = 2
+	elseif fullscreen then default_mode = 1 end
+	local resolutions, default_resolution = self:getResolutions()	
+
+	local font_styles = FontPackage:list()
+	local default_font_style = table.findValueSub(font_styles, )
+
+	self.c_layout:makeByLines{
+		{
+			{"Header", {width=self.iw, text=_t"Resolution", color=colors.simple1(colors.GOLD)}},
+		},
+		{ vcenter = true,
+			{            "Textzone", {auto_width=true, auto_height=true, text=_t"Mode: "}},
+			{w="40%-p1", "Dropdown", {default=default_mode, list=modes}, "resolution_mode"},
+			{            "Textzone", {auto_width=true, auto_height=true, text=_t"Resolution: "}},
+			{w="40%-p1", "Dropdown", {default=default_resolution, list=resolutions}, "resolution_size"},
+			{w="20%",    "Button",   {text="Apply", fct=function() self:changeResolution() end}},
+		},
+		{ vcenter = true,
+			{w="40%",    "NumberSlider", {title=_t"Max FPS: ", max=60, min=5, value=config.settings.display_fps, step=1, on_change=self:saveNumberValue("display_fps", function(v) core.game.setFPS(v) end)}},
+		},
+
+		{
+			{"Header", {width=self.iw, text=_t"Shaders", color=colors.simple1(colors.GOLD)}},
+		},
+		{ vcenter = true,
+			{w="33%",    "Checkbox", {title=_t"Shaders: Advanced", default=config.settings.shaders_kind_adv, on_change=self:saveBoolValue("shaders_kind_adv")}},
+			{w="33%",    "Checkbox", {title=_t"Shaders: Distortion", default=config.settings.shaders_kind_distort, on_change=self:saveBoolValue("shaders_kind_distort")}},
+			{w="33%",    "Checkbox", {title=_t"Shaders: Volumetric", default=config.settings.shaders_kind_volumetric, on_change=self:saveBoolValue("shaders_kind_volumetric")}},
+		},
+
+		{
+			{"Header", {width=self.iw, text=_t"Fonts", color=colors.simple1(colors.GOLD)}},
+		},
+		{ vcenter = true,
+			{            "Textzone", {auto_width=true, auto_height=true, text=_t"Style: "}},
+			{w="40%-p1", "Dropdown", {default=default_resolution, list=resolutions}, "resolution_size"},
+		},
+	}
+
+	self.c_layout:generate()
+end
+
+function _M:changeResolution(item)
+	local mode = self.c_layout:getNUI("resolution_mode").value.mode
+	local r = self.c_layout:getNUI("resolution_size").value.r..mode
+	local _, _, w, h = r:find("^([0-9]+)x([0-9]+)")
+	
+	-- See if we need a restart (confirm).
+	if core.display.setWindowSizeRequiresRestart(w, h, mode == " Fullscreen", mode == " Borderless") then
+		Dialog:yesnoPopup(_t"Engine Restart Required"
+			, ("Continue? %s"):tformat(game.creating_player and "" or _t" (progress will be saved)")
+			, function(restart)
+				if restart then
+					local resetPos = Dialog:yesnoPopup(_t"Reset Window Position?"
+						, _t"Simply restart or restart+reset window position?"
+						, function(simplyRestart)
+							if not simplyRestart then
+								core.display.setWindowPos(0, 0)
+								game:onWindowMoved(0, 0)
+							end
+							game:setResolution(r, true)
+							-- Save game and reboot
+							if not game.creating_player then game:saveGame() end
+							util.showMainMenu(false, nil, nil
+								, game.__mod_info.short_name, game.save_name
+								, false)
+						end, _t"Restart", _t"Restart with reset")
+				end
+			end, _t"Yes", _t"No")
+	else
+		game:setResolution(r, true)
+	end
+	
+	game:unregisterDialog(self)
+end
+
 function _M:getResolutions()
 	local l = {}
 	local seen = {}
@@ -118,84 +225,9 @@ function _M:getResolutions()
 
 	local _, _, curw, curh = config.settings.window.size:find("^([0-9]+)x([0-9]+)")
 	local cur = curw.."x"..curh
-	if not table.findValue(list, cur) then table.insert(list, {name=cur, r=cur}) end
+	if not table.findValueSub(list, cur, "r") then table.insert(list, {name=cur, r=cur}) end
 
-	return list
-end
-
-function _M:switchTo(kind)
-	self['generateList'..kind:capitalize()](self)
-	self:triggerHook{"GameOptions2:generateList", list=self.list, kind=kind}
-
-	local uis = {}
-	self.c_layout.uis = uis
-
-	local modes = {
-		{name=_t"Fullscreen", mode=" Fullscreen"},
-		{name=_t"Borderless", mode=" Borderless"},
-		{name=_t"Windowed", mode=" Windowed"},
-	}
-	local w, h, fullscreen, borderless = core.display.size()
-	local default_mode = 3
-	if borderless then default_mode = 2
-	elseif fullscreen then default_mode = 1 end
-
-	-- self:addOptionLine(
-	-- 	Textzone.new{auto_width=true, auto_height=true, text=_t"Mode: "},
-	-- 	Dropdown.new{width=150, fct=function(item)  end, on_select=function(item) end, list=modes},
-	-- 	Textzone.new{auto_width=true, auto_height=true, text=_t"Resolution: "},
-	-- 	Dropdown.new{width=150, fct=function(item)  end, on_select=function(item) end, list=self:getResolutions()},
-	-- 	Button.new{text="Apply", fct=function() end}
-	-- )
-
-	self.c_layout:makeByLines{
-		{
-			{"Header", {width=self.iw, text=_t"Resolution", color=colors.simple1(colors.GOLD)}},
-		},
-		{ padding = 50, vcenter = true,
-			{            "Textzone", {auto_width=true, auto_height=true, text=_t"Mode: "}},
-			{w="40%-p1", "Dropdown", {fct=function(item)  end, on_select=function(item) end, default=default_mode, list=modes}, "resolution_mode"},
-			{            "Textzone", {auto_width=true, auto_height=true, text=_t"Resolution: "}},
-			{w="40%-p1", "Dropdown", {fct=function(item)  end, on_select=function(item) end, list=self:getResolutions()}, "resolution_size"},
-			{w="20%",    "Button",   {text="Apply", fct=function() self:changeResolution() end}},
-		},
-	}
-
-	self.c_layout:generate()
-end
-
-function _M:changeResolution(item)
-	local mode = self.c_layout:getNUI("resolution_mode").value
-	local r = self.c_layout:getNUI("resolution_size").value..mode
-	local _, _, w, h = r:find("^([0-9]+)x([0-9]+)")
-	
-	-- See if we need a restart (confirm).
-	if core.display.setWindowSizeRequiresRestart(w, h, mode == " Fullscreen", mode == " Borderless") then
-		Dialog:yesnoPopup(_t"Engine Restart Required"
-			, ("Continue? %s"):tformat(game.creating_player and "" or _t" (progress will be saved)")
-			, function(restart)
-				if restart then
-					local resetPos = Dialog:yesnoPopup(_t"Reset Window Position?"
-						, _t"Simply restart or restart+reset window position?"
-						, function(simplyRestart)
-							if not simplyRestart then
-								core.display.setWindowPos(0, 0)
-								game:onWindowMoved(0, 0)
-							end
-							game:setResolution(r, true)
-							-- Save game and reboot
-							if not game.creating_player then game:saveGame() end
-							util.showMainMenu(false, nil, nil
-								, game.__mod_info.short_name, game.save_name
-								, false)
-						end, _t"Restart", _t"Restart with reset")
-				end
-			end, _t"Yes", _t"No")
-	else
-		game:setResolution(r, true)
-	end
-	
-	game:unregisterDialog(self)
+	return list, table.findValueSub(list, cur, "r")
 end
 
 

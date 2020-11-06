@@ -31,7 +31,7 @@ module(..., package.seeall, class.inherit(Base, Focusable))
 function _M:init(t)
 	self.text = t.text or ""
 	self.w = assert(t.width, "no dropdown width")
-	self.fct = assert(t.fct, "no dropdown fct")
+	self.fct = t.fct or function() end
 	self.list = assert(t.list, "no dropdown list")
 	self.nb_items = t.nb_items or #t.list
 	self.on_select = t.on_select
@@ -68,6 +68,7 @@ function _M:positioned(x, y, sx, sy, dialog)
 	self.c_list = List.new{width=self.w, list=table.clone(self.list, true), select=self.on_select, display_prop=self.display_prop, scrollbar=self.scrollbar, nb_items=self.nb_items, fct=function()
 		game:unregisterDialog(self.popup)
 		self:sound("button")
+		self.value = self.c_list.list[self.c_list.sel]
 		self.fct(self.c_list.list[self.c_list.sel])
 		self.textinput:setText(self.c_list:getCurrentText())
 	end}
@@ -96,6 +97,7 @@ function _M:showSelect()
 		game:unregisterDialog(self.popup)
 		self.c_list.sel = self.previous
 		self:sound("button")
+		self.value = self.c_list.list[self.c_list.sel]
 		self.fct(self.c_list.list[self.c_list.sel])
 		self.textinput:setText(self.c_list:getCurrentText())
 	end)

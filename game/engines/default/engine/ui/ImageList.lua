@@ -33,7 +33,7 @@ function _M:init(t)
 	self.w = assert(t.width, "no image list width")
 	self.h = assert(t.height, "no image list  height")
 	self.list = assert(t.list, "no image list list")
-	self.fct = assert(t.fct, "no image list fct")
+	self.fct = t.fct or function() end
 	self.padding = t.padding or 6
 	self.force_size = t.force_size
 	self.scrollbar = t.scrollbar

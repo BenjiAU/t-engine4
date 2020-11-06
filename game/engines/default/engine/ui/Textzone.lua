@@ -39,7 +39,7 @@ function _M:init(t)
 	self.auto_width = t.auto_width
 	self.has_box = t.has_box
 	self.has_box_alpha = t.has_box_alpha
-	self.fct = t.fct
+	self.fct = t.fct or function() end
 	self.all_buttons_fct = t.all_buttons_fct
 	self.center_w = t.center_w
 

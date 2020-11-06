@@ -32,10 +32,10 @@ function _M:init(t)
 	self.value = t.value or self.min
 	self.step = t.step or 10
 	self.on_change = t.on_change
-	self.fct = t.fct
-	assert(t.size or t.w, "no numberspinner size")
+	self.fct = t.fct or function() end
+	assert(t.size or t.w or t.width, "no numberspinner size")
 	self.size = t.size
-	self.w = t.w
+	self.w = t.w or t.width
 
 	WithTitle.init(self, t)
 end

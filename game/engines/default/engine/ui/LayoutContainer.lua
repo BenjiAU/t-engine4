@@ -299,10 +299,11 @@ function _M:makeByLines(lines)
 	for i, line in ipairs(lines) do
 		local x = 0
 		local max_h = 0
-		line.padding = line.padding or 3
+		line.padding = line.padding or 10
 		for j, ui in ipairs(line) do
 			local forcew = nil
 			local args = table.clone(ui[2], true)
+			local use_w = 0
 			if ui.w then
 				local p1 = ((j > 1) and line[j-1].pos.ui.w or 0) + line.padding
 				local p2 = ((j > 2) and line[j-2].pos.ui.w or 0) + line.padding
@@ -310,17 +311,16 @@ function _M:makeByLines(lines)
 				local p4 = ((j > 4) and line[j-4].pos.ui.w or 0) + line.padding
 				local p5 = ((j > 5) and line[j-5].pos.ui.w or 0) + line.padding
 				local s = "return function(p1,p2,p3,p4,p5) return "..ui.w:gsub('%%', '*'..self.iw.."/100").." end"
-				print(s)
 				s = loadstring(s)()
-				print(" => ", s(p1,p2,p3,p4,p5), "with p1", p1)
 				args.width = s(p1,p2,p3,p4,p5)
+				use_w = args.width
 			end
 			local class = ui[1]
 			if not class:find("%.") then class = "engine.ui."..class end
 			local c = require(class).new(args)
 			ui.pos = {left = x, top = y, ui=c}
 			uis[#uis+1] = ui.pos
-			x = x + c.w + line.padding
+			x = x + math.max(c.w, use_w) + line.padding
 			max_h = math.max(max_h, c.h)
 			if ui[3] then self.nuis[ui[3]] = c end
 		end

@@ -36,7 +36,7 @@ function _M:init(t)
 	self.h = t.height
 	self.nb_items = t.nb_items
 	assert(self.h or self.nb_items, "no tree height/nb_items")
-	self.fct = t.fct
+	self.fct = t.fct or function() end
 	self.on_drag = t.on_drag
 	self.on_drag_end = t.on_drag_end
 	self.on_expand = t.on_expand

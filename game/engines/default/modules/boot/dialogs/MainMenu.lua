@@ -74,8 +74,7 @@ function _M:init()
 				if not mod.team then fs.mount(fs.getRealPath(mod.dir), "/mod", false)
 				else fs.mount(fs.getRealPath(mod.team), "/", false) end
 
-				package.loaded["mod.dialogs.GameOptions2"] = nil
-				local d = require("mod.dialogs.GameOptions2").new()
+				local d = require("mod.dialogs.GameOptions").new()
 				function d:unload()
 					fs.reset()
 					fs.mountAll(allmounts)
