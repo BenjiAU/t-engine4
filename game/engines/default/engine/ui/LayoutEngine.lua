@@ -50,7 +50,7 @@ function _M:makeUIByLines(lines)
 				local p5 = ((j > 5) and line[j-5].pos.ui.w or 0) + line.padding
 				local s = "return function(p1,p2,p3,p4,p5) return "..ui.w:gsub('%%', '*'..self.iw.."/100").." end"
 				s = loadstring(s)()
-				args.width = s(p1,p2,p3,p4,p5)
+				args.width = s(p1,p2,p3,p4,p5) - line.padding
 				use_w = args.width
 			end
 			local class = ui[1]
@@ -72,7 +72,14 @@ function _M:makeUIByLines(lines)
 			ui.pos = {left = x, top = y, ui=c}
 			uis[#uis+1] = ui.pos
 			x = x + math.max(c.w, use_w) + line.padding
-			max_h = math.max(max_h, c.h)
+			-- if x + c.w > self.iw then
+			-- 	x = 0
+			-- 	y = y + math.max(max_h, c.h) + (line.vpadding or 3)
+			-- 	max_h = 0
+			-- else
+				max_h = math.max(max_h, c.h)
+			-- end
+
 			if ui[3] then self.nuis[ui[3]] = c end
 			if ui[4] then ui.pos.has_tooltip = ui[4] end
 		end

@@ -1082,7 +1082,7 @@ static int sdl_set_window_size(lua_State *L)
 	int h = luaL_checknumber(L, 2);
 	bool fullscreen = lua_toboolean(L, 3);
 	bool borderless = lua_toboolean(L, 4);
-	float zoom = luaL_checknumber(L, 5);
+	float zoom = fmax(0.5, luaL_checknumber(L, 5));
 
 	printf("Setting resolution to %dx%d (%s, %s)\n", w, h, fullscreen ? "fullscreen" : "windowed", borderless ? "borderless" : "with borders");
 	do_resize(w, h, fullscreen, borderless, zoom);

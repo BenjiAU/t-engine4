@@ -71,6 +71,13 @@ function _M:init()
 
 	self:switchTo("video")
 
+	self.key:addCommands{
+		_UP = function() end,
+		_DOWN = function() end,
+		_LEFT = function() end,
+		_RIGHT = function() end,
+	}
+
 	self.key:addBinds{
 		EXIT = function() game:unregisterDialog(self) end,
 	}
@@ -129,6 +136,44 @@ _M.save_array = {
 	["tome.fonts.type"] = function(v) return "tome.fonts", ("{ type = %q, size = %q }"):format(v, "normal") end,
 }
 
+function _M:defineSection(title, color)
+	if self.cur_ui_defs.cur_line then
+		self.cur_ui_defs.uis[#self.cur_ui_defs.uis+1] = self.cur_ui_defs.cur_line
+	end
+
+	color = color or colors.simple1(colors.GOLD)
+	self.cur_ui_defs.uis[#self.cur_ui_defs.uis+1] = {{w="100%", "Header", {text=title, color=color}}, vpadding_up=#self.cur_ui_defs.uis == 0 and 0 or 20}
+	self.cur_ui_defs.cur_line = {vcenter=true}
+end
+
+function _M:defineNextLine()
+	if self.cur_ui_defs.cur_line then
+		self.cur_ui_defs.uis[#self.cur_ui_defs.uis+1] = self.cur_ui_defs.cur_line
+	end
+	self.cur_ui_defs.cur_line = {vcenter=true}
+end
+
+function _M:defineOption(id, pos, widget, widget_args, tooltip)
+	local d = pos or {}
+	d[1] = widget
+	d[2] = widget_args
+	d[3] = id
+	d[4] = tooltip
+	self.cur_ui_defs.cur_line[#self.cur_ui_defs.cur_line+1] = d
+end
+
+function _M:defineLabel(text, pos)
+	self:defineOption(nil, pos, "Textzone", {auto_width=true, auto_height=true, text=text})
+end
+
+function _M:defineCheckbox(id, pos, title, fct, tooltip)
+	local dv = loadstring("return config.settings."..id)()
+	self:defineOption(id, pos,
+		"Checkbox", {title=title, default=dv, on_change=self:saveBoolValue(id, fct)},
+		tooltip
+	)
+end
+
 function _M:switchTo(kind)
 	self['generateList'..kind:capitalize()](self)
 	self:triggerHook{"GameOptions2:generateList", list=self.list, kind=kind}
@@ -150,55 +195,90 @@ function _M:switchTo(kind)
 	local font_styles = FontPackage:list()
 	local default_font_style = table.findValueSub(font_styles, config.settings.tome.fonts.type, "id")
 
-	self.use_tooltip:set("AZDAZPDPAD\nAZDAZPDPAD\nAZDAZPDPAD\nAZDAZPDPAD\nAZDAZPDPAD\nAZDAZPDPAD\nAZDAZPDPAD\n")
-	self.c_layout:makeUIByLines{
-		{{"Header", {width=self.iw, text=_t"Display", color=colors.simple1(colors.GOLD)}}},
-		{ vcenter = true,
-			{            "Textzone", {auto_width=true, auto_height=true, text=_t"Mode: "}},
-			{w="30%-p1", "Dropdown", {default=default_mode, list=modes, fct=function() self.c_layout:getNUI("resolution_apply").hide = false end}, "resolution_mode"},
-			{x="50%",    "Textzone", {auto_width=true, auto_height=true, text=_t"Resolution: "}},
-			{w="30%-p1", "Dropdown", {default=default_resolution, list=resolutions, fct=function() self.c_layout:getNUI("resolution_apply").hide = false end}, "resolution_size"},
-			{x="100%-w-10", "Button",   {text="Apply", fct=function() self:changeResolution() end, hide=true}, "resolution_apply"},
-		},
-		{ vcenter = true,
-			{w="50%",    "NumberSlider", {title=_t"Max FPS: ", max=60, min=5, value=config.settings.display_fps, step=1, on_change=self:saveNumberValue("display_fps", function(v) core.game.setFPS(v) end)}},
-			{w="50%",    "NumberSlider", {title=_t"Gamma: ", max=300, min=50, value=config.settings.gamma_correction, step=5, on_change=self:saveNumberValue("gamma_correction", function(v) game:setGamma(v / 100) end)}, nil, _t"Gamma correction setting.\nIncrease this to get a brighter display.#WHITE#"},
-		},
-		{ vcenter = true,
-			{w="50%",    "NumberSlider", {title=_t"Zoom: ", max=400, min=50, value=config.settings.screen_zoom*100, step=5, on_change=self:saveFloatValue("screen_zoom", nil, nil, 1/100)}, nil, _t"If you have a very high DPI screen you may want to raise this value. Requires a restart to take effect.#WHITE#"},
-		},
+	self.cur_ui_defs = {uis={}}
 
-		{{"Header", {width=self.iw, text=_t"Fonts", color=colors.simple1(colors.GOLD)}}, vpadding_up=20},
-		{ vcenter = true,
-			{            "Textzone", {auto_width=true, auto_height=true, text=_t"Style: "}},
-			{w="50%-p1", "Dropdown", {default=default_font_style, list=font_styles, fct=self:saveArrayValue("tome.fonts.type", nil, "id")}},
-			{w="50%",    "NumberSlider", {title=_t"Size: ", max=300, min=50, value=config.settings.font_scale, step=1, on_change=self:saveNumberValue("font_scale")}},
-		},
+	-------------------------------------------------------------------------------------------
+	self:defineSection(_t"Display") -----------------------------------------------------------
 
-		{{"Header", {width=self.iw, text=_t"Visual Effects", color=colors.simple1(colors.GOLD)}}, vpadding_up=20},
-		{ vcenter = true,
-			{w="33%",    "Checkbox", {title=_t"Shaders: Advanced", default=config.settings.shaders_kind_adv, on_change=self:saveBoolValue("shaders_kind_adv")}, nil, _t"Activates advanced shaders.\nThis option allows for advanced effects (like water surfaces, ...). Disabling it can improve performance.\n\n#LIGHT_RED#You must restart the game for it to take effect.#WHITE#"},
-			{w="33%",    "Checkbox", {title=_t"Shaders: Distortion", default=config.settings.shaders_kind_distort, on_change=self:saveBoolValue("shaders_kind_distort")}, nil, _t"Activates distorting shaders.\nThis option allows for distortion effects (like spell effects doing a visual distortion, ...). Disabling it can improve performance.\n\n#LIGHT_RED#You must restart the game for it to take effect.#WHITE#"},
-			{w="33%",    "Checkbox", {title=_t"Shaders: Volumetric", default=config.settings.shaders_kind_volumetric, on_change=self:saveBoolValue("shaders_kind_volumetric")}, nil, _t"Activates volumetric shaders.\nThis option allows for volumetricion effects (like deep starfields). Enabling it will severely reduce performance when shaders are displayed.\n\n#LIGHT_RED#You must restart the game for it to take effect.#WHITE#"},
-		},
-		{ vcenter = true,
-			{w="33%",    "Checkbox", {title=_t"Custom mouse cursor", default=config.settings.mouse_cursor, on_change=self:saveBoolValue("mouse_cursor")}, nil, _t"Use the custom cursor.\nDisabling it will use your normal operating system cursor.#WHITE#"},
-		},
-		{ vcenter = true,
-			{w="100%",    "NumberSlider", {title=_t"Particle effects density: ", max=100, min=0, value=config.settings.particles_density, step=1, on_change=self:saveNumberValue("particles_density")}, nil , _t"Controls the particle effects density.\nThis option allows to change the density of the many particle effects in the game.\nIf the game is slow when displaying spell effects try to lower this setting.#WHITE#"},
-		},
+	self:defineLabel(_t"Mode: ")
+	self:defineOption("resolution_mode", {w="30%-p1"},
+		"Dropdown", {default=default_mode, list=modes, fct=function() self.c_layout:getNUI("resolution_apply").hide = false end}
+	)
+	self:defineLabel(_t"Resolution: ")
+	self:defineOption("resolution_size", {w="30%-p1"},
+		"Dropdown", {default=default_resolution, list=resolutions, fct=function() self.c_layout:getNUI("resolution_apply").hide = false end}
+	)
+	self:defineOption("resolution_apply", {x="100%-w-10"},
+		"Button", {text="Apply", fct=function() self:changeResolution() end, hide=true}
+	)
 
-		{{"Header", {width=self.iw, text=_t"Map", color=colors.simple1(colors.GOLD)}}, vpadding_up=20},
-		{ vcenter = true,
-			{w="100%",    "NumberSlider", {title=_t"Creatures visual movement speed: ", max=60, min=0, value=config.settings.tome.smooth_move, step=1, on_change=self:saveNumberValue("tome.smooth_move", function(v) if self:isTome() then engine.Map.smooth_scroll = v end end)}, nil, _t"Make the movement of creatures and projectiles 'smooth'. When set to 0 movement will be instantaneous.\nThe higher this value the slower the movements will appear.\n\nNote: This does not affect the turn-based idea of the game. You can move again while your character is still moving, and it will correctly update and compute a new animation."},
-		},
-		{ vcenter = true,
-			{w="33%",     "Checkbox", {title=_t"Creatures attack animation", default=config.settings.tome.twitch_move, on_change=self:saveBoolValue("tome.twitch_move")}, nil, _t"Enables or disables 'twitch' movement.\nWhen enabled creatures will do small bumps when moving and attacking.#WHITE#"},
-		},
-		{ vcenter = true,
-			{w="33%",     "Checkbox", {title=_t"Visible grid lines", default=config.settings.tome.show_grid_lines, on_change=self:saveBoolValue("tome.show_grid_lines", function() if self:isTome() then game:createMapGridLines() end end)}, nil, _t"Draw faint lines to separate each grid, making visual positioning easier to see.#WHITE#"},
-		},
-	}
+	self:defineNextLine()
+	self:defineOption(nil, {w="50%"},
+		"NumberSlider", {title=_t"Max FPS: ", max=60, min=5, value=config.settings.display_fps, step=1, on_change=self:saveNumberValue("display_fps", function(v) core.game.setFPS(v) end)}
+	)
+	self:defineOption(nil, {w="50%"},
+		"NumberSlider", {title=_t"Gamma: ", max=300, min=50, value=config.settings.gamma_correction, formatter=function(v) return ("%d%%"):tformat(v) end, step=5, on_change=self:saveNumberValue("gamma_correction", function(v) game:setGamma(v / 100) end)},
+		_t"Gamma correction setting.\nIncrease this to get a brighter display.#WHITE#"
+	)
+
+	-- self:defineNextLine()
+	-- self:defineOption(nil, {w="50%"},
+	-- 	"NumberSlider", {title=_t"Zoom: ", max=400, min=50, value=config.settings.screen_zoom*100, step=5, on_change=self:saveFloatValue("screen_zoom", nil, nil, 1/100)}, 
+	-- 	_t"If you have a very high DPI screen you may want to raise this value. Requires a restart to take effect.#WHITE#"
+	-- )
+
+	-------------------------------------------------------------------------------------------
+	self:defineSection(_t"Fonts") -----------------------------------------------------------
+
+	self:defineLabel(_t"Style: ")
+	self:defineOption("resolution_size", {w="50%-p1"},
+		"Dropdown", {default=default_font_style, list=font_styles, fct=self:saveArrayValue("tome.fonts.type", nil, "id")}
+	)
+	self:defineOption(nil, {w="50%"},
+		"NumberSlider", {title=_t"Size: ", max=300, min=50, step=5, value=config.settings.font_scale, formatter=function(v) return ("%d%%"):tformat(v) end, on_change=self:saveNumberValue("font_scale")}
+	)
+
+	-------------------------------------------------------------------------------------------
+	self:defineSection(_t"Visual Effects") -----------------------------------------------------------
+
+	self:defineCheckbox("shaders_kind_adv", {w="33%"}, _t"Shaders: Advanced", nil,
+		_t"Activates advanced shaders.\nThis option allows for advanced effects (like water surfaces, ...). Disabling it can improve performance.\n\n#LIGHT_RED#You must restart the game for it to take effect.#WHITE#"
+	)
+	self:defineCheckbox("shaders_kind_distort", {w="33%"}, _t"Shaders: Distortion", nil,
+		_t"Activates distorting shaders.\nThis option allows for distortion effects (like spell effects doing a visual distortion, ...). Disabling it can improve performance.\n\n#LIGHT_RED#You must restart the game for it to take effect.#WHITE#"
+	)
+	self:defineCheckbox("shaders_kind_volumetric", {w="33%"}, _t"Shaders: Volumetric", nil,
+		_t"Activates volumetric shaders.\nThis option allows for volumetricion effects (like deep starfields). Enabling it will severely reduce performance when shaders are displayed.\n\n#LIGHT_RED#You must restart the game for it to take effect.#WHITE#"
+	)
+
+	self:defineNextLine()
+	self:defineCheckbox("mouse_cursor", {w="33%"}, _t"Custom mouse cursor", nil,
+		_t"Use the custom cursor.\nDisabling it will use your normal operating system cursor.#WHITE#"
+	)
+	self:defineCheckbox("tome.smooth_fov", {w="33%"}, _t"Smooth unseen fog", nil,
+		_t"Enables smooth fog-of-war.\nDisabling it will make the fog of war look 'blocky' but might gain an extremely slight performance increase."
+	)
+
+	-------------------------------------------------------------------------------------------
+	self:defineSection(_t"Map") -----------------------------------------------------------
+
+	self:defineOption(nil, {w="100%"},
+		"NumberSlider", {title=_t"Creatures visual movement speed: ", max=60, min=0, value=config.settings.tome.smooth_move, formatter=function(v) return ("%0.2fs"):tformat(v / 30) end, step=1, on_change=self:saveNumberValue("tome.smooth_move", function(v) if self:isTome() then engine.Map.smooth_scroll = v end end)},
+		_t"Make the movement of creatures and projectiles 'smooth'. When set to 0 movement will be instantaneous.\nThis is the time it takes for actors to visualy move to their new position.\n\nNote: This does not affect the turn-based idea of the game. You can move again while your character is still moving, and it will correctly update and compute a new animation."
+	)
+
+	self:defineNextLine()
+	self:defineCheckbox("tome.twitch_move", {w="33%"}, _t"Creatures move & attack animations", nil,
+		_t"Enables or disables 'twitch' movement.\nWhen enabled creatures will do small bumps when moving and attacking."
+	)
+	self:defineCheckbox("tome.show_grid_lines", {w="33%"}, _t"Visible grid lines", function() if self:isTome() then game:createMapGridLines() end end,
+		_t"Draw faint lines to separate each grid, making visual positioning easier to see."
+	)
+
+
+	self:defineNextLine()
+	self.c_layout:makeUIByLines(self.cur_ui_defs.uis)
+	self.cur_uis = nil
 
 	self.c_layout:generate()
 end

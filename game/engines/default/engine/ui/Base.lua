@@ -232,6 +232,11 @@ local function resizeFrame(f, w, h, iw, ih)
 	if not h then h = ih + f.b8.h + f.b2.h end
 	local cx, cy = f.cx, f.cy
 
+	if not f.b1 then
+		if not f.container then f.container = core.renderer.container() end
+		return
+	end
+
 	if f.b1.t == f.b2.t and f.b1.t == f.b3.t and f.b1.t == f.b4.t and f.b1.t == f.b5.t and f.b1.t == f.b6.t and f.b1.t == f.b7.t and f.b1.t == f.b8.t and f.b1.t == f.b9.t then
 		if not f.container then f.container = core.renderer.vertexes() end
 		-- print("====MAKING MONO VERTEX FRAME")
@@ -296,12 +301,21 @@ function _M:makeFrameDO(base, w, h, iw, ih, center, resizable)
 		if not w then w = iw + f.b4.w + f.b6.w end
 		if not h then h = ih + f.b8.h + f.b2.h end
 
+		f.ix = math.floor(f.b4.w)
+		f.iy = math.floor(f.b8.h)
+		f.iw = math.floor(w - f.b4.w - f.b6.w)
+		f.ih = math.floor(h - f.b8.h - f.b2.h)
+
 		if center then cx, cy = -math.floor(w / 2), -math.floor(h / 2) end
 		f.cx, f.cy = cx, cy
 
 		resizeFrame(f, w, h)
 	else
 		f.container = core.renderer.container() -- dummy
+		f.ix = 0
+		f.iy = 0
+		f.iw = math.floor(w)
+		f.ih = math.floor(h)
 	end
 	f.w = math.floor(w)
 	f.h = math.floor(h)

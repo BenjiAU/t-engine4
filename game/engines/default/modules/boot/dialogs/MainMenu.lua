@@ -51,6 +51,7 @@ function _M:init()
 		else fs.mount(fs.getRealPath(mod.team), "/", false) end
 
 		package.loaded["engine.ui.Dialog"] = nil
+		package.loaded["engine.ui.NumberSlider"] = nil
 		package.loaded["engine.ui.LayoutContainer"] = nil
 		package.loaded["engine.ui.LayoutEngine"] = nil
 		package.loaded["mod.dialogs.GameOptions2"] = nil
