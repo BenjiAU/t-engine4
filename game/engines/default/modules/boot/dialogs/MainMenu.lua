@@ -50,6 +50,9 @@ function _M:init()
 		if not mod.team then fs.mount(fs.getRealPath(mod.dir), "/mod", false)
 		else fs.mount(fs.getRealPath(mod.team), "/", false) end
 
+		package.loaded["engine.ui.Dialog"] = nil
+		package.loaded["engine.ui.LayoutContainer"] = nil
+		package.loaded["engine.ui.LayoutEngine"] = nil
 		package.loaded["mod.dialogs.GameOptions2"] = nil
 		local d = require("mod.dialogs.GameOptions2").new()
 		function d:unload()

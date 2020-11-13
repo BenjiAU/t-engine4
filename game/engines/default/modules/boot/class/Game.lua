@@ -490,7 +490,7 @@ end
 
 function _M:tick()
 	if self.stopped then engine.Game.tick(self) return true end
-	return false
+	return true
 end
 
 --- Called every game turns

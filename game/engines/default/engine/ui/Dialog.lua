@@ -486,6 +486,7 @@ function _M:generate()
 	self.full_container = core.renderer.container()
 	self.renderer:add(self.full_container)
 	self.renderer:zSort(true)
+
 	if self.allow_scroll then
 		self.do_container = core.renderer.renderer():zSort(true)
 	else
@@ -502,6 +503,13 @@ function _M:generate()
 	else
 		self.renderer_outer = self.renderer
 	end
+
+	local Tooltip = require "engine.Tooltip"
+	local FontPackage = require "engine.FontPackage"
+	local font_mono, size_mono = FontPackage:getFont("mono_small", "mono")
+	self.use_tooltip = Tooltip.new(font_mono, size_mono, nil, colors.DARK_GREY, 400)	
+	self.use_tooltip_container = core.renderer.container():add(self.use_tooltip:getDO())
+	self.renderer:add(self.use_tooltip_container:shown(false))
 
 	local b7 = self:getAtlasTexture(self.frame.b7)
 	local b9 = self:getAtlasTexture(self.frame.b9)
@@ -1045,7 +1053,11 @@ function _M:toScreen(x, y, nb_keyframes)
 
 	self:innerDisplay(x, y, nb_keyframes)
 
-	if self.first_display then self:firstDisplay() self.first_display = false end
+	if self.first_display then
+		self:registerTooltip()
+		self:firstDisplay()
+		self.first_display = false
+	end
 
 	-- Particles
 	if self.frame.particles then
@@ -1072,4 +1084,20 @@ function _M:toScreen(x, y, nb_keyframes)
 	end
 
 	self.renderer_outer:toScreen()
+end
+
+function _M:registerTooltip()
+end
+
+function _M:useTooltip(x, y, h, str)
+	if not x then self.use_tooltip_container:shown(false) return end
+	self.use_tooltip_container:shown(true)
+	if str then
+		self.use_tooltip:set(str)
+		if y + h + 20 + self.use_tooltip.h > game.h then
+			self.use_tooltip:getDO():translate(x, y - self.use_tooltip.h - 20, 50)
+		else
+			self.use_tooltip:getDO():translate(x, y + h + 20, 50)
+		end
+	end
 end

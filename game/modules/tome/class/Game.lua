@@ -2402,7 +2402,7 @@ do return end
 				{ _t"Character Sheet", function() self:unregisterDialog(menu) self.key:triggerVirtual("SHOW_CHARACTER_SHEET") end },
 				"keybinds",
 				"language",
-				{_t"Game Options", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.GameOptions").new()) end},
+				{_t"Options", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.GameOptions2").new()) end},
 				"video",
 				"sound",
 				"save",

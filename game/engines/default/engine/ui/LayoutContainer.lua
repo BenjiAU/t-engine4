@@ -70,6 +70,8 @@ end
 
 function _M:positioned(x, y, sx, sy, dialog)
 	self.display_x, self.display_y = sx, sy
+	self.use_tooltip = dialog.use_tooltip
+	self.useTooltip = function(self, ...) return dialog:useTooltip(...) end
 end
 
 function _M:setupUI(resizex, resizey, on_resize, addmw, addmh)
@@ -252,8 +254,17 @@ end
 
 function _M:mouseEvent(button, x, y, xrel, yrel, bx, by, event)
 	-- Look for focus
+	self:useTooltip(false)
 	for i = 1, #self.uis do
 		local ui = self.uis[i]
+		if ui.has_tooltip and bx >= ui.x and bx <= ui.x + ui.ui.w and by >= ui.y and by <= ui.y + ui.ui.h then
+			self:useTooltip(true)
+			if self.last_tooltip ~= ui then
+				local dx, dy = ui.ui.do_container:getTranslate(true)
+				self:useTooltip(dx, dy, ui.ui.h, ui.has_tooltip)
+			end
+			self.last_tooltip = ui
+		end
 		if (ui.ui.can_focus or ui.ui.can_focus_mouse) and bx >= ui.x and bx <= ui.x + ui.ui.w and by >= ui.y and by <= ui.y + ui.ui.h then
 			self:setSubFocus(i, "mouse")
 
@@ -286,4 +297,8 @@ function _M:on_focus_change(status)
 		self.focus_ui_id = 0 -- Hack
 		self:moveSubFocus(1)
 	end
+end
+
+function _M:display(x, y, nb_keyframes, ox, oy)
+	-- self.floating_tooltip:toScreen(self.floating_tooltip_pos.x, self.floating_tooltip_pos.y)
 end

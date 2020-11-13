@@ -61,7 +61,7 @@ function _M:init()
 
 	self.c_tabs = Tabs.new{width=self.iw - 5, tabs=tabs, on_change=function(kind) self:switchTo(kind) end}
 
-	self.c_layout = LayoutContainer.new{width=self.iw, height=self.ih - self.c_tabs.h, uis={}}
+	self.c_layout = LayoutContainer.new{width=self.iw, height=self.ih - self.c_tabs.h, allow_scroll=true, uis={}}
 
 	self:loadUI{
 		{left=0, top=0, ui=self.c_tabs},
@@ -150,28 +150,22 @@ function _M:switchTo(kind)
 	local font_styles = FontPackage:list()
 	local default_font_style = table.findValueSub(font_styles, config.settings.tome.fonts.type, "id")
 
+	self.use_tooltip:set("AZDAZPDPAD\nAZDAZPDPAD\nAZDAZPDPAD\nAZDAZPDPAD\nAZDAZPDPAD\nAZDAZPDPAD\nAZDAZPDPAD\n")
 	self.c_layout:makeUIByLines{
 		{{"Header", {width=self.iw, text=_t"Display", color=colors.simple1(colors.GOLD)}}},
 		{ vcenter = true,
 			{            "Textzone", {auto_width=true, auto_height=true, text=_t"Mode: "}},
-			{w="40%-p1", "Dropdown", {default=default_mode, list=modes}, "resolution_mode"},
-			{            "Textzone", {auto_width=true, auto_height=true, text=_t"Resolution: "}},
-			{w="40%-p1", "Dropdown", {default=default_resolution, list=resolutions}, "resolution_size"},
-			{w="20%",    "Button",   {text="Apply", fct=function() self:changeResolution() end}},
+			{w="30%-p1", "Dropdown", {default=default_mode, list=modes, fct=function() self.c_layout:getNUI("resolution_apply").hide = false end}, "resolution_mode"},
+			{x="50%",    "Textzone", {auto_width=true, auto_height=true, text=_t"Resolution: "}},
+			{w="30%-p1", "Dropdown", {default=default_resolution, list=resolutions, fct=function() self.c_layout:getNUI("resolution_apply").hide = false end}, "resolution_size"},
+			{x="100%-w-10", "Button",   {text="Apply", fct=function() self:changeResolution() end, hide=true}, "resolution_apply"},
 		},
 		{ vcenter = true,
 			{w="50%",    "NumberSlider", {title=_t"Max FPS: ", max=60, min=5, value=config.settings.display_fps, step=1, on_change=self:saveNumberValue("display_fps", function(v) core.game.setFPS(v) end)}},
-			{w="50%",    "NumberSlider", {title=_t"Gamma: ", max=300, min=50, value=config.settings.gamma_correction, step=5, on_change=self:saveNumberValue("gamma_correction", function(v) game:setGamma(v / 100) end)}},
+			{w="50%",    "NumberSlider", {title=_t"Gamma: ", max=300, min=50, value=config.settings.gamma_correction, step=5, on_change=self:saveNumberValue("gamma_correction", function(v) game:setGamma(v / 100) end)}, nil, _t"Gamma correction setting.\nIncrease this to get a brighter display.#WHITE#"},
 		},
 		{ vcenter = true,
-			{w="50%",    "NumberSlider", {title=_t"Zoom: ", max=400, min=50, value=config.settings.screen_zoom*100, step=5, on_change=self:saveFloatValue("screen_zoom", nil, nil, 1/100)}},
-		},
-
-		{{"Header", {width=self.iw, text=_t"Shaders", color=colors.simple1(colors.GOLD)}}, vpadding_up=20},
-		{ vcenter = true,
-			{w="33%",    "Checkbox", {title=_t"Shaders: Advanced", default=config.settings.shaders_kind_adv, on_change=self:saveBoolValue("shaders_kind_adv")}},
-			{w="33%",    "Checkbox", {title=_t"Shaders: Distortion", default=config.settings.shaders_kind_distort, on_change=self:saveBoolValue("shaders_kind_distort")}},
-			{w="33%",    "Checkbox", {title=_t"Shaders: Volumetric", default=config.settings.shaders_kind_volumetric, on_change=self:saveBoolValue("shaders_kind_volumetric")}},
+			{w="50%",    "NumberSlider", {title=_t"Zoom: ", max=400, min=50, value=config.settings.screen_zoom*100, step=5, on_change=self:saveFloatValue("screen_zoom", nil, nil, 1/100)}, nil, _t"If you have a very high DPI screen you may want to raise this value. Requires a restart to take effect.#WHITE#"},
 		},
 
 		{{"Header", {width=self.iw, text=_t"Fonts", color=colors.simple1(colors.GOLD)}}, vpadding_up=20},
@@ -181,12 +175,28 @@ function _M:switchTo(kind)
 			{w="50%",    "NumberSlider", {title=_t"Size: ", max=300, min=50, value=config.settings.font_scale, step=1, on_change=self:saveNumberValue("font_scale")}},
 		},
 
-		{{"Header", {width=self.iw, text=_t"Misc", color=colors.simple1(colors.GOLD)}}, vpadding_up=20},
+		{{"Header", {width=self.iw, text=_t"Visual Effects", color=colors.simple1(colors.GOLD)}}, vpadding_up=20},
 		{ vcenter = true,
-			{w="50%",    "NumberSlider", {title=_t"Particle effects density: ", max=100, min=0, value=config.settings.particles_density, step=1, on_change=self:saveNumberValue("particles_density")}},
+			{w="33%",    "Checkbox", {title=_t"Shaders: Advanced", default=config.settings.shaders_kind_adv, on_change=self:saveBoolValue("shaders_kind_adv")}, nil, _t"Activates advanced shaders.\nThis option allows for advanced effects (like water surfaces, ...). Disabling it can improve performance.\n\n#LIGHT_RED#You must restart the game for it to take effect.#WHITE#"},
+			{w="33%",    "Checkbox", {title=_t"Shaders: Distortion", default=config.settings.shaders_kind_distort, on_change=self:saveBoolValue("shaders_kind_distort")}, nil, _t"Activates distorting shaders.\nThis option allows for distortion effects (like spell effects doing a visual distortion, ...). Disabling it can improve performance.\n\n#LIGHT_RED#You must restart the game for it to take effect.#WHITE#"},
+			{w="33%",    "Checkbox", {title=_t"Shaders: Volumetric", default=config.settings.shaders_kind_volumetric, on_change=self:saveBoolValue("shaders_kind_volumetric")}, nil, _t"Activates volumetric shaders.\nThis option allows for volumetricion effects (like deep starfields). Enabling it will severely reduce performance when shaders are displayed.\n\n#LIGHT_RED#You must restart the game for it to take effect.#WHITE#"},
 		},
 		{ vcenter = true,
-			{w="50%",    "Checkbox", {title=_t"Custom mouse cursor", default=config.settings.mouse_cursor, on_change=self:saveBoolValue("mouse_cursor")}},
+			{w="33%",    "Checkbox", {title=_t"Custom mouse cursor", default=config.settings.mouse_cursor, on_change=self:saveBoolValue("mouse_cursor")}, nil, _t"Use the custom cursor.\nDisabling it will use your normal operating system cursor.#WHITE#"},
+		},
+		{ vcenter = true,
+			{w="100%",    "NumberSlider", {title=_t"Particle effects density: ", max=100, min=0, value=config.settings.particles_density, step=1, on_change=self:saveNumberValue("particles_density")}, nil , _t"Controls the particle effects density.\nThis option allows to change the density of the many particle effects in the game.\nIf the game is slow when displaying spell effects try to lower this setting.#WHITE#"},
+		},
+
+		{{"Header", {width=self.iw, text=_t"Map", color=colors.simple1(colors.GOLD)}}, vpadding_up=20},
+		{ vcenter = true,
+			{w="100%",    "NumberSlider", {title=_t"Creatures visual movement speed: ", max=60, min=0, value=config.settings.tome.smooth_move, step=1, on_change=self:saveNumberValue("tome.smooth_move", function(v) if self:isTome() then engine.Map.smooth_scroll = v end end)}, nil, _t"Make the movement of creatures and projectiles 'smooth'. When set to 0 movement will be instantaneous.\nThe higher this value the slower the movements will appear.\n\nNote: This does not affect the turn-based idea of the game. You can move again while your character is still moving, and it will correctly update and compute a new animation."},
+		},
+		{ vcenter = true,
+			{w="33%",     "Checkbox", {title=_t"Creatures attack animation", default=config.settings.tome.twitch_move, on_change=self:saveBoolValue("tome.twitch_move")}, nil, _t"Enables or disables 'twitch' movement.\nWhen enabled creatures will do small bumps when moving and attacking.#WHITE#"},
+		},
+		{ vcenter = true,
+			{w="33%",     "Checkbox", {title=_t"Visible grid lines", default=config.settings.tome.show_grid_lines, on_change=self:saveBoolValue("tome.show_grid_lines", function() if self:isTome() then game:createMapGridLines() end end)}, nil, _t"Draw faint lines to separate each grid, making visual positioning easier to see.#WHITE#"},
 		},
 	}
 
