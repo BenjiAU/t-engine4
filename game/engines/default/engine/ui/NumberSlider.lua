@@ -88,12 +88,12 @@ function _M:generate()
 
 	self.key:addBind("ACCEPT", function() self:onChange() if self.fct then self.fct() end end)
 	self.key:addCommands{
-		_RIGHT = function() self:setValue(self.value + self.step) end,
-		_LEFT = function() self:setValue(self.value - self.step) end,
-		_UP = function() self:setValue(self.value + self.step) end,
-		_DOWN = function() self:setValue(self.value - self.step) end,
-		_PAGEUP = function() self:setValue(self.value + self.step * 5) end,
-		_PAGEDOWN = function() self:setValue(self.value - self.step * 5) end,
+		_RIGHT = function() self:setValue(self.value + self.step, true) end,
+		_LEFT = function() self:setValue(self.value - self.step, true) end,
+		_UP = function() self:setValue(self.value + self.step, true) end,
+		_DOWN = function() self:setValue(self.value - self.step, true) end,
+		_PAGEUP = function() self:setValue(self.value + self.step * 5, true) end,
+		_PAGEDOWN = function() self:setValue(self.value - self.step * 5, true) end,
 	}
 
 	-- precise click
@@ -101,11 +101,11 @@ function _M:generate()
 	self.mouse:registerZone(self.start_w, 0, self.size, self.h, function(button, x, y, xrel, yrel, bx, by, event)
 		if button == "left" then
 			x = (x - self.start_w) / self.size
-			self:setValue(math.round(x * (self.max - self.min) + self.min))
+			self:setValue(math.round(x * (self.max - self.min) + self.min), true)
 		elseif button == "wheeldown" then
-			self:setValue(self.value - self.step)
+			self:setValue(self.value - self.step, true)
 		elseif button == "wheelup" then
-			self:setValue(self.value + self.step)
+			self:setValue(self.value + self.step, true)
 		end
 	end, {button=true, move=true}, "precise")
 	self.mouse:registerZone(self.title_w, 0, minus_t.w, self.h, function(button, x, y, xrel, yrel, bx, by, event) if button == "left" then
@@ -151,9 +151,14 @@ function _M:onChange()
 	if self.on_change then self.on_change(self.value) end
 end
 
-function _M:setValue(v)
+function _M:setValue(v, smooth)
 	self.value = v
 	self:onChange()
-	self.knob:translate(self.start_w + ((self.value - self.min) / (self.max - self.min)) * self.size, self.h / 2)
+	local nx = self.start_w + ((self.value - self.min) / (self.max - self.min)) * self.size
+	if smooth then
+		self.knob:tween(7, "x", nil, nx, "outQuad")
+	else
+		self.knob:translate(nx, self.h / 2)
+	end
 	self.value_text:text(self.formatter(self.value)):center()
 end

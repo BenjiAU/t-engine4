@@ -89,6 +89,18 @@ function _M:checkGameOption(name)
 	return not list[name]
 end
 
+function _M:resizeIconsHotkeysToolbar()
+	for i, c in ipairs(self.minicontainers) do
+		if c.rebuild_on_hotkey_size then
+			local nc = require(c:getClassName()).new(self)
+			self.minicontainers[i] = nc
+			c:getDO():removeFromParent()
+			self.renderer:add(nc:getDO())
+		end
+	end
+	self:placeContainers()
+end
+
 _M.allcontainers = {
 	"mod.class.uiset.minimalist.PlayerFrame",
 	"mod.class.uiset.minimalist.Minimap",
@@ -136,6 +148,11 @@ function _M:saveSettings()
 	end
 
 	self:triggerHook{"UISet:Minimalist:saveSettings", lines=lines}
+
+	local exec = {}
+	for i, l in ipairs(lines) do exec[#exec+1] = "config.settings."..l end
+	local f = loadstring(table.concat(exec, "\n"))
+	if f then f() end
 
 	game:saveSettings("tome.uiset_minimalist2", table.concat(lines, "\n"))
 end

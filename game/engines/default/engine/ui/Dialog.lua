@@ -507,7 +507,7 @@ function _M:generate()
 	local Tooltip = require "engine.Tooltip"
 	local FontPackage = require "engine.FontPackage"
 	local font_mono, size_mono = FontPackage:getFont("mono_small", "mono")
-	self.use_tooltip = Tooltip.new(font_mono, size_mono, nil, colors.DARK_GREY, 400)	
+	self.use_tooltip = Tooltip.new(font_mono, size_mono, nil, colors.DARK_GREY, game.w * 0.5)
 	self.use_tooltip_container = core.renderer.container():add(self.use_tooltip:getDO())
 	self.renderer:add(self.use_tooltip_container:shown(false))
 
