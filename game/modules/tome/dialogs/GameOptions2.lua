@@ -72,7 +72,7 @@ function _M:init()
 	}
 	self:setupUI()
 
-	self:switchTo("ui")
+	self:switchTo("video")
 
 	self.key:addCommands{
 		_UP = function() end,

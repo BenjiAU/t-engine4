@@ -41,27 +41,27 @@ function _M:init()
 
 	local l = {}
 	self.list = l
-	l[#l+1] = {name="TEST OPTIONS", fct=function()
-		-- OMFG this is such a nasty hack, I'm nearly pround of it !
-		local mod = Module:listModules().tome
-		if not mod then return end
+	-- l[#l+1] = {name="TEST OPTIONS", fct=function()
+	-- 	-- OMFG this is such a nasty hack, I'm nearly pround of it !
+	-- 	local mod = Module:listModules().tome
+	-- 	if not mod then return end
 
-		local allmounts = fs.getSearchPath(true)
-		if not mod.team then fs.mount(fs.getRealPath(mod.dir), "/mod", false)
-		else fs.mount(fs.getRealPath(mod.team), "/", false) end
+	-- 	local allmounts = fs.getSearchPath(true)
+	-- 	if not mod.team then fs.mount(fs.getRealPath(mod.dir), "/mod", false)
+	-- 	else fs.mount(fs.getRealPath(mod.team), "/", false) end
 
-		package.loaded["engine.ui.Dialog"] = nil
-		package.loaded["engine.ui.NumberSlider"] = nil
-		package.loaded["engine.ui.LayoutContainer"] = nil
-		package.loaded["engine.ui.LayoutEngine"] = nil
-		package.loaded["mod.dialogs.GameOptions2"] = nil
-		local d = require("mod.dialogs.GameOptions2").new()
-		function d:unload()
-			fs.reset()
-			fs.mountAll(allmounts)
-		end
-		game:registerDialog(d)
-	end}
+	-- 	package.loaded["engine.ui.Dialog"] = nil
+	-- 	package.loaded["engine.ui.NumberSlider"] = nil
+	-- 	package.loaded["engine.ui.LayoutContainer"] = nil
+	-- 	package.loaded["engine.ui.LayoutEngine"] = nil
+	-- 	package.loaded["mod.dialogs.GameOptions2"] = nil
+	-- 	local d = require("mod.dialogs.GameOptions2").new()
+	-- 	function d:unload()
+	-- 		fs.reset()
+	-- 		fs.mountAll(allmounts)
+	-- 	end
+	-- 	game:registerDialog(d)
+	-- end}
 	l[#l+1] = {name=_t"New Game", fct=function() game:registerDialog(require("mod.dialogs.NewGame").new()) end}
 	l[#l+1] = {name=_t"Load Game", fct=function() game:registerDialog(require("mod.dialogs.LoadGame").new()) end}
 	l[#l+1] = {name=_t"Addons", fct=function() game:registerDialog(require("mod.dialogs.Addons").new()) end}
@@ -78,7 +78,7 @@ function _M:init()
 				if not mod.team then fs.mount(fs.getRealPath(mod.dir), "/mod", false)
 				else fs.mount(fs.getRealPath(mod.team), "/", false) end
 
-				local d = require("mod.dialogs.GameOptions").new()
+				local d = require("mod.dialogs.GameOptions2").new()
 				function d:unload()
 					fs.reset()
 					fs.mountAll(allmounts)
@@ -86,8 +86,6 @@ function _M:init()
 				game:registerDialog(d)
 			end},
 			"language",
-			"video",
-			"sound",
 			"steam",
 			"cheatmode",
 		}

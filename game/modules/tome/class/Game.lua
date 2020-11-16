@@ -2403,8 +2403,6 @@ do return end
 				"keybinds",
 				"language",
 				{_t"Options", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.GameOptions2").new()) end},
-				"video",
-				"sound",
 				"save",
 				"quit",
 				"exit",
