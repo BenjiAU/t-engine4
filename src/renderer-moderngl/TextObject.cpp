@@ -97,8 +97,8 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 			}
 		}
 
-		font->kind->font->outline_thickness = 0;
-		font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
+		// font->kind->font->outline_thickness = 0;
+		// font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
 		ftgl::texture_glyph_t *d = font->kind->getGlyph(c);
 		if (d) {
 			float kerning = 0;
@@ -128,16 +128,16 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 				vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
 			}
 
-			if (outline) {
+			if (0&&outline) {
 				font->kind->font->outline_thickness = 2;
-				font->kind->font->rendermode = ftgl::RENDER_OUTLINE_POSITIVE;
+				font->kind->font->rendermode = ftgl::RENDER_OUTLINE_EDGE;
 				ftgl::texture_glyph_t *doutline = font->kind->getGlyph(c);
 				if (doutline) {
-					float x0  = bx + x + doutline->offset_x * scale;
-					float x1  = x0 + doutline->width * scale;
-					float italicx = - doutline->offset_x * scale * italic;
-					float y0 = by + (font->kind->font->ascender - doutline->offset_y) * scale + d->height * (base_scale - scale);
-					float y1 = y0 + (doutline->height) * scale;
+					// float x0  = bx + x + doutline->offset_x * scale;
+					// float x1  = x0 + doutline->width * scale;
+					// float italicx = - doutline->offset_x * scale * italic;
+					// float y0 = by + (font->kind->font->ascender - doutline->offset_y) * scale + d->height * (base_scale - scale);
+					// float y1 = y0 + (doutline->height) * scale;
 
 					vertices.push_back({{1+x0+italicx, 1+y0, 0, 1},	{doutline->s0, doutline->t0}, outline_color});
 					vertices.push_back({{1+x1+italicx, 1+y0, 0, 1},	{doutline->s1, doutline->t0}, outline_color});
@@ -146,7 +146,10 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});
 					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});
 					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});				}
+					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});
+				}
+				font->kind->font->outline_thickness = 0;
+				font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
 			}
 
 			vertices.push_back({{x0+italicx, y0, 0, 1},	{d->s0, d->t0}, {r, g, b, a}});
@@ -194,7 +197,14 @@ void DORText::parseText() {
 	// printf("==CUREC  %fx%fx%fx%f\n", font_color.r, font_color.g, font_color.b, font_color.a);
 	// printf("==USEDC  %fx%fx%fx%f\n", used_color.r, used_color.g, used_color.b, used_color.a);
 
+
 	if (!font) return;
+if (outline){
+				font->kind->font->outline_thickness = 2;
+				font->kind->font->rendermode = ftgl::RENDER_OUTLINE_EDGE;
+	
+}
+
 	size_t len = strlen(text);
 	if (!len) {
 		used_color = font_color;

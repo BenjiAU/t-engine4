@@ -53,7 +53,7 @@ void FontKind::used(bool v) {
 
 FontKind* FontKind::getFont(string &name) {
 	auto am = all_fonts.find(name);
-	if (am != all_fonts.end()) { // Found, use it
+	if (am != all_fonts.end()&&0) { // Found, use it
 		FontKind *fk = am->second;
 		fk->used(true);
 		printf("[FONT] add use %s => %d\n", fk->fontname.c_str(), fk->nb_use);
@@ -86,10 +86,10 @@ FontKind::FontKind(string &name) : fontname(name) {
 	}
 	PHYSFS_close(fff);
 
-	atlas = texture_atlas_new(DEFAULT_ATLAS_W, DEFAULT_ATLAS_H, 1);
+	atlas = texture_atlas_new(256, DEFAULT_ATLAS_H, 1);
 	font = texture_font_new_from_memory(atlas, 32, font_mem, font_mem_size);
-	font->rendermode = RENDER_SIGNED_DISTANCE_FIELD;
-	texture_font_load_glyphs(font, default_atlas_chars.c_str());
+	// font->rendermode = RENDER_SIGNED_DISTANCE_FIELD;
+	// texture_font_load_glyphs(font, default_atlas_chars.c_str());
 	lineskip = font->height;
 
 	glGenTextures(1, &atlas->id);

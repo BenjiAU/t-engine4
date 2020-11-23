@@ -566,7 +566,7 @@ cleanup_stroker:
         int bottom;
     } padding = { 0, 0, 2, 2 };
 
-    if( self->rendermode == RENDER_SIGNED_DISTANCE_FIELD )
+    if(1|| self->rendermode == RENDER_SIGNED_DISTANCE_FIELD )
     {
         padding.top = 2;
         padding.left = 2;
@@ -601,7 +601,7 @@ cleanup_stroker:
         src_ptr += ft_bitmap.pitch;
     }
 
-    if( self->rendermode == RENDER_SIGNED_DISTANCE_FIELD )
+    if(1||  self->rendermode == RENDER_SIGNED_DISTANCE_FIELD )
     {
         unsigned char *sdf = make_distance_mapb( buffer, tgt_w, tgt_h );
         free( buffer );
