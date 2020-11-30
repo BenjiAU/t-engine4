@@ -29,6 +29,8 @@
 class DORText : public DORVertexes{
 private:
 	static shader_type *default_shader;
+	static float default_outline;
+	static vec4 default_outline_color;
 
 	DORContainer entities_container;
 	vector<int> entities_container_refs;
@@ -52,8 +54,8 @@ private:
 	float shadow_x = 0, shadow_y = 0;
 	vec4 shadow_color;
 
-	float outline = 0;
-	vec4 outline_color;
+	float outline = 1;
+	vec4 outline_color = vec4(0, 0, 0, 1);
 
 	bool small_caps = false;
 
@@ -92,6 +94,7 @@ public:
 
 	void setShadow(float offx, float offy, vec4 color) { shadow_x = offx; shadow_y = offy; shadow_color = color; };
 	void setOutline(float o, vec4 color) { outline = o; outline_color = color; };
+	static void setOutlineDefault(float o, vec4 color) { default_outline = o; default_outline_color = color; };
 
 	virtual void clear();
 

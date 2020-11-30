@@ -1337,7 +1337,7 @@ static int gl_text_shadow(lua_State *L)
 static int gl_text_outline(lua_State *L)
 {
 	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
-	vec4 color = {0, 0, 0, 0.7};
+	vec4 color = {0, 0, 0, 1};
 	if (lua_isnumber(L, 3)) {
 		color.r = lua_tonumber(L, 3);
 		color.g = lua_tonumber(L, 4);
@@ -1348,6 +1348,19 @@ static int gl_text_outline(lua_State *L)
 
 	lua_pushvalue(L, 1);
 	return 1;
+}
+
+static int gl_text_static_default_outline(lua_State *L)
+{
+	vec4 color = {0, 0, 0, 1};
+	if (lua_isnumber(L, 2)) {
+		color.r = lua_tonumber(L, 2);
+		color.g = lua_tonumber(L, 3);
+		color.b = lua_tonumber(L, 4);
+		color.a = lua_tonumber(L, 5);
+	}
+	DORText::setOutlineDefault(lua_tonumber(L, 1), color);
+	return 0;
 }
 
 static int gl_text_style(lua_State *L)
@@ -2311,6 +2324,11 @@ const luaL_Reg rendererlib[] = {
 	{NULL, NULL}
 };
 
+const luaL_Reg textslib[] = {
+	{"defaultOutline", gl_text_static_default_outline},
+	{NULL, NULL}
+};
+
 const luaL_Reg physicslib[] = {
 	{"pause", physic_world_pause},
 	{"sleepAll", physic_world_sleep_all},
@@ -2341,6 +2359,7 @@ int luaopen_renderer(lua_State *L)
 	auxiliar_newclass(L, "gl{view}", gl_view_reg);
 	auxiliar_newclass(L, "gl{vbo}", gl_vbo_reg);
 	luaL_openlib(L, "core.renderer", rendererlib, 0);
+	luaL_openlib(L, "core.renderer.textconf", textslib, 0);
 	luaL_openlib(L, "core.physics", physicslib, 0);
 
 	// Build the weak self store registry

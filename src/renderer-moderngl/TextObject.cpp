@@ -36,6 +36,8 @@ extern "C" {
 #include "colors.hpp"
 
 shader_type *DORText::default_shader = NULL;
+float DORText::default_outline = 0;
+vec4 DORText::default_outline_color = vec4(0, 0, 0, 1);
 
 void DORText::cloneInto(DisplayObject* _into) {
 	DORVertexes::cloneInto(_into);
@@ -128,25 +130,26 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 				vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
 			}
 
-			if (0&&outline) {
+			if (outline) {
 				font->kind->font->outline_thickness = 2;
 				font->kind->font->rendermode = ftgl::RENDER_OUTLINE_EDGE;
 				ftgl::texture_glyph_t *doutline = font->kind->getGlyph(c);
 				if (doutline) {
-					// float x0  = bx + x + doutline->offset_x * scale;
-					// float x1  = x0 + doutline->width * scale;
-					// float italicx = - doutline->offset_x * scale * italic;
-					// float y0 = by + (font->kind->font->ascender - doutline->offset_y) * scale + d->height * (base_scale - scale);
-					// float y1 = y0 + (doutline->height) * scale;
+					float x0  = bx + x + doutline->offset_x * scale;
+					float x1  = x0 + doutline->width * scale;
+					float italicx = - doutline->offset_x * scale * italic;
+					float y0 = by + (font->kind->font->ascender - doutline->offset_y) * scale + d->height * (base_scale - scale);
+					float y1 = y0 + (doutline->height) * scale;
 
-					vertices.push_back({{1+x0+italicx, 1+y0, 0, 1},	{doutline->s0, doutline->t0}, outline_color});
-					vertices.push_back({{1+x1+italicx, 1+y0, 0, 1},	{doutline->s1, doutline->t0}, outline_color});
-					vertices.push_back({{1+x1, 1+y1, 0, 1},	{doutline->s1, doutline->t1}, outline_color});
-					vertices.push_back({{1+x0, 1+y1, 0, 1},	{doutline->s0, doutline->t1}, outline_color});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});
+					vertices.push_back({{x0+italicx, y0, 0, 1},	{doutline->s0, doutline->t0}, outline_color});
+					vertices.push_back({{x1+italicx, y0, 0, 1},	{doutline->s1, doutline->t0}, outline_color});
+					vertices.push_back({{x1, y1, 0, 1},	{doutline->s1, doutline->t1}, outline_color});
+					vertices.push_back({{x0, y1, 0, 1},	{doutline->s0, doutline->t1}, outline_color});
+					float mode = (style == FONT_STYLE_BOLD ? 3.0f : 2.0f);
+					vertices_kind_info.push_back({mode});
+					vertices_kind_info.push_back({mode});
+					vertices_kind_info.push_back({mode});
+					vertices_kind_info.push_back({mode});
 				}
 				font->kind->font->outline_thickness = 0;
 				font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
@@ -156,15 +159,42 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 			vertices.push_back({{x1+italicx, y0, 0, 1},	{d->s1, d->t0}, {r, g, b, a}});
 			vertices.push_back({{x1, y1, 0, 1},	{d->s1, d->t1}, {r, g, b, a}});
 			vertices.push_back({{x0, y1, 0, 1},	{d->s0, d->t1}, {r, g, b, a}});
-			vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-			vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-			vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-			vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
+			float mode = (style == FONT_STYLE_BOLD ? 1.0f : 0.0f);
+			vertices_kind_info.push_back({mode});
+			vertices_kind_info.push_back({mode});
+			vertices_kind_info.push_back({mode});
+			vertices_kind_info.push_back({mode});
 
 			// Much trickery, such dev
 			if (style == FONT_STYLE_UNDERLINED) {
 				ftgl::texture_glyph_t *ul = font->kind->getGlyph('_');
 				if (ul) {
+/*
+					if (outline) {
+						font->kind->font->outline_thickness = 2;
+						font->kind->font->rendermode = ftgl::RENDER_OUTLINE_EDGE;
+						ftgl::texture_glyph_t *doutline = font->kind->getGlyph('_');
+						if (doutline) {
+							float x0  = bx + x;
+							float x1  = x0 + d->advance_x * scale;
+							float y0 = by + (font->kind->font->ascender * 1.05 - doutline->offset_y) * scale;
+							float y1 = y0 + (doutline->height) * scale;
+							float s2 = (doutline->s1 - doutline->s0) / 1.5;
+
+							vertices.push_back({{x0+italicx, y0, 0, 1},	{doutline->s0, doutline->t0}, outline_color});
+							vertices.push_back({{x1+italicx, y0, 0, 1},	{doutline->s1, doutline->t0}, outline_color});
+							vertices.push_back({{x1, y1, 0, 1},	{doutline->s1, doutline->t1}, outline_color});
+							vertices.push_back({{x0, y1, 0, 1},	{doutline->s0, doutline->t1}, outline_color});
+							float mode = (style == FONT_STYLE_BOLD ? 3.0f : 2.0f);
+							vertices_kind_info.push_back({mode});
+							vertices_kind_info.push_back({mode});
+							vertices_kind_info.push_back({mode});
+							vertices_kind_info.push_back({mode});
+						}
+						font->kind->font->outline_thickness = 0;
+						font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
+					}
+*/
 					float x0  = bx + x;
 					float x1  = x0 + d->advance_x * scale;
 					float y0 = by + (font->kind->font->ascender * 1.05 - ul->offset_y) * scale;
@@ -181,7 +211,8 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});				}
 			}			
 
-			x += d->advance_x * scale * (style == FONT_STYLE_BOLD ? 1.1 : 1);
+			x += d->advance_x * scale;
+			// if (style == FONT_STYLE_BOLD) x += d->width * scale * 0.1;
 		}
 	}
 	return x;
@@ -199,12 +230,7 @@ void DORText::parseText() {
 
 
 	if (!font) return;
-if (outline){
-				font->kind->font->outline_thickness = 2;
-				font->kind->font->rendermode = ftgl::RENDER_OUTLINE_EDGE;
 	
-}
-
 	size_t len = strlen(text);
 	if (!len) {
 		used_color = font_color;
@@ -501,12 +527,90 @@ void DORText::clear() {
 	entities_container_refs.clear();
 }
 
+// Copies how to do stuff from DORVertexes::render but do it differently for multi texturing
 void DORText::render(RendererGL *container, mat4& cur_model, vec4& cur_color, bool cur_visible) {
 	if (!visible || !cur_visible) return;
-	DORVertexes::render(container, cur_model, cur_color, true);
-	mat4 emodel = cur_model * model;
-	vec4 ecolor = cur_color * color;
-	entities_container.render(container, emodel, ecolor, true);
+	mat4 vmodel = cur_model * model;
+	vec4 vcolor = cur_color * color;
+
+
+	auto dl = getDisplayList(container, tex, shader, data_kind, render_kind);
+
+	// Make sure we do not have to reallocate each step
+	int nb = vertices.size();
+	int startat = dl->list.size();
+	dl->list.reserve(startat + nb);
+	// Copy & apply the model matrix
+	// DGDGDGDG: is it better to first copy it all and then alter it ? most likely not, change me
+	dl->list.insert(std::end(dl->list), std::begin(this->vertices), std::end(this->vertices));
+	vertex *dest = dl->list.data();
+
+	if (data_kind & VERTEX_MODEL_INFO) {
+		// Make sure we do not have to reallocate each step
+		int nb = vertices.size();
+		int startat = dl->list_model_info.size();
+		dl->list_model_info.resize(startat + nb);
+		vertex_model_info vm;
+		vm.model = vmodel;
+		std::fill_n(std::begin(dl->list_model_info) + startat, nb, vm);
+		for (int di = startat; di < startat + nb; di++) {
+			dest[di].color = vcolor * dest[di].color;
+		}		
+		// printf("rendering with model info\n");
+	} else {
+		// printf("rendering withOUT model info\n");
+		for (int di = startat; di < startat + nb; di++) {
+			dest[di].pos = vmodel * dest[di].pos;
+			dest[di].color = vcolor * dest[di].color;
+		}		
+	}
+
+	if (data_kind & VERTEX_KIND_INFO) {
+		// Make sure we do not have to reallocate each step
+		int nb = vertices_kind_info.size();
+		int startat = dl->list_kind_info.size();
+		dl->list_kind_info.reserve(startat + nb);
+		dl->list_kind_info.insert(std::end(dl->list_kind_info), std::begin(this->vertices_kind_info), std::end(this->vertices_kind_info));
+	}
+
+	if (data_kind & VERTEX_MAP_INFO) {
+		// Make sure we do not have to reallocate each step
+		int nb = vertices_map_info.size();
+		int startat = dl->list_map_info.size();
+		dl->list_map_info.reserve(startat + nb);
+		dl->list_map_info.insert(std::end(dl->list_map_info), std::begin(this->vertices_map_info), std::end(this->vertices_map_info));
+	}
+
+	if (data_kind & VERTEX_PICKING_INFO) {
+		// Make sure we do not have to reallocate each step
+		int nb = vertices_picking_info.size();
+		int startat = dl->list_picking_info.size();
+		dl->list_picking_info.reserve(startat + nb);
+		dl->list_picking_info.insert(std::end(dl->list_picking_info), std::begin(this->vertices_picking_info), std::end(this->vertices_picking_info));
+	}
+
+	if (data_kind & VERTEX_NORMAL_INFO) {
+		// Make sure we do not have to reallocate each step
+		int nb = vertices_normal_info.size();
+		int startat = dl->list_normal_info.size();
+		dl->list_normal_info.reserve(startat + nb);
+		dl->list_normal_info.insert(std::end(dl->list_normal_info), std::begin(this->vertices_normal_info), std::end(this->vertices_normal_info));
+
+		// Apply rotations
+		if (!(data_kind & VERTEX_MODEL_INFO)) {
+			vertex_normal_info *dest = dl->list_normal_info.data();
+			mat3 rotmat(vmodel);
+			rotmat = glm::transpose(glm::inverse(rotmat));
+			for (int di = startat; di < startat + nb; di++) {
+				dest[di].normal = glm::normalize(rotmat * dest[di].normal);
+			}		
+		}
+	}
+
+	resetChanged();
+
+	// Add the sub entities we need to display
+	entities_container.render(container, vmodel, vcolor, true);
 }
 
 // void DORText::renderZ(RendererGL *container, mat4& cur_model, vec4& cur_color, bool cur_visible) {
@@ -524,6 +628,7 @@ DORText::DORText() {
 	entities_container.setParent(this);
 	if (default_shader) setShader(default_shader);
 	setDataKinds(VERTEX_BASE + VERTEX_KIND_INFO);
+	setOutline(default_outline, default_outline_color);
 };
 
 DORText::~DORText() {

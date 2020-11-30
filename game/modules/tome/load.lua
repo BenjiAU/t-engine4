@@ -20,6 +20,9 @@
 -- Configure Map
 --dofile("/mod/map_config.lua")
 
+-- We want nice outlined fonts!
+core.renderer.textconf.defaultOutline(1)
+
 -- Switch to realtime mode, to get more accurate FPS
 core.game.setRealtime(1)
 

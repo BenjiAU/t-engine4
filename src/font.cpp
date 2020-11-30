@@ -87,9 +87,10 @@ FontKind::FontKind(string &name) : fontname(name) {
 	PHYSFS_close(fff);
 
 	atlas = texture_atlas_new(256, DEFAULT_ATLAS_H, 1);
-	font = texture_font_new_from_memory(atlas, 32, font_mem, font_mem_size);
+	atlas_outline = texture_atlas_new(256, DEFAULT_ATLAS_H, 1);
+	font = texture_font_new_from_memory(atlas, BASE_FONT_SIZE, font_mem, font_mem_size);
 	// font->rendermode = RENDER_SIGNED_DISTANCE_FIELD;
-	// texture_font_load_glyphs(font, default_atlas_chars.c_str());
+	texture_font_load_glyphs(font, default_atlas_chars.c_str());
 	lineskip = font->height;
 
 	glGenTextures(1, &atlas->id);
@@ -108,13 +109,27 @@ FontKind::~FontKind() {
 	glDeleteTextures(1, &atlas->id);
 	texture_font_delete(font);
 	texture_atlas_delete(atlas);
+	texture_atlas_delete(atlas_outline);
 	delete[] font_mem;
 }
 
 void FontKind::updateAtlas() {
 	if (!atlas->changed) return;
 	glBindTexture(GL_TEXTURE_2D, atlas->id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, atlas->width, atlas->height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, atlas->data);
+
+	unsigned char data[atlas->width * atlas->height * 4];
+	for (uint32_t i = 0; i < atlas->width; i++) {
+		for (uint32_t j = 0; j < atlas->height; j++) {
+			uint32_t idx = (j * atlas->width + i);
+			data[idx*4+0] = atlas->data[idx];
+			data[idx*4+1] = atlas_outline->data[idx];
+			data[idx*4+2] = 0;
+			data[idx*4+3] = 1;
+		}
+	}
+
+	// glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, atlas->width, atlas->height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, atlas->data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, atlas->width, atlas->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	atlas->changed = false;
 }
 

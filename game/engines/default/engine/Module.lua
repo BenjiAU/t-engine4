@@ -939,6 +939,7 @@ function _M:instanciate(mod, name, new_game, no_reboot, extra_module_info)
 
 	-- Reset white space breaking
 	core.display.breakTextAllCharacter(false)
+	core.renderer.textconf.defaultOutline(0)
 
 	-- Turn based by default
 	core.game.setRealtime(0)
