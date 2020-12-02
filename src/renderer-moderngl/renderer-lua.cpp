@@ -1274,14 +1274,6 @@ static int gl_text_free(lua_State *L)
 	return 1;
 }
 
-static int gl_text_model_data(lua_State *L)
-{
-	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
-	v->setDataKinds(VERTEX_BASE + VERTEX_MODEL_INFO + VERTEX_KIND_INFO);
-	lua_pushvalue(L, 1);
-	return 1;
-}
-
 static int gl_text_linefeed(lua_State *L)
 {
 	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
@@ -1415,6 +1407,14 @@ static int gl_text_center(lua_State *L)
 	return 1;
 }
 
+static int gl_text_clear(lua_State *L)
+{
+	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
+	v->clear();
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
 static int gl_text_set(lua_State *L)
 {
 	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
@@ -1432,18 +1432,6 @@ static int gl_text_stats(lua_State *L)
 	lua_pushnumber(L, v->h);
 	lua_pushnumber(L, v->nb_lines);
 	return 3;
-}
-
-static int gl_text_texture(lua_State *L)
-{
-	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
-	texture_lua *t = texture_lua::from_state(L, 2);
-	int id = lua_tonumber(L, 3);
-	lua_pushvalue(L, 2);
-	v->setTexture(t, luaL_ref(L, LUA_REGISTRYINDEX), id);
-
-	lua_pushvalue(L, 1);
-	return 1;
 }
 
 static int gl_text_shader(lua_State *L)
@@ -2213,13 +2201,12 @@ static const struct luaL_Reg gl_text_reg[] =
 	{"getStats", gl_text_stats},
 	{"maxWidth", gl_text_max_width},
 	{"maxLines", gl_text_max_lines},
-	{"enableModelData", gl_text_model_data},
 	{"linefeed", gl_text_linefeed},
 	{"getLetterPosition", gl_text_get_letter_position},
 	{"center", gl_text_center},
-	{"texture", gl_text_texture},
-	{"shader", gl_text_shader},
-	{"clear", gl_vertexes_clear},
+	// {"texture", gl_text_texture},
+	// {"shader", gl_text_shader},
+	{"clear", gl_text_clear},
 	INJECT_GENERIC_DO_METHODS
 	{NULL, NULL},
 };

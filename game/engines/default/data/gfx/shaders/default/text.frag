@@ -61,9 +61,8 @@ const float glyph_center = 0.50;
 void main(void)
 {
 	vec4  color = texture2D(tex, te4_uv);
-	float dist  = color.r;
+	float dist  = color.a;
 	if (outline) {
-		dist = color.g;
 		if (bold > 0.0) dist = pow(dist, 0.85);
 	} else {
 		if (bold > 0.0) dist = sqrt(dist);

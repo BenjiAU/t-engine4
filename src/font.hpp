@@ -35,8 +35,8 @@ extern "C" {
 
 using namespace std;
 
-#define DEFAULT_ATLAS_W	2048
-#define DEFAULT_ATLAS_H	2048
+#define DEFAULT_ATLAS_W	256
+#define DEFAULT_ATLAS_H	1024
 #define BASE_FONT_SIZE 32
 
 typedef enum {
@@ -64,7 +64,6 @@ protected:
 	int32_t font_mem_size;
 	float lineskip;
 	ftgl::texture_atlas_t *atlas;
-	ftgl::texture_atlas_t *atlas_outline;
 	ftgl::texture_font_t *font;
 
 	CodepointGlyphMap glyph_map_normal;
@@ -93,13 +92,11 @@ public:
 		auto it = glyph_map->find(codepoint);
 		if (it != glyph_map->end()) return it->second;
 
-		if (font->rendermode == ftgl::RENDER_OUTLINE_EDGE) font->atlas = atlas_outline;
 		ftgl::texture_glyph_t *g = ftgl::texture_font_get_glyph(font, codepoint);
 		if (g) {
 			std::pair<uint32_t, ftgl::texture_glyph_t*> p(codepoint, g);
 			glyph_map->insert(p);
 		}
-		if (font->rendermode == ftgl::RENDER_OUTLINE_EDGE) font->atlas = atlas;
 		return g;
 	}
 };

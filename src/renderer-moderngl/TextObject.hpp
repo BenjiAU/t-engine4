@@ -26,11 +26,13 @@
 #include <vector>
 #include "font.hpp"
 
-class DORText : public DORVertexes{
+class DORText : public DisplayObject{
 private:
 	static shader_type *default_shader;
 	static float default_outline;
 	static vec4 default_outline_color;
+
+	shader_type *shader = nullptr;
 
 	DORContainer entities_container;
 	vector<int> entities_container_refs;
@@ -59,6 +61,15 @@ private:
 
 	bool small_caps = false;
 
+	struct render_char {
+		vec2 p0, p1;
+		float italicx;
+		vec2 tex0, tex1;
+		vec4 color;
+		float mode;
+	};
+	std::vector<render_char> rendered_chars;
+
 	virtual void cloneInto(DisplayObject *into);
 
 public:
@@ -86,6 +97,7 @@ public:
 	void setTextColor(float r, float g, float b, float a);
 	void setTextSmallCaps(bool v);
 	void setFrom(DORText *prev);
+	void setShader(shader_type *s);
 
 	vec2 getLetterPosition(int idx);
 
@@ -100,6 +112,7 @@ public:
 
 	virtual void render(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
 	// virtual void renderZ(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
+	virtual void sortCoords(RendererGL *container, mat4& cur_model);
 
 private:
 	void parseText();
