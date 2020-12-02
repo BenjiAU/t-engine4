@@ -86,36 +86,45 @@ FontKind::FontKind(string &name) : fontname(name) {
 	}
 	PHYSFS_close(fff);
 
-	atlas = texture_atlas_new(DEFAULT_ATLAS_W, DEFAULT_ATLAS_H, 1);
-	font = texture_font_new_from_memory(atlas, BASE_FONT_SIZE, font_mem, font_mem_size);
-	// font->rendermode = RENDER_SIGNED_DISTANCE_FIELD;
-	texture_font_load_glyphs(font, default_atlas_chars.c_str());
+	makeAtlas();
+	font = texture_font_new_from_memory(atlas.back(), BASE_FONT_SIZE, font_mem, font_mem_size);
+	font->rendermode = RENDER_SIGNED_DISTANCE_FIELD;
+	// texture_font_load_glyphs(font, default_atlas_chars.c_str());
 	lineskip = font->height;
 
-	glGenTextures(1, &atlas->id);
-	tfglBindTexture(GL_TEXTURE_2D, atlas->id );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
 	updateAtlas();
+}
+
+void FontKind::makeAtlas() {
+	auto a = texture_atlas_new(DEFAULT_ATLAS_W, DEFAULT_ATLAS_H, 1);
+	glGenTextures(1, &a->id);
+	tfglBindTexture(GL_TEXTURE_2D, a->id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	atlas.emplace_back(a);
 }
 
 FontKind::~FontKind() {
 	glyph_map_normal.clear();
 	glyph_map_outline.clear();
-	glDeleteTextures(1, &atlas->id);
 	texture_font_delete(font);
-	texture_atlas_delete(atlas);
+	for (auto a : atlas) {
+		glDeleteTextures(1, &a->id);
+		texture_atlas_delete(a);
+	}
 	delete[] font_mem;
 }
 
 void FontKind::updateAtlas() {
-	if (!atlas->changed) return;
-	glBindTexture(GL_TEXTURE_2D, atlas->id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, atlas->width, atlas->height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, atlas->data);
-	atlas->changed = false;
+	auto a = atlas.back();
+	for (auto &a : atlas) {
+		if (!a->changed) continue;
+		glBindTexture(GL_TEXTURE_2D, a->id);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, a->width, a->height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, a->data);
+		a->changed = false;
+	}
 }
 
 
@@ -167,7 +176,7 @@ glm::vec2 FontInstance::textSize(const char *str, size_t len, font_style style) 
 		str += off;
 		len -= off;
 
-		texture_glyph_t *d = kind->getGlyph(c);
+		auto d = get<0>(kind->getGlyph(c));
 		if (d) {
 			if (oldc) {
 				x += texture_glyph_get_kerning(d, oldc) * scale;

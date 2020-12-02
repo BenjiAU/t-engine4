@@ -106,7 +106,8 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 
 		// font->kind->font->outline_thickness = 0;
 		// font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
-		ftgl::texture_glyph_t *d = font->kind->getGlyph(c);
+		auto dr = font->kind->getGlyph(c);
+		auto d = get<0>(dr);
 		if (d) {
 			float kerning = 0;
 			if (last_glyph) {
@@ -126,18 +127,21 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 
 			if (shadow_x || shadow_y) {
 				float mode = (style == FONT_STYLE_BOLD ? 1.0f : 0.0f);
-				rendered_chars.push_back({{shadow_x+x0, shadow_y+y0}, {shadow_x+x1, shadow_y+y1}, italicx, {d->s0, d->t0}, {d->s1, d->t1}, shadow_color, mode});
+				auto &rc = getRenderTable(TextLayer::BACK, get<1>(dr));
+				rc.push_back({{shadow_x+x0, shadow_y+y0}, {shadow_x+x1, shadow_y+y1}, italicx, {d->s0, d->t0}, {d->s1, d->t1}, shadow_color, mode});
 			}
 
 			// Much trickery, such dev
 			if (style == FONT_STYLE_UNDERLINED) {
-				ftgl::texture_glyph_t *ul = font->kind->getGlyph('_');
+				auto ulr = font->kind->getGlyph('_');
+				auto ul = get<0>(ulr);
 				if (ul) {
 
 					if (outline) {
 						font->kind->font->outline_thickness = 2;
 						font->kind->font->rendermode = ftgl::RENDER_OUTLINE_EDGE;
-						ftgl::texture_glyph_t *doutline = font->kind->getGlyph('_');
+						auto doutliner = font->kind->getGlyph('_');
+						auto doutline = get<0>(doutliner);
 						if (doutline) {
 							float x0  = bx + x;
 							float x1  = x0 + d->advance_x * scale;
@@ -146,7 +150,8 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 							float s2 = (doutline->s1 - doutline->s0) / 1.5;
 
 							float mode = (style == FONT_STYLE_BOLD ? 3.0f : 2.0f);
-							rendered_chars.push_back({{x0, y0}, {x1, y1}, italicx, {doutline->s0 + s2, doutline->t0}, {doutline->s1 - s2, doutline->t1}, outline_color, mode});
+							auto &rc = getRenderTable(TextLayer::BACK, get<1>(doutliner));
+							rc.push_back({{x0, y0}, {x1, y1}, italicx, {doutline->s0 + s2, doutline->t0}, {doutline->s1 - s2, doutline->t1}, outline_color, mode});
 						}
 						font->kind->font->outline_thickness = 0;
 						font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
@@ -157,14 +162,16 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 					float y0 = by + (font->kind->font->ascender * 1.05 - ul->offset_y) * scale;
 					float y1 = y0 + (ul->height) * scale;
 					float s2 = (ul->s1 - ul->s0) / 1.5;
-					rendered_chars.push_back({{x0, y0}, {x1, y1}, italicx, {ul->s0 + s2, ul->t0}, {ul->s1 - s2, ul->t1}, {r, g, b, a}, style == FONT_STYLE_BOLD ? 1.0f : 0.0f});
+					auto &rc = getRenderTable(TextLayer::FRONT, get<1>(ulr));
+					rc.push_back({{x0, y0}, {x1, y1}, italicx, {ul->s0 + s2, ul->t0}, {ul->s1 - s2, ul->t1}, {r, g, b, a}, style == FONT_STYLE_BOLD ? 1.0f : 0.0f});
 				}
 			}			
 
 			if (outline) {
 				font->kind->font->outline_thickness = 2;
 				font->kind->font->rendermode = ftgl::RENDER_OUTLINE_EDGE;
-				ftgl::texture_glyph_t *doutline = font->kind->getGlyph(c);
+				auto doutliner = font->kind->getGlyph(c);
+				auto doutline = get<0>(doutliner);
 				if (doutline) {
 					float x0  = bx + x + doutline->offset_x * scale;
 					float x1  = x0 + doutline->width * scale;
@@ -173,14 +180,16 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 					float y1 = y0 + (doutline->height) * scale;
 
 					float mode = (style == FONT_STYLE_BOLD ? 3.0f : 2.0f);
-					rendered_chars.push_back({{x0, y0}, {x1, y1}, italicx, {doutline->s0, doutline->t0}, {doutline->s1, doutline->t1}, outline_color, mode});
+					auto &rc = getRenderTable(TextLayer::BACK, get<1>(doutliner));
+					rc.push_back({{x0, y0}, {x1, y1}, italicx, {doutline->s0, doutline->t0}, {doutline->s1, doutline->t1}, outline_color, mode});
 				}
 				font->kind->font->outline_thickness = 0;
 				font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
 			}
 
 			float mode = (style == FONT_STYLE_BOLD ? 1.0f : 0.0f);
-			rendered_chars.push_back({{x0, y0}, {x1, y1}, italicx, {d->s0, d->t0}, {d->s1, d->t1}, {r, g, b, a}, mode});
+			auto &rc = getRenderTable(TextLayer::FRONT, get<1>(dr));
+			rc.push_back({{x0, y0}, {x1, y1}, italicx, {d->s0, d->t0}, {d->s1, d->t1}, {r, g, b, a}, mode});
 
 			x += d->advance_x * scale;
 			// if (style == FONT_STYLE_BOLD) x += d->width * scale * 0.1;
@@ -460,11 +469,15 @@ void DORText::center() {
 	
 	// We dont use translate() to now make other translate fail, we move the actual center
 	float hw = w / 2, hh = h / 2;
-	for (auto &it : rendered_chars) {
-		it.p0.x -= hw;
-		it.p0.y -= hh;
-		it.p1.x -= hw;
-		it.p1.y -= hh;
+	for (auto &layer : rendered_chars) { 
+		for (auto &rc : layer) { 
+			for (auto &it : rc) {
+				it.p0.x -= hw;
+				it.p0.y -= hh;
+				it.p1.x -= hw;
+				it.p1.y -= hh;
+			}
+		}
 	}
 	entities_container.translate(-hw, -hh, (float)0, false);
 	setChanged();
@@ -485,7 +498,7 @@ void DORText::clear() {
 	}
 	entities_container_refs.clear();
 	positions.clear();
-	rendered_chars.clear();
+	for (auto &rc : rendered_chars) rc.clear();
 }
 
 void DORText::render(RendererGL *container, mat4& cur_model, vec4& cur_color, bool cur_visible) {
@@ -493,31 +506,37 @@ void DORText::render(RendererGL *container, mat4& cur_model, vec4& cur_color, bo
 	mat4 vmodel = cur_model * model;
 	vec4 vcolor = cur_color * color;
 
-	auto dl = getDisplayList(container, font->kind->getAtlasTexture(), shader, VERTEX_BASE + VERTEX_KIND_INFO, RenderKind::QUADS);
+	for (auto &layer : rendered_chars) { 
+		uint8_t id = 0;
+		for (auto &rc : layer) { 
+			auto dl = getDisplayList(container, font->kind->getAtlasTexture(id), shader, VERTEX_BASE + VERTEX_KIND_INFO, RenderKind::QUADS);
 
-	// Make sure we do not have to reallocate each step
-	int nb = rendered_chars.size() * 4;
-	int startat = dl->list.size();
-	dl->list.reserve(startat + nb);
-	dl->list_kind_info.reserve(startat + nb);
+			// Make sure we do not have to reallocate each step
+			int nb = rc.size() * 4;
+			int startat = dl->list.size();
+			dl->list.reserve(startat + nb);
+			dl->list_kind_info.reserve(startat + nb);
 
-	for (auto &c : rendered_chars) {
-		vec4 color = vcolor * c.color;
-		vec4 p0(c.p0.x + c.italicx, c.p0.y, 0, 1);
-		vec4 p1(c.p1.x + c.italicx, c.p0.y, 0, 1);
-		vec4 p2(c.p1.x, 	    c.p1.y, 0, 1);
-		vec4 p3(c.p0.x, 	    c.p1.y, 0, 1);
-		// printf("==== char: %fx%f : %fx%f ::: %fx%f : %fx%f ::: %f, %f, %f, %f ::: %f\n", c.p0.x, c.p0.y, c.p1.x, c.p1.y, c.tex0.x, c.tex0.y, c.tex1.x, c.tex1.y, color.r, color.g, color.b, color.a, c.mode);
+			for (auto &c : rc) {
+				vec4 color = vcolor * c.color;
+				vec4 p0(c.p0.x + c.italicx, c.p0.y, 0, 1);
+				vec4 p1(c.p1.x + c.italicx, c.p0.y, 0, 1);
+				vec4 p2(c.p1.x, 	    c.p1.y, 0, 1);
+				vec4 p3(c.p0.x, 	    c.p1.y, 0, 1);
+				// printf("==== char: %fx%f : %fx%f ::: %fx%f : %fx%f ::: %f, %f, %f, %f ::: %f\n", c.p0.x, c.p0.y, c.p1.x, c.p1.y, c.tex0.x, c.tex0.y, c.tex1.x, c.tex1.y, color.r, color.g, color.b, color.a, c.mode);
 
-		dl->list.push_back({vmodel * p0, {c.tex0.x, c.tex0.y}, color});
-		dl->list.push_back({vmodel * p1, {c.tex1.x, c.tex0.y}, color});
-		dl->list.push_back({vmodel * p2, {c.tex1.x, c.tex1.y}, color});
-		dl->list.push_back({vmodel * p3, {c.tex0.x, c.tex1.y}, color});
-		dl->list_kind_info.push_back({c.mode});
-		dl->list_kind_info.push_back({c.mode});
-		dl->list_kind_info.push_back({c.mode});
-		dl->list_kind_info.push_back({c.mode});
-	}		
+				dl->list.push_back({vmodel * p0, {c.tex0.x, c.tex0.y}, color});
+				dl->list.push_back({vmodel * p1, {c.tex1.x, c.tex0.y}, color});
+				dl->list.push_back({vmodel * p2, {c.tex1.x, c.tex1.y}, color});
+				dl->list.push_back({vmodel * p3, {c.tex0.x, c.tex1.y}, color});
+				dl->list_kind_info.push_back({c.mode});
+				dl->list_kind_info.push_back({c.mode});
+				dl->list_kind_info.push_back({c.mode});
+				dl->list_kind_info.push_back({c.mode});
+			}
+			id++;
+		}
+	}
 
 	resetChanged();
 
@@ -534,7 +553,7 @@ void DORText::sortCoords(RendererGL *container, mat4& cur_model) {
 	container->sorted_dos.push_back(this);
 }
 
-DORText::DORText() {
+DORText::DORText() : rendered_chars(2) { // Init rendered_chars to 2 size for TextLayer BACK & FRONT
 	text = (char*)malloc(1);
 	text[0] = '\0';
 	font_color = {1, 1, 1, 1};

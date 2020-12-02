@@ -26,6 +26,10 @@
 #include <vector>
 #include "font.hpp"
 
+enum class TextLayer : uint8_t {
+	BACK, FRONT,
+};
+
 class DORText : public DisplayObject{
 private:
 	static shader_type *default_shader;
@@ -68,7 +72,12 @@ private:
 		vec4 color;
 		float mode;
 	};
-	std::vector<render_char> rendered_chars;
+	std::vector<std::vector<std::vector<render_char>>> rendered_chars;
+	inline std::vector<render_char> &getRenderTable(TextLayer l, uint32_t id) {
+		auto &rc = rendered_chars[static_cast<uint8_t>(l)];
+		while (rc.size() < id+1) rc.emplace_back();
+		return rc[id];
+	}
 
 	virtual void cloneInto(DisplayObject *into);
 
