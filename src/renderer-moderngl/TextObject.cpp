@@ -423,6 +423,7 @@ endcolor:
 	this->w = max_size;
 	this->h = nb_lines * font_h;
 
+	checkSortability(); // Check if we start and end with the same texture
 	font->kind->updateAtlas(); // Make sure any texture changes are upload to the GPU
 }
 
@@ -442,6 +443,7 @@ void DORText::parseTextSimple() {
 	this->nb_lines = 1;
 	this->h = font_h;
 
+	checkSortability(); // Check if we start and end with the same texture
 	font->kind->updateAtlas(); // Make sure any texture changes are upload to the GPU
 }
 
@@ -509,30 +511,32 @@ void DORText::render(RendererGL *container, mat4& cur_model, vec4& cur_color, bo
 	for (auto &layer : rendered_chars) { 
 		uint8_t id = 0;
 		for (auto &rc : layer) { 
-			auto dl = getDisplayList(container, font->kind->getAtlasTexture(id), shader, VERTEX_BASE + VERTEX_KIND_INFO, RenderKind::QUADS);
+			if (rc.size()) {
+				auto dl = getDisplayList(container, font->kind->getAtlasTexture(id), shader, VERTEX_BASE + VERTEX_KIND_INFO, RenderKind::QUADS);
 
-			// Make sure we do not have to reallocate each step
-			int nb = rc.size() * 4;
-			int startat = dl->list.size();
-			dl->list.reserve(startat + nb);
-			dl->list_kind_info.reserve(startat + nb);
+				// Make sure we do not have to reallocate each step
+				int nb = rc.size() * 4;
+				int startat = dl->list.size();
+				dl->list.reserve(startat + nb);
+				dl->list_kind_info.reserve(startat + nb);
 
-			for (auto &c : rc) {
-				vec4 color = vcolor * c.color;
-				vec4 p0(c.p0.x + c.italicx, c.p0.y, 0, 1);
-				vec4 p1(c.p1.x + c.italicx, c.p0.y, 0, 1);
-				vec4 p2(c.p1.x, 	    c.p1.y, 0, 1);
-				vec4 p3(c.p0.x, 	    c.p1.y, 0, 1);
-				// printf("==== char: %fx%f : %fx%f ::: %fx%f : %fx%f ::: %f, %f, %f, %f ::: %f\n", c.p0.x, c.p0.y, c.p1.x, c.p1.y, c.tex0.x, c.tex0.y, c.tex1.x, c.tex1.y, color.r, color.g, color.b, color.a, c.mode);
+				for (auto &c : rc) {
+					vec4 color = vcolor * c.color;
+					vec4 p0(c.p0.x + c.italicx, c.p0.y, 0, 1);
+					vec4 p1(c.p1.x + c.italicx, c.p0.y, 0, 1);
+					vec4 p2(c.p1.x, 	    c.p1.y, 0, 1);
+					vec4 p3(c.p0.x, 	    c.p1.y, 0, 1);
+					// printf("==== char: %fx%f : %fx%f ::: %fx%f : %fx%f ::: %f, %f, %f, %f ::: %f\n", c.p0.x, c.p0.y, c.p1.x, c.p1.y, c.tex0.x, c.tex0.y, c.tex1.x, c.tex1.y, color.r, color.g, color.b, color.a, c.mode);
 
-				dl->list.push_back({vmodel * p0, {c.tex0.x, c.tex0.y}, color});
-				dl->list.push_back({vmodel * p1, {c.tex1.x, c.tex0.y}, color});
-				dl->list.push_back({vmodel * p2, {c.tex1.x, c.tex1.y}, color});
-				dl->list.push_back({vmodel * p3, {c.tex0.x, c.tex1.y}, color});
-				dl->list_kind_info.push_back({c.mode});
-				dl->list_kind_info.push_back({c.mode});
-				dl->list_kind_info.push_back({c.mode});
-				dl->list_kind_info.push_back({c.mode});
+					dl->list.push_back({vmodel * p0, {c.tex0.x, c.tex0.y}, color});
+					dl->list.push_back({vmodel * p1, {c.tex1.x, c.tex0.y}, color});
+					dl->list.push_back({vmodel * p2, {c.tex1.x, c.tex1.y}, color});
+					dl->list.push_back({vmodel * p3, {c.tex0.x, c.tex1.y}, color});
+					dl->list_kind_info.push_back({c.mode});
+					dl->list_kind_info.push_back({c.mode});
+					dl->list_kind_info.push_back({c.mode});
+					dl->list_kind_info.push_back({c.mode});
+				}
 			}
 			id++;
 		}
@@ -549,7 +553,11 @@ void DORText::sortCoords(RendererGL *container, mat4& cur_model) {
 
 	sort_coords = vmodel * sort_center;
 	sort_shader = shader;
-	sort_tex = 0;
+	if (is_sortable > -1) {
+		sort_tex = font->kind->atlas[is_sortable]->id;
+	} else {
+		sort_tex = 0;
+	}
 	container->sorted_dos.push_back(this);
 }
 

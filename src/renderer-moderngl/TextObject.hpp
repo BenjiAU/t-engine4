@@ -79,6 +79,23 @@ private:
 		return rc[id];
 	}
 
+	int8_t is_sortable = -1;
+	inline void checkSortability() {
+		int8_t first = -1, last = -1;
+
+		for (auto &layer : rendered_chars) { 
+			uint8_t id = 0;
+			for (auto &rc : layer) { 
+				if (rc.size()) {
+					if (first == -1) first = id;
+					last = id;
+				}
+				id++;
+			}
+		}
+		is_sortable = (first == last) ? first : -1;
+	}
+
 	virtual void cloneInto(DisplayObject *into);
 
 public:

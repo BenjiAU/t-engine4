@@ -36,8 +36,8 @@ extern "C" {
 
 using namespace std;
 
-#define DEFAULT_ATLAS_W	256
-#define DEFAULT_ATLAS_H	256
+#define DEFAULT_ATLAS_W	1024
+#define DEFAULT_ATLAS_H	1024
 #define BASE_FONT_SIZE 32
 
 typedef enum {
@@ -59,7 +59,7 @@ class FontKind {
 	friend DORText;
 protected:
 	static unordered_map<string, FontKind*> all_fonts;
-	const string default_atlas_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMOPQRSTUVWXYZ0123456789.-_/*&~\"'\\{}()[]|^%%*$! =+,€";
+	const string default_atlas_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_/*&~\"'\\{}()[]|^%%*$!? =+,€@";
 
 	string fontname;
 	char *font_mem;

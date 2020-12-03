@@ -53,7 +53,7 @@ void FontKind::used(bool v) {
 
 FontKind* FontKind::getFont(string &name) {
 	auto am = all_fonts.find(name);
-	if (am != all_fonts.end()&&0) { // Found, use it
+	if (am != all_fonts.end()) { // Found, use it
 		FontKind *fk = am->second;
 		fk->used(true);
 		printf("[FONT] add use %s => %d\n", fk->fontname.c_str(), fk->nb_use);
@@ -88,9 +88,21 @@ FontKind::FontKind(string &name) : fontname(name) {
 
 	makeAtlas();
 	font = texture_font_new_from_memory(atlas.back(), BASE_FONT_SIZE, font_mem, font_mem_size);
-	font->rendermode = RENDER_SIGNED_DISTANCE_FIELD;
-	// texture_font_load_glyphs(font, default_atlas_chars.c_str());
 	lineskip = font->height;
+
+	// Preload glyphs
+	font->rendermode = RENDER_SIGNED_DISTANCE_FIELD;
+	const char *str = default_atlas_chars.c_str();
+	size_t len = default_atlas_chars.size();
+	ssize_t off = 1;
+	int32_t c;
+	while (off > 0) {
+		off = utf8proc_iterate((const uint8_t*)str, len, &c);
+		str += off;
+		len -= off;
+		getGlyph(c);
+	}
+
 
 	updateAtlas();
 }
@@ -119,12 +131,10 @@ FontKind::~FontKind() {
 
 void FontKind::updateAtlas() {
 	auto a = atlas.back();
-	for (auto &a : atlas) {
-		if (!a->changed) continue;
-		glBindTexture(GL_TEXTURE_2D, a->id);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, a->width, a->height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, a->data);
-		a->changed = false;
-	}
+	if (!a->changed) return;
+	glBindTexture(GL_TEXTURE_2D, a->id);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, a->width, a->height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, a->data);
+	a->changed = false;
 }
 
 
