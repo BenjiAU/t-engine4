@@ -120,7 +120,7 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 			
 			float x0  = bx + x + d->offset_x * scale;
 			float x1  = x0 + d->width * scale;
-			float italicx = - d->offset_x * scale * italic;
+			float italicx = d->advance_x * scale * italic;
 			float y0 = by + (font->kind->font->ascender - d->offset_y) * scale + d->height * (base_scale - scale);
 			float y1 = y0 + (d->height) * scale;
 			positions.push_back({x0, y});
@@ -175,7 +175,7 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 				if (doutline) {
 					float x0  = bx + x + doutline->offset_x * scale;
 					float x1  = x0 + doutline->width * scale;
-					float italicx = - doutline->offset_x * scale * italic;
+					float italicx = doutline->advance_x * scale * italic;
 					float y0 = by + (font->kind->font->ascender - doutline->offset_y) * scale + d->height * (base_scale - scale);
 					float y1 = y0 + (doutline->height) * scale;
 
