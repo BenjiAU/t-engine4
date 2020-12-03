@@ -76,14 +76,14 @@ void main(void)
 
 	vec3 o = mix(vec3(0,0,0), te4_fragcolor.rgb, oa);
 	vec3 c = te4_fragcolor.rgb;
-	gl_FragColor = vec4(c, alpha);
+	gl_FragColor = vec4(c, alpha * te4_fragcolor.a);
 	// gl_FragColor = vec4(c, max(alpha,oa));
 	// gl_FragColor = vec4(c * alpha + o * (1.0 - alpha), max(alpha,oa));
 
 	// gl_FragColor = vec4(te4_fragcolor.rgb, oa);
 
 	// Compute in the requested color alpha
-	gl_FragColor.a *= te4_fragcolor.a;
+	// gl_FragColor.a *= te4_fragcolor.a;
 }
 
 
