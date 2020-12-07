@@ -31,9 +31,9 @@ module(..., package.seeall, class.inherit(Base, Focusable))
 function _M:init(t)
 	self.text = t.text or ""
 	self.w = assert(t.width, "no dropdown width")
-	self.fct = assert(t.fct, "no dropdown fct")
+	self.fct = t.fct or function() end
 	self.list = assert(t.list, "no dropdown list")
-	self.nb_items = assert(t.nb_items, "no dropdown nb_items")
+	self.nb_items = t.nb_items or #t.list
 	self.on_select = t.on_select
 	self.display_prop = t.display_prop or "name"
 	self.scrollbar = t.scrollbar
@@ -68,6 +68,7 @@ function _M:positioned(x, y, sx, sy, dialog)
 	self.c_list = List.new{width=self.w, list=table.clone(self.list, true), select=self.on_select, display_prop=self.display_prop, scrollbar=self.scrollbar, nb_items=self.nb_items, fct=function()
 		game:unregisterDialog(self.popup)
 		self:sound("button")
+		self.value = self.c_list.list[self.c_list.sel]
 		self.fct(self.c_list.list[self.c_list.sel])
 		self.textinput:setText(self.c_list:getCurrentText())
 	end}
@@ -81,7 +82,7 @@ function _M:positioned(x, y, sx, sy, dialog)
 end
 
 function _M:showSelect()
-	local sx, sy = self.base_x, self.base_y + self.h
+	local sx, sy = self.base_x + self.dialog.display_x, self.base_y + self.h + self.dialog.display_y
 	if self.dialog() and self.dialog().scrollbar then sy = sy - self.dialog().scrollbar.pos  end
 
 	if sy + self.h + self.c_list.h > game.h then sy = game.h - self.c_list.h - self.h end
@@ -96,6 +97,7 @@ function _M:showSelect()
 		game:unregisterDialog(self.popup)
 		self.c_list.sel = self.previous
 		self:sound("button")
+		self.value = self.c_list.list[self.c_list.sel]
 		self.fct(self.c_list.list[self.c_list.sel])
 		self.textinput:setText(self.c_list:getCurrentText())
 	end)
@@ -105,12 +107,14 @@ end
 
 function _M:selectEntry(i)
 	self.c_list.sel = i
+	self.value = self.c_list.list[self.c_list.sel]
 	self.textinput:setText(self.c_list:getCurrentText())
 end
 
 function _M:selectEntryBy(k, v)
 	for i, t in ipairs(self.list) do if t[k] == v then
 		self.c_list.sel = i
+		self.value = self.c_list.list[self.c_list.sel]
 		self.textinput:setText(self.c_list:getCurrentText())
 	end end
 end

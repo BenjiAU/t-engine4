@@ -19,12 +19,15 @@
 
 require "engine.class"
 local FontPackage = require "engine.FontPackage"
+local GetQuantitySlider = require "engine.dialogs.GetQuantitySlider"
 local HotkeysIconsDisplay = require "engine.HotkeysIconsDisplay"
 local MiniContainer = require "mod.class.uiset.minimalist.MiniContainer"
 local UI = require "engine.ui.Base"
 
 --- Log display for Minimalist ui
 module(..., package.seeall, class.inherit(MiniContainer))
+
+_M.rebuild_on_hotkey_size = true
 
 function _M:init(minimalist)
 	MiniContainer.init(self, minimalist)
@@ -145,8 +148,18 @@ end
 function _M:editMenu()
 	return {
 		{ name = "Toggle frame", fct=function() self:toggleFrame() end },
+		{ name = "Icons size", fct=function() self:setIconsSize() end },
 		{ name = "Force orientation: natural", fct=function() self:forceOrientation("natural") end },
 		{ name = "Force orientation: horizontal", fct=function() self:forceOrientation("horizontal") end },
 		{ name = "Force orientation: vertical", fct=function() self:forceOrientation("vertical") end },
 	}
+end
+
+function _M:setIconsSize()
+	game:registerDialog(GetQuantitySlider.new(_t"Icons size", _t"From 16 to 128", config.settings.tome.hotkey_icons_size, 16, 128, 4, function(qty)
+		qty = util.bound(qty, 16, 128)
+		game:saveSettings("tome.hotkey_icons_size", ("tome.hotkey_icons_size = %d\n"):format(qty))
+		config.settings.tome.hotkey_icons_size = qty
+		game:onTickEnd(function() game:resizeIconsHotkeysToolbar() end)
+	end))
 end

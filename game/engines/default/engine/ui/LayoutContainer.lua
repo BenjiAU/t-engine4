@@ -20,17 +20,23 @@
 require "engine.class"
 local Base = require "engine.ui.Base"
 local Focusable = require "engine.ui.Focusable"
+local LayoutEngine = require "engine.ui.LayoutEngine"
+local Scrollbar = require "engine.ui.blocks.Scrollbar"
 local KeyBind = require "engine.KeyBind"
 
 --- A UI container that can host other UI elements and lay them out same as Dialog can
 -- @classmod engine.ui.LayoutContainer
-module(..., package.seeall, class.inherit(Base, Focusable))
+module(..., package.seeall, class.inherit(Base, Focusable, LayoutEngine))
 
 function _M:init(t)
 	if not t.uis then error("LayoutContainer needs uis") end
 	self.w = t.width
 	self.h = t.height
+	self.allow_scroll = t.allow_scroll
+
 	self.frame_id = t.frame_id
+	if self.frame_id == false then self.frame_id = nil
+	else self.frame_id = self.frame_id or "ui/textbox" end
 
 	self.uis = {}
 	self.ui_by_ui = {}
@@ -53,18 +59,42 @@ function _M:generate()
 	self.mouse:reset()
 	self.key:reset()
 	self.do_container:clear()
+
+	if self.allow_scroll then
+		self.main_container = core.renderer.renderer()
+		-- self.main_container = core.renderer.container()
+	else
+		self.main_container = core.renderer.container()
+	end
+	self.scroll_container = core.renderer:container()
+	self.do_container:add(self.main_container)
+	self.do_container:add(self.scroll_container)
+
 	self.uis_container = core.renderer.renderer()
 
+	self.frame = self:makeFrameDO(self.frame_id, self.w, self.h, nil, nil, false, true)
 	self:setupUI(self.w == nil, self.h == nil)
 
-	self.frame = self:makeFrameDO(self.frame_id or "ui/textbox", self.w, self.h, nil, nil, false, true)
-	self.do_container:add(self.frame.container)
-	self.do_container:add(self.uis_container)
+	self.main_container:add(self.frame.container)
 
-	self.uis_container:cutoff(0, 0, self.iw, self.ih)
+	if self.allow_scroll then
+		self.outer_uis_container = core.renderer.renderer()
+		self.outer_uis_container:cutoff(0, 0, self.iw, self.ih)		
+		self.main_container:add(self.outer_uis_container)
+		self.outer_uis_container:add(self.uis_container)
+	else
+		self.main_container:add(self.uis_container)
+		self.uis_container:cutoff(0, 0, self.iw, self.ih)
+	end
 
 	self.mouse:registerZone(0, 0, self.w, self.h, function(...) self:mouseEvent(...) end, nil, nil, true)
 	self.key.receiveKey = function(_, ...) self:keyEvent(...) end
+end
+
+function _M:positioned(x, y, sx, sy, dialog)
+	self.display_x, self.display_y = sx, sy
+	self.use_tooltip = dialog.use_tooltip
+	self.useTooltip = function(self, ...) return dialog:useTooltip(...) end
 end
 
 function _M:setupUI(resizex, resizey, on_resize, addmw, addmh)
@@ -110,8 +140,14 @@ function _M:setupUI(resizex, resizey, on_resize, addmw, addmh)
 	end
 
 	self.w, self.h = math.floor(nw), math.floor(nh)
-	self.ix, self.iy = 5, 8
-	self.iw, self.ih = self.w - 2 * 5, self.h - 8 - 8
+	self.frame:resize(self.w, self.h)
+	self.ix, self.iy = self.frame.ix, self.frame.iy
+	self.iw, self.ih = self.frame.iw, self.frame.ih
+
+	if self.allow_scroll then
+		self.scrollbar = Scrollbar.new(nil, self.ih, self.ih)
+		self.iw = self.iw - self.scrollbar.w
+	end
 
 	self.uis_container:clear()
 	local actual_container = self.uis_container
@@ -194,13 +230,21 @@ function _M:setupUI(resizex, resizey, on_resize, addmw, addmh)
 		ui.y = uy
 		ui.ui.mouse.delegate_offset_x = ux
 		ui.ui.mouse.delegate_offset_y = uy
-		-- ui.ui:positioned(ux, uy, self.display_x + ux, self.display_y + uy, self)
+		ui.ui:positioned(ux, uy, ux, uy, self)
 		if ui.ui.do_container then
 			ui.ui.do_container:translate(ui.x, ui.y, 0)
 			ui.ui.do_container:removeFromParent()
 			actual_container:add(ui.ui.do_container)
 		end
 		full_h = math.max(full_h, uy + ui.ui.h)
+	end
+
+	if self.allow_scroll then
+		-- self.main_container:cutoff(0, 0, self.iw, self.ih)
+		self.scrollbar:setMax(full_h - self.ih)
+		self.scroll_inertia = 0
+		local sx, sy = self.main_container:getTranslate()
+		self.scroll_container:clear():add(self.scrollbar:get():translate(sx + self.iw, sy))
 	end
 end
 
@@ -246,9 +290,29 @@ function _M:no_subfocus()
 end
 
 function _M:mouseEvent(button, x, y, xrel, yrel, bx, by, event)
+	if self.allow_scroll and self.scrollbar then
+		y = y + self.scrollbar.pos
+		by = by + self.scrollbar.pos
+
+		if event == "button" and button == "wheelup" then
+			self.scroll_inertia = math.min(self.scroll_inertia, 0) - 5
+		elseif event == "button" and button == "wheeldown" then
+			self.scroll_inertia = math.max(self.scroll_inertia, 0) + 5
+		end
+	end
+
 	-- Look for focus
+	self:useTooltip(false)
 	for i = 1, #self.uis do
 		local ui = self.uis[i]
+		if ui.has_tooltip and bx >= ui.x and bx <= ui.x + ui.ui.w and by >= ui.y and by <= ui.y + ui.ui.h then
+			self:useTooltip(true)
+			if self.last_tooltip ~= ui then
+				local dx, dy = ui.ui.do_container:getTranslate(true)
+				self:useTooltip(dx, dy, ui.ui.h, ui.has_tooltip)
+			end
+			self.last_tooltip = ui
+		end
 		if (ui.ui.can_focus or ui.ui.can_focus_mouse) and bx >= ui.x and bx <= ui.x + ui.ui.w and by >= ui.y and by <= ui.y + ui.ui.h then
 			self:setSubFocus(i, "mouse")
 
@@ -280,5 +344,21 @@ function _M:on_focus_change(status)
 	else
 		self.focus_ui_id = 0 -- Hack
 		self:moveSubFocus(1)
+	end
+end
+
+function _M:setScroll(pos)
+	self.scrollbar:setPos(pos)
+	self.uis_container:translate(0, -self.scrollbar.pos)
+end
+
+function _M:display(x, y, nb_keyframes, ox, oy)
+	if self.scrollbar then
+		local oldpos = self.scrollbar.pos
+		if self.scroll_inertia ~= 0 then self:setScroll(util.minBound(self.scrollbar.pos + self.scroll_inertia, 0, self.scrollbar.max)) end
+		if self.scroll_inertia > 0 then self.scroll_inertia = math.max(self.scroll_inertia - nb_keyframes, 0)
+		elseif self.scroll_inertia < 0 then self.scroll_inertia = math.min(self.scroll_inertia + nb_keyframes, 0)
+		end
+		if self.scrollbar.pos == 0 or self.scrollbar.pos == self.scrollbar.max then self.scroll_inertia = 0 end
 	end
 end

@@ -48,7 +48,6 @@ VBO::~VBO() {
 void VBO::clear() {
 	vertices.clear();
 	textures.clear();
-	shader = NULL;
 	changed = true;
 }
 

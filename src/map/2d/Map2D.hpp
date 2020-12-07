@@ -268,6 +268,7 @@ private:
 	// Grid lines
 	VBO grid_lines_vbo;
 	int grid_lines_shader_ref = LUA_NOREF;
+	shader_type *grid_lines_shader = nullptr;
 	float show_grid_lines = 2;
 
 	// Renderer
@@ -327,8 +328,18 @@ public:
 	void setDefaultShader(shader_type *s, int ref);
 
 	/* Scrolling */
+	struct area{
+		int32_t minx, miny, maxx, maxy;
+		area(int32_t minx, int32_t maxx, int32_t miny, int32_t maxy) : minx(minx), miny(miny), maxx(maxx), maxy(maxy) {};
+	};
 	void scroll(int32_t x, int32_t y, float smooth);
 	vec2 getScroll();
+	inline area computeVisibleArea() {
+		return area(
+			mx + viewport_pos.x + scroll_anim_dx, mx + viewport_size.x + scroll_anim_dx,
+			my + viewport_pos.y + scroll_anim_dy, my + viewport_size.y + scroll_anim_dy
+		);
+	}
 
 	/* Z-layers */
 	void setZCallback(int32_t z, int ref);

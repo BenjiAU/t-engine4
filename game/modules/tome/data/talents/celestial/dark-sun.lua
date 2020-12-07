@@ -20,8 +20,8 @@
 local Object = require "mod.class.Object"
 
 newTalent{
-	name = "Breach", short_name = "FALLEN_BREACH",
-	type = {"celestial/black-sun", 1},
+	name = "Collapse",
+	type = {"celestial/dark-sun", 1},
 	require = divi_str_req_high1,
 	points = 5,
 	cooldown = 12,
@@ -135,7 +135,7 @@ The damage will increase with your Spellpower.]]):
 
 newTalent{
 	name = "Devourer Stance",
-	type = {"celestial/black-sun", 2},
+	type = {"celestial/dark-sun", 2},
 	require = divi_str_req_high2,
 	points = 5,
 	cooldown = 15,
@@ -154,7 +154,7 @@ The damage will increase with your Spellpower.]]):tformat(t.getDuration(self,t),
 
 newTalent{
 	name = "Singularity Armor",
-	type = {"celestial/black-sun", 3},
+	type = {"celestial/dark-sun", 3},
 	require = divi_str_req_high3,
 	points = 5,
 	mode = "sustained",
@@ -190,7 +190,7 @@ newTalent{
 
 newTalent{
 	name = "Doom Spiral",
-	type = {"celestial/black-sun", 4},
+	type = {"celestial/dark-sun", 4},
 	require = divi_str_req_high4,
 	points = 5,
 	random_ego = "attack",

@@ -1217,7 +1217,7 @@ static int gl_vertexes_font_atlas_texture(lua_State *L)
 	DORVertexes *v = userdata_to_DO<DORVertexes>(L, 1, "gl{vertexes}");
 	FontInstance *f = *(FontInstance**)auxiliar_checkclass(L, "sdl{font}", 2);
 	lua_pushvalue(L, 2);
-	v->setTexture(f->kind->getAtlasTexture(), luaL_ref(L, LUA_REGISTRYINDEX));
+	v->setTexture(f->kind->getAtlasTexture(lua_tonumber(L, 3)), luaL_ref(L, LUA_REGISTRYINDEX));
 
 	lua_pushvalue(L, 1);
 	return 1;
@@ -1271,14 +1271,6 @@ static int gl_text_free(lua_State *L)
 	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
 	delete(v);
 	lua_pushnumber(L, 1);
-	return 1;
-}
-
-static int gl_text_model_data(lua_State *L)
-{
-	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
-	v->setDataKinds(VERTEX_BASE + VERTEX_MODEL_INFO + VERTEX_KIND_INFO);
-	lua_pushvalue(L, 1);
 	return 1;
 }
 
@@ -1337,7 +1329,7 @@ static int gl_text_shadow(lua_State *L)
 static int gl_text_outline(lua_State *L)
 {
 	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
-	vec4 color = {0, 0, 0, 0.7};
+	vec4 color = {0, 0, 0, 1};
 	if (lua_isnumber(L, 3)) {
 		color.r = lua_tonumber(L, 3);
 		color.g = lua_tonumber(L, 4);
@@ -1348,6 +1340,19 @@ static int gl_text_outline(lua_State *L)
 
 	lua_pushvalue(L, 1);
 	return 1;
+}
+
+static int gl_text_static_default_outline(lua_State *L)
+{
+	vec4 color = {0, 0, 0, 1};
+	if (lua_isnumber(L, 2)) {
+		color.r = lua_tonumber(L, 2);
+		color.g = lua_tonumber(L, 3);
+		color.b = lua_tonumber(L, 4);
+		color.a = lua_tonumber(L, 5);
+	}
+	DORText::setOutlineDefault(lua_tonumber(L, 1), color);
+	return 0;
 }
 
 static int gl_text_style(lua_State *L)
@@ -1363,7 +1368,16 @@ static int gl_text_style(lua_State *L)
 		lua_pushstring(L, "text:style called without normal/bold/italic/underline");
 		lua_error(L);
 	}
-	return 0;
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
+static int gl_text_smallcaps(lua_State *L)
+{
+	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
+	v->setTextSmallCaps(lua_toboolean(L, 2));
+	lua_pushvalue(L, 1);
+	return 1;
 }
 
 static int gl_text_from(lua_State *L)
@@ -1393,6 +1407,14 @@ static int gl_text_center(lua_State *L)
 	return 1;
 }
 
+static int gl_text_clear(lua_State *L)
+{
+	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
+	v->clear();
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
 static int gl_text_set(lua_State *L)
 {
 	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
@@ -1410,18 +1432,6 @@ static int gl_text_stats(lua_State *L)
 	lua_pushnumber(L, v->h);
 	lua_pushnumber(L, v->nb_lines);
 	return 3;
-}
-
-static int gl_text_texture(lua_State *L)
-{
-	DORText *v = userdata_to_DO<DORText>(L, 1, "gl{text}");
-	texture_lua *t = texture_lua::from_state(L, 2);
-	int id = lua_tonumber(L, 3);
-	lua_pushvalue(L, 2);
-	v->setTexture(t, luaL_ref(L, LUA_REGISTRYINDEX), id);
-
-	lua_pushvalue(L, 1);
-	return 1;
 }
 
 static int gl_text_shader(lua_State *L)
@@ -2186,16 +2196,17 @@ static const struct luaL_Reg gl_text_reg[] =
 	{"outline", gl_text_outline},
 	{"setFrom", gl_text_from},
 	{"textColor", gl_text_text_color},
+	{"textStyle", gl_text_style},
+	{"smallCaps", gl_text_smallcaps},
 	{"getStats", gl_text_stats},
 	{"maxWidth", gl_text_max_width},
 	{"maxLines", gl_text_max_lines},
-	{"enableModelData", gl_text_model_data},
 	{"linefeed", gl_text_linefeed},
 	{"getLetterPosition", gl_text_get_letter_position},
 	{"center", gl_text_center},
-	{"texture", gl_text_texture},
-	{"shader", gl_text_shader},
-	{"clear", gl_vertexes_clear},
+	// {"texture", gl_text_texture},
+	// {"shader", gl_text_shader},
+	{"clear", gl_text_clear},
 	INJECT_GENERIC_DO_METHODS
 	{NULL, NULL},
 };
@@ -2300,6 +2311,11 @@ const luaL_Reg rendererlib[] = {
 	{NULL, NULL}
 };
 
+const luaL_Reg textslib[] = {
+	{"defaultOutline", gl_text_static_default_outline},
+	{NULL, NULL}
+};
+
 const luaL_Reg physicslib[] = {
 	{"pause", physic_world_pause},
 	{"sleepAll", physic_world_sleep_all},
@@ -2330,6 +2346,7 @@ int luaopen_renderer(lua_State *L)
 	auxiliar_newclass(L, "gl{view}", gl_view_reg);
 	auxiliar_newclass(L, "gl{vbo}", gl_vbo_reg);
 	luaL_openlib(L, "core.renderer", rendererlib, 0);
+	luaL_openlib(L, "core.renderer.textconf", textslib, 0);
 	luaL_openlib(L, "core.physics", physicslib, 0);
 
 	// Build the weak self store registry

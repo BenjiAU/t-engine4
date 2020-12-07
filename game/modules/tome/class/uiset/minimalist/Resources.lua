@@ -89,6 +89,8 @@ function _M:init(minimalist, w, h)
 				if player:attr("time_shield") then shield = shield + player.time_shield_absorb max_shield = max_shield + player.time_shield_absorb_max end
 				if player:attr("damage_shield") then shield = shield + player.damage_shield_absorb max_shield = max_shield + player.damage_shield_absorb_max end
 				if player:attr("displacement_shield") then shield = shield + player.displacement_shield max_shield = max_shield + player.displacement_shield_max end
+				local necroshield = player:isTalentActive(player.T_HIEMAL_SHIELD)
+				if necroshield then shield = shield + (necroshield.shield or 0) end
 				return shield > 0
 			end,
 			get_values = function(player)
@@ -96,6 +98,8 @@ function _M:init(minimalist, w, h)
 				if player:attr("time_shield") then shield = shield + player.time_shield_absorb max_shield = max_shield + player.time_shield_absorb_max end
 				if player:attr("damage_shield") then shield = shield + player.damage_shield_absorb max_shield = max_shield + player.damage_shield_absorb_max end
 				if player:attr("displacement_shield") then shield = shield + player.displacement_shield max_shield = max_shield + player.displacement_shield_max end
+				local necroshield = player:isTalentActive(player.T_HIEMAL_SHIELD)
+				if necroshield then shield = shield + (necroshield.shield or 0) max_shield = max_shield + (necroshield.original_shield or 0) end
 				return shield, 0, max_shield, 0
 			end,
 		},

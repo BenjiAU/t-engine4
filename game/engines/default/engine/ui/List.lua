@@ -33,7 +33,7 @@ function _M:init(t)
 	self.h = t.height
 	self.nb_items = t.nb_items
 	assert(self.h or self.nb_items, "no list height/nb_items")
-	self.fct = t.fct
+	self.fct = t.fct or function() end
 	self.on_select = t.select
 	self.on_drag = t.on_drag
 	self.display_prop = t.display_prop or "name"

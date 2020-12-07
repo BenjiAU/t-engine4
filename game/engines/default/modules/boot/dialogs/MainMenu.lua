@@ -41,6 +41,27 @@ function _M:init()
 
 	local l = {}
 	self.list = l
+	-- l[#l+1] = {name="TEST OPTIONS", fct=function()
+	-- 	-- OMFG this is such a nasty hack, I'm nearly pround of it !
+	-- 	local mod = Module:listModules().tome
+	-- 	if not mod then return end
+
+	-- 	local allmounts = fs.getSearchPath(true)
+	-- 	if not mod.team then fs.mount(fs.getRealPath(mod.dir), "/mod", false)
+	-- 	else fs.mount(fs.getRealPath(mod.team), "/", false) end
+
+	-- 	package.loaded["engine.ui.Dialog"] = nil
+	-- 	package.loaded["engine.ui.NumberSlider"] = nil
+	-- 	package.loaded["engine.ui.LayoutContainer"] = nil
+	-- 	package.loaded["engine.ui.LayoutEngine"] = nil
+	-- 	package.loaded["mod.dialogs.GameOptions2"] = nil
+	-- 	local d = require("mod.dialogs.GameOptions2").new()
+	-- 	function d:unload()
+	-- 		fs.reset()
+	-- 		fs.mountAll(allmounts)
+	-- 	end
+	-- 	game:registerDialog(d)
+	-- end}
 	l[#l+1] = {name=_t"New Game", fct=function() game:registerDialog(require("mod.dialogs.NewGame").new()) end}
 	l[#l+1] = {name=_t"Load Game", fct=function() game:registerDialog(require("mod.dialogs.LoadGame").new()) end}
 	l[#l+1] = {name=_t"Addons", fct=function() game:registerDialog(require("mod.dialogs.Addons").new()) end}
@@ -48,7 +69,7 @@ function _M:init()
 		local list = {
 			"resume",
 			"keybinds_all",
-			{_t"Game Options", function()
+			{_t"Options", function()
 				-- OMFG this is such a nasty hack, I'm nearly pround of it !
 				local mod = Module:listModules().tome
 				if not mod then return end
@@ -57,7 +78,7 @@ function _M:init()
 				if not mod.team then fs.mount(fs.getRealPath(mod.dir), "/mod", false)
 				else fs.mount(fs.getRealPath(mod.team), "/", false) end
 
-				local d = require("mod.dialogs.GameOptions").new()
+				local d = require("mod.dialogs.GameOptions2").new()
 				function d:unload()
 					fs.reset()
 					fs.mountAll(allmounts)
@@ -65,8 +86,6 @@ function _M:init()
 				game:registerDialog(d)
 			end},
 			"language",
-			"video",
-			"sound",
 			"steam",
 			"cheatmode",
 		}
@@ -220,6 +239,7 @@ function _M:updateUI()
 ----------------------------
 --[[
 	local LayoutContainer = require "engine.ui.LayoutContainer"
+	local Dropdown = require "engine.ui.Dropdown"
 
 	local tree = {}
 	for i = 1, 100 do tree[#tree+1] = {name='this is azlkdj a long text '..i, plop="kjhekjghekg", plop3="kjhekjghekg"} end
@@ -240,6 +260,7 @@ function _M:updateUI()
 	local test5 = Textzone.new{width=200, auto_height=true, text=table.concat(txttest,"\n")}
 	local test3 = Button.new{text="Login", width=100, fct=function() print("PLOP") end}
 	local test4 = Textbox.new{title="Search: ", text="", chars=30, max_len=60, fct=function() end, on_change=function(text)end}
+	local droptest = Dropdown.new{width=150, fct=function(item)  end, on_select=function(item) end, list={{name="pop"}, {name="pop1"}, {name="pop2"}, {name="pop3"}, }}
 	
 	local lay = LayoutContainer.new{width=600, height=600, uis={
 		{left=0, top=0, ui=test},
@@ -247,9 +268,11 @@ function _M:updateUI()
 		{left=0, top=test, ui=test5},
 	}}
 	local lay2 = LayoutContainer.new{width=600, height=600, uis={
-		{left=0, top=0, ui=test3},
-		{right=0, top=0, ui=test4},
+		{left=0, top=0, ui=droptest},
+		{left=0, top=60, ui=test3},
+		{right=0, top=200, ui=test4},
 	}}
+
 
 	uis = {
 		{left=0, top=0, ui=lay},

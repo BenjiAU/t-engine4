@@ -29,15 +29,18 @@ extern "C" {
 #include "main.h"
 #include "utf8proc/utf8proc.h"
 }
+#include <cctype>
 
 #include "renderer-moderngl/Renderer.hpp"
 #include "renderer-moderngl/TextObject.hpp"
 #include "colors.hpp"
 
 shader_type *DORText::default_shader = NULL;
+float DORText::default_outline = 0;
+vec4 DORText::default_outline_color = vec4(0, 0, 0, 1);
 
 void DORText::cloneInto(DisplayObject* _into) {
-	DORVertexes::cloneInto(_into);
+	DisplayObject::cloneInto(_into);
 	DORText *into = dynamic_cast<DORText*>(_into);
 
 	// Clone reference
@@ -46,12 +49,17 @@ void DORText::cloneInto(DisplayObject* _into) {
 		into->font_lua_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 	}
 
+	into->shader = shader;
 	into->font = font;
 	into->font_color = font_color;
 	into->line_max_width = line_max_width;
 	into->max_lines = max_lines;
 	into->no_linefeed = no_linefeed;
 	into->setText(text);
+}
+
+void DORText::setShader(shader_type *s) {
+	shader = s ? s : nullptr;
 }
 
 void DORText::setFrom(DORText *prev) {
@@ -63,6 +71,7 @@ void DORText::setFrom(DORText *prev) {
 void DORText::setTextStyle(font_style style) {
 	default_style = style;
 	used_font_style = style;
+	parseText();
 }
 void DORText::setTextColor(float r, float g, float b, float a) {
 	font_color.r = r; font_color.g = g; font_color.b = b; font_color.a = a;
@@ -71,22 +80,34 @@ void DORText::setTextColor(float r, float g, float b, float a) {
 	used_last_color = font_last_color;
 	parseText();
 }
+void DORText::setTextSmallCaps(bool v) {
+	small_caps = v;
+	parseText();
+}
 
 int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, int by, float r, float g, float b, float a) {
 	int x = 0, y = by;
 	ssize_t off = 1;
 	int32_t c;
-	float scale = font->scale;
 	float italic = 0;
+	float base_scale = font->scale;
 	if (style == FONT_STYLE_ITALIC) { style = FONT_STYLE_NORMAL; italic = 0.3; }
 	while (off > 0) {
 		off = utf8proc_iterate((const uint8_t*)str, len, &c);
 		str += off;
 		len -= off;
+		float scale = base_scale;
+		if (small_caps) {
+			if (!isupper(c)) {
+				scale *= 0.75;
+				c = toupper(c);
+			}
+		}
 
-		font->kind->font->outline_thickness = 0;
-		font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
-		ftgl::texture_glyph_t *d = font->kind->getGlyph(c);
+		// font->kind->font->outline_thickness = 0;
+		// font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
+		auto dr = font->kind->getGlyph(c);
+		auto d = get<0>(dr);
 		if (d) {
 			float kerning = 0;
 			if (last_glyph) {
@@ -99,73 +120,79 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 			
 			float x0  = bx + x + d->offset_x * scale;
 			float x1  = x0 + d->width * scale;
-			float italicx = - d->offset_x * scale * italic;
-			float y0 = by + (font->kind->font->ascender - d->offset_y) * scale;
+			float italicx = d->advance_x * scale * italic;
+			float y0 = by + (font->kind->font->ascender - d->offset_y) * scale + d->height * (base_scale - scale);
 			float y1 = y0 + (d->height) * scale;
 			positions.push_back({x0, y});
 
 			if (shadow_x || shadow_y) {
-				vertices.push_back({{shadow_x+x0+italicx, shadow_y+y0, -1, 1},	{d->s0, d->t0}, shadow_color});
-				vertices.push_back({{shadow_x+x1+italicx, shadow_y+y0, -1, 1},	{d->s1, d->t0}, shadow_color});
-				vertices.push_back({{shadow_x+x1, shadow_y+y1, -1, 1},	{d->s1, d->t1}, shadow_color});
-				vertices.push_back({{shadow_x+x0, shadow_y+y1, -1, 1},	{d->s0, d->t1}, shadow_color});
-				vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-				vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-				vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-				vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
+				float mode = (style == FONT_STYLE_BOLD ? 1.0f : 0.0f);
+				auto &rc = getRenderTable(TextLayer::BACK, get<1>(dr));
+				rc.push_back({{shadow_x+x0, shadow_y+y0}, {shadow_x+x1, shadow_y+y1}, italicx, {d->s0, d->t0}, {d->s1, d->t1}, shadow_color, mode});
 			}
-
-			if (outline) {
-				font->kind->font->outline_thickness = 2;
-				font->kind->font->rendermode = ftgl::RENDER_OUTLINE_POSITIVE;
-				ftgl::texture_glyph_t *doutline = font->kind->getGlyph(c);
-				if (doutline) {
-					float x0  = bx + x + doutline->offset_x * scale;
-					float x1  = x0 + doutline->width * scale;
-					float italicx = - doutline->offset_x * scale * italic;
-					float y0 = by + (font->kind->font->ascender - doutline->offset_y) * scale;
-					float y1 = y0 + (doutline->height) * scale;
-
-					vertices.push_back({{1+x0+italicx, 1+y0, 0, 1},	{doutline->s0, doutline->t0}, outline_color});
-					vertices.push_back({{1+x1+italicx, 1+y0, 0, 1},	{doutline->s1, doutline->t0}, outline_color});
-					vertices.push_back({{1+x1, 1+y1, 0, 1},	{doutline->s1, doutline->t1}, outline_color});
-					vertices.push_back({{1+x0, 1+y1, 0, 1},	{doutline->s0, doutline->t1}, outline_color});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 3.0f : 2.0f)});				}
-			}
-
-			vertices.push_back({{x0+italicx, y0, 0, 1},	{d->s0, d->t0}, {r, g, b, a}});
-			vertices.push_back({{x1+italicx, y0, 0, 1},	{d->s1, d->t0}, {r, g, b, a}});
-			vertices.push_back({{x1, y1, 0, 1},	{d->s1, d->t1}, {r, g, b, a}});
-			vertices.push_back({{x0, y1, 0, 1},	{d->s0, d->t1}, {r, g, b, a}});
-			vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-			vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-			vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-			vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
 
 			// Much trickery, such dev
 			if (style == FONT_STYLE_UNDERLINED) {
-				ftgl::texture_glyph_t *ul = font->kind->getGlyph('_');
+				auto ulr = font->kind->getGlyph('_');
+				auto ul = get<0>(ulr);
 				if (ul) {
+
+					if (outline) {
+						font->kind->font->outline_thickness = 2;
+						font->kind->font->rendermode = ftgl::RENDER_OUTLINE_EDGE;
+						auto doutliner = font->kind->getGlyph('_');
+						auto doutline = get<0>(doutliner);
+						if (doutline) {
+							float x0  = bx + x;
+							float x1  = x0 + d->advance_x * scale;
+							float y0 = by + (font->kind->font->ascender * 1.05 - doutline->offset_y) * scale;
+							float y1 = y0 + (doutline->height) * scale;
+							float s2 = (doutline->s1 - doutline->s0) / 1.5;
+
+							float mode = (style == FONT_STYLE_BOLD ? 3.0f : 2.0f);
+							auto &rc = getRenderTable(TextLayer::BACK, get<1>(doutliner));
+							rc.push_back({{x0, y0}, {x1, y1}, italicx, {doutline->s0 + s2, doutline->t0}, {doutline->s1 - s2, doutline->t1}, outline_color, mode});
+						}
+						font->kind->font->outline_thickness = 0;
+						font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
+					}
+
 					float x0  = bx + x;
 					float x1  = x0 + d->advance_x * scale;
 					float y0 = by + (font->kind->font->ascender * 1.05 - ul->offset_y) * scale;
 					float y1 = y0 + (ul->height) * scale;
 					float s2 = (ul->s1 - ul->s0) / 1.5;
-
-					vertices.push_back({{x0, y0, 0, 1},	{ul->s0 + s2, ul->t0}, {r, g, b, a}});
-					vertices.push_back({{x1, y0, 0, 1},	{ul->s1 - s2, ul->t0}, {r, g, b, a}});
-					vertices.push_back({{x1, y1, 0, 1},	{ul->s1 - s2, ul->t1}, {r, g, b, a}});
-					vertices.push_back({{x0, y1, 0, 1},	{ul->s0 + s2, ul->t1}, {r, g, b, a}});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});
-					vertices_kind_info.push_back({(style == FONT_STYLE_BOLD ? 1.0f : 0.0f)});				}
+					auto &rc = getRenderTable(TextLayer::FRONT, get<1>(ulr));
+					rc.push_back({{x0, y0}, {x1, y1}, italicx, {ul->s0 + s2, ul->t0}, {ul->s1 - s2, ul->t1}, {r, g, b, a}, style == FONT_STYLE_BOLD ? 1.0f : 0.0f});
+				}
 			}			
 
-			x += d->advance_x * scale * (style == FONT_STYLE_BOLD ? 1.1 : 1);
+			if (outline) {
+				font->kind->font->outline_thickness = 2;
+				font->kind->font->rendermode = ftgl::RENDER_OUTLINE_EDGE;
+				auto doutliner = font->kind->getGlyph(c);
+				auto doutline = get<0>(doutliner);
+				if (doutline) {
+					float x0  = bx + x + doutline->offset_x * scale;
+					float x1  = x0 + doutline->width * scale;
+					float italicx = doutline->advance_x * scale * italic;
+					float y0 = by + (font->kind->font->ascender - doutline->offset_y) * scale + d->height * (base_scale - scale);
+					float y1 = y0 + (doutline->height) * scale;
+
+					float mode = (style == FONT_STYLE_BOLD ? 3.0f : 2.0f);
+					auto &rc = getRenderTable(TextLayer::BACK, get<1>(doutliner));
+					rc.push_back({{x0, y0}, {x1, y1}, italicx, {doutline->s0, doutline->t0}, {doutline->s1, doutline->t1}, outline_color, mode});
+				}
+				font->kind->font->outline_thickness = 0;
+				font->kind->font->rendermode = ftgl::RENDER_SIGNED_DISTANCE_FIELD;
+			}
+
+			float mode = (style == FONT_STYLE_BOLD ? 1.0f : 0.0f);
+			auto &rc = getRenderTable(TextLayer::FRONT, get<1>(dr));
+			rc.push_back({{x0, y0}, {x1, y1}, italicx, {d->s0, d->t0}, {d->s1, d->t1}, {r, g, b, a}, mode});
+
+			x += d->advance_x * scale;
+			// if (style == FONT_STYLE_BOLD) x += d->width * scale * 0.1;
 		}
 	}
 	return x;
@@ -173,7 +200,6 @@ int DORText::addCharQuad(const char *str, size_t len, font_style style, int bx, 
 
 void DORText::parseText() {
 	clear();
-	positions.clear();
 	centered = false;
 	setChanged(true);
 
@@ -181,7 +207,9 @@ void DORText::parseText() {
 	// printf("==CUREC  %fx%fx%fx%f\n", font_color.r, font_color.g, font_color.b, font_color.a);
 	// printf("==USEDC  %fx%fx%fx%f\n", used_color.r, used_color.g, used_color.b, used_color.a);
 
+
 	if (!font) return;
+	
 	size_t len = strlen(text);
 	if (!len) {
 		used_color = font_color;
@@ -194,12 +222,6 @@ void DORText::parseText() {
 	float lr = font_last_color.r, lg = font_last_color.g, lb = font_last_color.b, la = font_last_color.a;
 	int max_width = line_max_width;
 	int bx = 0, by = 0;
-
-	setTexture(font->kind->getAtlasTexture(), LUA_NOREF);
-
-	// Update VO size once, we are allocating a few more than neede in case of utf8 or control sequences, but we dont care
-	vertices.reserve(len * 4);
-	vertices_kind_info.reserve(len * 4);
 
 	int font_h = font->getHeight();
 	int nb_lines = 1;
@@ -401,13 +423,12 @@ endcolor:
 	this->w = max_size;
 	this->h = nb_lines * font_h;
 
+	checkSortability(); // Check if we start and end with the same texture
 	font->kind->updateAtlas(); // Make sure any texture changes are upload to the GPU
 }
 
 void DORText::parseTextSimple() {
 	clear();
-	entities_container.clear();
-	positions.clear();
 	centered = false;
 	setChanged(true);
 
@@ -417,16 +438,12 @@ void DORText::parseTextSimple() {
 	const char *str = text;
 	float r = font_color.r, g = font_color.g, b = font_color.b, a = font_color.a;
 
-	setTexture(font->kind->getAtlasTexture(), LUA_NOREF);
-
-	// Update VO size once, we are allocating a few more than neede in case of utf8 or control sequences, but we dont care
-	vertices.reserve(len * 4);
-
 	int font_h = font->getHeight();
 	this->w = addCharQuad(str, len, default_style, 0, 0, r, g, b, a);
 	this->nb_lines = 1;
 	this->h = font_h;
 
+	checkSortability(); // Check if we start and end with the same texture
 	font->kind->updateAtlas(); // Make sure any texture changes are upload to the GPU
 }
 
@@ -454,10 +471,17 @@ void DORText::center() {
 	
 	// We dont use translate() to now make other translate fail, we move the actual center
 	float hw = w / 2, hh = h / 2;
-	for (auto it = vertices.begin() ; it != vertices.end(); ++it) {
-		it->pos.x -= hw;
-		it->pos.y -= hh;
+	for (auto &layer : rendered_chars) { 
+		for (auto &rc : layer) { 
+			for (auto &it : rc) {
+				it.p0.x -= hw;
+				it.p0.y -= hh;
+				it.p1.x -= hw;
+				it.p1.y -= hh;
+			}
+		}
 	}
+	entities_container.translate(-hw, -hh, (float)0, false);
 	setChanged();
 }
 
@@ -469,37 +493,81 @@ vec2 DORText::getLetterPosition(int idx) {
 }
 
 void DORText::clear() {
-	DORVertexes::clear();
+	setChanged();
 	entities_container.clear();
 	for (auto ref : entities_container_refs) {
 		refcleaner(&ref);
 	}
 	entities_container_refs.clear();
+	positions.clear();
+	for (auto &rc : rendered_chars) rc.clear();
 }
 
 void DORText::render(RendererGL *container, mat4& cur_model, vec4& cur_color, bool cur_visible) {
 	if (!visible || !cur_visible) return;
-	DORVertexes::render(container, cur_model, cur_color, true);
-	mat4 emodel = cur_model * model;
-	vec4 ecolor = cur_color * color;
-	entities_container.render(container, emodel, ecolor, true);
+	mat4 vmodel = cur_model * model;
+	vec4 vcolor = cur_color * color;
+
+	for (auto &layer : rendered_chars) { 
+		uint8_t id = 0;
+		for (auto &rc : layer) { 
+			if (rc.size()) {
+				auto dl = getDisplayList(container, font->kind->getAtlasTexture(id), shader, VERTEX_BASE + VERTEX_KIND_INFO, RenderKind::QUADS);
+
+				// Make sure we do not have to reallocate each step
+				int nb = rc.size() * 4;
+				int startat = dl->list.size();
+				dl->list.reserve(startat + nb);
+				dl->list_kind_info.reserve(startat + nb);
+
+				for (auto &c : rc) {
+					vec4 color = vcolor * c.color;
+					vec4 p0(c.p0.x + c.italicx, c.p0.y, 0, 1);
+					vec4 p1(c.p1.x + c.italicx, c.p0.y, 0, 1);
+					vec4 p2(c.p1.x, 	    c.p1.y, 0, 1);
+					vec4 p3(c.p0.x, 	    c.p1.y, 0, 1);
+					// printf("==== char: %fx%f : %fx%f ::: %fx%f : %fx%f ::: %f, %f, %f, %f ::: %f\n", c.p0.x, c.p0.y, c.p1.x, c.p1.y, c.tex0.x, c.tex0.y, c.tex1.x, c.tex1.y, color.r, color.g, color.b, color.a, c.mode);
+
+					dl->list.push_back({vmodel * p0, {c.tex0.x, c.tex0.y}, color});
+					dl->list.push_back({vmodel * p1, {c.tex1.x, c.tex0.y}, color});
+					dl->list.push_back({vmodel * p2, {c.tex1.x, c.tex1.y}, color});
+					dl->list.push_back({vmodel * p3, {c.tex0.x, c.tex1.y}, color});
+					dl->list_kind_info.push_back({c.mode});
+					dl->list_kind_info.push_back({c.mode});
+					dl->list_kind_info.push_back({c.mode});
+					dl->list_kind_info.push_back({c.mode});
+				}
+			}
+			id++;
+		}
+	}
+
+	resetChanged();
+
+	// Add the sub entities we need to display
+	entities_container.render(container, vmodel, vcolor, true);
 }
 
-// void DORText::renderZ(RendererGL *container, mat4& cur_model, vec4& cur_color, bool cur_visible) {
-// 	if (!visible || !cur_visible) return;
-// 	DORVertexes::renderZ(container, cur_model, cur_color, true);
-// 	mat4 emodel = cur_model * model;
-// 	vec4 ecolor = cur_color * color;
-// 	entities_container.renderZ(container, emodel, ecolor, true);
-// }
+void DORText::sortCoords(RendererGL *container, mat4& cur_model) {
+	mat4 vmodel = cur_model * model;
 
-DORText::DORText() {
+	sort_coords = vmodel * sort_center;
+	sort_shader = shader;
+	if (is_sortable > -1) {
+		sort_tex = font->kind->atlas[is_sortable]->id;
+	} else {
+		sort_tex = 0;
+	}
+	container->sorted_dos.push_back(this);
+}
+
+DORText::DORText() : rendered_chars(2) { // Init rendered_chars to 2 size for TextLayer BACK & FRONT
 	text = (char*)malloc(1);
 	text[0] = '\0';
 	font_color = {1, 1, 1, 1};
 	entities_container.setParent(this);
 	if (default_shader) setShader(default_shader);
-	setDataKinds(VERTEX_BASE + VERTEX_KIND_INFO);
+	setOutline(default_outline, default_outline_color);
 };
 
 DORText::~DORText() {

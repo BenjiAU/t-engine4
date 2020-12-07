@@ -118,7 +118,7 @@ newTalent{
 					-- Instakill critters
 					if act.rank <= 1 then
 						if act:canBe("instakill") then
-							game.logSeen(act, "%s shatters!", act.name:capitalize())
+							game.logSeen(act, "%s shatters!", act:getName():capitalize())
 							act:die(self)
 						end
 					end
@@ -168,7 +168,7 @@ newTalent{
 	cooldown = 30,
 	tactical = { BUFF = 2 },
 	getColdDamageIncrease = function(self, t) return self:combatTalentScale(t, 2.5, 10) end,
-	getResistPenalty = function(self, t) return self:combatTalentLimit(t, 60, 17, 50) end, -- Limit < 60
+	getResistPenalty = function(self, t) return self:combatTalentLimit(t, 60, 20, 50) end, -- Limit < 60
 	getPierce = function(self, t) return math.min(100, self:getTalentLevelRaw(t) * 20) end, 
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/ice")

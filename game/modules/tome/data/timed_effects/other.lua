@@ -643,7 +643,7 @@ newEffect{
 		return new_eff
 	end,
 	on_timeout = function(self, eff)
-		local dead, val = self:takeHit(eff.dam, self, {special_death_msg="was smeared across all space and time"})
+		local dead, val = self:takeHit(eff.dam, self, {special_death_msg=_t"was smeared across all space and time"})
 
 		game:delayedLogDamage(eff, self, val, ("%s%d %s#LAST#"):tformat(DamageType:get(DamageType.TEMPORAL).text_color or "#aaaaaa#", math.ceil(val), DamageType:get(DamageType.TEMPORAL).name), false)
 	end,
@@ -2605,7 +2605,7 @@ newEffect{
 			eff.dur = eff.dur + 1
 			return
 		end
-		local dead, val = self:takeHit(eff.dam, self, {special_death_msg="burnt to death by cauterize"})
+		local dead, val = self:takeHit(eff.dam, self, {special_death_msg=_t"burnt to death by cauterize"})
 
 		local srcname = self.x and self.y and game.level.map.seens(self.x, self.y) and self:getName():capitalize() or _t"Something"
 		game:delayedLogDamage(eff, self, val, ("%s%d %s#LAST#"):tformat(DamageType:get(DamageType.FIRE).text_color or "#aaaaaa#", math.ceil(val), DamageType:get(DamageType.FIRE).name), false)
@@ -3208,7 +3208,7 @@ newEffect{
 	status = "detrimental",
 	long_desc = function(self, eff) return ("The target had breathed in noxious sleep-induced fumes and is losing %d life per turn."):tformat(eff.power) end,
 	on_timeout = function(self, eff)
-		local dead, val = self:takeHit(eff.power, self, {special_death_msg="killed in a dream"})
+		local dead, val = self:takeHit(eff.power, self, {special_death_msg=_t"killed in a dream"})
 		game:delayedLogDamage(eff, self, val, ("%s%d %s#LAST#"):tformat(DamageType:get(DamageType.MIND).text_color or "#aaaaaa#", math.ceil(val), "dream"), false)
 	end,
 }
@@ -4010,7 +4010,7 @@ newEffect{
 	deactivate = function(self, eff)
 		if eff.success then return end
 		self.lich_no_more_regen = true
-		self:die(self, {special_death_msg="failed to complete the lich ressurection ritual"})
+		self:die(self, {special_death_msg=_t"failed to complete the lich ressurection ritual"})
 	end,
 }
 
@@ -4124,8 +4124,12 @@ newEffect{
 	subtype = { status=true, },
 	status = "detrimental",
 	parameters = { },
-	activate = function(self, eff) end,
-	deactivate = function(self, eff) end,
+	activate = function(self, eff) 
+		eff.particle = self:addParticles(Particles.new("circle", 1, {base_rot=1, oversize=1.0, a=200, appear=8, speed=0, img="blood_rush_mark", radius=0}))
+	end,
+	deactivate = function(self, eff)
+		self:removeParticles(eff.particle)
+	end,
 	callbackOnDeath = function(self, eff, src, note)
 		marker = eff.src
 		reduc = eff.dur * 2
@@ -4145,6 +4149,9 @@ newEffect{
 	status = "detrimental",
 	parameters = { },
 	callbackOnActBase = function(self, t)
+		self:incPositive(-1 * self:getPositive())
+	end,
+	callbackOnTalentPost = function(self, t)
 		self:incPositive(-1 * self:getPositive())
 	end,
 	activate = function(self, eff) end,
@@ -4175,7 +4182,7 @@ newEffect{
 			eff.dur = eff.dur + 1
 			return
 		end
-		local dead, val = self:takeHit(eff.power, self, {special_death_msg="died a well-deserved death by exsanguination"})
+		local dead, val = self:takeHit(eff.power, self, {special_death_msg=_t"died a well-deserved death by exsanguination"})
 		
 		local srcname = self.x and self.y and game.level.map.seens(self.x, self.y) and self.name:capitalize() or "Something"
 		game:delayedLogDamage(eff, self, val, ("#CRIMSON#%d Bleed #LAST#"):tformat(math.ceil(val)), false)

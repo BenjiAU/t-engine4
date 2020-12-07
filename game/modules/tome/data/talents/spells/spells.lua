@@ -209,6 +209,10 @@ function necroSetupSummon(self, def, x, y, level, turns, no_control)
 		game.logSeen(self, "#GREY#%s can not be healed this way!", self:getName():capitalize())
 	end
 
+	if self:knowTalent(self.T_SURGE_OF_UNDEATH) then
+		m.life_regen = 0.5
+	end
+
 	if self:isTalentActive(self.T_NECROTIC_AURA) then
 		local t = self:getTalentFromId(self.T_NECROTIC_AURA)
 		local perc = t:_getInherit(self) / 100

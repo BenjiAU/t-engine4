@@ -111,7 +111,7 @@ newTalent{
 	end,
 	info = function(self, t)
 		local damage = t.getBleedDamage(self, t)
-		return ([[Teleport to an enemy, striking them for 100%% weapon damage, bleeding them for %d%% weapon damage over five turns, and marking them for six turns.
+		return ([[Teleport to an enemy, striking them for 100%% weapon damage, bleeding them for %d%% weapon damage over five turns, and marking them for six turns. You will not teleport if you are already adjacent.
 
 When the marked enemy dies, the cooldown of this talent will be reduced by two turns for every turn the mark had remaining.
 
@@ -179,6 +179,9 @@ newTalent{
 	on_unlearn = function(self, t) self:unlearnTalent(self.T_BLOOD_CLOT) end,
 	activate = function(self, t)
 		local ret = {}
+		local h1x, h1y = self:attachementSpot("hand1", true) if h1x then self:talentParticles(ret, {type="dripping_hands", args={x=h1x, y=h1y, r=168, b=13}}) end
+		local h2x, h2y = self:attachementSpot("hand2", true) if h2x then self:talentParticles(ret, {type="dripping_hands", args={x=h2x, y=h2y, r=168, b=13}}) end
+		self:talentParticles(ret, {type="apply_poison", args={}})
 		return ret
 	end,
 	deactivate = function(self, t, p)

@@ -1675,7 +1675,7 @@ function _M:getCombatStats(type, inven_id, item)
 		aspeed = 1/self:combatSpeed(mean)
 	end
 	if type == "psionic" then self:attr("use_psi_combat", -1) end
-	return {obj=o, atk=atk, dmg=dmg, apr=apr, crit=crit, crit_power=crit_power or 0, aspeed=aspeed, range=range, mspeed=mspeed, archery=archery, mean=mean, ammo=ammo, block=mean.block, talented=mean.talented}
+	return {obj=o, atk=atk, dmg=dmg, apr=apr, crit=crit, crit_power=crit_power or 0, aspeed=aspeed, range=range, mspeed=mspeed, archery=archery, mean=mean, ammo=ammo, block=mean and mean.block, talented=mean and mean.talented}
 end
 -- Gets the full name of the Actor
 function _M:getName()
@@ -2498,7 +2498,7 @@ function _M:onTakeHit(value, src, death_note)
 			a.life = math.max(1, self.life - value / 2)
 			a.clone_on_hit.chance = math.ceil(self.clone_on_hit.chance / 2)
 			a.energy.value = 0
-			a.exp_worth = 0.1
+			a.exp_worth = math.min(0.1, a.exp_worth)
 			a.inven = {}
 			a:removeAllMOs()
 			a.x, a.y = nil, nil
@@ -3602,7 +3602,7 @@ function _M:resolveLevelTalents()
 		for tid, info in pairs(self._levelup_talents) do
 			if not info.max or (self.talents[tid] or 0) < math.floor(info.max*maxfact) then
 				local last = info.last or self.start_level
-				if self.level - last >= info.every then
+				if self.level - last >= (info.every or 5) then
 					self:learnTalent(tid, true)
 					info.last = self.level
 				end
@@ -4834,6 +4834,7 @@ end
 -- Make sure such talents are always flagged as unlearnable (see Command Staff for an example)
 function _M:learnItemTalent(o, tid, level)
 	local t = self:getTalentFromId(tid)
+	if not t then return end
 	local max = t.hard_cap or (t.points and t.points + 2) or 5
 	if not self.item_talent_surplus_levels then self.item_talent_surplus_levels = {} end
 	if not self.item_talent_surplus_levels[tid] then self.item_talent_surplus_levels[tid] = 0 end
@@ -4856,6 +4857,7 @@ end
 
 function _M:unlearnItemTalent(o, tid, level)
 	local t = self:getTalentFromId(tid)
+	if not t then return end
 	local max = (t.points and t.points + 2) or 5
 	if not self.item_talent_surplus_levels then self.item_talent_surplus_levels = {} end
 	if not self.item_talent_surplus_levels[tid] then self.item_talent_surplus_levels[tid] = 0 end
@@ -5393,12 +5395,11 @@ end
 -- Check the actor can cast it
 -- @param ab the talent (not the id, the table)
 -- @return true to continue, false to stop
-function _M:preUseTalent(ab, silent, fake)
+function _M:preUseTalent(ab, silent, fake, ignore_ressources)
 	if ab._ai_parsed == nil then -- add some AI info to the talent if needed
 		print("[Actor:preUseTalent] PARSING TALENT for AI info", ab.id, self.name)
 		mod.class.interface.ActorAI.aiParseTalent(ab, self)
 	end
-
 	if self.forbid_talents and self.forbid_talents[ab.id] then
 		if not silent then game.logSeen(self, self.forbid_talents[ab.id] or "%s can not use %s.", self:getName():capitalize(), ab.name) end
 		return false
@@ -5488,7 +5489,7 @@ function _M:preUseTalent(ab, silent, fake)
 	end
 
 	-- check resource costs (sustains can always be deactivated at no cost)
-	if not self:attr("force_talent_ignore_ressources") and not self:isTalentActive(ab.id) and (not self.talent_no_resources or not self.talent_no_resources[ab.id]) then
+	if not ignore_ressources and not self:attr("force_talent_ignore_ressources") and not self:isTalentActive(ab.id) and (not self.talent_no_resources or not self.talent_no_resources[ab.id]) then
 		local rname, cost, rmin, rmax
 		-- check for sustained resources
 		self.on_preuse_checking_resources = true
@@ -6719,8 +6720,11 @@ end
 -- @return the experience rewarded
 function _M:worthExp(target)
 	if not target.level or self.level < target.level - 7 then return 0 end
+	if self.summoner then return 0 end
 
 	local level_mult = game.level.data.exp_worth_mult or 1
+
+	local worth = 0
 
 	-- HHHHAACKKK ! Use a normal scheme for the game except in the infinite dungeon
 	if not game.zone.infinite_dungeon then
@@ -6734,7 +6738,7 @@ function _M:worthExp(target)
 		elseif self.rank >= 5 then mult = 60
 		end
 
-		return self.level * mult * self.exp_worth * (target.exp_kill_multiplier or 1) * level_mult
+		worth = self.level * mult * self.exp_worth * (target.exp_kill_multiplier or 1) * level_mult
 	else
 		local mult = 2 + (self.exp_kill_multiplier or 0)
 		if self.rank == 1 then mult = 2
@@ -6746,8 +6750,9 @@ function _M:worthExp(target)
 		elseif self.rank >= 5 then mult = 6.5
 		end
 
-		return self.level * mult * self.exp_worth * (target.exp_kill_multiplier or 1) * level_mult
+		worth = self.level * mult * self.exp_worth * (target.exp_kill_multiplier or 1) * level_mult
 	end
+	return worth
 end
 
 --- Burn arcane resources
@@ -6919,8 +6924,6 @@ end
 -- @param src who is doing the dispelling
 -- @param allow_immunity If true will check for canBe("dispel_XXX"), defaults to true
 function _M:dispel(effid_or_tid, src, allow_immunity, params)
-	if allow_immunity and self:attr("invulnerable") then return end
-
 	if not params then params = {} end
 	if params.silent == nil then params.silent = false end
 	if params.force == nil then params.force = false end
@@ -6930,6 +6933,8 @@ function _M:dispel(effid_or_tid, src, allow_immunity, params)
 
 	-- Dont resist yourself!
 	if src == self then allow_immunity = false end
+
+	if allow_immunity and self:attr("invulnerable") then return end
 
 	-- Effect
 	if effid_or_tid:find("^EFF_") then

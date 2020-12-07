@@ -30,7 +30,7 @@ function _M:init(t, text, color, w, h)
 	Block.init(self, t)
 
 	self.cursor_t = self.parent:getAtlasTexture("ui/textbox-cursor.png")
-	self.cursor = core.renderer.fromTextureTable(self.cursor_t, 0, 0)
+	self.cursor = core.renderer.fromTextureTable(self.cursor_t, 0, 0):color(0.5, 1, 1, 1)
 
 	self.frame = self.parent:makeFrameDO("ui/textbox", nil, nil, w, h)
 	self.frame_sel = self.parent:makeFrameDO("ui/textbox-sel", nil, nil, w, h)

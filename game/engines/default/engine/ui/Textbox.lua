@@ -33,7 +33,7 @@ function _M:init(t)
 	self.hide = t.hide
 	self.on_change = t.on_change
 	self.max_len = t.max_len or 999
-	self.fct = assert(t.fct, "no textbox fct")
+	self.fct = t.fct or function() end
 	self.chars = assert(t.chars, "no textbox chars")
 	self.filter = t.filter or function(c) return c end
 

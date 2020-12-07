@@ -39,7 +39,8 @@ if fs.exists("/data/gfx/altefcat") then tiles_packs.altefcat = {name= _t"Altefca
 if fs.exists("/data/gfx/oldrpg") then tiles_packs.oldrpg = {name= _t"Old RPG", order=4} end
 
 
-function _M:init()
+function _M:init(on_change)
+	self.on_change = on_change or function() end
 	self.cur_sel = "main"
 	self:generateList()
 	self.changed = false
@@ -63,6 +64,7 @@ function _M:init()
 					local gfx = config.settings.tome.gfx
 					game:saveSettings("tome.gfx", ('tome.gfx = {tiles=%q, size=%q, tiles_custom_dir=%q, tiles_custom_moddable=%s, tiles_custom_adv=%s}\n'):format(gfx.tiles, gfx.size, gfx.tiles_custom_dir or "", gfx.tiles_custom_moddable and "true" or "false", gfx.tiles_custom_adv and "true" or "false"))
 				end
+				self.on_change()
 			end
 			game:unregisterDialog(self)
 		end,

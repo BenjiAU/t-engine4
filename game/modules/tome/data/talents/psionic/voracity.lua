@@ -25,7 +25,7 @@ newTalent{
 	points = 5,
 	psi = 0,
 	cooldown = function(self, t)
-		return math.max(6, math.ceil(25 - self:getTalentLevelRaw(t)*3))
+		return math.max(6, math.ceil(25 - self:getTalentLevel(t)*2.5))
 	end,
 	tactical = { DISABLE = 2, PSI = 1 },
 	direct_hit = true,
@@ -65,7 +65,7 @@ newTalent{
 						act:setEffect(act.EFF_SLEEP, 4, {src=self, power=en, insomnia=en, no_ct_effect=true, apply_power=self:combatMindpower()})
 						game.level.map:particleEmitter(act.x, act.y, 1, "generic_charge", {rm=0, rM=0, gm=180, gM=255, bm=180, bM=255, am=35, aM=90})
 					else
-						game.logSeen(self, "%s resists the sleep!", act.name:capitalize())
+						game.logSeen(self, "%s resists the sleep!", act:getName():capitalize())
 					end
 				end
 			end
@@ -90,7 +90,7 @@ newTalent{
 	require = psi_wil_req2,
 	points = 5,
 	cooldown = function(self, t)
-		return math.max(6, math.ceil(25 - self:getTalentLevelRaw(t)*3))
+		return math.max(6, math.ceil(25 - self:getTalentLevel(t)*2.5))
 	end,
 	psi = 0,
 	tactical = { ATTACKAREA = { COLD = 2 }, DISABLE = { stun = 2 }, PSI = 1 },
@@ -151,7 +151,7 @@ newTalent{
 	points = 5,
 	psi = 0,
 	cooldown = function(self, t)
-		return math.max(6, math.ceil(25 - self:getTalentLevelRaw(t)*3))
+		return math.max(6, math.ceil(25 - self:getTalentLevel(t)*2.5))
 	end,
 	tactical = { ATTACKAREA = { LIGHTNING = 2 }, DISABLE = { stun = 1 }, PSI = 1 },
 	direct_hit = true,

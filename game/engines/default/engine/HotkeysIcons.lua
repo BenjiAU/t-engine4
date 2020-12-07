@@ -117,6 +117,7 @@ local frames_colors = {
 }
 
 function _M:removeFrom(hks, actor)
+	if not self.frame then return end
 	self.frame.container:removeFromParent()
 	self.pie:removeFromParent()
 	self.selframe:removeFromParent()

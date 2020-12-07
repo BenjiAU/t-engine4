@@ -20,6 +20,8 @@
 -- We are running, set a flag so that if we crash we will restart into safe mode
 util.setForceSafeBoot()
 
+core.renderer.textconf.defaultOutline(1)
+
 -- This file loads the game module, and loads data
 local KeyBind = require "engine.KeyBind"
 local DamageType = require "engine.DamageType"
