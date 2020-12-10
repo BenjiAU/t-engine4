@@ -41,6 +41,11 @@ extern "C" {
 #include <vector>
 #include <unordered_map>
 
+#include <condition_variable>
+#ifdef MINGW_WIN_THREAD_COMPAT
+#include "mingw.condition_variable.h"
+#endif
+
 using namespace SoLoud;
 using namespace std;
 
@@ -246,11 +251,15 @@ static int audio_enable(lua_State *L) {
 	return 0;
 }
 
+static mutex sound_play_mux;
+
 static int sound_play(lua_State *L) {
 	if (soloud.getActiveVoiceCount() >= soloud.getMaxActiveVoiceCount()) {
 		lua_pushnumber(L, 0);
 		return 1;
 	}
+
+	lock_guard<mutex> guard(sound_play_mux);
 
 	auto name = string(lua_tostring(L, 1));
 	auto s = do_load(name, L, 3);
@@ -277,6 +286,8 @@ bool play_sound(string &name) {
 	if (soloud.getActiveVoiceCount() >= soloud.getMaxActiveVoiceCount()) {
 		return false;
 	}
+
+	lock_guard<mutex> guard(sound_play_mux);
 
 	auto s = do_load(name);
 	if (!s->data) return false;
