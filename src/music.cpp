@@ -220,6 +220,20 @@ static LoadedSound* do_load(string &name, lua_State *L = nullptr, int lua_def_st
 	return s;
 }
 
+// do_load version for the external code, no need to access LoadedSound
+bool load_sound(string &name) {
+	auto it = loaded_sounds.find(name);
+	if (it != loaded_sounds.end()) {
+		// printf("Reusing %s\n", name.c_str());
+		return it->second.get()->data ? true : false;
+	}
+	auto s = new LoadedSound();
+	s->loadWav(name);
+	loaded_sounds.emplace(name, s);
+	printf("[SOUND] Loading %s\n", name.c_str());
+	return s->data ? true : false;
+}
+
 static int sound_load(lua_State *L) {
 	auto name = string(lua_tostring(L, 1));
 	do_load(name, L, 2);
@@ -231,6 +245,7 @@ static int audio_enable(lua_State *L) {
 	soloud.fadeGlobalVolume(v and 1 or 0, 0.3);
 	return 0;
 }
+
 static int sound_play(lua_State *L) {
 	if (soloud.getActiveVoiceCount() >= soloud.getMaxActiveVoiceCount()) {
 		lua_pushnumber(L, 0);
@@ -256,6 +271,28 @@ static int sound_play(lua_State *L) {
 	auxiliar_setclass(L, "sound{handle}", -1);
 	*lh = h;
 	return 1;
+}
+
+bool play_sound(string &name) {
+	if (soloud.getActiveVoiceCount() >= soloud.getMaxActiveVoiceCount()) {
+		return false;
+	}
+
+	auto s = do_load(name);
+	if (!s->data) return false;
+	s->die_in = s->ttl;
+	handle h;
+	// if (lua_istable(L, 2)) {
+	// 	float x = 0, y = 0, z = 0;
+	// 	float_get_lua_table(L, 2, "x", x);
+	// 	float_get_lua_table(L, 2, "y", y);
+	// 	float_get_lua_table(L, 2, "z", z);
+	// 	h = soloud.play3d(*s->data, x, y, z);
+	// } else {
+		h = soloud.play(*s->data);
+	// }
+	if (s->speed != 1) soloud.setRelativePlaySpeed(h, s->speed);
+	return true;
 }
 
 static int sound_pause(lua_State *L) {

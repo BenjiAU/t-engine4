@@ -21,11 +21,15 @@
 #ifndef _MUSIC_HPP_
 #define _MUSIC_HPP_
 
+#include <string>
+
 void init_sounds();
 void deinit_sounds();
 void update_audio(float nb_keyframes);
 void kill_audio();
 int luaopen_sound(lua_State *L);
+bool load_sound(std::string &name);
+bool play_sound(std::string &name);
 
 #endif
 

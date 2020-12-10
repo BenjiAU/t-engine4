@@ -84,16 +84,3 @@ public:
 	virtual void finish() { accumulator = rate; };
 	virtual void emit(ParticlesData &p, float dt);
 };
-
-class SoundEmitter : public Emitter {
-private:
-	float accumulator = 0;
-	float startat_cnt = 0;
-public:
-	string 
-	float rate;
-	float duration;
-	float startat;
-	virtual void finish() { accumulator = rate; };
-	virtual void emit(ParticlesData &p, float dt);
-};

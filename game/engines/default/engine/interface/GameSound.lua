@@ -27,7 +27,7 @@ _M.max_simultanous_sounds = 50
 
 --- Initializes
 function _M:init()
-	self:loaded()
+	_M.loaded(self)
 end
 
 function _M:loaded()
