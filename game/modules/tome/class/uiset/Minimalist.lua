@@ -18,6 +18,7 @@
 -- darkgod@te4.org
 
 require "engine.class"
+local Shader = require "engine.Shader"
 local UI = require "engine.ui.Base"
 local UISet = require "mod.class.uiset.UISet"
 local Dialog = require "engine.ui.Dialog"
@@ -195,6 +196,15 @@ function _M:activate()
 	game.logPlayer = function(e, style, ...) if e == game.player or e == game.party then game.log(style, ...) end end
 
 	self:placeContainers()
+
+	self:makeFbos(game.w, game.h)
+end
+
+function _M:makeFbos(w, h)
+	self.ui_fbo_shader = Shader.new("ui_fbo")
+	self.ui_fbo_shader:setUniform("resolution", {w, h})
+	self.ui_fbo = core.renderer.target(w, h)
+	self.ui_fbo:shader(self.ui_fbo_shader)
 end
 
 function _M:placeContainers()
@@ -209,6 +219,8 @@ end
 
 function _M:handleResolutionChange(w, h, ow, oh)
 	game:resizeMapViewport(w, h, 0, 0)
+
+	self:makeFbos(w, h)
 
 	for _, container in ipairs(self.minicontainers) do container:onResolutionChange(w, h, ow, oh) end
 	return false
@@ -230,9 +242,20 @@ function _M:display(nb_keyframes)
 	Map.viewport_padding_2 = 0
 	self.map_h_stop_tooltip = game.h
 
+	if self.ui_fbo then self.ui_fbo:use(true) end
+
 	for _, container in ipairs(self.minicontainers) do container:update(nb_keyframes) end
 	self.renderer:toScreen()
 	UISet.display(self, nb_keyframes)
+	
+	if self.ui_fbo then
+		self.ui_fbo:use(false)
+		if game.level and game.level.map and game.player then
+			local px, py = game.level.map:getTileToScreen(game.player.x, game.player.y, true)
+			self.ui_fbo_shader:setUniform("player", {px / game.w, py / game.h})
+		end
+		self.ui_fbo:toScreen(0, 0)
+	end
 end
 
 function _M:setupMouse(mouse)
