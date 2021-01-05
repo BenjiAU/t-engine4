@@ -223,6 +223,7 @@ struct MapObjectSort {
 	vec4 color;
 };
 
+class DORTarget;
 class Map2D : public SubRenderer, public IRealtime, public MapObjectProcessor {
 	friend Minimap2D;
 private:
@@ -249,6 +250,11 @@ private:
 	// Shaders
 	int default_shader_ref = LUA_NOREF;
 	shader_type *default_shader = nullptr;
+
+	// Rendering FBO if needed
+	static int render_fbo_ref;
+	static DORTarget *render_fbo;
+	static int render_fbo_start_z;
 
 	// Z-layers
 	DORCallbackMapZ **zobjects;
@@ -362,6 +368,9 @@ public:
 	/* Minimap */
 	void addMinimap(Minimap2D *mm);
 	void removeMinimap(Minimap2D *mm);
+
+	/* Render FBO */
+	static void setRenderFBO(DORTarget *fbo, int fbo_ref = LUA_NOREF, int start_z = 0);
 
 	/* Class superloads */
 	virtual void toScreen(mat4 cur_model, vec4 color);

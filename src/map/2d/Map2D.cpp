@@ -35,6 +35,7 @@ extern "C" {
 
 #include "map/2d/Map2D.hpp"
 #include "map/2d/Minimap2D.hpp"
+#include "renderer-moderngl/FBO.hpp"
 #include <algorithm>
 #include <unordered_set>
 
@@ -753,6 +754,16 @@ void Map2D::updateVision() {
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, seens_texture_size.x, seens_texture_size.y, GL_RED, GL_UNSIGNED_BYTE, seens_texture_data);
 }
 
+int Map2D::render_fbo_ref = LUA_NOREF;
+DORTarget *Map2D::render_fbo = nullptr;
+int Map2D::render_fbo_start_z = 0;
+void Map2D::setRenderFBO(DORTarget *fbo, int fbo_ref, int start_z) {
+	refcleaner(&render_fbo_ref);
+	render_fbo_ref = fbo_ref;
+	render_fbo = fbo;
+	render_fbo_start_z = start_z;
+}
+
 void Map2D::toScreen(mat4 cur_model, vec4 color) {
 	color *= tint;
 
@@ -780,6 +791,7 @@ void Map2D::toScreen(mat4 cur_model, vec4 color) {
 	// DGDGDGDG Idea: define a max layer size, say 64x64, any map bigger is split into multiple sectors
 
 	for (int32_t z = 0; z < zdepth; z++) {
+		if (render_fbo && render_fbo_start_z == z) render_fbo->use(true);
 		if (renderers_changed[z]) {
 			renderers_changed[z] = false;
 			renderers[z]->resetDisplayLists();
@@ -813,6 +825,10 @@ void Map2D::toScreen(mat4 cur_model, vec4 color) {
 
 		// Render the layer
 		renderers[z]->toScreen(mcur_model, color);
+	}
+	if (render_fbo) {
+		render_fbo->use(false);
+		render_fbo->toScreen(0, 0);
 	}
 
 	// Render grid lines

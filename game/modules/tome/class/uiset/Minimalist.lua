@@ -203,8 +203,25 @@ end
 function _M:makeFbos(w, h)
 	self.ui_fbo_shader = Shader.new("ui_fbo")
 	self.ui_fbo_shader:setUniform("resolution", {w, h})
-	self.ui_fbo = core.renderer.target(w, h)
-	self.ui_fbo:shader(self.ui_fbo_shader)
+	if self.ui_fbo_shader.shad then
+		self.ui_fbo = core.renderer.target(w, h)
+		self.ui_fbo:shader(self.ui_fbo_shader)
+		self.ui_fbo_shader.shad:paramNumber("unhide_cnt", 0)
+	else
+		self.ui_fbo = nil
+	end
+
+	self.map_hide_fbo_shader = Shader.new("map_hide_fbo")
+	self.map_hide_fbo_shader:setUniform("resolution", {w, h})
+	if self.map_hide_fbo_shader.shad then
+		self.map_hide_fbo = core.renderer.target(w, h)
+		self.map_hide_fbo:shader(self.map_hide_fbo_shader)
+		self.map_hide_fbo_shader.shad:paramNumber("unhide_cnt", 0)
+		core.map2d.setRenderFBO(self.map_hide_fbo, 13) -- 13 is the first z layer after actors
+	else
+		self.map_hide_fbo = nil
+		core.map2d.setRenderFBO(nil)
+	end
 end
 
 function _M:placeContainers()
@@ -251,8 +268,25 @@ function _M:display(nb_keyframes)
 	if self.ui_fbo then
 		self.ui_fbo:use(false)
 		if game.level and game.level.map and game.player then
-			local px, py = game.level.map:getTileToScreen(game.player.x, game.player.y, true)
-			self.ui_fbo_shader:setUniform("player", {px / game.w, py / game.h})
+			local map = game.level.map
+			local list = {}
+			for i = map.mx, map.mx + map.viewport.mwidth - 1 do
+				for j = map.my, map.my + map.viewport.mheight - 1 do
+					local a = map(i, j, map.ACTOR)
+					if a then
+						local ax, ay = map:getTileToScreen(i, j, true)
+						list[#list+1] = {ax / game.w, ay / game.h}
+						if #list >= 200 then break end
+					end
+				end
+				if #list >= 200 then break end
+			end
+			self.ui_fbo_shader.shad:paramNumber("unhide_cnt", #list)
+			self.map_hide_fbo_shader.shad:paramNumber("unhide_cnt", #list)
+			if #list > 0 then
+				self.ui_fbo_shader.shad:paramNumber2("unhide", list)
+				self.map_hide_fbo_shader.shad:paramNumber2("unhide", list)
+			end
 		end
 		self.ui_fbo:toScreen(0, 0)
 	end

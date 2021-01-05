@@ -35,6 +35,7 @@ extern "C" {
 
 #include "map/2d/Map2D.hpp"
 #include "map/2d/Minimap2D.hpp"
+#include "renderer-moderngl/FBO.hpp"
 #include "renderer-moderngl/renderer-lua.hpp"
 #include "auxiliar.hpp"
 
@@ -318,6 +319,19 @@ static int map_objects_to_displayobject(lua_State *L) {
 /*************************************************************************
  ** Map2D wrapper
  *************************************************************************/
+static int map_render_fbo(lua_State *L) {
+	if (lua_isnil(L, 1)) {
+		Map2D::setRenderFBO(nullptr, LUA_NOREF, 0);
+	} else {
+		DORTarget *fbo = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
+		int start_z = luaL_checknumber(L, 2);
+
+		lua_pushvalue(L, 1);
+		Map2D::setRenderFBO(fbo, luaL_ref(L, LUA_REGISTRYINDEX), start_z);
+	}
+	return 0;
+}
+
 static int map_new(lua_State *L) {
 	int w = luaL_checknumber(L, 1);
 	int h = luaL_checknumber(L, 2);
@@ -619,6 +633,7 @@ static const struct luaL_Reg maplib[] = {
 	{"newMap", map_new},
 	{"newObject", map_object_new},
 	{"mapObjectsToDisplayObject", map_objects_to_displayobject},
+	{"setRenderFBO", map_render_fbo},
 	{NULL, NULL},
 };
 

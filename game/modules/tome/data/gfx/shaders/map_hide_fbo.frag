@@ -13,12 +13,12 @@ void main(void)
 	vec2 uv = gl_FragCoord.xy / resolution;
 	float r_ratio = resolution.x / resolution.y;
 	float a = 1.0;
-	float r = 0.1;
+	float r = 0.05;
 	for(int i = 0; i < unhide_cnt; i++) {
 		vec2 center = uv - vec2(unhide[i].x, 1.0 - unhide[i].y);
 		center.x = center.x * r_ratio;
 
-		float aa = smoothstep(r, r + 0.05, length(center)) / 0.7 + 0.3;
+		float aa = smoothstep(r, r * 1.3, length(center)) / 0.5 + 0.5;
 		a = min(a, aa);
 	}
 

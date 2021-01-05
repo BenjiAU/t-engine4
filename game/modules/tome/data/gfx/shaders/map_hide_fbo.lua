@@ -18,7 +18,7 @@
 -- darkgod@te4.org
 
 return {
-	frag = "ui_fbo",
+	frag = "map_hide_fbo",
 	vert = nil,
 	args = {
 		tex = { texture = 0 },
