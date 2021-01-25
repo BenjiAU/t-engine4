@@ -21,6 +21,8 @@
 using namespace std;
 using namespace glm;
 
+#include "renderer-moderngl/Blending.hpp"
+
 struct renderer_vertex {
 	vec2 pos;
 	vec2 tex;
@@ -33,22 +35,18 @@ enum class RendererBlend : uint8_t {
 inline void enableBlending(RendererBlend blend) {
 	switch (blend) {
 		case RendererBlend::DefaultBlend: break;
-		case RendererBlend::AdditiveBlend: glBlendFunc(GL_ONE, GL_ONE); break;
-		case RendererBlend::MixedBlend: glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); break;
-		case RendererBlend::ShinyBlend: glBlendFunc(GL_SRC_ALPHA,GL_ONE); break;
-		case RendererBlend::SubstractBlend: glBlendFunc(GL_ONE, GL_ONE); glBlendEquation(GL_FUNC_REVERSE_SUBTRACT); break;
-		case RendererBlend::SubstractMixedBlend: glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO); glBlendEquation(GL_FUNC_REVERSE_SUBTRACT); break;
-		case RendererBlend::SubstractShinyBlend: glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE, GL_ONE, GL_ZERO); glBlendEquation(GL_FUNC_REVERSE_SUBTRACT); break;
+		case RendererBlend::AdditiveBlend: BlendingState::push(GL_ONE, GL_ONE); break;
+		case RendererBlend::MixedBlend: BlendingState::push(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); break;
+		case RendererBlend::ShinyBlend: BlendingState::push(GL_SRC_ALPHA,GL_ONE); break;
+		case RendererBlend::SubstractBlend: BlendingState::push(GL_ONE, GL_ONE, GL_FUNC_REVERSE_SUBTRACT); break;
+		case RendererBlend::SubstractMixedBlend: BlendingState::push(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO, GL_FUNC_REVERSE_SUBTRACT); break;
+		case RendererBlend::SubstractShinyBlend: BlendingState::push(GL_SRC_ALPHA,GL_ONE, GL_ONE, GL_ZERO, GL_FUNC_REVERSE_SUBTRACT); break;
 	}
 }
 inline void disableBlending(RendererBlend blend) {
 	switch (blend) {
 		case RendererBlend::DefaultBlend: break;
-		case RendererBlend::SubstractBlend:
-		case RendererBlend::SubstractMixedBlend:
-		case RendererBlend::SubstractShinyBlend:
-			glBlendEquation(GL_FUNC_ADD); glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); break;
-		default: glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); break;
+		default: BlendingState::push(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); break;
 	}
 }
 

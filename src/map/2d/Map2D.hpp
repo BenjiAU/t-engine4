@@ -252,9 +252,9 @@ private:
 	shader_type *default_shader = nullptr;
 
 	// Rendering FBO if needed
-	static int render_fbo_ref;
-	static DORTarget *render_fbo;
-	static int render_fbo_start_z;
+	int render_fbo_ref = LUA_NOREF;
+	DORTarget *render_fbo = nullptr;
+	int render_fbo_start_z = 0;
 
 	// Z-layers
 	DORCallbackMapZ **zobjects;
@@ -370,7 +370,7 @@ public:
 	void removeMinimap(Minimap2D *mm);
 
 	/* Render FBO */
-	static void setRenderFBO(DORTarget *fbo, int fbo_ref = LUA_NOREF, int start_z = 0);
+	void setRenderFBO(DORTarget *fbo, int fbo_ref = LUA_NOREF, int start_z = 0);
 
 	/* Class superloads */
 	virtual void toScreen(mat4 cur_model, vec4 color);

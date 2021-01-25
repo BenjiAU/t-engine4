@@ -55,6 +55,7 @@ extern "C" {
 #include "core_lua.hpp"
 #include "profile.hpp"
 #include "renderer-moderngl/Interfaces.hpp"
+#include "renderer-moderngl/Blending.hpp"
 #include "utilities.hpp"
 #include "imgui/te4_imgui.hpp"
 
@@ -963,8 +964,7 @@ Uint32 redraw_timer(Uint32 interval, void *param)
 }
 
 /* general OpenGL initialization function */
-int initGL()
-{
+int initGL() {
 	/* Set the background black */
 	tglClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 
@@ -975,12 +975,14 @@ int initGL()
 	glDepthFunc(GL_LEQUAL);
 
 	glEnable(GL_BLEND);
-	glEnable(GL_PROGRAM_POINT_SIZE);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_PROGRAM_POINT_SIZE);	
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
+
+	BlendingState::clear();
+	BlendingState::push(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	return( true );
 }

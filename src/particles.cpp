@@ -511,9 +511,10 @@ static void particles_draw(particles_type *ps, mat4 model)
 
 	SDL_mutexP(ps->lock);
 
-	if (ps->blend_mode == BLEND_SHINY) glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-	else if (ps->blend_mode == BLEND_ADDITIVE) glBlendFunc(GL_ONE, GL_ONE);
-	else if (ps->blend_mode == BLEND_MIXED) glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	bool blended = false;
+	if (ps->blend_mode == BLEND_SHINY) { blended = true; BlendingState::push(GL_SRC_ALPHA,GL_ONE); }
+	else if (ps->blend_mode == BLEND_ADDITIVE) { blended = true; BlendingState::push(GL_ONE, GL_ONE); }
+	else if (ps->blend_mode == BLEND_MIXED) { blended = true; BlendingState::push(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); }
 
 	if (multitexture_active) tglActiveTexture(GL_TEXTURE0);
 	tglBindTexture(GL_TEXTURE_2D, ps->texture);
@@ -587,7 +588,7 @@ static void particles_draw(particles_type *ps, mat4 model)
 	glDrawElements(GL_TRIANGLES, ps->batch_nb * 6, GL_UNSIGNED_INT, (void*)0);
 	// glDrawArrays(GL_QUADS, 0, ps->batch_nb);
 
-	if (ps->blend_mode) glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	if (blended) BlendingState::pop();
 
 	if (alter_fbo) {
 		tglActiveTexture(GL_TEXTURE0);

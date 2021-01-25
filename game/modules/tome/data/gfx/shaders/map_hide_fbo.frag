@@ -18,7 +18,7 @@ void main(void)
 		vec2 center = uv - vec2(unhide[i].x, 1.0 - unhide[i].y);
 		center.x = center.x * r_ratio;
 
-		float aa = smoothstep(r, r * 1.3, length(center)) / 0.5 + 0.5;
+		float aa = smoothstep(r, r * 1.3, length(center)) * 0.5 + 0.5;
 		a = min(a, aa);
 	}
 

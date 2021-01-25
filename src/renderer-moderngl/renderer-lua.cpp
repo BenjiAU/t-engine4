@@ -768,6 +768,15 @@ static int gl_target_clearcolor(lua_State *L)
 	return 1;
 }
 
+static int gl_target_ui_mode(lua_State *L)
+{
+	DORTarget *v = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
+	v->uiMode(lua_toboolean(L, 2));
+
+	lua_pushvalue(L, 1);
+	return 1;
+}
+
 static int gl_target_view(lua_State *L)
 {
 	DORTarget *v = userdata_to_DO<DORTarget>(L, 1, "gl{target}");
@@ -2143,6 +2152,7 @@ static const struct luaL_Reg gl_target_reg[] =
 	{"picking", gl_target_picking},
 	{"displaySize", gl_target_displaysize},
 	{"clearColor", gl_target_clearcolor},
+	{"uiMode", gl_target_ui_mode},
 	{"view", gl_target_view},
 	{"texture", gl_target_texture},
 	{"textureTarget", gl_target_target_texture},

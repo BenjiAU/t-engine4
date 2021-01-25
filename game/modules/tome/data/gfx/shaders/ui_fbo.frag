@@ -18,11 +18,12 @@ void main(void)
 		vec2 center = uv - vec2(unhide[i].x, 1.0 - unhide[i].y);
 		center.x = center.x * r_ratio;
 
-		float aa = smoothstep(r, r + 0.05, length(center)) / 0.7 + 0.3;
+		float aa = smoothstep(r, r + 0.05, length(center)) * 0.5 + 0.5;
 		a = min(a, aa);
 	}
 
 	// Output to screen
 	c.a *= a;
+	// c.r = a;
 	gl_FragColor = c;
 }

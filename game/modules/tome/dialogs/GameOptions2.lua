@@ -532,6 +532,13 @@ function _M:generateListMap()
 	self:defineCheckbox("tome.daynight", {w="50%"}, _t"Day/night light cycle", nil,
 		_t"Enables or disables day/night light variations effects."
 	)
+
+	self:defineNextLine()
+	self:defineCheckbox("tome.actors_seethrough", {w="50%"}, _t"Semi-transparent UI and terrains over actors", function(v) if self:isTome() then
+			game.uiset:updateSeethrough()
+		end end,
+		_t"Enables or disables the fading of UI elements and high ground/trees/... when they would obscure the player or npcs."
+	)
 end
 
 function _M:generateListUi()

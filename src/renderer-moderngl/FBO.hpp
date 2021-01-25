@@ -146,6 +146,8 @@ protected:
 	GLuint picking_pbo[2] = {0, 0};
 	int picking_pbo_idx = 0;
 
+	bool ui_mode = false; // DGDGDGDG this is bad, it sets a special blending mode, this should be more generic
+
 	bool copy_depth = false;
 
 	VBO *toscreen_vbo = NULL;
@@ -189,6 +191,8 @@ public:
 	void copyDepth(bool v) { copy_depth = v; }
 	void enablePicking(int tex_id);
 	uint32_t picking(int x, int y);
+
+	void uiMode(bool v) { ui_mode = v; }
 };
 
 #endif

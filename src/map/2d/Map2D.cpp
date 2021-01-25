@@ -754,9 +754,6 @@ void Map2D::updateVision() {
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, seens_texture_size.x, seens_texture_size.y, GL_RED, GL_UNSIGNED_BYTE, seens_texture_data);
 }
 
-int Map2D::render_fbo_ref = LUA_NOREF;
-DORTarget *Map2D::render_fbo = nullptr;
-int Map2D::render_fbo_start_z = 0;
 void Map2D::setRenderFBO(DORTarget *fbo, int fbo_ref, int start_z) {
 	refcleaner(&render_fbo_ref);
 	render_fbo_ref = fbo_ref;

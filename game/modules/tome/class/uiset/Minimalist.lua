@@ -200,13 +200,26 @@ function _M:activate()
 	self:makeFbos(game.w, game.h)
 end
 
+function _M:updateSeethrough()
+	self:makeFbos(game.w, game.h)
+end
+
 function _M:makeFbos(w, h)
+	if not config.settings.tome.actors_seethrough then
+		self.ui_fbo = nil
+		self.map_hide_fbo = nil
+		engine.Map:setRenderFBO(game.level and game.level.map, nil)
+		return
+	end
+
 	self.ui_fbo_shader = Shader.new("ui_fbo")
 	self.ui_fbo_shader:setUniform("resolution", {w, h})
 	if self.ui_fbo_shader.shad then
 		self.ui_fbo = core.renderer.target(w, h)
-		self.ui_fbo:shader(self.ui_fbo_shader)
+		self.ui_fbo:shader(self.ui_fbo_shader):uiMode(true)
 		self.ui_fbo_shader.shad:paramNumber("unhide_cnt", 0)
+		self.ui_renderer = core.renderer.renderer()
+		self.ui_renderer:add(self.ui_fbo)
 	else
 		self.ui_fbo = nil
 	end
@@ -215,12 +228,12 @@ function _M:makeFbos(w, h)
 	self.map_hide_fbo_shader:setUniform("resolution", {w, h})
 	if self.map_hide_fbo_shader.shad then
 		self.map_hide_fbo = core.renderer.target(w, h)
-		self.map_hide_fbo:shader(self.map_hide_fbo_shader)
+		self.map_hide_fbo:shader(self.map_hide_fbo_shader):uiMode(true)
 		self.map_hide_fbo_shader.shad:paramNumber("unhide_cnt", 0)
-		core.map2d.setRenderFBO(self.map_hide_fbo, 13) -- 13 is the first z layer after actors
+		engine.Map:setRenderFBO(game.level and game.level.map, self.map_hide_fbo, 13) -- 13 is the first z layer after actors
 	else
 		self.map_hide_fbo = nil
-		core.map2d.setRenderFBO(nil)
+		engine.Map:setRenderFBO(game.level and game.level.map, nil)
 	end
 end
 
@@ -273,7 +286,7 @@ function _M:display(nb_keyframes)
 			for i = map.mx, map.mx + map.viewport.mwidth - 1 do
 				for j = map.my, map.my + map.viewport.mheight - 1 do
 					local a = map(i, j, map.ACTOR)
-					if a then
+					if a and map.seens(i, j) and game.player:canSee(a) then
 						local ax, ay = map:getTileToScreen(i, j, true)
 						list[#list+1] = {ax / game.w, ay / game.h}
 						if #list >= 200 then break end
@@ -288,7 +301,7 @@ function _M:display(nb_keyframes)
 				self.map_hide_fbo_shader.shad:paramNumber2("unhide", list)
 			end
 		end
-		self.ui_fbo:toScreen(0, 0)
+		self.ui_renderer:toScreen(0, 0)
 	end
 end
 
