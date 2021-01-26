@@ -46,7 +46,7 @@ inline void enableBlending(RendererBlend blend) {
 inline void disableBlending(RendererBlend blend) {
 	switch (blend) {
 		case RendererBlend::DefaultBlend: break;
-		default: BlendingState::push(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); break;
+		default: BlendingState::pop(); break;
 	}
 }
 
