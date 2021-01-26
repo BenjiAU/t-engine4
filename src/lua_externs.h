@@ -38,7 +38,6 @@ extern int luaopen_physfs(lua_State *L);
 extern int luaopen_profiler(lua_State *L);
 extern int luaopen_shaders(lua_State *L);
 extern int luaopen_socket_core(lua_State *L);
-extern int luaopen_sound(lua_State *L);
 extern int luaopen_struct(lua_State *L);
 extern int luaopen_zlib (lua_State *L);
 extern int luaopen_colors (lua_State *L);

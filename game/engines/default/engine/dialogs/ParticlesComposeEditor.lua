@@ -182,6 +182,7 @@ local pdef = {
 		emitters = {
 			{PC.LinearEmitter, {
 				{PC.BasicTextureGenerator},
+				{PC.SoundGenerator, name="fireflash"},
 				{PC.LifeGenerator, max=1.000000, duration=10.000000, min=0.300000},
 				{PC.CirclePosGenerator, radius="size", width="size/10"},
 				{PC.DiskVelGenerator, max_vel=100.000000, min_vel=30.000000},
@@ -747,6 +748,10 @@ local specific_uis = {
 			{type="string", id="name", text="Parameter name", default="p1", line=true},
 			{type="string", id="expr", chars=40, text="Expr", default="rng(1, 10)"},
 		}},
+		[PC.SoundGenerator] = {name="SoundGenerator", category="sound", fields={
+			{type="sound", id="name", text="Soundfile", dir="/data/sound/", filter="%.ogg$", default="fireflash", line=true},
+			{type="bool", id="once", text="Play only once", default=true},
+		}},
 	},
 	updaters = {
 		[PC.BasicTimeUpdater] = {name="BasicTimeUpdater", category="life", fields={}},
@@ -1167,10 +1172,11 @@ function _M:input_vec2(name, base, k, min, max, converter)
 	ig.PopStyleColor()
 end
 
-function _M:input_combo(name, base, k, list, d_prop, v_prop)
+function _M:input_combo(name, base, k, list, d_prop, v_prop, alter)
 	local v = ffi.new("int[1]", (table.findValueSub(list, base[k], v_prop) or 1) - 1)
 	if ig.ComboStr(name..self:getFieldId(), v, table.concatsub(list, "\0", d_prop), #list) then
 		base[k] = list[v[0]+1][v_prop]
+		if alter then base[k] = alter(base[k]) end
 		self:regenParticle()
 	end
 	if ig.IsItemHovered() then ig.SetTooltip(name) end
@@ -1184,10 +1190,18 @@ function _M:input_shader(name, base, k)
 	return self:input_combo(name..self:getFieldId(), base, k, list, "name", "path")
 end
 
-function _M:input_file(name, base, k, field)
+function _M:input_file(name, base, k, field, alter)
 	local list = {{name = "--", path=nil}}
 	for i, file in ipairs(fs.list(filesprefix..field.dir)) do if file:find(field.filter) then
 		list[#list+1] = {name=file, path=field.dir..file}
+	end end
+	return self:input_combo(name..self:getFieldId(), base, k, list, "name", "path", alter)
+end
+
+function _M:input_sound(name, base, k, field, alter)
+	local list = {{name = "--", path=nil}}
+	for i, file in ipairs(fs.list(filesprefix..field.dir)) do if file:find(field.filter) then
+		list[#list+1] = {name=file, path=file:gsub("%.ogg$", "")}
 	end end
 	return self:input_combo(name..self:getFieldId(), base, k, list, "name", "path")
 end
@@ -1294,7 +1308,10 @@ function _M:processSpecificUI(kind, spe, color, delete)
 				self:input_select(field.text, spe, field.id, field)
 			elseif field.type == "file" then
 				if not spe[field.id] then spe[field.id] = field.default end
-				self:input_file(field.text, spe, field.id, field)
+				self:input_file(field.text, spe, field.id, field, field.alter)
+			elseif field.type == "sound" then
+				if not spe[field.id] then spe[field.id] = field.default end
+				self:input_sound(field.text, spe, field.id, field, field.alter)
 			end
 			-- if not field.line and i < #spe_def.fields then ig.SameLine() end
 			if i == #spe_def.fields - 1 then ig.PopStyleVar() end

@@ -23,6 +23,7 @@ extern "C" {
 }
 #include "renderer-moderngl/Renderer.hpp"
 #include "particles-system/system.hpp"
+#include "music.hpp"
 #include <math.h>
 
 namespace particles {
@@ -445,6 +446,16 @@ void ParametrizerGenerator::generate(ParticlesData &p, uint32_t start, uint32_t 
 
 	*val = ee->exprs.eval(expr);
 	ee->computeParametrizedValues(system);
+}
+
+SoundGenerator::SoundGenerator(string name, bool once) : name(name), once(once) {
+	loaded = load_sound(name);
+}
+
+void SoundGenerator::generate(ParticlesData &p, uint32_t start, uint32_t end) {
+	if (!loaded) return;
+	printf("PLAYING SOUND %s : %d\n", name.c_str(), play_sound(name));
+	if (once) loaded = false;
 }
 
 }

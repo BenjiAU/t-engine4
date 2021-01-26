@@ -47,7 +47,7 @@ project "TEngine"
 	if _OPTIONS.steam then
 		files { "../steamworks/luasteam.c", }
 	end
-	links { "physfs", "lua".._OPTIONS.lua, "fov", "luasocket", "luaprofiler", "lpeg", "tcodimport", "lxp", "expatstatic", "luamd5", "luazlib", "luabitop", "te4-bzip", "te4-wfc", "utf8proc", "te4-renderer", "te4-map2d", "te4-particles-system", "te4-navmesh", "te4-spriter", "tinyxml2", "te4-freetype-gl", "te4-tinyobjloader", "te4-box2d-".._OPTIONS.box2d:lower(), "te4-poly2tri", "te4-clipper", "te4-muparser", "te4-binpack", "te4-imgui" }
+	links { "physfs", "lua".._OPTIONS.lua, "fov", "luasocket", "luaprofiler", "lpeg", "tcodimport", "lxp", "expatstatic", "luamd5", "luazlib", "luabitop", "te4-bzip", "te4-wfc", "utf8proc", "te4-renderer", "te4-map2d", "te4-particles-system", "te4-navmesh", "te4-spriter", "tinyxml2", "te4-freetype-gl", "te4-tinyobjloader", "te4-box2d-".._OPTIONS.box2d:lower(), "te4-poly2tri", "te4-clipper", "te4-muparser", "te4-binpack", "te4-imgui", "te4-soloud" }
 	if _OPTIONS.discord then defines { "DISCORD_TE4" } end
 	defines { "_DEFAULT_VIDEOMODE_FLAGS_='SDL_HWSURFACE|SDL_DOUBLEBUF'" }
 	defines { [[TENGINE_HOME_PATH='".t-engine"']], "TE4CORE_VERSION="..TE4CORE_VERSION }
@@ -84,17 +84,13 @@ project "TEngine"
 		files { "../src/mac/SDL*" }
 		includedirs {
 			"/System/Library/Frameworks/OpenGL.framework/Headers",
-			"/System/Library/Frameworks/OpenAL.framework/Headers",
 
 			"/Library/Frameworks/SDL2.framework/Headers",
 			"/Library/Frameworks/SDL2_image.framework/Headers",
 			"/Library/Frameworks/libpng.framework/Headers",
-			"/Library/Frameworks/ogg.framework/Headers",
-			"/Library/Frameworks/vorbis.framework/Headers",
 
 			-- MacPorts paths
 			"/opt/local/include",
-			"/opt/local/include/Vorbis",
 
 			-- Homebrew paths
 			"/usr/local/include",
@@ -104,13 +100,10 @@ project "TEngine"
 		linkoptions {
 			"-framework Cocoa",
 			"-framework OpenGL",
-			"-framework OpenAL",
 
 			"-framework SDL2",
 			"-framework SDL2_image",
 			"-framework libpng",
-			"-framework ogg",
-			"-framework vorbis",
 			"-Wl,-rpath,'@loader_path/../Frameworks'",
 		}
 		if _OPTIONS.lua == "jit2" then
@@ -124,7 +117,7 @@ project "TEngine"
 		links { "IOKit" }
 
 	configuration "windows"
-		links { "mingw32", "freetype", "SDL2main", "SDL2", "SDL2_image", "OpenAL32", "vorbisfile", "opengl32", "glu32", "wsock32", "png" }
+		links { "mingw32", "freetype", "SDL2main", "SDL2", "SDL2_image", "opengl32", "glu32", "wsock32", "png" }
 		defines { [[TENGINE_HOME_PATH='"T-Engine"']], 'SELFEXE_WINDOWS'  }
 		if _OPTIONS.wincross then
 			prebuildcommands { "i686-w64-mingw32.shared-windres ../src/windows/icon.rc -O coff -o ../src/windows/icon.res" }
@@ -141,14 +134,14 @@ project "TEngine"
 		else
 			libdirs {"/opt/SDL-2.0/lib/"}
 		end
-		links { "dl", "freetype", "SDL2", "SDL2_image", "png", "openal", "vorbisfile", "GL", "GLU", "m", "pthread" }
+		links { "dl", "freetype", "SDL2", "SDL2_image", "png", "GL", "GLU", "m", "pthread" }
 		linkoptions { "-Wl,-E" }
 		defines { [[TENGINE_HOME_PATH='".t-engine"']], 'SELFEXE_LINUX' }
 		if steamlin64 then steamlin64() end
 
 	configuration "bsd"
 		libdirs {"/usr/local/lib/"}
-		links { "SDL2", "SDL2_image", "png", "openal", "vorbisfile", "GL", "GLU", "m", "pthread" }
+		links { "SDL2", "SDL2_image", "png", "GL", "GLU", "m", "pthread" }
 		defines { [[TENGINE_HOME_PATH='".t-engine"']], 'SELFEXE_BSD' }
 
 	configuration {"Debug"}
@@ -878,3 +871,23 @@ project "te4-discord"
 		kind "SharedLib"
 		-- Empty
 end
+
+project "te4-soloud"
+	kind "StaticLib"
+	language "C++"
+	targetname "te4-soloud"
+	if _OPTIONS.profiling then buildoptions { "-fno-omit-frame-pointer" } linkoptions{ "-fno-omit-frame-pointer" } end
+	enableSanitizer()
+
+	files{
+		"../src/soloud/src/audiosource/**.c*",
+		"../src/soloud/src/filter/**.c*",
+		"../src/soloud/src/core/**.c*",
+		"../src/soloud/src/backend/sdl2_static/**.c*",
+	}
+
+	includedirs{
+		"../src/soloud/src/**",
+		"../src/soloud/include"
+	}
+	defines { "WITH_SDL2_STATIC" }

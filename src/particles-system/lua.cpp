@@ -546,6 +546,12 @@ static int p_new(lua_State *L) {
 							auto g = new ParametrizerGenerator(e, sys, name_str, expr_str); gg = g;
 						}
 						break;}
+					case GeneratorsList::SoundGenerator: {
+						const char *name_str = lua_string(L, -1, "name", NULL);
+						if (name_str) {
+							auto g = new SoundGenerator(name_str, lua_bool(L, -1, "once", true)); gg = g;
+						}
+						break;}
 					default: 
 						lua_pushliteral(L, "Unknown particles Generator"); lua_error(L);
 						break;
@@ -801,6 +807,7 @@ extern "C" int luaopen_particles_system(lua_State *L) {
 	lua_pushliteral(L, "CopyGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::CopyGenerator)); lua_rawset(L, -3);
 	lua_pushliteral(L, "JaggedLineBetweenGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::JaggedLineBetweenGenerator)); lua_rawset(L, -3);
 	lua_pushliteral(L, "ParametrizerGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::ParametrizerGenerator)); lua_rawset(L, -3);
+	lua_pushliteral(L, "SoundGenerator"); lua_pushnumber(L, static_cast<uint8_t>(GeneratorsList::SoundGenerator)); lua_rawset(L, -3);
 
 	lua_pushliteral(L, "TriggerDELETE"); lua_pushnumber(L, static_cast<uint8_t>(TriggerableKind::DESTROY)); lua_rawset(L, -3);
 	lua_pushliteral(L, "TriggerWAKEUP"); lua_pushnumber(L, static_cast<uint8_t>(TriggerableKind::WAKEUP)); lua_rawset(L, -3);

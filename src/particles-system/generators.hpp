@@ -31,6 +31,7 @@ enum class GeneratorsList : uint8_t {
 	StartStopColorGenerator, FixedColorGenerator,
 	CopyGenerator, JaggedLineBetweenGenerator,
 	ParametrizerGenerator,
+	SoundGenerator,
 };
 
 class Generator {
@@ -310,4 +311,16 @@ public:
 	virtual void useSlots(ParticlesData &p) {}
 	virtual void generate(ParticlesData &p, uint32_t start, uint32_t end);
 	virtual GeneratorsList getID() { return GeneratorsList::ParametrizerGenerator; }
+};
+
+
+class SoundGenerator : public Generator {
+protected:
+	string name;
+	bool loaded = false;
+public:
+	bool once = true;
+	SoundGenerator(string name, bool once);
+	virtual void generate(ParticlesData &p, uint32_t start, uint32_t end);
+	virtual GeneratorsList getID() { return GeneratorsList::SoundGenerator; }
 };

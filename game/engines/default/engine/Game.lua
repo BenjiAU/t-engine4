@@ -347,8 +347,6 @@ function _M:tick()
 
 	Shader:cleanup()
 
-	if self.cleanSounds then self:cleanSounds() end
-
 	self:onTickEndExecute()
 end
 
