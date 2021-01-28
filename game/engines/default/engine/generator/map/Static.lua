@@ -578,7 +578,7 @@ function _M:generate(lev, old_lev)
 		if type(c) == "string" then g = self:resolve("grid", c)
 		else g = self:resolve(nil, c.grid) end
 		if g then
-			if g.force_clone then g = g:clone() end
+			if g.force_clone then g = g:cloneFull() end
 			g:resolve() g:resolve(nil, true)
 			self.map(i-1, j-1, Map.TERRAIN, g)
 			g:check("addedToLevel", self.level, i-1, j-1)

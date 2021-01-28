@@ -2054,6 +2054,13 @@ function _M:setupCommands()
 			print("===============")
 		end end,
 		[{"_g","ctrl"}] = function() if config.settings.cheat then
+			game.level.map:particleEmitter(self.player.x, self.player.y, 1, "tentacle_tree", {tentacle_id=1, force_tf=500})
+do return end
+			-- local g = game.level.map(game.player.x, game.player.y, engine.Map.TERRAIN)
+			-- game.player:addParticles(engine.Particles.new("inferno"))
+			-- g:defineDisplayCallback()
+			-- game.level.map:updateMap(game.player.x, game.player.y)
+do return end
 			game.player:takeHit(100, game.player)
 			game.player:useEnergy()
 			-- DamageType:get(DamageType.ACID).projector(game.player, game.player.x, game.player.y, DamageType.ACID, 100)
