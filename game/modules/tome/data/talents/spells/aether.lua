@@ -206,7 +206,7 @@ newTalent{
 	requires_target = true,
 	no_energy = true,
 	tactical = { BUFF = 2 },
-	getNb = function(self, t) return math.floor(self:combatTalentLimit(t, 15, 5, 9)) end, -- Limit duration < 15	
+	getNb = function(self, t) return math.floor(self:combatTalentLimit(t, 15, 5.1, 10.1)) end, -- Limit duration < 15	
 	callbackOnTalentPost = function(self, t, ab)
 		if not self:hasEffect(self.EFF_AETHER_AVATAR) then return end
 		if ab.mode == "sustained" then return end
@@ -276,7 +276,7 @@ newTalent{
 	tactical = { BUFF = 2 },
 	getNbRemove = function(self, t) return math.floor(self:combatTalentScale(t, 1, 4)) end,
 	getDamageIncrease = function(self, t) return self:combatTalentScale(t, 2.5, 10) end,
-	getResistPenalty = function(self, t) return self:combatTalentLimit(t, 60, 17, 50, true) end, -- Limit < 60%	
+	getResistPenalty = function(self, t) return self:combatTalentLimit(t, 60, 20, 50) end, -- Limit < 60%	
 	activate = function(self, t)
 		game:playSoundNear(self, "talents/arcane")
 

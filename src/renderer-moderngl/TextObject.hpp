@@ -26,9 +26,17 @@
 #include <vector>
 #include "font.hpp"
 
-class DORText : public DORVertexes{
+enum class TextLayer : uint8_t {
+	BACK, FRONT,
+};
+
+class DORText : public DisplayObject{
 private:
 	static shader_type *default_shader;
+	static float default_outline;
+	static vec4 default_outline_color;
+
+	shader_type *shader = nullptr;
 
 	DORContainer entities_container;
 	vector<int> entities_container_refs;
@@ -52,8 +60,41 @@ private:
 	float shadow_x = 0, shadow_y = 0;
 	vec4 shadow_color;
 
-	float outline = 0;
-	vec4 outline_color;
+	float outline = 1;
+	vec4 outline_color = vec4(0, 0, 0, 1);
+
+	bool small_caps = false;
+
+	struct render_char {
+		vec2 p0, p1;
+		float italicx;
+		vec2 tex0, tex1;
+		vec4 color;
+		float mode;
+	};
+	std::vector<std::vector<std::vector<render_char>>> rendered_chars;
+	inline std::vector<render_char> &getRenderTable(TextLayer l, uint32_t id) {
+		auto &rc = rendered_chars[static_cast<uint8_t>(l)];
+		while (rc.size() < id+1) rc.emplace_back();
+		return rc[id];
+	}
+
+	int8_t is_sortable = -1;
+	inline void checkSortability() {
+		int8_t first = -1, last = -1;
+
+		for (auto &layer : rendered_chars) { 
+			uint8_t id = 0;
+			for (auto &rc : layer) { 
+				if (rc.size()) {
+					if (first == -1) first = id;
+					last = id;
+				}
+				id++;
+			}
+		}
+		is_sortable = (first == last) ? first : -1;
+	}
 
 	virtual void cloneInto(DisplayObject *into);
 
@@ -80,7 +121,9 @@ public:
 	void setMaxLines(int max) { this->max_lines = max; parseText(); };
 	void setTextStyle(font_style style);
 	void setTextColor(float r, float g, float b, float a);
+	void setTextSmallCaps(bool v);
 	void setFrom(DORText *prev);
+	void setShader(shader_type *s);
 
 	vec2 getLetterPosition(int idx);
 
@@ -89,11 +132,13 @@ public:
 
 	void setShadow(float offx, float offy, vec4 color) { shadow_x = offx; shadow_y = offy; shadow_color = color; };
 	void setOutline(float o, vec4 color) { outline = o; outline_color = color; };
+	static void setOutlineDefault(float o, vec4 color) { default_outline = o; default_outline_color = color; };
 
 	virtual void clear();
 
 	virtual void render(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
 	// virtual void renderZ(RendererGL *container, mat4& cur_model, vec4& color, bool cur_visible);
+	virtual void sortCoords(RendererGL *container, mat4& cur_model);
 
 private:
 	void parseText();

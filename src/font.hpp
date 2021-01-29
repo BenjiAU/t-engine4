@@ -28,6 +28,7 @@ extern "C" {
 #include "freetype-gl/texture-font.h"
 }
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 #define GLM_FORCE_INLINE
@@ -35,8 +36,9 @@ extern "C" {
 
 using namespace std;
 
-#define DEFAULT_ATLAS_W	2048
-#define DEFAULT_ATLAS_H	2048
+#define DEFAULT_ATLAS_W	1024
+#define DEFAULT_ATLAS_H	1024
+#define BASE_FONT_SIZE 32
 
 typedef enum {
 	FONT_STYLE_NORMAL,
@@ -46,7 +48,8 @@ typedef enum {
 	FONT_STYLE_ITALIC,
 } font_style;
 
-using CodepointGlyphMap = unordered_map<uint32_t, ftgl::texture_glyph_t*>;
+using PointAtlas = std::pair<ftgl::texture_glyph_t*, uint8_t>;
+using CodepointGlyphMap = unordered_map<uint32_t, PointAtlas>;
 
 class FontInstance;
 class DORText;
@@ -56,13 +59,13 @@ class FontKind {
 	friend DORText;
 protected:
 	static unordered_map<string, FontKind*> all_fonts;
-	const string default_atlas_chars = "abcdefghijklmopqrstuvwxyzABCDEFGHIJKLMOPQRSTUVWXYZ0123456789.-_/*&~\"'\\{}()[]|^%%*$! =+,€";
+	const string default_atlas_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_/*&~\"'\\{}()[]|^%%*$!? =+,€@";
 
 	string fontname;
 	char *font_mem;
 	int32_t font_mem_size;
 	float lineskip;
-	ftgl::texture_atlas_t *atlas;
+	vector<ftgl::texture_atlas_t*>atlas;
 	ftgl::texture_font_t *font;
 
 	CodepointGlyphMap glyph_map_normal;
@@ -77,24 +80,36 @@ public:
 	~FontKind();
 
 	void used(bool v);
+	void makeAtlas();
 	void updateAtlas();
-	inline glm::vec2 getAtlasSize() { return {atlas->width, atlas->height}; }
+	inline glm::vec2 getAtlasSize() { return {DEFAULT_ATLAS_W, DEFAULT_ATLAS_H}; }
 	inline float lineSkip() { return lineskip; }
-	inline GLuint getAtlasTexture() { return atlas->id; }
+	inline GLuint getAtlasTexture(uint8_t id = 0) {
+		if (id < 0) id = 0;
+		if (id >= atlas.size()) id = atlas.size() - 1;
+		return atlas[id]->id;
+	}
 
-	inline ftgl::texture_glyph_t* getGlyph(uint32_t codepoint) {
+	inline PointAtlas getGlyph(uint32_t codepoint) {
 		CodepointGlyphMap *glyph_map = &glyph_map_normal;
-		if (font->rendermode == ftgl::RENDER_OUTLINE_POSITIVE) glyph_map = &glyph_map_outline;
+		if (font->rendermode == ftgl::RENDER_OUTLINE_EDGE) {
+			glyph_map = &glyph_map_outline;
+		}
 
 		auto it = glyph_map->find(codepoint);
 		if (it != glyph_map->end()) return it->second;
 
 		ftgl::texture_glyph_t *g = ftgl::texture_font_get_glyph(font, codepoint);
 		if (g) {
-			std::pair<uint32_t, ftgl::texture_glyph_t*> p(codepoint, g);
-			glyph_map->insert(p);
+			std::pair<uint32_t, PointAtlas> p(codepoint, {g, atlas.size()-1});
+			glyph_map->emplace(p);
+			return get<1>(p);
+		} else {
+			updateAtlas(); // Do the final update to the current atlas
+			makeAtlas(); // Swap to a new one
+			font->atlas = atlas.back();
+			return getGlyph(codepoint);
 		}
-		return g;
 	}
 };
 
@@ -104,7 +119,7 @@ public:
 	float size;
 	float scale;
 
-	FontInstance(FontKind *fk, float size) : kind(fk), scale(size / 32.0), size(size) {};
+	FontInstance(FontKind *fk, float size) : kind(fk), scale(size / (float)BASE_FONT_SIZE), size(size) {};
 
 	glm::vec2 textSize(const char *str, size_t len, font_style style=FONT_STYLE_NORMAL);
 	inline glm::vec2 textSize(string &text, font_style style=FONT_STYLE_NORMAL) { return textSize(text.c_str(), text.size(), style); }

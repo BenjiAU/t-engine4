@@ -38,7 +38,6 @@ extern "C" {
 #include "physfsrwops.h"
 #include "wfc/lua_wfc_external.h"
 #include "getself.h"
-#include "music.h"
 #include "serial.h"
 #include "main.h"
 #include "te4web.h"
@@ -52,9 +51,11 @@ extern "C" {
 #endif
 }
 
+#include "music.hpp"
 #include "core_lua.hpp"
 #include "profile.hpp"
 #include "renderer-moderngl/Interfaces.hpp"
+#include "renderer-moderngl/Blending.hpp"
 #include "utilities.hpp"
 #include "imgui/te4_imgui.hpp"
 
@@ -62,6 +63,14 @@ extern "C" {
 #define HEIGHT 600
 #define DEFAULT_IDLE_FPS (2)
 #define WINDOW_ICON_PATH ("/engines/default/data/gfx/te4-icon.png")
+
+#ifdef SELFEXE_WINDOWS
+extern "C" {
+// Force nvidia optimus and amd equivalent to use the real GPU instead of the intel crappy one
+__declspec( dllexport ) DWORD NvOptimusEnablement                = 0x00000001;
+__declspec( dllexport ) int AmdPowerXpressRequestHighPerformance = 1;
+}
+#endif
 
 int start_xpos = -1, start_ypos = -1;
 bool ignore_window_change_pos = false;
@@ -840,7 +849,7 @@ void on_redraw()
 
 	if (ticks_count >= 500) {
 		current_fps = (float)frames_done * 1000.0 / (float)ticks_count;
-		// printf("%d frames in %d ms = %0.2f FPS (%f keyframes)\n", frames_done, ticks_count, current_fps, keyframes_done);
+		//printf("%d frames in %d ms = %0.2f FPS (%f keyframes)\n", frames_done, ticks_count, current_fps, keyframes_done);
 		ticks_count = 0;
 		frames_done = 0;
 		keyframes_done = 0;
@@ -855,11 +864,14 @@ void on_redraw()
 #endif
 	if (te4_web_update) te4_web_update(L);
 
+	update_audio(nb_keyframes);
+
 	// Run GC every second, this is the only place the GC should be called
 	// This is also a way to ensure the GC wont try to delete things while in callbacks from the display code and such which is annoying
-	if (ticks_count_gc >= 100) {
+	if (ticks_count_gc >= 5000) {
 		refcleaner_clean(L);
 		// lua_gc(L, LUA_GCSTEP, 5);
+		lua_gc(L, LUA_GCCOLLECT, 0);
 		ticks_count_gc = 0;
 	}
 }
@@ -954,8 +966,7 @@ Uint32 redraw_timer(Uint32 interval, void *param)
 }
 
 /* general OpenGL initialization function */
-int initGL()
-{
+int initGL() {
 	/* Set the background black */
 	tglClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 
@@ -966,12 +977,14 @@ int initGL()
 	glDepthFunc(GL_LEQUAL);
 
 	glEnable(GL_BLEND);
-	glEnable(GL_PROGRAM_POINT_SIZE);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_PROGRAM_POINT_SIZE);	
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
+
+	BlendingState::clear();
+	BlendingState::push(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	return( true );
 }
@@ -1315,6 +1328,7 @@ void do_resize(int w, int h, bool fullscreen, bool borderless, float zoom)
 }
 
 static void close_state() {
+	kill_audio();
 	core_mouse_close();
 	refcleaner_clean(L);
 	core_loader_waitall();
@@ -1790,8 +1804,6 @@ int main(int argc, char *argv[])
 	if (!no_steam) te4_steam_init();
 #endif
 
-	init_openal();
-
 	// RNG init
 	init_gen_rand(time(NULL));
 
@@ -1822,6 +1834,8 @@ int main(int argc, char *argv[])
 			printf("Found gamepad, enabling support: %s\n", SDL_GameControllerMapping(gamepad));
 		}
 	}
+
+	init_sounds();
 
 	// Filter events, to catch the quit event
 	SDL_SetEventFilter(event_filter, NULL);
@@ -1865,6 +1879,9 @@ int main(int argc, char *argv[])
 
 	imgui_load_settings();
 
+	// yes its duplicated I know
+	init_blank_surface();
+
 	while (!exit_engine)
 	{
 		event_loop();
@@ -1904,8 +1921,8 @@ int main(int argc, char *argv[])
 	if (desktop_gamma_set) SDL_SetWindowBrightness(window, desktop_gamma);
 //	SDL_Quit();
 	printf("SDL shutdown complete\n");
-//	deinit_openal();
-	printf("OpenAL shutdown complete\n");
+	deinit_sounds();
+	printf("SoLoud shutdown complete\n");
 	printf("Thanks for having fun!\n");
 
 #ifdef SELFEXE_WINDOWS

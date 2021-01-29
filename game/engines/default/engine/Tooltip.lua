@@ -217,6 +217,10 @@ end
 
 function _M:display() end
 
+function _M:getDO()
+	return self.do_container
+end
+
 function _M:toScreen(x, y, nb_keyframes)
 	self.last_display_x = x
 	self.last_display_y = y

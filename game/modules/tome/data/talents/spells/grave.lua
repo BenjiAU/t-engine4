@@ -117,7 +117,7 @@ newTalent{
 	range = 7,
 	getMaxStacks = function(self, t) return math.floor(self:combatTalentScale(t, 3, 7.5)) end,
 	getDamage = function(self, t) return self:combatTalentSpellDamage(t, 30, 400) / 7 end,
-	target = function(self, t) return {type="ball", radius=self:getTalentRadius(t), range=self:getTalentRange(t), nolock=true, nowarning=true} end,
+	target = function(self, t) return {type="ball", radius=self:getTalentRadius(t) + (self.life < 1 and 3 or 0), range=self:getTalentRange(t), nolock=true, nowarning=true} end,
 	action = function(self, t)
 		local tg = self:getTalentTarget(t)
 		local x, y = self:getTargetLimitedWallStop(tg)
@@ -130,7 +130,7 @@ newTalent{
 		local radius = self:getTalentRadius(t)
 		return ([[You summon a corpselight that radiates cold for 7 turns in radius %d.
 		Every turn all foes inside take %0.2f cold damage.
-		Anytime you cast a spell inside your corpselight's area it grows by one stack, each stack giving +1 radius and +10%% damage.
+		Anytime you cast a spell while standing inside your corpselight's area it grows by one stack, each stack giving +1 radius and +10%% damage.
 		The corpselight can gain at most %d stacks and the radius will never extend beyond 10.
 		If cast while under 1 life it spawns with 3 stacks.
 		The damage will increase with your Spellpower.]]):

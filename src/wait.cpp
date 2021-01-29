@@ -218,11 +218,14 @@ bool draw_waiting(lua_State *L)
 {
 	if (!waiting) return FALSE;
 
-	if (wait_draw_ref != LUA_NOREF)
-	{
+	if (wait_draw_ref != LUA_NOREF) {
 		lua_rawgeti(L, LUA_REGISTRYINDEX, wait_draw_ref);
-		if (lua_pcall(L, 0, 0, 0)) {
-			printf("Waiter error: %s\n", lua_tostring(L, -1));
+		if (lua_isfunction(L, -1)) {
+			if (lua_pcall(L, 0, 0, 0)) {
+				printf("Waiter error: %s\n", lua_tostring(L, -1));
+			}
+		} else {
+			lua_pop(L, 1);
 		}
 	}
 	else draw_last_frame(L);

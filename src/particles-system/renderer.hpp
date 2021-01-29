@@ -21,13 +21,34 @@
 using namespace std;
 using namespace glm;
 
+#include "renderer-moderngl/Blending.hpp"
+
 struct renderer_vertex {
 	vec2 pos;
 	vec2 tex;
 	vec4 color;
 };
 
-enum class RendererBlend : uint8_t { DefaultBlend, AdditiveBlend, MixedBlend, ShinyBlend };
+enum class RendererBlend : uint8_t {
+	DefaultBlend, AdditiveBlend, MixedBlend, ShinyBlend, SubstractBlend, SubstractMixedBlend, SubstractShinyBlend
+};
+inline void enableBlending(RendererBlend blend) {
+	switch (blend) {
+		case RendererBlend::DefaultBlend: break;
+		case RendererBlend::AdditiveBlend: BlendingState::push(GL_ONE, GL_ONE); break;
+		case RendererBlend::MixedBlend: BlendingState::push(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); break;
+		case RendererBlend::ShinyBlend: BlendingState::push(GL_SRC_ALPHA,GL_ONE); break;
+		case RendererBlend::SubstractBlend: BlendingState::push(GL_ONE, GL_ONE, GL_FUNC_REVERSE_SUBTRACT); break;
+		case RendererBlend::SubstractMixedBlend: BlendingState::push(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO, GL_FUNC_REVERSE_SUBTRACT); break;
+		case RendererBlend::SubstractShinyBlend: BlendingState::push(GL_SRC_ALPHA,GL_ONE, GL_ONE, GL_ZERO, GL_FUNC_REVERSE_SUBTRACT); break;
+	}
+}
+inline void disableBlending(RendererBlend blend) {
+	switch (blend) {
+		case RendererBlend::DefaultBlend: break;
+		default: BlendingState::pop(); break;
+	}
+}
 
 class Renderer {
 protected:

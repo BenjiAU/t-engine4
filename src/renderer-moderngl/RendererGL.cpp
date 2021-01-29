@@ -27,6 +27,8 @@ extern "C" {
        // #include <unistd.h>
 }
 
+stack<BlendingState> BlendingState::states;
+
 /**********************************
  ** Permanent VBO/DisplayList store
  ***************************************************************************/
@@ -424,7 +426,7 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 
 	if (zsort == SortMode::GL) glEnable(GL_DEPTH_TEST);
 	if (!allow_blending) glDisable(GL_BLEND);
-	if (premultiplied_alpha) glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	if (premultiplied_alpha) BlendingState::push(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	if (disable_depth_writing) glDepthMask(GL_FALSE);
 
 	// Draw all display lists
@@ -567,7 +569,7 @@ void RendererGL::toScreen(mat4 cur_model, vec4 cur_color) {
 
 	if (zsort == SortMode::GL) glDisable(GL_DEPTH_TEST);
 	if (!allow_blending) glEnable(GL_BLEND);
-	if (premultiplied_alpha) glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	if (premultiplied_alpha) BlendingState::pop();
 	if (disable_depth_writing) glDepthMask(GL_TRUE);
 
 	if (view) view->use(false);

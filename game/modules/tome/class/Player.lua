@@ -1019,6 +1019,7 @@ end
 --- We started resting
 function _M:onRestStart()
 	core.game.setRealtime(0) -- Swap to tick mode to improve speed
+	core.game.setFPS(config.settings.display_fps / 3)
 	if self.resting and self:attr("equilibrium_regen_on_rest") and not self.resting.equilibrium_regen then
 		self:attr("equilibrium_regen", self:attr("equilibrium_regen_on_rest"))
 		self.resting.equilibrium_regen = self:attr("equilibrium_regen_on_rest")
@@ -1033,6 +1034,7 @@ end
 --- We stopped resting
 function _M:onRestStop()
 	core.game.setRealtime(1) -- Swap back to realtime mode
+	core.game.setFPS(config.settings.display_fps)
 	if self.resting and self.resting.equilibrium_regen then
 		self:attr("equilibrium_regen", -self.resting.equilibrium_regen)
 		self.resting.equilibrium_regen = nil
@@ -1047,11 +1049,13 @@ end
 --- We started running
 function _M:onRunStart()
 	core.game.setRealtime(0) -- Swap to tick mode to improve speed
+	core.game.setFPS(config.settings.display_fps / 3)
 end
 
 --- We stopped running
 function _M:onRunStop()
 	core.game.setRealtime(1) -- Swap back to realtime mode
+	core.game.setFPS(config.settings.display_fps)
 end
 
 --- Can we continue resting ?
@@ -1070,6 +1074,7 @@ function _M:restCheck()
 	end
 
 	-- Resting improves regen
+	local mp = game:getPlayer(true)
 	for act, def in pairs(game.party.members) do if game.level:hasEntity(act) and not act.dead then
 		-- Drastically improve regen while resting as this is one of the most common areas lag causes frustration
 		-- To avoid interactions with life regen buffs and minimize any other non-QOL impacts we wait 15 turns before doing any enhancement
@@ -1079,7 +1084,10 @@ function _M:restCheck()
 		end
 		local old_shield = act.arcane_shield
 		act.arcane_shield = nil
-		act:heal(act.life_regen * perc)
+		if act.life_regen > 0 then
+			local life_regen = math.max(act.life_regen, mp.life_regen) -- Prevent slowdowns when  party member can regen but very slowly
+			act:heal(life_regen * perc)
+		end
 		act.arcane_shield = old_shield
 		act:incStamina(act.stamina_regen * perc)
 		act:incMana(act.mana_regen * perc)
@@ -1466,6 +1474,34 @@ function _M:playerTakeoff()
 	end)
 end
 
+function _M:playerUseObject(o, item, inven)
+	-- Count magic devices
+	if (o.power_source and o.power_source.arcane) and self:attr("forbid_arcane") then
+		game.logPlayer(self, "Your antimagic disrupts %s.", o:getName{no_count=true, do_color=true})
+		return true
+	end
+
+	local ret = o:use(self, nil, inven, item) or {}
+	if not ret.used then return end
+	if ret.id then
+		o:identify(true)
+	end
+	if ret.destroy then
+		if o.multicharge and o.multicharge > 1 then
+			o.multicharge = o.multicharge - 1
+		else
+			local _, del = self:removeObject(self:getInven(inven), item)
+			if del then
+				game.log("You have no more %s.", o:getName{no_count=true, do_color=true})
+			else
+				game.log("You have %s.", o:getName{do_color=true})
+			end
+			self:sortInven(self:getInven(inven))
+		end
+		return true
+	end
+end
+
 function _M:playerUseItem(object, item, inven)
 	if self.no_inventory_access then return end
 	if not game.zone or game.zone.wilderness then game.logPlayer(self, "You cannot use items on the world map.") return end
@@ -1474,33 +1510,7 @@ function _M:playerUseItem(object, item, inven)
 		if not o then return end
 		local co = coroutine.create(function()
 			self.changed = true
-
-			-- Count magic devices
-			if (o.power_source and o.power_source.arcane) and self:attr("forbid_arcane") then
-				game.logPlayer(self, "Your antimagic disrupts %s.", o:getName{no_count=true, do_color=true})
-				return true
-			end
-
-			local ret = o:use(self, nil, inven, item) or {}
-			if not ret.used then return end
-			if ret.id then
-				o:identify(true)
-			end
-			if ret.destroy then
-				if o.multicharge and o.multicharge > 1 then
-					o.multicharge = o.multicharge - 1
-				else
-					local _, del = self:removeObject(self:getInven(inven), item)
-					if del then
-						game.log("You have no more %s.", o:getName{no_count=true, do_color=true})
-					else
-						game.log("You have %s.", o:getName{do_color=true})
-					end
-					self:sortInven(self:getInven(inven))
-				end
-				return true
-			end
-			self.changed = true
+			return self:playerUseObject(o, item, inven)
 		end)
 		local ok, ret = coroutine.resume(co)
 		if not ok and ret then print(debug.traceback(co)) error(ret) end

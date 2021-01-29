@@ -35,6 +35,7 @@ extern "C" {
 
 #include "map/2d/Map2D.hpp"
 #include "map/2d/Minimap2D.hpp"
+#include "renderer-moderngl/FBO.hpp"
 #include <algorithm>
 #include <unordered_set>
 
@@ -549,8 +550,8 @@ void Map2D::setupGridLines() {
 	if (!show_grid_lines) return;
 
 	float size = show_grid_lines;
-	int32_t grid_w = 1 + mwidth;
-	int32_t grid_h = 1 + mheight;
+	int32_t grid_w = 40 + mwidth;
+	int32_t grid_h = 40 + mheight;
 	grid_lines_vbo.setTexture(gl_tex_white);
 
 	int vi = 0, ci = 0, ti = 0, i;
@@ -591,7 +592,10 @@ void Map2D::setVisionShader(shader_type *s, int ref) {
 void Map2D::setGridLinesShader(shader_type *s, int ref) {
 	refcleaner(&grid_lines_shader_ref);
 	grid_lines_shader_ref = ref;
+	grid_lines_shader = s;
 	grid_lines_vbo.setShader(s);
+	useShaderSimple(s);
+	glUniform2f(s->p_texsize, screen->w / screen_zoom, screen->h / screen_zoom);
 }
 
 void Map2D::setZCallback(int32_t z, int ref) {
@@ -725,16 +729,17 @@ inline void Map2D::computeGrid(MapObject *m, int32_t dz, int32_t i, int32_t j) {
 }
 
 void Map2D::updateVision() {
-	int32_t msx = mx, msy = my;
-	// int32_t msx = mx + scroll_anim_dx, msy = my + scroll_anim_dy;
-	int32_t mini = msx + viewport_pos.x, maxi = msx + viewport_size.x;
-	int32_t minj = msy + viewport_pos.y, maxj = msy + viewport_size.y;
+	// int32_t msx = mx, msy = my;
+	// // int32_t msx = mx + scroll_anim_dx, msy = my + scroll_anim_dy;
+	// int32_t mini = msx + viewport_pos.x, maxi = msx + viewport_size.x;
+	// int32_t minj = msy + viewport_pos.y, maxj = msy + viewport_size.y;
+	auto size = computeVisibleArea();
 
-	for (int32_t j = minj; j < maxj; j++) {
-		int32_t sj = j - minj;
-		for (int32_t i = mini; i < maxi; i++) {
+	for (int32_t j = size.miny; j < size.maxy; j++) {
+		int32_t sj = j - size.miny;
+		for (int32_t i = size.minx; i < size.maxx; i++) {
 			// printf("%dx%d / %dx%d\n", i-mini, sj, viewport_dimension.x, viewport_dimension.y);
-			int32_t idx = sj * seens_texture_size.x + (i - mini);
+			int32_t idx = sj * seens_texture_size.x + (i - size.minx);
 			if (!checkBounds(0, i, j)) seens_texture_data[idx] = 255;
 			else {
 				float seen = isSeen(i, j);
@@ -749,6 +754,13 @@ void Map2D::updateVision() {
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, seens_texture_size.x, seens_texture_size.y, GL_RED, GL_UNSIGNED_BYTE, seens_texture_data);
 }
 
+void Map2D::setRenderFBO(DORTarget *fbo, int fbo_ref, int start_z) {
+	refcleaner(&render_fbo_ref);
+	render_fbo_ref = fbo_ref;
+	render_fbo = fbo;
+	render_fbo_start_z = start_z;
+}
+
 void Map2D::toScreen(mat4 cur_model, vec4 color) {
 	color *= tint;
 
@@ -756,10 +768,10 @@ void Map2D::toScreen(mat4 cur_model, vec4 color) {
 	vec4 zcolor = vec4(1, 1, 1, 1);
 
 	computeScrollAnim(keyframes);
+	auto visible_area = computeVisibleArea();
 
 	float msx = -floor((mx + scroll_anim_dx) * tile_w), msy = -floor((my + scroll_anim_dy) * tile_h);
-	float sx = -floor(scroll_anim_dx * tile_w), sy = -floor(scroll_anim_dy * tile_h);
-
+	float sx = -floor((mx - visible_area.minx - 2 + scroll_anim_dx) * tile_w), sy = -floor((my - visible_area.miny - 2 + scroll_anim_dy) * tile_h);
 
 	// Compute the smooth scrolling matrix offset
 	mat4 scrollmodel = mat4();
@@ -770,33 +782,26 @@ void Map2D::toScreen(mat4 cur_model, vec4 color) {
 	mscrollmodel = glm::translate(mscrollmodel, glm::vec3(msx, msy, 0));
 	mat4 mcur_model = cur_model * mscrollmodel;
 
-
 	// DGDGDGDG Idea: define some layers as static and some as dynamic
 	// static ones are generated for the whole level and we let GPU clip because they dont change often at all
 	// dynamic one are generated for the screen and we do the clipping because they change every frame or close enough
 	// DGDGDGDG Idea: define a max layer size, say 64x64, any map bigger is split into multiple sectors
 
 	for (int32_t z = 0; z < zdepth; z++) {
+		if (render_fbo && render_fbo_start_z == z) render_fbo->use(true);
 		if (renderers_changed[z]) {
 			renderers_changed[z] = false;
 			renderers[z]->resetDisplayLists();
 			renderers[z]->setChanged(true);
 
-			int32_t mini, maxi;
-			int32_t minj, maxj;
-
-			// DGDGDGDG
-			// if (z==10) {
-			// 	mini = mx + viewport_pos.x; maxi = mx + viewport_size.x;
-			// 	minj = my + viewport_pos.y; maxj = my + viewport_size.y;
-			// } else {
-				mini = 0; maxi = w;
-				minj = 0; maxj = h;
+			area size(0, w, 0, h);
+			// if (z == 10) {
+			// 	size = visible_area;
 			// }
 			
 			// printf("------ recomputing Z %d\n", z);
-			for (int32_t j = minj; j < maxj; j++) {
-				for (int32_t i = mini; i < maxi; i++) {
+			for (int32_t j = size.miny; j < size.maxy; j++) {
+				for (int32_t i = size.minx; i < size.maxx; i++) {
 					// printf("     * i, j %dx%d\n", i, j);
 					if (!checkBounds(z, i, j)) continue;
 					MapObject *mo = at(z, i, j);
@@ -818,15 +823,27 @@ void Map2D::toScreen(mat4 cur_model, vec4 color) {
 		// Render the layer
 		renderers[z]->toScreen(mcur_model, color);
 	}
+	if (render_fbo) {
+		render_fbo->use(false);
+		render_fbo->toScreen(0, 0);
+	}
+
+	// Render grid lines
+	if (show_grid_lines) {
+		if (grid_lines_shader) {
+			int x = 0, y = 0;
+			int buttons = SDL_GetMouseState(&x, &y);
+			useShaderSimple(grid_lines_shader);
+			glUniform2f(grid_lines_shader->p_mapcoord, x / screen_zoom, (screen->h - y) / screen_zoom);
+		}
+		grid_lines_vbo.toScreen(scur_model);
+	}
 
 	// Render the vision overlay	
 	if (show_vision) {
 		updateVision();
 		seens_vbo.toScreen(scur_model);
 	}
-
-	// Render grid lines
-	if (show_grid_lines) grid_lines_vbo.toScreen(scur_model);
 
 	// Update minimaps
 	if (minimap_changed) {

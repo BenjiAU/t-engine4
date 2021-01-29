@@ -279,6 +279,24 @@ vec2 DORPhysic::getLinearVelocity() {
 	return {v.x * PhysicSimulator::unit_scale, -v.y * PhysicSimulator::unit_scale};
 }
 
+void DORPhysic::createJoint(DORPhysic *b2) {
+	b2DistanceJointDef jointDef;
+	jointDef.Initialize(body, b2->body, body->GetWorldCenter(), b2->body->GetWorldCenter());
+	jointDef.length = 0.2;
+	jointDef.frequencyHz = 28;
+	jointDef.dampingRatio = 1;
+	// b2PrismaticJointDef jointDef;
+	// b2Vec2 worldAxis(1.0f, 0.0f);
+	// jointDef.Initialize(body, b2->body, body->GetWorldCenter(), worldAxis);
+	// jointDef.lowerTranslation = -5.0f;
+	// jointDef.upperTranslation = 5.0f;
+	// jointDef.enableLimit = true;
+	// jointDef.maxMotorForce = 0.5f;
+	// jointDef.motorSpeed = 0.0f;
+	// jointDef.enableMotor = true;
+	PhysicSimulator::current->world.CreateJoint(&jointDef);
+}
+
 void DORPhysic::onKeyframe(float nb_keyframes) {
 	if (staticbodies) return;
 	b2Vec2 position = body->GetPosition();
@@ -287,7 +305,7 @@ void DORPhysic::onKeyframe(float nb_keyframes) {
 
 	// printf("%4.2f %4.2f %4.2f\n", position.x * unit_scale, position.y * unit_scale, angle);
 	me->translate(floor(position.x * unit_scale), -floor(position.y * unit_scale), me->z, true);
-	me->rotate(me->rot_x, me->rot_y, angle, true);
+	me->rotate(me->rot_x, me->rot_y, -angle, true);
 }
 
 /*************************************************************

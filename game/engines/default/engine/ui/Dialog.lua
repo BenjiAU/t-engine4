@@ -22,10 +22,11 @@ local KeyBind = require "engine.KeyBind"
 local Base = require "engine.ui.Base"
 local Particles = require "engine.Particles"
 local Scrollbar = require "engine.ui.blocks.Scrollbar"
+local LayoutEngine = require "engine.ui.LayoutEngine"
 
 --- A generic UI Dialog
 -- @classmod engine.ui.Dialog
-module(..., package.seeall, class.inherit(Base))
+module(..., package.seeall, class.inherit(Base, LayoutEngine))
 
 --- Requests a simple waiter dialog
 function _M:simpleWaiter(title, text, width, count, max)
@@ -485,6 +486,7 @@ function _M:generate()
 	self.full_container = core.renderer.container()
 	self.renderer:add(self.full_container)
 	self.renderer:zSort(true)
+
 	if self.allow_scroll then
 		self.do_container = core.renderer.renderer():zSort(true)
 	else
@@ -502,6 +504,13 @@ function _M:generate()
 		self.renderer_outer = self.renderer
 	end
 
+	local Tooltip = require "engine.Tooltip"
+	local FontPackage = require "engine.FontPackage"
+	local font_mono, size_mono = FontPackage:getFont("mono_small", "mono")
+	self.use_tooltip = Tooltip.new(font_mono, size_mono, nil, colors.DARK_GREY, game.w * 0.5)
+	self.use_tooltip_container = core.renderer.container():add(self.use_tooltip:getDO())
+	self.renderer:add(self.use_tooltip_container:shown(false))
+
 	local b7 = self:getAtlasTexture(self.frame.b7)
 	local b9 = self:getAtlasTexture(self.frame.b9)
 	local b1 = self:getAtlasTexture(self.frame.b1)
@@ -511,6 +520,15 @@ function _M:generate()
 	local b2 = self:getAtlasTexture(self.frame.b2)
 	local b6 = self:getAtlasTexture(self.frame.b6)
 	local b5 = self:getAtlasTexture(self.frame.b5)
+	self.b7 = b7
+	self.b9 = b9
+	self.b1 = b1
+	self.b3 = b3
+	self.b8 = b8
+	self.b4 = b4
+	self.b2 = b2
+	self.b6 = b6
+	self.b5 = b5
 
 	local cx, cy = self.frame.ox1, self.frame.oy1
 	self.frame_container = core.renderer.container()
@@ -553,8 +571,8 @@ function _M:generate()
 	self.overs = {}
 	if #(self.frame.overlays or {}) > 0 then
 		local overs_container = core.renderer.container()
-		overs_container:translate(0, 0, 1)
-		self.full_container:add(overs_container)
+		overs_container:translate(0, 0, 100)
+		self.frame_container:add(overs_container)
 
 		for i, o in ipairs(self.frame.overlays) do
 			local ov = self:getAtlasTexture(o.image)
@@ -604,6 +622,8 @@ function _M:generate()
 		Base:changeDefault(self._lastui)
 		self._lastui = nil
 	end
+
+	if self.postGenerate then self:postGenerate() end
 end
 
 function _M:updateTitle(title)
@@ -611,7 +631,7 @@ function _M:updateTitle(title)
 	if type(title)=="function" then title = title() end
 
 	if not self.title_do then
-		self.title_do = core.renderer.text(self.font_bold):scale(1.15, 1.15, 1)
+		self.title_do = core.renderer.text(self.font_bold):smallCaps(true):scale(1.15, 1.15, 1)
 		self.do_container:add(self.title_do)
 	else
 		self.title_do:removeFromParent()
@@ -994,79 +1014,6 @@ function _M:cleanup()
 	end
 end
 
--- DGDGDGDG some stuff to steal still, blood & such
--- function _M:drawFrame(x, y, r, g, b, a)
--- 	x = x + self.frame.ox1
--- 	y = y + self.frame.oy1
-
--- 	-- Sides
--- 	if self.frame.dialog_h_middles then
--- 		local mw = math.floor(self.frame.w / 2)
--- 		local b8hw = math.floor(self.b8.w / 2)
--- 		self.b8l.t:toScreenFull(x + self.b7.w, y, mw - self.b7.w - b8hw, self.b8l.h, self.b8l.tw, self.b8l.th, r, g, b, a)
--- 		self.b8r.t:toScreenFull(x + mw + b8hw, y, mw - self.b9.w - b8hw, self.b8r.h, self.b8r.tw, self.b8r.th, r, g, b, a)
--- 		self.b8.t:toScreenFull(x + mw - b8hw, y, self.b8.w, self.b8.h, self.b8.tw, self.b8.th, r, g, b, a)
-
--- 		local b2hw = math.floor(self.b2.w / 2)
--- 		self.b2l.t:toScreenFull(x + self.b1.w, y + self.frame.h - self.b3.h, mw - self.b1.w - b2hw, self.b2l.h, self.b2l.tw, self.b2l.th, r, g, b, a)
--- 		self.b2r.t:toScreenFull(x + mw + b2hw, y + self.frame.h - self.b3.h, mw - self.b3.w - b2hw, self.b2r.h, self.b2r.tw, self.b2r.th, r, g, b, a)
--- 		self.b2.t:toScreenFull(x + mw - b2hw, y + self.frame.h - self.b3.h, self.b2.w, self.b2.h, self.b2.tw, self.b2.th, r, g, b, a)
--- 	else
--- 		self.b8.t:toScreenFull(x + self.b7.w, y, self.frame.w - self.b7.w - self.b9.w, self.b8.h, self.b8.tw, self.b8.th, r, g, b, a)
--- 		self.b2.t:toScreenFull(x + self.b7.w, y + self.frame.h - self.b3.h, self.frame.w - self.b7.w - self.b9.w, self.b2.h, self.b2.tw, self.b2.th, r, g, b, a)
--- 	end
--- 	self.b4.t:toScreenFull(x, y + self.b7.h, self.b4.w, self.frame.h - self.b7.h - self.b1.h, self.b4.tw, self.b4.th, r, g, b, a)
--- 	self.b6.t:toScreenFull(x + self.frame.w - self.b9.w, y + self.b7.h, self.b6.w, self.frame.h - self.b7.h - self.b1.h, self.b6.tw, self.b6.th, r, g, b, a)
-
--- 	-- Corners
--- 	self.b1.t:toScreenFull(x, y + self.frame.h - self.b1.h, self.b1.w, self.b1.h, self.b1.tw, self.b1.th, r, g, b, a)
--- 	self.b7.t:toScreenFull(x, y, self.b7.w, self.b7.h, self.b7.tw, self.b7.th, r, g, b, a)
--- 	self.b9.t:toScreenFull(x + self.frame.w - self.b9.w, y, self.b9.w, self.b9.h, self.b9.tw, self.b9.th, r, g, b, a)
--- 	self.b3.t:toScreenFull(x + self.frame.w - self.b3.w, y + self.frame.h - self.b3.h, self.b3.w, self.b3.h, self.b3.tw, self.b3.th, r, g, b, a)
-
--- 	-- Body
--- 	self.b5.t:toScreenFull(x + self.b7.w, y + self.b7.h, self.frame.w - self.b7.w - self.b3.w , self.frame.h - self.b7.h - self.b3.h, self.b5.tw, self.b5.th, r, g, b, a)
-
--- 	-- Overlays
--- 	for i = 1, #self.overs do
--- 		local ov = self.overs[i]
--- 		ov.t:toScreenFull(x + ov.x, y + ov.y, ov.w , ov.h, ov.tw, ov.th, r, g, b, a * ov.a)
--- 	end
-
--- 	if self.frame.particles then
--- 		for i, pdef in ipairs(self.frame.particles) do
--- 			if rng.chance(pdef.chance) then
--- 				local p = Particles.new(pdef.name, 1, pdef.args)
--- 				local pos = {x=0, y=0}
--- 				if pdef.position.base == 7 then
--- 					pos.x = pdef.position.ox
--- 					pos.y = pdef.position.oy
--- 				elseif pdef.position.base == 9 then
--- 					pos.x = self.w + pdef.position.ox + self.b9.w
--- 					pos.y = pdef.position.oy
--- 				elseif pdef.position.base == 1 then
--- 					pos.x = pdef.position.ox
--- 					pos.y = self.h + pdef.position.oy + self.b1.h
--- 				elseif pdef.position.base == 3 then
--- 					pos.x = self.w + pdef.position.ox + self.b3.w
--- 					pos.y = self.h + pdef.position.oy + self.b3.h
--- 				end
--- 				self.particles[p] = pos
--- 			end
--- 		end
--- 	end
-
--- 	if next(self.particles) then
--- 		for p, pos in pairs(self.particles) do
--- 			if p.ps:isAlive() then
--- 				p.ps:toScreen(x + pos.x, y + pos.y, true, 1)
--- 			else
--- 				self.particles[p] = nil
--- 			end
--- 		end
--- 	end
--- end
-
 function _M:innerDisplayBack(x, y, nb_keyframes)
 end
 function _M:innerDisplay(x, y, nb_keyframes)
@@ -1096,8 +1043,7 @@ function _M:toScreen(x, y, nb_keyframes)
 
 	local ox, oy = x, y
 
-	-- DGDGDGDG
-	-- self:innerDisplayBack(x, y, nb_keyframes, tx, ty)
+	self:innerDisplayBack(x, y, nb_keyframes, tx, ty)
 
 	-- UI elements
 	for i = 1, #self.uis do
@@ -1105,11 +1051,53 @@ function _M:toScreen(x, y, nb_keyframes)
 		if not ui.hidden then ui.ui:display(x + ui.x, y + ui.y, nb_keyframes, ox + ui.x, oy + ui.y) end
 	end
 
-	-- DGDGDGDG
 	self:innerDisplay(x, y, nb_keyframes)
 
-	-- DGDGDGDG
-	-- if self.first_display then self:firstDisplay() self.first_display = false end
+	if self.first_display then
+		self:registerTooltip()
+		self:firstDisplay()
+		self.first_display = false
+	end
+
+	-- Particles
+	if self.frame.particles then
+		for i, pdef in ipairs(self.frame.particles) do
+			if rng.chance(pdef.chance) then
+				local p = Particles.new(pdef.name, 1, pdef.args)
+				local pos = {x=0, y=0}
+				if pdef.position.base == 7 then
+					pos.x = pdef.position.ox
+					pos.y = pdef.position.oy
+				elseif pdef.position.base == 9 then
+					pos.x = self.w + pdef.position.ox + self.b9.w
+					pos.y = pdef.position.oy
+				elseif pdef.position.base == 1 then
+					pos.x = pdef.position.ox
+					pos.y = self.h + pdef.position.oy + self.b1.h
+				elseif pdef.position.base == 3 then
+					pos.x = self.w + pdef.position.ox + self.b3.w
+					pos.y = self.h + pdef.position.oy + self.b3.h
+				end
+				self.frame_container:add(p:getDO():translate(self.frame.ox1 + pos.x, self.frame.oy1 + pos.y, 100))
+			end
+		end
+	end
 
 	self.renderer_outer:toScreen()
+end
+
+function _M:registerTooltip()
+end
+
+function _M:useTooltip(x, y, h, str)
+	if not x then self.use_tooltip_container:shown(false) return end
+	self.use_tooltip_container:shown(true)
+	if str then
+		self.use_tooltip:set(str)
+		if y + h + 20 + self.use_tooltip.h > game.h then
+			self.use_tooltip:getDO():translate(x, y - self.use_tooltip.h - 20, 50)
+		else
+			self.use_tooltip:getDO():translate(x, y + h + 20, 50)
+		end
+	end
 end

@@ -35,7 +35,7 @@ function _M:init(t)
 	self.default_color = self.color
 	self.w = assert(t.width, "no colorpicker width")
 	self.h = assert(t.height, "no colorpicker height")
-	self.fct = assert(t.fct, "no colorpicker fct")
+	self.fct = t.fct or function() end
 
 	t.require_renderer = true
 	Base.init(self, t)

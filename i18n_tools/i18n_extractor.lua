@@ -380,6 +380,7 @@ for _, section in ipairs(slist) do
 	-- table.sort(list)
 
 	for _, s in ipairs(list) do
+		-- f:write(('t(%q, %q, %q) -- \n'):format(s.text, s.text, s.type))
 		f:write(('tDef(%s, %q, %q) -- \n'):format(s.line, s.text, s.type))
 	end
 	f:write('\n\n')

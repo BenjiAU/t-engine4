@@ -80,3 +80,6 @@ end
 
 function _M:setupMinimap(level)
 end
+
+function _M:updateSeethrough()
+end

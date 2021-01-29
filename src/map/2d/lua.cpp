@@ -35,6 +35,7 @@ extern "C" {
 
 #include "map/2d/Map2D.hpp"
 #include "map/2d/Minimap2D.hpp"
+#include "renderer-moderngl/FBO.hpp"
 #include "renderer-moderngl/renderer-lua.hpp"
 #include "auxiliar.hpp"
 
@@ -343,6 +344,21 @@ static int map_free(lua_State *L) {
 	return 1;
 }
 
+static int map_render_fbo(lua_State *L) {
+	Map2D *map = *(Map2D**)auxiliar_checkclass(L, "core{map2d}", 1);
+
+	if (lua_isnil(L, 2)) {
+		map->setRenderFBO(nullptr, LUA_NOREF, 0);
+	} else {
+		DORTarget *fbo = userdata_to_DO<DORTarget>(L, 2, "gl{target}");
+		int start_z = luaL_checknumber(L, 3);
+
+		lua_pushvalue(L, 2);
+		map->setRenderFBO(fbo, luaL_ref(L, LUA_REGISTRYINDEX), start_z);
+	}
+	return 0;
+}
+
 static int map_show_vision(lua_State *L) {
 	Map2D *map = *(Map2D**)auxiliar_checkclass(L, "core{map2d}", 1);
 	map->enableVision(lua_toboolean(L, 2));
@@ -648,6 +664,7 @@ static const struct luaL_Reg map_reg[] = {
 	{"toScreen", lua_map_toscreen},
 	{"setupGridLines", map_define_grid_lines},
 	{"getMinimapDO", map_get_display_object_mm},
+	{"setRenderFBO", map_render_fbo},
 	INJECT_GENERIC_DO_METHODS
 	{NULL, NULL},
 };

@@ -113,7 +113,7 @@ newTalent{
 	type = {"spell/animus", 3},
 	require = spells_req3,
 	points = 5,
-	mana = 25,
+	mana = 40,
 	cooldown = 18,
 	tactical = { ATTACKAREA = { COLD=1, DARK=1 }, SOUL=2 },
 	radius = 10,
@@ -177,6 +177,7 @@ newTalent{
 		return ret
 	end,
 	deactivate = function(self, t)
+		game:onTickEnd(function() self:updateTalentPassives(t) end)
 		return true
 	end,
 	info = function(self, t)

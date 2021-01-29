@@ -351,8 +351,6 @@ function _M:tick()
 
 	Shader:cleanup()
 
-	if self.cleanSounds then self:cleanSounds() end
-
 	self:onTickEndExecute()
 end
 
@@ -773,13 +771,13 @@ function _M:setGamma(gamma)
 			-- Tell the shader which gamma to use
 			self.full_fbo_shader:setUniform("gamma", gamma)
 			-- Remove SDL gamma correction
-			core.display.setGamma(1)
+			-- core.display.setGamma(1)
 			print("[GAMMA] Setting gamma correction using fullscreen shader", gamma)
 		else
 			print("[GAMMA] Not setting gamma correction yet, no fullscreen shader found", gamma)
 		end
 	else
-		core.display.setGamma(gamma)
+		-- core.display.setGamma(gamma)
 		print("[GAMMA] Setting gamma correction using SDL", gamma)
 	end
 end

@@ -32,7 +32,7 @@ end
 
 local function doclone(g, full)
 	local saveinstead = g.__SAVEINSTEAD
-	if full then g = g:cloneFull()
+	if full or g.force_clone then g = g:cloneFull()
 	else g = g:clone() end
 	g.__SAVEINSTEAD = saveinstead
 	return g

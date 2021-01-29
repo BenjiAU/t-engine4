@@ -27,7 +27,8 @@ local Tab = require "engine.ui.Tab"
 
 module(..., package.seeall, class.inherit(Dialog))
 
-function _M:init(title, equip_actor, filter, action, on_select, inven_actor)
+function _M:init(title, equip_actor, filter, action, on_select, inven_actor, force_equipdoll)
+	self.force_equipdoll = force_equipdoll
 	self.action = action
 	self.filter = filter
 	inven_actor = inven_actor or equip_actor
@@ -58,6 +59,7 @@ function _M:init(title, equip_actor, filter, action, on_select, inven_actor)
 	end
 
 	self.c_doll = EquipDoll.new{
+		equipdoll = self.force_equipdoll or nil,
 		subobject=equip_actor:attr("can_tinker") and "getTinker" or nil,
 		subobject_restrict_slots=equip_actor.tinker_restrict_slots,
 		actor=equip_actor, drag_enable=true, filter=filter,
@@ -90,7 +92,7 @@ function _M:init(title, equip_actor, filter, action, on_select, inven_actor)
 	self.c_inven = Inventory.new{actor=inven_actor, inven=inven_actor:getInven("INVEN") or {}, width=self.iw - vsep.w - self.c_doll.w, height=self.ih - 10, filter=filter,
 		default_last_tabs = "all",
 		fct=function(item, sel, button, event) self:use(item, button, event) end,
-		select=function(item, sel) if self.c_inven and item._pos_y then
+		select=function(item, sel) if self.c_inven and item and item._pos_y then
 			item.last_display_x = self.c_inven.c_inven.last_display_x + self.c_inven.w
 			item.last_display_y = self.c_inven.c_inven.last_display_y + item._pos_y
 			self:select(item)
@@ -202,11 +204,6 @@ function _M:switchSets(which)
 
 	self.c_main_set.selected = not self.equip_actor.off_weapon_slots
 	self.c_off_set.selected = self.equip_actor.off_weapon_slots
-end
-
-function _M:firstDisplay()
-	self.cur_item = nil
-	self.c_inven.c_inven:onSelect(true)
 end
 
 function _M:on_register()

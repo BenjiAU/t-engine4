@@ -210,8 +210,10 @@ void DORTarget::use(bool activate) {
 		useFramebuffer(&fbo);
 		fbo_stack.push(fbo.fbo);
 		if (view) view->use(true);
+		if (ui_mode) BlendingState::push(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
 	} else {
 		fbo_stack.pop();
+		if (ui_mode) BlendingState::pop();
 		tglClearColor(0, 0, 0, 1);
 
 		// If we have a special mode to do stuff, do it now!
@@ -500,7 +502,7 @@ void TargetBlur::renderMode() {
 
 	vbo.resetTexture();
 	glDisable(GL_BLEND);
-	// glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); // DGDGDGDG: probably betetr to use premultipled alpha, work on me!
+	// BlendingState::push(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); // DGDGDGDG: probably betetr to use premultipled alpha, work on me!
 
 	// Draw all passes
 	view.use(true);
@@ -531,7 +533,7 @@ void TargetBlur::renderMode() {
 	}
 	view.use(false);
 
-	// glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	// BlendingState::pop();
 	glEnable(GL_BLEND);
 }	
 
@@ -627,6 +629,5 @@ void TargetBlurDownsampling::renderMode() {
 	// 	vbo.toScreen(model);
 	// }
 
-	// glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 }	

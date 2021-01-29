@@ -18,6 +18,7 @@
 -- darkgod@te4.org
 
 require "engine.class"
+local Shader = require "engine.Shader"
 local UI = require "engine.ui.Base"
 local UISet = require "mod.class.uiset.UISet"
 local Dialog = require "engine.ui.Dialog"
@@ -89,6 +90,18 @@ function _M:checkGameOption(name)
 	return not list[name]
 end
 
+function _M:resizeIconsHotkeysToolbar()
+	for i, c in ipairs(self.minicontainers) do
+		if c.rebuild_on_hotkey_size then
+			local nc = require(c:getClassName()).new(self)
+			self.minicontainers[i] = nc
+			c:getDO():removeFromParent()
+			self.renderer:add(nc:getDO())
+		end
+	end
+	self:placeContainers()
+end
+
 _M.allcontainers = {
 	"mod.class.uiset.minimalist.PlayerFrame",
 	"mod.class.uiset.minimalist.Minimap",
@@ -137,6 +150,11 @@ function _M:saveSettings()
 
 	self:triggerHook{"UISet:Minimalist:saveSettings", lines=lines}
 
+	local exec = {}
+	for i, l in ipairs(lines) do exec[#exec+1] = "config.settings."..l end
+	local f = loadstring(table.concat(exec, "\n"))
+	if f then f() end
+
 	game:saveSettings("tome.uiset_minimalist2", table.concat(lines, "\n"))
 end
 
@@ -178,6 +196,45 @@ function _M:activate()
 	game.logPlayer = function(e, style, ...) if e == game.player or e == game.party then game.log(style, ...) end end
 
 	self:placeContainers()
+
+	self:makeFbos(game.w, game.h)
+end
+
+function _M:updateSeethrough()
+	self:makeFbos(game.w, game.h)
+end
+
+function _M:makeFbos(w, h)
+	if not config.settings.tome.actors_seethrough then
+		self.ui_fbo = nil
+		self.map_hide_fbo = nil
+		engine.Map:setRenderFBO(game.level and game.level.map, nil)
+		return
+	end
+
+	self.ui_fbo_shader = Shader.new("ui_fbo")
+	self.ui_fbo_shader:setUniform("resolution", {w, h})
+	if self.ui_fbo_shader.shad then
+		self.ui_fbo = core.renderer.target(w, h)
+		self.ui_fbo:shader(self.ui_fbo_shader):uiMode(true)
+		self.ui_fbo_shader.shad:paramNumber("unhide_cnt", 0)
+		self.ui_renderer = core.renderer.renderer()
+		self.ui_renderer:add(self.ui_fbo)
+	else
+		self.ui_fbo = nil
+	end
+
+	self.map_hide_fbo_shader = Shader.new("map_hide_fbo")
+	self.map_hide_fbo_shader:setUniform("resolution", {w, h})
+	if self.map_hide_fbo_shader.shad then
+		self.map_hide_fbo = core.renderer.target(w, h)
+		self.map_hide_fbo:shader(self.map_hide_fbo_shader):uiMode(true)
+		self.map_hide_fbo_shader.shad:paramNumber("unhide_cnt", 0)
+		engine.Map:setRenderFBO(game.level and game.level.map, self.map_hide_fbo, 13) -- 13 is the first z layer after actors
+	else
+		self.map_hide_fbo = nil
+		engine.Map:setRenderFBO(game.level and game.level.map, nil)
+	end
 end
 
 function _M:placeContainers()
@@ -192,6 +249,8 @@ end
 
 function _M:handleResolutionChange(w, h, ow, oh)
 	game:resizeMapViewport(w, h, 0, 0)
+
+	self:makeFbos(w, h)
 
 	for _, container in ipairs(self.minicontainers) do container:onResolutionChange(w, h, ow, oh) end
 	return false
@@ -213,9 +272,37 @@ function _M:display(nb_keyframes)
 	Map.viewport_padding_2 = 0
 	self.map_h_stop_tooltip = game.h
 
+	if self.ui_fbo then self.ui_fbo:use(true) end
+
 	for _, container in ipairs(self.minicontainers) do container:update(nb_keyframes) end
 	self.renderer:toScreen()
 	UISet.display(self, nb_keyframes)
+	
+	if self.ui_fbo then
+		self.ui_fbo:use(false)
+		if game.level and game.level.map and game.player then
+			local map = game.level.map
+			local list = {}
+			for i = map.mx, map.mx + map.viewport.mwidth - 1 do
+				for j = map.my, map.my + map.viewport.mheight - 1 do
+					local a = map(i, j, map.ACTOR)
+					if a and map.seens(i, j) and game.player:canSee(a) then
+						local ax, ay = map:getTileToScreen(i, j, true)
+						list[#list+1] = {ax / game.w, ay / game.h}
+						if #list >= 200 then break end
+					end
+				end
+				if #list >= 200 then break end
+			end
+			self.ui_fbo_shader.shad:paramNumber("unhide_cnt", #list)
+			self.map_hide_fbo_shader.shad:paramNumber("unhide_cnt", #list)
+			if #list > 0 then
+				self.ui_fbo_shader.shad:paramNumber2("unhide", list)
+				self.map_hide_fbo_shader.shad:paramNumber2("unhide", list)
+			end
+		end
+		self.ui_renderer:toScreen(0, 0)
+	end
 end
 
 function _M:setupMouse(mouse)

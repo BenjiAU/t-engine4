@@ -32,10 +32,11 @@ function _M:init(t)
 	self.value = t.value or self.min
 	self.step = t.step or 10
 	self.on_change = t.on_change
-	self.fct = t.fct
-	assert(t.size or t.w, "no numberspinner size")
+	self.formatter = t.formatter or function(v) return ("%d"):format(v) end
+	self.fct = t.fct or function() end
+	assert(t.size or t.w or t.width, "no numberspinner size")
 	self.size = t.size
-	self.w = t.w
+	self.w = t.w or t.width
 
 	WithTitle.init(self, t)
 end
@@ -45,140 +46,119 @@ function _M:generate()
 	self.key:reset()
 	self.do_container:clear()
 
-	local left, middle, right
-	left = self:getAtlasTexture("ui/border_hor_left.png")
-	middle = self:getAtlasTexture("ui/border_hor_middle.png")
-	right = self:getAtlasTexture("ui/border_hor_right.png")
-	self.nbox = Numberbox.new{
-		min=self.min,
-		max=self.max,
-		title="",
-		chars = #tostring(self.max) + 1,
-		number = self.value,
-		fct = function(v) self:onChange() if self.fct then self.fct() end end,
-	}
+	local knob_t = self:getAtlasTexture("ui/scrollbar-sel.png")
+	local minus_t = self:getAtlasTexture("ui/minus.png")
+	local plus_t = self:getAtlasTexture("ui/plus.png")
 
-	self.h = math.max(self.nbox.h, middle.h)
+	self.h = self.font:height()
 	self:generateTitle(self.h)
 	self.w = self.w or self.size + self.title_w
 	self.size = self.w - self.title_w
 
-	local left_t, middle_t, right_t
-	left_t = core.renderer.fromTextureTable(left, self.title_w, (self.h - left.h) / 2)
-	middle_t = core.renderer.fromTextureTable(middle, self.title_w + left.w, 0, self.size - left.w - right.w, middle.h, true)
-	right_t = core.renderer.fromTextureTable(right, self.w - right.w, (self.h - right.h) / 2)
-	self.backdrop = core.renderer.container()
-	self.backdrop:add(left_t)
-	self.backdrop:add(middle_t)
-	self.backdrop:add(right_t)
-	-- self.backdrop:translate(0, 0, 0.5)
-	self.do_container:add(self.backdrop)
-	self.left_w = left.w
-	self.right_w = right.w
+	local frame_green = self:makeFrameDO("ui/selector-green", plus_t.w, plus_t.h)
 
-	self.do_container:add(self.nbox.do_container)
-	self.nbox.do_container:translate(0, 0, 1)
+	local frame = self:makeFrameDO("ui/selector", self.size, nil, nil, 0)
+	self.backdrop = frame.container:translate(self.title_w, (self.h - frame.h) / 2)
+	self.do_container:add(self.backdrop)
+
+	local frame_sel = self:makeFrameDO("ui/selector-sel", self.size, nil, nil, 0)
+	self.backdrop_sel = frame_sel.container:translate(self.title_w, (self.h - frame.h) / 2)
+	self.do_container:add(self.backdrop_sel:color(1, 1, 1, 0))
+
+	self.value_text = core.renderer.text(self.font):scale(0.8, 0.8, 1):outline(1):text(self.formatter(self.value)):center()
+	self.do_container:add(self.value_text:translate(self.title_w + self.size / 2, self.h / 2))
+
+	local scale = frame.h / plus_t.h
+	local plus = core.renderer.fromTextureTable(plus_t, 0, -plus_t.h/2):scale(scale, scale, scale)
+	self.do_container:add(frame_green.container:translate(self.w - plus_t.w))
+	self.do_container:add(plus:translate(self.w - plus_t.w, self.h / 2))
+
+	local scale = frame.h / plus_t.h
+	local minus = core.renderer.fromTextureTable(minus_t, 0, -minus_t.h/2):scale(scale, scale, scale)
+	local frame_green = self:makeFrameDO("ui/selector-green", nil, nil, 0, 0)
+	self.do_container:add(frame_green.container:clone():translate(self.title_w))
+	self.do_container:add(minus:translate(self.title_w, self.h / 2))
+	
+	self.start_w = self.title_w + minus_t.w + knob_t.w / 2
+	self.size = self.w - self.title_w - plus_t.w - knob_t.w - minus_t.w
+
+	local scale = frame.h / knob_t.h
+	self.knob = core.renderer.fromTextureTable(knob_t, -knob_t.w/2, -knob_t.h/2):scale(scale, scale, scale)
+	self.do_container:add(self.knob:translate(self.start_w + ((self.value - self.min) / (self.max - self.min)) * self.size, self.h / 2))
 
 	self.key:addBind("ACCEPT", function() self:onChange() if self.fct then self.fct() end end)
 	self.key:addCommands{
-		-- _LEFT = function(sym, ctrl, shift, alt, meta, unicode, key) self.nbox.key:receiveKey(sym, ctrl, shift, alt, meta, unicode, false, key) end,
-		-- _RIGHT = function(sym, ctrl, shift, alt, meta, unicode, key) self.nbox.key:receiveKey(sym, ctrl, shift, alt, meta, unicode, false, key) end,
-		_RIGHT = function() self.nbox:updateText(self.step) self:onChange() end,
-		_LEFT = function() self.nbox:updateText(-self.step) self:onChange() end,
-		_UP = function() self.nbox:updateText(self.step) self:onChange() end,
-		_DOWN = function() self.nbox:updateText(-self.step) self:onChange() end,
-		_PAGEUP = function() self.nbox:updateText(self.step * 5) self:onChange() end,
-		_PAGEDOWN = function() self.nbox:updateText(-self.step * 5) self:onChange() end,
+		_RIGHT = function() self:setValue(self.value + self.step, true) end,
+		_LEFT = function() self:setValue(self.value - self.step, true) end,
+		_UP = function() self:setValue(self.value + self.step, true) end,
+		_DOWN = function() self:setValue(self.value - self.step, true) end,
+		_PAGEUP = function() self:setValue(self.value + self.step * 5, true) end,
+		_PAGEDOWN = function() self:setValue(self.value - self.step * 5, true) end,
 	}
-	self.key.atLast = function(sym, ctrl, shift, alt, meta, unicode, isup, key) self.nbox.key:receiveKey(sym, ctrl, shift, alt, meta, unicode, isup, key) end
 
 	-- precise click
-	local current_button = "none"
 	self.mouse:allowDownEvent(true)
-	self.mouse:registerZone(self.title_w + self.left_w, 0, self.size - self.left_w - self.right_w, self.h, function(button, x, y, xrel, yrel, bx, by, event)
-		if 
-			((event == "button" or event == "button-down") and button == "left") or
-			(event == "motion" and current_button == "left")
-		then
-			x = x - self.title_w - self.left_w
-			local full = self.size - self.left_w - self.right_w
-			local point = util.bound(x, 0, full)
-			local delta = self.max - self.min
-			if full > 0 then
-				local value = point / full * delta
-				value = math.floor((value / self.step) + 0.5) * self.step
-				self.nbox:updateText(value + self.min - self.value)
-				self:onChange()
-			end
+	self.mouse:registerZone(self.start_w, 0, self.size, self.h, function(button, x, y, xrel, yrel, bx, by, event)
+		if button == "left" then
+			x = (x - self.start_w) / self.size
+			self:setValue(math.round(x * (self.max - self.min) + self.min), true)
+		elseif button == "wheeldown" then
+			self:setValue(self.value - self.step, true)
+		elseif button == "wheelup" then
+			self:setValue(self.value + self.step, true)
 		end
-		if event == "button-down" then current_button = button
-		elseif event == "button" then current_button = "none" end
 	end, {button=true, move=true}, "precise")
-	-- the box
-	self.mouse:registerZone(self.title_w + self.left_w, 0, self.size - self.left_w - self.right_w, self.h, function(button, x, y, xrel, yrel, bx, by, event)
-		if event == "button-down" then current_button = button
-		elseif event == "button" then current_button = "none" end
-		if x < self.range[1] or x > self.range[2] then return false end
-		self.nbox.mouse:delegate(button, x, y, xrel, yrel, bx, by, button)
-	end, nil, "box")
-	self.nbox.mouse.delegate_offset_y = (self.h - self.nbox.h) / 2
-	-- wheeeeeeee
-	local wheelTable = {wheelup = 1 * self.step, wheeldown = -1 * self.step}
-	self.mouse:registerZone(self.title_w, 0, self.size, self.h, function(button, x, y, xrel, yrel, bx, by, event)
-		if event == "button-down" then return false end
-		if event ~= "button" or not wheelTable[button] then return false end
-		self.nbox:updateText(wheelTable[button])
-		self:onChange()
-	end, {button=true})
-	-- clicking on arrows
-	local stepTable = {left = self.step, right = 1}
-	self.mouse:registerZone(self.title_w, 0, self.left_w, self.h, function(button, x, y, xrel, yrel, bx, by, event)
-		if event == "button-down" then return false end
-		if event ~= "button" or not stepTable[button] then return false end
-		self.nbox:updateText(-stepTable[button])
-		self:onChange()
-	end, {button=true}, "left")
-	self.mouse:registerZone(self.title_w + self.size - self.right_w, 0, self.right_w, self.h, function(button, x, y, xrel, yrel, bx, by, event)
-		if event == "button-down" then return false end
-		if event ~= "button" or not stepTable[button] then return false end
-		self.nbox:updateText(stepTable[button])
-		self:onChange()
-	end, {button=true}, "right")
+	self.mouse:registerZone(self.title_w, 0, minus_t.w, self.h, function(button, x, y, xrel, yrel, bx, by, event) if button == "left" then
+		self:setValue(self.value - self.step)
+	end end)
+	self.mouse:registerZone(self.w - plus_t.w, 0, plus_t.w, self.h, function(button, x, y, xrel, yrel, bx, by, event) if button == "left" then
+		self:setValue(self.value + self.step)
+	end end)
+
+	-- -- wheeeeeeee
+	-- local wheelTable = {wheelup = 1 * self.step, wheeldown = -1 * self.step}
+	-- self.mouse:registerZone(self.start_w, 0, self.size, self.h, function(button, x, y, xrel, yrel, bx, by, event)
+	-- 	if event == "button-down" then return false end
+	-- 	if event ~= "button" or not wheelTable[button] then return false end
+	-- 	self:onChange()
+	-- end, {button=true})
+
+	-- -- clicking on arrows
+	-- local stepTable = {left = self.step, right = 1}
+	-- self.mouse:registerZone(self.start_w, 0, self.left_w, self.h, function(button, x, y, xrel, yrel, bx, by, event)
+	-- 	if event == "button-down" then return false end
+	-- 	if event ~= "button" or not stepTable[button] then return false end
+	-- 	self:onChange()
+	-- end, {button=true}, "left")
+	-- self.mouse:registerZone(self.start_w + self.size - self.right_w, 0, self.right_w, self.h, function(button, x, y, xrel, yrel, bx, by, event)
+	-- 	if event == "button-down" then return false end
+	-- 	if event ~= "button" or not stepTable[button] then return false end
+	-- 	self:onChange()
+	-- end, {button=true}, "right")
 
 	self:onChange()
 end
 
 function _M:on_focus(v)
 	game:onTickEnd(function() self.key:unicodeInput(v) end)
-	self.nbox:setFocus(v)
+	self.backdrop:tween(4, "a", nil, v and 0 or 1, "linear")
+	self.backdrop_sel:tween(4, "a", nil, v and 1 or 0, "linear")
 	self:onChange()
 end
 
 function _M:onChange()
-	self.value = util.bound(self.nbox.number, self.min, self.max)
+	self.value = util.bound(self.value, self.min, self.max)
 	if self.on_change then self.on_change(self.value) end
-
-	local halfw = self.nbox.w / 2
-	local delta = self.max - self.min
-	local shift = self.value - self.min
-	local prop = delta > 0 and shift / delta or 0.5
-	local xmin, xmax = self.left_w + halfw, self.size - self.right_w - halfw
-	local nbx = xmin + (xmax - xmin) * prop
-	self.range = {self.title_w + nbx - halfw, self.title_w + nbx + halfw}
-	local offsety = (self.h - self.nbox.h) / 2
-
-	self.nbox.mouse.delegate_offset_x = self.range[1]
-	self.nbox.mouse.delegate_offset_y = offsety
-	self.mouse:updateZone("box", self.range[1], offsety, self.range[2] - self.range[1], self.h - 2 * offsety)
-	self.nbox.do_container:translate(self.range[1], offsety)
 end
 
-function _M:setValue(v)
-	self.nbox.number = v
-	self.nbox:updateText(0)
+function _M:setValue(v, smooth)
+	self.value = v
 	self:onChange()
+	local nx = self.start_w + ((self.value - self.min) / (self.max - self.min)) * self.size
+	if smooth then
+		self.knob:tween(7, "x", nil, nx, "outQuad")
+	else
+		self.knob:translate(nx, self.h / 2)
+	end
+	self.value_text:text(self.formatter(self.value)):center()
 end
-
-function _M:display(x, y, nb_keyframes)
-end
-

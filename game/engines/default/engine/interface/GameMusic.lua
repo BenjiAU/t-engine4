@@ -23,69 +23,48 @@ require "engine.class"
 -- @classmod engine.generator.interface.GameMusic
 module(..., package.seeall, class.make)
 
+_M.music_fade_time = 1.2
+
 --- Initializes musics
 function _M:init()
-	self.current_music = nil
-	self.next_music = nil
-	self.loaded_musics = {}
 	self.playing_musics = {}
 end
 
 function _M:loaded()
 	self.playing_musics = self.playing_musics or {}
-	self.loaded_musics = self.loaded_musics or {}
 end
 
 function _M:playMusic(name)
 	if not name then
-		for name, data in pairs(self.playing_musics) do self:playMusic(name) end
+		for _, name in pairs(self.playing_musics) do self:playMusic(name) end
 		return
 	end
-	if self.loaded_musics[name] then return end
-	local ok
-	ok, self.loaded_musics[name] = pcall(core.sound.load, "/data/music/"..name, false)
-	local m = self.loaded_musics[name]
-	print("[MUSIC] loading", name, m)
-	if not ok or not m then self.loaded_musics[name] = nil return end
-
-	print("[MUSIC] playing", name, m)
-	m = m:use() -- Get the source
-	m:loop(true)
-	m:play()
-	m:volume(config.settings.audio.music_volume / 100)
-	self.playing_musics[name] = {source=m}
+	if not name:find("^/") then name = "/data/music/"..name end
+	local m = core.music.play(name, self.music_fade_time)
+	if not m then return end
+	self.playing_musics = core.music.list()
 end
 
-function _M:stopMusic(name)
-	if not name then
-		for name, _ in pairs(self.loaded_musics) do self:stopMusic(name) end
-		return
-	end
-
-	if not self.loaded_musics[name] then return end
-	if self.playing_musics[name].source then self.playing_musics[name].source:stop() end
-	self.loaded_musics[name] = nil
-	self.playing_musics[name] = nil
-	print("[MUSIC] stoping", name)
+function _M:stopMusic()
+	core.music.stopCurrent(self.music_fade_time)
+	self.playing_musics = core.music.list()
+	print("[MUSIC] stoping all")
 end
 
 function _M:playAndStopMusic(...)
-	local keep = table.reverse{...}
-	for name, _ in pairs(self.loaded_musics) do if not keep[name] then self:stopMusic(name) end end
-	for name, _ in pairs(keep) do if not self.loaded_musics[name] then self:playMusic(name) end end
+	local keep = table.map(function(_, v) return "/data/music/"..v, true end, {...})
+	core.music.stopCurrent(self.music_fade_time, keep)
+	for name, status in pairs(keep) do if status ~= "playing" then self:playMusic(name) end end
 end
 
 function _M:volumeMusic(vol)
 	vol = util.bound(vol, 0, 100)
-	print("====",vol)
 	if vol then
 		config.settings.audio = config.settings.audio or {}
 		config.settings.audio.music_volume = vol
 		game:audioSaveSettings()
 	end
-	for name, m in pairs(self.playing_musics) do
-		m.source:volume(vol / 100)
-	end
+	core.music.volume(vol / 100)
 end
 
 function _M:audioSaveSettings()

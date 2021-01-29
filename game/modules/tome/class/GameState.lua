@@ -902,22 +902,21 @@ function _M:playAmbientSounds(level, s, nb_keyframes)
 	for i = 1, #s do
 		local data = s[i]
 
-		if data._sound then if not data._sound:playing() then data._sound = nil end end
-
-		if not data._sound and nb_keyframes > 0 and rng.chance(math.ceil(data.chance / nb_keyframes)) then
+		if nb_keyframes > 0 and rng.chance(math.ceil(data.chance / nb_keyframes)) then
 			local f = rng.table(data.files)
-			data._sound = game:playSound(f)
 			local pos = {x=0,y=0,z=0}
 			if data.random_pos then
 				local a, r = rng.float(0, 2 * math.pi), rng.float(1, data.random_pos.rad or 10)
 				pos.x = math.cos(a) * r
 				pos.y = math.sin(a) * r
 			end
+			local h = game:playSound(f, pos)
+			if data.volume_mod then h:volume(nil, true) end
 --			print("===playing", data.name, f, data._sound)
-			if data._sound then
-				if data.volume_mod then data._sound:volume(data._sound:volume() * data.volume_mod) end
-				if data.pitch then data._sound:pitch(data.pitch) end
-			end
+			-- if data._sound then
+			-- 	if data.volume_mod then data._sound:volume(data._sound:volume() * data.volume_mod) end
+			-- 	if data.pitch then data._sound:pitch(data.pitch) end
+			-- end
 		end
 	end
 end

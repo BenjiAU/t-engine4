@@ -2054,14 +2054,21 @@ function _M:setupCommands()
 			print("===============")
 		end end,
 		[{"_g","ctrl"}] = function() if config.settings.cheat then
-			local f, err = loadfile("/data/general/events/glowing-chest.lua")
-			print(f, err)
-			setfenv(f, setmetatable({level=self.level, zone=self.zone}, {__index=_G}))
-			print(pcall(f))
+			game.level.map:particleEmitter(self.player.x, self.player.y, 1, "tentacle_tree", {tentacle_id=1, force_tf=500})
+do return end
+			-- local g = game.level.map(game.player.x, game.player.y, engine.Map.TERRAIN)
+			-- game.player:addParticles(engine.Particles.new("inferno"))
+			-- g:defineDisplayCallback()
+			-- game.level.map:updateMap(game.player.x, game.player.y)
 do return end
 			game.player:takeHit(100, game.player)
 			game.player:useEnergy()
 			-- DamageType:get(DamageType.ACID).projector(game.player, game.player.x, game.player.y, DamageType.ACID, 100)
+do return end
+			local f, err = loadfile("/data/general/events/glowing-chest.lua")
+			print(f, err)
+			setfenv(f, setmetatable({level=self.level, zone=self.zone}, {__index=_G}))
+			print(pcall(f))
 do return end
 			game.player:setEffect("EFF_STUNNED", 1, {apply_power=200})
 do return end
@@ -2170,6 +2177,7 @@ do return end
 						self.log("There is nowhere left to explore.")
 						self:triggerHook{"Player:autoExplore:nowhere"}
 					else
+						self.player:onRunStart()
 						while self.player:enoughEnergy() and self.player:runStep() do end
 					end
 				end
@@ -2401,9 +2409,7 @@ do return end
 				{ _t"Character Sheet", function() self:unregisterDialog(menu) self.key:triggerVirtual("SHOW_CHARACTER_SHEET") end },
 				"keybinds",
 				"language",
-				{_t"Game Options", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.GameOptions").new()) end},
-				"video",
-				"sound",
+				{_t"Options", function() self:unregisterDialog(menu) self:registerDialog(require("mod.dialogs.GameOptions2").new()) end},
 				"save",
 				"quit",
 				"exit",

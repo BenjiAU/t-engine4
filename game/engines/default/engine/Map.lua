@@ -115,6 +115,14 @@ function _M:setupGridLines(size, r, g, b, a)
 	self.grid_lines = {size, r, g, b, a}
 end
 
+--- Set an FBO to render (some) of the z layers
+-- Static
+function _M:setRenderFBO(cur_map, fbo, start_z)
+	self.__render_fbo = fbo
+	self.__render_fbo_z = start_z
+	if cur_map and cur_map._map then cur_map._map:setRenderFBO(fbo, start_z) end
+end
+
 --- Setup a fbo/shader pair to display map effects
 -- If not set this just uses plain quads
 function _M:enableFBORenderer(shader)
@@ -272,6 +280,16 @@ function _M:setVisionShader(shader)
 	self._map:setVisionShader(shader.shad)
 end
 
+function _M:setGridLinesShader(shader)
+	if not shader then
+		if not _M.default_gridlines_shader then
+			_M.default_gridlines_shader = Shader.new("default/map_gridlines")
+		end
+		shader = _M.default_gridlines_shader
+	end
+	self._map:setGridLinesShader(shader.shad)
+end
+
 function _M:getMapDO()
 	-- Map C object is already a DO, woot
 	return self._map
@@ -295,8 +313,11 @@ function _M:makeCMap()
 	self._map:setShown(unpack(self.color_shown))
 	self._map:setupGridLines(unpack(self.grid_lines))
 
+	if self.__render_fbo then self._map:setRenderFBO(self.__render_fbo, self.__render_fbo_z) end
+
 	self:updateDefaultShader()
 	self:setVisionShader()
+	self:setGridLinesShader()
 
 	self._fovcache =
 	{

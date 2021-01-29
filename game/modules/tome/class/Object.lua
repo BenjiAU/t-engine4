@@ -167,7 +167,7 @@ end
 --	@param who = the object user (optional)
 --	returns boolean, msg
 function _M:canUseObject(who)
-	if self.__transmo then return false end
+	if self.__transmo then return false, _t"Can not use an item in the transmogrification chest." end
 	if not engine.interface.ObjectActivable.canUseObject(self, who) then
 		return false, _t"This object has no usable power."
 	end
@@ -182,7 +182,7 @@ function _M:canUseObject(who)
 		if self.use_no_silence and who:attr("silence") then
 			return false, _t"You are silenced!"
 		end
-		if self:wornInven() and not self.wielded and not self.use_no_wear then
+		if not who.bypass_active_item_worn_check and (self:wornInven() and not self.wielded and not self.use_no_wear) then
 			return false, _t"You must wear this object to use it!"
 		end
 		if who:hasEffect(self.EFF_UNSTOPPABLE) then
@@ -2533,6 +2533,7 @@ end
 function _M:canAttachTinker(tinker, override)
 	if not tinker.is_tinker then return end
 	if tinker.on_type and tinker.on_type ~= rawget(self, "type") then return end
+	if tinker.on_subtype and tinker.on_subtype ~= rawget(self, "subtype") then return end
 	if tinker.on_slot and tinker.on_slot ~= self.slot then return end
 	if self.tinker and not override then return end
 	return true

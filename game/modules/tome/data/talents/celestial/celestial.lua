@@ -40,10 +40,10 @@ newTalentType{ allow_random=true, no_silence=true, is_spell=true, type="celestia
 newTalentType{ no_silence=true, is_spell=true, type="celestial/other", name = _t"other", description = _t"Various celestial talents." }
 
 -- Fallen Class Evolution
-newTalentType{ allow_random=false, no_silence=true, is_spell=true, type="celestial/dirges", name = "Dirges", description = "The songs the Fallen sing." }
-newTalentType{ allow_random=false, no_silence=true, is_spell=true, type="celestial/darkside", name = "Darkside", description = "Signature magics of the Fallen.  The sun shines for the guilty and the innocent alike." }
-newTalentType{ allow_random=false, no_silence=true, is_spell=true, type="celestial/black-sun", name = "Black Sun", description = "Celestial combat techniques inspired by the dark places that are not empty." }
-newTalentType{ allow_random=false, no_silence=true, is_spell=true, generic=true, type="celestial/dirge", name = "Dirges", description = "Sing of death and damnation." }
+newTalentType{ allow_random=false, no_silence=true, is_spell=true, type="celestial/dirges", name = _t"Dirges", description = _t"The songs the Fallen sing." }
+newTalentType{ allow_random=false, no_silence=true, is_spell=true, type="celestial/darkside", name = _t"Darkside", description = _t"Signature magics of the Fallen.  The sun shines for the guilty and the innocent alike." }
+newTalentType{ allow_random=false, no_silence=true, is_spell=true, type="celestial/dark-sun", name = _t"Dark Sun", description = _t"Celestial combat techniques inspired by the dark places that are not empty." }
+newTalentType{ allow_random=false, no_silence=true, is_spell=true, generic=true, type="celestial/dirge", name = _t"Dirges", description = _t"Sing of death and damnation." }
 
 -- Generic requires for celestial spells based on talent level
 divi_req1 = {
@@ -87,7 +87,7 @@ divi_req_high5 = {
 	level = function(level) return 26 + (level-1)  end,
 }
 
--- Used by Fallen Black Sun tree
+-- Used by Fallen Dark Sun tree
 divi_str_req_high1 = {
 	stat = { str=function(level) return 22 + (level-1) * 2 end },
 	level = function(level) return 10 + (level-1)  end,
@@ -128,5 +128,5 @@ load("/data/talents/celestial/circles.lua")
 load("/data/talents/celestial/other.lua")
 
 load("/data/talents/celestial/darkside.lua")
-load("/data/talents/celestial/black-sun.lua")
+load("/data/talents/celestial/dark-sun.lua")
 load("/data/talents/celestial/dirge.lua")

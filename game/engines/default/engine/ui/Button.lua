@@ -33,6 +33,7 @@ function _M:init(t)
 	self.all_buttons_fct = t.all_buttons_fct
 	self.on_select = t.on_select
 	self.force_w = t.width
+	self.hide = t.hide
 	self.use_frame = t.use_frame
 	if t.can_focus ~= nil then self.can_focus = t.can_focus end
 	if t.can_focus_mouse ~= nil then self.can_focus_mouse = t.can_focus_mouse end

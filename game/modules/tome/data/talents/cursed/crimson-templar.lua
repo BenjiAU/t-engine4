@@ -66,6 +66,10 @@ newTalent{
 				state.no_reflect = nil
 				
 				game:delayedLogDamage(src, self, 0, ("%s(%d shared agony)#LAST#"):tformat(DamageType:get(type).text_color or "#aaaaaa#", displace), false)
+
+				local hx, hy = self:attachementSpot("back", true)
+				local ps = Particles.new("blood_trail", 1, {range=core.fov.distance(self.x, self.y, a.x, a.y), dir=math.deg(math.atan2(a.y-self.y, a.x-self.x)+math.pi/2), img="blood_trail_segment_thin", dx=hx, dy=hy, grab=false})
+				self:addParticles(ps)
 			end
 		end
 		
@@ -74,9 +78,9 @@ newTalent{
 	info = function(self, t)
 		local shrug = t.getShrug(self, t)
 		local amp = t.getAmp(self, t)
-		return ([[You displace %d%% of any damage you receive onto a random bleeding enemy within range 5.	This redirected damage is amplified by %d%%.
+		return ([[You displace %d%% of any damage you receive onto a random bleeding enemy within range 5. This redirected damage is amplified by %d%%.
 
-#{italic}#All living things are linked by blood.	It is one river, flowing through all.#{normal}#]]):tformat(shrug, amp)
+#{italic}#All living things are linked by blood. It is one river, flowing through all.#{normal}#]]):tformat(shrug, amp)
 	 end,
 }
 
@@ -103,13 +107,13 @@ newTalent{
 														 DamageType.SOLAR_BLOOD, {dam=self:spellCrit(t.getStrength(self, t)), pow=self:combatSpellpower()},
 														 self:getTalentRadius(t),
 														 5, nil,
-														 MapEffect.new{zdepth=6, overlay_particle={zdepth=6, only_one=true, type="circle", args={appear=8, oversize=0, img="celestial_circle", radius=self:getTalentRadius(t)*2}}, color_br=255, color_bg=187, color_bb=187, alpha=10, effect_shader="shader_images/sunlight_effect.png"},
+														 MapEffect.new{zdepth=6, overlay_particle={zdepth=6, only_one=true, type="circle", args={appear=8, oversize=0, img="sun_sigil_dark", radius=self:getTalentRadius(t)*2}}, color_br=255, color_bg=187, color_bb=187, alpha=10, effect_shader="shader_images/sunlight_effect.png"},
 														 nil, true
 														)
 	end,
 	
 	action = function(self, t)
-		self:takeHit(self.max_life * t.getPrice(self, t) / 100, self, {special_death_msg="sacrificed themself"})
+		self:takeHit(self.max_life * t.getPrice(self, t) / 100, self, {special_death_msg=_t"sacrificed themself"})
 		t.makeSigil(self, t, self.x, self.y)
 		game:playSoundNear(self, "talents/arcane")
 		return true
@@ -124,7 +128,7 @@ newTalent{
 		local burn = t.getStrength(self, t)
 		local cost = t.getPrice(self, t)
 		local dur = t.getDuration(self, t)
-		return ([[When you kill an enemy, their death forms a cursed magical pattern on the ground. This creates a circle of radius %d which blinds enemies and deals them %0.2f light damage, while giving you %d positive energy per turn.	 The circle lasts for %d turns.
+		return ([[When you kill an enemy, their death forms a cursed magical pattern on the ground. This creates a circle of radius %d which blinds enemies and deals them %0.2f light damage, while giving you %d positive energy per turn. The circle lasts for %d turns.
 							The damage will increase with your Spellpower.
 							The duration of the circle can be increased by a critical hit.
 							The blind chance increases with your Spellpower.
@@ -161,12 +165,12 @@ newTalent{
 									 target:setEffect(target.EFF_MARK_OF_THE_VAMPIRE, 20, {src=self, dam=dam, power=t.getBleedIncrease(self, t), apply_power=self:combatSpellpower()})
 													 end)
 		local _ _, _, _, x, y = self:canProject(tg, x, y)
-		game.level.map:particleEmitter(x, y, tg.radius, "circle", {oversize=0.7, g=90, b=100, a=100, limit_life=8, appear=8, speed=2, img="blight_circle", radius=self:getTalentRadius(t)})
+		game.level.map:particleEmitter(x, y, tg.radius, "circle", {oversize=0.7, g=90, b=100, a=100, limit_life=8, appear=8, speed=2, img="vampire_circle", radius=self:getTalentRadius(t)})
 		game:playSoundNear(self, "talents/slime")
 		return true
 	end,
 	info = function(self, t)
-		return ([[Dooms your target and everything within a radius 2 ball around it for 20 turns. Each time an affected target uses a talent, it takes %0.2f physical damage as its life is drawn out.	In addition, any bleed applied to the target will have its power increased by %d%%.
+		return ([[Dooms all enemies within a radius 2 ball for 20 turns. Each time an affected target uses a talent, it takes %0.2f physical damage as its life is drawn out. In addition, any bleed applied to the target will have its power increased by %d%%.
 							The damage will increase with your Spellpower.
 							The chance to apply will increase with your Spellpower.]]):
 		tformat(damDesc(self, DamageType.PHYSICAL, t.getPower(self, t)), t.getBleedIncrease(self, t)*100)
@@ -236,6 +240,9 @@ newTalent{
 										 end
 										 
 										 if bleeding and target:canBe("sleep") then
+											 local hx, hy = self:attachementSpot("back", true)
+											 local ps = Particles.new("blood_trail", 1, {range=core.fov.distance(self.x, self.y, target.x, target.y), dir=math.deg(math.atan2(target.y-self.y, target.x-self.x)+math.pi/2), img="blood_trail_segment_thick", grab=true, dx=hx, dy=hy})
+											 self:addParticles(ps)
 											 target:setEffect(target.EFF_SLEEP, dur+t.getExtension(self, t), {src=self, power = math.ceil(sleepPower * sleepMultiplier * 1.5), contagious=0, waking=is_waking, insomnia=t.getInsomniaPower(self, t), no_ct_effect=true, apply_power=self:combatSpellpower()})
 										 else
 											 game.logSeen(self, "%s resists the sleep!", target.name:capitalize())
@@ -256,9 +263,9 @@ newTalent{
 		local conversion = t.getConversion(self, t)*100
 		local minimum = t.getMinHeal(self, t)
 		local extension = t.getExtension(self, t)
-		return ([[Draw on the wounds of nearby enemies, healing yourself and putting them into a merciful sleep.
+		return ([[Draw on the wounds of enemies within range 10, healing yourself and putting them into a merciful sleep.
 							The sleep chance increases with your Spellpower.
-							You are healed for %d%% of the remaining damage of bleed effects on enemies in range (minimum %d per bleed).	Enemies fall asleep for %d turns longer than their longest-lasting bleed, rendering them unable to act. The strength of the sleep effect is based on the strength of the bleed.	 Excess damage will reduce their sleep duration.
+							You are healed for %d%% of the remaining damage of bleed effects on enemies in range (minimum %d per bleed). Enemies fall asleep for %d turns longer than their longest-lasting bleed, rendering them unable to act. The strength of the sleep effect is based on the strength of the bleed. Excess damage will reduce their sleep duration.
 							
 							When the sleep ends, each target will benefit from Insomnia for a number of turns equal to the amount of time it was asleep (up to ten turns max), granting it 50%% sleep immunity.]]):tformat(conversion, minimum, extension)
 	end,

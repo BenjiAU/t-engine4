@@ -1216,7 +1216,7 @@ newDamageType{
 			dam = dam - init_dam
 			target:setEffect(target.EFF_BURNING, dur, {src=src, power=dam / dur, no_ct_effect=true})
 				if rng.percent(chance) then
-					DamageType:get(DamageType.FLAMESHOCK).projector(src, x, y, DamageType.FLAMESHOCK, {dur=3, dam=15, apply_power=src:combatMindpower()}, state)
+					DamageType:get(DamageType.FLAMESHOCK).projector(src, x, y, DamageType.FLAMESHOCK, {dur=3, dam=15, apply_power=math.max(src:combatMindpower(), src:combatSpellpower())}, state)
 			end
 		end
 		return init_dam
@@ -2612,7 +2612,14 @@ newDamageType{
 		end
 
 		if target and (target:attr("undead") or target:attr("retch_heal")) then
-			target:heal(dam * 1.5, src)
+			local mult = 1
+			if target.turn_procs and target.turn_procs.been_retched then
+				mult = 0.5 ^ target.turn_procs.been_retched
+			end
+			target:heal(dam * 1.5 * mult, src)
+			if target.turn_procs then
+				target.turn_procs.been_retched = (target.turn_procs.been_retched or 0) + 1
+			end
 
 			if src.callTalent then
 				if rng.percent(src:callTalent(src.T_RETCH, "getPurgeChance")) then

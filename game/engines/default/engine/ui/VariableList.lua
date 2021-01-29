@@ -31,7 +31,7 @@ function _M:init(t)
 	self.list = assert(t.list, "no list list")
 	self.w = assert(t.width, "no list width")
 	self.h = t.height
-	self.fct = t.fct
+	self.fct = t.fct or function() end
 	self.on_select = t.select
 	self.on_drag = t.on_drag
 	self.display_prop = t.display_prop or "name"

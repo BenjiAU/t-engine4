@@ -39,7 +39,7 @@ newTalent{
 		self:updateTalentPassives(t)
 	end),
 	passives = function(self, t, p)
-		if type(self.max_life) ~= "number" then return end -- Prevent running on NPCs being spawned
+		if type(self.max_life) ~= "number" or type(self.life) ~= "number" then return end -- Prevent running on NPCs being spawned
 		local bonus = t.getLifeBonus(self, t)
 		self:talentTemporaryValue(p, "die_at", -bonus)
 		self:talentTemporaryValue(p, "max_life", -math.ceil(bonus * t.getLifeLostFactor(self, t)))
@@ -102,7 +102,7 @@ newTalent{
 	mode = "passive",
 	no_npc_use = true, -- They mostly wouldnt use it efficiently
 	getLifeBonus = function(self, t) return self:combatTalentScale(t, 8, 30) end,
-	getCrit = function(self, t) return self:combatTalentScale(t, 1, 3) end,
+	getCrit = function(self, t) return self:combatTalentScale(t, 1, 1.8) end,
 	countRunes = function(self, t)
 		local nb = 0
 		for tid, lvl in pairs(self.talents) do
