@@ -26,6 +26,13 @@ local ffi = require "ffi"
 module(..., package.seeall, class.make)
 
 local error_color = ig.ImVec4(1, 0, 0, 1)
+local path_sel_color = ig.ImVec4(0x55/255, 0xa3/255, 0x47/255, 1)
+local string_color = ig.ImVec4(colors.hex1alphaunpack("e7d559"))
+local number_color = ig.ImVec4(colors.hex1alphaunpack("a37ffe"))
+local tbool_color = ig.ImVec4(colors.hex1alphaunpack("3dad7d"))
+local fbool_color = ig.ImVec4(colors.hex1alphaunpack("ad663d"))
+local table_color = ig.ImVec4(colors.hex1alphaunpack("c791d0"))
+local default_val_color = ig.ImVec4(colors.hex1alphaunpack("ffffff"))
 
 _M.history = {
 	[[<<<<<------------------------------------------------------------------------------------->>>>>]],
@@ -42,6 +49,20 @@ _M.current_command = ""
 
 function _M:init()
 	self.input_buffer = ffi.new("char[10000]", _M.current_command)
+
+	-- self.inspector_list = { {name="<Game>", val=game} }
+	-- self.inspector_pos = 1
+end
+
+function set_val_color(v)
+	local t = type(v)
+	if t == "string" then ig.PushStyleColor(ig.lib.ImGuiCol_Text, string_color)
+	elseif t == "number" then ig.PushStyleColor(ig.lib.ImGuiCol_Text, number_color)
+	elseif t == "boolean" and v == true then ig.PushStyleColor(ig.lib.ImGuiCol_Text, tbool_color)
+	elseif t == "boolean" and v == false then ig.PushStyleColor(ig.lib.ImGuiCol_Text, fbool_color)
+	elseif t == "table" then ig.PushStyleColor(ig.lib.ImGuiCol_Text, table_color)
+	else ig.PushStyleColor(ig.lib.ImGuiCol_Text, default_val_color)
+	end
 end
 
 function _M:display()
@@ -72,6 +93,54 @@ function _M:display()
 	end
 
 	----------------------------------------------------------------------------------
+	-- Inspector
+	----------------------------------------------------------------------------------
+	if not ig.Begin("Inspector") then ig.End()
+	else
+		local cur_pos = self.inspector_pos
+		for i, d in ipairs(self.inspector_list or {}) do
+			if i > 1 then ig.SameLine() end
+			if i == cur_pos then ig.PushStyleColor(ig.lib.ImGuiCol_Button, path_sel_color) end
+			if ig.Button(d.name.."##ipa"..i) then self.inspector_pos = i end
+			if i == cur_pos then ig.PopStyleColor() end
+			ig.SameLine()
+			ig.TextUnformatted("/")
+		end
+		ig.Separator()
+
+		local id = 1
+		ig.BeginChild("Log", nil, nil, ig.lib.ImGuiWindowFlags_HorizontalScrollbar)
+		ig.Columns(2, "data")
+		if self.inspector_list and self.inspector_list[self.inspector_pos] then
+			local d = self.inspector_list[self.inspector_pos]
+			for k, v in table.orderedPairs(d.val) do
+				id = id + 1
+				set_val_color(k)
+				if ig.Selectable(tostring(k).."##insp"..id) and type(k) == "table" then
+					while #self.inspector_list > self.inspector_pos do table.remove(self.inspector_list) end
+					self.inspector_list[#self.inspector_list+1] = { name="K<"..tostring(k)..">", val=k }
+					self.inspector_pos = #self.inspector_list
+				end
+				ig.PopStyleColor()
+				ig.NextColumn()
+				id = id + 1
+				set_val_color(v)
+				if ig.Selectable(tostring(v).."##insp"..id) and type(v) == "table" then
+					while #self.inspector_list > self.inspector_pos do table.remove(self.inspector_list) end
+					self.inspector_list[#self.inspector_list+1] = { name="V<"..tostring(k)..">", val=v }
+					self.inspector_pos = #self.inspector_list
+				end
+				ig.PopStyleColor()
+				ig.NextColumn()
+		ig.Separator()
+			end
+		end
+		ig.Columns(1)
+		ig.EndChild()	
+		ig.End()
+	end
+
+	----------------------------------------------------------------------------------
 	-- Lua Console
 	----------------------------------------------------------------------------------
 	if not ig.Begin("Debug Console", nil, ig.lib.ImGuiWindowFlags_NoNavInputs) then ig.End()
@@ -94,22 +163,27 @@ function _M:display()
 		ig.Separator()
 		ig.PushItemWidth(ig.GetWindowWidth())
 		if ig.InputText("", self.input_buffer, ffi.sizeof(self.input_buffer), ig.lib.ImGuiInputTextFlags_EnterReturnsTrue) then
+			ig.SetKeyboardFocusHere()
 			_M.current_command = ffi.string(self.input_buffer)
 			self:execCommand()
 		else
 			-- _M.current_command = ffi.string(self.input_buffer)
 		end
-		ig.SetItemDefaultFocus()
-		if self.console_hovered then ig.SetKeyboardFocusHere() end
+		-- ig.SetItemDefaultFocus()
+		-- if self.console_hovered then ig.SetKeyboardFocusHere() end
 		ig.PopItemWidth()
 
 		if ig.HotkeyEntered(0, engine.Key._UP) then self:commandHistoryUp() end
 		if ig.HotkeyEntered(0, engine.Key._DOWN) then self:commandHistoryDown() end
 
-
 		if #_M.history ~= self.last_history_size then self.force_scroll = 10 self.last_history_size = #_M.history end
 		ig.End()
 	end
+
+	if ig.HotkeyEntered(0, engine.Key._ESCAPE) then game:showDebugConsole(false) end
+
+	local b = ffi.new("bool[1]", 1)
+	ig.ShowDemoWindow(b)
 end
 
 function _M:remakeBuffer()
@@ -164,6 +238,11 @@ function _M:execCommand()
 				end
 			end
 		end
+		table.remove(res, 1) -- Remove the pcall result flag
+		self.inspector_list = {
+			{name="<Results>", val=(#res == 1 and type(res[1] == "table")) and res[1] or res}
+		}
+		self.inspector_pos = 1
 	end
 	self.last_history_size = nil
 
