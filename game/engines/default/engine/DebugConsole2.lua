@@ -48,6 +48,7 @@ _M.commands = {}
 _M.current_command = ""
 
 function _M:init()
+	self.first_draw = true
 	self.input_buffer = ffi.new("char[10000]", _M.current_command)
 
 	-- self.inspector_list = { {name="<Game>", val=game} }
@@ -169,8 +170,11 @@ function _M:display()
 		else
 			-- _M.current_command = ffi.string(self.input_buffer)
 		end
-		-- ig.SetItemDefaultFocus()
-		-- if self.console_hovered then ig.SetKeyboardFocusHere() end
+		if self.first_draw then
+			ig.SetItemDefaultFocus()
+			ig.SetKeyboardFocusHere()
+			self.first_draw = false
+		end
 		ig.PopItemWidth()
 
 		if ig.HotkeyEntered(0, engine.Key._UP) then self:commandHistoryUp() end
