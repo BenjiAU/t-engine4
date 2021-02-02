@@ -32,30 +32,39 @@ local number_color = ig.ImVec4(colors.hex1alphaunpack("a37ffe"))
 local tbool_color = ig.ImVec4(colors.hex1alphaunpack("3dad7d"))
 local fbool_color = ig.ImVec4(colors.hex1alphaunpack("ad663d"))
 local table_color = ig.ImVec4(colors.hex1alphaunpack("c791d0"))
+local comment_color = ig.ImVec4(colors.hex1alphaunpack("706c4d"))
 local default_val_color = ig.ImVec4(colors.hex1alphaunpack("ffffff"))
 
-_M.history = {
-	[[<<<<<------------------------------------------------------------------------------------->>>>>]],
-	[[<                          Welcome to the T-Engine Lua Console                                >]],
-	[[<--------------------------------------------------------------------------------------------->]],
-	[[< You have access to the T-Engine global namespace.                                           >]],
-	[[< To execute commands, simply type them and hit Enter.                                        >]],
-	[[< To see the return values of a command, start the line off with a "=" character.             >]],
-	[[< For a table, this will not show keys inherited from a metatable (usually class functions).  >]],
-	[[<--------------------------------------------------------------------------------------------->]],
-}
+_M.history = ([[
+<<<<<------------------------------------------------------------------------------------->>>>>
+<                          Welcome to the T-Engine Lua Console                                >
+<--------------------------------------------------------------------------------------------->
+< You have access to the T-Engine global namespace.                                           >
+< To execute commands, simply type them and hit Enter.                                        >
+< To see the return values of a command, start the line off with a "=" character.             >
+< For a table, this will not show keys inherited from a metatable (usually class functions).  >
+<--------------------------------------------------------------------------------------------->
+< Here are some useful keyboard shortcuts:                                                    >
+<     Up/down arrows     :=: Move between previous/later executed lines                       >
+<     Ctrl+Space         :=: Print help for the function to the left of the cursor            >
+<     Ctrl+Shift+Space   :=: Print the entire definition for the function                     >
+<     Tab                :=: Auto-complete path strings or tables at the cursor               >
+<<<<<------------------------------------------------------------------------------------->>>>>
+]]):split("\n")
+
 _M.commands = {}
 _M.current_command = ""
 
 function _M:init()
 	self.first_draw = true
-	self.input_buffer = ffi.new("char[10000]", _M.current_command)
+	self.input_buffer = ffi.new("char[100000]", _M.current_command)
 
+	self.inspector_cur_k = setmetatable({__mode="v"}, {})
 	-- self.inspector_list = { {name="<Game>", val=game} }
 	-- self.inspector_pos = 1
 end
 
-function set_val_color(v)
+local function set_val_color(v)
 	local t = type(v)
 	if t == "string" then ig.PushStyleColor(ig.lib.ImGuiCol_Text, string_color)
 	elseif t == "number" then ig.PushStyleColor(ig.lib.ImGuiCol_Text, number_color)
@@ -65,6 +74,33 @@ function set_val_color(v)
 	else ig.PushStyleColor(ig.lib.ImGuiCol_Text, default_val_color)
 	end
 end
+
+local function updateBuffer(buf, src)
+	for i = 1, #src do
+		local c = string.byte(src:sub(i, i))
+		buf[i-1] = c 
+	end
+	buf[#src] = 0
+end
+
+local console_text_cb = ffi.cast("ImGuiInputTextCallback", function(data, self)
+	if data.EventFlag == ig.lib.ImGuiInputTextFlags_CallbackHistory then
+		if data.EventKey == ig.lib.ImGuiKey_UpArrow then data.BufTextLen = _M:commandHistoryUp(data.Buf) data.CursorPos = data.BufTextLen data.BufDirty = true end
+		if data.EventKey == ig.lib.ImGuiKey_DownArrow then data.BufTextLen = _M:commandHistoryDown(data.Buf) data.CursorPos = data.BufTextLen data.BufDirty = true end
+	elseif data.EventFlag == ig.lib.ImGuiInputTextFlags_CallbackCompletion then
+		local res, pos = _M:autoComplete(ffi.string(data.Buf), data.CursorPos)
+		if res then
+			updateBuffer(data.Buf, res)
+			data.BufTextLen = #res
+			data.CursorPos = #res
+			data.BufDirty = true
+		end
+	elseif data.EventFlag == ig.lib.ImGuiInputTextFlags_CallbackAlways then
+		_M.current_command_typed = ffi.string(data.Buf)
+		_M.current_command_typed_pos = data.CursorPos
+	end
+	return 0
+end)
 
 function _M:display()
 	----------------------------------------------------------------------------------
@@ -114,27 +150,31 @@ function _M:display()
 		ig.Columns(2, "data")
 		if self.inspector_list and self.inspector_list[self.inspector_pos] then
 			local d = self.inspector_list[self.inspector_pos]
-			for k, v in table.orderedPairs(d.val) do
+			if type(d.val) == "table" then for k, v in table.orderedPairs(d.val) do
 				id = id + 1
+
 				set_val_color(k)
-				if ig.Selectable(tostring(k).."##insp"..id) and type(k) == "table" then
+				if ig.Selectable(tostring(k).."##insp"..id, self.inspector_cur_k.cur == k) and type(k) == "table" then
 					while #self.inspector_list > self.inspector_pos do table.remove(self.inspector_list) end
 					self.inspector_list[#self.inspector_list+1] = { name="K<"..tostring(k)..">", val=k }
 					self.inspector_pos = #self.inspector_list
 				end
+				if ig.IsItemHovered() then self.inspector_cur_k.cur = k end
 				ig.PopStyleColor()
 				ig.NextColumn()
 				id = id + 1
 				set_val_color(v)
-				if ig.Selectable(tostring(v).."##insp"..id) and type(v) == "table" then
+				if ig.Selectable(tostring(v).."##insp"..id, self.inspector_cur_k.cur == k) and type(v) == "table" then
 					while #self.inspector_list > self.inspector_pos do table.remove(self.inspector_list) end
 					self.inspector_list[#self.inspector_list+1] = { name="V<"..tostring(k)..">", val=v }
 					self.inspector_pos = #self.inspector_list
 				end
+				if ig.IsItemHovered() then self.inspector_cur_k.cur = k end
 				ig.PopStyleColor()
+
 				ig.NextColumn()
-		ig.Separator()
-			end
+				ig.Separator()
+			end end
 		end
 		ig.Columns(1)
 		ig.EndChild()	
@@ -150,7 +190,13 @@ function _M:display()
 		ig.BeginChild("ConsoleLog", ig.ImVec2(0, -30), nil, ig.lib.ImGuiWindowFlags_NoNav + ig.lib.ImGuiWindowFlags_HorizontalScrollbar + ig.lib.ImGuiWindowFlags_NoFocusOnAppearing)
 		ig.PushTextWrapPos(0)
 		for i, line in ipairs(_M.history) do
-			ig.TextUnformatted(line)
+			if type(line) == "table" then
+				ig.PushStyleColor(ig.lib.ImGuiCol_Text, line[1])
+				ig.TextUnformatted(line[2])
+				ig.PopStyleColor()
+			else
+				ig.TextUnformatted(line)
+			end
 		end
 		ig.PopTextWrapPos()
 		if self.force_scroll then
@@ -163,12 +209,10 @@ function _M:display()
 		-- Command line
 		ig.Separator()
 		ig.PushItemWidth(ig.GetWindowWidth())
-		if ig.InputText("", self.input_buffer, ffi.sizeof(self.input_buffer), ig.lib.ImGuiInputTextFlags_EnterReturnsTrue) then
+		if ig.InputText("", self.input_buffer, ffi.sizeof(self.input_buffer), ig.lib.ImGuiInputTextFlags_EnterReturnsTrue + ig.lib.ImGuiInputTextFlags_CallbackHistory + ig.lib.ImGuiInputTextFlags_CallbackCompletion + ig.lib.ImGuiInputTextFlags_CallbackAlways, console_text_cb) then
 			ig.SetKeyboardFocusHere()
 			_M.current_command = ffi.string(self.input_buffer)
 			self:execCommand()
-		else
-			-- _M.current_command = ffi.string(self.input_buffer)
 		end
 		if self.first_draw then
 			ig.SetItemDefaultFocus()
@@ -177,11 +221,12 @@ function _M:display()
 		end
 		ig.PopItemWidth()
 
-		if ig.HotkeyEntered(0, engine.Key._UP) then self:commandHistoryUp() end
-		if ig.HotkeyEntered(0, engine.Key._DOWN) then self:commandHistoryDown() end
+		self:showHelpTooltip()
 
 		if #_M.history ~= self.last_history_size then self.force_scroll = 10 self.last_history_size = #_M.history end
 		ig.End()
+
+		if ig.HotkeyEntered(2, engine.Key._SPACE) then self:showFunctionHelp(_M.current_command_typed, _M.current_command_typed_pos) end
 	end
 
 	if ig.HotkeyEntered(0, engine.Key._ESCAPE) then game:showDebugConsole(false) end
@@ -190,43 +235,57 @@ function _M:display()
 	ig.ShowDemoWindow(b)
 end
 
-function _M:remakeBuffer()
-	for i = 1, #_M.current_command do
-		local c = string.byte(_M.current_command:sub(i, i))
-		self.input_buffer[i-1] = c 
-	end
-	self.input_buffer[#_M.current_command] = 0
-	print("====>>>", ffi.string(self.input_buffer))
+function _M:showHelpTooltip()
+	local help = self:getFunctionHelp(_M.current_command_typed, _M.current_command_typed_pos + 1)
+	if not help then return end
+
+	local pos = ig.GetCursorScreenPos()
+	local input_size = ig.GetItemRectSize()
+	ig.Begin("##input_help", nil, ig.lib.ImGuiWindowFlags_NoInputs + ig.lib.ImGuiWindowFlags_NoTitleBar + ig.lib.ImGuiWindowFlags_NoMove + ig.lib.ImGuiWindowFlags_NoResize + ig.lib.ImGuiWindowFlags_NoFocusOnAppearing + ig.lib.ImGuiWindowFlags_NoSavedSettings + ig.lib.ImGuiWindowFlags_AlwaysAutoResize)
+	local tooltip = ig.GetCurrentWindowRead()
+	ig.TextUnformatted(help)
+	ig.SetWindowPos(pos - ig.ImVec2(0, ig.GetWindowHeight() + input_size.y + 9), ig.lib.ImGuiCond_Always)
+	ig.End()
+	ig.BringWindowToDisplayFront(tooltip)
 end
 
-function _M:commandHistoryUp()
+function _M:remakeBuffer(buf)
+	buf = buf or self.input_buffer
+	updateBuffer(buf, _M.current_command)
+end
+
+function _M:commandHistoryUp(buf)
+	if not _M.com_sel then return end
 	_M.com_sel = util.bound(_M.com_sel - 1, 0, #_M.commands)
 	if _M.commands[_M.com_sel] then
 		_M.current_command = _M.commands[_M.com_sel]
 	end
-	self:remakeBuffer()
+	self:remakeBuffer(buf)
+	return #_M.current_command
 end
-function _M:commandHistoryDown()
+function _M:commandHistoryDown(buf)
+	if not _M.com_sel then return end
 	_M.com_sel = util.bound(_M.com_sel + 1, 1, #_M.commands)
 	if _M.commands[_M.com_sel] then
 		_M.current_command = _M.commands[_M.com_sel]
 	else
 		_M.current_command = ""
 	end
-	self:remakeBuffer()
+	self:remakeBuffer(buf)
+	return #_M.current_command
 end
 
 function _M:execCommand()
 	if _M.current_command == "" then return end
 	table.insert(_M.commands, _M.current_command)
 	_M.com_sel = #_M.commands + 1
-	table.insert(_M.history, _M.current_command)
+	table.insert(_M.history, {string_color, _M.current_command})
 	table.iprint(_M.commands)
 	-- Handle assignment and simple printing
 	if _M.current_command:match("^=") then _M.current_command = "return ".._M.current_command:sub(2) end
 	local f, err = loadstring(_M.current_command)
 	if err then
-		table.insert(_M.history, err)
+		table.insert(_M.history, {error_color, err})
 	else
 		local res = {pcall(f)}
 		for i, v in ipairs(res) do
@@ -250,9 +309,254 @@ function _M:execCommand()
 	end
 	self.last_history_size = nil
 
-print("-------- EXECUTED", _M.current_command)
 	_M.current_command = ""
 	self:remakeBuffer()
+end
+
+--- Parses a string for autocompletion
+-- @local
+-- @string remaining the string to parse, also used for recursion
+-- @return[1] nil
+-- @return[1] error object
+-- @return[2] nil
+-- @return[2] "%s does not exist."
+-- @return[3] nil
+-- @return[3] "%s is not a valid path"
+-- @return[4] head
+-- @return[4] tail
+local function find_base(remaining)
+	-- Check if we are in a string by counting quotation marks
+	local _, nsinglequote = remaining:gsub("\'", "")
+	local _, ndoublequote = remaining:gsub("\"", "")
+	if (nsinglequote % 2 ~= 0) or (ndoublequote % 2 ~= 0) then
+		-- Only auto-complete paths
+		local path_to_complete
+		if (nsinglequote % 2 ~= 0) and not (ndoublequote % 2 ~= 0) then
+			path_to_complete = remaining:match("[^\']+$")
+		elseif (ndoublequote % 2 ~= 0) and not (nsinglequote % 2 ~= 0) then
+			path_to_complete = remaining:match("[^\"]+$")
+		end
+		if path_to_complete and path_to_complete:sub(1, 1) == "/" then
+			local tail = path_to_complete:match("[^/]+$") or ""
+			local head = path_to_complete:sub(1, #path_to_complete - #tail)
+			if fs.exists(head) then
+				return head, tail
+			else
+				return nil, ([[%s is not a valid path]]):format(head)
+			end
+		else
+			return nil, "Cannot auto-complete strings."
+		end
+	end
+	-- Work from the back of the line to the front
+	local string_to_complete = remaining:match("[%d%w_%[%]%.:\'\"]+$") or ""
+	-- Find the trailing tail
+	local tail = string_to_complete:match("[%d%w_]+$") or ""
+	local linking_char = string_to_complete:sub(#string_to_complete - #tail, #string_to_complete - #tail)
+	-- Only handle numerical keys to auto-complete
+	if linking_char == "[" and not tonumber(tail) then
+		return find_base(tail)
+	end
+	-- Drop the linking character
+	local head = string_to_complete:sub(1, util.bound(#string_to_complete - #tail - 1, 0))
+	if #head > 0 then
+		local f, err = loadstring("return " .. head)
+		if err then
+			return nil, err
+		else
+			local res = {pcall(f)}
+			if res[1] and res[2] then
+				return res[2], tail
+			else
+				return nil, ([[%s does not exist.]]):format(head)
+			end
+		end
+	-- Global namespace if there is no head
+	else
+		return _G, tail
+	end
+end
+
+--- Autocomplete the current line  
+-- Will handle either tables (eg. mod.cla -> mod.class) or paths (eg. "/mod/cla" -> "/mod/class/")
+function _M:autoComplete(line, line_pos)
+	local base, to_complete = find_base(line:sub(1, line_pos))
+	if not base then
+		if to_complete then
+			table.insert(_M.history, ([[<<<<< %s >>>>>]]):format(to_complete))
+			self.changed = true
+		end
+		return
+	end
+	-- Autocomplete a table
+	local set = {}
+	if type(base) == "table" then
+		local recurs_bases
+		recurs_bases = function(base)
+			if type(base) ~= "table" then return end
+			for k, v in pairs(base) do
+				-- Need to handle numbers, too
+				if type(k) == "number" and tonumber(to_complete) then
+					if tostring(k):match("^" .. to_complete) then
+						set[tostring(k)] = true
+					end
+				elseif type(k) == "string" then
+					if k:match("^" .. to_complete) then
+						set[k] = true
+					end
+				end
+			end
+			-- Check the metatable __index
+			local mt = getmetatable(base)
+			if mt and mt.__index and type(mt.__index) == "table" then
+				recurs_bases(mt.__index)
+			end
+		end
+		recurs_bases(base)
+	-- Autocomplete a path
+	elseif type(base) == "string" then
+		-- Make sure the directory exists
+		if fs.exists(base) then
+			for i, fname in ipairs(fs.list(base)) do
+				if fname:sub(1, #to_complete) == to_complete then
+					-- Add a "/" to directories
+					if fs.isdir(base.."/"..fname) then
+						set[fname.."/"] = true
+					else
+						set[fname] = true
+					end
+				end
+			end
+		end
+	else
+		return
+	end
+	-- Convert to a sorted array
+	local array = {}
+	for k, _ in pairs(set) do
+		array[#array+1] = k
+	end
+	table.sort(array, function(a, b) return a < b end)
+	-- If there is one possibility, complete it
+	if #array == 1 then
+		-- Special case for a table...
+		if array[1] == to_complete and type(base[to_complete]) == "table" then
+			line = line:sub(1, line_pos) .. "." .. line:sub(line_pos + 1)
+			line_pos = line_pos + 1
+		elseif array[1] == to_complete and type(base[to_complete]) == "function" then
+			line = line:sub(1, line_pos) .. "(" .. line:sub(line_pos + 1)
+			line_pos = line_pos + 1
+		else
+			line = line:sub(1, line_pos - #to_complete) .. array[1] .. line:sub(line_pos + 1)
+			line_pos = line_pos - #to_complete + #array[1]
+		end
+	elseif #array > 1 then
+		table.insert(_M.history, "<<<<< Auto-complete possibilities: >>>>>")
+		self:historyColumns(array)
+		-- Find the longest common substring and complete it
+		local substring = array[1]:sub(#to_complete+1)
+		for i=2,#array do
+			local min_len = math.min(#array[i]-#to_complete, #substring)
+			for j=1,min_len do
+				if substring:sub(j, j) ~= array[i]:sub(#to_complete+j, #to_complete+j) then
+					substring = substring:sub(1, util.bound(j-1, 0))
+					break
+				end
+			end
+			if #substring == 0 then break end
+		end
+		-- Complete to the longest common substring
+		if #substring > 0 then
+			line = line:sub(1, line_pos) .. substring .. line:sub(line_pos + 1)
+			line_pos = line_pos + #substring
+		end
+	else
+		table.insert(_M.history, "<<<<< No auto-complete possibilities. >>>>>") 
+	end
+	return line, line_pos
+end
+
+
+--- Prints comments for a function
+-- @func func only works on a function obviously
+-- @param[type=boolean] verbose give extra junk
+function _M:functionHelp(func, verbose)
+	if type(func) ~= "function" then return nil, "Can only give help on functions." end
+	local info = debug.getinfo(func, "S")
+	-- Check the path exists
+	local fpath = string.gsub(info.source,"@","")
+	if not fs.exists(fpath) then return nil, ([[%s does not exist.]]):format(fpath) end
+	local f = fs.open(fpath, "r")
+	local lines = {}
+	local line_num = 0
+	local line
+	while true do
+		line = f:readLine()
+		if line then
+			line_num = line_num + 1
+			if line_num == info.linedefined then
+				lines[#lines+1] = line
+				break
+			elseif line:sub(1,2) == "--" then
+				lines[#lines+1] = line
+			else
+				lines = {}
+			end
+		else
+			break
+		end
+	end
+	if verbose then
+		for i=info.linedefined+1,info.lastlinedefined do
+			line = f:readLine()
+			lines[#lines+1] = line
+		end
+	end
+	f:close()
+	return lines, info.short_src, info.linedefined
+end
+
+function _M:showFunctionHelp(line, line_pos)
+	local base, remaining = find_base(line:sub(1, line_pos))
+	local func = base and base[remaining]
+	if not func or type(func) ~= "function" then
+		table.insert(_M.history, {comment_color, "<<<<< No function found >>>>>"})
+		return
+	end
+	local lines, fname, lnum = self:functionHelp(func)
+	if not lines then
+		table.insert(_M.history, {comment_color, ([[<<<<< %s >>>>>]]):format(fname)})
+		return
+	end
+	table.insert(_M.history, {comment_color, ([[<<<<< Help found in %s at line %d. >>>>>]]):format(fname, lnum)})
+	for _, line in ipairs(lines) do
+		table.insert(_M.history, {comment_color, "    " .. line:gsub("\t", "    ")})
+	end
+end
+
+function _M:getFunctionHelp(line, line_pos)
+	if not line then return false end
+
+	-- Find the whole word if we are in the middle of one
+	local i, j, what = line:find("[a-zA-Z0-9_]*", line_pos)
+	if i == line_pos then line_pos = j end
+	
+	local base, remaining = find_base(line:sub(1, line_pos))
+	local func = base and base[remaining]
+	local res = {}
+	if not func or type(func) ~= "function" then
+		return false
+	end
+	local lines, fname, lnum = self:functionHelp(func)
+	if not lines then
+		table.insert(res, ([[<<<<< %s >>>>>]]):format(fname))
+		return table.concat(res, "\n")
+	end
+	table.insert(res, ([[<<<<< Help found in %s at line %d. >>>>>]]):format(fname, lnum))
+	for _, line in ipairs(lines) do
+		table.insert(res, "    " .. line:gsub("\t", "    "))
+	end
+	return table.concat(res, "\n")
 end
 
 --- Add a list of strings to the history with multiple columns
