@@ -48,6 +48,7 @@ _M.history = ([[
 <     Up/down arrows     :=: Move between previous/later executed lines                       >
 <     Ctrl+Space         :=: Print help for the function to the left of the cursor            >
 <     Ctrl+Shift+Space   :=: Print the entire definition for the function                     >
+<     Ctrl+I             :=: Lock the inspector window to the currently displayed table       >
 <     Tab                :=: Auto-complete path strings or tables at the cursor               >
 <<<<<------------------------------------------------------------------------------------->>>>>
 ]]):split("\n")
@@ -59,6 +60,8 @@ function _M:init()
 	self.first_draw = true
 	self.input_buffer = ffi.new("char[100000]", _M.current_command)
 
+
+	self.inspector_locked = ffi.new("bool[1]", false)
 	self.inspector_cur_k = setmetatable({__mode="v"}, {})
 	-- self.inspector_list = { {name="<Game>", val=game} }
 	-- self.inspector_pos = 1
@@ -81,6 +84,13 @@ local function updateBuffer(buf, src)
 		buf[i-1] = c 
 	end
 	buf[#src] = 0
+end
+
+function _M:setInspector(name, val)
+	if self.inspector_locked[0] then return end
+
+	self.inspector_list = { {name=name, val=val} }
+	self.inspector_pos = 1
 end
 
 local console_text_cb = ffi.cast("ImGuiInputTextCallback", function(data, self)
@@ -143,6 +153,8 @@ function _M:display()
 			ig.SameLine()
 			ig.TextUnformatted("/")
 		end
+		ig.SameLine(ig.GetWindowWidth() - 65)
+		ig.Checkbox("Lock", self.inspector_locked)
 		ig.Separator()
 
 		local id = 1
@@ -227,6 +239,7 @@ function _M:display()
 		ig.End()
 
 		if ig.HotkeyEntered(2, engine.Key._SPACE) then self:showFunctionHelp(_M.current_command_typed, _M.current_command_typed_pos) end
+		if ig.HotkeyEntered(2, engine.Key._i) then self.inspector_locked[0] = not self.inspector_locked[0] end
 	end
 
 	if ig.HotkeyEntered(0, engine.Key._ESCAPE) then game:showDebugConsole(false) end
@@ -236,8 +249,9 @@ function _M:display()
 end
 
 function _M:showHelpTooltip()
-	local help = self:getFunctionHelp(_M.current_command_typed, _M.current_command_typed_pos + 1)
-	if not help then return end
+	if not _M.current_command_typed then return end
+	local ok, help = pcall(self.getFunctionHelp, self, _M.current_command_typed, _M.current_command_typed_pos + 1)
+	if not ok or not help then return end
 
 	local pos = ig.GetCursorScreenPos()
 	local input_size = ig.GetItemRectSize()
@@ -282,7 +296,8 @@ function _M:execCommand()
 	table.insert(_M.history, {string_color, _M.current_command})
 	table.iprint(_M.commands)
 	-- Handle assignment and simple printing
-	if _M.current_command:match("^=") then _M.current_command = "return ".._M.current_command:sub(2) end
+	local do_inspect = false
+	if _M.current_command:match("^=") then _M.current_command = "return ".._M.current_command:sub(2) do_inspect = true end
 	local f, err = loadstring(_M.current_command)
 	if err then
 		table.insert(_M.history, {error_color, err})
@@ -301,15 +316,15 @@ function _M:execCommand()
 				end
 			end
 		end
-		table.remove(res, 1) -- Remove the pcall result flag
-		self.inspector_list = {
-			{name="<Results>", val=(#res == 1 and type(res[1] == "table")) and res[1] or res}
-		}
-		self.inspector_pos = 1
+		if do_inspect then
+			table.remove(res, 1) -- Remove the pcall result flag
+			self:setInspector("<Results>", (#res == 1 and type(res[1] == "table")) and res[1] or res)
+		end
 	end
 	self.last_history_size = nil
 
 	_M.current_command = ""
+	self.inspector_autohelp_last_found_table = nil
 	self:remakeBuffer()
 end
 
@@ -518,7 +533,7 @@ end
 
 function _M:showFunctionHelp(line, line_pos)
 	local base, remaining = find_base(line:sub(1, line_pos))
-	local func = base and base[remaining]
+	local func = type(base) == "table" and base[remaining]
 	if not func or type(func) ~= "function" then
 		table.insert(_M.history, {comment_color, "<<<<< No function found >>>>>"})
 		return
@@ -540,23 +555,30 @@ function _M:getFunctionHelp(line, line_pos)
 	-- Find the whole word if we are in the middle of one
 	local i, j, what = line:find("[a-zA-Z0-9_]*", line_pos)
 	if i == line_pos then line_pos = j end
-	
-	local base, remaining = find_base(line:sub(1, line_pos))
-	local func = base and base[remaining]
+
+	line = line:sub(1, line_pos)
+	local base, remaining = find_base(line)
+	local func = type(base) == "table" and base[remaining]
 	local res = {}
-	if not func or type(func) ~= "function" then
+	if not func then return false end
+	if type(func) == "function" then
+		local lines, fname, lnum = self:functionHelp(func)
+		if not lines then
+			if fname and fname:find("=[C]", 1, 1) then return false end
+			table.insert(res, ([[<<<<< %s >>>>>]]):format(fname))
+			return table.concat(res, "\n")
+		end
+		table.insert(res, ([[<<<<< Help found in %s at line %d. >>>>>]]):format(fname, lnum))
+		for _, line in ipairs(lines) do
+			table.insert(res, line:gsub("\t", "   "))
+		end
+		return table.concat(res, "\n")
+	elseif type(func) == "table" and self.inspector_autohelp_last_found_table ~= func then
+		self.inspector_autohelp_last_found_table = func
+		self:setInspector(select(3, line:find("([a-zA-Z0-9_]+)$")) or "???", func)
+
 		return false
 	end
-	local lines, fname, lnum = self:functionHelp(func)
-	if not lines then
-		table.insert(res, ([[<<<<< %s >>>>>]]):format(fname))
-		return table.concat(res, "\n")
-	end
-	table.insert(res, ([[<<<<< Help found in %s at line %d. >>>>>]]):format(fname, lnum))
-	for _, line in ipairs(lines) do
-		table.insert(res, "    " .. line:gsub("\t", "    "))
-	end
-	return table.concat(res, "\n")
 end
 
 --- Add a list of strings to the history with multiple columns
