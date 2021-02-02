@@ -37,7 +37,6 @@ local HotkeysDisplay = require "engine.HotkeysDisplay"
 local ActorsSeenDisplay = require "engine.ActorsSeenDisplay"
 local LogDisplay = require "engine.LogDisplay"
 local LogFlasher = require "engine.LogFlasher"
-local DebugConsole = require "engine.DebugConsole"
 local FlyingText = require "engine.FlyingText"
 local Tooltip = require "engine.Tooltip"
 
@@ -360,7 +359,7 @@ function _M:setupCommands()
 
 		-- Lua console, you probably want to disable it for releases
 		LUA_CONSOLE = function()
-			self:registerDialog(DebugConsole.new())
+			local console = game:showDebugConsole(true)
 		end,
 
 		-- Toggle monster list

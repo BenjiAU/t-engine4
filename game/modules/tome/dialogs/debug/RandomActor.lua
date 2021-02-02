@@ -243,11 +243,7 @@ The #LIGHT_BLUE#Base Filter#LAST# is used to filter the actor randomly generated
 	self.key:addBinds{ EXIT = function()
 			game:unregisterDialog(self) 
 		end,
-		LUA_CONSOLE = function()
-			if config.settings.cheat then
-				game:registerDialog(DebugConsole.new())
-			end
-		end,}
+	}
 	self.key:addCommands{ 
 		_F1 = function() -- Help for filters and data (at upper left)
 			local d = Dialog:simpleLongPopup(_t"Filter and Data Help", 
@@ -303,10 +299,8 @@ _M.newButton = function(t)
 			local act = _M[self._actor_field]
 			if act then
 				game.log("#LIGHT_BLUE#Lua Inspect [%s]%s", act.uid, act.name)
-				local DebugConsole = require"engine.DebugConsole"
-				local d = DebugConsole.new()
-				game:registerDialog(d)
-				d:setLineText("=__uids["..act.uid.."]")
+				local console = game:showDebugConsole(true)
+				console:setCommand("=__uids["..act.uid.."]")
 			else
 				game.log("#LIGHT_BLUE#No actor to Lua inspect")
 			end

@@ -91,10 +91,8 @@ function _M:use(item)
 			game.player:useTalent(d.talent.id)
 		end
 	elseif act == "debug-inspect" then
-		local DebugConsole = require"engine.DebugConsole"
-		local d = DebugConsole.new()
-		game:registerDialog(d)
-		d:setLineText("=__uids["..item.actor.uid.."]")
+		local console = game:showDebugConsole(true)
+		console:setCommand("=__uids["..item.actor.uid.."]")
 	elseif act == "debug-inventory" then
 		local d
 		local actor = item.actor

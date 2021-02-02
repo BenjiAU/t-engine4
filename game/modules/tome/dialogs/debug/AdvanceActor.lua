@@ -248,12 +248,6 @@ The actor is backed up before changes are made.  (Use the "Restore" button to re
 		end,
 		RETURN = function()
 		end,
-		LUA_CONSOLE = function()
-			if config.settings.cheat then
-				local DebugConsole = require "engine.DebugConsole"
-				game:registerDialog(DebugConsole.new())
-			end
-		end,
 	}
 end
 

@@ -308,8 +308,7 @@ function _M:updateKeys()
 		EXIT = function() _M.cs_player_dup = game.player:clone() game:unregisterDialog(self) end,
 		LUA_CONSOLE = function()
 			if config.settings.cheat then
-				local DebugConsole = require "engine.DebugConsole"
-				game:registerDialog(DebugConsole.new())
+				game:showDebugConsole(true)
 			end
 		end,
 		}

@@ -45,13 +45,7 @@ function _M:init()
 			if v.name:sub(1, 1):lower() == c:lower() then list:select(i) return end
 		end
 	end}
-	self.key:addBinds{ EXIT = function() game:unregisterDialog(self) end,
-		LUA_CONSOLE = function()
-			if config.settings.cheat then
-				local DebugConsole = require "engine.DebugConsole"
-				game:registerDialog(DebugConsole.new())
-			end
-		end,}
+	self.key:addBinds{ EXIT = function() game:unregisterDialog(self) end }
 end
 
 function _M:on_register()

@@ -466,11 +466,7 @@ The #LIGHT_BLUE#Base Object#LAST# will be used if possible.]]):tformat()}
 	self.key:addBinds{ EXIT = function()
 			game:unregisterDialog(self) 
 		end,
-		LUA_CONSOLE = function()
-			if config.settings.cheat then
-				game:registerDialog(DebugConsole.new())
-			end
-		end,}
+	}
 	self.key:addCommands{
 		_F1 = function() self:help() end,
 		__TEXTINPUT = function(c)
@@ -539,10 +535,8 @@ _M.newButton = function(t)
 			local obj = _M[self._object_field]
 			if obj then
 				game.log("#LIGHT_BLUE#Lua Inspect [%s] %s", obj.uid, obj.name)
-				local DebugConsole = require"engine.DebugConsole"
-				local d = DebugConsole.new()
-				game:registerDialog(d)
-				d:setLineText("=__uids["..obj.uid.."]")
+				local console = game:showDebugConsole(true)
+				console:setCommand("=__uids["..obj.uid.."]")
 			else
 				game.log("#LIGHT_BLUE#Nothing to Lua inspect")
 			end

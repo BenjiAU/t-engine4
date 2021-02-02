@@ -897,8 +897,11 @@ end
 --- Show a debug console
 function _M:showDebugConsole(v)
 	if v == nil then v = not self._display_console end
-	package.loaded["engine.DebugConsole2"] = nil
-	local DebugConsole2 = require "engine.DebugConsole2"
-	self._debug_console = DebugConsole2.new()
+	if not self._debug_console or true then
+		package.loaded["engine.DebugConsole2"] = nil
+		local DebugConsole2 = require "engine.DebugConsole2"
+		self._debug_console = DebugConsole2.new()
+	end
 	self._display_console = v
+	return self._debug_console
 end

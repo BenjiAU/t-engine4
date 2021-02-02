@@ -149,12 +149,8 @@ function _M:use(item)
 	elseif act == "chat-link" then
 		profile.chat.uc_ext:sendObjectLink(self.object)
 	elseif act == "debug-inspect" then
-		local DebugConsole = require"engine.DebugConsole"
-		local d = DebugConsole.new()
-		game:registerDialog(d)
-		DebugConsole.line = "=__uids["..self.object.uid.."]"
-		DebugConsole.line_pos = #DebugConsole.line
-		d.changed_input = true
+		local console = game:showDebugConsole(true)
+		console:setCommand("=__uids["..self.object.uid.."]")
 	else
 		self:triggerHook{"UseItemMenu:use", actor=self.actor, object=self.object, inven=self.inven, item=self.item, act=act, onuse=self.onuse}
 	end

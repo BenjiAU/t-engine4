@@ -609,12 +609,10 @@ function _M:generate()
 	self.key:addBind("SCREENSHOT", function() if type(game) == "table" and game.key then game.key:triggerVirtual("SCREENSHOT") end end)
 	if config.settings.cheat and self:getClassName() ~= "engine.DebugConsole" then
 		self.key:addBind("LUA_CONSOLE", function()
-			local DebugConsole = require "engine.DebugConsole"
-			local d = DebugConsole.new()
+			local console = game:showDebugConsole(true)
 			if self.__stack_id then
-				d:setLineText("=game.dialogs["..self.__stack_id.."]")
+				console:setCommand("=game.dialogs["..self.__stack_id.."]")
 			end
-			game:registerDialog(d)
 		end)
 	end
 

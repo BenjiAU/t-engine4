@@ -158,12 +158,6 @@ function _M:init()
 	}
 	self.key:addBinds{ EXIT = function() game:unregisterDialog(self) end,
 		ACCEPT = function() self.o_list.key:triggerVirtual("ACCEPT") end,
-		LUA_CONSOLE = function()
-			if config.settings.cheat then
-				local DebugConsole = require "engine.DebugConsole"
-				game:registerDialog(DebugConsole.new())
-			end
-		end,
 	}
 	self:setFocus(self.o_list)
 end

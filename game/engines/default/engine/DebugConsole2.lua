@@ -93,6 +93,10 @@ function _M:setInspector(name, val)
 	self.inspector_pos = 1
 end
 
+function _M:setCommand(line)
+	_M.next_command = line
+end
+
 local console_text_cb = ffi.cast("ImGuiInputTextCallback", function(data, self)
 	if data.EventFlag == ig.lib.ImGuiInputTextFlags_CallbackHistory then
 		if data.EventKey == ig.lib.ImGuiKey_UpArrow then data.BufTextLen = _M:commandHistoryUp(data.Buf) data.CursorPos = data.BufTextLen data.BufDirty = true end
@@ -106,8 +110,18 @@ local console_text_cb = ffi.cast("ImGuiInputTextCallback", function(data, self)
 			data.BufDirty = true
 		end
 	elseif data.EventFlag == ig.lib.ImGuiInputTextFlags_CallbackAlways then
+		if _M.next_command then
+			updateBuffer(data.Buf, _M.next_command)
+			data.BufTextLen = #_M.next_command
+			data.CursorPos = #_M.next_command
+			data.BufDirty = true
+		end
+
 		_M.current_command_typed = ffi.string(data.Buf)
 		_M.current_command_typed_pos = data.CursorPos
+
+		if _M.next_command then _M:showHelpTooltip() end
+		_M.next_command = nil
 	end
 	return 0
 end)

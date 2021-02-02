@@ -47,7 +47,6 @@ local Player = require "mod.class.Player"
 local NPC = require "mod.class.NPC"
 local Entity = require "engine.Entity"
 
-local DebugConsole = require "engine.DebugConsole"
 local FlyingText = require "engine.FlyingText"
 local Tooltip = require "mod.class.Tooltip"
 local BigNews = require "engine.BigNews"
@@ -2366,7 +2365,7 @@ do return end
 		-- Lua console
 		LUA_CONSOLE = function()
 			if config.settings.cheat then
-				self:registerDialog(DebugConsole.new())
+				game:showDebugConsole(true)
 			end
 		end,
 		-- Debug dialog
