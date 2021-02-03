@@ -1738,7 +1738,8 @@ function _M:onTurn()
 	if self.turn % 10 ~= 0 then return end
 
 	-- Day/Night cycle
-	if self.level.data.day_night then self.state:dayNightCycle() end
+	-- No need to do it every turn, we do it every 80 turns which is about one hour, this avoids doing full map redraws
+	if self.level.data.day_night and self.turn % 800 == 0 then self.state:dayNightCycle() end
 
 	if not self.day_of_year or self.day_of_year ~= self.calendar:getDayOfYear(self.turn) then
 		self.log(self.calendar:getTimeDate(self.turn))

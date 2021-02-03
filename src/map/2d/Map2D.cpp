@@ -502,6 +502,7 @@ Map2D::Map2D(int32_t z, int32_t w, int32_t h, int32_t tile_w, int32_t tile_h, in
 		// renderer->countDraws(true);
 		renderers.push_back(renderer);
 		renderers_changed.push_back(true);
+		z_modes.push_back(ZMode::STATIC);
 	}
 
 	setupGridLines();
@@ -618,6 +619,11 @@ void Map2D::setZCallback(int32_t z, int ref) {
 	renderers_changed[z] = true;
 }
 
+void Map2D::setZMode(int32_t z, ZMode mode) {
+	if (!checkBounds(z, 0, 0)) return;
+	z_modes[z] = mode;
+}
+
 void Map2D::scroll(int32_t x, int32_t y, float smooth) {
 	if (smooth) {
 		// Not moving, use starting point
@@ -642,6 +648,12 @@ void Map2D::scroll(int32_t x, int32_t y, float smooth) {
 	my = y;	
 
 	computeScrollAnim(0, true);
+
+	for (int32_t z = 0; z < zdepth; z++) {
+		if (z_modes[z] == ZMode::DYNAMIC) {
+			renderers_changed[z] = true;
+		}
+	}
 }
 
 inline bool Map2D::computeScrollAnim(float nb_keyframes, bool force) {
@@ -782,9 +794,6 @@ void Map2D::toScreen(mat4 cur_model, vec4 color) {
 	mscrollmodel = glm::translate(mscrollmodel, glm::vec3(msx, msy, 0));
 	mat4 mcur_model = cur_model * mscrollmodel;
 
-	// DGDGDGDG Idea: define some layers as static and some as dynamic
-	// static ones are generated for the whole level and we let GPU clip because they dont change often at all
-	// dynamic one are generated for the screen and we do the clipping because they change every frame or close enough
 	// DGDGDGDG Idea: define a max layer size, say 64x64, any map bigger is split into multiple sectors
 
 	for (int32_t z = 0; z < zdepth; z++) {
@@ -795,11 +804,11 @@ void Map2D::toScreen(mat4 cur_model, vec4 color) {
 			renderers[z]->setChanged(true);
 
 			area size(0, w, 0, h);
-			// if (z == 10) {
-			// 	size = visible_area;
-			// }
+			if (z_modes[z] == ZMode::DYNAMIC) {
+				size = visible_area;
+			}
 			
-			// printf("------ recomputing Z %d\n", z);
+			// printf("------ recomputing Z %d [%s]\n", z, z_modes[z] == ZMode::DYNAMIC ? "dynamic" : "static");
 			for (int32_t j = size.miny; j < size.maxy; j++) {
 				for (int32_t i = size.minx; i < size.maxx; i++) {
 					// printf("     * i, j %dx%d\n", i, j);

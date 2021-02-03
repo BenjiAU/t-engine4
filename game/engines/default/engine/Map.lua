@@ -38,6 +38,9 @@ setmetatable(__map_store, {__mode="k"})
 --- The map vertical depth storage
 zdepth = 20
 
+--- Either "static" or "dynamic"; if unset defaults to static
+z_display_modes = {}
+
 --- The place of a terrain entity in a map grid
 TERRAIN = 1
 --- The place of a terrain entity in a map grid
@@ -318,6 +321,8 @@ function _M:makeCMap()
 	self:updateDefaultShader()
 	self:setVisionShader()
 	self:setGridLinesShader()
+
+	for z, mode in pairs(_M.z_display_modes) do self._map:zMode(z, mode) end
 
 	self._fovcache =
 	{

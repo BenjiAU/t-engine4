@@ -389,6 +389,21 @@ static int map_set_z_callback(lua_State *L) {
 	return 0;
 }
 
+static int map_set_z_mode(lua_State *L) {
+	Map2D *map = *(Map2D**)auxiliar_checkclass(L, "core{map2d}", 1);
+	int32_t z = luaL_checknumber(L, 2);
+	if (lua_isstring(L, 3)) {
+		const char *ms = lua_tostring(L, 3);
+		if (!strcmp(ms, "static")) map->setZMode(z, Map2D::ZMode::STATIC);
+		else if (!strcmp(ms, "dynamic")) map->setZMode(z, Map2D::ZMode::DYNAMIC);
+		else {
+			lua_pushstring(L, "Parameter to zMode() must be one of static/dynamic");
+			lua_error(L);
+		}
+	}
+	return 0;
+}
+
 static int map_set_tint(lua_State *L) {
 	Map2D *map = *(Map2D**)auxiliar_checkclass(L, "core{map2d}", 1);
 	map->setTint({lua_tonumber(L, 2), lua_tonumber(L, 3), lua_tonumber(L, 4), lua_tonumber(L, 5)});
@@ -646,6 +661,7 @@ static const struct luaL_Reg map_reg[] = {
 	{"setShown", map_set_shown},
 	{"setObscure", map_set_obscure},
 	{"setGrid", map_set_grid},
+	{"zMode", map_set_z_mode},
 	{"zCallback", map_set_z_callback},
 	{"cleanSeen", map_clean_seen},
 	{"cleanRemember", map_clean_remember},

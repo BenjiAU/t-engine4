@@ -226,6 +226,10 @@ struct MapObjectSort {
 class DORTarget;
 class Map2D : public SubRenderer, public IRealtime, public MapObjectProcessor {
 	friend Minimap2D;
+
+public:
+	enum class ZMode { STATIC, DYNAMIC };
+
 private:
 	// Map data
 	int32_t tile_w, tile_h;
@@ -286,6 +290,8 @@ private:
 	bool minimap_changed = true;
 	unordered_set<Minimap2D*> minimap_dos;
 
+	// Z systems
+	vector<ZMode> z_modes;
 
 public:
 	Map2D(int32_t z, int32_t w, int32_t h, int32_t tile_w, int32_t tile_h, int32_t mwidth, int32_t mheight);
@@ -308,7 +314,8 @@ public:
 
 		map[off] = mo;
 		if (mo) { mo->grid_x = x; mo->grid_y = y; }
-		renderers_changed[z] = true;
+		// renderers_changed[z] = true;
+		printf("z change set %d\n", z);
 		minimap_changed = true;
 		return old;
 	}
@@ -348,6 +355,7 @@ public:
 	}
 
 	/* Z-layers */
+	void setZMode(int32_t z, ZMode mode);
 	void setZCallback(int32_t z, int ref);
 
 	/* Compute visuals */
