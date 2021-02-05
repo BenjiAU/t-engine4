@@ -114,6 +114,15 @@ void MapObject::setDisplayObject(DisplayObject *d, int ref, bool front) {
 	notifyChangedMORs();
 }
 
+void MapObject::setTactical(DisplayObject *front, int front_ref, DisplayObject *back, int back_ref) {
+	refcleaner(&front_ref);
+	tactical_front = front;
+	tactical_front_ref = front_ref;
+	refcleaner(&back_ref);
+	tactical_back = back;
+	tactical_back_ref = back_ref;
+}
+
 void MapObject::addMOR(MapObjectRenderer *mor) {
 	mor_set.insert(mor);
 }
@@ -454,6 +463,7 @@ void MapObjectRenderer::render(RendererGL *container, mat4& cur_model, vec4& cur
 Map2D::Map2D(int32_t z, int32_t w, int32_t h, int32_t tile_w, int32_t tile_h, int32_t mwidth, int32_t mheight)
 	// z+1 to account for z=0 on the lua side
 	: zdepth(z+1), w(w), h(h), tile_w(tile_w), tile_h(tile_h), mwidth(mwidth), mheight(mheight),
+	tactical_front_renderer(VBOMode::STREAM), tactical_back_renderer(VBOMode::STREAM),
 	MapObjectProcessor(tile_w, tile_h, true, true, true), seens_vbo(VBOMode::STATIC), grid_lines_vbo(VBOMode::STATIC)
 {
 	w_off = h;
@@ -599,6 +609,11 @@ void Map2D::setGridLinesShader(shader_type *s, int ref) {
 	glUniform2f(s->p_texsize, screen->w / screen_zoom, screen->h / screen_zoom);
 }
 
+void Map2D::defineTacticalLayers(int32_t back_before, int32_t front_after) {
+	tactical_back_zlayer = back_before;
+	tactical_front_zlayer = front_after;
+}
+
 void Map2D::setZCallback(int32_t z, int ref) {
 	if (!checkBounds(z, 0, 0)) return;
 
@@ -738,6 +753,24 @@ inline void Map2D::computeGrid(MapObject *m, int32_t dz, int32_t i, int32_t j) {
 			}
 		}
 	}
+
+	/********************************************************
+	 ** Register tactical info
+	 ********************************************************/
+	if (m->tactical_front) {
+		if (!m->tactical_front->hasParent(&tactical_front_renderer)) {
+			m->tactical_front->removeFromParent();
+			tactical_front_renderer.add(m->tactical_front);
+		}
+		m->tactical_front->translate(dx + floor(m->move_anim_dx * tile_w), dy + floor(m->move_anim_dy * tile_h), 0, false);
+	}
+	if (m->tactical_back) {
+		if (!m->tactical_back->hasParent(&tactical_back_renderer)) {
+			m->tactical_back->removeFromParent();
+			tactical_back_renderer.add(m->tactical_back);
+		}
+		m->tactical_back->translate(dx + floor(m->move_anim_dx * tile_w), dy + floor(m->move_anim_dy * tile_h), 0, false);
+	}
 }
 
 void Map2D::updateVision() {
@@ -829,8 +862,12 @@ void Map2D::toScreen(mat4 cur_model, vec4 color) {
 			}
 		}
 
+		if (z == tactical_back_zlayer) tactical_back_renderer.toScreen(mcur_model, color);
+
 		// Render the layer
 		renderers[z]->toScreen(mcur_model, color);
+		
+		if (z == tactical_front_zlayer) tactical_front_renderer.toScreen(mcur_model, color);
 	}
 	if (render_fbo) {
 		render_fbo->use(false);

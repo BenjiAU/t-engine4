@@ -998,6 +998,7 @@ function _M:defineDisplayCallback()
 			self._tactical = TacticalOverlayBig.new(self)
 		end
 	end
+	self._mo:tactical(self._tactical.DO_front, self._tactical.DO)
 
 	-- Cunning trick here!
 	-- the callback we give to mo:displayCallback is a function that references self
@@ -1012,8 +1013,6 @@ function _M:defineDisplayCallback()
 	local function particles(x, y, w, h, zoom, on_map)
 		local self = weak[1]
 		if not self or not self._mo then return end
-
-		self._tactical.DO_front:toScreen(x, y)
 
 		local e
 		local dy = 0
@@ -1032,8 +1031,6 @@ function _M:defineDisplayCallback()
 	local function backparticles(x, y, w, h, zoom, on_map)
 		local self = weak[1]
 		if not self then return end
-
-		self._tactical.DO:toScreen(x, y)
 
 		local e
 		local dy = 0

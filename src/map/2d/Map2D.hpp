@@ -162,6 +162,9 @@ protected:
 
 	unordered_set<MapObjectRenderer*> mor_set;
 
+	DisplayObject *tactical_front = nullptr, *tactical_back = nullptr;
+	int tactical_front_ref = LUA_NOREF, tactical_back_ref = LUA_NOREF;
+
 public:
 	MapObject(int64_t uid, uint8_t nb_textures, bool on_seen, bool on_remember, bool on_unknown, vec2 pos, vec2 size, float scale);
 	~MapObject();
@@ -175,6 +178,7 @@ public:
 	bool setTexture(uint8_t slot, GLuint tex, int ref, vec4 coords);
 	bool setTextureTrimmed(uint8_t slot, vec4 info);
 	void setDisplayObject(DisplayObject *d, int ref, bool front);
+	void setTactical(DisplayObject *front, int front_ref, DisplayObject *back, int back_ref);
 	void addParticles(DORParticles *p, int ref);
 	void removeParticles(ParticlesVector::iterator *it);
 	void removeParticles(DORParticles *p);
@@ -286,6 +290,10 @@ private:
 	vector<RendererGL*> renderers;
 	vector<bool> renderers_changed;
 
+	// Tactical interface display
+	RendererGL tactical_front_renderer, tactical_back_renderer;
+	int32_t tactical_front_zlayer = -1, tactical_back_zlayer = -1; // -1 Means it will never display
+
 	// Minimap listing
 	bool minimap_changed = true;
 	unordered_set<Minimap2D*> minimap_dos;
@@ -314,8 +322,7 @@ public:
 
 		map[off] = mo;
 		if (mo) { mo->grid_x = x; mo->grid_y = y; }
-		// renderers_changed[z] = true;
-		printf("z change set %d\n", z);
+		renderers_changed[z] = true;
 		minimap_changed = true;
 		return old;
 	}
@@ -357,6 +364,7 @@ public:
 	/* Z-layers */
 	void setZMode(int32_t z, ZMode mode);
 	void setZCallback(int32_t z, int ref);
+	void defineTacticalLayers(int32_t back_before, int32_t front_after);
 
 	/* Compute visuals */
 	void computeGrid(MapObject *m, int32_t dz, int32_t i, int32_t j);

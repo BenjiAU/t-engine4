@@ -155,6 +155,24 @@ static int map_object_set_do(lua_State *L) {
 	return 0;
 }
 
+static int map_object_set_tactical(lua_State *L) {
+	auto obj = lua_get_sobj_get<MapObject>(L, "core{mapobj2d}", 1);
+	DisplayObject *front = nullptr, *back = nullptr;
+	int front_ref = LUA_NOREF, back_ref = LUA_NOREF;
+	if (!lua_isnil(L, 2)) {
+		front = userdata_to_DO(L, 2);
+		lua_pushvalue(L, 2);
+		front_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	}
+	if (!lua_isnil(L, 3)) {
+		back = userdata_to_DO(L, 3);
+		lua_pushvalue(L, 3);
+		back_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	}
+	obj->setTactical(front, front_ref, back, back_ref);
+	return 0;
+}
+
 static int map_object_shader(lua_State *L) {
 	auto obj = lua_get_sobj_get<MapObject>(L, "core{mapobj2d}", 1);
 	if (!lua_isnil(L, 2)) {
@@ -374,6 +392,14 @@ static int map_smooth_vision(lua_State *L) {
 static int map_define_grid_lines(lua_State *L) {
 	Map2D *map = *(Map2D**)auxiliar_checkclass(L, "core{map2d}", 1);
 	map->enableGridLines(luaL_checknumber(L, 2));
+	return 0;
+}
+
+static int map_define_tactical_layers(lua_State *L) {
+	Map2D *map = *(Map2D**)auxiliar_checkclass(L, "core{map2d}", 1);
+	int32_t before = luaL_checknumber(L, 2);
+	int32_t after = luaL_checknumber(L, 3);
+	map->defineTacticalLayers(before, after);
 	return 0;
 }
 
@@ -662,6 +688,7 @@ static const struct luaL_Reg map_reg[] = {
 	{"setObscure", map_set_obscure},
 	{"setGrid", map_set_grid},
 	{"zMode", map_set_z_mode},
+	{"defineTacticalLayers", map_define_tactical_layers},
 	{"zCallback", map_set_z_callback},
 	{"cleanSeen", map_clean_seen},
 	{"cleanRemember", map_clean_remember},
@@ -690,6 +717,7 @@ static const struct luaL_Reg map_object_reg[] = {
 	{"texture", map_object_texture},
 	{"displayObject", map_object_set_do},
 	{"displayCallback", map_object_cb},
+	{"tactical", map_object_set_tactical},
 	{"chain", map_object_chain},
 	{"tint", map_object_tint},
 	{"shader", map_object_shader},

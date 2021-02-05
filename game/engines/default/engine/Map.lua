@@ -41,6 +41,10 @@ zdepth = 20
 --- Either "static" or "dynamic"; if unset defaults to static
 z_display_modes = {}
 
+--- Which layers are used to render tactical infos
+z_tactical_back_before = 10
+z_tactical_front_after = 12
+
 --- The place of a terrain entity in a map grid
 TERRAIN = 1
 --- The place of a terrain entity in a map grid
@@ -321,6 +325,7 @@ function _M:makeCMap()
 	self:updateDefaultShader()
 	self:setVisionShader()
 	self:setGridLinesShader()
+	self._map:defineTacticalLayers(z_tactical_back_before, z_tactical_front_after)
 
 	for z, mode in pairs(_M.z_display_modes) do self._map:zMode(z, mode) end
 

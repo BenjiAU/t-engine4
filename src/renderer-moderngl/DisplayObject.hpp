@@ -186,6 +186,7 @@ public:
 	void setLuaRef(int ref) {lua_ref = ref; };
 	int unsetLuaRef() { int ref = lua_ref; lua_ref = LUA_NOREF; return ref; };
 	void setParent(DisplayObject *parent);
+	inline bool hasParent(DisplayObject *p) { return p == parent; }
 	void removeFromParent();
 	void setChanged(bool force=false);
 	virtual void setSortingChanged();
