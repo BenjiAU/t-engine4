@@ -232,13 +232,14 @@ class Map2D : public SubRenderer, public IRealtime, public MapObjectProcessor {
 	friend Minimap2D;
 
 public:
-	enum class ZMode { STATIC, DYNAMIC };
+	enum class ZMode { STATIC, STATIC_SORTED, DYNAMIC };
 
 private:
 	// Map data
 	int32_t tile_w, tile_h;
 	int32_t z_off, w_off;
 	int32_t zdepth, w, h;
+	vector<tuple<MapObject*,int32_t,int32_t>> mo_sorting_array;
 	sMapObject *map;
 	float *map_seens;
 	bool *map_remembers;
@@ -324,6 +325,10 @@ public:
 		if (mo) { mo->grid_x = x; mo->grid_y = y; }
 		renderers_changed[z] = true;
 		minimap_changed = true;
+
+		if (old && old->tactical_front) old->tactical_front->removeFromParent();
+		if (old && old->tactical_back) old->tactical_back->removeFromParent();
+
 		return old;
 	}
 	inline void setSeen(int32_t x, int32_t y, float v) { map_seens[x * w_off + y] = v; minimap_changed = true; }

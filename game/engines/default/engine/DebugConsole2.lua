@@ -258,8 +258,8 @@ function _M:display()
 
 	if ig.HotkeyEntered(0, engine.Key._ESCAPE) then game:showDebugConsole(false) end
 
-	local b = ffi.new("bool[1]", 1)
-	ig.ShowDemoWindow(b)
+	-- local b = ffi.new("bool[1]", 1)
+	-- ig.ShowDemoWindow(b)
 end
 
 function _M:showHelpTooltip()

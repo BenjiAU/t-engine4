@@ -482,6 +482,9 @@ Map2D::Map2D(int32_t z, int32_t w, int32_t h, int32_t tile_w, int32_t tile_h, in
 	map_important = new bool[w * h]; std::fill_n(map_important, w * h, false);
 	zobjects = new DORCallbackMapZ*[zdepth]; std::fill_n(zobjects, zdepth, nullptr);
 
+	// Sorter array, used to render static layers
+	mo_sorting_array.reserve(w * h);
+
 	// Init vision data
 	seens_texture_size = powerOfTwoSize(viewport_dimension.x, viewport_dimension.y);
 	glGenTextures(1, &seens_texture);
@@ -836,25 +839,68 @@ void Map2D::toScreen(mat4 cur_model, vec4 color) {
 			renderers[z]->resetDisplayLists();
 			renderers[z]->setChanged(true);
 
+			// printf("------ recomputing Z %d [%s]\n", z, z_modes[z] == ZMode::DYNAMIC ? "dynamic" : "static");
+
 			area size(0, w, 0, h);
+			// Dynamic map layers only render the current viewport in linear order
 			if (z_modes[z] == ZMode::DYNAMIC) {
 				size = visible_area;
-			}
-			
-			// printf("------ recomputing Z %d [%s]\n", z, z_modes[z] == ZMode::DYNAMIC ? "dynamic" : "static");
-			for (int32_t j = size.miny; j < size.maxy; j++) {
-				for (int32_t i = size.minx; i < size.maxx; i++) {
-					// printf("     * i, j %dx%d\n", i, j);
-					if (!checkBounds(z, i, j)) continue;
-					MapObject *mo = at(z, i, j);
-					if (!mo) continue;
+				for (int32_t j = size.miny; j < size.maxy; j++) {
+					for (int32_t i = size.minx; i < size.maxx; i++) {
+						// printf("     * i, j %dx%d\n", i, j);
+						if (!checkBounds(z, i, j)) continue;
+						MapObject *mo = at(z, i, j);
+						if (!mo) continue;
 
-					float seen = isSeen(i, j);
-					if ((mo->isSeen() && seen) || mo->isRemember() || mo->isUnknown()) {
-						computeGrid(mo, z, i, j);
+						float seen = isSeen(i, j);
+						if ((mo->isSeen() && seen) || mo->isRemember() || mo->isUnknown()) {
+							computeGrid(mo, z, i, j);
+						}
+					}
+				}
+			// For static layers we can afford to first sort the tiles by texture/shader to optimize later rendering as they dont change often since we render the whole map
+			// Note, if not using show_vision it is a bad idea!
+			} else if (z_modes[z] == ZMode::STATIC_SORTED) {
+				mo_sorting_array.clear();
+				for (int32_t j = size.miny; j < size.maxy; j++) {
+					for (int32_t i = size.minx; i < size.maxx; i++) {
+						// printf("     * i, j %dx%d\n", i, j);
+						if (!checkBounds(z, i, j)) continue;
+						MapObject *mo = at(z, i, j);
+						if (!mo) continue;
+
+						float seen = isSeen(i, j);
+						if ((mo->isSeen() && seen) || mo->isRemember() || mo->isUnknown()) {
+							mo_sorting_array.emplace_back(mo, i, j);
+						}
+					}
+				}
+
+				// As an optimization we ignore sub-mos to do the sorting
+				sort(mo_sorting_array.begin(), mo_sorting_array.end(), [](tuple<MapObject*,int32_t,int32_t> &a, tuple<MapObject*,int32_t,int32_t> &b) {
+					if (get<0>(a)->shader == get<0>(b)->shader) return get<0>(a) < get<0>(b);
+					else if (get<0>(a)->textures == get<0>(b)->textures) return get<0>(a)->shader < get<0>(b)->shader;
+					else return get<1>(a) < get<1>(b);
+				});			
+				for (auto mo : mo_sorting_array) computeGrid(get<0>(mo), z, get<1>(mo), get<2>(mo));
+			// Static map layers render everything and let the card discard them
+			} else {
+				size = visible_area;
+				for (int32_t j = size.miny; j < size.maxy; j++) {
+					for (int32_t i = size.minx; i < size.maxx; i++) {
+						// printf("     * i, j %dx%d\n", i, j);
+						if (!checkBounds(z, i, j)) continue;
+						MapObject *mo = at(z, i, j);
+						if (!mo) continue;
+
+						float seen = isSeen(i, j);
+						if ((mo->isSeen() && seen) || mo->isRemember() || mo->isUnknown()) {
+							computeGrid(mo, z, i, j);
+						}
 					}
 				}
 			}
+
 			// printf("------ recomputing Z DONE\n");
 
 			if (zobjects[z]) {

@@ -385,6 +385,8 @@ bool RendererGL::activateCutting(mat4 &cur_model, bool v) {
 			}
 		}
 
+		if (c.z < 0) c.z = 0;
+		if (c.w < 0) c.w = 0;
 		glScissor(c.x, c.y, c.z, c.w);
 		cutting_history.push(c);
 		// printf("[CUTTING] %lx : %dx%d => %dx%d\n", this, (int)c.x, (int)c.y, (int)c.z, (int)c.w);

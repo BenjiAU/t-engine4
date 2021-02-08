@@ -421,6 +421,7 @@ static int map_set_z_mode(lua_State *L) {
 	if (lua_isstring(L, 3)) {
 		const char *ms = lua_tostring(L, 3);
 		if (!strcmp(ms, "static")) map->setZMode(z, Map2D::ZMode::STATIC);
+		else if (!strcmp(ms, "static_sorted")) map->setZMode(z, Map2D::ZMode::STATIC_SORTED);
 		else if (!strcmp(ms, "dynamic")) map->setZMode(z, Map2D::ZMode::DYNAMIC);
 		else {
 			lua_pushstring(L, "Parameter to zMode() must be one of static/dynamic");

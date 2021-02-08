@@ -48,6 +48,7 @@ Map.faction_danger2 = "tactical_danger.png"
 Map.faction_danger1 = "tactical_enemy_strong.png"
 Map.faction_danger_check = function(self, e, max) return (not max and e.rank > 3) or (max and e.rank >= 3.5) end
 Map.z_display_modes = { [10] = "dynamic", [11] = "dynamic", [12] = "dynamic", [13] = "dynamic", [14] = "dynamic", [15] = "dynamic", }
+for i = 0, 19 do if not Map.z_display_modes[i] then Map.z_display_modes[i] = "static_sorted" end end
 Level.remove_old_entity_on_duplicate = true
 
 -- Dialog UI
