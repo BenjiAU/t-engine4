@@ -349,7 +349,7 @@ newEntity{ base="WATER_BASE_DEEP", define_as = "SEA_SASH", name = "sea of Sash" 
 newEntity{ base="WATER_BASE_DEEP", define_as = "LAKE", name = "lake" }
 newEntity{ base="WATER_BASE_DEEP", define_as = "LAKE_WESTREACH", name = "Westreach lake" }
 newEntity{ base="WATER_BASE_DEEP", define_as = "LAKE_IRONDEEP", name = "Irondeep lake" }
-newEntity{ base="WATER_BASE_DEEP", define_as = "LAKE_SPELLMURK", name = "Spellmurk lake" }
+newEntity{ base="WATER_BASE_DEEP", define_as = "LAKE_SPELLMURK", name = "Spellmurk lake", image = "terrain/poison_waves_01.png" }
 
 
 --------------------------------------------------------------------------------

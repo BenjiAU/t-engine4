@@ -1614,6 +1614,44 @@ function _M:editTileRoads_def(level, i, j, g, nt)
 	self:editTileGenericRoad(level, i, j, g, defs[nt.def], defs[nt.def].type or "defaultroad")
 end
 
+function _M:editTileWater(level, i, j, g)
+	local kind = "define_as"
+	local type = g.define_as
+	local g5 = level.map:checkEntity(i, j,   Map.TERRAIN, kind) or "none"
+	local g8 = level.map:checkEntity(i, j-1, Map.TERRAIN, kind) or "none"
+	local g2 = level.map:checkEntity(i, j+1, Map.TERRAIN, kind) or "none"
+	local g4 = level.map:checkEntity(i-1, j, Map.TERRAIN, kind) or "none"
+	local g6 = level.map:checkEntity(i+1, j, Map.TERRAIN, kind) or "none"
+	local g7 = level.map:checkEntity(i-1, j-1, Map.TERRAIN, kind) or "none"
+	local g9 = level.map:checkEntity(i+1, j-1, Map.TERRAIN, kind) or "none"
+	local g1 = level.map:checkEntity(i-1, j+1, Map.TERRAIN, kind) or "none"
+	local g3 = level.map:checkEntity(i+1, j+1, Map.TERRAIN, kind) or "none"
+
+	local id = "water:"..table.concat({g.define_as or "--",type,tostring(g1==g5),tostring(g2==g5),tostring(g3==g5),tostring(g4==g5),tostring(g5==g5),tostring(g6==g5),tostring(g7==g5),tostring(g8==g5),tostring(g9==g5)}, ",")
+
+	local water_def = {
+		edge8 = { z=0, copy_base=true, add_mos_shader=g.shader, add_mos = {{shader=g.shader, image=g.image, display_y=-1}} },
+		edge2 = { z=0, copy_base=true, add_mos_shader=g.shader, add_mos = {{shader=g.shader, image=g.image, display_y=1}} },
+		edge4 = { z=0, copy_base=true, add_mos_shader=g.shader, add_mos = {{shader=g.shader, image=g.image, display_x=-1}} },
+		edge6 = { z=0, copy_base=true, add_mos_shader=g.shader, add_mos = {{shader=g.shader, image=g.image, display_x=1}} },
+		edge7 = { z=0, copy_base=true, add_mos_shader=g.shader, add_mos = {{shader=g.shader, image=g.image, display_x=-1, display_y=-1}} },
+		edge9 = { z=0, copy_base=true, add_mos_shader=g.shader, add_mos = {{shader=g.shader, image=g.image, display_x=1, display_y=-1}} },
+		edge1 = { z=0, copy_base=true, add_mos_shader=g.shader, add_mos = {{shader=g.shader, image=g.image, display_x=-1, display_y=1}} },
+		edge3 = { z=0, copy_base=true, add_mos_shader=g.shader, add_mos = {{shader=g.shader, image=g.image, display_x=1, display_y=1}} },
+	}
+
+	if     g5 ~= g8 then self:edit(i, j, id, water_def.edge8) end
+	if     g5 ~= g2 then self:edit(i, j, id, water_def.edge2) end
+	if     g5 ~= g4 then self:edit(i, j, id, water_def.edge4) end
+	if     g5 ~= g6 then self:edit(i, j, id, water_def.edge6) end
+
+	-- Corners make sure that other nearby tiles wont fill them themselves as their normal edges
+	if     g5 ~= g7 and g5 ~= g4 and g5 ~= g8 then self:edit(i, j, id, water_def.edge7) end
+	if     g5 ~= g9 and g5 ~= g6 and g5 ~= g8 then self:edit(i, j, id, water_def.edge9) end
+	if     g5 ~= g1 and g5 ~= g4 and g5 ~= g2 then self:edit(i, j, id, water_def.edge1) end
+	if     g5 ~= g3 and g5 ~= g6 and g5 ~= g2 then self:edit(i, j, id, water_def.edge3) end
+end
+
 
 -- This array is precomputed, it holds the possible combinations of walls and the nice tile they generate
 -- The data is bit-encoded

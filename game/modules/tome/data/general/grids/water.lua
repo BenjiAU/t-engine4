@@ -128,6 +128,7 @@ newEntity{
 	special_minimap = colors.BLUE,
 	z = 0,
 	shader = "water",
+	nice_editer = { method="water" },
 }
 
 -----------------------------------------
